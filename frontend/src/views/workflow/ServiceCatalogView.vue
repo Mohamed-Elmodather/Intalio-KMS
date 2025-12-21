@@ -378,12 +378,23 @@ const getCategoryColor = (categoryName: string) => {
 async function loadServices() {
   try {
     error.value = null
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 600))
-    // TODO: Load categories and services from API
-    categories.value = []
-    services.value = []
-    featuredServices.value = []
+
+    // Load categories and services from API
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001/api'
+
+    const [categoriesRes, servicesRes] = await Promise.all([
+      fetch(`${apiUrl}/services/categories`).then(r => r.json()),
+      fetch(`${apiUrl}/services/catalog`).then(r => r.json())
+    ])
+
+    categories.value = categoriesRes || []
+    services.value = (servicesRes || []).map((s: any) => ({
+      ...s,
+      categoryName: categories.value.find((c: any) => c.id === s.categoryId)?.name || 'General',
+      type: 'Standard',
+      requestCount: 0
+    }))
+    featuredServices.value = services.value.slice(0, 3)
     isLoading.value = false
 
     // Trigger entrance animations
@@ -395,6 +406,7 @@ async function loadServices() {
       isContentVisible.value = true
     }
   } catch (e) {
+    console.error('Failed to load services:', e)
     error.value = e as Error
     isLoading.value = false
   }
