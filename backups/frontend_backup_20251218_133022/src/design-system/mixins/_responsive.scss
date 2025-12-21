@@ -1,0 +1,288 @@
+// ============================================
+// DESIGN SYSTEM: RESPONSIVE MIXINS
+// Media queries and responsive utilities
+// ============================================
+
+@use '../tokens' as *;
+
+// ----------------------------------------
+// MOBILE-FIRST BREAKPOINTS (min-width)
+// Use for progressive enhancement
+// ----------------------------------------
+
+@mixin screen-xs {
+  @media (min-width: $breakpoint-xs) {
+    @content;
+  }
+}
+
+@mixin screen-sm {
+  @media (min-width: $breakpoint-sm) {
+    @content;
+  }
+}
+
+@mixin screen-md {
+  @media (min-width: $breakpoint-md) {
+    @content;
+  }
+}
+
+@mixin screen-lg {
+  @media (min-width: $breakpoint-lg) {
+    @content;
+  }
+}
+
+@mixin screen-xl {
+  @media (min-width: $breakpoint-xl) {
+    @content;
+  }
+}
+
+@mixin screen-2xl {
+  @media (min-width: $breakpoint-2xl) {
+    @content;
+  }
+}
+
+// ----------------------------------------
+// DESKTOP-FIRST BREAKPOINTS (max-width)
+// Use for graceful degradation
+// ----------------------------------------
+
+@mixin until-xs {
+  @media (max-width: #{$breakpoint-xs - 1px}) {
+    @content;
+  }
+}
+
+@mixin until-sm {
+  @media (max-width: #{$breakpoint-sm - 1px}) {
+    @content;
+  }
+}
+
+@mixin until-md {
+  @media (max-width: #{$breakpoint-md - 1px}) {
+    @content;
+  }
+}
+
+@mixin until-lg {
+  @media (max-width: #{$breakpoint-lg - 1px}) {
+    @content;
+  }
+}
+
+@mixin until-xl {
+  @media (max-width: #{$breakpoint-xl - 1px}) {
+    @content;
+  }
+}
+
+@mixin until-2xl {
+  @media (max-width: #{$breakpoint-2xl - 1px}) {
+    @content;
+  }
+}
+
+// ----------------------------------------
+// RANGE QUERIES
+// Between two breakpoints
+// ----------------------------------------
+
+@mixin screen-between($min, $max) {
+  @media (min-width: $min) and (max-width: #{$max - 1px}) {
+    @content;
+  }
+}
+
+@mixin screen-only-sm {
+  @include screen-between($breakpoint-sm, $breakpoint-md) {
+    @content;
+  }
+}
+
+@mixin screen-only-md {
+  @include screen-between($breakpoint-md, $breakpoint-lg) {
+    @content;
+  }
+}
+
+@mixin screen-only-lg {
+  @include screen-between($breakpoint-lg, $breakpoint-xl) {
+    @content;
+  }
+}
+
+// ----------------------------------------
+// SEMANTIC DEVICE QUERIES
+// ----------------------------------------
+
+// Mobile phones (< 768px)
+@mixin mobile {
+  @media (max-width: #{$breakpoint-md - 1px}) {
+    @content;
+  }
+}
+
+// Tablets (768px - 1023px)
+@mixin tablet {
+  @media (min-width: $breakpoint-md) and (max-width: #{$breakpoint-lg - 1px}) {
+    @content;
+  }
+}
+
+// Desktop (>= 1024px)
+@mixin desktop {
+  @media (min-width: $breakpoint-lg) {
+    @content;
+  }
+}
+
+// Large desktop (>= 1280px)
+@mixin large-desktop {
+  @media (min-width: $breakpoint-xl) {
+    @content;
+  }
+}
+
+// Touch devices
+@mixin touch {
+  @media (hover: none) and (pointer: coarse) {
+    @content;
+  }
+}
+
+// Devices with hover capability
+@mixin hover-capable {
+  @media (hover: hover) and (pointer: fine) {
+    @content;
+  }
+}
+
+// ----------------------------------------
+// ORIENTATION
+// ----------------------------------------
+
+@mixin landscape {
+  @media (orientation: landscape) {
+    @content;
+  }
+}
+
+@mixin portrait {
+  @media (orientation: portrait) {
+    @content;
+  }
+}
+
+// ----------------------------------------
+// DISPLAY & ACCESSIBILITY PREFERENCES
+// ----------------------------------------
+
+// Print styles
+@mixin print {
+  @media print {
+    @content;
+  }
+}
+
+// Reduced motion preference
+@mixin reduced-motion {
+  @media (prefers-reduced-motion: reduce) {
+    @content;
+  }
+}
+
+// Dark mode preference
+@mixin prefers-dark {
+  @media (prefers-color-scheme: dark) {
+    @content;
+  }
+}
+
+// Light mode preference
+@mixin prefers-light {
+  @media (prefers-color-scheme: light) {
+    @content;
+  }
+}
+
+// High contrast
+@mixin high-contrast {
+  @media (prefers-contrast: high) {
+    @content;
+  }
+}
+
+// ----------------------------------------
+// RETINA / HIGH DPI
+// ----------------------------------------
+
+@mixin retina {
+  @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    @content;
+  }
+}
+
+@mixin retina-3x {
+  @media (-webkit-min-device-pixel-ratio: 3), (min-resolution: 288dpi) {
+    @content;
+  }
+}
+
+// ----------------------------------------
+// CONTAINER QUERIES (if supported)
+// ----------------------------------------
+
+@mixin container-sm {
+  @container (min-width: $breakpoint-sm) {
+    @content;
+  }
+}
+
+@mixin container-md {
+  @container (min-width: $breakpoint-md) {
+    @content;
+  }
+}
+
+@mixin container-lg {
+  @container (min-width: $breakpoint-lg) {
+    @content;
+  }
+}
+
+// ----------------------------------------
+// RESPONSIVE VISIBILITY
+// ----------------------------------------
+
+@mixin hide-on-mobile {
+  @include mobile {
+    display: none !important;
+  }
+}
+
+@mixin hide-on-desktop {
+  @include desktop {
+    display: none !important;
+  }
+}
+
+@mixin show-on-mobile {
+  display: none !important;
+
+  @include mobile {
+    display: block !important;
+  }
+}
+
+@mixin show-on-desktop {
+  display: none !important;
+
+  @include desktop {
+    display: block !important;
+  }
+}

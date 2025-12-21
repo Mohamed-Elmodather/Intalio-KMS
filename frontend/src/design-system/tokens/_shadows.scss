@@ -1,0 +1,271 @@
+// ============================================
+// DESIGN TOKENS: SHADOWS
+// Single source of truth for elevation system
+// ============================================
+
+@use 'colors' as *;
+
+// ----------------------------------------
+// ELEVATION SCALE
+// Standard shadow progression for depth
+// ----------------------------------------
+
+$shadow-none: none;
+
+// Subtle shadows - For borders and light elevation
+$shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+
+// Small shadows - For cards at rest
+$shadow-sm:
+  0 1px 3px 0 rgba(0, 0, 0, 0.04),
+  0 1px 2px -1px rgba(0, 0, 0, 0.04);
+
+// Medium shadows - For cards on hover, dropdowns
+$shadow-md:
+  0 4px 6px -1px rgba(0, 0, 0, 0.05),
+  0 2px 4px -2px rgba(0, 0, 0, 0.05);
+
+// Large shadows - For modals, popovers
+$shadow-lg:
+  0 10px 15px -3px rgba(0, 0, 0, 0.06),
+  0 4px 6px -4px rgba(0, 0, 0, 0.06);
+
+// Extra large shadows - For dialogs, elevated content
+$shadow-xl:
+  0 20px 25px -5px rgba(0, 0, 0, 0.08),
+  0 8px 10px -6px rgba(0, 0, 0, 0.06);
+
+// 2XL shadows - For maximum elevation
+$shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+
+// ----------------------------------------
+// ELEVATED SHADOWS
+// Premium multi-layer shadows with ambient glow
+// ----------------------------------------
+
+$shadow-elevated-sm:
+  0 2px 8px -2px rgba(0, 0, 0, 0.08),
+  0 1px 2px -1px rgba(0, 0, 0, 0.04);
+
+$shadow-elevated-md:
+  0 4px 16px -4px rgba(0, 0, 0, 0.1),
+  0 2px 4px -2px rgba(0, 0, 0, 0.05);
+
+$shadow-elevated-lg:
+  0 8px 24px -4px rgba(0, 0, 0, 0.12),
+  0 4px 8px -4px rgba(0, 0, 0, 0.06);
+
+$shadow-elevated-xl:
+  0 16px 40px -8px rgba(0, 0, 0, 0.15),
+  0 8px 16px -8px rgba(0, 0, 0, 0.08);
+
+// ----------------------------------------
+// COLORED SHADOWS
+// Brand-accented shadows for interactive elements
+// ----------------------------------------
+
+$shadow-brand-sm: 0 4px 14px -3px rgba($color-brand-primary, 0.25);
+$shadow-brand-md: 0 8px 20px -4px rgba($color-brand-primary, 0.3);
+$shadow-brand-lg: 0 12px 28px -5px rgba($color-brand-primary, 0.35);
+$shadow-brand-glow: 0 0 40px -10px rgba($color-brand-primary, 0.4);
+
+// Status colored shadows
+$shadow-success: 0 4px 14px -3px rgba($color-success, 0.25);
+$shadow-warning: 0 4px 14px -3px rgba($color-warning, 0.25);
+$shadow-error: 0 4px 14px -3px rgba($color-error, 0.25);
+$shadow-info: 0 4px 14px -3px rgba($color-info, 0.25);
+
+// ----------------------------------------
+// INNER SHADOWS
+// For inputs and inset elements
+// ----------------------------------------
+
+$shadow-inner: inset 0 2px 4px 0 rgba(0, 0, 0, 0.04);
+$shadow-inner-lg: inset 0 4px 8px 0 rgba(0, 0, 0, 0.06);
+$shadow-inner-brand: inset 0 2px 4px 0 rgba($color-brand-primary, 0.1);
+
+// ----------------------------------------
+// FOCUS RING SHADOWS
+// Accessibility-focused outline alternatives
+// ----------------------------------------
+
+$shadow-focus-ring: 0 0 0 3px rgba($color-brand-primary, 0.15);
+$shadow-focus-ring-brand: 0 0 0 3px rgba($color-brand-primary, 0.25);
+$shadow-focus-ring-error: 0 0 0 3px rgba($color-error, 0.15);
+$shadow-focus-ring-success: 0 0 0 3px rgba($color-success, 0.15);
+
+// Stronger focus rings (for dark backgrounds)
+$shadow-focus-ring-strong: 0 0 0 3px rgba($color-brand-primary, 0.4);
+
+// ----------------------------------------
+// COMPONENT-SPECIFIC SHADOWS
+// Pre-composed shadows for common components
+// ----------------------------------------
+
+// Cards
+$shadow-card:
+  0 1px 3px rgba(0, 0, 0, 0.04),
+  0 4px 12px rgba(0, 0, 0, 0.04);
+
+$shadow-card-hover:
+  0 4px 12px rgba(0, 0, 0, 0.06),
+  0 12px 24px rgba(0, 0, 0, 0.08);
+
+$shadow-card-active:
+  0 2px 8px rgba(0, 0, 0, 0.08),
+  0 8px 16px rgba(0, 0, 0, 0.1);
+
+// Buttons
+$shadow-button:
+  0 1px 2px rgba(0, 0, 0, 0.05);
+
+$shadow-button-hover:
+  0 4px 8px rgba(0, 0, 0, 0.1);
+
+$shadow-button-brand:
+  0 4px 14px -3px rgba($color-brand-primary, 0.35);
+
+$shadow-button-brand-hover:
+  0 6px 20px -3px rgba($color-brand-primary, 0.45);
+
+// Dropdowns & Menus
+$shadow-dropdown:
+  0 4px 6px -1px rgba(0, 0, 0, 0.1),
+  0 2px 4px -2px rgba(0, 0, 0, 0.1),
+  0 0 0 1px rgba(0, 0, 0, 0.05);
+
+// Modals
+$shadow-modal:
+  0 20px 25px -5px rgba(0, 0, 0, 0.1),
+  0 8px 10px -6px rgba(0, 0, 0, 0.1);
+
+// Toast notifications
+$shadow-toast:
+  0 10px 15px -3px rgba(0, 0, 0, 0.1),
+  0 4px 6px -4px rgba(0, 0, 0, 0.1);
+
+// ----------------------------------------
+// SHADOW MAP (for programmatic access)
+// ----------------------------------------
+
+$shadows: (
+  'none': $shadow-none,
+  'xs': $shadow-xs,
+  'sm': $shadow-sm,
+  'md': $shadow-md,
+  'lg': $shadow-lg,
+  'xl': $shadow-xl,
+  '2xl': $shadow-2xl,
+  'inner': $shadow-inner,
+  'card': $shadow-card,
+  'card-hover': $shadow-card-hover,
+  'dropdown': $shadow-dropdown,
+  'modal': $shadow-modal,
+);
+
+// ----------------------------------------
+// ENHANCED SHADOW SYSTEM
+// Premium multi-layer shadows for modern UI
+// ----------------------------------------
+
+// Hero shadows - For featured content
+$shadow-hero:
+  0 2px 4px rgba(0, 0, 0, 0.02),
+  0 4px 8px rgba(0, 0, 0, 0.03),
+  0 8px 16px rgba(0, 0, 0, 0.04),
+  0 16px 32px rgba(0, 0, 0, 0.06);
+
+// Glass shadows - With ambient glow
+$shadow-glass:
+  0 4px 30px rgba(0, 0, 0, 0.08),
+  0 0 40px -15px rgba($color-brand-primary, 0.15);
+
+// FAB (Floating Action Button) shadows
+$shadow-fab:
+  0 4px 8px rgba(0, 0, 0, 0.1),
+  0 8px 16px rgba(0, 0, 0, 0.08),
+  0 0 30px -5px rgba($color-brand-primary, 0.25);
+
+$shadow-fab-hover:
+  0 6px 12px rgba(0, 0, 0, 0.12),
+  0 12px 24px rgba(0, 0, 0, 0.1),
+  0 0 40px -5px rgba($color-brand-primary, 0.35);
+
+// Ambient brand shadows
+$shadow-ambient-brand:
+  0 10px 40px -10px rgba($color-brand-primary, 0.3);
+
+$shadow-ambient-brand-strong:
+  0 15px 50px -10px rgba($color-brand-primary, 0.4);
+
+// Long drop shadows - For dramatic depth
+$shadow-long-drop:
+  0 50px 100px -20px rgba(0, 0, 0, 0.25);
+
+$shadow-long-drop-subtle:
+  0 30px 60px -15px rgba(0, 0, 0, 0.15);
+
+// Soft premium shadows
+$shadow-soft-sm:
+  0 2px 4px -1px rgba(0, 0, 0, 0.02),
+  0 4px 6px -1px rgba(0, 0, 0, 0.03);
+
+$shadow-soft-md:
+  0 4px 6px -1px rgba(0, 0, 0, 0.03),
+  0 8px 10px -2px rgba(0, 0, 0, 0.04);
+
+$shadow-soft-lg:
+  0 6px 8px -2px rgba(0, 0, 0, 0.04),
+  0 12px 16px -4px rgba(0, 0, 0, 0.05);
+
+$shadow-soft-xl:
+  0 4px 6px -1px rgba(0, 0, 0, 0.03),
+  0 10px 15px -3px rgba(0, 0, 0, 0.05),
+  0 20px 25px -5px rgba(0, 0, 0, 0.06);
+
+// Depth layer system - Progressive elevation
+$shadow-depth-1: 0 1px 3px rgba(0, 0, 0, 0.04);
+$shadow-depth-2: 0 4px 6px rgba(0, 0, 0, 0.05);
+$shadow-depth-3: 0 10px 15px rgba(0, 0, 0, 0.06);
+$shadow-depth-4: 0 20px 25px rgba(0, 0, 0, 0.08);
+$shadow-depth-5: 0 25px 50px rgba(0, 0, 0, 0.12);
+
+// Interactive state shadows
+$shadow-hover-lift:
+  0 8px 25px -5px rgba(0, 0, 0, 0.1),
+  0 4px 10px -5px rgba(0, 0, 0, 0.04);
+
+$shadow-active-press:
+  0 2px 8px rgba(0, 0, 0, 0.08);
+
+// Glow shadows with color
+$shadow-glow-brand:
+  0 0 20px -5px rgba($color-brand-primary, 0.3),
+  0 0 40px -10px rgba($color-brand-primary, 0.2);
+
+$shadow-glow-success:
+  0 0 20px -5px rgba($color-success, 0.3),
+  0 0 40px -10px rgba($color-success, 0.2);
+
+$shadow-glow-error:
+  0 0 20px -5px rgba($color-error, 0.3),
+  0 0 40px -10px rgba($color-error, 0.2);
+
+// Sidebar and panel shadows
+$shadow-sidebar:
+  4px 0 15px -3px rgba(0, 0, 0, 0.05),
+  1px 0 3px rgba(0, 0, 0, 0.03);
+
+$shadow-sidebar-rtl:
+  -4px 0 15px -3px rgba(0, 0, 0, 0.05),
+  -1px 0 3px rgba(0, 0, 0, 0.03);
+
+// ----------------------------------------
+// LEGACY ALIASES
+// For backwards compatibility - migrate away
+// ----------------------------------------
+
+$shadow-teal-sm: $shadow-brand-sm;
+$shadow-teal-md: $shadow-brand-md;
+$shadow-teal-lg: $shadow-brand-lg;
+$shadow-teal-glow: $shadow-brand-glow;

@@ -1,0 +1,110 @@
+// ============================================
+// DESIGN TOKENS: BORDERS
+// Single source of truth for border styles
+// ============================================
+
+// ----------------------------------------
+// BORDER RADIUS
+// ----------------------------------------
+
+$radius-none: 0;
+$radius-xs: 0.125rem;   // 2px
+$radius-sm: 0.25rem;    // 4px
+$radius-md: 0.375rem;   // 6px
+$radius-lg: 0.5rem;     // 8px
+$radius-xl: 0.75rem;    // 12px
+$radius-2xl: 1rem;      // 16px
+$radius-3xl: 1.5rem;    // 24px
+$radius-4xl: 2rem;      // 32px
+$radius-full: 9999px;   // Circular
+
+// ----------------------------------------
+// SEMANTIC BORDER RADIUS
+// Named radius for specific use cases
+// ----------------------------------------
+
+// Component radius
+$radius-button: $radius-lg;      // 8px - Buttons
+$radius-input: $radius-lg;       // 8px - Form inputs
+$radius-card: $radius-xl;        // 12px - Cards
+$radius-modal: $radius-2xl;      // 16px - Modals, dialogs
+$radius-tooltip: $radius-md;     // 6px - Tooltips
+$radius-badge: $radius-full;     // Pill badges
+$radius-avatar: $radius-full;    // Circular avatars
+$radius-tag: $radius-md;         // 6px - Tags, chips
+
+// Section radius
+$radius-section: $radius-2xl;    // 16px - Page sections
+$radius-panel: $radius-xl;       // 12px - Panels
+
+// ----------------------------------------
+// BORDER WIDTH
+// ----------------------------------------
+
+$border-width-0: 0;
+$border-width-1: 1px;
+$border-width-2: 2px;
+$border-width-3: 3px;
+$border-width-4: 4px;
+$border-width-8: 8px;
+
+// Semantic border widths
+$border-width-default: $border-width-1;
+$border-width-focus: $border-width-2;
+$border-width-active: $border-width-2;
+$border-width-accent: $border-width-3;
+
+// ----------------------------------------
+// BORDER STYLES
+// Pre-composed border declarations
+// ----------------------------------------
+
+// Using color tokens (imported where needed)
+// These are just the structural parts
+
+$border-style-solid: solid;
+$border-style-dashed: dashed;
+$border-style-dotted: dotted;
+
+// ----------------------------------------
+// OUTLINE
+// For focus states and accessibility
+// ----------------------------------------
+
+$outline-width: 2px;
+$outline-offset: 2px;
+$outline-offset-inset: -2px;
+
+// ----------------------------------------
+// DIVIDER
+// For separating content sections
+// ----------------------------------------
+
+$divider-thickness: 1px;
+$divider-thickness-thick: 2px;
+
+// ----------------------------------------
+// BORDER RADIUS MAP (for programmatic access)
+// ----------------------------------------
+
+$radii: (
+  'none': $radius-none,
+  'xs': $radius-xs,
+  'sm': $radius-sm,
+  'md': $radius-md,
+  'lg': $radius-lg,
+  'xl': $radius-xl,
+  '2xl': $radius-2xl,
+  '3xl': $radius-3xl,
+  '4xl': $radius-4xl,
+  'full': $radius-full,
+);
+
+$border-widths: (
+  '0': $border-width-0,
+  '1': $border-width-1,
+  '2': $border-width-2,
+  '3': $border-width-3,
+  '4': $border-width-4,
+  '8': $border-width-8,
+);

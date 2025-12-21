@@ -1,0 +1,18 @@
+// ============================================
+// DESIGN TOKENS - BARREL EXPORT
+// Import this file to access all design tokens
+// ============================================
+
+// Core tokens (no dependencies)
+@forward 'colors';
+@forward 'colors-extended';
+@forward 'typography';
+@forward 'spacing';
+@forward 'borders';
+@forward 'motion';
+@forward 'breakpoints';
+@forward 'z-index';
+
+// Tokens with dependencies (import after core)
+@forward 'shadows';
+@forward 'effects';

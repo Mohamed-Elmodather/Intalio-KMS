@@ -1,0 +1,318 @@
+// ============================================
+// DESIGN TOKENS: COLORS
+// Single source of truth for all color values
+// ============================================
+
+// ----------------------------------------
+// PRIMITIVE COLORS
+// Raw color values - not for direct use
+// ----------------------------------------
+
+// Intalio Teal - Brand Primary
+$-teal-50:  #e6faf6;
+$-teal-100: #b3f0e6;
+$-teal-200: #80e6d5;
+$-teal-300: #4ddcc5;
+$-teal-400: #26d4b8;
+$-teal-500: #00ae8d;
+$-teal-600: #009a7d;
+$-teal-700: #008670;
+$-teal-800: #006b59;
+$-teal-900: #004d40;
+
+// Slate - Neutral cool gray
+$-slate-50:  #f8fafc;
+$-slate-100: #f1f5f9;
+$-slate-200: #e2e8f0;
+$-slate-300: #cbd5e1;
+$-slate-400: #94a3b8;
+$-slate-500: #64748b;
+$-slate-600: #475569;
+$-slate-700: #334155;
+$-slate-800: #1e293b;
+$-slate-900: #0f172a;
+$-slate-950: #020617;
+
+// Gray - Neutral warm gray
+$-gray-50:  #fafafa;
+$-gray-100: #f5f5f5;
+$-gray-200: #e5e5e5;
+$-gray-300: #d4d4d4;
+$-gray-400: #a3a3a3;
+$-gray-500: #737373;
+$-gray-600: #525252;
+$-gray-700: #404040;
+$-gray-800: #262626;
+$-gray-900: #171717;
+
+// Success - Green
+$-success-50:  #ecfdf5;
+$-success-100: #d1fae5;
+$-success-200: #a7f3d0;
+$-success-300: #6ee7b7;
+$-success-400: #34d399;
+$-success-500: #10b981;
+$-success-600: #059669;
+$-success-700: #047857;
+$-success-800: #065f46;
+$-success-900: #064e3b;
+
+// Warning - Amber
+$-warning-50:  #fffbeb;
+$-warning-100: #fef3c7;
+$-warning-200: #fde68a;
+$-warning-300: #fcd34d;
+$-warning-400: #fbbf24;
+$-warning-500: #f59e0b;
+$-warning-600: #d97706;
+$-warning-700: #b45309;
+$-warning-800: #92400e;
+$-warning-900: #78350f;
+
+// Error - Red
+$-error-50:  #fef2f2;
+$-error-100: #fee2e2;
+$-error-200: #fecaca;
+$-error-300: #fca5a5;
+$-error-400: #f87171;
+$-error-500: #ef4444;
+$-error-600: #dc2626;
+$-error-700: #b91c1c;
+$-error-800: #991b1b;
+$-error-900: #7f1d1d;
+
+// Info - Blue
+$-info-50:  #eff6ff;
+$-info-100: #dbeafe;
+$-info-200: #bfdbfe;
+$-info-300: #93c5fd;
+$-info-400: #60a5fa;
+$-info-500: #3b82f6;
+$-info-600: #2563eb;
+$-info-700: #1d4ed8;
+$-info-800: #1e40af;
+$-info-900: #1e3a8a;
+
+// ----------------------------------------
+// SEMANTIC COLOR TOKENS
+// Use these in your components
+// ----------------------------------------
+
+// Brand Colors
+$color-brand-primary: $-teal-500;
+$color-brand-primary-light: $-teal-300;
+$color-brand-primary-dark: $-teal-700;
+$color-brand-primary-50: $-teal-50;
+$color-brand-primary-100: $-teal-100;
+$color-brand-primary-200: $-teal-200;
+$color-brand-primary-300: $-teal-300;
+$color-brand-primary-400: $-teal-400;
+$color-brand-primary-500: $-teal-500;
+$color-brand-primary-600: $-teal-600;
+$color-brand-primary-700: $-teal-700;
+$color-brand-primary-800: $-teal-800;
+$color-brand-primary-900: $-teal-900;
+
+// Text Colors
+$color-text-primary: $-slate-900;
+$color-text-secondary: $-slate-600;
+$color-text-tertiary: $-slate-500;
+$color-text-muted: $-slate-400;
+$color-text-inverse: #ffffff;
+$color-text-brand: $-teal-600;
+$color-text-link: $-teal-600;
+$color-text-link-hover: $-teal-700;
+
+// Background Colors
+$color-bg-primary: #ffffff;
+$color-bg-secondary: $-slate-50;
+$color-bg-tertiary: $-slate-100;
+$color-bg-elevated: #ffffff;
+$color-bg-sunken: $-slate-100;
+$color-bg-overlay: rgba(15, 23, 42, 0.5);
+$color-bg-brand: $-teal-500;
+$color-bg-brand-subtle: $-teal-50;
+
+// Border Colors
+$color-border-default: $-slate-200;
+$color-border-light: $-slate-100;
+$color-border-dark: $-slate-300;
+$color-border-focus: $-teal-500;
+$color-border-error: $-error-500;
+
+// Surface Colors (for cards, panels)
+$color-surface-0: #ffffff;
+$color-surface-50: $-slate-50;
+$color-surface-100: $-slate-100;
+$color-surface-200: $-slate-200;
+
+// Status Colors
+$color-success: $-success-500;
+$color-success-light: $-success-50;
+$color-success-dark: $-success-700;
+
+$color-warning: $-warning-500;
+$color-warning-light: $-warning-50;
+$color-warning-dark: $-warning-700;
+
+$color-error: $-error-500;
+$color-error-light: $-error-50;
+$color-error-dark: $-error-700;
+
+$color-info: $-info-500;
+$color-info-light: $-info-50;
+$color-info-dark: $-info-700;
+
+// Interactive State Colors
+$color-interactive-hover: $-slate-50;
+$color-interactive-active: $-slate-100;
+$color-interactive-selected: $-teal-50;
+$color-interactive-disabled: $-slate-100;
+
+// ----------------------------------------
+// GRADIENTS
+// ----------------------------------------
+
+$gradient-brand-primary: linear-gradient(135deg, $-teal-500 0%, $-teal-400 50%, #00c9a7 100%);
+$gradient-brand-primary-hover: linear-gradient(135deg, $-teal-600 0%, $-teal-500 50%, $-teal-400 100%);
+$gradient-brand-subtle: linear-gradient(135deg, $-teal-50 0%, rgba($-teal-100, 0.5) 100%);
+
+$gradient-hero: linear-gradient(135deg, $-teal-600 0%, $-teal-500 35%, #00c9a7 100%);
+$gradient-hero-dark: linear-gradient(135deg, $-teal-900 0%, $-teal-800 50%, $-teal-700 100%);
+
+$gradient-surface: linear-gradient(180deg, $-slate-50 0%, #ffffff 100%);
+$gradient-card: linear-gradient(180deg, #ffffff 0%, $-slate-50 100%);
+
+$gradient-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%);
+$gradient-glass-dark: linear-gradient(135deg, rgba(30, 41, 59, 0.95) 0%, rgba(15, 23, 42, 0.9) 100%);
+
+$gradient-mesh: radial-gradient(at 40% 20%, rgba($-teal-100, 0.3) 0px, transparent 50%),
+                radial-gradient(at 80% 0%, rgba($-teal-50, 0.4) 0px, transparent 50%),
+                radial-gradient(at 0% 50%, rgba($-teal-100, 0.2) 0px, transparent 50%);
+
+// ----------------------------------------
+// COLOR MAPS (for programmatic access)
+// ----------------------------------------
+
+$colors-brand: (
+  'primary-50': $-teal-50,
+  'primary-100': $-teal-100,
+  'primary-200': $-teal-200,
+  'primary-300': $-teal-300,
+  'primary-400': $-teal-400,
+  'primary-500': $-teal-500,
+  'primary-600': $-teal-600,
+  'primary-700': $-teal-700,
+  'primary-800': $-teal-800,
+  'primary-900': $-teal-900,
+);
+
+$colors-slate: (
+  '50': $-slate-50,
+  '100': $-slate-100,
+  '200': $-slate-200,
+  '300': $-slate-300,
+  '400': $-slate-400,
+  '500': $-slate-500,
+  '600': $-slate-600,
+  '700': $-slate-700,
+  '800': $-slate-800,
+  '900': $-slate-900,
+  '950': $-slate-950,
+);
+
+$colors-status: (
+  'success': $color-success,
+  'success-light': $color-success-light,
+  'warning': $color-warning,
+  'warning-light': $color-warning-light,
+  'error': $color-error,
+  'error-light': $color-error-light,
+  'info': $color-info,
+  'info-light': $color-info-light,
+);
+
+// ----------------------------------------
+// LEGACY ALIASES (for backwards compatibility)
+// These will be deprecated - migrate away from them
+// ----------------------------------------
+
+// TODO: Remove these after migration
+$intalio-teal-50: $-teal-50;
+$intalio-teal-100: $-teal-100;
+$intalio-teal-200: $-teal-200;
+$intalio-teal-300: $-teal-300;
+$intalio-teal-400: $-teal-400;
+$intalio-teal-500: $-teal-500;
+$intalio-teal-600: $-teal-600;
+$intalio-teal-700: $-teal-700;
+$intalio-teal-800: $-teal-800;
+$intalio-teal-900: $-teal-900;
+$intalio-teal-primary: $-teal-500;
+$intalio-teal-dark: $-teal-700;
+$intalio-teal-light: $-teal-300;
+
+$slate-50: $-slate-50;
+$slate-100: $-slate-100;
+$slate-200: $-slate-200;
+$slate-300: $-slate-300;
+$slate-400: $-slate-400;
+$slate-500: $-slate-500;
+$slate-600: $-slate-600;
+$slate-700: $-slate-700;
+$slate-800: $-slate-800;
+$slate-900: $-slate-900;
+$slate-950: $-slate-950;
+
+$gray-50: $-gray-50;
+$gray-100: $-gray-100;
+$gray-200: $-gray-200;
+$gray-300: $-gray-300;
+$gray-400: $-gray-400;
+$gray-500: $-gray-500;
+$gray-600: $-gray-600;
+$gray-700: $-gray-700;
+$gray-800: $-gray-800;
+$gray-900: $-gray-900;
+
+$intalio-gray: $-slate-500;
+$intalio-gray-light: $-slate-400;
+$intalio-gray-dark: $-slate-600;
+
+$success-50: $-success-50;
+$success-100: $-success-100;
+$success-500: $-success-500;
+$success-600: $-success-600;
+$success-700: $-success-700;
+
+$warning-50: $-warning-50;
+$warning-100: $-warning-100;
+$warning-200: $-warning-200;
+$warning-500: $-warning-500;
+$warning-600: $-warning-600;
+$warning-700: $-warning-700;
+
+$error-50: $-error-50;
+$error-100: $-error-100;
+$error-500: $-error-500;
+$error-600: $-error-600;
+$error-700: $-error-700;
+
+$info-50: $-info-50;
+$info-100: $-info-100;
+$info-500: $-info-500;
+$info-600: $-info-600;
+$info-700: $-info-700;
+
+// Legacy gradient aliases
+$gradient-primary: $gradient-brand-primary;
+$gradient-primary-hover: $gradient-brand-primary-hover;
+$gradient-primary-subtle: $gradient-brand-subtle;
+$gradient-background: $gradient-surface;
+
+// Legacy AFC27 aliases
+$afc27-green-primary: $-teal-500;
+$afc27-green-dark: $-teal-700;
+$afc27-green-light: $-teal-300;
+$afc27-gold: $-slate-500;
+$afc27-gold-light: $-slate-400;

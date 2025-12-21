@@ -1,0 +1,365 @@
+// ============================================
+// INTALIO KMS - WORLD-CLASS DESIGN SYSTEM
+// Version 2.0 - Elevated Modern
+// ============================================
+
+// ----------------------------------------
+// BRAND COLORS - Primary Palette
+// ----------------------------------------
+
+// Intalio Teal - Full Spectrum
+$intalio-teal-50:  #e6faf6;
+$intalio-teal-100: #b3f0e6;
+$intalio-teal-200: #80e6d5;
+$intalio-teal-300: #4ddcc5;
+$intalio-teal-400: #26d4b8;
+$intalio-teal-500: #00ae8d;  // Primary
+$intalio-teal-600: #009a7d;
+$intalio-teal-700: #008670;
+$intalio-teal-800: #006b59;
+$intalio-teal-900: #004d40;
+
+// Convenient aliases
+$intalio-teal-primary: $intalio-teal-500;
+$intalio-teal-dark: $intalio-teal-700;
+$intalio-teal-light: $intalio-teal-300;
+
+// ----------------------------------------
+// SECONDARY & ACCENT COLORS
+// ----------------------------------------
+
+// Slate Gray - For text and UI elements
+$slate-50:  #f8fafc;
+$slate-100: #f1f5f9;
+$slate-200: #e2e8f0;
+$slate-300: #cbd5e1;
+$slate-400: #94a3b8;
+$slate-500: #64748b;
+$slate-600: #475569;
+$slate-700: #334155;
+$slate-800: #1e293b;
+$slate-900: #0f172a;
+$slate-950: #020617;
+
+// Neutral Gray - Legacy compatible
+$gray-50:  #fafafa;
+$gray-100: #f5f5f5;
+$gray-200: #e5e5e5;
+$gray-300: #d4d4d4;
+$gray-400: #a3a3a3;
+$gray-500: #737373;
+$gray-600: #525252;
+$gray-700: #404040;
+$gray-800: #262626;
+$gray-900: #171717;
+
+// Intalio Gray (Secondary)
+$intalio-gray: #64748b;
+$intalio-gray-light: #94a3b8;
+$intalio-gray-dark: #475569;
+
+// ----------------------------------------
+// SEMANTIC COLORS
+// ----------------------------------------
+
+// Success
+$success-50:  #ecfdf5;
+$success-100: #d1fae5;
+$success-500: #10b981;
+$success-600: #059669;
+$success-700: #047857;
+
+// Warning
+$warning-50:  #fffbeb;
+$warning-100: #fef3c7;
+$warning-200: #fde68a;
+$warning-500: #f59e0b;
+$warning-600: #d97706;
+$warning-700: #b45309;
+
+// Error/Danger
+$error-50:  #fef2f2;
+$error-100: #fee2e2;
+$error-500: #ef4444;
+$error-600: #dc2626;
+$error-700: #b91c1c;
+
+// Info
+$info-50:  #eff6ff;
+$info-100: #dbeafe;
+$info-500: #3b82f6;
+$info-600: #2563eb;
+$info-700: #1d4ed8;
+
+// ----------------------------------------
+// GRADIENTS - Premium Feel
+// ----------------------------------------
+
+// Primary gradients
+$gradient-primary: linear-gradient(135deg, $intalio-teal-500 0%, $intalio-teal-400 50%, #00c9a7 100%);
+$gradient-primary-hover: linear-gradient(135deg, $intalio-teal-600 0%, $intalio-teal-500 50%, $intalio-teal-400 100%);
+$gradient-primary-subtle: linear-gradient(135deg, $intalio-teal-50 0%, rgba($intalio-teal-100, 0.5) 100%);
+
+// Hero/Feature gradients
+$gradient-hero: linear-gradient(135deg, $intalio-teal-600 0%, $intalio-teal-500 35%, #00c9a7 100%);
+$gradient-hero-dark: linear-gradient(135deg, $intalio-teal-900 0%, $intalio-teal-800 50%, $intalio-teal-700 100%);
+
+// Background gradients
+$gradient-background: linear-gradient(180deg, $slate-50 0%, #ffffff 100%);
+$gradient-card: linear-gradient(180deg, #ffffff 0%, $slate-50 100%);
+
+// Glass effect
+$gradient-glass: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%);
+$gradient-glass-dark: linear-gradient(135deg, rgba(30,41,59,0.95) 0%, rgba(15,23,42,0.9) 100%);
+
+// Mesh gradient for backgrounds
+$gradient-mesh: radial-gradient(at 40% 20%, rgba($intalio-teal-100, 0.3) 0px, transparent 50%),
+                radial-gradient(at 80% 0%, rgba($intalio-teal-50, 0.4) 0px, transparent 50%),
+                radial-gradient(at 0% 50%, rgba($intalio-teal-100, 0.2) 0px, transparent 50%);
+
+// Legacy aliases
+$afc27-green-primary: $intalio-teal-primary;
+$afc27-green-dark: $intalio-teal-dark;
+$afc27-green-light: $intalio-teal-light;
+$afc27-gold: $intalio-gray;
+$afc27-gold-light: $intalio-gray-light;
+
+// Typography
+$font-family-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+$font-family-arabic: 'Noto Sans Arabic', 'Inter', sans-serif;
+
+$font-size-xs: 0.75rem;   // 12px
+$font-size-sm: 0.875rem;  // 14px
+$font-size-base: 1rem;    // 16px
+$font-size-lg: 1.125rem;  // 18px
+$font-size-xl: 1.25rem;   // 20px
+$font-size-2xl: 1.5rem;   // 24px
+$font-size-3xl: 1.875rem; // 30px
+$font-size-4xl: 2.25rem;  // 36px
+
+// Short aliases (Tailwind-style naming)
+$text-xs: $font-size-xs;
+$text-sm: $font-size-sm;
+$text-base: $font-size-base;
+$text-lg: $font-size-lg;
+$text-xl: $font-size-xl;
+$text-2xl: $font-size-2xl;
+$text-3xl: $font-size-3xl;
+$text-4xl: $font-size-4xl;
+
+$font-weight-light: 300;
+$font-weight-normal: 400;
+$font-weight-medium: 500;
+$font-weight-semibold: 600;
+$font-weight-bold: 700;
+
+// Spacing
+$spacing-1: 0.25rem;  // 4px
+$spacing-2: 0.5rem;   // 8px
+$spacing-3: 0.75rem;  // 12px
+$spacing-4: 1rem;     // 16px
+$spacing-5: 1.25rem;  // 20px
+$spacing-6: 1.5rem;   // 24px
+$spacing-8: 2rem;     // 32px
+$spacing-10: 2.5rem;  // 40px
+$spacing-12: 3rem;    // 48px
+$spacing-16: 4rem;    // 64px
+
+// Border Radius
+$radius-sm: 0.25rem;  // 4px
+$radius-md: 0.5rem;   // 8px
+$radius-lg: 0.75rem;  // 12px
+$radius-xl: 1rem;     // 16px
+$radius-2xl: 1.5rem;  // 24px
+$radius-full: 9999px;
+
+// ----------------------------------------
+// SHADOWS - Elevated Multi-Layer System
+// ----------------------------------------
+
+// Standard shadows (subtle, professional)
+$shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+$shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 1px 2px -1px rgba(0, 0, 0, 0.04);
+$shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+$shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.06), 0 4px 6px -4px rgba(0, 0, 0, 0.06);
+$shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.06);
+$shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+
+// Elevated shadows with ambient glow (premium feel)
+$shadow-elevated-sm: 0 2px 8px -2px rgba(0, 0, 0, 0.08), 0 1px 2px -1px rgba(0, 0, 0, 0.04);
+$shadow-elevated-md: 0 4px 16px -4px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+$shadow-elevated-lg: 0 8px 24px -4px rgba(0, 0, 0, 0.12), 0 4px 8px -4px rgba(0, 0, 0, 0.06);
+$shadow-elevated-xl: 0 16px 40px -8px rgba(0, 0, 0, 0.15), 0 8px 16px -8px rgba(0, 0, 0, 0.08);
+
+// Colored shadows (brand accent)
+$shadow-teal-sm: 0 4px 14px -3px rgba($intalio-teal-500, 0.25);
+$shadow-teal-md: 0 8px 20px -4px rgba($intalio-teal-500, 0.3);
+$shadow-teal-lg: 0 12px 28px -5px rgba($intalio-teal-500, 0.35);
+$shadow-teal-glow: 0 0 40px -10px rgba($intalio-teal-400, 0.4);
+
+// Inner shadows (for inputs and inset elements)
+$shadow-inner: inset 0 2px 4px 0 rgba(0, 0, 0, 0.04);
+$shadow-inner-lg: inset 0 4px 8px 0 rgba(0, 0, 0, 0.06);
+
+// Focus ring shadows
+$shadow-focus-ring: 0 0 0 3px rgba($intalio-teal-500, 0.15);
+$shadow-focus-ring-error: 0 0 0 3px rgba($error-500, 0.15);
+
+// Card shadows (layered for depth)
+$shadow-card: 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.04);
+$shadow-card-hover: 0 4px 12px rgba(0, 0, 0, 0.06), 0 12px 24px rgba(0, 0, 0, 0.08);
+$shadow-card-active: 0 2px 8px rgba(0, 0, 0, 0.08), 0 8px 16px rgba(0, 0, 0, 0.1);
+
+// Breakpoints
+$breakpoint-sm: 640px;
+$breakpoint-md: 768px;
+$breakpoint-lg: 1024px;
+$breakpoint-xl: 1280px;
+$breakpoint-2xl: 1536px;
+
+// Z-index
+$z-dropdown: 1000;
+$z-sticky: 1020;
+$z-fixed: 1030;
+$z-modal-backdrop: 1040;
+$z-modal: 1050;
+$z-popover: 1060;
+$z-tooltip: 1070;
+
+// ----------------------------------------
+// TRANSITIONS & ANIMATIONS
+// ----------------------------------------
+
+// Timing functions (premium easing)
+$ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+$ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+$ease-in-out-quart: cubic-bezier(0.76, 0, 0.24, 1);
+$ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+$ease-bounce: cubic-bezier(0.68, -0.6, 0.32, 1.6);
+$ease-out: $ease-out-expo; // Short alias
+
+// Duration scale
+$duration-instant: 75ms;
+$duration-fast: 150ms;
+$duration-base: 200ms;
+$duration-moderate: 300ms;
+$duration-slow: 400ms;
+$duration-slower: 500ms;
+
+// Composed transitions (use these)
+$transition-fast: $duration-fast $ease-out-quart;
+$transition-base: $duration-base $ease-out-quart;
+$transition-normal: $duration-base $ease-out-quart; // alias for base
+$transition-slow: $duration-moderate $ease-out-expo;
+$transition-spring: $duration-moderate $ease-spring;
+
+// Property-specific transitions
+$transition-colors: color $duration-fast $ease-out-quart,
+                    background-color $duration-fast $ease-out-quart,
+                    border-color $duration-fast $ease-out-quart;
+$transition-shadow: box-shadow $duration-base $ease-out-expo;
+$transition-transform: transform $duration-base $ease-out-expo;
+$transition-opacity: opacity $duration-base $ease-out-quart;
+$transition-all: all $duration-base $ease-out-quart;
+
+// Layout
+$sidebar-width: 280px;
+$sidebar-collapsed-width: 80px;
+$header-height: 64px;
+$footer-height: 48px;
+
+// ----------------------------------------
+// SEMANTIC COLOR TOKENS
+// Design System compatible naming
+// ----------------------------------------
+
+// Brand Colors
+$color-brand-primary: $intalio-teal-500;
+$color-brand-primary-light: $intalio-teal-300;
+$color-brand-primary-dark: $intalio-teal-700;
+
+// Text Colors
+$color-text-primary: $slate-900;
+$color-text-secondary: $slate-600;
+$color-text-tertiary: $slate-500;
+$color-text-muted: $slate-400;
+$color-text-inverse: #ffffff;
+
+// Background Colors
+$color-bg-primary: #ffffff;
+$color-bg-secondary: $slate-50;
+$color-bg-tertiary: $slate-100;
+$color-bg-elevated: #ffffff;
+$color-bg-brand-subtle: $intalio-teal-50;
+
+// Border Colors
+$color-border-default: $slate-200;
+$color-border-light: $slate-100;
+$color-border-dark: $slate-300;
+
+// Status Colors - Semantic
+$color-success: $success-500;
+$color-success-light: $success-50;
+$color-success-dark: $success-700;
+
+$color-warning: $warning-500;
+$color-warning-light: $warning-50;
+$color-warning-dark: $warning-700;
+
+$color-error: $error-500;
+$color-error-light: $error-50;
+$color-error-dark: $error-700;
+
+$color-info: $info-500;
+$color-info-light: $info-50;
+$color-info-dark: $info-700;
+
+// ----------------------------------------
+// ADDITIONAL DESIGN SYSTEM TOKENS
+// ----------------------------------------
+
+// Additional spacing
+$spacing-0: 0;
+$spacing-px: 1px;
+$spacing-0-5: 0.125rem;  // 2px
+$spacing-1-5: 0.375rem;  // 6px
+$spacing-2-5: 0.625rem;  // 10px
+$spacing-3-5: 0.875rem;  // 14px
+$spacing-7: 1.75rem;     // 28px
+$spacing-9: 2.25rem;     // 36px
+$spacing-11: 2.75rem;    // 44px
+$spacing-14: 3.5rem;     // 56px
+$spacing-20: 5rem;       // 80px
+
+// Gradients - Brand
+$gradient-brand-primary: $gradient-primary;
+$gradient-brand-primary-hover: $gradient-primary-hover;
+$gradient-brand-subtle: linear-gradient(135deg, $intalio-teal-50 0%, rgba($intalio-teal-100, 0.5) 100%);
+
+// Additional radius
+$radius-xs: 0.125rem;  // 2px
+$radius-3xl: 2rem;     // 32px
+
+// Additional duration
+$duration-normal: $duration-base;  // alias
+
+// Additional ease
+$ease-default: $ease-out-quart;
+
+// Brand color aliases (shorthand)
+$brand-50: $intalio-teal-50;
+$brand-100: $intalio-teal-100;
+$brand-200: $intalio-teal-200;
+$brand-300: $intalio-teal-300;
+$brand-400: $intalio-teal-400;
+$brand-500: $intalio-teal-500;
+$brand-600: $intalio-teal-600;
+$brand-700: $intalio-teal-700;
+$brand-800: $intalio-teal-800;
+$brand-900: $intalio-teal-900;
+
+// Brand shadow aliases
+$shadow-brand-sm: $shadow-teal-sm;
+$shadow-brand-md: $shadow-teal-md;
+$shadow-brand-lg: $shadow-teal-lg;
+$shadow-focus-ring-brand: 0 0 0 3px rgba($intalio-teal-500, 0.2);

@@ -1,0 +1,97 @@
+// ============================================
+// DESIGN TOKENS: Z-INDEX
+// Single source of truth for stacking contexts
+// ============================================
+
+// ----------------------------------------
+// Z-INDEX SCALE
+// Organized by layer/purpose
+// ----------------------------------------
+
+// Base layer - Default content
+$z-base: 0;
+$z-above: 1;
+$z-below: -1;
+
+// Elevated content - Cards, raised elements
+$z-raised: 10;
+
+// Dropdowns - Menus, selects, autocomplete
+$z-dropdown: 100;
+
+// Sticky elements - Headers, navigation
+$z-sticky: 200;
+
+// Fixed elements - Fixed position UI
+$z-fixed: 300;
+
+// Drawers - Side panels, slide-outs
+$z-drawer: 400;
+
+// Overlay - Background dimming
+$z-overlay: 500;
+
+// Modal - Dialogs, lightboxes
+$z-modal: 600;
+
+// Popover - Popovers, context menus
+$z-popover: 700;
+
+// Toast - Notifications
+$z-toast: 800;
+
+// Tooltip - Hover tips
+$z-tooltip: 900;
+
+// Maximum - Dev tools, critical alerts
+$z-max: 9999;
+
+// ----------------------------------------
+// SEMANTIC Z-INDEX
+// Named values for specific components
+// ----------------------------------------
+
+// Layout components
+$z-sidebar: $z-fixed;
+$z-header: $z-sticky;
+$z-footer: $z-base;
+
+// Interactive components
+$z-select-menu: $z-dropdown;
+$z-autocomplete: $z-dropdown;
+$z-context-menu: $z-popover;
+$z-date-picker: $z-dropdown;
+
+// Feedback components
+$z-notification: $z-toast;
+$z-alert: $z-toast;
+$z-loading-overlay: $z-overlay;
+$z-progress-bar: $z-sticky;
+
+// ----------------------------------------
+// Z-INDEX MAP (for programmatic access)
+// ----------------------------------------
+
+$z-layers: (
+  'below': $z-below,
+  'base': $z-base,
+  'above': $z-above,
+  'raised': $z-raised,
+  'dropdown': $z-dropdown,
+  'sticky': $z-sticky,
+  'fixed': $z-fixed,
+  'drawer': $z-drawer,
+  'overlay': $z-overlay,
+  'modal': $z-modal,
+  'popover': $z-popover,
+  'toast': $z-toast,
+  'tooltip': $z-tooltip,
+  'max': $z-max,
+);
+
+// ----------------------------------------
+// LEGACY ALIASES
+// For backwards compatibility - migrate away
+// ----------------------------------------
+
+$z-modal-backdrop: $z-overlay;

@@ -1,0 +1,210 @@
+// ============================================
+// DESIGN SYSTEM: CSS RESET
+// Modern CSS reset with sensible defaults
+// ============================================
+
+@use '../tokens' as *;
+
+// ----------------------------------------
+// BOX SIZING
+// ----------------------------------------
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+// ----------------------------------------
+// MARGIN RESET
+// ----------------------------------------
+
+* {
+  margin: 0;
+}
+
+// ----------------------------------------
+// BODY DEFAULTS
+// ----------------------------------------
+
+html {
+  // Prevent font size inflation on mobile
+  -moz-text-size-adjust: none;
+  -webkit-text-size-adjust: none;
+  text-size-adjust: none;
+
+  // Smooth scrolling (with reduced motion support)
+  scroll-behavior: smooth;
+
+  @media (prefers-reduced-motion: reduce) {
+    scroll-behavior: auto;
+  }
+}
+
+body {
+  // Improve text rendering
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+
+  // Prevent horizontal overflow
+  overflow-x: hidden;
+
+  // Full viewport height
+  min-height: 100vh;
+  min-height: 100dvh; // Dynamic viewport height for mobile
+
+  // Default line height
+  line-height: $line-height-normal;
+}
+
+// ----------------------------------------
+// TYPOGRAPHY RESET
+// ----------------------------------------
+
+// Balance headings across multiple lines
+h1, h2, h3, h4, h5, h6 {
+  text-wrap: balance;
+  overflow-wrap: break-word;
+}
+
+// Prevent orphans in paragraphs
+p {
+  text-wrap: pretty;
+  overflow-wrap: break-word;
+}
+
+// ----------------------------------------
+// MEDIA DEFAULTS
+// ----------------------------------------
+
+img,
+picture,
+video,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+img {
+  height: auto;
+}
+
+// ----------------------------------------
+// FORM ELEMENTS
+// ----------------------------------------
+
+input,
+button,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+// Remove default button styles
+button {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+// Remove default fieldset styles
+fieldset {
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+
+// Textarea resize only vertically by default
+textarea {
+  resize: vertical;
+}
+
+// Fix placeholder opacity in Firefox
+::placeholder {
+  opacity: 1;
+}
+
+// ----------------------------------------
+// LINKS
+// ----------------------------------------
+
+a {
+  color: inherit;
+  text-decoration: inherit;
+}
+
+// ----------------------------------------
+// LISTS
+// ----------------------------------------
+
+ul,
+ol {
+  list-style: none;
+  padding: 0;
+}
+
+// ----------------------------------------
+// TABLES
+// ----------------------------------------
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+// ----------------------------------------
+// MISC ELEMENTS
+// ----------------------------------------
+
+// Remove default hr styling
+hr {
+  border: none;
+  height: 1px;
+  background: $color-border-light;
+}
+
+// Remove default blockquote styling
+blockquote {
+  margin: 0;
+  padding: 0;
+}
+
+// Default code styling
+code,
+pre,
+kbd,
+samp {
+  font-family: $font-family-mono;
+  font-size: 0.875em;
+}
+
+// Summary cursor
+summary {
+  cursor: pointer;
+}
+
+// Dialog defaults
+dialog {
+  padding: 0;
+  border: none;
+  background: transparent;
+}
+
+// ----------------------------------------
+// REDUCED MOTION
+// ----------------------------------------
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

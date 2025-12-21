@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>AFC27.KMS.Admin</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.11" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Shared\AFC27.KMS.SharedKernel\AFC27.KMS.SharedKernel.csproj" />
+    <ProjectReference Include="..\AFC27.KMS.Identity\AFC27.KMS.Identity.csproj" />
+    <ProjectReference Include="..\AFC27.KMS.Documents\AFC27.KMS.Documents.csproj" />
+  </ItemGroup>
+
+</Project>

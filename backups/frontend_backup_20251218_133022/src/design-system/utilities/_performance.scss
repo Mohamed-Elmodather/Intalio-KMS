@@ -1,0 +1,252 @@
+// ============================================
+// DESIGN SYSTEM: PERFORMANCE UTILITIES
+// GPU-accelerated animations and optimization hints
+// ============================================
+
+@use '../tokens' as *;
+
+// ----------------------------------------
+// WILL-CHANGE HINTS
+// Use sparingly - only for elements about to animate
+// ----------------------------------------
+
+/// Apply will-change for transform animations
+@mixin will-change-transform() {
+  will-change: transform;
+}
+
+/// Apply will-change for opacity animations
+@mixin will-change-opacity() {
+  will-change: opacity;
+}
+
+/// Apply will-change for common animation properties
+@mixin will-change-animation() {
+  will-change: transform, opacity;
+}
+
+/// Apply will-change for scroll animations
+@mixin will-change-scroll() {
+  will-change: scroll-position;
+}
+
+/// Remove will-change (call after animation completes)
+@mixin will-change-auto() {
+  will-change: auto;
+}
+
+// ----------------------------------------
+// GPU ACCELERATION
+// Force hardware acceleration
+// ----------------------------------------
+
+/// Force GPU layer creation
+@mixin gpu-accelerate() {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/// GPU acceleration with containment
+@mixin gpu-accelerate-contained() {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  contain: layout style paint;
+}
+
+// ----------------------------------------
+// CONTAIN PROPERTY
+// Isolate layout/paint calculations
+// ----------------------------------------
+
+/// Strict containment (best performance)
+@mixin contain-strict() {
+  contain: strict;
+}
+
+/// Layout containment
+@mixin contain-layout() {
+  contain: layout;
+}
+
+/// Content containment (layout + paint)
+@mixin contain-content() {
+  contain: content;
+}
+
+/// Paint containment only
+@mixin contain-paint() {
+  contain: paint;
+}
+
+// ----------------------------------------
+// PERFORMANCE UTILITY CLASSES
+// ----------------------------------------
+
+// Will-change utilities
+.will-change-transform {
+  will-change: transform;
+}
+
+.will-change-opacity {
+  will-change: opacity;
+}
+
+.will-change-animation {
+  will-change: transform, opacity;
+}
+
+// GPU acceleration utilities
+.gpu-accelerate {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+// Contain utilities
+.contain-strict {
+  contain: strict;
+}
+
+.contain-content {
+  contain: content;
+}
+
+.contain-layout {
+  contain: layout;
+}
+
+.contain-paint {
+  contain: paint;
+}
+
+// ----------------------------------------
+// ANIMATION PERFORMANCE PATTERNS
+// ----------------------------------------
+
+/// Optimized fade animation
+/// Only animates opacity (most performant)
+@mixin optimized-fade($duration: $duration-normal) {
+  opacity: 0;
+  transition: opacity $duration $ease-default;
+  will-change: opacity;
+
+  &.is-visible,
+  &.is-active {
+    opacity: 1;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+    opacity: 1;
+  }
+}
+
+/// Optimized transform animation
+/// Only animates transform (GPU accelerated)
+@mixin optimized-transform($duration: $duration-normal) {
+  transform: translateY(20px);
+  transition: transform $duration $ease-out-expo;
+  will-change: transform;
+
+  &.is-visible,
+  &.is-active {
+    transform: translateY(0);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+    transform: none;
+  }
+}
+
+/// Optimized scale animation
+@mixin optimized-scale($duration: $duration-normal) {
+  transform: scale(0.95);
+  transition: transform $duration $ease-out-expo;
+  will-change: transform;
+
+  &.is-visible,
+  &.is-active {
+    transform: scale(1);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+    transform: none;
+  }
+}
+
+/// Combined optimized animation (fade + transform)
+@mixin optimized-entrance($duration: $duration-normal) {
+  opacity: 0;
+  transform: translateY(20px);
+  transition:
+    opacity $duration $ease-out-expo,
+    transform $duration $ease-out-expo;
+  will-change: transform, opacity;
+
+  &.is-visible,
+  &.is-active {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+    opacity: 1;
+    transform: none;
+  }
+}
+
+// ----------------------------------------
+// SCROLL PERFORMANCE
+// ----------------------------------------
+
+/// Smooth scroll behavior with reduced motion support
+@mixin smooth-scroll() {
+  scroll-behavior: smooth;
+
+  @media (prefers-reduced-motion: reduce) {
+    scroll-behavior: auto;
+  }
+}
+
+/// Hardware-accelerated scrolling container
+@mixin scroll-container-optimized() {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+// ----------------------------------------
+// IMAGE PERFORMANCE
+// ----------------------------------------
+
+/// Lazy loading optimization for images
+@mixin lazy-image() {
+  content-visibility: auto;
+  contain-intrinsic-size: 200px; // Estimated size
+}
+
+// ----------------------------------------
+// REDUCED MOTION MIXINS
+// ----------------------------------------
+
+/// Disable all animations for reduced motion
+@mixin respect-reduced-motion() {
+  @media (prefers-reduced-motion: reduce) {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+  }
+}
+
+/// Alternative animation for reduced motion
+/// Provides instant state change instead of animation
+@mixin reduced-motion-safe($property, $value) {
+  @media (prefers-reduced-motion: reduce) {
+    #{$property}: $value;
+    animation: none !important;
+    transition: none !important;
+  }
+}

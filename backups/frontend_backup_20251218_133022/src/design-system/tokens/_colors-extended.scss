@@ -1,0 +1,281 @@
+// ============================================
+// DESIGN TOKENS: EXTENDED COLORS
+// Vibrant accent colors for modern UI/UX
+// ============================================
+
+@use 'colors' as *;
+
+// ----------------------------------------
+// ACCENT COLOR PALETTES
+// Additional colors for visual vibrancy
+// ----------------------------------------
+
+// Coral - Warm accent for alerts, highlights, CTAs
+$-coral-50:  #fff5f5;
+$-coral-100: #ffe3e3;
+$-coral-200: #ffc9c9;
+$-coral-300: #ffa8a8;
+$-coral-400: #ff8787;
+$-coral-500: #ff5252;
+$-coral-600: #fa3e3e;
+$-coral-700: #e53935;
+$-coral-800: #c62828;
+$-coral-900: #b71c1c;
+
+// Purple - Creative accent for special features
+$-purple-50:  #faf5ff;
+$-purple-100: #f3e8ff;
+$-purple-200: #e9d5ff;
+$-purple-300: #d8b4fe;
+$-purple-400: #c084fc;
+$-purple-500: #a855f7;
+$-purple-600: #9333ea;
+$-purple-700: #7e22ce;
+$-purple-800: #6b21a8;
+$-purple-900: #581c87;
+
+// Gold - Premium highlights, achievements, awards
+$-gold-50:  #fefce8;
+$-gold-100: #fef9c3;
+$-gold-200: #fef08a;
+$-gold-300: #fde047;
+$-gold-400: #facc15;
+$-gold-500: #eab308;
+$-gold-600: #ca8a04;
+$-gold-700: #a16207;
+$-gold-800: #854d0e;
+$-gold-900: #713f12;
+
+// Ocean - Cool accent for info, links, secondary actions
+$-ocean-50:  #ecfeff;
+$-ocean-100: #cffafe;
+$-ocean-200: #a5f3fc;
+$-ocean-300: #67e8f9;
+$-ocean-400: #22d3ee;
+$-ocean-500: #06b6d4;
+$-ocean-600: #0891b2;
+$-ocean-700: #0e7490;
+$-ocean-800: #155e75;
+$-ocean-900: #164e63;
+
+// ----------------------------------------
+// SEMANTIC ACCENT TOKENS
+// Use these in your components
+// ----------------------------------------
+
+// Coral
+$color-accent-coral: $-coral-500;
+$color-accent-coral-light: $-coral-100;
+$color-accent-coral-dark: $-coral-700;
+$color-accent-coral-subtle: $-coral-50;
+
+// Purple
+$color-accent-purple: $-purple-500;
+$color-accent-purple-light: $-purple-100;
+$color-accent-purple-dark: $-purple-700;
+$color-accent-purple-subtle: $-purple-50;
+
+// Gold
+$color-accent-gold: $-gold-500;
+$color-accent-gold-light: $-gold-100;
+$color-accent-gold-dark: $-gold-700;
+$color-accent-gold-subtle: $-gold-50;
+
+// Ocean
+$color-accent-ocean: $-ocean-500;
+$color-accent-ocean-light: $-ocean-100;
+$color-accent-ocean-dark: $-ocean-700;
+$color-accent-ocean-subtle: $-ocean-50;
+
+// ----------------------------------------
+// GLOW COLORS
+// For hover effects and emphasis
+// ----------------------------------------
+
+$color-glow-brand: rgba($color-brand-primary-400, 0.5);
+$color-glow-brand-intense: rgba($color-brand-primary-400, 0.7);
+$color-glow-coral: rgba($-coral-400, 0.5);
+$color-glow-purple: rgba($-purple-400, 0.5);
+$color-glow-gold: rgba($-gold-400, 0.5);
+$color-glow-ocean: rgba($-ocean-400, 0.5);
+
+// ----------------------------------------
+// EXTENDED GRADIENTS
+// Vibrant multi-color gradients
+// ----------------------------------------
+
+// Hero gradients - for page headers and featured sections
+$gradient-hero-vivid: linear-gradient(
+  135deg,
+  $intalio-teal-500 0%,
+  $-ocean-500 50%,
+  $-purple-500 100%
+);
+
+$gradient-hero-warm: linear-gradient(
+  135deg,
+  $intalio-teal-500 0%,
+  $-gold-500 50%,
+  $-coral-400 100%
+);
+
+$gradient-hero-cool: linear-gradient(
+  135deg,
+  $-ocean-500 0%,
+  $intalio-teal-500 50%,
+  $-purple-500 100%
+);
+
+// Accent gradients - for buttons and interactive elements
+$gradient-accent-coral: linear-gradient(135deg, $-coral-400 0%, $-coral-600 100%);
+$gradient-accent-purple: linear-gradient(135deg, $-purple-400 0%, $-purple-600 100%);
+$gradient-accent-gold: linear-gradient(135deg, $-gold-400 0%, $-gold-600 100%);
+$gradient-accent-ocean: linear-gradient(135deg, $-ocean-400 0%, $-ocean-600 100%);
+
+// Rainbow gradient - for special occasions
+$gradient-rainbow: linear-gradient(
+  90deg,
+  $-coral-500 0%,
+  $-gold-500 25%,
+  $intalio-teal-500 50%,
+  $-ocean-500 75%,
+  $-purple-500 100%
+);
+
+// Shimmer gradient - for loading states
+$gradient-shimmer: linear-gradient(
+  90deg,
+  transparent 0%,
+  rgba(255, 255, 255, 0.4) 50%,
+  transparent 100%
+);
+
+// Mesh background gradients
+$gradient-mesh-vivid:
+  radial-gradient(at 40% 20%, rgba($intalio-teal-300, 0.3) 0px, transparent 50%),
+  radial-gradient(at 80% 0%, rgba($-ocean-200, 0.3) 0px, transparent 50%),
+  radial-gradient(at 0% 50%, rgba($-purple-200, 0.2) 0px, transparent 50%),
+  radial-gradient(at 80% 50%, rgba($-coral-200, 0.15) 0px, transparent 50%),
+  radial-gradient(at 0% 100%, rgba($-gold-200, 0.2) 0px, transparent 50%);
+
+$gradient-mesh-subtle:
+  radial-gradient(at 40% 20%, rgba($intalio-teal-100, 0.4) 0px, transparent 50%),
+  radial-gradient(at 80% 0%, rgba($slate-100, 0.3) 0px, transparent 50%),
+  radial-gradient(at 0% 50%, rgba($intalio-teal-50, 0.3) 0px, transparent 50%);
+
+// ----------------------------------------
+// COLOR MAPS (for programmatic access)
+// ----------------------------------------
+
+$colors-coral: (
+  '50': $-coral-50,
+  '100': $-coral-100,
+  '200': $-coral-200,
+  '300': $-coral-300,
+  '400': $-coral-400,
+  '500': $-coral-500,
+  '600': $-coral-600,
+  '700': $-coral-700,
+  '800': $-coral-800,
+  '900': $-coral-900,
+);
+
+$colors-purple: (
+  '50': $-purple-50,
+  '100': $-purple-100,
+  '200': $-purple-200,
+  '300': $-purple-300,
+  '400': $-purple-400,
+  '500': $-purple-500,
+  '600': $-purple-600,
+  '700': $-purple-700,
+  '800': $-purple-800,
+  '900': $-purple-900,
+);
+
+$colors-gold: (
+  '50': $-gold-50,
+  '100': $-gold-100,
+  '200': $-gold-200,
+  '300': $-gold-300,
+  '400': $-gold-400,
+  '500': $-gold-500,
+  '600': $-gold-600,
+  '700': $-gold-700,
+  '800': $-gold-800,
+  '900': $-gold-900,
+);
+
+$colors-ocean: (
+  '50': $-ocean-50,
+  '100': $-ocean-100,
+  '200': $-ocean-200,
+  '300': $-ocean-300,
+  '400': $-ocean-400,
+  '500': $-ocean-500,
+  '600': $-ocean-600,
+  '700': $-ocean-700,
+  '800': $-ocean-800,
+  '900': $-ocean-900,
+);
+
+// ----------------------------------------
+// CONVENIENCE ALIASES
+// For ease of use in components
+// ----------------------------------------
+
+$coral-50: $-coral-50;
+$coral-100: $-coral-100;
+$coral-200: $-coral-200;
+$coral-300: $-coral-300;
+$coral-400: $-coral-400;
+$coral-500: $-coral-500;
+$coral-600: $-coral-600;
+$coral-700: $-coral-700;
+$coral-800: $-coral-800;
+$coral-900: $-coral-900;
+
+$purple-50: $-purple-50;
+$purple-100: $-purple-100;
+$purple-200: $-purple-200;
+$purple-300: $-purple-300;
+$purple-400: $-purple-400;
+$purple-500: $-purple-500;
+$purple-600: $-purple-600;
+$purple-700: $-purple-700;
+$purple-800: $-purple-800;
+$purple-900: $-purple-900;
+
+$gold-50: $-gold-50;
+$gold-100: $-gold-100;
+$gold-200: $-gold-200;
+$gold-300: $-gold-300;
+$gold-400: $-gold-400;
+$gold-500: $-gold-500;
+$gold-600: $-gold-600;
+$gold-700: $-gold-700;
+$gold-800: $-gold-800;
+$gold-900: $-gold-900;
+
+$ocean-50: $-ocean-50;
+$ocean-100: $-ocean-100;
+$ocean-200: $-ocean-200;
+$ocean-300: $-ocean-300;
+$ocean-400: $-ocean-400;
+$ocean-500: $-ocean-500;
+$ocean-600: $-ocean-600;
+$ocean-700: $-ocean-700;
+$ocean-800: $-ocean-800;
+$ocean-900: $-ocean-900;
+
+// Brand aliases with full palette
+$brand-50: $intalio-teal-50;
+$brand-100: $intalio-teal-100;
+$brand-200: $intalio-teal-200;
+$brand-300: $intalio-teal-300;
+$brand-400: $intalio-teal-400;
+$brand-500: $intalio-teal-500;
+$brand-600: $intalio-teal-600;
+$brand-700: $intalio-teal-700;
+$brand-800: $intalio-teal-800;
+$brand-900: $intalio-teal-900;

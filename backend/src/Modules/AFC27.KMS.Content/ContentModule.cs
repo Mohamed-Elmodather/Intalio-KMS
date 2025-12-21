@@ -1,0 +1,37 @@
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+
+namespace AFC27.KMS.Content;
+
+/// <summary>
+/// Content module registration.
+/// </summary>
+public static class ContentModule
+{
+    /// <summary>
+    /// Add Content module services.
+    /// </summary>
+    public static IServiceCollection AddContentModule(this IServiceCollection services, IConfiguration configuration)
+    {
+        // Add module-specific services
+        // services.AddScoped<IArticleService, ArticleService>();
+        // services.AddScoped<ICategoryService, CategoryService>();
+        // services.AddScoped<ITagService, TagService>();
+        // services.AddScoped<ITemplateService, TemplateService>();
+
+        // Add authorization policies
+        services.AddAuthorizationBuilder()
+            .AddPolicy("CanCreateContent", policy =>
+                policy.RequireClaim("permission", "content:create"))
+            .AddPolicy("CanEditContent", policy =>
+                policy.RequireClaim("permission", "content:edit"))
+            .AddPolicy("CanDeleteContent", policy =>
+                policy.RequireClaim("permission", "content:delete"))
+            .AddPolicy("CanPublishContent", policy =>
+                policy.RequireClaim("permission", "content:publish"))
+            .AddPolicy("CanManageContent", policy =>
+                policy.RequireClaim("permission", "content:manage"));
+
+        return services;
+    }
+}

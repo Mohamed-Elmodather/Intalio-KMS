@@ -1,0 +1,284 @@
+// ============================================
+// DESIGN SYSTEM: CARD MIXINS
+// Card and surface patterns
+// ============================================
+
+@use '../tokens' as *;
+
+// ----------------------------------------
+// BASE CARD
+// ----------------------------------------
+
+@mixin card-base {
+  background: $color-surface-0;
+  border-radius: $radius-card;
+  border: 1px solid $color-border-light;
+  box-shadow: $shadow-card;
+  transition:
+    box-shadow $duration-normal $ease-default,
+    transform $duration-normal $ease-default,
+    border-color $duration-fast $ease-default;
+}
+
+// Card with hover elevation
+@mixin card-elevated {
+  @include card-base;
+
+  &:hover {
+    box-shadow: $shadow-card-hover;
+    border-color: $color-border-default;
+    transform: translateY(-2px);
+  }
+}
+
+// Card with click interaction
+@mixin card-interactive {
+  @include card-elevated;
+  cursor: pointer;
+
+  &:active {
+    transform: translateY(0);
+    box-shadow: $shadow-card-active;
+  }
+}
+
+// ----------------------------------------
+// CARD VARIANTS
+// ----------------------------------------
+
+// Flat card (no shadow)
+@mixin card-flat {
+  background: $color-surface-0;
+  border-radius: $radius-card;
+  border: 1px solid $color-border-default;
+  transition: border-color $duration-fast $ease-default;
+
+  &:hover {
+    border-color: $color-border-dark;
+  }
+}
+
+// Sunken card (inset appearance)
+@mixin card-sunken {
+  background: $color-bg-sunken;
+  border-radius: $radius-card;
+  border: 1px solid $color-border-light;
+  box-shadow: $shadow-inner;
+}
+
+// Outlined card
+@mixin card-outlined {
+  background: transparent;
+  border-radius: $radius-card;
+  border: 1px solid $color-border-default;
+  transition: border-color $duration-fast $ease-default;
+
+  &:hover {
+    border-color: $color-brand-primary;
+  }
+}
+
+// Glass card (glassmorphism)
+@mixin card-glass($blur: 12px, $opacity: 0.85) {
+  background: rgba(255, 255, 255, $opacity);
+  backdrop-filter: blur($blur);
+  -webkit-backdrop-filter: blur($blur);
+  border-radius: $radius-card;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+// Dark glass card
+@mixin card-glass-dark($blur: 12px, $opacity: 0.9) {
+  background: rgba($-slate-900, $opacity);
+  backdrop-filter: blur($blur);
+  -webkit-backdrop-filter: blur($blur);
+  border-radius: $radius-card;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  color: $color-text-inverse;
+}
+
+// ----------------------------------------
+// CARD PADDING VARIANTS
+// ----------------------------------------
+
+@mixin card-padding-sm {
+  padding: $space-card-sm;
+}
+
+@mixin card-padding-md {
+  padding: $space-card-md;
+}
+
+@mixin card-padding-lg {
+  padding: $space-card-lg;
+}
+
+// ----------------------------------------
+// CONTENT CARD (for items in lists/grids)
+// ----------------------------------------
+
+@mixin content-card {
+  @include card-base;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  cursor: pointer;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: $shadow-elevated-lg;
+    border-color: $color-brand-primary-200;
+  }
+}
+
+// Card thumbnail area
+@mixin card-thumbnail($height: 180px) {
+  position: relative;
+  height: $height;
+  overflow: hidden;
+  background: $color-bg-tertiary;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform $duration-slow $ease-out-expo;
+  }
+
+  &:hover img {
+    transform: scale(1.05);
+  }
+}
+
+// Card body area
+@mixin card-body {
+  padding: $space-card-md;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+// Card footer area
+@mixin card-footer {
+  padding: $space-card-sm $space-card-md;
+  border-top: 1px solid $color-border-light;
+  background: $color-bg-secondary;
+}
+
+// ----------------------------------------
+// WIDGET CARD (dashboard widgets)
+// ----------------------------------------
+
+@mixin widget {
+  @include card-base;
+  padding: $space-card-lg;
+}
+
+@mixin widget-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-4;
+  padding-bottom: $spacing-3;
+  border-bottom: 1px solid $color-border-light;
+}
+
+@mixin widget-title {
+  display: flex;
+  align-items: center;
+  gap: $spacing-2;
+
+  i {
+    font-size: $font-size-lg;
+    color: $color-brand-primary;
+  }
+
+  h3 {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-semibold;
+    color: $color-text-primary;
+    margin: 0;
+  }
+}
+
+@mixin widget-body {
+  flex: 1;
+}
+
+@mixin widget-action {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $color-brand-primary;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: $spacing-1 $spacing-2;
+  border-radius: $radius-md;
+  transition: background-color $duration-fast $ease-default;
+
+  &:hover {
+    background: $color-brand-primary-50;
+  }
+}
+
+// ----------------------------------------
+// STAT CARD
+// ----------------------------------------
+
+@mixin stat-card {
+  @include card-base;
+  padding: $space-card-md;
+  display: flex;
+  align-items: center;
+  gap: $spacing-4;
+  cursor: pointer;
+
+  &:hover {
+    box-shadow: $shadow-card-hover;
+    transform: translateY(-2px);
+  }
+}
+
+@mixin stat-icon($bg-color: $color-brand-primary-50, $icon-color: $color-brand-primary) {
+  width: 48px;
+  height: 48px;
+  border-radius: $radius-lg;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: $bg-color;
+  color: $icon-color;
+  font-size: $font-size-xl;
+  flex-shrink: 0;
+}
+
+@mixin stat-content {
+  flex: 1;
+  min-width: 0;
+}
+
+@mixin stat-value {
+  font-size: $font-size-2xl;
+  font-weight: $font-weight-bold;
+  color: $color-text-primary;
+  line-height: $line-height-tight;
+}
+
+@mixin stat-label {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+}
+
+@mixin stat-trend($positive: true) {
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-1;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+
+  @if $positive {
+    color: $color-success;
+  } @else {
+    color: $color-error;
+  }
+}

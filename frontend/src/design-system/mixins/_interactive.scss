@@ -1,0 +1,301 @@
+// ============================================
+// DESIGN SYSTEM: INTERACTIVE MIXINS
+// Hover, focus, active states and effects
+// ============================================
+
+@use '../tokens' as *;
+
+// ----------------------------------------
+// HOVER EFFECTS
+// ----------------------------------------
+
+// Lift on hover (subtle elevation)
+@mixin hover-lift($distance: -2px) {
+  transition:
+    transform $duration-normal $ease-default,
+    box-shadow $duration-normal $ease-default;
+
+  &:hover {
+    transform: translateY($distance);
+  }
+}
+
+// Lift with shadow
+@mixin hover-lift-shadow {
+  transition:
+    transform $duration-normal $ease-default,
+    box-shadow $duration-normal $ease-default;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: $shadow-elevated-lg;
+  }
+}
+
+// Scale on hover
+@mixin hover-scale($scale: 1.02) {
+  transition: transform $duration-normal $ease-default;
+
+  &:hover {
+    transform: scale($scale);
+  }
+}
+
+// Scale down on hover (press effect)
+@mixin hover-press {
+  transition: transform $duration-fast $ease-default;
+
+  &:hover {
+    transform: scale(0.98);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+// Background color change
+@mixin hover-bg($color: $color-interactive-hover) {
+  transition: background-color $duration-fast $ease-default;
+
+  &:hover {
+    background-color: $color;
+  }
+}
+
+// Brand glow on hover
+@mixin hover-glow($color: $color-brand-primary) {
+  transition: box-shadow $duration-normal $ease-default;
+
+  &:hover {
+    box-shadow: 0 0 20px -5px rgba($color, 0.4);
+  }
+}
+
+// Border color change
+@mixin hover-border($color: $color-brand-primary) {
+  transition: border-color $duration-fast $ease-default;
+
+  &:hover {
+    border-color: $color;
+  }
+}
+
+// ----------------------------------------
+// FOCUS STATES
+// ----------------------------------------
+
+// Standard focus ring
+@mixin focus-ring {
+  &:focus-visible {
+    outline: none;
+    box-shadow: $shadow-focus-ring;
+  }
+}
+
+// Inset focus ring
+@mixin focus-ring-inset {
+  &:focus-visible {
+    outline: none;
+    box-shadow: inset 0 0 0 2px $color-brand-primary;
+  }
+}
+
+// Focus ring with offset
+@mixin focus-outline {
+  &:focus-visible {
+    outline: $outline-width solid $color-brand-primary;
+    outline-offset: $outline-offset;
+  }
+}
+
+// Focus within container
+@mixin focus-within-ring {
+  &:focus-within {
+    box-shadow: $shadow-focus-ring;
+  }
+}
+
+// Error focus ring
+@mixin focus-ring-error {
+  &:focus-visible {
+    outline: none;
+    box-shadow: $shadow-focus-ring-error;
+  }
+}
+
+// ----------------------------------------
+// ACTIVE STATES
+// ----------------------------------------
+
+@mixin active-press {
+  &:active {
+    transform: translateY(1px);
+  }
+}
+
+@mixin active-scale {
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+// ----------------------------------------
+// DISABLED STATES
+// ----------------------------------------
+
+@mixin disabled {
+  &:disabled,
+  &[disabled],
+  &.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+}
+
+@mixin disabled-muted {
+  &:disabled,
+  &[disabled],
+  &.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+    filter: grayscale(50%);
+  }
+}
+
+// ----------------------------------------
+// SELECTION STATES
+// ----------------------------------------
+
+@mixin selected {
+  background: $color-interactive-selected;
+  border-color: $color-brand-primary;
+}
+
+@mixin selected-ring {
+  box-shadow: 0 0 0 2px $color-brand-primary;
+}
+
+// ----------------------------------------
+// SKELETON LOADING
+// ----------------------------------------
+
+@mixin skeleton {
+  background: linear-gradient(
+    90deg,
+    $color-bg-tertiary 0%,
+    $color-bg-secondary 50%,
+    $color-bg-tertiary 100%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.5s ease-in-out infinite;
+  border-radius: $radius-md;
+}
+
+@keyframes skeleton-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+@mixin skeleton-text($width: 100%, $height: 1em) {
+  @include skeleton;
+  width: $width;
+  height: $height;
+}
+
+@mixin skeleton-circle($size: 40px) {
+  @include skeleton;
+  width: $size;
+  height: $size;
+  border-radius: $radius-full;
+}
+
+// ----------------------------------------
+// RIPPLE EFFECT
+// ----------------------------------------
+
+@mixin ripple {
+  position: relative;
+  overflow: hidden;
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, transparent 70%);
+    transform: scale(0);
+    opacity: 0;
+    transition: transform 0.5s, opacity 0.5s;
+    pointer-events: none;
+  }
+
+  &:active::after {
+    transform: scale(2);
+    opacity: 1;
+    transition: 0s;
+  }
+}
+
+// ----------------------------------------
+// CLICKABLE WRAPPER
+// Complete interactive element styling
+// ----------------------------------------
+
+@mixin clickable {
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: $transition-all;
+
+  @include focus-ring;
+  @include disabled;
+}
+
+@mixin clickable-card {
+  @include clickable;
+  @include hover-lift-shadow;
+  @include active-press;
+}
+
+// ----------------------------------------
+// LINK STYLES
+// ----------------------------------------
+
+@mixin link-default {
+  color: $color-text-link;
+  text-decoration: none;
+  transition: color $duration-fast $ease-default;
+
+  &:hover {
+    color: $color-text-link-hover;
+  }
+
+  @include focus-outline;
+}
+
+@mixin link-underline {
+  @include link-default;
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: 2px;
+
+  &:hover {
+    text-decoration-color: currentColor;
+  }
+}
+
+@mixin link-subtle {
+  color: $color-text-secondary;
+  text-decoration: none;
+  transition: color $duration-fast $ease-default;
+
+  &:hover {
+    color: $color-text-primary;
+  }
+}

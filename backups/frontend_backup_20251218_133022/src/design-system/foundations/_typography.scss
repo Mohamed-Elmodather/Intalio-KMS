@@ -1,0 +1,300 @@
+// ============================================
+// DESIGN SYSTEM: BASE TYPOGRAPHY
+// Global typography styles
+// ============================================
+
+@use '../tokens' as *;
+@use '../mixins/responsive' as *;
+
+// ----------------------------------------
+// ROOT TYPOGRAPHY
+// ----------------------------------------
+
+html {
+  font-size: 16px; // Base for rem calculations
+}
+
+body {
+  font-family: $font-family-primary;
+  font-size: $font-size-base;
+  font-weight: $font-weight-normal;
+  line-height: $line-height-normal;
+  color: $color-text-primary;
+}
+
+// RTL font family
+[dir="rtl"] body {
+  font-family: $font-family-arabic;
+}
+
+// ----------------------------------------
+// HEADINGS
+// ----------------------------------------
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: $font-weight-semibold;
+  line-height: $line-height-heading;
+  color: $color-text-primary;
+  margin: 0;
+}
+
+h1 {
+  font-size: $font-size-4xl;
+  font-weight: $font-weight-bold;
+  letter-spacing: $letter-spacing-heading;
+
+  @include mobile {
+    font-size: $font-size-3xl;
+  }
+}
+
+h2 {
+  font-size: $font-size-3xl;
+  letter-spacing: $letter-spacing-heading;
+
+  @include mobile {
+    font-size: $font-size-2xl;
+  }
+}
+
+h3 {
+  font-size: $font-size-2xl;
+
+  @include mobile {
+    font-size: $font-size-xl;
+  }
+}
+
+h4 {
+  font-size: $font-size-xl;
+
+  @include mobile {
+    font-size: $font-size-lg;
+  }
+}
+
+h5 {
+  font-size: $font-size-lg;
+}
+
+h6 {
+  font-size: $font-size-base;
+}
+
+// ----------------------------------------
+// BODY TEXT
+// ----------------------------------------
+
+p {
+  margin: 0;
+  color: $color-text-primary;
+}
+
+// Lead paragraph
+.text-lead {
+  font-size: $font-size-lg;
+  line-height: $line-height-relaxed;
+  color: $color-text-secondary;
+}
+
+// Small text
+small,
+.text-small {
+  font-size: $font-size-sm;
+}
+
+.text-xs {
+  font-size: $font-size-xs;
+}
+
+// ----------------------------------------
+// TEXT COLORS
+// ----------------------------------------
+
+.text-primary {
+  color: $color-text-primary;
+}
+
+.text-secondary {
+  color: $color-text-secondary;
+}
+
+.text-muted {
+  color: $color-text-muted;
+}
+
+.text-brand {
+  color: $color-brand-primary;
+}
+
+.text-success {
+  color: $color-success;
+}
+
+.text-warning {
+  color: $color-warning;
+}
+
+.text-error {
+  color: $color-error;
+}
+
+.text-info {
+  color: $color-info;
+}
+
+// ----------------------------------------
+// LINKS
+// ----------------------------------------
+
+a {
+  color: $color-text-link;
+  text-decoration: none;
+  transition: color $duration-fast $ease-default;
+
+  &:hover {
+    color: $color-text-link-hover;
+  }
+}
+
+// Underline link variant
+a.link-underline {
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: 2px;
+
+  &:hover {
+    text-decoration-color: currentColor;
+  }
+}
+
+// Subtle link (secondary color)
+a.link-subtle {
+  color: $color-text-secondary;
+
+  &:hover {
+    color: $color-text-primary;
+  }
+}
+
+// ----------------------------------------
+// LISTS (styled)
+// ----------------------------------------
+
+.list-styled {
+  padding-left: $spacing-6;
+
+  li {
+    margin-bottom: $spacing-2;
+  }
+
+  &.list-disc {
+    list-style-type: disc;
+  }
+
+  &.list-decimal {
+    list-style-type: decimal;
+  }
+}
+
+// ----------------------------------------
+// INLINE TEXT STYLES
+// ----------------------------------------
+
+strong,
+b {
+  font-weight: $font-weight-semibold;
+}
+
+em,
+i {
+  font-style: italic;
+}
+
+mark {
+  background-color: $color-warning-light;
+  color: $color-text-primary;
+  padding: 0.125em 0.25em;
+  border-radius: $radius-sm;
+}
+
+del {
+  text-decoration: line-through;
+  color: $color-text-muted;
+}
+
+// ----------------------------------------
+// CODE & PREFORMATTED
+// ----------------------------------------
+
+code {
+  font-family: $font-family-mono;
+  font-size: 0.875em;
+  padding: 0.125em 0.375em;
+  background: $color-bg-tertiary;
+  border-radius: $radius-sm;
+  color: $color-brand-primary-dark;
+}
+
+pre {
+  font-family: $font-family-mono;
+  font-size: $font-size-sm;
+  line-height: $line-height-relaxed;
+  padding: $spacing-4;
+  background: $color-bg-tertiary;
+  border-radius: $radius-lg;
+  overflow-x: auto;
+
+  code {
+    padding: 0;
+    background: none;
+  }
+}
+
+kbd {
+  font-family: $font-family-mono;
+  font-size: 0.75em;
+  padding: 0.125em 0.375em;
+  background: $color-bg-tertiary;
+  border: 1px solid $color-border-default;
+  border-radius: $radius-sm;
+  box-shadow: 0 1px 0 $color-border-dark;
+}
+
+// ----------------------------------------
+// BLOCKQUOTES
+// ----------------------------------------
+
+blockquote {
+  padding-left: $spacing-4;
+  border-left: 3px solid $color-brand-primary;
+  color: $color-text-secondary;
+  font-style: italic;
+
+  [dir="rtl"] & {
+    padding-left: 0;
+    padding-right: $spacing-4;
+    border-left: none;
+    border-right: 3px solid $color-brand-primary;
+  }
+}
+
+// ----------------------------------------
+// HORIZONTAL RULE
+// ----------------------------------------
+
+hr {
+  margin: $spacing-6 0;
+  border: none;
+  height: 1px;
+  background: $color-border-light;
+}
+
+// ----------------------------------------
+// SELECTION
+// ----------------------------------------
+
+::selection {
+  background-color: rgba($color-brand-primary, 0.2);
+  color: $color-brand-primary-dark;
+}

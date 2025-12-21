@@ -1,0 +1,300 @@
+// ============================================
+// DESIGN SYSTEM: BUTTON MIXINS
+// Button styles and variants
+// ============================================
+
+@use '../tokens' as *;
+
+// ----------------------------------------
+// BUTTON BASE
+// ----------------------------------------
+
+@mixin button-base {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-2;
+  font-family: inherit;
+  font-weight: $font-weight-medium;
+  font-size: $font-size-sm;
+  line-height: 1;
+  text-decoration: none;
+  border-radius: $radius-button;
+  cursor: pointer;
+  border: none;
+  outline: none;
+  transition: $transition-button;
+  white-space: nowrap;
+  user-select: none;
+
+  &:focus-visible {
+    box-shadow: $shadow-focus-ring;
+  }
+
+  &:disabled,
+  &[disabled] {
+    opacity: 0.6;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+}
+
+// ----------------------------------------
+// SIZE VARIANTS
+// ----------------------------------------
+
+@mixin button-sm {
+  padding: $space-button-y-sm $space-button-x-sm;
+  font-size: $font-size-xs;
+  gap: $spacing-1;
+}
+
+@mixin button-md {
+  padding: $space-button-y-md $space-button-x-md;
+  font-size: $font-size-sm;
+}
+
+@mixin button-lg {
+  padding: $space-button-y-lg $space-button-x-lg;
+  font-size: $font-size-base;
+}
+
+// ----------------------------------------
+// STYLE VARIANTS
+// ----------------------------------------
+
+// Primary button (brand gradient)
+@mixin button-primary {
+  @include button-base;
+  @include button-md;
+  background: $gradient-brand-primary;
+  color: $color-text-inverse;
+  box-shadow: $shadow-brand-sm;
+
+  &:hover:not(:disabled) {
+    background: $gradient-brand-primary-hover;
+    box-shadow: $shadow-brand-md;
+    transform: translateY(-1px);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow: $shadow-brand-sm;
+  }
+}
+
+// Secondary button (outlined)
+@mixin button-secondary {
+  @include button-base;
+  @include button-md;
+  background: $color-surface-0;
+  color: $color-text-primary;
+  border: 1px solid $color-border-default;
+  box-shadow: $shadow-sm;
+
+  &:hover:not(:disabled) {
+    background: $color-bg-secondary;
+    border-color: $color-border-dark;
+    box-shadow: $shadow-md;
+  }
+}
+
+// Ghost button (no background)
+@mixin button-ghost {
+  @include button-base;
+  @include button-md;
+  background: transparent;
+  color: $color-text-secondary;
+
+  &:hover:not(:disabled) {
+    background: $color-interactive-hover;
+    color: $color-text-primary;
+  }
+}
+
+// Text button (minimal)
+@mixin button-text {
+  @include button-base;
+  padding: $spacing-1 $spacing-2;
+  background: transparent;
+  color: $color-brand-primary;
+
+  &:hover:not(:disabled) {
+    background: $color-brand-primary-50;
+    color: $color-brand-primary-dark;
+  }
+}
+
+// Brand outline button
+@mixin button-outline-brand {
+  @include button-base;
+  @include button-md;
+  background: transparent;
+  color: $color-brand-primary;
+  border: 1.5px solid $color-brand-primary;
+
+  &:hover:not(:disabled) {
+    background: $color-brand-primary-50;
+    border-color: $color-brand-primary-dark;
+  }
+}
+
+// Danger button
+@mixin button-danger {
+  @include button-base;
+  @include button-md;
+  background: $color-error;
+  color: $color-text-inverse;
+  box-shadow: $shadow-error;
+
+  &:hover:not(:disabled) {
+    background: $color-error-dark;
+    box-shadow: 0 4px 14px -3px rgba($color-error, 0.35);
+  }
+}
+
+// Success button
+@mixin button-success {
+  @include button-base;
+  @include button-md;
+  background: $color-success;
+  color: $color-text-inverse;
+
+  &:hover:not(:disabled) {
+    background: $color-success-dark;
+  }
+}
+
+// ----------------------------------------
+// ICON BUTTONS
+// ----------------------------------------
+
+@mixin button-icon {
+  @include button-base;
+  padding: $spacing-2;
+  width: 36px;
+  height: 36px;
+  border-radius: $radius-md;
+  background: transparent;
+  color: $color-text-secondary;
+
+  &:hover:not(:disabled) {
+    background: $color-interactive-hover;
+    color: $color-text-primary;
+  }
+
+  i {
+    font-size: $font-size-base;
+  }
+}
+
+@mixin button-icon-sm {
+  @include button-icon;
+  width: 28px;
+  height: 28px;
+  padding: $spacing-1;
+
+  i {
+    font-size: $font-size-sm;
+  }
+}
+
+@mixin button-icon-lg {
+  @include button-icon;
+  width: 44px;
+  height: 44px;
+  padding: $spacing-3;
+
+  i {
+    font-size: $font-size-lg;
+  }
+}
+
+@mixin button-icon-rounded {
+  @include button-icon;
+  border-radius: $radius-full;
+}
+
+// ----------------------------------------
+// HEADER BUTTONS (for gradient backgrounds)
+// ----------------------------------------
+
+@mixin button-header-primary {
+  @include button-base;
+  @include button-md;
+  background: $color-surface-0;
+  color: $color-brand-primary;
+  border: 1px solid $color-surface-0;
+
+  &:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.9);
+    transform: translateY(-1px);
+    box-shadow: $shadow-lg;
+  }
+}
+
+@mixin button-header-secondary {
+  @include button-base;
+  @include button-md;
+  background: rgba(255, 255, 255, 0.15);
+  color: $color-text-inverse;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+
+  &:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.4);
+  }
+}
+
+// ----------------------------------------
+// BUTTON GROUP
+// ----------------------------------------
+
+@mixin button-group {
+  display: inline-flex;
+
+  > * {
+    border-radius: 0;
+
+    &:first-child {
+      border-radius: $radius-button 0 0 $radius-button;
+    }
+
+    &:last-child {
+      border-radius: 0 $radius-button $radius-button 0;
+    }
+
+    &:not(:last-child) {
+      border-right: 1px solid rgba(0, 0, 0, 0.1);
+    }
+  }
+}
+
+// ----------------------------------------
+// TOGGLE BUTTON GROUP
+// ----------------------------------------
+
+@mixin toggle-group {
+  display: inline-flex;
+  background: $color-bg-tertiary;
+  border-radius: $radius-lg;
+  padding: $spacing-1;
+}
+
+@mixin toggle-button {
+  @include button-base;
+  padding: $spacing-2 $spacing-3;
+  background: transparent;
+  color: $color-text-secondary;
+  border-radius: $radius-md;
+
+  &:hover:not(:disabled):not(.active) {
+    color: $color-text-primary;
+  }
+
+  &.active {
+    background: $color-surface-0;
+    color: $color-brand-primary;
+    box-shadow: $shadow-sm;
+  }
+}

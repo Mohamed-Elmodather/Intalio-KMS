@@ -1,0 +1,177 @@
+// ============================================
+// DESIGN SYSTEM: SCROLLBAR STYLES
+// Custom scrollbar styling
+// ============================================
+
+@use '../tokens' as *;
+
+// ----------------------------------------
+// DEFAULT SCROLLBAR
+// Applied to all scrollable elements
+// ----------------------------------------
+
+// Firefox
+* {
+  scrollbar-width: thin;
+  scrollbar-color: $color-border-dark transparent;
+}
+
+// Webkit (Chrome, Safari, Edge)
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: $color-border-dark;
+  border-radius: $radius-full;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+
+  &:hover {
+    background: $color-text-muted;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+// ----------------------------------------
+// THIN SCROLLBAR VARIANT
+// ----------------------------------------
+
+.scrollbar-thin {
+  scrollbar-width: thin;
+
+  &::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    border: 0;
+  }
+}
+
+// ----------------------------------------
+// HIDDEN SCROLLBAR
+// ----------------------------------------
+
+.scrollbar-none {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+// ----------------------------------------
+// VISIBLE ON HOVER
+// Scrollbar only visible when hovering
+// ----------------------------------------
+
+.scrollbar-on-hover {
+  &::-webkit-scrollbar-thumb {
+    background: transparent;
+  }
+
+  &:hover::-webkit-scrollbar-thumb {
+    background: $color-border-dark;
+  }
+}
+
+// ----------------------------------------
+// LIGHT SCROLLBAR
+// For dark backgrounds
+// ----------------------------------------
+
+.scrollbar-light {
+  scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+
+  &::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.5);
+    }
+  }
+}
+
+// ----------------------------------------
+// BRANDED SCROLLBAR
+// Uses brand color
+// ----------------------------------------
+
+.scrollbar-brand {
+  scrollbar-color: $color-brand-primary transparent;
+
+  &::-webkit-scrollbar-thumb {
+    background: $color-brand-primary;
+
+    &:hover {
+      background: $color-brand-primary-dark;
+    }
+  }
+}
+
+// ----------------------------------------
+// GUTTER SCROLLBAR
+// With visible track
+// ----------------------------------------
+
+.scrollbar-gutter {
+  scrollbar-gutter: stable;
+
+  &::-webkit-scrollbar-track {
+    background: $color-bg-tertiary;
+    border-radius: $radius-full;
+  }
+}
+
+// ----------------------------------------
+// HORIZONTAL SCROLLBAR
+// For horizontal scroll containers
+// ----------------------------------------
+
+.scroll-x {
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+
+  // Snap scrolling (optional)
+  &.scroll-snap {
+    scroll-snap-type: x mandatory;
+
+    > * {
+      scroll-snap-align: start;
+    }
+  }
+}
+
+// ----------------------------------------
+// VERTICAL SCROLLBAR
+// For vertical scroll containers
+// ----------------------------------------
+
+.scroll-y {
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+
+  // Snap scrolling (optional)
+  &.scroll-snap {
+    scroll-snap-type: y mandatory;
+
+    > * {
+      scroll-snap-align: start;
+    }
+  }
+}

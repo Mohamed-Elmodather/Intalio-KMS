@@ -1,0 +1,22 @@
+// ============================================
+// INTALIO KMS - DESIGN SYSTEM
+// Main entry point
+// ============================================
+
+// ----------------------------------------
+// 1. DESIGN TOKENS
+// Variables, colors, typography, spacing, etc.
+// These are forwarded so they can be used with @use
+// ----------------------------------------
+@forward 'tokens';
+
+// ----------------------------------------
+// 2. MIXINS
+// Reusable SCSS patterns
+// These are forwarded so they can be used with @use
+// ----------------------------------------
+@forward 'mixins';
+
+// Note: CSS Custom Properties (tokens-css/variables.css),
+// Foundations, and Animations should be imported in main.scss
+// as they contain actual CSS rules, not just SCSS variables/mixins

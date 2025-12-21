@@ -1,0 +1,4024 @@
+// ============================================
+// INTALIO KMS - DESIGN SYSTEM MIXINS
+// Reusable patterns for world-class UI
+// ============================================
+
+@use 'variables' as *;
+
+// ----------------------------------------
+// GLASS MORPHISM
+// ----------------------------------------
+
+@mixin glass-card($blur: 12px, $opacity: 0.85) {
+  background: rgba(255, 255, 255, $opacity);
+  backdrop-filter: blur($blur);
+  -webkit-backdrop-filter: blur($blur);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+@mixin glass-card-dark($blur: 12px, $opacity: 0.9) {
+  background: rgba($slate-900, $opacity);
+  backdrop-filter: blur($blur);
+  -webkit-backdrop-filter: blur($blur);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+// ----------------------------------------
+// ELEVATED CARDS
+// ----------------------------------------
+
+@mixin card-base {
+  background: white;
+  border-radius: $radius-xl;
+  border: 1px solid $slate-100;
+  box-shadow: $shadow-card;
+  transition: box-shadow $transition-base, transform $transition-base, border-color $transition-fast;
+}
+
+@mixin card-elevated {
+  @include card-base;
+
+  &:hover {
+    box-shadow: $shadow-card-hover;
+    border-color: $slate-200;
+    transform: translateY(-2px);
+  }
+}
+
+@mixin card-interactive {
+  @include card-elevated;
+  cursor: pointer;
+
+  &:active {
+    transform: translateY(0);
+    box-shadow: $shadow-card-active;
+  }
+}
+
+// ----------------------------------------
+// BUTTONS
+// ----------------------------------------
+
+@mixin button-base {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-2;
+  font-weight: $font-weight-medium;
+  font-size: $font-size-sm;
+  line-height: 1;
+  border-radius: $radius-lg;
+  padding: $spacing-3 $spacing-5;
+  cursor: pointer;
+  border: none;
+  outline: none;
+  transition: all $transition-base;
+
+  &:focus-visible {
+    box-shadow: $shadow-focus-ring;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+@mixin button-primary {
+  @include button-base;
+  background: $gradient-primary;
+  color: white;
+  box-shadow: $shadow-teal-sm;
+
+  &:hover:not(:disabled) {
+    background: $gradient-primary-hover;
+    box-shadow: $shadow-teal-md;
+    transform: translateY(-1px);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow: $shadow-teal-sm;
+  }
+}
+
+@mixin button-secondary {
+  @include button-base;
+  background: white;
+  color: $slate-700;
+  border: 1px solid $slate-200;
+  box-shadow: $shadow-sm;
+
+  &:hover:not(:disabled) {
+    background: $slate-50;
+    border-color: $slate-300;
+    box-shadow: $shadow-md;
+  }
+}
+
+@mixin button-ghost {
+  @include button-base;
+  background: transparent;
+  color: $slate-600;
+
+  &:hover:not(:disabled) {
+    background: $slate-100;
+    color: $slate-900;
+  }
+}
+
+@mixin button-teal-outline {
+  @include button-base;
+  background: transparent;
+  color: $intalio-teal-600;
+  border: 1.5px solid $intalio-teal-500;
+
+  &:hover:not(:disabled) {
+    background: $intalio-teal-50;
+    border-color: $intalio-teal-600;
+  }
+}
+
+// ----------------------------------------
+// INPUTS
+// ----------------------------------------
+
+@mixin input-base {
+  width: 100%;
+  padding: $spacing-3 $spacing-4;
+  font-size: $font-size-base;
+  line-height: 1.5;
+  color: $slate-900;
+  background: white;
+  border: 1.5px solid $slate-200;
+  border-radius: $radius-lg;
+  transition: border-color $transition-fast, box-shadow $transition-fast;
+
+  &::placeholder {
+    color: $slate-400;
+  }
+
+  &:hover:not(:disabled):not(:focus) {
+    border-color: $slate-300;
+  }
+
+  &:focus {
+    outline: none;
+    border-color: $intalio-teal-500;
+    box-shadow: $shadow-focus-ring;
+  }
+
+  &:disabled {
+    background: $slate-50;
+    color: $slate-500;
+    cursor: not-allowed;
+  }
+}
+
+@mixin input-elevated {
+  @include input-base;
+  background: $slate-50;
+  border-color: transparent;
+  box-shadow: $shadow-inner;
+
+  &:focus {
+    background: white;
+    border-color: $intalio-teal-500;
+    box-shadow: $shadow-focus-ring;
+  }
+}
+
+// ----------------------------------------
+// FOCUS STATES
+// ----------------------------------------
+
+@mixin focus-ring {
+  &:focus-visible {
+    outline: none;
+    box-shadow: $shadow-focus-ring;
+  }
+}
+
+@mixin focus-ring-inset {
+  &:focus-visible {
+    outline: none;
+    box-shadow: inset 0 0 0 2px $intalio-teal-500;
+  }
+}
+
+// ----------------------------------------
+// TYPOGRAPHY
+// ----------------------------------------
+
+@mixin heading-display {
+  font-weight: $font-weight-bold;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  color: $slate-900;
+}
+
+@mixin heading-section {
+  font-weight: $font-weight-semibold;
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+  color: $slate-800;
+}
+
+@mixin text-subtle {
+  font-size: $font-size-sm;
+  color: $slate-500;
+  line-height: 1.5;
+}
+
+@mixin text-label {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $slate-700;
+  letter-spacing: 0.01em;
+}
+
+// ----------------------------------------
+// ANIMATIONS
+// ----------------------------------------
+
+@mixin hover-lift {
+  transition: transform $transition-base, box-shadow $transition-base;
+
+  &:hover {
+    transform: translateY(-2px);
+  }
+}
+
+@mixin hover-glow($color: $intalio-teal-500) {
+  transition: box-shadow $transition-base;
+
+  &:hover {
+    box-shadow: 0 0 20px -5px rgba($color, 0.4);
+  }
+}
+
+@mixin animate-in {
+  animation: fadeInUp $duration-moderate $ease-out-expo forwards;
+}
+
+// ----------------------------------------
+// LAYOUT HELPERS
+// ----------------------------------------
+
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+@mixin flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+@mixin absolute-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+// ----------------------------------------
+// RESPONSIVE
+// ----------------------------------------
+
+@mixin mobile {
+  @media (max-width: #{$breakpoint-md - 1px}) {
+    @content;
+  }
+}
+
+@mixin tablet {
+  @media (min-width: $breakpoint-md) and (max-width: #{$breakpoint-lg - 1px}) {
+    @content;
+  }
+}
+
+@mixin desktop {
+  @media (min-width: $breakpoint-lg) {
+    @content;
+  }
+}
+
+@mixin large-desktop {
+  @media (min-width: $breakpoint-xl) {
+    @content;
+  }
+}
+
+// ----------------------------------------
+// SCROLLBAR
+// ----------------------------------------
+
+@mixin custom-scrollbar($width: 6px, $track: transparent, $thumb: $slate-300) {
+  &::-webkit-scrollbar {
+    width: $width;
+    height: $width;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: $track;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: $thumb;
+    border-radius: $radius-full;
+
+    &:hover {
+      background: darken($thumb, 10%);
+    }
+  }
+}
+
+// ----------------------------------------
+// TRUNCATION
+// ----------------------------------------
+
+@mixin truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@mixin line-clamp($lines: 2) {
+  display: -webkit-box;
+  -webkit-line-clamp: $lines;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+// ============================================
+// PAGE LAYOUT PATTERNS - UNIVERSAL GUIDELINES
+// ============================================
+//
+// !!! IMPORTANT - READ BEFORE CREATING NEW PAGES !!!
+// --------------------------------------------------
+// All portal pages MUST follow these spacing guidelines.
+// Reference template: src/views/_PageTemplate.vue
+// Reference implementation: src/views/content/ContentListView.vue
+//
+// QUICK START - Required Mixins for Every Page:
+// ----------------------------------------------
+// .your-page-view     { @include page-view; }
+// .page-header        { @include page-header; }
+// .header-background  { @include page-header-background; }
+// .header-content     { @include header-content; }
+// .header-left        { @include header-left; }
+// .breadcrumb         { @include breadcrumb; }
+// .breadcrumb-link    { @include breadcrumb-link; }
+// .breadcrumb-separator { @include breadcrumb-separator; }
+// .breadcrumb-current { @include breadcrumb-current; }
+// .page-title         { @include page-title; }
+// .page-description   { @include page-description; }
+// .header-actions     { @include header-actions; }
+// .stats-bar          { @include stats-bar; }
+// .main-content       { @include page-content; }
+//
+// For sidebar layouts:
+// .content-grid       { @include content-grid(320px); }
+//
+// ============================================
+//
+// SPACING SYSTEM REFERENCE:
+// -------------------------
+// $spacing-1:  0.25rem (4px)   - Micro spacing
+// $spacing-2:  0.5rem  (8px)   - Tight spacing
+// $spacing-3:  0.75rem (12px)  - Small spacing
+// $spacing-4:  1rem    (16px)  - Base spacing
+// $spacing-5:  1.25rem (20px)  - Medium spacing
+// $spacing-6:  1.5rem  (24px)  - Standard gap
+// $spacing-8:  2rem    (32px)  - Large spacing
+// $spacing-10: 2.5rem  (40px)  - XL spacing
+// $spacing-12: 3rem    (48px)  - 2XL spacing
+// $spacing-16: 4rem    (64px)  - 3XL spacing
+//
+// PAGE STRUCTURE - UNIVERSAL LAYOUT GUIDELINES
+// =============================================
+// MainLayout .content padding:
+//   - Desktop: $spacing-6 (24px)
+//   - Mobile (<768px): $spacing-4 (16px)
+//
+// All page elements align with MainLayout padding (visible side margins).
+//
+// 1. Page Container (.page-view)
+//    - padding: 0 (MainLayout provides the padding)
+//    - background: $slate-50
+//
+// 2. Page Header (.page-header)
+//    - VISIBLE SIDE MARGINS: Aligns with MainLayout padding (no negative side margins)
+//    - EXTENDS TO TOP: Negative top margin pulls header under nav bar
+//    - Desktop: margin -$spacing-6 top only, 0 sides
+//    - Mobile: margin -$spacing-4 top only, 0 sides
+//    - BORDER-RADIUS: 0 top, $radius-2xl bottom (only bottom corners rounded)
+//
+// 3. Stats Bar (.stats-bar) - Floating card overlapping header
+//    - MARGIN: -2.5rem top, $spacing-6 sides, $spacing-6 bottom
+//    - Side margins create visual breathing room from page edges
+//    - Mobile: -2rem top, $spacing-4 sides, $spacing-4 bottom
+//
+// 4. Main Content Area
+//    - PADDING: 0 (MainLayout provides side padding, stats-bar provides top spacing)
+//    - Content aligns with MainLayout padding naturally
+//
+// HEADER CONTENT SPACING:
+// -----------------------
+// - Breadcrumb: margin-bottom $spacing-3 (12px)
+// - Page Title (h1): margin-bottom $spacing-2 (8px)
+// - Page Description: margin 0
+// - Header Actions: gap $spacing-3 (12px)
+//
+// STATS BAR SPACING:
+// ------------------
+// - Gap between stat items: $spacing-8 (32px)
+// - Gap between icon and content: $spacing-3 (12px)
+// - Stat icon size: 44px × 44px
+// - Divider height: 40px
+// - Mobile gap: $spacing-4 (16px)
+//
+// DO NOT OVERRIDE THESE VALUES unless you have a specific
+// design requirement (e.g., ProfileView needs different overlap for profile card)
+//
+// ============================================
+
+// Page View Container - Zero padding (MainLayout provides $spacing-6)
+@mixin page-view {
+  padding: 0;
+  min-height: 100vh;
+  background: $slate-50;
+  animation: fadeIn 0.3s ease-out;
+}
+
+// Page Header - Gradient hero section with visible side margins
+// - Extends UP under the main navigation bar (gradient shows through transparent nav)
+// - VISIBLE SIDE MARGINS: Stays within MainLayout padding (no negative side margins)
+// - Rounded BOTTOM corners only (top hidden under nav bar)
+// - Minimal top padding for tight spacing below nav bar
+// CRITICAL: padding-bottom of 5rem (80px) allows stats-bar to overlap by 2.5rem (40px)
+@mixin page-header {
+  position: relative;
+  // Pull header up under nav bar, but keep within MainLayout side padding
+  margin: (-$spacing-6) 0 0 0;
+  // Top padding: minimal gap below nav bar
+  padding: $spacing-4 $spacing-6 5rem; // 16px top, 24px sides, 80px bottom
+  border-radius: 0 0 $radius-2xl $radius-2xl; // Only bottom corners rounded
+  overflow: hidden;
+
+  @include mobile {
+    margin: (-$spacing-4) 0 0 0;
+    padding: $spacing-3 $spacing-4 4rem; // 12px top, 16px sides, 64px bottom
+    border-radius: 0 0 $radius-xl $radius-xl;
+  }
+}
+
+// Page Header Background (layered gradient + pattern)
+@mixin page-header-background {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+
+  .bg-gradient {
+    position: absolute;
+    inset: 0;
+    background: $gradient-primary;
+  }
+
+  .bg-pattern {
+    position: absolute;
+    inset: 0;
+    opacity: 0.1;
+    background-image:
+      radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.3) 0%, transparent 50%),
+      radial-gradient(circle at 80% 50%, rgba(255, 255, 255, 0.2) 0%, transparent 40%);
+  }
+}
+
+// Alternative: Simple header with ::before pseudo element
+// Same behavior as page-header: visible side margins, extends under nav bar
+@mixin page-header-simple {
+  position: relative;
+  margin: (-$spacing-6) 0 0 0;
+  padding: $spacing-4 $spacing-6 5rem; // 16px top, 24px sides, 80px bottom
+  background: $gradient-hero;
+  border-radius: 0 0 $radius-2xl $radius-2xl; // Only bottom corners rounded
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: $gradient-mesh;
+    opacity: 0.5;
+  }
+
+  @include mobile {
+    margin: (-$spacing-4) 0 0 0;
+    padding: $spacing-3 $spacing-4 4rem; // 12px top, 16px sides, 64px bottom
+    border-radius: 0 0 $radius-xl $radius-xl;
+  }
+}
+
+// Header Content - Flex container for title and actions
+// Aligns title/description on left, actions on right (bottom-aligned)
+@mixin header-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: $spacing-4;
+
+  @include mobile {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+// Header Left Section - Contains breadcrumb, title, description
+@mixin header-left {
+  flex: 1;
+  min-width: 0; // Prevent flex item from overflowing
+}
+
+// Breadcrumb Navigation
+// Spacing: gap $spacing-2 between items, margin-bottom $spacing-3
+@mixin breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: $spacing-2;
+  margin-bottom: $spacing-3;
+}
+
+@mixin breadcrumb-link {
+  display: flex;
+  align-items: center;
+  gap: $spacing-2;
+  padding: $spacing-1 $spacing-2;
+  color: rgba(255, 255, 255, 0.8);
+  background: none;
+  border: none;
+  text-decoration: none;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  border-radius: $radius-md;
+  cursor: pointer;
+  transition: all $transition-fast;
+
+  i {
+    font-size: 0.875rem;
+  }
+
+  &:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.15);
+  }
+}
+
+@mixin breadcrumb-separator {
+  font-size: 0.625rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+@mixin breadcrumb-current {
+  color: white;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+}
+
+// Page Title (h1)
+// Spacing: margin-bottom $spacing-2
+@mixin page-title {
+  margin: 0 0 $spacing-2 0;
+  font-size: $font-size-3xl;
+  font-weight: $font-weight-bold;
+  color: #fff;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+
+  @include mobile {
+    font-size: $font-size-2xl;
+  }
+}
+
+// Page Description (subtitle)
+// Spacing: margin 0
+@mixin page-description {
+  font-size: $font-size-base;
+  color: rgba(255, 255, 255, 0.85);
+  margin: 0;
+  line-height: 1.5;
+}
+
+// Header Actions Container
+// Spacing: gap $spacing-3 between buttons
+@mixin header-actions {
+  display: flex;
+  gap: $spacing-3;
+  flex-shrink: 0;
+
+  @include mobile {
+    width: 100%;
+    margin-top: $spacing-4;
+
+    > * {
+      flex: 1;
+      justify-content: center;
+    }
+  }
+}
+
+// Header Button - Primary (white on gradient)
+// Padding: $spacing-3 vertical, $spacing-5 horizontal
+@mixin header-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-2;
+  font-weight: $font-weight-semibold;
+  font-size: $font-size-sm;
+  padding: $spacing-3 $spacing-5;
+  border-radius: $radius-lg;
+  background: #fff;
+  border: 1px solid #fff;
+  color: $intalio-teal-600;
+  cursor: pointer;
+  transition: all $transition-fast;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.9);
+    transform: translateY(-1px);
+    box-shadow: $shadow-lg;
+  }
+}
+
+// Header Button - Secondary (outline on gradient)
+@mixin header-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-2;
+  font-weight: $font-weight-semibold;
+  font-size: $font-size-sm;
+  padding: $spacing-3 $spacing-5;
+  border-radius: $radius-lg;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #fff;
+  cursor: pointer;
+  transition: all $transition-fast;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.25);
+  }
+}
+
+// ============================================
+// STATS BAR - Floating card overlapping header
+// ============================================
+// MARGIN: -2.5rem top, $spacing-6 sides, $spacing-6 bottom (matches Communities page)
+// PADDING: $spacing-5 vertical (20px), $spacing-6 horizontal (24px)
+
+@mixin stats-bar {
+  position: relative;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-8;
+  margin: -2.5rem $spacing-6 $spacing-6;
+  padding: $spacing-5 $spacing-6;
+  background: #fff;
+  border-radius: $radius-xl;
+  box-shadow: $shadow-elevated-md;
+
+  @include mobile {
+    margin: -2rem $spacing-4 $spacing-4;
+    padding: $spacing-4;
+    flex-wrap: wrap;
+    gap: $spacing-4;
+  }
+}
+
+// Stats Container - wrapper for stat items (use when stats-bar has additional wrapper)
+@mixin stats-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-8;
+  flex-wrap: wrap;
+
+  @include mobile {
+    gap: $spacing-4;
+  }
+}
+
+// Stat Item - Individual stat with icon and content
+// Gap: $spacing-3 between icon and text
+@mixin stat-item {
+  display: flex;
+  align-items: center;
+  gap: $spacing-3;
+}
+
+// Stat Content - value + label wrapper
+@mixin stat-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+// Stat Icon Box - 44px square
+@mixin stat-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: $radius-lg;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+// Stat Icon Variants - Color schemes
+@mixin stat-icon-primary {
+  background: rgba($intalio-teal-500, 0.1);
+  color: $intalio-teal-500;
+}
+
+@mixin stat-icon-info {
+  background: rgba($info-500, 0.1);
+  color: $info-500;
+}
+
+@mixin stat-icon-success {
+  background: rgba($success-500, 0.1);
+  color: $success-500;
+}
+
+@mixin stat-icon-warning {
+  background: rgba($warning-500, 0.1);
+  color: $warning-500;
+}
+
+@mixin stat-icon-error {
+  background: rgba($error-500, 0.1);
+  color: $error-500;
+}
+
+// Stat Value - Large number
+@mixin stat-value {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  color: $slate-900;
+  line-height: 1.2;
+}
+
+// Stat Label - Small uppercase text
+@mixin stat-label {
+  font-size: $font-size-xs;
+  color: $slate-500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+// Stat Divider - Vertical line between stats
+@mixin stat-divider {
+  width: 1px;
+  height: 40px;
+  background: $slate-200;
+
+  @include mobile {
+    display: none;
+  }
+}
+
+// ============================================
+// MAIN CONTENT AREA
+// ============================================
+// Padding: 0 top (stats-bar provides margin), $spacing-6 sides, $spacing-6 bottom
+
+@mixin page-content {
+  padding: 0 $spacing-6 $spacing-6;
+
+  @include mobile {
+    padding: 0 $spacing-4 $spacing-4;
+  }
+}
+
+// Content Grid - For sidebar + main layout
+@mixin content-grid($sidebar-width: 320px) {
+  display: grid;
+  grid-template-columns: $sidebar-width 1fr;
+  gap: $spacing-6;
+  padding: 0 $spacing-6 $spacing-6;
+
+  @include mobile {
+    grid-template-columns: 1fr;
+    padding: 0 $spacing-4 $spacing-4;
+  }
+}
+
+// Toolbar
+@mixin toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: $spacing-4;
+  margin-bottom: $spacing-6;
+  padding: $spacing-4;
+  background: #fff;
+  border-radius: $radius-xl;
+  box-shadow: $shadow-card;
+
+  @include mobile {
+    flex-direction: column;
+    gap: $spacing-3;
+  }
+}
+
+@mixin toolbar-left {
+  display: flex;
+  align-items: center;
+  gap: $spacing-4;
+  flex: 1;
+
+  @include mobile {
+    width: 100%;
+  }
+}
+
+@mixin toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: $spacing-3;
+}
+
+// Search Box
+@mixin search-box($width: 320px) {
+  position: relative;
+  width: $width;
+
+  i {
+    position: absolute;
+    inset-inline-start: $spacing-4;
+    top: 50%;
+    transform: translateY(-50%);
+    color: $slate-400;
+    z-index: 1;
+  }
+
+  @include mobile {
+    width: 100%;
+  }
+}
+
+@mixin search-input {
+  width: 100%;
+  height: 44px;
+  padding-inline-start: $spacing-10;
+  padding-inline-end: $spacing-4;
+  border-radius: $radius-lg;
+  border: 1px solid $slate-200;
+  background: $slate-50;
+  font-size: $font-size-sm;
+  transition: all $transition-fast;
+
+  &:focus {
+    border-color: $intalio-teal-400;
+    box-shadow: $shadow-focus-ring;
+    background: #fff;
+    outline: none;
+  }
+
+  &::placeholder {
+    color: $slate-400;
+  }
+}
+
+// View Toggle (List/Grid)
+@mixin view-toggle {
+  display: flex;
+  background: $slate-100;
+  border-radius: $radius-lg;
+  padding: $spacing-1;
+
+  button {
+    padding: $spacing-2 $spacing-3;
+    border: none;
+    background: transparent;
+    color: $slate-500;
+    border-radius: $radius-md;
+    cursor: pointer;
+    transition: all $transition-fast;
+
+    &:hover {
+      color: $slate-700;
+    }
+
+    &.active {
+      background: #fff;
+      color: $intalio-teal-600;
+      box-shadow: $shadow-sm;
+    }
+  }
+}
+
+// Content Area Card
+@mixin content-area {
+  background: #fff;
+  border-radius: $radius-xl;
+  box-shadow: $shadow-card;
+  overflow: hidden;
+}
+
+// Empty State
+@mixin empty-state {
+  text-align: center;
+  padding: $spacing-12 $spacing-6;
+}
+
+@mixin empty-state-icon {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto $spacing-4;
+  background: $slate-100;
+  border-radius: $radius-xl;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  i {
+    font-size: 2.5rem;
+    color: $slate-400;
+  }
+}
+
+@mixin empty-state-title {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-semibold;
+  color: $slate-800;
+  margin: 0 0 $spacing-2;
+}
+
+@mixin empty-state-text {
+  font-size: $font-size-base;
+  color: $slate-500;
+  margin: 0 0 $spacing-6;
+}
+
+// ----------------------------------------
+// CONTENT CARDS
+// Reusable card patterns for content items
+// ----------------------------------------
+
+// Base Card
+@mixin content-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--surface-card);
+  border-radius: $radius-xl;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all $transition-normal $ease-out;
+  box-shadow: $shadow-sm;
+  border: 1px solid var(--surface-border);
+
+  &:hover {
+    transform: translateY(-6px);
+    box-shadow: $shadow-elevated-lg;
+    border-color: $intalio-teal-200;
+  }
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba($intalio-teal-500, 0.3);
+  }
+}
+
+// Featured Card Variant
+@mixin content-card-featured {
+  border: 2px solid $intalio-teal-200;
+  background: linear-gradient(135deg, var(--surface-card) 0%, rgba($intalio-teal-50, 0.3) 100%);
+
+  &:hover {
+    border-color: $intalio-teal-400;
+  }
+}
+
+// Card Media Section
+@mixin card-media($height: 220px) {
+  position: relative;
+  height: $height;
+  overflow: hidden;
+  background: var(--surface-ground);
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s $ease-out;
+  }
+
+  &:hover img {
+    transform: scale(1.05);
+  }
+}
+
+// Card Placeholder Image
+@mixin card-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--surface-ground) 0%, var(--surface-100) 100%);
+
+  i {
+    font-size: 3rem;
+    color: var(--text-color-secondary);
+    opacity: 0.5;
+  }
+}
+
+// Card Badges Container
+@mixin card-badges {
+  position: absolute;
+  top: $spacing-3;
+  inset-inline-start: $spacing-3;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-2;
+  z-index: 2;
+}
+
+// Featured Badge
+@mixin featured-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-1;
+  padding: $spacing-1 $spacing-3;
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  color: white;
+  font-size: $font-size-xs;
+  font-weight: 600;
+  border-radius: $radius-full;
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.4);
+
+  i {
+    font-size: 0.625rem;
+  }
+}
+
+// Card Hover Overlay
+@mixin card-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.7) 0%, transparent 50%);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: $spacing-4;
+  opacity: 0;
+  transition: opacity $transition-normal;
+
+  &:hover {
+    opacity: 1;
+  }
+}
+
+// Card Body
+@mixin card-body {
+  padding: $spacing-5;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-3;
+  flex: 1;
+}
+
+// Card Title
+@mixin card-title {
+  margin: 0;
+  font-size: $font-size-lg;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--text-color);
+  transition: color $transition-fast;
+  @include line-clamp(2);
+}
+
+// Card Excerpt/Description
+@mixin card-excerpt {
+  margin: 0;
+  font-size: $font-size-sm;
+  line-height: 1.6;
+  color: var(--text-color-secondary);
+  @include line-clamp(2);
+}
+
+// Card Meta Row
+@mixin card-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: $font-size-xs;
+}
+
+// Card Footer
+@mixin card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: auto;
+  padding-top: $spacing-4;
+  border-top: 1px solid var(--surface-border);
+}
+
+// Card Tags
+@mixin card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-2;
+}
+
+// Tag Chip (with dynamic color)
+@mixin tag-chip {
+  padding: $spacing-1 $spacing-3;
+  background: color-mix(in srgb, var(--tag-color, $intalio-teal-500) 10%, transparent);
+  color: var(--tag-color, $intalio-teal-500);
+  font-size: $font-size-sm;
+  font-weight: 500;
+  border-radius: $radius-full;
+  transition: all $transition-fast;
+
+  &:hover {
+    background: color-mix(in srgb, var(--tag-color, $intalio-teal-500) 20%, transparent);
+  }
+}
+
+// ----------------------------------------
+// AUTHOR COMPONENTS
+// ----------------------------------------
+
+// Author Card (horizontal)
+@mixin author-card {
+  display: flex;
+  align-items: center;
+  gap: $spacing-4;
+  padding: $spacing-4;
+  background: var(--surface-card);
+  border-radius: $radius-xl;
+  box-shadow: $shadow-sm;
+}
+
+// Author Avatar
+@mixin author-avatar($size: 48px) {
+  width: $size;
+  height: $size;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: $gradient-primary;
+  border-radius: $radius-full;
+  flex-shrink: 0;
+
+  .avatar-text {
+    color: white;
+    font-size: calc($size / 2.5);
+    font-weight: 600;
+  }
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: $radius-full;
+  }
+}
+
+// Author Info
+@mixin author-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-1;
+
+  .author-name {
+    font-weight: 600;
+    color: var(--text-color);
+  }
+
+  .author-role {
+    font-size: $font-size-sm;
+    color: var(--text-color-secondary);
+  }
+}
+
+// Follow Button
+@mixin follow-btn {
+  display: flex;
+  align-items: center;
+  gap: $spacing-2;
+  padding: $spacing-2 $spacing-4;
+  background: $intalio-teal-50;
+  border: 1px solid $intalio-teal-200;
+  border-radius: $radius-lg;
+  color: $intalio-teal-600;
+  font-size: $font-size-sm;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all $transition-fast;
+
+  &:hover {
+    background: $intalio-teal-100;
+    border-color: $intalio-teal-300;
+  }
+}
+
+// ----------------------------------------
+// SIDEBAR COMPONENTS
+// ----------------------------------------
+
+// Sticky Sidebar
+@mixin sticky-sidebar {
+  position: sticky;
+  top: $spacing-6;
+  height: fit-content;
+  align-self: start;
+  max-height: calc(100vh - $header-height - $spacing-12);
+  overflow-y: auto;
+
+  @include mobile {
+    position: static;
+    max-height: none;
+  }
+}
+
+// Sidebar Section Card
+@mixin sidebar-section {
+  background: var(--surface-card);
+  border-radius: $radius-xl;
+  padding: $spacing-5;
+  box-shadow: $shadow-sm;
+  margin-bottom: $spacing-4;
+}
+
+// Section Title
+@mixin section-title {
+  display: flex;
+  align-items: center;
+  gap: $spacing-2;
+  margin: 0 0 $spacing-4 0;
+  font-size: $font-size-base;
+  font-weight: 600;
+  color: var(--text-color);
+
+  i {
+    color: $intalio-teal-500;
+  }
+}
+
+// Related Item Card
+@mixin related-card {
+  display: flex;
+  gap: $spacing-3;
+  padding: $spacing-3;
+  background: var(--surface-ground);
+  border-radius: $radius-lg;
+  cursor: pointer;
+  transition: all $transition-fast;
+
+  &:hover {
+    background: var(--surface-100);
+    transform: translateX(4px);
+  }
+}
+
+// Quick Action Button
+@mixin quick-action-btn {
+  display: flex;
+  align-items: center;
+  gap: $spacing-2;
+  padding: $spacing-3;
+  background: var(--surface-ground);
+  border: none;
+  border-radius: $radius-lg;
+  font-size: $font-size-sm;
+  color: var(--text-color);
+  cursor: pointer;
+  transition: all $transition-fast;
+  width: 100%;
+
+  i {
+    color: var(--text-color-secondary);
+  }
+
+  &:hover {
+    background: $intalio-teal-50;
+    color: $intalio-teal-600;
+
+    i {
+      color: $intalio-teal-500;
+    }
+  }
+}
+
+// ----------------------------------------
+// SHARE COMPONENTS
+// ----------------------------------------
+
+// Share Section
+@mixin share-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-4;
+  background: var(--surface-card);
+  border-radius: $radius-xl;
+  box-shadow: $shadow-sm;
+
+  @include mobile {
+    flex-direction: column;
+    gap: $spacing-3;
+    align-items: flex-start;
+  }
+}
+
+// Share Button
+@mixin share-btn {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: $radius-lg;
+  cursor: pointer;
+  transition: all $transition-fast;
+
+  &:hover {
+    transform: translateY(-2px);
+  }
+
+  &.twitter { background: #1da1f2; color: white; }
+  &.facebook { background: #4267b2; color: white; }
+  &.linkedin { background: #0077b5; color: white; }
+  &.copy {
+    background: var(--surface-ground);
+    color: var(--text-color);
+    &:hover { background: var(--surface-100); }
+  }
+}
+
+// ----------------------------------------
+// HERO SECTION (Detail Pages)
+// ----------------------------------------
+
+// Detail Hero with Image Background
+@mixin detail-hero($min-height: 420px) {
+  position: relative;
+  margin: -$spacing-6 -$spacing-6 $spacing-6;
+  min-height: $min-height;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  border-radius: 0 0 $radius-2xl $radius-2xl;
+  overflow: hidden;
+
+  @include mobile {
+    min-height: 360px;
+    margin: -$spacing-4 -$spacing-4 $spacing-4;
+  }
+}
+
+// Hero Background
+@mixin hero-background {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+// Hero Overlay Gradient
+@mixin hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.85) 0%,
+    rgba(0, 0, 0, 0.5) 40%,
+    rgba(0, 0, 0, 0.2) 70%,
+    rgba(0, 0, 0, 0.3) 100%
+  );
+}
+
+// Hero Content
+@mixin hero-content {
+  position: relative;
+  z-index: 1;
+  padding: $spacing-8 $spacing-6;
+  color: white;
+
+  @include mobile {
+    padding: $spacing-6 $spacing-4;
+  }
+}
+
+// Hero Action Button (on dark background)
+@mixin hero-action-btn {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: $radius-lg;
+  color: white;
+  cursor: pointer;
+  transition: all $transition-fast;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+  }
+}
+
+// Hero Back Button
+@mixin hero-back-btn {
+  display: flex;
+  align-items: center;
+  gap: $spacing-2;
+  padding: $spacing-2 $spacing-3;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: $radius-lg;
+  color: white;
+  cursor: pointer;
+  transition: all $transition-fast;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.2);
+  }
+}
+
+// Hero Stats
+@mixin hero-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-4;
+
+  .stat {
+    display: flex;
+    align-items: center;
+    gap: $spacing-2;
+    font-size: $font-size-sm;
+    color: rgba(255, 255, 255, 0.7);
+
+    i {
+      font-size: $font-size-xs;
+    }
+  }
+}
+
+// ----------------------------------------
+// ARTICLE BODY (Rich Content)
+// ----------------------------------------
+
+@mixin article-body {
+  background: var(--surface-card);
+  padding: $spacing-8;
+  border-radius: $radius-xl;
+  box-shadow: $shadow-sm;
+  line-height: 1.8;
+  font-size: $font-size-base;
+  color: var(--text-color);
+
+  @include mobile {
+    padding: $spacing-5;
+  }
+
+  :deep(h2) {
+    margin: $spacing-8 0 $spacing-4 0;
+    font-size: $font-size-2xl;
+    font-weight: 600;
+    color: var(--text-color);
+
+    &:first-child {
+      margin-top: 0;
+    }
+  }
+
+  :deep(h3) {
+    margin: $spacing-6 0 $spacing-3 0;
+    font-size: $font-size-xl;
+    font-weight: 600;
+  }
+
+  :deep(p) {
+    margin-bottom: $spacing-4;
+    color: var(--text-color-secondary);
+  }
+
+  :deep(ul), :deep(ol) {
+    margin: $spacing-4 0;
+    padding-inline-start: $spacing-6;
+
+    li {
+      margin-bottom: $spacing-2;
+      color: var(--text-color-secondary);
+    }
+  }
+
+  :deep(blockquote) {
+    margin: $spacing-6 0;
+    padding: $spacing-4 $spacing-6;
+    background: $intalio-teal-50;
+    border-inline-start: 4px solid $intalio-teal-500;
+    border-radius: 0 $radius-lg $radius-lg 0;
+    font-style: italic;
+    color: $intalio-teal-800;
+
+    cite {
+      display: block;
+      margin-top: $spacing-2;
+      font-size: $font-size-sm;
+      font-style: normal;
+      color: $intalio-teal-600;
+    }
+  }
+
+  :deep(strong) {
+    color: var(--text-color);
+    font-weight: 600;
+  }
+}
+
+// ----------------------------------------
+// PAGINATION
+// ----------------------------------------
+
+@mixin pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: $spacing-2;
+  margin-top: $spacing-8;
+  padding-top: $spacing-6;
+  border-top: 1px solid var(--surface-border);
+}
+
+@mixin page-btn {
+  min-width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface-card);
+  border: 1px solid var(--surface-border);
+  border-radius: $radius-lg;
+  font-size: $font-size-sm;
+  font-weight: 500;
+  color: var(--text-color);
+  cursor: pointer;
+  transition: all $transition-fast;
+
+  &:hover:not(:disabled):not(.active) {
+    background: $intalio-teal-50;
+    border-color: $intalio-teal-300;
+    color: $intalio-teal-600;
+  }
+
+  &.active {
+    background: $intalio-teal-500;
+    border-color: $intalio-teal-500;
+    color: white;
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}
+
+@mixin page-btn-nav {
+  background: $intalio-teal-50;
+  border-color: $intalio-teal-200;
+  color: $intalio-teal-600;
+
+  &:hover:not(:disabled) {
+    background: $intalio-teal-100;
+    border-color: $intalio-teal-300;
+  }
+}
+
+// ----------------------------------------
+// SKELETON LOADING
+// ----------------------------------------
+
+@mixin skeleton-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: $spacing-6;
+}
+
+@mixin skeleton-card {
+  background: var(--surface-card);
+  border-radius: $radius-xl;
+  overflow: hidden;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+// ----------------------------------------
+// FILTER COMPONENTS
+// ----------------------------------------
+
+// Filter Group with Label
+@mixin filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-2;
+  position: relative;
+}
+
+@mixin filter-label {
+  display: flex;
+  align-items: center;
+  gap: $spacing-2;
+  font-size: $font-size-xs;
+  font-weight: 600;
+  color: $slate-500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+
+  i {
+    font-size: 0.75rem;
+    color: $intalio-teal-500;
+  }
+}
+
+// Active Filters Bar
+@mixin active-filters {
+  display: flex;
+  align-items: center;
+  gap: $spacing-4;
+  padding: $spacing-4 $spacing-5;
+  background: linear-gradient(135deg, $intalio-teal-50 0%, rgba($intalio-teal-100, 0.5) 100%);
+  border: 1px solid $intalio-teal-100;
+  border-radius: $radius-xl;
+}
+
+// Filter Pill
+@mixin filter-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-2;
+  padding: $spacing-2 $spacing-3;
+  background: white;
+  border: 1px solid $intalio-teal-200;
+  border-radius: $radius-full;
+  font-size: $font-size-sm;
+  color: $slate-700;
+  cursor: pointer;
+  transition: all $transition-fast;
+  box-shadow: $shadow-xs;
+
+  &:hover {
+    background: $intalio-teal-50;
+    border-color: $intalio-teal-300;
+    transform: translateY(-1px);
+    box-shadow: $shadow-sm;
+  }
+}
+
+// ----------------------------------------
+// ANIMATIONS
+// ----------------------------------------
+
+@mixin fade-in-up {
+  animation: fadeInUp 0.4s ease-out both;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+// Staggered Animation (apply to parent, children animate)
+@mixin staggered-children($delay: 0.05s, $count: 20) {
+  @for $i from 1 through $count {
+    &:nth-child(#{$i}) {
+      animation-delay: calc(#{$i} * #{$delay});
+    }
+  }
+}
+
+// ----------------------------------------
+// TWO-COLUMN LAYOUT (Detail Pages)
+// ----------------------------------------
+
+@mixin two-column-layout($sidebar-width: 320px) {
+  display: grid;
+  grid-template-columns: 1fr $sidebar-width;
+  gap: $spacing-8;
+  max-width: 1200px;
+  margin: 0 auto;
+
+  @include tablet {
+    grid-template-columns: 1fr;
+  }
+}
+
+// ----------------------------------------
+// ACTION MENU (Popup/Dropdown)
+// Premium popup menu for actions
+// ----------------------------------------
+
+// Action Menu Button (three dots)
+@mixin action-menu-btn {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: $radius-lg;
+  color: $slate-400;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: $slate-100;
+    color: $slate-600;
+    transform: scale(1.05);
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+// Card Actions Button (floating on cards)
+@mixin card-action-btn {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+  border: 1px solid $slate-200;
+  border-radius: $radius-lg;
+  color: $slate-500;
+  cursor: pointer;
+  opacity: 0;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+  i {
+    font-size: 1rem;
+    transition: transform 0.2s ease;
+  }
+
+  &:hover {
+    background: #fff;
+    border-color: $intalio-teal-300;
+    color: $intalio-teal-600;
+    transform: scale(1.08);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+
+    i {
+      transform: rotate(90deg);
+    }
+  }
+
+  &:active {
+    transform: scale(1);
+  }
+}
+
+// Premium Popup Menu Styles (for PrimeVue Menu)
+@mixin action-menu-popup {
+  &:deep(.p-menu) {
+    padding: $spacing-2;
+    border-radius: $radius-xl;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    min-width: 220px;
+    background: #fff;
+    box-shadow:
+      0 0 0 1px rgba(0, 0, 0, 0.03),
+      0 4px 8px rgba(0, 0, 0, 0.04),
+      0 12px 24px rgba(0, 0, 0, 0.06),
+      0 24px 48px rgba(0, 0, 0, 0.08);
+    animation: menuSlideIn 0.2s cubic-bezier(0.2, 0, 0.2, 1);
+    overflow: hidden;
+  }
+
+  &:deep(.p-menu-list) {
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  &:deep(.p-menuitem) {
+    margin: 0;
+  }
+
+  &:deep(.p-menuitem-content) {
+    border-radius: $radius-lg;
+    transition: all 0.15s ease;
+  }
+
+  &:deep(.p-menuitem-link) {
+    padding: $spacing-3 $spacing-4;
+    border-radius: $radius-lg;
+    gap: $spacing-3;
+    transition: all 0.15s ease;
+
+    &:hover {
+      background: $slate-50;
+
+      .p-menuitem-icon {
+        color: $intalio-teal-600;
+        transform: scale(1.1);
+      }
+
+      .p-menuitem-text {
+        color: $slate-900;
+      }
+    }
+
+    &:focus {
+      box-shadow: none;
+      background: $slate-50;
+    }
+  }
+
+  &:deep(.p-menuitem-icon) {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: $slate-100;
+    border-radius: $radius-md;
+    color: $slate-500;
+    font-size: 0.875rem;
+    margin: 0;
+    transition: all 0.2s ease;
+  }
+
+  &:deep(.p-menuitem-text) {
+    color: $slate-700;
+    font-size: $font-size-sm;
+    font-weight: 500;
+  }
+
+  &:deep(.p-menu-separator) {
+    margin: $spacing-2 0;
+    border-top: 1px solid $slate-100;
+  }
+
+  // Danger/Delete item
+  &:deep(.text-red-500),
+  &:deep(.danger) {
+    .p-menuitem-content:hover {
+      background: rgba($error-500, 0.08);
+    }
+
+    .p-menuitem-icon {
+      background: rgba($error-500, 0.1);
+      color: $error-500;
+    }
+
+    .p-menuitem-text {
+      color: $error-600;
+    }
+
+    &:hover {
+      .p-menuitem-icon {
+        background: rgba($error-500, 0.15);
+        color: $error-600;
+      }
+
+      .p-menuitem-text {
+        color: $error-700;
+      }
+    }
+  }
+}
+
+// Menu slide-in animation
+@keyframes menuSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+// ========================================
+// PREMIUM TOOLBAR SYSTEM
+// Full-featured toolbar with filters, search, pagination
+// ========================================
+//
+// IMPORTANT: Use these mixins for ALL list/grid views in the application!
+// This ensures consistent styling across pages like Documents, Team Members,
+// Content, Media Gallery, etc.
+//
+// REQUIRED TEMPLATE STRUCTURE:
+// ┌──────────────────────────────────────────────────────────────┐
+// │ <div class="toolbar">                                         │
+// │   <div class="toolbar-row">                                   │
+// │     <div class="toolbar-left">                                │
+// │       • Search box                                            │
+// │       • Type toggle (optional)                                │
+// │       • Filter button                                         │
+// │     </div>                                                    │
+// │     <div class="toolbar-right">                               │
+// │       • Per-page control                                      │
+// │       • View toggle                                           │
+// │     </div>                                                    │
+// │   </div>                                                      │
+// │   <div class="filters-panel"> (expandable)                    │
+// │     • Filter groups with filter chips                         │
+// │   </div>                                                      │
+// │   <div class="active-filters"> (when panel closed)            │
+// │     • Removable filter tags                                   │
+// │   </div>                                                      │
+// │ </div>                                                        │
+// └──────────────────────────────────────────────────────────────┘
+//
+// SCSS USAGE EXAMPLE:
+// -------------------
+// .toolbar { @include toolbar-container; }
+// .toolbar-row { @include toolbar-row; }
+// .toolbar-left { @include toolbar-section-left; }
+// .toolbar-right { @include toolbar-section-right; }
+// .search-box { @include toolbar-search(280px); }
+// .search-input { @include toolbar-search-input; }
+// .type-toggle { @include type-toggle; }
+// .filter-btn { @include filter-btn; }
+// .filter-badge { @include filter-badge; }
+// .per-page-control { @include per-page-control; }
+// .per-page-label { @include per-page-label; }
+// .per-page-select { @include per-page-select; }
+// .filters-panel { @include filters-panel; }
+// .filter-group { @include filters-panel-group; }
+// .filter-label { @include filters-panel-label; }
+// .filter-options { @include filters-panel-options; }
+// .filter-chip { @include filter-chip; }
+// .clear-filters-btn { @include clear-filters-btn; }
+// .active-filters { @include active-filters-row; }
+// .active-filters-label { @include active-filters-label; }
+// .filter-tag { @include filter-tag; }
+// .clear-all-link { @include clear-all-link; }
+// .view-toggle { @include premium-view-toggle; }
+//
+// REFERENCE IMPLEMENTATIONS:
+// • DocumentLibraryView.vue - Full implementation with all features
+// • TeamMembersView.vue - Full implementation with pagination
+//
+// ----------------------------------------
+
+// Toolbar Container - Supports expandable filters
+@mixin toolbar-container {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-4;
+  margin-bottom: $spacing-6;
+  padding: $spacing-4;
+  background: #fff;
+  border-radius: $radius-xl;
+  box-shadow: $shadow-card;
+}
+
+// Toolbar Row - Main controls row
+@mixin toolbar-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: $spacing-4;
+  flex-wrap: wrap;
+}
+
+// Toolbar Left Section
+@mixin toolbar-section-left {
+  display: flex;
+  align-items: center;
+  gap: $spacing-3;
+  flex: 1;
+  flex-wrap: wrap;
+}
+
+// Toolbar Right Section
+@mixin toolbar-section-right {
+  display: flex;
+  align-items: center;
+  gap: $spacing-3;
+}
+
+// Premium Search Box
+@mixin toolbar-search($width: 280px) {
+  position: relative;
+  width: $width;
+
+  i {
+    position: absolute;
+    inset-inline-start: $spacing-4;
+    top: 50%;
+    transform: translateY(-50%);
+    color: $slate-400;
+    z-index: 1;
+  }
+
+  @include mobile {
+    width: 100%;
+  }
+}
+
+@mixin toolbar-search-input {
+  width: 100%;
+  height: 40px;
+  padding-inline-start: $spacing-10;
+  padding-inline-end: $spacing-4;
+  border-radius: $radius-lg;
+  border: 1px solid $slate-200;
+  background: $slate-50;
+  font-size: $font-size-sm;
+  transition: all $transition-fast;
+
+  &:focus {
+    border-color: $intalio-teal-400;
+    box-shadow: $shadow-focus-ring;
+    background: #fff;
+    outline: none;
+  }
+
+  &::placeholder {
+    color: $slate-400;
+  }
+}
+
+// Type Toggle (All/Folders/Documents style segmented control)
+@mixin type-toggle {
+  display: flex;
+  background: $slate-100;
+  border-radius: $radius-lg;
+  padding: 3px;
+
+  button {
+    display: flex;
+    align-items: center;
+    gap: $spacing-2;
+    padding: $spacing-2 $spacing-3;
+    border: none;
+    background: transparent;
+    color: $slate-500;
+    border-radius: $radius-md;
+    cursor: pointer;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
+    transition: all $transition-fast;
+    white-space: nowrap;
+
+    i {
+      font-size: 0.875rem;
+    }
+
+    &:hover:not(.active) {
+      color: $slate-700;
+    }
+
+    &.active {
+      background: #fff;
+      color: $intalio-teal-600;
+      box-shadow: $shadow-sm;
+    }
+  }
+}
+
+// Filter Button with Badge
+@mixin filter-btn {
+  display: flex;
+  align-items: center;
+  gap: $spacing-2;
+  padding: $spacing-2 $spacing-3;
+  border: 1px solid $slate-200;
+  background: #fff;
+  color: $slate-600;
+  border-radius: $radius-lg;
+  cursor: pointer;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  transition: all $transition-fast;
+
+  i {
+    font-size: 0.875rem;
+  }
+
+  &:hover {
+    border-color: $slate-300;
+    background: $slate-50;
+  }
+
+  &.active {
+    border-color: $intalio-teal-400;
+    background: $intalio-teal-50;
+    color: $intalio-teal-600;
+  }
+
+  &.has-filters {
+    border-color: $intalio-teal-400;
+    color: $intalio-teal-600;
+  }
+}
+
+// Filter Badge (count indicator)
+@mixin filter-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  background: $intalio-teal-500;
+  color: #fff;
+  border-radius: $radius-full;
+  font-size: 0.75rem;
+  font-weight: $font-weight-semibold;
+}
+
+// Per Page Control
+@mixin per-page-control {
+  display: flex;
+  align-items: center;
+  gap: $spacing-2;
+}
+
+@mixin per-page-label {
+  font-size: $font-size-sm;
+  color: $slate-500;
+  white-space: nowrap;
+}
+
+@mixin per-page-select {
+  padding: $spacing-2 $spacing-8 $spacing-2 $spacing-3;
+  border: 1px solid $slate-200;
+  border-radius: $radius-lg;
+  background: $slate-50;
+  color: $slate-700;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  cursor: pointer;
+  transition: all $transition-fast;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748b' d='M6 8L2 4h8z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right $spacing-2 center;
+
+  [dir='rtl'] & {
+    background-position: left $spacing-2 center;
+    padding-left: $spacing-8;
+    padding-right: $spacing-3;
+  }
+
+  &:hover {
+    border-color: $slate-300;
+    background-color: #fff;
+  }
+
+  &:focus {
+    outline: none;
+    border-color: $intalio-teal-400;
+    box-shadow: $shadow-focus-ring;
+    background-color: #fff;
+  }
+}
+
+// Filters Panel (expandable)
+@mixin filters-panel {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-6;
+  padding-top: $spacing-4;
+  border-top: 1px solid $slate-100;
+}
+
+// Filter Group in Panel
+@mixin filters-panel-group {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-2;
+}
+
+@mixin filters-panel-label {
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+  color: $slate-500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+@mixin filters-panel-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-2;
+}
+
+// Filter Chip (pill button in panel)
+@mixin filter-chip {
+  padding: $spacing-2 $spacing-3;
+  border: 1px solid $slate-200;
+  background: #fff;
+  color: $slate-600;
+  border-radius: $radius-full;
+  cursor: pointer;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  transition: all $transition-fast;
+
+  &:hover:not(.active) {
+    border-color: $slate-300;
+    background: $slate-50;
+  }
+
+  &.active {
+    border-color: $intalio-teal-400;
+    background: $intalio-teal-50;
+    color: $intalio-teal-600;
+  }
+}
+
+// Clear Filters Button
+@mixin clear-filters-btn {
+  display: flex;
+  align-items: center;
+  gap: $spacing-2;
+  padding: $spacing-2 $spacing-3;
+  border: none;
+  background: transparent;
+  color: $slate-500;
+  cursor: pointer;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  transition: all $transition-fast;
+  border-radius: $radius-md;
+
+  &:hover {
+    color: $error-600;
+    background: $error-50;
+  }
+}
+
+// Active Filters Row (tags when panel closed)
+@mixin active-filters-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: $spacing-2;
+  padding-top: $spacing-3;
+  border-top: 1px solid $slate-100;
+}
+
+@mixin active-filters-label {
+  font-size: $font-size-sm;
+  color: $slate-500;
+  font-weight: $font-weight-medium;
+}
+
+// Filter Tag (removable)
+@mixin filter-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-2;
+  padding: $spacing-1 $spacing-2 $spacing-1 $spacing-3;
+  background: $intalio-teal-50;
+  color: $intalio-teal-700;
+  border-radius: $radius-full;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+
+  i {
+    font-size: 0.75rem;
+  }
+
+  button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    padding: 0;
+    border: none;
+    background: rgba($intalio-teal-600, 0.15);
+    color: $intalio-teal-600;
+    border-radius: $radius-full;
+    cursor: pointer;
+    transition: all $transition-fast;
+
+    i {
+      font-size: 0.625rem;
+    }
+
+    &:hover {
+      background: $intalio-teal-600;
+      color: #fff;
+    }
+  }
+}
+
+// Clear All Link
+@mixin clear-all-link {
+  padding: $spacing-1 $spacing-2;
+  border: none;
+  background: transparent;
+  color: $slate-500;
+  cursor: pointer;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  text-decoration: underline;
+  transition: all $transition-fast;
+
+  &:hover {
+    color: $error-600;
+  }
+}
+
+// Bulk Actions Section
+@mixin bulk-actions {
+  display: flex;
+  align-items: center;
+  gap: $spacing-2;
+  padding-inline-start: $spacing-4;
+  border-inline-start: 1px solid $slate-200;
+}
+
+@mixin selection-count {
+  font-size: $font-size-sm;
+  color: $intalio-teal-600;
+  font-weight: $font-weight-medium;
+  padding-inline-end: $spacing-2;
+}
+
+// Premium View Toggle
+@mixin premium-view-toggle {
+  display: flex;
+  background: $slate-100;
+  border-radius: $radius-lg;
+  padding: 3px;
+
+  button {
+    padding: $spacing-2 $spacing-3;
+    border: none;
+    background: transparent;
+    color: $slate-500;
+    border-radius: $radius-md;
+    cursor: pointer;
+    transition: all $transition-fast;
+
+    &:hover:not(.active) {
+      color: $slate-700;
+    }
+
+    &.active {
+      background: #fff;
+      color: $intalio-teal-600;
+      box-shadow: $shadow-sm;
+    }
+  }
+}
+
+// ========================================
+// PREMIUM PAGINATION
+// Full pagination with info and controls
+// ========================================
+//
+// IMPORTANT: Use these mixins for ALL paginated lists/grids!
+// Always pair with the Premium Toolbar System above.
+//
+// REQUIRED TEMPLATE STRUCTURE:
+// ┌──────────────────────────────────────────────────────────────┐
+// │ <div class="pagination-wrapper">                              │
+// │   <div class="pagination-info">                               │
+// │     Showing X to Y of Z items                                 │
+// │   </div>                                                      │
+// │   <div class="pagination-controls">                           │
+// │     <button class="page-btn nav-btn">←</button>               │
+// │     <button class="page-btn">1</button>                       │
+// │     <span class="page-ellipsis">...</span>                    │
+// │     <button class="page-btn active">5</button>                │
+// │     <button class="page-btn nav-btn">→</button>               │
+// │   </div>                                                      │
+// │ </div>                                                        │
+// └──────────────────────────────────────────────────────────────┘
+//
+// SCSS USAGE:
+// -----------
+// .pagination-wrapper { @include pagination-wrapper; }
+// .pagination-info { @include pagination-info; }
+// .pagination-controls { @include pagination-controls; }
+// .page-btn { @include pagination-btn; }
+// .page-ellipsis { @include pagination-ellipsis; }
+//
+// SCRIPT REQUIREMENTS (Vue Composition API):
+// ------------------------------------------
+// const currentPage = ref(1)
+// const itemsPerPage = ref(10)
+// const totalPages = computed(() => Math.ceil(items.length / itemsPerPage.value))
+// const paginatedItems = computed(() => items.slice(start, end))
+// const goToPage = (page: number) => { currentPage.value = page }
+//
+// ----------------------------------------
+
+@mixin pagination-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: $spacing-4;
+  margin-top: $spacing-6;
+  padding: $spacing-4 $spacing-6;
+  background: #fff;
+  border-radius: $radius-xl;
+  box-shadow: $shadow-card;
+  flex-wrap: wrap;
+}
+
+@mixin pagination-info {
+  font-size: $font-size-sm;
+  color: $slate-500;
+  font-weight: $font-weight-medium;
+}
+
+@mixin pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: $spacing-1;
+}
+
+@mixin pagination-btn {
+  min-width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: $radius-lg;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $slate-600;
+  cursor: pointer;
+  transition: all $transition-fast;
+
+  &:hover:not(:disabled) {
+    background: $slate-50;
+    border-color: $slate-200;
+    color: $slate-800;
+  }
+
+  &:focus {
+    outline: none;
+    box-shadow: $shadow-focus-ring;
+  }
+
+  &.active {
+    background: $gradient-primary;
+    border-color: transparent;
+    color: #fff;
+    font-weight: $font-weight-semibold;
+    box-shadow: 0 2px 8px rgba($intalio-teal-500, 0.3);
+
+    &:hover {
+      background: $gradient-primary-hover;
+    }
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  &.nav-btn {
+    background: $slate-50;
+    border-color: $slate-200;
+
+    &:hover:not(:disabled) {
+      background: $slate-100;
+      border-color: $slate-300;
+    }
+  }
+}
+
+@mixin pagination-ellipsis {
+  min-width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: $slate-400;
+  font-weight: $font-weight-medium;
+}
+
+// ----------------------------------------
+// TOOLBAR RESPONSIVE MIXINS
+// ----------------------------------------
+
+@mixin toolbar-responsive-lg {
+  @media (max-width: $breakpoint-lg) {
+    .toolbar-row {
+      flex-wrap: wrap;
+    }
+
+    .toolbar-left {
+      order: 1;
+      flex-basis: 100%;
+    }
+
+    .toolbar-right {
+      order: 2;
+      width: 100%;
+      justify-content: space-between;
+      margin-top: $spacing-2;
+    }
+  }
+}
+
+@mixin toolbar-responsive-md {
+  @media (max-width: $breakpoint-md) {
+    .toolbar-row {
+      flex-direction: column;
+      align-items: stretch;
+      gap: $spacing-3;
+    }
+
+    .toolbar-left {
+      flex-direction: column;
+      align-items: stretch;
+      gap: $spacing-3;
+    }
+
+    .toolbar-right {
+      flex-direction: row;
+      justify-content: space-between;
+    }
+
+    .search-box {
+      width: 100%;
+    }
+
+    .type-toggle {
+      width: 100%;
+      justify-content: center;
+
+      button {
+        flex: 1;
+        justify-content: center;
+      }
+    }
+
+    .filter-btn {
+      width: 100%;
+      justify-content: center;
+    }
+
+    .filters-panel {
+      flex-direction: column;
+    }
+
+    .filter-group {
+      width: 100%;
+    }
+  }
+}
+
+@mixin pagination-responsive-md {
+  @media (max-width: $breakpoint-md) {
+    .pagination-wrapper {
+      flex-direction: column;
+      gap: $spacing-3;
+      padding: $spacing-4;
+    }
+
+    .pagination-info {
+      order: 2;
+      text-align: center;
+    }
+
+    .pagination-controls {
+      order: 1;
+      width: 100%;
+      justify-content: center;
+    }
+
+    .page-btn {
+      min-width: 36px;
+      height: 36px;
+    }
+  }
+}
+
+// ============================================
+// ANIMATIONS - Global reusable animations
+// ============================================
+
+// Keyframes for fade-in with upward slide
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Simple fade-in animation
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+// Mixin for staggered fade-in animation on stat items
+// Usage: @include stat-item-animation;
+@mixin stat-item-animation {
+  animation: fadeInUp 0.4s $ease-out-expo both;
+}
+
+// Mixin to generate staggered animation delays for child elements
+// Usage: @include staggered-animation-delays('.stat-item', 10, 0.05s);
+@mixin staggered-animation-delays($selector, $count: 10, $delay: 0.05s) {
+  @for $i from 1 through $count {
+    #{$selector}:nth-child(#{$i}) {
+      animation-delay: #{$i * $delay};
+    }
+  }
+}
+
+// Combined mixin for stats bar with staggered animation
+// Apply this to the stats-bar container
+@mixin stats-bar-animated {
+  .stat-item {
+    @include stat-item-animation;
+  }
+
+  @include staggered-animation-delays('.stat-item', 10, 0.05s);
+}
+
+// Mixin for card items with staggered animation
+@mixin card-item-animation {
+  animation: fadeInUp 0.4s $ease-out-expo both;
+}
+
+// Combined mixin for card grids/lists with staggered animation
+// Apply this to the container element
+@mixin cards-animated($selector: '.card') {
+  #{$selector} {
+    @include card-item-animation;
+  }
+
+  @include staggered-animation-delays($selector, 20, 0.05s);
+}
+
+// ============================================
+// MEMBER/TEAM COMPONENTS
+// Reusable components for team member displays
+// ============================================
+
+// Member Cards Grid
+@mixin members-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: $spacing-6;
+
+  @include mobile {
+    grid-template-columns: 1fr;
+    gap: $spacing-4;
+  }
+}
+
+// Member Card - Premium team member card
+@mixin member-card {
+  @include card-base;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: $spacing-6;
+  text-align: center;
+  cursor: pointer;
+  transition: all $transition-normal $ease-out;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: $shadow-elevated-lg;
+    border-color: $intalio-teal-200;
+
+    .member-avatar {
+      transform: scale(1.05);
+      box-shadow: 0 8px 24px rgba($intalio-teal-500, 0.25);
+    }
+  }
+}
+
+// Member Avatar - Large circular avatar
+@mixin member-avatar($size: 96px) {
+  width: $size;
+  height: $size;
+  border-radius: $radius-full;
+  overflow: hidden;
+  margin-bottom: $spacing-4;
+  transition: all $transition-normal $ease-out;
+  flex-shrink: 0;
+  position: relative;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  // Fallback with initials
+  &.avatar-fallback {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: $gradient-primary;
+    color: white;
+    font-size: calc($size / 2.5);
+    font-weight: $font-weight-bold;
+  }
+
+  // Online status indicator
+  .status-indicator {
+    position: absolute;
+    bottom: 4px;
+    right: 4px;
+    width: 16px;
+    height: 16px;
+    border-radius: $radius-full;
+    border: 3px solid white;
+
+    &.online { background: $success-500; }
+    &.away { background: $warning-500; }
+    &.busy { background: $error-500; }
+    &.offline { background: $slate-300; }
+  }
+}
+
+// Member Info Section
+@mixin member-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $spacing-1;
+  width: 100%;
+}
+
+// Member Name
+@mixin member-name {
+  margin: 0;
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $slate-900;
+  @include truncate;
+  max-width: 100%;
+}
+
+// Member Role/Title
+@mixin member-role {
+  margin: 0;
+  font-size: $font-size-sm;
+  color: $slate-500;
+  @include truncate;
+  max-width: 100%;
+}
+
+// Member Department Badge
+@mixin member-department {
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-1;
+  margin-top: $spacing-2;
+  padding: $spacing-1 $spacing-3;
+  background: $slate-100;
+  color: $slate-600;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  border-radius: $radius-full;
+
+  i {
+    font-size: 0.75rem;
+  }
+}
+
+// Member Role Badge (colored)
+@mixin member-role-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-1;
+  margin-top: $spacing-3;
+  padding: $spacing-1 $spacing-3;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+  border-radius: $radius-full;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+
+  &.admin {
+    background: rgba($intalio-teal-500, 0.1);
+    color: $intalio-teal-600;
+  }
+
+  &.manager {
+    background: rgba($info-500, 0.1);
+    color: $info-600;
+  }
+
+  &.member {
+    background: rgba($slate-500, 0.1);
+    color: $slate-600;
+  }
+
+  &.lead {
+    background: rgba($warning-500, 0.1);
+    color: $warning-700;
+  }
+}
+
+// Member Stats Row (followers, projects, etc.)
+@mixin member-stats {
+  display: flex;
+  justify-content: center;
+  gap: $spacing-6;
+  margin-top: $spacing-4;
+  padding-top: $spacing-4;
+  border-top: 1px solid $slate-100;
+  width: 100%;
+}
+
+@mixin member-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $spacing-1;
+
+  .stat-value {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-bold;
+    color: $slate-900;
+  }
+
+  .stat-label {
+    font-size: $font-size-xs;
+    color: $slate-500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+}
+
+// Member Actions (contact buttons)
+@mixin member-actions {
+  display: flex;
+  gap: $spacing-2;
+  margin-top: $spacing-4;
+  width: 100%;
+  justify-content: center;
+}
+
+@mixin member-action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: $radius-lg;
+  border: 1px solid $slate-200;
+  background: white;
+  color: $slate-500;
+  cursor: pointer;
+  transition: all $transition-fast;
+
+  &:hover {
+    background: $intalio-teal-50;
+    border-color: $intalio-teal-300;
+    color: $intalio-teal-600;
+    transform: translateY(-2px);
+  }
+
+  &.primary {
+    background: $intalio-teal-500;
+    border-color: $intalio-teal-500;
+    color: white;
+
+    &:hover {
+      background: $intalio-teal-600;
+      border-color: $intalio-teal-600;
+    }
+  }
+}
+
+// Member List Item (horizontal card variant)
+@mixin member-list-item {
+  @include card-base;
+  display: flex;
+  align-items: center;
+  gap: $spacing-4;
+  padding: $spacing-4;
+  cursor: pointer;
+  transition: all $transition-fast;
+
+  &:hover {
+    border-color: $intalio-teal-200;
+    box-shadow: $shadow-md;
+  }
+
+  .member-avatar {
+    margin-bottom: 0;
+  }
+
+  .member-info {
+    flex: 1;
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .member-actions {
+    margin-top: 0;
+    width: auto;
+  }
+}
+
+// Department Filter Chip
+@mixin department-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-2;
+  padding: $spacing-2 $spacing-4;
+  background: white;
+  border: 1px solid $slate-200;
+  border-radius: $radius-full;
+  cursor: pointer;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $slate-600;
+  transition: all $transition-fast;
+
+  i {
+    font-size: 0.875rem;
+    color: $slate-400;
+  }
+
+  .count {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    background: $slate-100;
+    border-radius: $radius-full;
+    font-size: $font-size-xs;
+    color: $slate-600;
+  }
+
+  &:hover {
+    border-color: $slate-300;
+    background: $slate-50;
+  }
+
+  &.active {
+    background: $intalio-teal-50;
+    border-color: $intalio-teal-400;
+    color: $intalio-teal-700;
+
+    i {
+      color: $intalio-teal-500;
+    }
+
+    .count {
+      background: $intalio-teal-500;
+      color: white;
+    }
+  }
+}
+
+// Team Section Header
+@mixin team-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-6;
+
+  h2 {
+    display: flex;
+    align-items: center;
+    gap: $spacing-3;
+    margin: 0;
+    font-size: $font-size-xl;
+    font-weight: $font-weight-semibold;
+    color: $slate-900;
+
+    i {
+      color: $intalio-teal-500;
+    }
+  }
+}
+
+// Animated members grid
+@mixin members-grid-animated {
+  .member-card {
+    @include card-item-animation;
+  }
+
+  @include staggered-animation-delays('.member-card', 20, 0.04s);
+}
+
+// ========================================
+// ADMIN PANEL DESIGN SYSTEM
+// Premium admin interface components
+// ========================================
+//
+// This system provides a cohesive design for admin areas including:
+// - Sidebar navigation with collapsible sections
+// - Data tables with selection and actions
+// - Stats cards and metrics
+// - Form layouts and inputs
+//
+// REFERENCE: AdminLayout.vue, UsersView.vue
+// ========================================
+
+// Admin color palette - extends main palette with admin-specific colors
+$admin-sidebar-width: 280px;
+$admin-sidebar-collapsed-width: 72px;
+$admin-header-height: 64px;
+
+// ----------------------------------------
+// ADMIN LAYOUT
+// ----------------------------------------
+
+@mixin admin-layout {
+  display: flex;
+  min-height: 100vh;
+  background: $slate-100;
+}
+
+@mixin admin-sidebar {
+  width: $admin-sidebar-width;
+  background: linear-gradient(180deg, $slate-900 0%, $slate-800 100%);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  inset-inline-start: 0;
+  z-index: 100;
+  transition: all $transition-base $ease-out;
+  overflow: hidden;
+
+  // Dark scrollbar for sidebar
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: rgba(#fff, 0.2);
+    border-radius: $radius-full;
+
+    &:hover {
+      background: rgba(#fff, 0.3);
+    }
+  }
+}
+
+@mixin admin-sidebar-header {
+  padding: $spacing-5;
+  border-bottom: 1px solid rgba(#fff, 0.08);
+  display: flex;
+  align-items: center;
+  gap: $spacing-3;
+  flex-shrink: 0;
+}
+
+@mixin admin-sidebar-logo {
+  width: 40px;
+  height: 40px;
+  background: $gradient-primary;
+  border-radius: $radius-lg;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  i, img {
+    width: 24px;
+    height: 24px;
+    color: #fff;
+    font-size: 1.25rem;
+  }
+}
+
+@mixin admin-sidebar-brand {
+  flex: 1;
+  min-width: 0;
+
+  .brand-title {
+    font-size: $font-size-base;
+    font-weight: $font-weight-bold;
+    color: #fff;
+    margin: 0;
+    white-space: nowrap;
+  }
+
+  .brand-subtitle {
+    font-size: $font-size-xs;
+    color: rgba(#fff, 0.5);
+    margin: 0;
+  }
+}
+
+@mixin admin-sidebar-nav {
+  flex: 1;
+  overflow-y: auto;
+  padding: $spacing-4 0;
+}
+
+@mixin admin-nav-section {
+  margin-bottom: $spacing-2;
+}
+
+@mixin admin-nav-section-title {
+  padding: $spacing-3 $spacing-5;
+  font-size: 0.6875rem;
+  font-weight: $font-weight-semibold;
+  color: rgba(#fff, 0.35);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin: 0;
+}
+
+@mixin admin-nav-item {
+  display: flex;
+  align-items: center;
+  gap: $spacing-3;
+  width: 100%;
+  padding: $spacing-3 $spacing-5;
+  background: transparent;
+  border: none;
+  color: rgba(#fff, 0.65);
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  text-align: start;
+  cursor: pointer;
+  transition: all $transition-fast;
+  position: relative;
+
+  // Left accent bar
+  &::before {
+    content: '';
+    position: absolute;
+    inset-inline-start: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 0;
+    background: $intalio-teal-400;
+    border-radius: 0 2px 2px 0;
+    transition: height $transition-fast;
+  }
+
+  .nav-icon {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(#fff, 0.05);
+    border-radius: $radius-md;
+    flex-shrink: 0;
+    transition: all $transition-fast;
+
+    i {
+      font-size: 1rem;
+    }
+  }
+
+  .nav-text {
+    flex: 1;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .nav-badge {
+    padding: 2px 8px;
+    background: rgba(#fff, 0.1);
+    color: rgba(#fff, 0.7);
+    font-size: 0.6875rem;
+    font-weight: $font-weight-semibold;
+    border-radius: $radius-full;
+  }
+
+  &:hover {
+    color: #fff;
+    background: rgba(#fff, 0.05);
+
+    .nav-icon {
+      background: rgba(#fff, 0.1);
+    }
+  }
+
+  &.active {
+    color: #fff;
+    background: rgba($intalio-teal-500, 0.15);
+
+    &::before {
+      height: 24px;
+    }
+
+    .nav-icon {
+      background: $intalio-teal-500;
+      box-shadow: 0 4px 12px rgba($intalio-teal-500, 0.4);
+    }
+
+    .nav-badge {
+      background: $intalio-teal-500;
+      color: #fff;
+    }
+  }
+}
+
+@mixin admin-sidebar-footer {
+  padding: $spacing-4 $spacing-5;
+  border-top: 1px solid rgba(#fff, 0.08);
+  flex-shrink: 0;
+}
+
+@mixin admin-sidebar-user {
+  display: flex;
+  align-items: center;
+  gap: $spacing-3;
+  padding: $spacing-3;
+  background: rgba(#fff, 0.05);
+  border-radius: $radius-lg;
+  cursor: pointer;
+  transition: all $transition-fast;
+
+  &:hover {
+    background: rgba(#fff, 0.1);
+  }
+
+  .user-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: $radius-full;
+    overflow: hidden;
+    flex-shrink: 0;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  .user-info {
+    flex: 1;
+    min-width: 0;
+
+    .user-name {
+      font-size: $font-size-sm;
+      font-weight: $font-weight-medium;
+      color: #fff;
+      margin: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .user-role {
+      font-size: $font-size-xs;
+      color: rgba(#fff, 0.5);
+      margin: 0;
+    }
+  }
+
+  .user-menu-icon {
+    color: rgba(#fff, 0.5);
+    font-size: 0.875rem;
+  }
+}
+
+// ----------------------------------------
+// ADMIN MAIN CONTENT
+// ----------------------------------------
+
+@mixin admin-main {
+  flex: 1;
+  margin-inline-start: $admin-sidebar-width;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  transition: margin $transition-base;
+}
+
+@mixin admin-topbar {
+  height: $admin-header-height;
+  background: #fff;
+  border-bottom: 1px solid $slate-200;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 $spacing-6;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+@mixin admin-topbar-left {
+  display: flex;
+  align-items: center;
+  gap: $spacing-4;
+}
+
+@mixin admin-topbar-title {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $slate-900;
+  margin: 0;
+}
+
+@mixin admin-topbar-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: $spacing-2;
+  font-size: $font-size-sm;
+  color: $slate-500;
+
+  a, button {
+    color: $slate-500;
+    text-decoration: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+
+    &:hover {
+      color: $intalio-teal-600;
+    }
+  }
+
+  .separator {
+    color: $slate-300;
+  }
+
+  .current {
+    color: $slate-900;
+    font-weight: $font-weight-medium;
+  }
+}
+
+@mixin admin-topbar-right {
+  display: flex;
+  align-items: center;
+  gap: $spacing-3;
+}
+
+@mixin admin-topbar-action {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: $radius-lg;
+  color: $slate-500;
+  cursor: pointer;
+  position: relative;
+  transition: all $transition-fast;
+
+  &:hover {
+    background: $slate-100;
+    color: $slate-700;
+  }
+
+  .badge {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 18px;
+    height: 18px;
+    background: $error-500;
+    color: #fff;
+    font-size: 0.625rem;
+    font-weight: $font-weight-bold;
+    border-radius: $radius-full;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+@mixin admin-content {
+  flex: 1;
+  padding: $spacing-6;
+}
+
+// ----------------------------------------
+// ADMIN DATA TABLE
+// ----------------------------------------
+
+@mixin admin-table-container {
+  background: #fff;
+  border-radius: $radius-xl;
+  box-shadow: $shadow-card;
+  overflow: hidden;
+}
+
+@mixin admin-table-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-5;
+  border-bottom: 1px solid $slate-100;
+  gap: $spacing-4;
+  flex-wrap: wrap;
+}
+
+@mixin admin-table-title {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $slate-900;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: $spacing-2;
+
+  .count {
+    font-size: $font-size-sm;
+    font-weight: $font-weight-normal;
+    color: $slate-500;
+  }
+}
+
+@mixin admin-table-actions {
+  display: flex;
+  align-items: center;
+  gap: $spacing-3;
+}
+
+@mixin admin-table-search {
+  position: relative;
+  width: 280px;
+
+  i {
+    position: absolute;
+    inset-inline-start: $spacing-3;
+    top: 50%;
+    transform: translateY(-50%);
+    color: $slate-400;
+    font-size: 0.875rem;
+  }
+
+  input {
+    width: 100%;
+    height: 40px;
+    padding-inline-start: $spacing-10;
+    padding-inline-end: $spacing-3;
+    background: $slate-50;
+    border: 1px solid $slate-200;
+    border-radius: $radius-lg;
+    font-size: $font-size-sm;
+    color: $slate-900;
+    transition: all $transition-fast;
+
+    &::placeholder {
+      color: $slate-400;
+    }
+
+    &:focus {
+      outline: none;
+      background: #fff;
+      border-color: $intalio-teal-400;
+      box-shadow: 0 0 0 3px rgba($intalio-teal-500, 0.1);
+    }
+  }
+}
+
+@mixin admin-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+@mixin admin-table-th {
+  padding: $spacing-4 $spacing-5;
+  text-align: start;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+  color: $slate-500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background: $slate-50;
+  border-bottom: 1px solid $slate-200;
+  white-space: nowrap;
+
+  &.sortable {
+    cursor: pointer;
+    user-select: none;
+
+    &:hover {
+      color: $slate-700;
+    }
+
+    .sort-icon {
+      margin-inline-start: $spacing-1;
+      opacity: 0.5;
+    }
+
+    &.sorted {
+      color: $intalio-teal-600;
+
+      .sort-icon {
+        opacity: 1;
+      }
+    }
+  }
+}
+
+@mixin admin-table-td {
+  padding: $spacing-4 $spacing-5;
+  font-size: $font-size-sm;
+  color: $slate-700;
+  border-bottom: 1px solid $slate-100;
+  vertical-align: middle;
+}
+
+@mixin admin-table-row {
+  transition: background $transition-fast;
+
+  &:hover {
+    background: $slate-50;
+  }
+
+  &.selected {
+    background: rgba($intalio-teal-500, 0.05);
+  }
+
+  &:last-child td {
+    border-bottom: none;
+  }
+}
+
+@mixin admin-table-checkbox {
+  width: 20px;
+  height: 20px;
+  border: 2px solid $slate-300;
+  border-radius: $radius-sm;
+  cursor: pointer;
+  appearance: none;
+  transition: all $transition-fast;
+
+  &:checked {
+    background: $intalio-teal-500;
+    border-color: $intalio-teal-500;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z'/%3E%3C/svg%3E");
+    background-size: 14px;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba($intalio-teal-500, 0.2);
+  }
+}
+
+@mixin admin-table-user-cell {
+  display: flex;
+  align-items: center;
+  gap: $spacing-3;
+
+  .avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: $radius-full;
+    overflow: hidden;
+    flex-shrink: 0;
+    background: $slate-200;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    &.initials {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: $intalio-teal-100;
+      color: $intalio-teal-600;
+      font-size: $font-size-sm;
+      font-weight: $font-weight-semibold;
+    }
+  }
+
+  .user-details {
+    min-width: 0;
+
+    .name {
+      font-weight: $font-weight-medium;
+      color: $slate-900;
+      margin: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .email {
+      font-size: $font-size-xs;
+      color: $slate-500;
+      margin: 0;
+    }
+  }
+}
+
+@mixin admin-table-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: $spacing-1 $spacing-3;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+  border-radius: $radius-full;
+  text-transform: capitalize;
+
+  &.admin {
+    background: rgba($error-500, 0.1);
+    color: $error-600;
+  }
+
+  &.editor {
+    background: rgba($info-500, 0.1);
+    color: $info-600;
+  }
+
+  &.viewer {
+    background: rgba($slate-500, 0.1);
+    color: $slate-600;
+  }
+
+  &.active {
+    background: rgba($success-500, 0.1);
+    color: $success-600;
+  }
+
+  &.inactive {
+    background: rgba($slate-500, 0.1);
+    color: $slate-500;
+  }
+
+  &.pending {
+    background: rgba($warning-500, 0.1);
+    color: $warning-600;
+  }
+}
+
+@mixin admin-table-actions-cell {
+  display: flex;
+  align-items: center;
+  gap: $spacing-1;
+  justify-content: flex-end;
+}
+
+@mixin admin-table-action-btn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: $radius-md;
+  color: $slate-400;
+  cursor: pointer;
+  transition: all $transition-fast;
+
+  &:hover {
+    background: $slate-100;
+    color: $slate-600;
+  }
+
+  &.danger:hover {
+    background: $error-50;
+    color: $error-600;
+  }
+}
+
+// ----------------------------------------
+// ADMIN TABLE PAGINATION
+// ----------------------------------------
+
+@mixin admin-table-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-4 $spacing-5;
+  border-top: 1px solid $slate-100;
+  background: $slate-50;
+}
+
+@mixin admin-pagination-info {
+  font-size: $font-size-sm;
+  color: $slate-500;
+}
+
+@mixin admin-pagination {
+  display: flex;
+  align-items: center;
+  gap: $spacing-1;
+}
+
+@mixin admin-pagination-btn {
+  min-width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: $radius-md;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $slate-600;
+  cursor: pointer;
+  transition: all $transition-fast;
+
+  &:hover:not(:disabled) {
+    background: #fff;
+    border-color: $slate-200;
+  }
+
+  &.active {
+    background: $intalio-teal-500;
+    color: #fff;
+    border-color: $intalio-teal-500;
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}
+
+// ----------------------------------------
+// ADMIN STATS CARDS
+// ----------------------------------------
+
+@mixin admin-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: $spacing-5;
+  margin-bottom: $spacing-6;
+
+  @media (max-width: $breakpoint-lg) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @include mobile {
+    grid-template-columns: 1fr;
+  }
+}
+
+@mixin admin-stat-card {
+  background: #fff;
+  border-radius: $radius-xl;
+  padding: $spacing-5;
+  box-shadow: $shadow-card;
+  display: flex;
+  align-items: flex-start;
+  gap: $spacing-4;
+  transition: all $transition-fast;
+
+  &:hover {
+    box-shadow: $shadow-card-hover;
+    transform: translateY(-2px);
+  }
+}
+
+@mixin admin-stat-icon {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: $radius-lg;
+  flex-shrink: 0;
+
+  i {
+    font-size: 1.25rem;
+  }
+
+  &.primary {
+    background: rgba($intalio-teal-500, 0.1);
+    color: $intalio-teal-600;
+  }
+
+  &.success {
+    background: rgba($success-500, 0.1);
+    color: $success-600;
+  }
+
+  &.warning {
+    background: rgba($warning-500, 0.1);
+    color: $warning-600;
+  }
+
+  &.danger {
+    background: rgba($error-500, 0.1);
+    color: $error-600;
+  }
+
+  &.info {
+    background: rgba($info-500, 0.1);
+    color: $info-600;
+  }
+}
+
+@mixin admin-stat-content {
+  flex: 1;
+  min-width: 0;
+
+  .value {
+    font-size: $font-size-2xl;
+    font-weight: $font-weight-bold;
+    color: $slate-900;
+    line-height: 1.2;
+    margin: 0;
+  }
+
+  .label {
+    font-size: $font-size-sm;
+    color: $slate-500;
+    margin: $spacing-1 0 0 0;
+  }
+
+  .change {
+    display: inline-flex;
+    align-items: center;
+    gap: $spacing-1;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-medium;
+    margin-top: $spacing-2;
+
+    &.positive {
+      color: $success-600;
+    }
+
+    &.negative {
+      color: $error-600;
+    }
+  }
+}
+
+// ----------------------------------------
+// ADMIN BUTTON VARIANTS
+// ----------------------------------------
+
+@mixin admin-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-2;
+  padding: $spacing-2 $spacing-4;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  border-radius: $radius-lg;
+  cursor: pointer;
+  transition: all $transition-fast;
+  border: none;
+  white-space: nowrap;
+
+  i {
+    font-size: 0.875rem;
+  }
+}
+
+@mixin admin-btn-primary {
+  @include admin-btn;
+  background: $intalio-teal-500;
+  color: #fff;
+
+  &:hover {
+    background: $intalio-teal-600;
+  }
+
+  &:active {
+    background: $intalio-teal-700;
+  }
+}
+
+@mixin admin-btn-secondary {
+  @include admin-btn;
+  background: #fff;
+  color: $slate-700;
+  border: 1px solid $slate-200;
+
+  &:hover {
+    background: $slate-50;
+    border-color: $slate-300;
+  }
+}
+
+@mixin admin-btn-ghost {
+  @include admin-btn;
+  background: transparent;
+  color: $slate-600;
+
+  &:hover {
+    background: $slate-100;
+    color: $slate-800;
+  }
+}
+
+@mixin admin-btn-danger {
+  @include admin-btn;
+  background: $error-500;
+  color: #fff;
+
+  &:hover {
+    background: $error-600;
+  }
+}
+
+// ----------------------------------------
+// ADMIN RESPONSIVE
+// ----------------------------------------
+
+@mixin admin-mobile-sidebar {
+  @media (max-width: $breakpoint-lg) {
+    .admin-sidebar {
+      transform: translateX(-100%);
+
+      [dir='rtl'] & {
+        transform: translateX(100%);
+      }
+
+      &.open {
+        transform: translateX(0);
+      }
+    }
+
+    .admin-main {
+      margin-inline-start: 0;
+    }
+
+    .sidebar-overlay {
+      display: block;
+    }
+  }
+}

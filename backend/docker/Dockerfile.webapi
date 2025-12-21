@@ -1,0 +1,54 @@
+# Build stage
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /src
+
+# Copy solution and project files
+COPY ["AFC27.KMS.sln", "./"]
+COPY ["src/AFC27.KMS.WebApi/AFC27.KMS.WebApi.csproj", "src/AFC27.KMS.WebApi/"]
+COPY ["src/Shared/AFC27.KMS.SharedKernel/AFC27.KMS.SharedKernel.csproj", "src/Shared/AFC27.KMS.SharedKernel/"]
+COPY ["src/Shared/AFC27.KMS.Contracts/AFC27.KMS.Contracts.csproj", "src/Shared/AFC27.KMS.Contracts/"]
+COPY ["src/Shared/AFC27.KMS.Infrastructure/AFC27.KMS.Infrastructure.csproj", "src/Shared/AFC27.KMS.Infrastructure/"]
+COPY ["src/Modules/AFC27.KMS.Identity/AFC27.KMS.Identity.csproj", "src/Modules/AFC27.KMS.Identity/"]
+COPY ["src/Modules/AFC27.KMS.Content/AFC27.KMS.Content.csproj", "src/Modules/AFC27.KMS.Content/"]
+COPY ["src/Modules/AFC27.KMS.Documents/AFC27.KMS.Documents.csproj", "src/Modules/AFC27.KMS.Documents/"]
+COPY ["src/Modules/AFC27.KMS.Search/AFC27.KMS.Search.csproj", "src/Modules/AFC27.KMS.Search/"]
+COPY ["src/Modules/AFC27.KMS.Collaboration/AFC27.KMS.Collaboration.csproj", "src/Modules/AFC27.KMS.Collaboration/"]
+COPY ["src/Modules/AFC27.KMS.Media/AFC27.KMS.Media.csproj", "src/Modules/AFC27.KMS.Media/"]
+COPY ["src/Modules/AFC27.KMS.Workflow/AFC27.KMS.Workflow.csproj", "src/Modules/AFC27.KMS.Workflow/"]
+COPY ["src/Modules/AFC27.KMS.Calendar/AFC27.KMS.Calendar.csproj", "src/Modules/AFC27.KMS.Calendar/"]
+COPY ["src/Modules/AFC27.KMS.Notifications/AFC27.KMS.Notifications.csproj", "src/Modules/AFC27.KMS.Notifications/"]
+COPY ["src/Modules/AFC27.KMS.AI/AFC27.KMS.AI.csproj", "src/Modules/AFC27.KMS.AI/"]
+COPY ["src/Modules/AFC27.KMS.Integration/AFC27.KMS.Integration.csproj", "src/Modules/AFC27.KMS.Integration/"]
+
+# Restore dependencies
+RUN dotnet restore "src/AFC27.KMS.WebApi/AFC27.KMS.WebApi.csproj"
+
+# Copy everything else
+COPY . .
+
+# Build
+WORKDIR "/src/src/AFC27.KMS.WebApi"
+RUN dotnet build "AFC27.KMS.WebApi.csproj" -c Release -o /app/build
+
+# Publish
+FROM build AS publish
+RUN dotnet publish "AFC27.KMS.WebApi.csproj" -c Release -o /app/publish /p:UseAppHost=false
+
+# Runtime stage
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
+WORKDIR /app
+
+# Install cultures for localization
+RUN apt-get update && apt-get install -y locales && \
+    sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen && \
+    sed -i '/ar_SA.UTF-8/s/^# //g' /etc/locale.gen && \
+    locale-gen
+
+ENV ASPNETCORE_URLS=http://+:5001
+ENV ASPNETCORE_ENVIRONMENT=Production
+
+COPY --from=publish /app/publish .
+
+EXPOSE 5001
+
+ENTRYPOINT ["dotnet", "AFC27.KMS.WebApi.dll"]

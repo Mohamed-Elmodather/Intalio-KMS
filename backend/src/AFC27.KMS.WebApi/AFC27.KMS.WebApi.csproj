@@ -1,0 +1,48 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>AFC27.KMS.WebApi</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.11" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.11">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Polly" Version="8.2.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.9.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.11" />
+    <PackageReference Include="Microsoft.Identity.Web" Version="3.3.1" />
+    <PackageReference Include="Serilog.AspNetCore" Version="8.0.3" />
+    <PackageReference Include="Serilog.Enrichers.Environment" Version="3.0.1" />
+    <PackageReference Include="AspNetCoreRateLimit" Version="5.0.0" />
+    <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.0" />
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.11.0" />
+    <PackageReference Include="MediatR" Version="12.4.1" />
+    <PackageReference Include="AspNetCore.HealthChecks.SqlServer" Version="8.0.2" />
+    <PackageReference Include="AspNetCore.HealthChecks.Redis" Version="8.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Shared\AFC27.KMS.SharedKernel\AFC27.KMS.SharedKernel.csproj" />
+    <ProjectReference Include="..\Shared\AFC27.KMS.Contracts\AFC27.KMS.Contracts.csproj" />
+    <ProjectReference Include="..\Shared\AFC27.KMS.Infrastructure\AFC27.KMS.Infrastructure.csproj" />
+    <ProjectReference Include="..\Modules\AFC27.KMS.Identity\AFC27.KMS.Identity.csproj" />
+    <ProjectReference Include="..\Modules\AFC27.KMS.Content\AFC27.KMS.Content.csproj" />
+    <ProjectReference Include="..\Modules\AFC27.KMS.Documents\AFC27.KMS.Documents.csproj" />
+    <ProjectReference Include="..\Modules\AFC27.KMS.Search\AFC27.KMS.Search.csproj" />
+    <ProjectReference Include="..\Modules\AFC27.KMS.Collaboration\AFC27.KMS.Collaboration.csproj" />
+    <ProjectReference Include="..\Modules\AFC27.KMS.Media\AFC27.KMS.Media.csproj" />
+    <ProjectReference Include="..\Modules\AFC27.KMS.Workflow\AFC27.KMS.Workflow.csproj" />
+    <ProjectReference Include="..\Modules\AFC27.KMS.Calendar\AFC27.KMS.Calendar.csproj" />
+    <ProjectReference Include="..\Modules\AFC27.KMS.Notifications\AFC27.KMS.Notifications.csproj" />
+    <ProjectReference Include="..\Modules\AFC27.KMS.AI\AFC27.KMS.AI.csproj" />
+    <ProjectReference Include="..\Modules\AFC27.KMS.Admin\AFC27.KMS.Admin.csproj" />
+    <ProjectReference Include="..\Modules\AFC27.KMS.Integration\AFC27.KMS.Integration.csproj" />
+  </ItemGroup>
+
+</Project>

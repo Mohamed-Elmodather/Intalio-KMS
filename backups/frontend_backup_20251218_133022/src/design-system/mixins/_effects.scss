@@ -1,0 +1,362 @@
+// ============================================
+// DESIGN SYSTEM: EFFECTS MIXINS
+// Reusable mixins for visual effects
+// ============================================
+
+@use '../tokens' as *;
+
+// ----------------------------------------
+// GLASSMORPHISM MIXINS
+// ----------------------------------------
+
+/// Apply glassmorphism effect
+/// @param {String} $variant - 'light-subtle', 'light-medium', 'light-strong', 'dark-medium', 'brand-subtle'
+/// @param {Boolean} $with-border - Include glass border
+@mixin glass($variant: 'light-medium', $with-border: true) {
+  @if $variant == 'light-subtle' {
+    background: $glass-bg-light-subtle;
+    backdrop-filter: blur($glass-blur-sm);
+    -webkit-backdrop-filter: blur($glass-blur-sm);
+    @if $with-border {
+      border: $glass-border-light;
+    }
+  } @else if $variant == 'light-medium' {
+    background: $glass-bg-light;
+    backdrop-filter: blur($glass-blur-md);
+    -webkit-backdrop-filter: blur($glass-blur-md);
+    @if $with-border {
+      border: $glass-border-medium;
+    }
+  } @else if $variant == 'light-strong' {
+    background: $glass-bg-light-strong;
+    backdrop-filter: blur($glass-blur-lg);
+    -webkit-backdrop-filter: blur($glass-blur-lg);
+    @if $with-border {
+      border: $glass-border-strong;
+    }
+  } @else if $variant == 'dark-medium' {
+    background: $glass-bg-dark;
+    backdrop-filter: blur($glass-blur-md);
+    -webkit-backdrop-filter: blur($glass-blur-md);
+    @if $with-border {
+      border: $glass-border-dark;
+    }
+  } @else if $variant == 'brand-subtle' {
+    background: $glass-bg-brand;
+    backdrop-filter: blur($glass-blur-md);
+    -webkit-backdrop-filter: blur($glass-blur-md);
+    @if $with-border {
+      border: 1px solid rgba($brand-200, 0.3);
+    }
+  }
+}
+
+/// Card-specific glass effect with shadows
+/// @param {Number} $blur - Blur amount in pixels
+@mixin glass-card($blur: 12px) {
+  background: $glass-bg-light;
+  backdrop-filter: blur($blur);
+  -webkit-backdrop-filter: blur($blur);
+  border: $glass-border-medium;
+  box-shadow: $shadow-glass;
+}
+
+/// Header glass effect
+@mixin glass-header() {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.95) 0%,
+    rgba(255, 255, 255, 0.85) 100%
+  );
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+}
+
+// ----------------------------------------
+// GLOW MIXINS
+// ----------------------------------------
+
+/// Apply glow effect
+/// @param {Color} $color - Glow color
+/// @param {String} $intensity - 'subtle', 'medium', 'strong', 'intense'
+@mixin glow($color: $brand-400, $intensity: 'medium') {
+  @if $intensity == 'subtle' {
+    box-shadow: 0 0 20px -5px rgba($color, 0.25);
+  } @else if $intensity == 'medium' {
+    box-shadow: 0 0 30px -5px rgba($color, 0.4);
+  } @else if $intensity == 'strong' {
+    box-shadow: 0 0 40px -5px rgba($color, 0.55);
+  } @else if $intensity == 'intense' {
+    box-shadow: 0 0 60px -10px rgba($color, 0.7);
+  }
+}
+
+/// Interactive glow on hover
+/// @param {Color} $color - Glow color
+@mixin glow-hover($color: $brand-400) {
+  transition: box-shadow $duration-normal $ease-default;
+
+  &:hover {
+    box-shadow:
+      0 4px 20px rgba(0, 0, 0, 0.08),
+      0 0 40px -10px rgba($color, 0.35);
+  }
+}
+
+/// Pulsing glow animation
+/// @param {Color} $color - Glow color
+@mixin glow-pulse($color: $brand-400) {
+  animation: glowPulse 2s ease-in-out infinite;
+
+  @at-root {
+    @keyframes glowPulse {
+      0%, 100% {
+        box-shadow: 0 0 20px -5px rgba($color, 0.3);
+      }
+      50% {
+        box-shadow: 0 0 40px -5px rgba($color, 0.55);
+      }
+    }
+  }
+}
+
+// ----------------------------------------
+// GRADIENT TEXT MIXINS
+// ----------------------------------------
+
+/// Apply gradient to text
+/// @param {Gradient} $gradient - CSS gradient value
+@mixin gradient-text($gradient: $gradient-brand-primary) {
+  background: $gradient;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+/// Brand gradient text
+@mixin gradient-text-brand() {
+  @include gradient-text($gradient-brand-primary);
+}
+
+/// Vivid gradient text
+@mixin gradient-text-vivid() {
+  @include gradient-text($gradient-hero-vivid);
+}
+
+// ----------------------------------------
+// GRADIENT BORDER MIXINS
+// ----------------------------------------
+
+/// Gradient border using pseudo-element
+/// @param {Gradient} $gradient - Border gradient
+/// @param {Number} $width - Border width
+/// @param {Number} $radius - Border radius
+@mixin gradient-border($gradient: $border-gradient-brand, $width: 2px, $radius: $radius-lg) {
+  position: relative;
+  background: white;
+  border-radius: $radius;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    padding: $width;
+    background: $gradient;
+    border-radius: inherit;
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: xor;
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    pointer-events: none;
+  }
+}
+
+// ----------------------------------------
+// SHIMMER EFFECT MIXINS
+// ----------------------------------------
+
+/// Apply shimmer loading effect
+@mixin shimmer() {
+  background: linear-gradient(
+    90deg,
+    $slate-100 0%,
+    $slate-200 50%,
+    $slate-100 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite linear;
+}
+
+/// Shimmer sweep on hover
+@mixin shimmer-hover() {
+  position: relative;
+  overflow: hidden;
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.4) 50%,
+      transparent 100%
+    );
+    transform: translateX(-100%);
+    transition: none;
+  }
+
+  &:hover::after {
+    animation: shimmerSweep 0.6s ease-out;
+  }
+
+  @at-root {
+    @keyframes shimmerSweep {
+      to {
+        transform: translateX(100%);
+      }
+    }
+  }
+}
+
+// ----------------------------------------
+// DEPTH & ELEVATION MIXINS
+// ----------------------------------------
+
+/// Apply depth level shadow
+/// @param {Number} $level - 1 to 5
+@mixin depth($level: 2) {
+  @if $level == 1 {
+    box-shadow: $shadow-depth-1;
+  } @else if $level == 2 {
+    box-shadow: $shadow-depth-2;
+  } @else if $level == 3 {
+    box-shadow: $shadow-depth-3;
+  } @else if $level == 4 {
+    box-shadow: $shadow-depth-4;
+  } @else if $level == 5 {
+    box-shadow: $shadow-depth-5;
+  }
+}
+
+/// Progressive depth on hover
+/// @param {Number} $from - Starting level
+/// @param {Number} $to - Hover level
+@mixin depth-hover($from: 1, $to: 3) {
+  @include depth($from);
+  transition: box-shadow $duration-normal $ease-default,
+              transform $duration-normal $ease-default;
+
+  &:hover {
+    @include depth($to);
+    transform: translateY(-2px);
+  }
+}
+
+// ----------------------------------------
+// ANIMATED GRADIENT BACKGROUND
+// ----------------------------------------
+
+/// Animated gradient background
+/// @param {Gradient} $gradient - The gradient to animate
+@mixin animated-gradient($gradient: $gradient-animated-brand) {
+  background: $gradient;
+  background-size: $gradient-animated-size;
+  animation: gradientShift 15s ease infinite;
+}
+
+// ----------------------------------------
+// MESH BACKGROUND
+// ----------------------------------------
+
+/// Apply mesh gradient background
+/// @param {String} $variant - 'subtle' or 'vivid'
+@mixin mesh-background($variant: 'subtle') {
+  @if $variant == 'subtle' {
+    background-color: white;
+    background-image: $gradient-mesh-subtle;
+  } @else if $variant == 'vivid' {
+    background-color: white;
+    background-image: $gradient-mesh-vivid;
+  }
+}
+
+// ----------------------------------------
+// 3D TRANSFORM EFFECTS
+// ----------------------------------------
+
+/// 3D perspective container
+@mixin perspective-container($distance: 1000px) {
+  perspective: $distance;
+  perspective-origin: center;
+}
+
+/// 3D tilt on hover
+/// @param {Number} $intensity - Tilt amount in degrees
+@mixin tilt-3d($intensity: 5deg) {
+  transition: transform $duration-normal $ease-default;
+  transform-style: preserve-3d;
+
+  &:hover {
+    transform: rotateX(calc(var(--mouse-y, 0) * #{$intensity}))
+               rotateY(calc(var(--mouse-x, 0) * #{$intensity}));
+  }
+}
+
+// Note: Ripple effect mixin is defined in _interactive.scss
+// Use @include ripple() from there
+
+// ----------------------------------------
+// FLOATING ANIMATION
+// ----------------------------------------
+
+/// Floating element animation
+/// @param {Number} $distance - Float distance in pixels
+/// @param {Number} $duration - Animation duration
+@mixin float($distance: 10px, $duration: 3s) {
+  animation: floatCustom $duration ease-in-out infinite;
+
+  @at-root {
+    @keyframes floatCustom {
+      0%, 100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-#{$distance});
+      }
+    }
+  }
+}
+
+// ----------------------------------------
+// REDUCED MOTION SUPPORT
+// ----------------------------------------
+
+/// Wrap animations for reduced motion preference
+@mixin respect-motion() {
+  @media (prefers-reduced-motion: reduce) {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/// Safe animation wrapper
+@mixin safe-animation($animation-value) {
+  animation: $animation-value;
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}
+
+/// Safe transition wrapper
+@mixin safe-transition($transition-value) {
+  transition: $transition-value;
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
+}

@@ -1,0 +1,344 @@
+// ============================================
+// INTALIO KMS - GLOBAL STYLES
+// ============================================
+//
+// ARCHITECTURE:
+// - Legacy SCSS variables: @use "@/assets/styles/_variables.scss" as *;
+// - Design System tokens: @use "@/design-system/tokens" as *;
+// - Design System mixins: @use "@/design-system/mixins" as *;
+//
+// MIGRATION STATUS:
+// - Foundations: Using legacy styles (gradual migration to design-system)
+// - Animations: Using design-system animations
+// - Utilities: Using legacy styles (gradual migration)
+// ============================================
+
+// Note: Legacy variables are globally injected via vite.config.ts
+
+// ----------------------------------------
+// 1. CSS CUSTOM PROPERTIES
+// Runtime-switchable variables for theming
+// ----------------------------------------
+@import '@/design-system/tokens-css/variables.css';
+
+// ----------------------------------------
+// 2. ANIMATIONS
+// Keyframes, Vue transitions, utility classes
+// ----------------------------------------
+@import '@/design-system/animations/keyframes';
+@import '@/design-system/animations/transitions';
+@import '@/design-system/animations/utility-classes';
+
+// ----------------------------------------
+// 2.5 UTILITIES
+// Performance and accessibility utilities
+// ----------------------------------------
+@import '@/design-system/utilities/performance';
+@import '@/design-system/utilities/accessibility';
+
+// ----------------------------------------
+// 3. RESET & BASE STYLES
+// TODO: Migrate to @import '@/design-system/foundations/reset';
+// ----------------------------------------
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: $font-family-primary;
+  line-height: 1.5;
+  color: $gray-900;
+  background-color: $gray-50;
+}
+
+// RTL Support
+[dir="rtl"] body {
+  font-family: $font-family-arabic;
+}
+
+// Focus States - Enhanced for accessibility
+:focus-visible {
+  outline: 2px solid $intalio-teal-primary;
+  outline-offset: 2px;
+}
+
+// Focus ring for interactive elements
+button:focus-visible,
+[role="button"]:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid $intalio-teal-primary;
+  outline-offset: 2px;
+  border-radius: $radius-sm;
+}
+
+// Hide default outline when using custom focus styles
+.custom-focus:focus {
+  outline: none;
+}
+
+// Focus within indicator for compound components
+.focus-within-indicator:focus-within {
+  box-shadow: 0 0 0 2px rgba($intalio-teal-primary, 0.3);
+}
+
+// Selection
+::selection {
+  background-color: rgba($intalio-teal-primary, 0.2);
+  color: $intalio-teal-dark;
+}
+
+// ----------------------------------------
+// 4. SCROLLBAR
+// TODO: Migrate to @import '@/design-system/foundations/scrollbar';
+// ----------------------------------------
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: $gray-100;
+}
+
+::-webkit-scrollbar-thumb {
+  background: $gray-400;
+  border-radius: $radius-full;
+
+  &:hover {
+    background: $gray-500;
+  }
+}
+
+// ----------------------------------------
+// 5. TYPOGRAPHY
+// TODO: Migrate to @import '@/design-system/foundations/typography';
+// ----------------------------------------
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: $font-weight-semibold;
+  line-height: 1.25;
+  color: $gray-900;
+}
+
+h1 { font-size: $font-size-4xl; }
+h2 { font-size: $font-size-3xl; }
+h3 { font-size: $font-size-2xl; }
+h4 { font-size: $font-size-xl; }
+h5 { font-size: $font-size-lg; }
+h6 { font-size: $font-size-base; }
+
+// Links
+a {
+  color: $intalio-teal-primary;
+  text-decoration: none;
+  transition: color $transition-fast;
+
+  &:hover {
+    color: $intalio-teal-dark;
+  }
+}
+
+// ----------------------------------------
+// 6. RTL UTILITIES
+// ----------------------------------------
+
+.rtl {
+  direction: rtl;
+  text-align: right;
+}
+
+.ltr {
+  direction: ltr;
+  text-align: left;
+}
+
+// ----------------------------------------
+// 7. LAYOUT CLASSES
+// ----------------------------------------
+
+.layout-wrapper {
+  display: flex;
+  min-height: 100vh;
+}
+
+.layout-sidebar {
+  width: $sidebar-width;
+  min-height: 100vh;
+  background-color: white;
+  border-inline-end: 1px solid $gray-200;
+  transition: width $transition-base;
+
+  &.collapsed {
+    width: $sidebar-collapsed-width;
+  }
+}
+
+.layout-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.layout-header {
+  height: $header-height;
+  background-color: white;
+  border-bottom: 1px solid $gray-200;
+  display: flex;
+  align-items: center;
+  padding: 0 $spacing-6;
+  position: sticky;
+  top: 0;
+  z-index: $z-sticky;
+}
+
+.layout-content {
+  flex: 1;
+  padding: $spacing-6;
+  overflow-y: auto;
+}
+
+// ----------------------------------------
+// 8. WIDGET STYLES
+// ----------------------------------------
+
+.widget-container {
+  background-color: white;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-sm;
+  padding: $spacing-6;
+
+  &:hover {
+    box-shadow: $shadow-md;
+  }
+}
+
+.widget-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-4;
+  padding-bottom: $spacing-3;
+  border-bottom: 1px solid $gray-100;
+
+  h3 {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-semibold;
+    color: $gray-800;
+  }
+}
+
+// ----------------------------------------
+// 9. DASHBOARD GRID
+// ----------------------------------------
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: $spacing-6;
+
+  @media (max-width: $breakpoint-lg) {
+    grid-template-columns: repeat(6, 1fr);
+  }
+
+  @media (max-width: $breakpoint-md) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.widget-small { grid-column: span 3; }
+.widget-medium { grid-column: span 6; }
+.widget-large { grid-column: span 12; }
+
+// ----------------------------------------
+// 10. STATUS BADGES
+// TODO: Migrate to BaseBadge component
+// ----------------------------------------
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: $spacing-1 $spacing-3;
+  border-radius: $radius-full;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+
+  &.status-success {
+    background-color: rgba($intalio-teal-primary, 0.1);
+    color: $intalio-teal-primary;
+  }
+
+  &.status-warning {
+    background-color: rgba($intalio-gray, 0.1);
+    color: darken($intalio-gray, 10%);
+  }
+
+  &.status-error {
+    background-color: rgba($error-500, 0.1);
+    color: $error-600;
+  }
+
+  &.status-info {
+    background-color: rgba($info-500, 0.1);
+    color: $info-600;
+  }
+}
+
+// ----------------------------------------
+// 11. AVATAR STYLES
+// TODO: Migrate to BaseAvatar component
+// ----------------------------------------
+
+.user-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: $radius-full;
+  object-fit: cover;
+  border: 2px solid $gray-200;
+
+  &.avatar-sm { width: 32px; height: 32px; }
+  &.avatar-lg { width: 56px; height: 56px; }
+  &.avatar-xl { width: 80px; height: 80px; }
+}
+
+// ----------------------------------------
+// 12. HOVER EFFECTS
+// ----------------------------------------
+
+.hover-card {
+  transition: transform $transition-base, box-shadow $transition-base;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: $shadow-lg;
+  }
+}
+
+// ----------------------------------------
+// 13. REDUCED MOTION SUPPORT
+// ----------------------------------------
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

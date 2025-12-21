@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>AFC27.KMS.Documents</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.11" />
+    <PackageReference Include="MassTransit" Version="8.2.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Shared\AFC27.KMS.SharedKernel\AFC27.KMS.SharedKernel.csproj" />
+    <ProjectReference Include="..\..\Shared\AFC27.KMS.Contracts\AFC27.KMS.Contracts.csproj" />
+    <ProjectReference Include="..\..\Shared\AFC27.KMS.Infrastructure\AFC27.KMS.Infrastructure.csproj" />
+    <ProjectReference Include="..\AFC27.KMS.Identity\AFC27.KMS.Identity.csproj" />
+  </ItemGroup>
+</Project>
