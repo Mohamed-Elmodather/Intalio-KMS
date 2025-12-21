@@ -390,23 +390,32 @@ public class AIAnalysisService : IAIAnalysisService
         _dbContext.BatchAnalysisJobs.Add(entity);
         await _dbContext.SaveChangesAsync(cancellationToken);
 
-        // Process in background
+        // Process in background with a new scope to avoid disposed context
+        var batchEntityId = entity.Id;
+        var documentIds = request.DocumentIds.ToList();
+        var options = request.Options;
         _ = Task.Run(async () =>
         {
             try
             {
-                var job = await _dbContext.BatchAnalysisJobs.FindAsync(entity.Id);
+                using var scope = _scopeFactory.CreateScope();
+                var dbContext = scope.ServiceProvider.GetRequiredService<KmsDbContext>();
+
+                var job = await dbContext.BatchAnalysisJobs.FindAsync(batchEntityId);
                 if (job == null) return;
 
                 job.Status = BatchAnalysisStatusEnum.Processing;
                 job.StartedAt = DateTime.UtcNow;
-                await _dbContext.SaveChangesAsync(CancellationToken.None);
+                await dbContext.SaveChangesAsync(CancellationToken.None);
 
-                foreach (var docId in request.DocumentIds)
+                foreach (var docId in documentIds)
                 {
                     try
                     {
-                        await AnalyzeDocumentAsync(docId, request.Options, CancellationToken.None);
+                        // Create a new scope for each document analysis
+                        using var docScope = _scopeFactory.CreateScope();
+                        var analysisService = docScope.ServiceProvider.GetRequiredService<IAIAnalysisService>();
+                        await analysisService.AnalyzeDocumentAsync(docId, options, CancellationToken.None);
                         job.ProcessedDocuments++;
                     }
                     catch (Exception ex)
@@ -414,16 +423,17 @@ public class AIAnalysisService : IAIAnalysisService
                         job.FailedDocuments++;
                         _logger.LogError(ex, "Failed to analyze document {DocumentId} in batch {BatchId}", docId, job.Id);
                     }
-                    await _dbContext.SaveChangesAsync(CancellationToken.None);
+                    await dbContext.SaveChangesAsync(CancellationToken.None);
                 }
 
-                job.Status = job.FailedDocuments > 0 ? BatchAnalysisStatusEnum.Completed : BatchAnalysisStatusEnum.Completed;
+                job.Status = BatchAnalysisStatusEnum.Completed;
                 job.CompletedAt = DateTime.UtcNow;
-                await _dbContext.SaveChangesAsync(CancellationToken.None);
+                await dbContext.SaveChangesAsync(CancellationToken.None);
+                _logger.LogInformation("Completed batch analysis {BatchId}", batchEntityId);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error processing batch analysis {BatchId}", entity.Id);
+                _logger.LogError(ex, "Error processing batch analysis {BatchId}", batchEntityId);
             }
         });
 
