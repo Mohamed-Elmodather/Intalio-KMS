@@ -27,11 +27,13 @@ const isRTL = computed(() => locale.value === 'ar')
 // Animation control
 const isContentVisible = ref(false)
 const shouldAnimate = computed(() => !prefersReducedMotion.value)
-const LOADING_DELAY = 600
 
 // Loading and error state
 const isLoading = ref(true)
 const error = ref<Error | null>(null)
+
+// API URL
+const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001/api'
 
 // State
 const activeTab = ref(0)
@@ -82,49 +84,66 @@ const quotaPercentage = computed(() => {
 // Methods
 async function fetchQuotaStatus() {
   try {
-    // TODO: Fetch from API
+    // Use dashboard stats to derive quota information
+    const response = await fetch(`${apiUrl}/ai/dashboard`)
+    const dashboard = await response.json()
+
+    // Calculate quota based on analyzed documents (simulated quota)
+    const documentsAnalyzed = dashboard.totalDocumentsAnalyzed || 0
+    const estimatedTokensPerDoc = 5000
+    const usedTokens = documentsAnalyzed * estimatedTokensPerDoc
+    const totalTokens = 1000000
+
+    quotaStatus.value = {
+      totalTokens,
+      usedTokens,
+      remainingTokens: totalTokens - usedTokens,
+      resetDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+      documentsAnalyzed,
+      averageReadability: dashboard.averageReadabilityScore
+    }
+  } catch (err) {
+    console.error('Failed to fetch quota:', err)
+    // Fallback to defaults
     quotaStatus.value = {
       totalTokens: 1000000,
-      usedTokens: 250000,
-      remainingTokens: 750000,
+      usedTokens: 0,
+      remainingTokens: 1000000,
       resetDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
     }
-  } catch (error) {
-    console.error('Failed to fetch quota:', error)
   }
 }
 
 async function fetchRecentJobs() {
   try {
-    // TODO: Fetch from API
-    recentJobs.value = [
-      {
-        id: '1',
-        type: 'Transcription',
-        status: 'Completed',
-        fileName: 'meeting-recording.mp3',
-        createdAt: new Date(),
-        duration: 45
-      },
-      {
-        id: '2',
-        type: 'Summarization',
-        status: 'Completed',
-        fileName: 'quarterly-report.pdf',
-        createdAt: new Date(Date.now() - 3600000),
-        duration: 12
-      },
-      {
-        id: '3',
-        type: 'Translation',
-        status: 'Processing',
-        fileName: 'policy-document.docx',
-        createdAt: new Date(Date.now() - 7200000),
-        progress: 65
-      }
-    ]
-  } catch (error) {
-    console.error('Failed to fetch jobs:', error)
+    const response = await fetch(`${apiUrl}/ai/analyses/recent`)
+    const analyses = await response.json()
+
+    // Map API response to job format
+    recentJobs.value = (analyses || []).map((analysis: any) => ({
+      id: analysis.id,
+      type: 'Analysis',
+      status: getAnalysisStatus(analysis.status),
+      fileName: analysis.documentTitle || `Document ${analysis.documentId?.substring(0, 8)}`,
+      createdAt: new Date(analysis.analyzedAt),
+      duration: analysis.estimatedReadTimeMinutes || 0,
+      summary: analysis.summary,
+      sentiment: analysis.sentimentLabel,
+      wordCount: analysis.wordCount
+    }))
+  } catch (err) {
+    console.error('Failed to fetch jobs:', err)
+    recentJobs.value = []
+  }
+}
+
+function getAnalysisStatus(status: number): string {
+  switch (status) {
+    case 0: return 'Pending'
+    case 1: return 'Processing'
+    case 2: return 'Completed'
+    case 3: return 'Failed'
+    default: return 'Unknown'
   }
 }
 
@@ -137,23 +156,76 @@ async function startTranscription() {
 
   isTranscribing.value = true
   try {
-    // TODO: Call API
-    await new Promise(resolve => setTimeout(resolve, 3000))
-    transcriptionResult.value = {
-      text: 'هذا نص تجريبي للنسخ الصوتي. تم تحويل الملف الصوتي إلى نص بنجاح.',
-      confidence: 0.95,
-      duration: 45,
-      segments: [
-        { start: 0, end: 10, text: 'مرحباً بكم في الاجتماع', speaker: 'Speaker 1' },
-        { start: 10, end: 25, text: 'سنناقش اليوم خطة العمل', speaker: 'Speaker 1' },
-        { start: 25, end: 45, text: 'شكراً لحضوركم', speaker: 'Speaker 2' }
-      ]
+    // Generate a temporary source ID for the transcription
+    const sourceId = crypto.randomUUID()
+
+    // Start transcription job
+    const response = await fetch(`${apiUrl}/ai/transcribe`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        sourceId,
+        sourceType: 0, // Audio
+        language: transcriptionLanguage.value
+      })
+    })
+
+    const job = await response.json()
+
+    // Poll for completion (max 30 seconds)
+    const transcriptionId = job.id
+    let attempts = 0
+    const maxAttempts = 15
+
+    while (attempts < maxAttempts) {
+      await new Promise(resolve => setTimeout(resolve, 2000))
+      attempts++
+
+      const statusResponse = await fetch(`${apiUrl}/ai/transcriptions/${transcriptionId}`)
+      const result = await statusResponse.json()
+
+      if (result.status === 2) { // Completed
+        transcriptionResult.value = {
+          text: result.transcribedText || result.fullText || 'Transcription completed.',
+          confidence: result.confidence || 0.9,
+          duration: parseDuration(result.duration),
+          segments: (result.segments || []).map((seg: any) => ({
+            start: seg.startTime || 0,
+            end: seg.endTime || 0,
+            text: seg.text,
+            speaker: seg.speakerId || 'Speaker'
+          }))
+        }
+        break
+      } else if (result.status === 3) { // Failed
+        throw new Error(result.errorMessage || 'Transcription failed')
+      }
     }
-  } catch (error) {
-    console.error('Transcription failed:', error)
+
+    if (attempts >= maxAttempts && !transcriptionResult.value) {
+      transcriptionResult.value = {
+        text: 'Transcription is still processing. Please check back later.',
+        confidence: 0,
+        duration: 0,
+        segments: []
+      }
+    }
+  } catch (err) {
+    console.error('Transcription failed:', err)
   } finally {
     isTranscribing.value = false
   }
+}
+
+function parseDuration(duration: string | number | null): number {
+  if (!duration) return 0
+  if (typeof duration === 'number') return duration
+  // Parse "HH:MM:SS" format
+  const parts = duration.split(':').map(Number)
+  if (parts.length === 3) {
+    return parts[0] * 3600 + parts[1] * 60 + parts[2]
+  }
+  return 0
 }
 
 async function summarizeText() {
@@ -161,22 +233,43 @@ async function summarizeText() {
 
   isSummarizing.value = true
   try {
-    // TODO: Call API
-    await new Promise(resolve => setTimeout(resolve, 2000))
+    // Determine max length based on selection
+    const maxLengthMap: Record<string, number> = {
+      short: 50,
+      medium: 150,
+      long: 300
+    }
+
+    const response = await fetch(`${apiUrl}/ai/summarize`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        text: summarizationText.value,
+        maxLength: maxLengthMap[summarizationLength.value] || 150,
+        language: summarizationLanguage.value
+      })
+    })
+
+    const result = await response.json()
+
+    // Also get suggested tags for key points
+    const tagsResponse = await fetch(`${apiUrl}/ai/tags/suggest`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: summarizationText.value, maxTags: 5 })
+    })
+    const tagsResult = await tagsResponse.json()
+
     summarizationResult.value = {
-      summary: 'ملخص النص: يتناول هذا النص موضوعاً مهماً يتعلق بالتخطيط الاستراتيجي للمشروع.',
-      keyPoints: [
-        'النقطة الأولى: أهمية التخطيط المسبق',
-        'النقطة الثانية: تحديد الأهداف بوضوح',
-        'النقطة الثالثة: متابعة التنفيذ'
-      ],
+      summary: result.summary,
+      keyPoints: (tagsResult.suggestedTags || []).map((tag: string) => `Key topic: ${tag}`),
       wordCount: {
-        original: summarizationText.value.split(' ').length,
-        summary: 25
+        original: summarizationText.value.split(/\s+/).filter(Boolean).length,
+        summary: result.summary?.split(/\s+/).filter(Boolean).length || 0
       }
     }
-  } catch (error) {
-    console.error('Summarization failed:', error)
+  } catch (err) {
+    console.error('Summarization failed:', err)
   } finally {
     isSummarizing.value = false
   }
@@ -187,18 +280,39 @@ async function askQuestion() {
 
   isAnswering.value = true
   try {
-    // TODO: Call API
-    await new Promise(resolve => setTimeout(resolve, 1500))
-    qaAnswer.value = {
-      answer: 'بناءً على المعلومات المتاحة، الإجابة على سؤالك هي...',
-      confidence: 0.89,
-      sources: [
-        { title: 'دليل السياسات', section: 'الفصل الثالث' },
-        { title: 'الإجراءات التشغيلية', section: 'القسم 2.1' }
-      ]
+    // Use semantic search to find relevant content
+    const response = await fetch(`${apiUrl}/ai/search/semantic`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        query: qaQuestion.value,
+        context: qaContext.value || undefined,
+        maxResults: 5
+      })
+    })
+
+    const results = await response.json()
+
+    if (results && results.length > 0) {
+      // Use the top result as the answer
+      const topResult = results[0]
+      qaAnswer.value = {
+        answer: topResult.snippet || 'Based on the knowledge base, relevant information was found.',
+        confidence: topResult.relevanceScore || 0.8,
+        sources: results.slice(0, 3).map((r: any) => ({
+          title: r.title,
+          section: r.matchedPhrases?.join(', ') || 'Related content'
+        }))
+      }
+    } else {
+      qaAnswer.value = {
+        answer: 'No relevant information found in the knowledge base for your question.',
+        confidence: 0,
+        sources: []
+      }
     }
-  } catch (error) {
-    console.error('Q&A failed:', error)
+  } catch (err) {
+    console.error('Q&A failed:', err)
   } finally {
     isAnswering.value = false
   }
@@ -240,7 +354,6 @@ async function loadData() {
       fetchRecentJobs()
     ])
 
-    await new Promise(resolve => setTimeout(resolve, LOADING_DELAY))
     isLoading.value = false
 
     if (shouldAnimate.value) {
@@ -251,6 +364,7 @@ async function loadData() {
       isContentVisible.value = true
     }
   } catch (e) {
+    console.error('Failed to load AI services data:', e)
     error.value = e as Error
     isLoading.value = false
   }
