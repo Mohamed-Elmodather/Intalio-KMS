@@ -21,7 +21,6 @@ export type {
 
 // Type exports from UnifiedPageLayout
 export type {
-  Breadcrumb,
   PageStat,
   PageAction
 } from './UnifiedPageLayout.vue'

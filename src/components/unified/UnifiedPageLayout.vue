@@ -2,12 +2,6 @@
 import { computed } from 'vue'
 
 // Types
-export interface Breadcrumb {
-  label: string
-  route?: string
-  icon?: string
-}
-
 export interface PageStat {
   id: string
   label: string
@@ -30,7 +24,6 @@ interface Props {
   subtitle?: string
   icon?: string
   iconBgClass?: string
-  breadcrumbs?: Breadcrumb[]
   stats?: PageStat[]
   actions?: PageAction[]
   showHero?: boolean
@@ -44,7 +37,6 @@ const props = withDefaults(defineProps<Props>(), {
   subtitle: '',
   icon: '',
   iconBgClass: 'bg-gradient-to-br from-teal-500 to-teal-600',
-  breadcrumbs: () => [],
   stats: () => [],
   actions: () => [],
   showHero: true,
@@ -56,7 +48,6 @@ const props = withDefaults(defineProps<Props>(), {
 // Emits
 const emit = defineEmits<{
   'action-click': [actionId: string]
-  'breadcrumb-click': [breadcrumb: Breadcrumb]
 }>()
 
 // Computed
@@ -74,10 +65,6 @@ const maxWidthClass = computed(() => {
 // Methods
 function handleActionClick(actionId: string) {
   emit('action-click', actionId)
-}
-
-function handleBreadcrumbClick(breadcrumb: Breadcrumb) {
-  emit('breadcrumb-click', breadcrumb)
 }
 
 function getStatColorClasses(color?: string) {
@@ -106,23 +93,6 @@ function getActionClasses(variant?: string) {
 
 <template>
   <div class="unified-page" :class="maxWidthClass">
-    <!-- Breadcrumbs -->
-    <nav v-if="breadcrumbs.length > 0" class="unified-page__breadcrumbs">
-      <template v-for="(crumb, index) in breadcrumbs" :key="index">
-        <component
-          :is="crumb.route ? 'router-link' : 'span'"
-          :to="crumb.route"
-          class="unified-page__breadcrumb"
-          :class="{ 'unified-page__breadcrumb--active': index === breadcrumbs.length - 1 }"
-          @click="handleBreadcrumbClick(crumb)"
-        >
-          <i v-if="crumb.icon" :class="crumb.icon" class="unified-page__breadcrumb-icon"></i>
-          {{ crumb.label }}
-        </component>
-        <i v-if="index < breadcrumbs.length - 1" class="fas fa-chevron-right unified-page__breadcrumb-separator"></i>
-      </template>
-    </nav>
-
     <!-- Hero Section -->
     <header
       v-if="showHero && (title || $slots.hero)"
@@ -206,42 +176,6 @@ function getActionClasses(variant?: string) {
 .unified-page {
   width: 100%;
   margin: 0 auto;
-}
-
-/* Breadcrumbs */
-.unified-page__breadcrumbs {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 16px;
-  font-size: 14px;
-}
-
-.unified-page__breadcrumb {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  color: #6b7280;
-  text-decoration: none;
-  transition: color 0.2s ease;
-}
-
-.unified-page__breadcrumb:hover:not(.unified-page__breadcrumb--active) {
-  color: #14b8a6;
-}
-
-.unified-page__breadcrumb--active {
-  color: #1f2937;
-  font-weight: 500;
-}
-
-.unified-page__breadcrumb-icon {
-  font-size: 12px;
-}
-
-.unified-page__breadcrumb-separator {
-  font-size: 10px;
-  color: #d1d5db;
 }
 
 /* Hero Section */
@@ -492,10 +426,6 @@ function getActionClasses(variant?: string) {
 @media (max-width: 480px) {
   .unified-page__stats {
     grid-template-columns: 1fr;
-  }
-
-  .unified-page__breadcrumbs {
-    flex-wrap: wrap;
   }
 }
 </style>
