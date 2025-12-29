@@ -2,8 +2,9 @@
 export { default as UnifiedSearch } from './UnifiedSearch.vue'
 export { default as UnifiedHeader } from './UnifiedHeader.vue'
 export { default as UnifiedSidebar } from './UnifiedSidebar.vue'
+export { default as UnifiedPageLayout } from './UnifiedPageLayout.vue'
 
-// Type exports
+// Type exports from UnifiedHeader
 export type {
   HeaderAction,
   CreateMenuItem,
@@ -11,8 +12,16 @@ export type {
   NotificationItem
 } from './UnifiedHeader.vue'
 
+// Type exports from UnifiedSidebar
 export type {
   NavItem,
   WorkspaceItem,
   BottomAction
 } from './UnifiedSidebar.vue'
+
+// Type exports from UnifiedPageLayout
+export type {
+  Breadcrumb,
+  PageStat,
+  PageAction
+} from './UnifiedPageLayout.vue'
