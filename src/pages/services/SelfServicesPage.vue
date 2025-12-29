@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
+import { UnifiedPageLayout } from '@/components/unified'
+import type { PageStat, PageAction } from '@/components/unified'
 
 // State
 const showNewRequest = ref(false)
@@ -17,6 +19,19 @@ const stats = ref({
   facilitiesRequests: 5,
   financeRequests: 3
 })
+
+// Page stats for hero section
+const pageStats = computed<PageStat[]>(() => [
+  { id: 'it', label: 'IT Support', value: `${stats.value.itRequests}`, icon: 'fas fa-laptop', color: 'teal' },
+  { id: 'hr', label: 'HR Services', value: `${stats.value.hrRequests}`, icon: 'fas fa-users', color: 'blue' },
+  { id: 'facilities', label: 'Facilities', value: `${stats.value.facilitiesRequests}`, icon: 'fas fa-building', color: 'orange' },
+  { id: 'finance', label: 'Finance', value: `${stats.value.financeRequests}`, icon: 'fas fa-wallet', color: 'purple' }
+])
+
+// Page actions
+const pageActions: PageAction[] = [
+  { id: 'new-request', label: 'New Request', icon: 'fas fa-plus', variant: 'primary' }
+]
 
 // Categories
 const categories = ref([
@@ -143,6 +158,12 @@ const filteredRequests = computed(() => {
 })
 
 // Methods
+function handleActionClick(actionId: string) {
+  if (actionId === 'new-request') {
+    showNewRequest.value = true
+  }
+}
+
 function selectService(service: any) {
   selectedService.value = service
   showNewRequest.value = true
@@ -173,263 +194,216 @@ function askAI(query: string) {
 </script>
 
 <template>
-  <div class="space-y-6">
+  <div>
     <!-- Loading State -->
     <div v-if="isLoading" class="flex items-center justify-center min-h-[400px]">
       <LoadingSpinner size="lg" text="Loading services..." />
     </div>
 
     <template v-else>
-      <!-- Header -->
-      <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-10 fade-in-up">
-        <div>
-          <h1 class="text-3xl font-bold text-gray-900 mb-2">Self-Service Portal</h1>
-          <p class="text-gray-600">Request services, track progress, and get help</p>
-        </div>
-        <button @click="showNewRequest = true" class="btn btn-vibrant ripple-effect">
-          <i class="fas fa-plus"></i> New Request
-        </button>
-      </div>
-
-      <!-- Quick Actions & Stats -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
-        <div class="card-animated cursor-pointer ripple-effect" style="animation-delay: 0.1s" @click="filterCategory = 'it'">
-          <div class="flex items-center gap-4">
-            <div class="icon-vibrant w-14 h-14 rounded-2xl bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center hover-scale">
-              <i class="fas fa-laptop text-white text-2xl"></i>
-            </div>
-            <div>
-              <p class="text-2xl font-bold text-gray-900">{{ stats.itRequests }}</p>
-              <p class="text-sm text-gray-500">IT Support</p>
-            </div>
-          </div>
-        </div>
-        <div class="card-animated cursor-pointer ripple-effect" style="animation-delay: 0.2s" @click="filterCategory = 'hr'">
-          <div class="flex items-center gap-4">
-            <div class="icon-vibrant w-14 h-14 rounded-2xl bg-gradient-to-br from-teal-600 to-teal-700 flex items-center justify-center hover-scale">
-              <i class="fas fa-users text-white text-2xl"></i>
-            </div>
-            <div>
-              <p class="text-2xl font-bold text-gray-900">{{ stats.hrRequests }}</p>
-              <p class="text-sm text-gray-500">HR Services</p>
-            </div>
-          </div>
-        </div>
-        <div class="card-animated cursor-pointer ripple-effect" style="animation-delay: 0.3s" @click="filterCategory = 'facilities'">
-          <div class="flex items-center gap-4">
-            <div class="icon-vibrant w-14 h-14 rounded-2xl bg-gradient-to-br from-teal-400 to-teal-500 flex items-center justify-center hover-scale">
-              <i class="fas fa-building text-white text-2xl"></i>
-            </div>
-            <div>
-              <p class="text-2xl font-bold text-gray-900">{{ stats.facilitiesRequests }}</p>
-              <p class="text-sm text-gray-500">Facilities</p>
-            </div>
-          </div>
-        </div>
-        <div class="card-animated cursor-pointer ripple-effect" style="animation-delay: 0.4s" @click="filterCategory = 'finance'">
-          <div class="flex items-center gap-4">
-            <div class="icon-vibrant w-14 h-14 rounded-2xl bg-gradient-to-br from-teal-500 to-emerald-600 flex items-center justify-center hover-scale">
-              <i class="fas fa-wallet text-white text-2xl"></i>
-            </div>
-            <div>
-              <p class="text-2xl font-bold text-gray-900">{{ stats.financeRequests }}</p>
-              <p class="text-sm text-gray-500">Finance</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
-        <!-- Service Catalog -->
-        <div class="xl:col-span-2">
-          <div class="card-animated" style="animation-delay: 0.5s">
-            <div class="p-5 border-b border-gray-100">
-              <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <h2 class="text-lg font-semibold text-gray-900">Service Catalog</h2>
-                <div class="flex flex-wrap gap-2">
-                  <button v-for="cat in categories" :key="cat.id"
-                          @click="filterCategory = cat.id"
-                          :class="['px-4 py-2 rounded-xl text-sm font-medium transition-all ripple-effect',
-                                   filterCategory === cat.id ? 'btn-vibrant' : 'bg-teal-50 text-gray-700 hover:bg-teal-100']">
-                    {{ cat.label }}
-                  </button>
+      <!-- Unified Page Layout with Hero -->
+      <UnifiedPageLayout
+        title="Self-Service Portal"
+        subtitle="Request services, track progress, and get help"
+        icon="fas fa-concierge-bell"
+        :stats="pageStats"
+        :actions="pageActions"
+        hero-variant="default"
+        @action-click="handleActionClick"
+      >
+        <!-- Main Content -->
+        <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+          <!-- Service Catalog -->
+          <div class="xl:col-span-2">
+            <div class="card-animated">
+              <div class="p-5 border-b border-gray-100">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                  <h2 class="text-lg font-semibold text-gray-900">Service Catalog</h2>
+                  <div class="flex flex-wrap gap-2">
+                    <button v-for="cat in categories" :key="cat.id"
+                            @click="filterCategory = cat.id"
+                            :class="['px-4 py-2 rounded-xl text-sm font-medium transition-all ripple-effect',
+                                     filterCategory === cat.id ? 'btn-vibrant' : 'bg-teal-50 text-gray-700 hover:bg-teal-100']">
+                      {{ cat.label }}
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <div class="p-5 grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div v-for="service in filteredServices" :key="service.id"
-                   @click="selectService(service)"
-                   class="list-item-animated p-4 rounded-xl border-2 border-transparent bg-teal-50/50 hover:border-teal-300 hover:bg-teal-100/50 cursor-pointer transition-all group ripple-effect">
-                <div class="flex items-start gap-4">
-                  <div :class="['icon-soft w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 hover-scale', service.iconBg]">
-                    <i :class="[service.icon, service.iconColor, 'text-xl']"></i>
-                  </div>
-                  <div class="flex-1 min-w-0">
-                    <h3 class="font-semibold text-gray-900 group-hover:text-gray-700">{{ service.name }}</h3>
-                    <p class="text-sm text-gray-500 mt-1">{{ service.description }}</p>
-                    <div class="flex items-center gap-3 mt-2">
-                      <span class="text-xs text-gray-400"><i class="fas fa-clock mr-1"></i>{{ service.eta }}</span>
-                      <span :class="['text-xs px-2 py-0.5 rounded-full', service.priorityClass]">{{ service.priority }}</span>
+              <div class="p-5 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div v-for="service in filteredServices" :key="service.id"
+                     @click="selectService(service)"
+                     class="list-item-animated p-4 rounded-xl border-2 border-transparent bg-teal-50/50 hover:border-teal-300 hover:bg-teal-100/50 cursor-pointer transition-all group ripple-effect">
+                  <div class="flex items-start gap-4">
+                    <div :class="['icon-soft w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 hover-scale', service.iconBg]">
+                      <i :class="[service.icon, service.iconColor, 'text-xl']"></i>
                     </div>
-                  </div>
-                  <i class="fas fa-chevron-right text-gray-300 group-hover:text-gray-500 transition-colors"></i>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- My Requests -->
-          <div class="card-animated mt-6" style="animation-delay: 0.6s">
-            <div class="p-5 border-b border-gray-100 flex items-center justify-between">
-              <h2 class="text-lg font-semibold text-gray-900">My Requests</h2>
-              <div class="flex items-center gap-2">
-                <select v-model="requestFilter" class="input text-sm py-2">
-                  <option value="all">All Status</option>
-                  <option value="pending">Pending</option>
-                  <option value="in-progress">In Progress</option>
-                  <option value="completed">Completed</option>
-                </select>
-              </div>
-            </div>
-
-            <div class="divide-y divide-gray-100">
-              <div v-for="request in filteredRequests" :key="request.id"
-                   @click="showRequestDetail(request)"
-                   class="list-item-animated p-4 hover:bg-teal-50/50 cursor-pointer transition-colors ripple-effect">
-                <div class="flex items-center gap-4">
-                  <div :class="['icon-soft w-10 h-10 rounded-xl flex items-center justify-center hover-scale', request.iconBg]">
-                    <i :class="[request.icon, request.iconColor]"></i>
-                  </div>
-                  <div class="flex-1 min-w-0">
-                    <div class="flex items-center gap-2">
-                      <h3 class="font-medium text-gray-900">{{ request.title }}</h3>
-                      <span class="text-xs text-gray-400">#{{ request.id }}</span>
-                    </div>
-                    <p class="text-sm text-gray-500 truncate">{{ request.description }}</p>
-                  </div>
-                  <div class="text-right flex-shrink-0">
-                    <span :class="['badge', request.statusClass]">{{ request.status }}</span>
-                    <p class="text-xs text-gray-400 mt-1">{{ request.date }}</p>
-                  </div>
-                </div>
-
-                <!-- Progress Timeline -->
-                <div class="mt-4 ml-14">
-                  <div class="flex items-center gap-2">
-                    <div v-for="(step, idx) in request.steps" :key="idx" class="flex items-center">
-                      <div :class="['w-6 h-6 rounded-full flex items-center justify-center text-xs',
-                                   step.completed ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-400']">
-                        <i v-if="step.completed" class="fas fa-check"></i>
-                        <span v-else>{{ idx + 1 }}</span>
+                    <div class="flex-1 min-w-0">
+                      <h3 class="font-semibold text-gray-900 group-hover:text-gray-700">{{ service.name }}</h3>
+                      <p class="text-sm text-gray-500 mt-1">{{ service.description }}</p>
+                      <div class="flex items-center gap-3 mt-2">
+                        <span class="text-xs text-gray-400"><i class="fas fa-clock mr-1"></i>{{ service.eta }}</span>
+                        <span :class="['text-xs px-2 py-0.5 rounded-full', service.priorityClass]">{{ service.priority }}</span>
                       </div>
-                      <div v-if="idx < request.steps.length - 1"
-                           :class="['w-12 h-0.5', step.completed ? 'bg-teal-500' : 'bg-gray-100']"></div>
+                    </div>
+                    <i class="fas fa-chevron-right text-gray-300 group-hover:text-gray-500 transition-colors"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- My Requests -->
+            <div class="card-animated mt-6">
+              <div class="p-5 border-b border-gray-100 flex items-center justify-between">
+                <h2 class="text-lg font-semibold text-gray-900">My Requests</h2>
+                <div class="flex items-center gap-2">
+                  <select v-model="requestFilter" class="input text-sm py-2">
+                    <option value="all">All Status</option>
+                    <option value="pending">Pending</option>
+                    <option value="in-progress">In Progress</option>
+                    <option value="completed">Completed</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="divide-y divide-gray-100">
+                <div v-for="request in filteredRequests" :key="request.id"
+                     @click="showRequestDetail(request)"
+                     class="list-item-animated p-4 hover:bg-teal-50/50 cursor-pointer transition-colors ripple-effect">
+                  <div class="flex items-center gap-4">
+                    <div :class="['icon-soft w-10 h-10 rounded-xl flex items-center justify-center hover-scale', request.iconBg]">
+                      <i :class="[request.icon, request.iconColor]"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                      <div class="flex items-center gap-2">
+                        <h3 class="font-medium text-gray-900">{{ request.title }}</h3>
+                        <span class="text-xs text-gray-400">#{{ request.id }}</span>
+                      </div>
+                      <p class="text-sm text-gray-500 truncate">{{ request.description }}</p>
+                    </div>
+                    <div class="text-right flex-shrink-0">
+                      <span :class="['badge', request.statusClass]">{{ request.status }}</span>
+                      <p class="text-xs text-gray-400 mt-1">{{ request.date }}</p>
                     </div>
                   </div>
-                  <div class="flex gap-2 mt-1 text-xs text-gray-500">
-                    <span v-for="(step, idx) in request.steps" :key="idx"
-                          :class="['w-6', idx < request.steps.length - 1 ? 'mr-12' : '']">
-                      {{ step.label }}
-                    </span>
+
+                  <!-- Progress Timeline -->
+                  <div class="mt-4 ml-14">
+                    <div class="flex items-center gap-2">
+                      <div v-for="(step, idx) in request.steps" :key="idx" class="flex items-center">
+                        <div :class="['w-6 h-6 rounded-full flex items-center justify-center text-xs',
+                                     step.completed ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-400']">
+                          <i v-if="step.completed" class="fas fa-check"></i>
+                          <span v-else>{{ idx + 1 }}</span>
+                        </div>
+                        <div v-if="idx < request.steps.length - 1"
+                             :class="['w-12 h-0.5', step.completed ? 'bg-teal-500' : 'bg-gray-100']"></div>
+                      </div>
+                    </div>
+                    <div class="flex gap-2 mt-1 text-xs text-gray-500">
+                      <span v-for="(step, idx) in request.steps" :key="idx"
+                            :class="['w-6', idx < request.steps.length - 1 ? 'mr-12' : '']">
+                        {{ step.label }}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
 
-            <div v-if="filteredRequests.length === 0" class="p-8 text-center">
-              <div class="w-16 h-16 rounded-full bg-teal-100 flex items-center justify-center mx-auto mb-4">
-                <i class="fas fa-inbox text-teal-400 text-2xl"></i>
+              <div v-if="filteredRequests.length === 0" class="p-8 text-center">
+                <div class="w-16 h-16 rounded-full bg-teal-100 flex items-center justify-center mx-auto mb-4">
+                  <i class="fas fa-inbox text-teal-400 text-2xl"></i>
+                </div>
+                <p class="text-gray-500">No requests found</p>
               </div>
-              <p class="text-gray-500">No requests found</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Right Sidebar -->
-        <div class="space-y-6">
-          <!-- AI Assistant Widget -->
-          <div class="card-animated" style="animation-delay: 0.7s">
-            <div class="flex items-center gap-3 mb-4">
-              <div class="icon-vibrant w-10 h-10 rounded-xl bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center hover-scale">
-                <i class="fas fa-robot text-white"></i>
-              </div>
-              <div>
-                <h3 class="font-semibold text-gray-900">AI Assistant</h3>
-                <p class="text-xs text-gray-500">Get instant help</p>
-              </div>
-            </div>
-
-            <div class="space-y-2 mb-4">
-              <button v-for="(query, idx) in quickQueries" :key="idx"
-                      @click="askAI(query)"
-                      class="list-item-animated w-full p-3 text-left text-sm rounded-xl bg-teal-50 hover:bg-teal-100 text-gray-700 transition-colors ripple-effect">
-                <i class="fas fa-comment-dots text-gray-400 mr-2"></i>{{ query }}
-              </button>
-            </div>
-
-            <div class="relative">
-              <input type="text" v-model="aiQuery" @keydown.enter="askAI(aiQuery)"
-                     placeholder="Ask anything..." class="input pr-10">
-              <button @click="askAI(aiQuery)" class="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-lg hover:bg-teal-50 text-gray-500 ripple-effect hover-scale">
-                <i class="fas fa-paper-plane"></i>
-              </button>
             </div>
           </div>
 
-          <!-- FAQ -->
-          <div class="card-animated" style="animation-delay: 0.8s">
-            <h3 class="font-semibold text-gray-900 mb-4">
-              <i class="fas fa-question-circle text-gray-500 mr-2 hover-scale"></i>Frequently Asked
-            </h3>
-            <div class="space-y-3">
-              <div v-for="(faq, idx) in faqs" :key="idx" class="list-item-animated border-b border-gray-100 last:border-0 pb-3 last:pb-0">
-                <button @click="faq.open = !faq.open" class="w-full text-left flex items-center justify-between ripple-effect">
-                  <span class="text-sm font-medium text-gray-800">{{ faq.question }}</span>
-                  <i :class="['fas text-gray-400 transition-transform hover-scale', faq.open ? 'fa-chevron-up' : 'fa-chevron-down']"></i>
+          <!-- Right Sidebar -->
+          <div class="space-y-6">
+            <!-- AI Assistant Widget -->
+            <div class="card-animated">
+              <div class="flex items-center gap-3 mb-4">
+                <div class="icon-vibrant w-10 h-10 rounded-xl bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center hover-scale">
+                  <i class="fas fa-robot text-white"></i>
+                </div>
+                <div>
+                  <h3 class="font-semibold text-gray-900">AI Assistant</h3>
+                  <p class="text-xs text-gray-500">Get instant help</p>
+                </div>
+              </div>
+
+              <div class="space-y-2 mb-4">
+                <button v-for="(query, idx) in quickQueries" :key="idx"
+                        @click="askAI(query)"
+                        class="list-item-animated w-full p-3 text-left text-sm rounded-xl bg-teal-50 hover:bg-teal-100 text-gray-700 transition-colors ripple-effect">
+                  <i class="fas fa-comment-dots text-gray-400 mr-2"></i>{{ query }}
                 </button>
-                <p v-if="faq.open" class="text-sm text-gray-600 mt-2 animate-fadeIn">{{ faq.answer }}</p>
+              </div>
+
+              <div class="relative">
+                <input type="text" v-model="aiQuery" @keydown.enter="askAI(aiQuery)"
+                       placeholder="Ask anything..." class="input pr-10">
+                <button @click="askAI(aiQuery)" class="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-lg hover:bg-teal-50 text-gray-500 ripple-effect hover-scale">
+                  <i class="fas fa-paper-plane"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- FAQ -->
+            <div class="card-animated">
+              <h3 class="font-semibold text-gray-900 mb-4">
+                <i class="fas fa-question-circle text-gray-500 mr-2 hover-scale"></i>Frequently Asked
+              </h3>
+              <div class="space-y-3">
+                <div v-for="(faq, idx) in faqs" :key="idx" class="list-item-animated border-b border-gray-100 last:border-0 pb-3 last:pb-0">
+                  <button @click="faq.open = !faq.open" class="w-full text-left flex items-center justify-between ripple-effect">
+                    <span class="text-sm font-medium text-gray-800">{{ faq.question }}</span>
+                    <i :class="['fas text-gray-400 transition-transform hover-scale', faq.open ? 'fa-chevron-up' : 'fa-chevron-down']"></i>
+                  </button>
+                  <p v-if="faq.open" class="text-sm text-gray-600 mt-2 animate-fadeIn">{{ faq.answer }}</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Contact Support -->
+            <div class="card-animated">
+              <h3 class="font-semibold text-gray-900 mb-4">
+                <i class="fas fa-headset text-gray-500 mr-2 hover-scale"></i>Need More Help?
+              </h3>
+              <div class="space-y-3">
+                <a href="#" class="list-item-animated flex items-center gap-3 p-3 rounded-xl bg-teal-50 hover:bg-teal-100 transition-colors ripple-effect">
+                  <div class="icon-soft w-8 h-8 rounded-lg bg-teal-100 flex items-center justify-center hover-scale">
+                    <i class="fas fa-phone text-gray-600"></i>
+                  </div>
+                  <div>
+                    <p class="text-sm font-medium text-gray-800">Call Support</p>
+                    <p class="text-xs text-gray-500">+1 (555) 123-4567</p>
+                  </div>
+                </a>
+                <a href="#" class="list-item-animated flex items-center gap-3 p-3 rounded-xl bg-teal-50 hover:bg-teal-100 transition-colors ripple-effect">
+                  <div class="icon-soft w-8 h-8 rounded-lg bg-teal-100 flex items-center justify-center hover-scale">
+                    <i class="fas fa-envelope text-gray-600"></i>
+                  </div>
+                  <div>
+                    <p class="text-sm font-medium text-gray-800">Email Us</p>
+                    <p class="text-xs text-gray-500">support@intalio.com</p>
+                  </div>
+                </a>
+                <a href="#" class="list-item-animated flex items-center gap-3 p-3 rounded-xl bg-teal-50 hover:bg-teal-100 transition-colors ripple-effect">
+                  <div class="icon-soft w-8 h-8 rounded-lg bg-teal-100 flex items-center justify-center hover-scale">
+                    <i class="fas fa-comments text-gray-700"></i>
+                  </div>
+                  <div>
+                    <p class="text-sm font-medium text-gray-800">Live Chat</p>
+                    <p class="text-xs text-gray-500">Available 24/7</p>
+                  </div>
+                </a>
               </div>
             </div>
           </div>
-
-          <!-- Contact Support -->
-          <div class="card-animated" style="animation-delay: 0.9s">
-            <h3 class="font-semibold text-gray-900 mb-4">
-              <i class="fas fa-headset text-gray-500 mr-2 hover-scale"></i>Need More Help?
-            </h3>
-            <div class="space-y-3">
-              <a href="#" class="list-item-animated flex items-center gap-3 p-3 rounded-xl bg-teal-50 hover:bg-teal-100 transition-colors ripple-effect">
-                <div class="icon-soft w-8 h-8 rounded-lg bg-teal-100 flex items-center justify-center hover-scale">
-                  <i class="fas fa-phone text-gray-600"></i>
-                </div>
-                <div>
-                  <p class="text-sm font-medium text-gray-800">Call Support</p>
-                  <p class="text-xs text-gray-500">+1 (555) 123-4567</p>
-                </div>
-              </a>
-              <a href="#" class="list-item-animated flex items-center gap-3 p-3 rounded-xl bg-teal-50 hover:bg-teal-100 transition-colors ripple-effect">
-                <div class="icon-soft w-8 h-8 rounded-lg bg-teal-100 flex items-center justify-center hover-scale">
-                  <i class="fas fa-envelope text-gray-600"></i>
-                </div>
-                <div>
-                  <p class="text-sm font-medium text-gray-800">Email Us</p>
-                  <p class="text-xs text-gray-500">support@intalio.com</p>
-                </div>
-              </a>
-              <a href="#" class="list-item-animated flex items-center gap-3 p-3 rounded-xl bg-teal-50 hover:bg-teal-100 transition-colors ripple-effect">
-                <div class="icon-soft w-8 h-8 rounded-lg bg-teal-100 flex items-center justify-center hover-scale">
-                  <i class="fas fa-comments text-gray-700"></i>
-                </div>
-                <div>
-                  <p class="text-sm font-medium text-gray-800">Live Chat</p>
-                  <p class="text-xs text-gray-500">Available 24/7</p>
-                </div>
-              </a>
-            </div>
-          </div>
         </div>
-      </div>
+      </UnifiedPageLayout>
 
       <!-- New Request Modal -->
       <div v-if="showNewRequest" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 fade-in-up">
