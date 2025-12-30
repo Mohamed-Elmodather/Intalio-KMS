@@ -332,7 +332,7 @@ function getActionClasses(variant?: string) {
   line-height: 1.2;
 }
 
-.unified-page__title-highlight {
+.unified-page__title :deep(.unified-page__title-highlight) {
   background: linear-gradient(135deg, #14b8a6 0%, #0891b2 50%, #0d9488 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
