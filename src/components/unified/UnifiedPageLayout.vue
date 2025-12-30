@@ -202,7 +202,7 @@ function getActionClasses(variant?: string) {
 .unified-page__hero--default {
   position: relative;
   padding: 2rem;
-  background: linear-gradient(135deg, #ccfbf1 0%, #ccfbf1 30%, #99f6e4 100%);
+  background: #ccfbf1;
   overflow: hidden;
   margin-bottom: 1.5rem;
 }
@@ -239,7 +239,7 @@ function getActionClasses(variant?: string) {
 .unified-page__hero--gradient {
   position: relative;
   padding: 2rem;
-  background: linear-gradient(135deg, #ccfbf1 0%, #ccfbf1 30%, #99f6e4 100%);
+  background: #ccfbf1;
   overflow: hidden;
   margin-bottom: 1.5rem;
 }
