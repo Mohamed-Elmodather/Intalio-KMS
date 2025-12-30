@@ -192,7 +192,7 @@ function getActionClasses(variant?: string) {
   margin-right: -1.5rem;
   margin-top: -1.5rem;
   min-height: 100%;
-  background: linear-gradient(180deg, #f0fdfa 0%, #f8fafc 15%, #ffffff 100%);
+  background: transparent; /* Allow MainLayout animated gradient to show through */
 }
 
 /* ============================================
