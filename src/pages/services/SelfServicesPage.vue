@@ -21,11 +21,17 @@ const stats = ref({
 })
 
 // Page stats for hero section
+// Stats matching static portal
+const openRequestsCount = ref(3)
+const completedRequestsCount = ref(24)
+const avgResolutionTime = ref(4)
+const totalServices = ref(15)
+
 const pageStats = computed<PageStat[]>(() => [
-  { id: 'it', label: 'IT Support', value: `${stats.value.itRequests}`, icon: 'fas fa-laptop', color: 'teal' },
-  { id: 'hr', label: 'HR Services', value: `${stats.value.hrRequests}`, icon: 'fas fa-users', color: 'blue' },
-  { id: 'facilities', label: 'Facilities', value: `${stats.value.facilitiesRequests}`, icon: 'fas fa-building', color: 'orange' },
-  { id: 'finance', label: 'Finance', value: `${stats.value.financeRequests}`, icon: 'fas fa-wallet', color: 'purple' }
+  { id: 'open', label: 'Open Requests', value: openRequestsCount.value, icon: 'fas fa-clock', color: 'teal' },
+  { id: 'completed', label: 'Completed', value: completedRequestsCount.value, icon: 'fas fa-check-circle', color: 'green' },
+  { id: 'resolution', label: 'Avg. Resolution', value: `${avgResolutionTime.value}h`, icon: 'fas fa-bolt', color: 'orange' },
+  { id: 'services', label: 'Services', value: totalServices.value, icon: 'fas fa-th-large', color: 'blue' }
 ])
 
 // Page actions
