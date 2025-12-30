@@ -187,7 +187,10 @@ function getActionClasses(variant?: string) {
 
 <style scoped>
 .unified-page {
-  width: 100%;
+  width: calc(100% + 3rem); /* Break out of parent padding (1.5rem * 2) */
+  margin-left: -1.5rem;
+  margin-right: -1.5rem;
+  margin-top: -1.5rem;
   min-height: 100%;
   background: linear-gradient(180deg, #f0fdfa 0%, #f8fafc 15%, #ffffff 100%);
 }
