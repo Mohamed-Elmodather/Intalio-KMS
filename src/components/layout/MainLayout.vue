@@ -190,17 +190,9 @@ onMounted(async () => {
       style="margin-top: 64px; min-height: calc(100vh - 64px);"
       :class="isCollapsed ? 'ml-20' : 'ml-64'"
     >
-      <div class="main-content-wrapper">
-        <slot />
-      </div>
+      <slot />
     </main>
 
     <AppToast />
   </div>
 </template>
-
-<style scoped>
-.main-content-wrapper {
-  /* No padding - UnifiedPageLayout handles its own layout */
-}
-</style>
