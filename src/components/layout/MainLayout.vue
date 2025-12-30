@@ -201,6 +201,6 @@ onMounted(async () => {
 
 <style scoped>
 .main-content-wrapper {
-  padding: 1.5rem;
+  /* No padding - UnifiedPageLayout handles its own layout */
 }
 </style>

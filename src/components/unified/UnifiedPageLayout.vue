@@ -187,10 +187,7 @@ function getActionClasses(variant?: string) {
 
 <style scoped>
 .unified-page {
-  width: calc(100% + 3rem); /* Break out of parent padding (1.5rem * 2) */
-  margin-left: -1.5rem;
-  margin-right: -1.5rem;
-  margin-top: -1.5rem;
+  width: 100%;
   min-height: 100%;
   background: transparent; /* Allow MainLayout animated gradient to show through */
 }
@@ -555,12 +552,10 @@ function getActionClasses(variant?: string) {
 
 .unified-page__content {
   width: 100%;
-  max-width: 1600px;
-  margin: 0 auto;
 }
 
 .unified-page__content--padded {
-  padding: 1.5rem 2rem 2rem;
+  padding: 1.5rem 0 2rem;
 }
 
 .unified-page__footer {
