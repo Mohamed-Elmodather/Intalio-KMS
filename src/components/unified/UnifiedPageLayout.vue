@@ -67,14 +67,14 @@ function handleActionClick(actionId: string) {
   emit('action-click', actionId)
 }
 
-function getStatColorClasses(color?: string) {
-  const colors: Record<string, { bg: string; icon: string; text: string; border: string }> = {
-    teal: { bg: 'bg-gradient-to-br from-teal-50 to-teal-100/50', icon: 'bg-teal-100 text-teal-600', text: 'text-teal-700', border: 'border-teal-200/50' },
-    blue: { bg: 'bg-gradient-to-br from-blue-50 to-blue-100/50', icon: 'bg-blue-100 text-blue-600', text: 'text-blue-700', border: 'border-blue-200/50' },
-    orange: { bg: 'bg-gradient-to-br from-orange-50 to-orange-100/50', icon: 'bg-orange-100 text-orange-600', text: 'text-orange-700', border: 'border-orange-200/50' },
-    purple: { bg: 'bg-gradient-to-br from-purple-50 to-purple-100/50', icon: 'bg-purple-100 text-purple-600', text: 'text-purple-700', border: 'border-purple-200/50' },
-    green: { bg: 'bg-gradient-to-br from-green-50 to-green-100/50', icon: 'bg-green-100 text-green-600', text: 'text-green-700', border: 'border-green-200/50' },
-    red: { bg: 'bg-gradient-to-br from-red-50 to-red-100/50', icon: 'bg-red-100 text-red-600', text: 'text-red-700', border: 'border-red-200/50' }
+function getStatIconClasses(color?: string) {
+  const colors: Record<string, string> = {
+    teal: 'bg-gradient-to-br from-teal-100 to-teal-200 text-teal-600',
+    blue: 'bg-gradient-to-br from-blue-100 to-blue-200 text-blue-600',
+    orange: 'bg-gradient-to-br from-orange-100 to-orange-200 text-orange-600',
+    purple: 'bg-gradient-to-br from-purple-100 to-purple-200 text-purple-600',
+    green: 'bg-gradient-to-br from-emerald-100 to-emerald-200 text-emerald-600',
+    red: 'bg-gradient-to-br from-red-100 to-red-200 text-red-600'
   }
   return colors[color || 'teal'] || colors.teal
 }
@@ -135,13 +135,11 @@ function getActionClasses(variant?: string) {
             <div v-if="stats.length > 0 || $slots.stats" class="unified-page__stats">
               <slot name="stats">
                 <div
-                  v-for="(stat, index) in stats"
+                  v-for="stat in stats"
                   :key="stat.id"
                   class="unified-page__stat"
-                  :class="[getStatColorClasses(stat.color).bg, getStatColorClasses(stat.color).border]"
-                  :style="{ animationDelay: `${index * 0.1}s` }"
                 >
-                  <div class="unified-page__stat-icon" :class="getStatColorClasses(stat.color).icon">
+                  <div class="unified-page__stat-icon" :class="getStatIconClasses(stat.color)">
                     <i :class="stat.icon"></i>
                   </div>
                   <div class="unified-page__stat-content">
@@ -185,15 +183,15 @@ function getActionClasses(variant?: string) {
    HERO SECTION
    ============================================ */
 .unified-page__hero {
-  margin-bottom: 1.5rem;
+  /* Base styles - variants add specific margins */
 }
 
 .unified-page__hero--default {
   position: relative;
   padding: 2rem;
   background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 50%, #99f6e4 100%);
-  border-radius: 1rem;
   overflow: hidden;
+  margin-bottom: 1.5rem;
 }
 
 .unified-page__hero--default::before {
@@ -229,8 +227,8 @@ function getActionClasses(variant?: string) {
   position: relative;
   padding: 2rem;
   background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 50%, #99f6e4 100%);
-  border-radius: 1rem;
   overflow: hidden;
+  margin-bottom: 1.5rem;
 }
 
 .unified-page__hero--gradient::before {
@@ -408,13 +406,13 @@ function getActionClasses(variant?: string) {
   padding: 1rem 1.25rem;
   min-width: 140px;
   border-radius: 1rem;
+  background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 100%);
   border: 1px solid rgba(20, 184, 166, 0.2);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   position: relative;
   overflow: hidden;
   cursor: default;
-  animation: statSlideIn 0.5s ease-out backwards;
 }
 
 .unified-page__stat::before {
@@ -473,6 +471,12 @@ function getActionClasses(variant?: string) {
     transform: translateY(0) scale(1);
   }
 }
+
+/* Staggered animation for stat cards */
+.unified-page__stat:nth-child(1) { animation: statSlideIn 0.5s ease-out 0.1s backwards; }
+.unified-page__stat:nth-child(2) { animation: statSlideIn 0.5s ease-out 0.2s backwards; }
+.unified-page__stat:nth-child(3) { animation: statSlideIn 0.5s ease-out 0.3s backwards; }
+.unified-page__stat:nth-child(4) { animation: statSlideIn 0.5s ease-out 0.4s backwards; }
 
 .unified-page__stat-icon {
   width: 48px;
