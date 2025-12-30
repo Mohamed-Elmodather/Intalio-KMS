@@ -204,6 +204,7 @@ function askAI(query: string) {
       <!-- Unified Page Layout with Hero -->
       <UnifiedPageLayout
         title="Self-Service Portal"
+        title-highlight="Self-Service"
         subtitle="Request services, track progress, and get help"
         icon="fas fa-concierge-bell"
         :stats="pageStats"

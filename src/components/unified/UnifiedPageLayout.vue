@@ -21,6 +21,7 @@ export interface PageAction {
 // Props
 interface Props {
   title?: string
+  titleHighlight?: string
   subtitle?: string
   icon?: string
   iconBgClass?: string
@@ -34,6 +35,7 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
   title: '',
+  titleHighlight: '',
   subtitle: '',
   icon: '',
   iconBgClass: 'bg-gradient-to-br from-teal-500 to-teal-600',
@@ -60,6 +62,16 @@ const maxWidthClass = computed(() => {
     '4xl': 'max-w-4xl'
   }
   return widths[props.maxWidth] || 'max-w-full'
+})
+
+const displayTitle = computed(() => {
+  if (props.titleHighlight && props.title.includes(props.titleHighlight)) {
+    return props.title.replace(
+      props.titleHighlight,
+      `<span class="unified-page__title-highlight">${props.titleHighlight}</span>`
+    )
+  }
+  return props.title
 })
 
 // Methods
@@ -109,7 +121,7 @@ function getActionClasses(variant?: string) {
                   <i :class="icon"></i>
                 </div>
                 <div>
-                  <h1 class="unified-page__title">{{ title }}</h1>
+                  <h1 class="unified-page__title" v-html="displayTitle"></h1>
                   <p v-if="subtitle" class="unified-page__subtitle">{{ subtitle }}</p>
                 </div>
               </div>
@@ -318,6 +330,20 @@ function getActionClasses(variant?: string) {
   margin: 0 0 0.25rem;
   letter-spacing: -0.025em;
   line-height: 1.2;
+}
+
+.unified-page__title-highlight {
+  background: linear-gradient(135deg, #14b8a6 0%, #0891b2 50%, #0d9488 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: titleShimmer 3s ease-in-out infinite;
+  background-size: 200% 100%;
+}
+
+@keyframes titleShimmer {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
 }
 
 .unified-page__subtitle {
