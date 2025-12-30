@@ -188,7 +188,8 @@ function getActionClasses(variant?: string) {
 <style scoped>
 .unified-page {
   width: 100%;
-  margin: 0 auto;
+  min-height: 100%;
+  background: linear-gradient(180deg, #f0fdfa 0%, #f8fafc 15%, #ffffff 100%);
 }
 
 /* ============================================
@@ -551,10 +552,12 @@ function getActionClasses(variant?: string) {
 
 .unified-page__content {
   width: 100%;
+  max-width: 1600px;
+  margin: 0 auto;
 }
 
 .unified-page__content--padded {
-  padding: 0;
+  padding: 1.5rem 2rem 2rem;
 }
 
 .unified-page__footer {

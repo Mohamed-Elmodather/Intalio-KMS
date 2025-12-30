@@ -190,9 +190,7 @@ onMounted(async () => {
       style="margin-top: 64px; min-height: calc(100vh - 64px);"
       :class="isCollapsed ? 'ml-20' : 'ml-64'"
     >
-      <div class="p-6">
-        <slot />
-      </div>
+      <slot />
     </main>
 
     <AppToast />
