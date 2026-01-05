@@ -671,62 +671,62 @@ onUnmounted(() => {
 <template>
   <div class="page-view">
     <!-- Hero Section -->
-    <div class="hero-section fade-in-up">
-      <div class="hero-content">
-        <div class="hero-left">
-          <div class="hero-header">
-            <div class="hero-icon">
-              <i class="fas fa-book-open"></i>
-            </div>
-            <div>
-              <h1 class="hero-title"><span class="hero-title-highlight">Articles</span> Hub</h1>
-              <p class="hero-subtitle">Discover articles, tutorials, and resources</p>
-            </div>
+    <div class="hero-gradient relative overflow-hidden">
+      <!-- Decorative elements with animations -->
+      <div class="circle-drift-1 absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full"></div>
+      <div class="circle-drift-2 absolute bottom-0 left-0 w-64 h-64 bg-white/5 rounded-full"></div>
+      <div class="circle-drift-3 absolute top-1/2 right-1/4 w-32 h-32 bg-white/10 rounded-full"></div>
+
+      <!-- Stats - Absolute Top Right -->
+      <div class="stats-top-right">
+        <div class="stat-card-square">
+          <div class="stat-icon-box">
+            <i class="fas fa-newspaper"></i>
           </div>
-          <a @click="navigateToEditor" class="hero-btn">
-            <i class="fas fa-plus"></i>
-            <span>New Article</span>
-          </a>
+          <p class="stat-value-mini">{{ articles.length }}</p>
+          <p class="stat-label-mini">Articles</p>
+        </div>
+        <div class="stat-card-square">
+          <div class="stat-icon-box">
+            <i class="fas fa-layer-group"></i>
+          </div>
+          <p class="stat-value-mini">{{ categories.length }}</p>
+          <p class="stat-label-mini">Categories</p>
+        </div>
+        <div class="stat-card-square">
+          <div class="stat-icon-box">
+            <i class="fas fa-eye"></i>
+          </div>
+          <p class="stat-value-mini">{{ totalViews }}</p>
+          <p class="stat-label-mini">Total Views</p>
+        </div>
+        <div class="stat-card-square">
+          <div class="stat-icon-box">
+            <i class="fas fa-users"></i>
+          </div>
+          <p class="stat-value-mini">{{ contributors }}</p>
+          <p class="stat-label-mini">Contributors</p>
+        </div>
+      </div>
+
+      <div class="relative px-8 py-8">
+        <div class="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-white text-xs font-semibold inline-flex items-center gap-2 mb-4">
+          <i class="fas fa-book-open"></i>
+          AFC Asian Cup 2027
         </div>
 
-        <!-- Stats -->
-        <div class="hero-stats">
-          <div class="stat-card-hero">
-            <div class="stat-card-hero-icon teal">
-              <i class="fas fa-newspaper"></i>
-            </div>
-            <div class="stat-card-hero-content">
-              <p class="stat-card-hero-value">{{ articles.length }}<span class="stat-card-hero-suffix">+</span></p>
-              <p class="stat-card-hero-label">Total Articles</p>
-            </div>
-          </div>
-          <div class="stat-card-hero">
-            <div class="stat-card-hero-icon blue">
-              <i class="fas fa-layer-group"></i>
-            </div>
-            <div class="stat-card-hero-content">
-              <p class="stat-card-hero-value">{{ categories.length }}</p>
-              <p class="stat-card-hero-label">Categories</p>
-            </div>
-          </div>
-          <div class="stat-card-hero">
-            <div class="stat-card-hero-icon orange">
-              <i class="fas fa-eye"></i>
-            </div>
-            <div class="stat-card-hero-content">
-              <p class="stat-card-hero-value">{{ totalViews }}<span class="stat-card-hero-suffix">+</span></p>
-              <p class="stat-card-hero-label">Total Views</p>
-            </div>
-          </div>
-          <div class="stat-card-hero">
-            <div class="stat-card-hero-icon purple">
-              <i class="fas fa-users"></i>
-            </div>
-            <div class="stat-card-hero-content">
-              <p class="stat-card-hero-value">{{ contributors }}</p>
-              <p class="stat-card-hero-label">Contributors</p>
-            </div>
-          </div>
+        <h1 class="text-3xl font-bold text-white mb-2">Articles Hub</h1>
+        <p class="text-teal-100 max-w-lg">Discover articles, tutorials, best practices, and knowledge resources.</p>
+
+        <div class="flex flex-wrap gap-3 mt-6">
+          <button @click="navigateToEditor" class="px-5 py-2.5 bg-white text-teal-600 rounded-xl font-semibold text-sm flex items-center gap-2 hover:bg-teal-50 transition-all shadow-lg">
+            <i class="fas fa-plus"></i>
+            New Article
+          </button>
+          <button class="px-5 py-2.5 bg-white/20 backdrop-blur-sm border border-white/30 text-white rounded-xl font-semibold text-sm hover:bg-white/30 transition-all flex items-center gap-2">
+            <i class="fas fa-bookmark"></i>
+            My Bookmarks
+          </button>
         </div>
       </div>
     </div>
@@ -1055,8 +1055,21 @@ onUnmounted(() => {
 
     <!-- Main Content Area -->
     <div class="px-6 pb-6">
+      <!-- Section Header -->
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-lg font-bold text-gray-900 flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center shadow-lg shadow-teal-200">
+            <i class="fas fa-newspaper text-white text-sm"></i>
+          </div>
+          <div>
+            <span class="block">All Articles</span>
+            <span class="text-xs font-medium text-gray-500">{{ filteredArticles.length }} articles found</span>
+          </div>
+        </h2>
+      </div>
+
       <!-- Toolbar -->
-      <div class="toolbar">
+      <div class="toolbar bg-white rounded-2xl p-4 shadow-sm border border-gray-100 mb-4">
         <div class="toolbar-left">
           <!-- Search Box -->
           <div class="search-box">
@@ -1333,6 +1346,136 @@ onUnmounted(() => {
 }
 
 /* ============================================
+   HERO SECTION (Matching Documents Page)
+   ============================================ */
+.hero-gradient {
+  background: linear-gradient(135deg, #0d9488 0%, #14b8a6 50%, #10b981 100%);
+}
+
+.stats-top-right {
+  position: absolute;
+  top: 24px;
+  right: 32px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  z-index: 10;
+}
+
+.stat-card-square {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(8px);
+  border-radius: 16px;
+  width: 115px;
+  height: 115px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-align: center;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.stat-card-square:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+.stat-card-square:hover .stat-icon-box {
+  transform: scale(1.1);
+}
+
+.stat-icon-box {
+  color: white;
+  font-size: 20px;
+  transition: transform 0.3s ease;
+}
+
+.stat-value-mini {
+  font-size: 24px;
+  font-weight: 700;
+  color: white;
+  line-height: 1;
+  margin: 0;
+}
+
+.stat-label-mini {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1;
+  margin: 0;
+}
+
+/* Circle Drift Animations */
+.circle-drift-1 {
+  animation: drift-1 20s ease-in-out infinite;
+}
+
+.circle-drift-2 {
+  animation: drift-2 25s ease-in-out infinite;
+}
+
+.circle-drift-3 {
+  animation: drift-3 18s ease-in-out infinite;
+}
+
+@keyframes drift-1 {
+  0%, 100% { transform: translate(33%, -50%); }
+  25% { transform: translate(28%, -45%); }
+  50% { transform: translate(35%, -55%); }
+  75% { transform: translate(30%, -48%); }
+}
+
+@keyframes drift-2 {
+  0%, 100% { transform: translate(-33%, 50%); }
+  33% { transform: translate(-28%, 45%); }
+  66% { transform: translate(-38%, 55%); }
+}
+
+@keyframes drift-3 {
+  0%, 100% { transform: translate(0, -50%); }
+  50% { transform: translate(10%, -40%); }
+}
+
+/* Responsive Hero */
+@media (max-width: 1024px) {
+  .stats-top-right {
+    position: relative;
+    top: 0;
+    right: 0;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: 16px;
+    gap: 8px;
+  }
+
+  .stat-card-square {
+    width: 100px;
+    height: 100px;
+  }
+
+  .stat-value-mini {
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 640px) {
+  .stats-top-right {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+
+  .stat-card-square {
+    width: 100%;
+    height: 90px;
+  }
+}
+
+/* ============================================
    MAIN CONTENT
    ============================================ */
 .main-content {
@@ -1345,7 +1488,6 @@ onUnmounted(() => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1rem;
   gap: 1rem;
   flex-wrap: wrap;
   animation: fadeInUp 0.4s ease-out;
@@ -1475,49 +1617,59 @@ onUnmounted(() => {
 
 /* Sort Select */
 .sort-select {
-  height: 36px;
-  padding: 0 1.75rem 0 0.625rem;
-  border: 1px solid #e2e8f0;
-  border-radius: 0.5rem;
-  background: white url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") no-repeat right 0.5rem center;
-  font-size: 0.8125rem;
+  height: 40px;
+  padding: 0 2rem 0 0.875rem;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 0.75rem;
+  background: white url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") no-repeat right 0.625rem center;
+  font-size: 0.875rem;
+  font-weight: 500;
   color: #334155;
   cursor: pointer;
   appearance: none;
+  transition: all 0.2s ease;
+}
+
+.sort-select:hover {
+  border-color: #5eead4;
+  background-color: #f0fdfa;
 }
 
 .sort-select:focus {
   outline: none;
   border-color: #14b8a6;
+  box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.1);
 }
 
 /* View Toggle */
 .view-toggle {
   display: flex;
-  background: #f1f5f9;
-  border-radius: 0.5rem;
-  padding: 0.1875rem;
+  background: linear-gradient(135deg, #f0fdfa 0%, #f1f5f9 100%);
+  border-radius: 0.75rem;
+  padding: 0.25rem;
+  border: 1px solid #e2e8f0;
 }
 
 .view-toggle button {
-  padding: 0.375rem 0.5rem;
+  padding: 0.5rem 0.75rem;
   border: none;
   background: transparent;
   color: #64748b;
-  border-radius: 0.375rem;
+  border-radius: 0.5rem;
   cursor: pointer;
-  transition: all 0.15s ease;
-  font-size: 0.8125rem;
+  transition: all 0.2s ease;
+  font-size: 0.875rem;
 }
 
 .view-toggle button:hover {
-  color: #334155;
+  color: #0d9488;
+  background: rgba(20, 184, 166, 0.1);
 }
 
 .view-toggle button.active {
-  background: white;
-  color: #0d9488;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+  color: white;
+  box-shadow: 0 2px 8px rgba(20, 184, 166, 0.3);
 }
 
 /* Filters Panel */
@@ -1710,9 +1862,9 @@ onUnmounted(() => {
 /* Content Area */
 .content-area {
   background: white;
-  border-radius: 0.875rem;
-  border: 1px solid #f1f5f9;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  border-radius: 1.25rem;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
   overflow: hidden;
   animation: fadeInUp 0.5s ease-out;
 }
@@ -1721,8 +1873,8 @@ onUnmounted(() => {
 .articles-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 1rem;
-  padding: 1rem;
+  gap: 1.25rem;
+  padding: 1.25rem;
 }
 
 /* Article Card - Vibrant */
