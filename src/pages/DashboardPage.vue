@@ -1332,15 +1332,18 @@ onUnmounted(() => {
       </div>
 
       <!-- Polls -->
-      <div class="card-animated rounded-2xl p-6 stagger-4">
+      <div class="card-animated rounded-2xl p-6 stagger-4 bg-gradient-to-br from-white to-teal-50/30 border border-teal-100/50">
         <div class="flex items-center justify-between mb-5">
-          <h2 class="text-lg font-semibold text-gray-900 flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-purple-200">
+          <h2 class="text-lg font-bold text-gray-900 flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center shadow-lg shadow-teal-200">
               <i class="fas fa-chart-pie text-white text-sm"></i>
             </div>
-            Active Polls
+            <div>
+              <span class="block">Active Polls</span>
+              <span class="text-xs font-medium text-teal-600">Cast your vote</span>
+            </div>
           </h2>
-          <router-link to="/polls" class="text-sm text-primary-600 font-medium hover:text-primary-700 flex items-center gap-1">
+          <router-link to="/polls" class="px-3 py-1.5 text-sm text-teal-600 hover:text-white bg-teal-50 hover:bg-teal-500 rounded-lg font-medium flex items-center gap-1.5 transition-all">
             View All <i class="fas fa-arrow-right text-xs"></i>
           </router-link>
         </div>
