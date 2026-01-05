@@ -439,58 +439,61 @@ function goToCreatePoll() {
 
     <template v-else>
       <!-- Page Hero Section -->
-      <div class="page-hero fade-in-up">
-        <div class="page-hero-content">
-          <div class="page-hero-text">
-            <h1 class="page-hero-title">
-              <span class="text-gradient">Polls</span> & Surveys
-            </h1>
-            <p class="page-hero-subtitle">Gather feedback and insights from your team</p>
-          </div>
-          <div class="page-hero-actions">
-            <button @click="goToCreatePoll" class="btn-vibrant ripple-effect">
-              <i class="fas fa-plus mr-2"></i>
-              Create New Poll
+      <div class="hero-section fade-in-up">
+        <div class="hero-content">
+          <div class="hero-left">
+            <div class="hero-header">
+              <div class="hero-icon">
+                <i class="fas fa-poll"></i>
+              </div>
+              <div>
+                <h1 class="hero-title"><span class="hero-title-highlight">Polls</span> & Surveys</h1>
+                <p class="hero-subtitle">Gather feedback and insights from your team</p>
+              </div>
+            </div>
+            <button @click="goToCreatePoll" class="hero-btn">
+              <i class="fas fa-plus"></i>
+              <span>Create New Poll</span>
             </button>
           </div>
-        </div>
 
-        <!-- Stats Cards -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
-          <div class="stat-card-hero fade-in-up" style="animation-delay: 0s">
-            <div class="stat-icon-hero bg-teal-100 text-teal-600">
-              <i class="fas fa-poll"></i>
+          <!-- Stats Cards -->
+          <div class="hero-stats">
+            <div class="stat-card-hero">
+              <div class="stat-card-hero-icon teal">
+                <i class="fas fa-poll"></i>
+              </div>
+              <div class="stat-card-hero-content">
+                <p class="stat-card-hero-value">{{ stats.active }}</p>
+                <p class="stat-card-hero-label">Active Polls</p>
+              </div>
             </div>
-            <div class="stat-content-hero">
-              <p class="stat-value-hero">{{ stats.active }}</p>
-              <p class="stat-label-hero">Active Polls</p>
+            <div class="stat-card-hero">
+              <div class="stat-card-hero-icon blue">
+                <i class="fas fa-vote-yea"></i>
+              </div>
+              <div class="stat-card-hero-content">
+                <p class="stat-card-hero-value">{{ stats.responses.toLocaleString() }}</p>
+                <p class="stat-card-hero-label">Responses</p>
+              </div>
             </div>
-          </div>
-          <div class="stat-card-hero fade-in-up" style="animation-delay: 0.1s">
-            <div class="stat-icon-hero bg-blue-100 text-blue-600">
-              <i class="fas fa-vote-yea"></i>
+            <div class="stat-card-hero">
+              <div class="stat-card-hero-icon orange">
+                <i class="fas fa-chart-pie"></i>
+              </div>
+              <div class="stat-card-hero-content">
+                <p class="stat-card-hero-value">{{ stats.created }}</p>
+                <p class="stat-card-hero-label">Polls Created</p>
+              </div>
             </div>
-            <div class="stat-content-hero">
-              <p class="stat-value-hero">{{ stats.responses.toLocaleString() }}</p>
-              <p class="stat-label-hero">Responses</p>
-            </div>
-          </div>
-          <div class="stat-card-hero fade-in-up" style="animation-delay: 0.2s">
-            <div class="stat-icon-hero bg-orange-100 text-orange-600">
-              <i class="fas fa-chart-pie"></i>
-            </div>
-            <div class="stat-content-hero">
-              <p class="stat-value-hero">{{ stats.created }}</p>
-              <p class="stat-label-hero">Polls Created</p>
-            </div>
-          </div>
-          <div class="stat-card-hero fade-in-up" style="animation-delay: 0.3s">
-            <div class="stat-icon-hero bg-purple-100 text-purple-600">
-              <i class="fas fa-users"></i>
-            </div>
-            <div class="stat-content-hero">
-              <p class="stat-value-hero">{{ stats.participation }}%</p>
-              <p class="stat-label-hero">Participation</p>
+            <div class="stat-card-hero">
+              <div class="stat-card-hero-icon purple">
+                <i class="fas fa-users"></i>
+              </div>
+              <div class="stat-card-hero-content">
+                <p class="stat-card-hero-value">{{ stats.participation }}%</p>
+                <p class="stat-card-hero-label">Participation</p>
+              </div>
             </div>
           </div>
         </div>
@@ -1460,65 +1463,6 @@ function goToCreatePoll() {
 }
 .completed-poll-body {
   padding: 1.25rem;
-}
-
-/* Page Hero */
-.page-hero {
-  background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 50%, #99f6e4 100%);
-  border-radius: 1.5rem;
-  padding: 2rem;
-  margin-bottom: 1.5rem;
-}
-.page-hero-content {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  align-items: center;
-  gap: 1rem;
-}
-.page-hero-title {
-  font-size: 1.875rem;
-  font-weight: 700;
-  color: #0f172a;
-}
-.page-hero-subtitle {
-  color: #64748b;
-  margin-top: 0.25rem;
-}
-.text-gradient {
-  background: linear-gradient(135deg, #0d9488, #14b8a6);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-/* Stat Card Hero */
-.stat-card-hero {
-  background: white;
-  border-radius: 1rem;
-  padding: 1.25rem;
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-}
-.stat-icon-hero {
-  width: 48px;
-  height: 48px;
-  border-radius: 0.75rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.25rem;
-}
-.stat-value-hero {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #0f172a;
-}
-.stat-label-hero {
-  font-size: 0.75rem;
-  color: #64748b;
 }
 
 /* Line Clamp */

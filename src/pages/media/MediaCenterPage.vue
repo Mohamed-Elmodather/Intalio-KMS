@@ -217,44 +217,46 @@ onMounted(() => {
     <div class="particles" id="media-particles"></div>
 
     <!-- Page Hero Section -->
-    <div class="page-hero-section">
-      <div class="page-hero-content">
-        <div class="page-hero-icon">
-          <i class="fas fa-photo-video"></i>
-        </div>
-        <div class="page-hero-text">
-          <h1 class="page-hero-title">
-            <span class="text-primary-600">Media</span> Center
-          </h1>
-          <p class="page-hero-subtitle">Videos, podcasts, photo galleries and multimedia content</p>
-        </div>
-      </div>
-      <div class="page-hero-stats">
-        <div class="stat-card-hero" style="animation-delay: 0ms;">
-          <div class="stat-card-hero-icon bg-primary-100 text-primary-600">
-            <i class="fas fa-video"></i>
-          </div>
-          <div class="stat-card-hero-content">
-            <div class="stat-card-hero-value">{{ mediaStats.totalVideos }}</div>
-            <div class="stat-card-hero-label">Videos</div>
+    <div class="hero-section fade-in-up">
+      <div class="hero-content">
+        <div class="hero-left">
+          <div class="hero-header">
+            <div class="hero-icon">
+              <i class="fas fa-photo-video"></i>
+            </div>
+            <div>
+              <h1 class="hero-title"><span class="hero-title-highlight">Media</span> Center</h1>
+              <p class="hero-subtitle">Videos, podcasts, photo galleries and multimedia content</p>
+            </div>
           </div>
         </div>
-        <div class="stat-card-hero" style="animation-delay: 100ms;">
-          <div class="stat-card-hero-icon bg-pink-100 text-pink-600">
-            <i class="fas fa-images"></i>
+        <div class="hero-stats">
+          <div class="stat-card-hero">
+            <div class="stat-card-hero-icon teal">
+              <i class="fas fa-video"></i>
+            </div>
+            <div class="stat-card-hero-content">
+              <p class="stat-card-hero-value">{{ mediaStats.totalVideos }}</p>
+              <p class="stat-card-hero-label">Videos</p>
+            </div>
           </div>
-          <div class="stat-card-hero-content">
-            <div class="stat-card-hero-value">{{ mediaStats.galleries }}</div>
-            <div class="stat-card-hero-label">Galleries</div>
+          <div class="stat-card-hero">
+            <div class="stat-card-hero-icon orange">
+              <i class="fas fa-images"></i>
+            </div>
+            <div class="stat-card-hero-content">
+              <p class="stat-card-hero-value">{{ mediaStats.galleries }}</p>
+              <p class="stat-card-hero-label">Galleries</p>
+            </div>
           </div>
-        </div>
-        <div class="stat-card-hero" style="animation-delay: 200ms;">
-          <div class="stat-card-hero-icon bg-purple-100 text-purple-600">
-            <i class="fas fa-podcast"></i>
-          </div>
-          <div class="stat-card-hero-content">
-            <div class="stat-card-hero-value">{{ mediaStats.podcasts }}</div>
-            <div class="stat-card-hero-label">Podcasts</div>
+          <div class="stat-card-hero">
+            <div class="stat-card-hero-icon purple">
+              <i class="fas fa-podcast"></i>
+            </div>
+            <div class="stat-card-hero-content">
+              <p class="stat-card-hero-value">{{ mediaStats.podcasts }}</p>
+              <p class="stat-card-hero-label">Podcasts</p>
+            </div>
           </div>
         </div>
       </div>
@@ -762,85 +764,6 @@ onMounted(() => {
     transform: translateY(-100vh) translateX(100px) scale(1);
     opacity: 0;
   }
-}
-
-/* Page Hero Section */
-.page-hero-section {
-  padding: 2rem 1.5rem;
-  background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 50%, #f0fdfa 100%);
-  border-bottom: 1px solid rgba(20, 184, 166, 0.1);
-  position: relative;
-  z-index: 1;
-}
-
-.page-hero-content {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
-}
-
-.page-hero-icon {
-  width: 3.5rem;
-  height: 3.5rem;
-  border-radius: 1rem;
-  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-size: 1.5rem;
-  box-shadow: 0 4px 15px rgba(20, 184, 166, 0.4);
-}
-
-.page-hero-title {
-  font-size: 1.75rem;
-  font-weight: 700;
-  color: #0f172a;
-  margin: 0;
-}
-
-.page-hero-subtitle {
-  font-size: 0.875rem;
-  color: #64748b;
-  margin: 0.25rem 0 0;
-}
-
-.page-hero-stats {
-  display: flex;
-  gap: 1rem;
-  flex-wrap: wrap;
-}
-
-.stat-card-hero {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.75rem 1rem;
-  background: white;
-  border-radius: 0.75rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  animation: fadeInUp 0.5s ease-out forwards;
-}
-
-.stat-card-hero-icon {
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: 0.625rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.stat-card-hero-value {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: #0f172a;
-}
-
-.stat-card-hero-label {
-  font-size: 0.75rem;
-  color: #64748b;
 }
 
 /* Card Animated */

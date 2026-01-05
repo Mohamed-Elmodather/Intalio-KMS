@@ -255,38 +255,46 @@ function getCategoryCount(categoryId: string) {
 <template>
   <div class="events-page">
     <!-- Page Hero Section -->
-    <div class="page-hero">
+    <div class="hero-section fade-in-up">
       <div class="hero-content">
-        <div class="hero-icon">
-          <i class="fas fa-calendar-alt"></i>
-        </div>
-        <div class="hero-text">
-          <h1 class="hero-title">
-            <span class="text-teal-600">Events</span> & Calendar
-          </h1>
-          <p class="hero-subtitle">Stay connected with company events, meetings, and activities</p>
-        </div>
-      </div>
-      <div class="hero-stats">
-        <div class="stat-card-hero teal">
-          <div class="stat-icon"><i class="fas fa-calendar-alt"></i></div>
-          <div class="stat-info">
-            <span class="stat-value">{{ eventStats.total }}</span>
-            <span class="stat-label">Total Events</span>
+        <div class="hero-left">
+          <div class="hero-header">
+            <div class="hero-icon">
+              <i class="fas fa-calendar-alt"></i>
+            </div>
+            <div>
+              <h1 class="hero-title"><span class="hero-title-highlight">Events</span> & Calendar</h1>
+              <p class="hero-subtitle">Stay connected with company events, meetings, and activities</p>
+            </div>
           </div>
         </div>
-        <div class="stat-card-hero blue">
-          <div class="stat-icon"><i class="fas fa-calendar-week"></i></div>
-          <div class="stat-info">
-            <span class="stat-value">{{ eventStats.thisWeek }}</span>
-            <span class="stat-label">This Week</span>
+        <div class="hero-stats">
+          <div class="stat-card-hero">
+            <div class="stat-card-hero-icon teal">
+              <i class="fas fa-calendar-alt"></i>
+            </div>
+            <div class="stat-card-hero-content">
+              <p class="stat-card-hero-value">{{ eventStats.total }}</p>
+              <p class="stat-card-hero-label">Total Events</p>
+            </div>
           </div>
-        </div>
-        <div class="stat-card-hero green">
-          <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
-          <div class="stat-info">
-            <span class="stat-value">{{ eventStats.yourRsvps }}</span>
-            <span class="stat-label">Your RSVPs</span>
+          <div class="stat-card-hero">
+            <div class="stat-card-hero-icon blue">
+              <i class="fas fa-calendar-week"></i>
+            </div>
+            <div class="stat-card-hero-content">
+              <p class="stat-card-hero-value">{{ eventStats.thisWeek }}</p>
+              <p class="stat-card-hero-label">This Week</p>
+            </div>
+          </div>
+          <div class="stat-card-hero">
+            <div class="stat-card-hero-icon teal">
+              <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="stat-card-hero-content">
+              <p class="stat-card-hero-value">{{ eventStats.yourRsvps }}</p>
+              <p class="stat-card-hero-label">Your RSVPs</p>
+            </div>
           </div>
         </div>
       </div>
@@ -725,122 +733,6 @@ function getCategoryCount(categoryId: string) {
 </template>
 
 <style scoped>
-/* Page Hero */
-.page-hero {
-  background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 50%, #e0f2fe 100%);
-  padding: 2rem;
-  border-radius: 1.5rem;
-  margin-bottom: 1.5rem;
-  position: relative;
-  overflow: hidden;
-}
-
-.page-hero::before {
-  content: '';
-  position: absolute;
-  top: -50px;
-  right: -50px;
-  width: 200px;
-  height: 200px;
-  background: radial-gradient(circle, rgba(20, 184, 166, 0.2) 0%, transparent 70%);
-  pointer-events: none;
-}
-
-.hero-content {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
-}
-
-.hero-icon {
-  width: 56px;
-  height: 56px;
-  background: linear-gradient(135deg, #14b8a6, #0d9488);
-  border-radius: 1rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 8px 20px rgba(20, 184, 166, 0.3);
-}
-
-.hero-icon i {
-  font-size: 1.5rem;
-  color: white;
-}
-
-.hero-title {
-  font-size: 1.75rem;
-  font-weight: 800;
-  color: #0f172a;
-  margin: 0;
-}
-
-.hero-subtitle {
-  font-size: 0.9375rem;
-  color: #64748b;
-  margin: 0.25rem 0 0;
-}
-
-.hero-stats {
-  display: flex;
-  gap: 1rem;
-}
-
-.stat-card-hero {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 1rem 1.25rem;
-  background: white;
-  border-radius: 1rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  flex: 1;
-}
-
-.stat-card-hero .stat-icon {
-  width: 44px;
-  height: 44px;
-  border-radius: 0.75rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.125rem;
-}
-
-.stat-card-hero.teal .stat-icon {
-  background: linear-gradient(135deg, #ccfbf1, #99f6e4);
-  color: #0d9488;
-}
-
-.stat-card-hero.blue .stat-icon {
-  background: linear-gradient(135deg, #dbeafe, #bfdbfe);
-  color: #2563eb;
-}
-
-.stat-card-hero.green .stat-icon {
-  background: linear-gradient(135deg, #d1fae5, #a7f3d0);
-  color: #059669;
-}
-
-.stat-card-hero .stat-info {
-  display: flex;
-  flex-direction: column;
-}
-
-.stat-card-hero .stat-value {
-  font-size: 1.5rem;
-  font-weight: 800;
-  color: #0f172a;
-  line-height: 1;
-}
-
-.stat-card-hero .stat-label {
-  font-size: 0.75rem;
-  color: #64748b;
-  margin-top: 0.25rem;
-}
-
 /* Main Content */
 .main-content {
   padding: 0;

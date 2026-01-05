@@ -26,6 +26,18 @@ const filteredDocuments = computed(() => {
   return result
 })
 
+const documentStats = computed(() => ({
+  totalDocuments: documents.value.length,
+  totalLibraries: libraries.value.length,
+  totalSize: documents.value.reduce((acc, doc) => acc + (doc.size || 0), 0),
+  recentUploads: documents.value.filter(d => {
+    const uploadDate = new Date(d.createdAt)
+    const weekAgo = new Date()
+    weekAgo.setDate(weekAgo.getDate() - 7)
+    return uploadDate > weekAgo
+  }).length
+}))
+
 onMounted(async () => {
   try {
     const [docsRes, libsRes] = await Promise.all([
@@ -44,7 +56,14 @@ onMounted(async () => {
 function formatFileSize(bytes: number): string {
   if (bytes < 1024) return bytes + ' B'
   if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB'
-  return (bytes / (1024 * 1024)).toFixed(1) + ' MB'
+  if (bytes < 1024 * 1024 * 1024) return (bytes / (1024 * 1024)).toFixed(1) + ' MB'
+  return (bytes / (1024 * 1024 * 1024)).toFixed(1) + ' GB'
+}
+
+function formatTotalSize(bytes: number): string {
+  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(0) + ' KB'
+  if (bytes < 1024 * 1024 * 1024) return (bytes / (1024 * 1024)).toFixed(1) + ' MB'
+  return (bytes / (1024 * 1024 * 1024)).toFixed(1) + ' GB'
 }
 
 function formatDate(dateString: string): string {
@@ -75,19 +94,69 @@ function getLibraryIcon(icon?: string): string {
 </script>
 
 <template>
-  <div class="space-y-6 fade-in">
-    <!-- Header -->
-    <div class="flex items-center justify-between">
-      <div>
-        <h1 class="text-2xl font-bold text-gray-900">Document Library</h1>
-        <p class="text-gray-500 mt-1">Access and manage your documents</p>
+  <div class="page-view">
+    <!-- Hero Section -->
+    <div class="hero-section fade-in-up">
+      <div class="hero-content">
+        <div class="hero-left">
+          <div class="hero-header">
+            <div class="hero-icon">
+              <i class="fas fa-folder-open"></i>
+            </div>
+            <div>
+              <h1 class="hero-title"><span class="hero-title-highlight">Document</span> Library</h1>
+              <p class="hero-subtitle">Access and manage your documents</p>
+            </div>
+          </div>
+          <button class="hero-btn">
+            <i class="fas fa-upload"></i>
+            <span>Upload Document</span>
+          </button>
+        </div>
+
+        <!-- Stats -->
+        <div class="hero-stats">
+          <div class="stat-card-hero">
+            <div class="stat-card-hero-icon teal">
+              <i class="fas fa-file-alt"></i>
+            </div>
+            <div class="stat-card-hero-content">
+              <p class="stat-card-hero-value">{{ documentStats.totalDocuments }}</p>
+              <p class="stat-card-hero-label">Documents</p>
+            </div>
+          </div>
+          <div class="stat-card-hero">
+            <div class="stat-card-hero-icon blue">
+              <i class="fas fa-folder"></i>
+            </div>
+            <div class="stat-card-hero-content">
+              <p class="stat-card-hero-value">{{ documentStats.totalLibraries }}</p>
+              <p class="stat-card-hero-label">Libraries</p>
+            </div>
+          </div>
+          <div class="stat-card-hero">
+            <div class="stat-card-hero-icon orange">
+              <i class="fas fa-hdd"></i>
+            </div>
+            <div class="stat-card-hero-content">
+              <p class="stat-card-hero-value">{{ formatTotalSize(documentStats.totalSize) }}</p>
+              <p class="stat-card-hero-label">Total Size</p>
+            </div>
+          </div>
+          <div class="stat-card-hero">
+            <div class="stat-card-hero-icon purple">
+              <i class="fas fa-clock"></i>
+            </div>
+            <div class="stat-card-hero-content">
+              <p class="stat-card-hero-value">{{ documentStats.recentUploads }}</p>
+              <p class="stat-card-hero-label">This Week</p>
+            </div>
+          </div>
+        </div>
       </div>
-      <button class="btn btn-primary">
-        <i class="fas fa-upload"></i>
-        <span>Upload Document</span>
-      </button>
     </div>
 
+    <div class="px-6 space-y-6">
     <!-- Libraries -->
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
       <button
@@ -193,6 +262,7 @@ function getLibraryIcon(icon?: string): string {
           </button>
         </div>
       </div>
+    </div>
     </div>
   </div>
 </template>

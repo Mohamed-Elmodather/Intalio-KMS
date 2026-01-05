@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
-import { UnifiedPageLayout } from '@/components/unified'
-import type { PageStat, PageAction } from '@/components/unified'
 
 // State
 const showNewRequest = ref(false)
@@ -27,17 +25,6 @@ const completedRequestsCount = ref(24)
 const avgResolutionTime = ref(4)
 const totalServices = ref(15)
 
-const pageStats = computed<PageStat[]>(() => [
-  { id: 'open', label: 'Open Requests', value: openRequestsCount.value, icon: 'fas fa-clock', color: 'teal' },
-  { id: 'completed', label: 'Completed', value: completedRequestsCount.value, icon: 'fas fa-check-circle', color: 'green' },
-  { id: 'resolution', label: 'Avg. Resolution', value: `${avgResolutionTime.value}h`, icon: 'fas fa-bolt', color: 'orange' },
-  { id: 'services', label: 'Services', value: totalServices.value, icon: 'fas fa-th-large', color: 'blue' }
-])
-
-// Page actions
-const pageActions: PageAction[] = [
-  { id: 'new-request', label: 'New Request', icon: 'fas fa-plus', variant: 'primary' }
-]
 
 // Categories
 const categories = ref([
@@ -164,12 +151,6 @@ const filteredRequests = computed(() => {
 })
 
 // Methods
-function handleActionClick(actionId: string) {
-  if (actionId === 'new-request') {
-    showNewRequest.value = true
-  }
-}
-
 function selectService(service: any) {
   selectedService.value = service
   showNewRequest.value = true
@@ -207,18 +188,70 @@ function askAI(query: string) {
     </div>
 
     <template v-else>
-      <!-- Unified Page Layout with Hero -->
-      <UnifiedPageLayout
-        title="Self-Service Portal"
-        title-highlight="Self-Service"
-        subtitle="Request services, track progress, and get help"
-        icon="fas fa-concierge-bell"
-        :stats="pageStats"
-        :actions="pageActions"
-        hero-variant="default"
-        @action-click="handleActionClick"
-      >
+      <div class="page-view">
+        <!-- Hero Section -->
+        <div class="hero-section fade-in-up">
+          <div class="hero-content">
+            <div class="hero-left">
+              <div class="hero-header">
+                <div class="hero-icon">
+                  <i class="fas fa-concierge-bell"></i>
+                </div>
+                <div>
+                  <h1 class="hero-title"><span class="hero-title-highlight">Self-Service</span> Portal</h1>
+                  <p class="hero-subtitle">Request services, track progress, and get help</p>
+                </div>
+              </div>
+              <button @click="showNewRequest = true" class="hero-btn">
+                <i class="fas fa-plus"></i>
+                <span>New Request</span>
+              </button>
+            </div>
+
+            <!-- Stats -->
+            <div class="hero-stats">
+              <div class="stat-card-hero">
+                <div class="stat-card-hero-icon teal">
+                  <i class="fas fa-clock"></i>
+                </div>
+                <div class="stat-card-hero-content">
+                  <p class="stat-card-hero-value">{{ openRequestsCount }}</p>
+                  <p class="stat-card-hero-label">Open Requests</p>
+                </div>
+              </div>
+              <div class="stat-card-hero">
+                <div class="stat-card-hero-icon teal">
+                  <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="stat-card-hero-content">
+                  <p class="stat-card-hero-value">{{ completedRequestsCount }}</p>
+                  <p class="stat-card-hero-label">Completed</p>
+                </div>
+              </div>
+              <div class="stat-card-hero">
+                <div class="stat-card-hero-icon orange">
+                  <i class="fas fa-bolt"></i>
+                </div>
+                <div class="stat-card-hero-content">
+                  <p class="stat-card-hero-value">{{ avgResolutionTime }}h</p>
+                  <p class="stat-card-hero-label">Avg. Resolution</p>
+                </div>
+              </div>
+              <div class="stat-card-hero">
+                <div class="stat-card-hero-icon blue">
+                  <i class="fas fa-th-large"></i>
+                </div>
+                <div class="stat-card-hero-content">
+                  <p class="stat-card-hero-value">{{ totalServices }}</p>
+                  <p class="stat-card-hero-label">Services</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- Main Content -->
+        <div class="px-6 py-6">
         <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
           <!-- Service Catalog -->
           <div class="xl:col-span-2">
@@ -410,7 +443,8 @@ function askAI(query: string) {
             </div>
           </div>
         </div>
-      </UnifiedPageLayout>
+        </div>
+      </div>
 
       <!-- New Request Modal -->
       <div v-if="showNewRequest" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 fade-in-up">
