@@ -930,10 +930,10 @@ onUnmounted(() => {
             </div>
             <!-- Actions -->
             <div class="flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
-              <button @click="previewDocument(doc, $event)" class="w-8 h-8 rounded-lg bg-teal-50 hover:bg-teal-100 flex items-center justify-center text-teal-500 hover:text-teal-600 transition-all" title="Preview">
+              <button @click.stop="previewDocument(doc, $event)" class="w-8 h-8 rounded-lg bg-teal-50 hover:bg-teal-100 flex items-center justify-center text-teal-500 hover:text-teal-600 transition-all" title="Preview">
                 <i class="fas fa-eye text-xs"></i>
               </button>
-              <button @click="downloadDocument(doc, $event)" class="w-8 h-8 rounded-lg bg-teal-50 hover:bg-teal-100 flex items-center justify-center text-teal-500 hover:text-teal-600 transition-all" title="Download">
+              <button @click.stop="downloadDocument(doc, $event)" class="w-8 h-8 rounded-lg bg-teal-50 hover:bg-teal-100 flex items-center justify-center text-teal-500 hover:text-teal-600 transition-all" title="Download">
                 <i class="fas fa-download text-xs"></i>
               </button>
             </div>
