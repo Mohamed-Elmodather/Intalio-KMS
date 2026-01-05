@@ -748,25 +748,77 @@ function viewCourse(courseId: number) {
 
 // Self Service actions
 function openService(service: any) {
-  const routes: Record<string, string> = {
-    'IT Support': '/self-services/it-support',
-    'HR Portal': '/self-services/hr',
-    'Facilities': '/self-services/facilities',
-    'Finance': '/self-services/finance',
-    'Travel': '/self-services/travel',
-    'Benefits': '/self-services/benefits'
-  }
-  router.push(routes[service.label] || '/self-services')
+  router.push(service.route || '/self-services')
 }
 
 // Self Services
 const selfServices = ref([
-  { id: 1, label: 'IT Support', icon: 'fas fa-headset', iconBg: 'bg-blue-100', iconColor: 'text-blue-600' },
-  { id: 2, label: 'HR Requests', icon: 'fas fa-user-tie', iconBg: 'bg-violet-100', iconColor: 'text-violet-600' },
-  { id: 3, label: 'Book Room', icon: 'fas fa-door-open', iconBg: 'bg-emerald-100', iconColor: 'text-emerald-600' },
-  { id: 4, label: 'Expenses', icon: 'fas fa-receipt', iconBg: 'bg-amber-100', iconColor: 'text-amber-600' },
-  { id: 5, label: 'Time Off', icon: 'fas fa-umbrella-beach', iconBg: 'bg-primary-100', iconColor: 'text-primary-600' },
-  { id: 6, label: 'Feedback', icon: 'fas fa-comment-dots', iconBg: 'bg-rose-100', iconColor: 'text-rose-600' }
+  {
+    id: 1,
+    label: 'Ticket Request',
+    description: 'Match tickets & hospitality',
+    icon: 'fas fa-ticket-alt',
+    gradientClass: 'from-teal-500 to-emerald-600',
+    route: '/self-services/tickets',
+    usageCount: 1247,
+    isPopular: true,
+    isNew: false
+  },
+  {
+    id: 2,
+    label: 'Accreditation',
+    description: 'Staff & media access',
+    icon: 'fas fa-id-badge',
+    gradientClass: 'from-blue-500 to-indigo-600',
+    route: '/self-services/accreditation',
+    usageCount: 856,
+    isPopular: true,
+    isNew: false
+  },
+  {
+    id: 3,
+    label: 'Transportation',
+    description: 'Shuttle & vehicle booking',
+    icon: 'fas fa-bus',
+    gradientClass: 'from-violet-500 to-purple-600',
+    route: '/self-services/transport',
+    usageCount: 623,
+    isPopular: false,
+    isNew: false
+  },
+  {
+    id: 4,
+    label: 'Accommodation',
+    description: 'Hotel reservations',
+    icon: 'fas fa-hotel',
+    gradientClass: 'from-amber-500 to-orange-600',
+    route: '/self-services/accommodation',
+    usageCount: 412,
+    isPopular: false,
+    isNew: false
+  },
+  {
+    id: 5,
+    label: 'IT Support',
+    description: 'Technical assistance',
+    icon: 'fas fa-headset',
+    gradientClass: 'from-rose-500 to-pink-600',
+    route: '/self-services/it-support',
+    usageCount: 934,
+    isPopular: false,
+    isNew: false
+  },
+  {
+    id: 6,
+    label: 'Volunteer Hub',
+    description: 'Volunteer registration',
+    icon: 'fas fa-hands-helping',
+    gradientClass: 'from-green-500 to-teal-600',
+    route: '/self-services/volunteers',
+    usageCount: 2103,
+    isPopular: true,
+    isNew: true
+  }
 ])
 
 // Carousel State
@@ -1701,25 +1753,56 @@ onUnmounted(() => {
         </div>
       </div>
 
-      <!-- Quick Self Services -->
-      <div class="card-animated rounded-2xl p-6 stagger-6">
+      <!-- Quick Self Services - Enhanced -->
+      <div class="card-animated rounded-2xl p-6 stagger-6 bg-gradient-to-br from-white to-teal-50/30 border border-teal-100/50">
         <div class="flex items-center justify-between mb-5">
-          <h2 class="text-base font-semibold text-gray-900 flex items-center gap-3">
-            <div class="icon-soft w-9 h-9 rounded-xl flex items-center justify-center">
-              <i class="fas fa-grid-2 text-sm"></i>
+          <h2 class="text-lg font-bold text-gray-900 flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center shadow-lg shadow-teal-200">
+              <i class="fas fa-th-large text-white text-sm"></i>
             </div>
-            Quick Services
+            <div>
+              <span class="block">Quick Services</span>
+              <span class="text-xs font-medium text-teal-600">AFC Asian Cup 2027</span>
+            </div>
           </h2>
-          <router-link to="/self-services" class="text-sm text-primary-600 font-medium hover:text-primary-700">View All</router-link>
+          <router-link to="/self-services" class="px-3 py-1.5 text-sm text-teal-600 hover:text-white bg-teal-50 hover:bg-teal-500 rounded-lg font-medium flex items-center gap-1.5 transition-all">
+            View All <i class="fas fa-arrow-right text-xs"></i>
+          </router-link>
         </div>
-        <div class="grid grid-cols-3 gap-3">
+
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
           <button v-for="service in selfServices" :key="service.id"
                   @click="openService(service)"
-                  class="flex flex-col items-center gap-2 p-4 rounded-xl bg-gray-50 hover:bg-primary-50 hover:shadow-sm border border-transparent hover:border-teal-200 transition-all group">
-            <div :class="['w-10 h-10 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110', service.iconBg]">
-              <i :class="[service.icon, service.iconColor]"></i>
+                  class="service-card relative flex flex-col items-center gap-3 p-4 rounded-xl bg-white border border-gray-100 hover:border-teal-200 hover:shadow-lg transition-all group overflow-hidden">
+
+            <!-- Popular/New Badge -->
+            <div v-if="service.isNew" class="absolute top-0 right-0">
+              <div class="bg-gradient-to-r from-green-400 to-emerald-500 text-white text-[8px] font-bold px-2 py-0.5 rounded-bl-lg">
+                NEW
+              </div>
             </div>
-            <span class="text-xs font-medium text-gray-700 group-hover:text-teal-600 text-center transition-colors">{{ service.label }}</span>
+            <div v-else-if="service.isPopular" class="absolute top-0 right-0">
+              <div class="bg-gradient-to-r from-amber-400 to-orange-500 text-white text-[8px] font-bold px-2 py-0.5 rounded-bl-lg">
+                <i class="fas fa-fire mr-0.5"></i>POPULAR
+              </div>
+            </div>
+
+            <!-- Icon -->
+            <div :class="['w-12 h-12 rounded-xl bg-gradient-to-br flex items-center justify-center shadow-md transition-transform group-hover:scale-110 group-hover:shadow-lg', service.gradientClass]">
+              <i :class="[service.icon, 'text-white text-lg']"></i>
+            </div>
+
+            <!-- Content -->
+            <div class="text-center">
+              <h4 class="text-sm font-semibold text-gray-900 group-hover:text-teal-600 transition-colors">{{ service.label }}</h4>
+              <p class="text-[10px] text-gray-400 mt-0.5">{{ service.description }}</p>
+            </div>
+
+            <!-- Usage Count -->
+            <div class="flex items-center gap-1 text-[9px] text-gray-400">
+              <i class="fas fa-users"></i>
+              <span>{{ service.usageCount.toLocaleString() }} uses</span>
+            </div>
           </button>
         </div>
       </div>
