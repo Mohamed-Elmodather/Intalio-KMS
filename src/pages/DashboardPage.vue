@@ -294,32 +294,115 @@ function viewPoll(pollId: number) {
 const learningCourses = ref([
   {
     id: 1,
-    title: 'Advanced Data Analytics',
-    instructor: 'Dr. James Wilson',
+    title: 'Stadium Operations Management',
+    instructor: 'Dr. Ahmed Al-Rashid',
+    instructorAvatar: 'AR',
+    instructorColor: '#14b8a6',
     progress: 75,
-    icon: 'fas fa-chart-bar',
-    iconBg: 'bg-violet-100',
-    iconColor: 'text-violet-600'
+    lessonsCompleted: 12,
+    totalLessons: 16,
+    duration: '8h 30m',
+    category: 'Operations',
+    difficulty: 'Advanced',
+    icon: 'fas fa-stadium',
+    gradientClass: 'from-teal-500 to-emerald-600',
+    image: 'https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=100&h=60&fit=crop',
+    isBookmarked: true,
+    lastAccessed: '2 hours ago',
+    certificateAvailable: true
   },
   {
     id: 2,
-    title: 'Leadership Essentials',
-    instructor: 'Maria Garcia',
+    title: 'Event Security Protocols',
+    instructor: 'Col. Khalid Hassan',
+    instructorAvatar: 'KH',
+    instructorColor: '#3b82f6',
     progress: 45,
-    icon: 'fas fa-crown',
-    iconBg: 'bg-amber-100',
-    iconColor: 'text-amber-600'
+    lessonsCompleted: 5,
+    totalLessons: 11,
+    duration: '6h 15m',
+    category: 'Security',
+    difficulty: 'Intermediate',
+    icon: 'fas fa-shield-alt',
+    gradientClass: 'from-blue-500 to-indigo-600',
+    image: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=100&h=60&fit=crop',
+    isBookmarked: false,
+    lastAccessed: 'Yesterday',
+    certificateAvailable: true
   },
   {
     id: 3,
-    title: 'Cybersecurity Fundamentals',
-    instructor: 'Alex Thompson',
+    title: 'Media & Broadcasting Excellence',
+    instructor: 'Sarah Mitchell',
+    instructorAvatar: 'SM',
+    instructorColor: '#8b5cf6',
     progress: 90,
-    icon: 'fas fa-lock',
-    iconBg: 'bg-rose-100',
-    iconColor: 'text-rose-600'
+    lessonsCompleted: 9,
+    totalLessons: 10,
+    duration: '5h 45m',
+    category: 'Media',
+    difficulty: 'Advanced',
+    icon: 'fas fa-broadcast-tower',
+    gradientClass: 'from-violet-500 to-purple-600',
+    image: 'https://images.unsplash.com/photo-1459865264687-595d652de67e?w=100&h=60&fit=crop',
+    isBookmarked: true,
+    lastAccessed: '3 days ago',
+    certificateAvailable: false
+  },
+  {
+    id: 4,
+    title: 'Fan Experience Design',
+    instructor: 'Omar Abdullah',
+    instructorAvatar: 'OA',
+    instructorColor: '#f59e0b',
+    progress: 30,
+    lessonsCompleted: 3,
+    totalLessons: 10,
+    duration: '4h 20m',
+    category: 'Experience',
+    difficulty: 'Beginner',
+    icon: 'fas fa-users',
+    gradientClass: 'from-amber-500 to-orange-600',
+    image: 'https://images.unsplash.com/photo-1489944440615-453fc2b6a9a9?w=100&h=60&fit=crop',
+    isBookmarked: false,
+    lastAccessed: '1 week ago',
+    certificateAvailable: true
   }
 ])
+
+// Learning stats
+const learningStats = computed(() => ({
+  inProgress: learningCourses.value.filter(c => c.progress > 0 && c.progress < 100).length,
+  completed: learningCourses.value.filter(c => c.progress === 100).length,
+  totalHours: learningCourses.value.reduce((acc, c) => acc + parseFloat(c.duration), 0).toFixed(0),
+  certificates: learningCourses.value.filter(c => c.progress === 100 && c.certificateAvailable).length
+}))
+
+// Learning actions
+const bookmarkedCourses = ref<Set<number>>(new Set([1, 3]))
+
+function toggleCourseBookmark(courseId: number, event: Event) {
+  event.stopPropagation()
+  if (bookmarkedCourses.value.has(courseId)) {
+    bookmarkedCourses.value.delete(courseId)
+  } else {
+    bookmarkedCourses.value.add(courseId)
+  }
+}
+
+function isCourseBookmarked(courseId: number): boolean {
+  return bookmarkedCourses.value.has(courseId)
+}
+
+function continueCourse(courseId: number, event: Event) {
+  event.stopPropagation()
+  router.push(`/learning/${courseId}`)
+}
+
+function shareCourse(courseId: number, event: Event) {
+  event.stopPropagation()
+  alert(`Share course #${courseId}`)
+}
 
 // Media Items
 const mediaItems = ref([
@@ -1342,41 +1425,149 @@ onUnmounted(() => {
         </div>
       </div>
 
-      <!-- Learning Progress -->
-      <div class="card-animated rounded-2xl p-6 stagger-5">
+      <!-- Learning Progress - Enhanced -->
+      <div class="card-animated rounded-2xl p-6 stagger-5 bg-gradient-to-br from-white to-violet-50/30 border border-violet-100/50">
         <div class="flex items-center justify-between mb-5">
-          <h2 class="text-base font-semibold text-gray-900 flex items-center gap-3">
-            <div class="icon-soft w-9 h-9 rounded-xl flex items-center justify-center">
-              <i class="fas fa-graduation-cap text-sm"></i>
+          <h2 class="text-lg font-bold text-gray-900 flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center shadow-lg shadow-violet-200">
+              <i class="fas fa-graduation-cap text-white text-sm"></i>
             </div>
-            My Learning
+            <div>
+              <span class="block">My Learning</span>
+              <span class="text-xs font-medium text-violet-600">Continue your journey</span>
+            </div>
           </h2>
-          <router-link to="/learning" class="text-sm text-primary-600 font-medium hover:text-primary-700">Browse</router-link>
+          <router-link to="/learning" class="px-3 py-1.5 text-sm text-violet-600 hover:text-white bg-violet-50 hover:bg-violet-500 rounded-lg font-medium flex items-center gap-1.5 transition-all">
+            Browse <i class="fas fa-arrow-right text-xs"></i>
+          </router-link>
         </div>
+
+        <!-- Quick Stats -->
+        <div class="grid grid-cols-4 gap-2 mb-4">
+          <div class="text-center p-2 rounded-lg bg-white border border-gray-100">
+            <p class="text-lg font-bold text-violet-600">{{ learningStats.inProgress }}</p>
+            <p class="text-[9px] text-gray-500 font-medium">In Progress</p>
+          </div>
+          <div class="text-center p-2 rounded-lg bg-white border border-gray-100">
+            <p class="text-lg font-bold text-green-600">{{ learningStats.completed }}</p>
+            <p class="text-[9px] text-gray-500 font-medium">Completed</p>
+          </div>
+          <div class="text-center p-2 rounded-lg bg-white border border-gray-100">
+            <p class="text-lg font-bold text-blue-600">{{ learningStats.totalHours }}</p>
+            <p class="text-[9px] text-gray-500 font-medium">Hours</p>
+          </div>
+          <div class="text-center p-2 rounded-lg bg-white border border-gray-100">
+            <p class="text-lg font-bold text-amber-600">{{ learningStats.certificates }}</p>
+            <p class="text-[9px] text-gray-500 font-medium">Certificates</p>
+          </div>
+        </div>
+
+        <!-- Course List -->
         <div class="space-y-3">
           <div v-for="course in learningCourses" :key="course.id"
                @click="viewCourse(course.id)"
-               class="list-item-animated p-4 rounded-xl bg-gray-50 hover:bg-primary-50/50 cursor-pointer border border-transparent hover:border-teal-200 hover:shadow-sm transition-all group">
-            <div class="flex items-start gap-3">
-              <div :class="['w-10 h-10 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110', course.iconBg]">
-                <i :class="[course.icon, course.iconColor]"></i>
+               class="course-card relative rounded-xl cursor-pointer border border-gray-100 hover:border-violet-200 hover:shadow-lg transition-all group overflow-hidden bg-white">
+
+            <div class="p-3">
+              <div class="flex gap-3">
+                <!-- Course Thumbnail -->
+                <div class="relative flex-shrink-0">
+                  <div class="w-16 h-16 rounded-xl overflow-hidden shadow-md transition-transform group-hover:scale-105">
+                    <img v-if="course.image" :src="course.image" :alt="course.title" class="w-full h-full object-cover">
+                    <div v-else :class="['w-full h-full bg-gradient-to-br flex items-center justify-center', course.gradientClass]">
+                      <i :class="[course.icon, 'text-white text-xl']"></i>
+                    </div>
+                  </div>
+                  <!-- Progress Ring -->
+                  <div class="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-white shadow-md flex items-center justify-center">
+                    <svg class="w-5 h-5 -rotate-90">
+                      <circle cx="10" cy="10" r="8" fill="none" stroke="#e5e7eb" stroke-width="2"/>
+                      <circle cx="10" cy="10" r="8" fill="none" stroke="#8b5cf6" stroke-width="2"
+                              :stroke-dasharray="50.3"
+                              :stroke-dashoffset="50.3 - (50.3 * course.progress / 100)"
+                              stroke-linecap="round"/>
+                    </svg>
+                    <span class="absolute text-[8px] font-bold text-violet-600">{{ course.progress }}%</span>
+                  </div>
+                </div>
+
+                <!-- Course Info -->
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-start justify-between gap-2">
+                    <h4 class="font-semibold text-gray-900 text-sm leading-tight group-hover:text-violet-600 transition-colors line-clamp-2">{{ course.title }}</h4>
+                    <!-- Bookmark -->
+                    <button @click="toggleCourseBookmark(course.id, $event)"
+                            :class="['w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 transition-all', isCourseBookmarked(course.id) ? 'bg-violet-500 text-white' : 'bg-gray-100 text-gray-400 hover:bg-violet-100 hover:text-violet-500']">
+                      <i :class="[isCourseBookmarked(course.id) ? 'fas' : 'far', 'fa-bookmark text-[10px]']"></i>
+                    </button>
+                  </div>
+
+                  <!-- Category & Difficulty -->
+                  <div class="flex items-center gap-2 mt-1">
+                    <span class="text-[9px] font-semibold px-1.5 py-0.5 rounded-full bg-violet-100 text-violet-700">{{ course.category }}</span>
+                    <span :class="['text-[9px] font-semibold px-1.5 py-0.5 rounded-full',
+                      course.difficulty === 'Beginner' ? 'bg-green-100 text-green-700' :
+                      course.difficulty === 'Intermediate' ? 'bg-amber-100 text-amber-700' :
+                      'bg-red-100 text-red-700']">
+                      {{ course.difficulty }}
+                    </span>
+                  </div>
+
+                  <!-- Instructor -->
+                  <div class="flex items-center gap-2 mt-2">
+                    <div class="w-5 h-5 rounded-full flex items-center justify-center text-[8px] font-bold text-white"
+                         :style="{ backgroundColor: course.instructorColor }">
+                      {{ course.instructorAvatar }}
+                    </div>
+                    <span class="text-[10px] text-gray-500">{{ course.instructor }}</span>
+                  </div>
+                </div>
               </div>
-              <div class="flex-1 min-w-0">
-                <h4 class="font-medium text-gray-900 text-sm truncate group-hover:text-teal-600 transition-colors">{{ course.title }}</h4>
-                <p class="text-xs text-gray-500 mt-0.5">{{ course.instructor }}</p>
+
+              <!-- Progress Bar & Stats -->
+              <div class="mt-3 pt-3 border-t border-gray-100">
+                <div class="flex items-center justify-between mb-1.5">
+                  <div class="flex items-center gap-3 text-[10px] text-gray-500">
+                    <span><i class="fas fa-book-open mr-1 text-violet-400"></i>{{ course.lessonsCompleted }}/{{ course.totalLessons }} lessons</span>
+                    <span><i class="fas fa-clock mr-1 text-violet-400"></i>{{ course.duration }}</span>
+                  </div>
+                  <span class="text-[10px] text-gray-400">{{ course.lastAccessed }}</span>
+                </div>
+                <div class="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                  <div class="h-full bg-gradient-to-r from-violet-500 to-purple-500 rounded-full transition-all duration-500" :style="{ width: course.progress + '%' }"></div>
+                </div>
               </div>
-            </div>
-            <div class="mt-3">
-              <div class="flex items-center justify-between text-xs mb-1">
-                <span class="text-gray-500">Progress</span>
-                <span class="text-primary-600 font-semibold">{{ course.progress }}%</span>
-              </div>
-              <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
-                <div class="h-full progress-animated rounded-full" :style="{ width: course.progress + '%' }"></div>
+
+              <!-- Actions -->
+              <div class="flex items-center justify-between mt-3">
+                <button v-if="course.certificateAvailable && course.progress === 100"
+                        class="text-[10px] font-semibold text-amber-600 flex items-center gap-1">
+                  <i class="fas fa-certificate"></i> Get Certificate
+                </button>
+                <span v-else></span>
+
+                <div class="flex items-center gap-1.5">
+                  <button @click="shareCourse(course.id, $event)"
+                          class="w-7 h-7 rounded-lg bg-gray-100 hover:bg-violet-100 flex items-center justify-center text-gray-400 hover:text-violet-500 transition-all"
+                          title="Share">
+                    <i class="fas fa-share-alt text-[10px]"></i>
+                  </button>
+                  <button @click="continueCourse(course.id, $event)"
+                          class="px-3 py-1.5 text-[10px] font-semibold bg-gradient-to-r from-violet-500 to-purple-600 text-white rounded-lg shadow-md shadow-violet-200 hover:shadow-lg transition-all flex items-center gap-1">
+                    <i class="fas fa-play text-[8px]"></i>
+                    {{ course.progress > 0 ? 'Continue' : 'Start' }}
+                  </button>
+                </div>
               </div>
             </div>
           </div>
         </div>
+
+        <!-- Browse More Button -->
+        <router-link to="/learning" class="block w-full mt-4 py-3 text-sm font-semibold text-violet-600 bg-violet-50 hover:bg-violet-100 border-2 border-dashed border-violet-200 hover:border-violet-300 rounded-xl transition-all text-center">
+          <i class="fas fa-compass mr-2"></i>
+          Explore More Courses
+        </router-link>
       </div>
     </div>
 
