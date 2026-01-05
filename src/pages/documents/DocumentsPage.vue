@@ -538,7 +538,7 @@ function getFileIconBg(type: string): string {
         <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
           <div class="flex items-center justify-between mb-4">
             <h2 class="text-lg font-bold text-gray-900 flex items-center gap-3">
-              <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-200">
+              <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center shadow-lg shadow-teal-200">
                 <i class="fas fa-clock-rotate-left text-white text-sm"></i>
               </div>
               <div>
@@ -557,13 +557,13 @@ function getFileIconBg(type: string): string {
               v-for="doc in recentFiles.slice(0, 5)"
               :key="'recent-' + doc.id"
               @click="viewDocument(doc)"
-              class="group flex items-center gap-3 p-3 rounded-xl border border-gray-100 hover:border-blue-200 hover:bg-blue-50/30 cursor-pointer transition-all"
+              class="group flex items-center gap-3 p-3 rounded-xl border border-gray-100 hover:border-teal-200 hover:bg-teal-50/30 cursor-pointer transition-all"
             >
               <div :class="['w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0', getFileIconBg(doc.type)]">
                 <i :class="[getFileIcon(doc.type), getFileIconColor(doc.type), 'text-lg']"></i>
               </div>
               <div class="flex-1 min-w-0">
-                <p class="text-sm font-medium text-gray-900 truncate group-hover:text-blue-600 transition-colors">{{ doc.name }}</p>
+                <p class="text-sm font-medium text-gray-900 truncate group-hover:text-teal-600 transition-colors">{{ doc.name }}</p>
                 <div class="flex items-center gap-2 mt-0.5">
                   <span class="text-[10px] text-gray-400 flex items-center gap-1">
                     <i class="fas fa-clock text-[8px]"></i>
@@ -585,7 +585,7 @@ function getFileIconBg(type: string): string {
                 </button>
                 <button
                   @click.stop="downloadDocument(doc)"
-                  class="w-7 h-7 rounded-lg bg-gray-100 text-gray-400 hover:bg-blue-100 hover:text-blue-600 flex items-center justify-center transition-all"
+                  class="w-7 h-7 rounded-lg bg-gray-100 text-gray-400 hover:bg-teal-100 hover:text-teal-600 flex items-center justify-center transition-all"
                 >
                   <i class="fas fa-download text-xs"></i>
                 </button>
