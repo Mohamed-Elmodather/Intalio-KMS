@@ -21,6 +21,16 @@ const showCategoryFilter = ref(false)
 const showTagFilter = ref(false)
 const selectedCategories = ref<string[]>([])
 const selectedTags = ref<string[]>([])
+const currentView = ref<'all' | 'shared' | 'team' | 'starred' | 'trash'>('all')
+
+// View Navigation Items
+const viewNavItems = [
+  { id: 'all', name: 'All Files', icon: 'fas fa-folder', color: 'text-teal-500' },
+  { id: 'shared', name: 'Shared with me', icon: 'fas fa-share-alt', color: 'text-blue-500' },
+  { id: 'team', name: 'Team Files', icon: 'fas fa-users', color: 'text-purple-500' },
+  { id: 'starred', name: 'Starred', icon: 'fas fa-star', color: 'text-amber-500' },
+  { id: 'trash', name: 'Trash', icon: 'fas fa-trash-alt', color: 'text-red-500' }
+]
 
 // Folder Tree Structure
 const folderTree = ref([
@@ -175,6 +185,10 @@ const documents = ref([
     downloads: 1245,
     isPinned: true,
     isShared: true,
+    isSharedWithMe: false,
+    isTeamFile: true,
+    isStarred: true,
+    isTrashed: false,
     thumbnail: null
   },
   {
@@ -190,6 +204,10 @@ const documents = ref([
     downloads: 89,
     isPinned: true,
     isShared: false,
+    isSharedWithMe: true,
+    isTeamFile: false,
+    isStarred: false,
+    isTrashed: false,
     thumbnail: null
   },
   {
@@ -205,6 +223,10 @@ const documents = ref([
     downloads: 456,
     isPinned: false,
     isShared: true,
+    isSharedWithMe: true,
+    isTeamFile: true,
+    isStarred: true,
+    isTrashed: false,
     thumbnail: null
   },
   {
@@ -220,6 +242,10 @@ const documents = ref([
     downloads: 2341,
     isPinned: false,
     isShared: true,
+    isSharedWithMe: true,
+    isTeamFile: false,
+    isStarred: false,
+    isTrashed: false,
     thumbnail: null
   },
   {
@@ -235,6 +261,10 @@ const documents = ref([
     downloads: 567,
     isPinned: true,
     isShared: false,
+    isSharedWithMe: false,
+    isTeamFile: true,
+    isStarred: true,
+    isTrashed: false,
     thumbnail: null
   },
   {
@@ -250,6 +280,10 @@ const documents = ref([
     downloads: 3456,
     isPinned: true,
     isShared: true,
+    isSharedWithMe: false,
+    isTeamFile: true,
+    isStarred: false,
+    isTrashed: false,
     thumbnail: null
   },
   {
@@ -265,6 +299,10 @@ const documents = ref([
     downloads: 789,
     isPinned: false,
     isShared: false,
+    isSharedWithMe: false,
+    isTeamFile: false,
+    isStarred: false,
+    isTrashed: true,
     thumbnail: null
   },
   {
@@ -280,6 +318,10 @@ const documents = ref([
     downloads: 234,
     isPinned: false,
     isShared: true,
+    isSharedWithMe: true,
+    isTeamFile: true,
+    isStarred: false,
+    isTrashed: false,
     thumbnail: null
   },
   {
@@ -295,6 +337,10 @@ const documents = ref([
     downloads: 1567,
     isPinned: false,
     isShared: true,
+    isSharedWithMe: false,
+    isTeamFile: true,
+    isStarred: true,
+    isTrashed: false,
     thumbnail: null
   },
   {
@@ -310,6 +356,10 @@ const documents = ref([
     downloads: 432,
     isPinned: false,
     isShared: false,
+    isSharedWithMe: false,
+    isTeamFile: false,
+    isStarred: false,
+    isTrashed: true,
     thumbnail: null
   },
   {
@@ -325,6 +375,10 @@ const documents = ref([
     downloads: 876,
     isPinned: false,
     isShared: true,
+    isSharedWithMe: true,
+    isTeamFile: false,
+    isStarred: false,
+    isTrashed: false,
     thumbnail: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=200&h=150&fit=crop'
   },
   {
@@ -340,6 +394,10 @@ const documents = ref([
     downloads: 2345,
     isPinned: true,
     isShared: true,
+    isSharedWithMe: false,
+    isTeamFile: true,
+    isStarred: true,
+    isTrashed: false,
     thumbnail: null
   }
 ])
@@ -364,8 +422,36 @@ const allTags = computed(() => {
   return Array.from(tags).sort()
 })
 
+// View counts for sidebar navigation
+const viewCounts = computed(() => ({
+  all: documents.value.filter(d => !d.isTrashed).length,
+  shared: documents.value.filter(d => d.isSharedWithMe && !d.isTrashed).length,
+  team: documents.value.filter(d => d.isTeamFile && !d.isTrashed).length,
+  starred: documents.value.filter(d => d.isStarred && !d.isTrashed).length,
+  trash: documents.value.filter(d => d.isTrashed).length
+}))
+
 const filteredDocuments = computed(() => {
   let result = [...documents.value]
+
+  // First apply view filter
+  switch (currentView.value) {
+    case 'all':
+      result = result.filter(d => !d.isTrashed)
+      break
+    case 'shared':
+      result = result.filter(d => d.isSharedWithMe && !d.isTrashed)
+      break
+    case 'team':
+      result = result.filter(d => d.isTeamFile && !d.isTrashed)
+      break
+    case 'starred':
+      result = result.filter(d => d.isStarred && !d.isTrashed)
+      break
+    case 'trash':
+      result = result.filter(d => d.isTrashed)
+      break
+  }
 
   if (selectedLibrary.value) {
     result = result.filter(d => d.libraryId === selectedLibrary.value)
@@ -409,19 +495,21 @@ const filteredDocuments = computed(() => {
   return result
 })
 
-const pinnedDocuments = computed(() => documents.value.filter(d => d.isPinned))
+const pinnedDocuments = computed(() => documents.value.filter(d => d.isPinned && !d.isTrashed))
 
 const recentFiles = computed(() => {
   return [...documents.value]
+    .filter(d => !d.isTrashed)
     .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
     .slice(0, 8)
 })
 
 const documentStats = computed(() => ({
-  totalDocuments: documents.value.length,
+  totalDocuments: documents.value.filter(d => !d.isTrashed).length,
   totalLibraries: libraries.value.length,
-  totalSize: documents.value.reduce((acc, doc) => acc + (doc.size || 0), 0),
+  totalSize: documents.value.filter(d => !d.isTrashed).reduce((acc, doc) => acc + (doc.size || 0), 0),
   recentUploads: documents.value.filter(d => {
+    if (d.isTrashed) return false
     const uploadDate = new Date(d.createdAt)
     const weekAgo = new Date()
     weekAgo.setDate(weekAgo.getDate() - 7)
@@ -462,6 +550,29 @@ function shareDocument(doc: any) {
 function togglePin(doc: any) {
   doc.isPinned = !doc.isPinned
   console.log(doc.isPinned ? 'Pinned:' : 'Unpinned:', doc.name)
+}
+
+function toggleStar(doc: any) {
+  doc.isStarred = !doc.isStarred
+  console.log(doc.isStarred ? 'Starred:' : 'Unstarred:', doc.name)
+}
+
+function moveToTrash(doc: any) {
+  doc.isTrashed = true
+  console.log('Moved to trash:', doc.name)
+}
+
+function restoreFromTrash(doc: any) {
+  doc.isTrashed = false
+  console.log('Restored from trash:', doc.name)
+}
+
+function permanentlyDelete(doc: any) {
+  const index = documents.value.findIndex(d => d.id === doc.id)
+  if (index > -1) {
+    documents.value.splice(index, 1)
+    console.log('Permanently deleted:', doc.name)
+  }
 }
 
 function viewDocument(doc: any) {
@@ -1167,6 +1278,21 @@ function getFileIconBg(type: string): string {
 
             <!-- Collapsed State - Icons Only -->
             <div v-if="isSidebarCollapsed" class="p-2 pt-4 space-y-2">
+              <!-- View Navigation Icons -->
+              <button
+                v-for="view in viewNavItems"
+                :key="'collapsed-' + view.id"
+                @click="currentView = view.id as any; isSidebarCollapsed = false"
+                :class="[
+                  'w-8 h-8 rounded-lg flex items-center justify-center transition-all',
+                  currentView === view.id ? 'bg-teal-100 text-teal-600' : 'hover:bg-gray-100 ' + view.color
+                ]"
+                :title="view.name"
+              >
+                <i :class="[view.icon, 'text-sm']"></i>
+              </button>
+              <div class="border-t border-gray-200 my-2"></div>
+              <!-- Folder Icons -->
               <button
                 v-for="folder in folderTree[0].children"
                 :key="folder.id"
@@ -1183,6 +1309,33 @@ function getFileIconBg(type: string): string {
 
             <!-- Expanded State - Full Tree -->
             <div v-else class="p-4">
+              <!-- View Navigation -->
+              <div class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Views</div>
+              <div class="space-y-1 mb-4">
+                <button
+                  v-for="view in viewNavItems"
+                  :key="view.id"
+                  @click="currentView = view.id as any"
+                  :class="[
+                    'w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-all text-left',
+                    currentView === view.id
+                      ? 'bg-teal-100 text-teal-700'
+                      : 'hover:bg-gray-100 text-gray-600'
+                  ]"
+                >
+                  <i :class="[view.icon, 'text-sm w-4', currentView === view.id ? 'text-teal-600' : view.color]"></i>
+                  <span class="text-sm font-medium flex-1">{{ view.name }}</span>
+                  <span :class="[
+                    'text-xs px-1.5 py-0.5 rounded-full min-w-[20px] text-center',
+                    currentView === view.id ? 'bg-teal-200 text-teal-700' : 'bg-gray-100 text-gray-500'
+                  ]">
+                    {{ viewCounts[view.id as keyof typeof viewCounts] }}
+                  </span>
+                </button>
+              </div>
+
+              <div class="border-t border-gray-200 my-4"></div>
+
               <div class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Folders</div>
 
               <!-- Recursive Folder Tree -->
@@ -1315,11 +1468,18 @@ function getFileIconBg(type: string): string {
 
             <!-- Breadcrumb -->
             <div class="flex items-center gap-2 mb-4 text-sm">
-              <button @click="selectedFolder = null" class="text-gray-500 hover:text-teal-600 transition-colors">
+              <button @click="currentView = 'all'; selectedFolder = null" class="text-gray-500 hover:text-teal-600 transition-colors">
                 <i class="fas fa-home"></i>
               </button>
               <i class="fas fa-chevron-right text-gray-300 text-xs"></i>
-              <span class="text-gray-700 font-medium">{{ selectedFolder || 'All Files' }}</span>
+              <span class="text-gray-700 font-medium flex items-center gap-2">
+                <i :class="[viewNavItems.find(v => v.id === currentView)?.icon, viewNavItems.find(v => v.id === currentView)?.color, 'text-sm']"></i>
+                {{ viewNavItems.find(v => v.id === currentView)?.name }}
+              </span>
+              <template v-if="selectedFolder">
+                <i class="fas fa-chevron-right text-gray-300 text-xs"></i>
+                <span class="text-gray-600">{{ selectedFolder }}</span>
+              </template>
               <span class="text-gray-400 text-xs ml-2">({{ filteredDocuments.length }} items)</span>
             </div>
 
@@ -1361,15 +1521,43 @@ function getFileIconBg(type: string): string {
                   <!-- Quick Actions -->
                   <div class="absolute top-1.5 right-1.5 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button
+                      v-if="currentView !== 'trash'"
+                      @click.stop="toggleStar(doc)"
+                      :class="[
+                        'w-6 h-6 rounded-md flex items-center justify-center transition-all',
+                        doc.isStarred ? 'bg-amber-400 text-white' : 'bg-white/90 text-gray-500 hover:bg-white'
+                      ]"
+                    >
+                      <i class="fas fa-star text-[10px]"></i>
+                    </button>
+                    <button
+                      v-if="currentView !== 'trash'"
                       @click.stop="togglePin(doc)"
                       :class="[
                         'w-6 h-6 rounded-md flex items-center justify-center transition-all',
-                        doc.isPinned ? 'bg-amber-500 text-white' : 'bg-white/90 text-gray-500 hover:bg-white'
+                        doc.isPinned ? 'bg-teal-500 text-white' : 'bg-white/90 text-gray-500 hover:bg-white'
                       ]"
                     >
                       <i class="fas fa-thumbtack text-[10px]"></i>
                     </button>
                     <button
+                      v-if="currentView === 'trash'"
+                      @click.stop="restoreFromTrash(doc)"
+                      class="w-6 h-6 rounded-md bg-teal-500 text-white hover:bg-teal-600 flex items-center justify-center transition-all"
+                      title="Restore"
+                    >
+                      <i class="fas fa-undo text-[10px]"></i>
+                    </button>
+                    <button
+                      v-if="currentView === 'trash'"
+                      @click.stop="permanentlyDelete(doc)"
+                      class="w-6 h-6 rounded-md bg-red-500 text-white hover:bg-red-600 flex items-center justify-center transition-all"
+                      title="Delete permanently"
+                    >
+                      <i class="fas fa-trash text-[10px]"></i>
+                    </button>
+                    <button
+                      v-if="currentView !== 'trash'"
                       @click.stop="downloadDocument(doc)"
                       class="w-6 h-6 rounded-md bg-white/90 text-gray-500 hover:bg-white flex items-center justify-center transition-all"
                     >
@@ -1379,7 +1567,10 @@ function getFileIconBg(type: string): string {
 
                   <!-- Badges -->
                   <div class="absolute top-1.5 left-1.5 flex flex-col gap-0.5">
-                    <span v-if="doc.isPinned" class="px-1.5 py-0.5 bg-amber-500 text-white text-[8px] font-bold rounded">
+                    <span v-if="doc.isStarred" class="px-1.5 py-0.5 bg-amber-400 text-white text-[8px] font-bold rounded">
+                      <i class="fas fa-star"></i>
+                    </span>
+                    <span v-if="doc.isPinned" class="px-1.5 py-0.5 bg-teal-500 text-white text-[8px] font-bold rounded">
                       <i class="fas fa-thumbtack"></i>
                     </span>
                     <span v-if="doc.isShared" class="px-1.5 py-0.5 bg-blue-500 text-white text-[8px] font-bold rounded">
@@ -1419,7 +1610,10 @@ function getFileIconBg(type: string): string {
                 <div class="flex-1 min-w-0">
                   <div class="flex items-center gap-2">
                     <h4 class="font-medium text-gray-900 text-sm truncate hover:text-teal-600 transition-colors">{{ doc.name }}</h4>
-                    <span v-if="doc.isPinned" class="px-1 py-0.5 bg-amber-100 text-amber-700 text-[8px] font-bold rounded">
+                    <span v-if="doc.isStarred" class="px-1 py-0.5 bg-amber-100 text-amber-600 text-[8px] font-bold rounded">
+                      <i class="fas fa-star"></i>
+                    </span>
+                    <span v-if="doc.isPinned" class="px-1 py-0.5 bg-teal-100 text-teal-700 text-[8px] font-bold rounded">
                       <i class="fas fa-thumbtack"></i>
                     </span>
                     <span v-if="doc.isShared" class="px-1 py-0.5 bg-blue-100 text-blue-700 text-[8px] font-bold rounded">
@@ -1437,27 +1631,60 @@ function getFileIconBg(type: string): string {
 
                 <!-- Actions -->
                 <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <button
-                    @click.stop="togglePin(doc)"
-                    :class="[
-                      'w-7 h-7 rounded-lg flex items-center justify-center transition-all',
-                      doc.isPinned ? 'bg-amber-100 text-amber-600' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
-                    ]"
-                  >
-                    <i class="fas fa-thumbtack text-xs"></i>
-                  </button>
-                  <button
-                    @click.stop="downloadDocument(doc)"
-                    class="w-7 h-7 rounded-lg bg-gray-100 text-gray-500 hover:bg-teal-100 hover:text-teal-600 flex items-center justify-center transition-all"
-                  >
-                    <i class="fas fa-download text-xs"></i>
-                  </button>
-                  <button
-                    @click.stop="shareDocument(doc)"
-                    class="w-7 h-7 rounded-lg bg-gray-100 text-gray-500 hover:bg-blue-100 hover:text-blue-600 flex items-center justify-center transition-all"
-                  >
-                    <i class="fas fa-share-alt text-xs"></i>
-                  </button>
+                  <template v-if="currentView !== 'trash'">
+                    <button
+                      @click.stop="toggleStar(doc)"
+                      :class="[
+                        'w-7 h-7 rounded-lg flex items-center justify-center transition-all',
+                        doc.isStarred ? 'bg-amber-100 text-amber-600' : 'bg-gray-100 text-gray-500 hover:bg-amber-100 hover:text-amber-600'
+                      ]"
+                    >
+                      <i class="fas fa-star text-xs"></i>
+                    </button>
+                    <button
+                      @click.stop="togglePin(doc)"
+                      :class="[
+                        'w-7 h-7 rounded-lg flex items-center justify-center transition-all',
+                        doc.isPinned ? 'bg-teal-100 text-teal-600' : 'bg-gray-100 text-gray-500 hover:bg-teal-100 hover:text-teal-600'
+                      ]"
+                    >
+                      <i class="fas fa-thumbtack text-xs"></i>
+                    </button>
+                    <button
+                      @click.stop="downloadDocument(doc)"
+                      class="w-7 h-7 rounded-lg bg-gray-100 text-gray-500 hover:bg-teal-100 hover:text-teal-600 flex items-center justify-center transition-all"
+                    >
+                      <i class="fas fa-download text-xs"></i>
+                    </button>
+                    <button
+                      @click.stop="shareDocument(doc)"
+                      class="w-7 h-7 rounded-lg bg-gray-100 text-gray-500 hover:bg-blue-100 hover:text-blue-600 flex items-center justify-center transition-all"
+                    >
+                      <i class="fas fa-share-alt text-xs"></i>
+                    </button>
+                    <button
+                      @click.stop="moveToTrash(doc)"
+                      class="w-7 h-7 rounded-lg bg-gray-100 text-gray-500 hover:bg-red-100 hover:text-red-600 flex items-center justify-center transition-all"
+                    >
+                      <i class="fas fa-trash-alt text-xs"></i>
+                    </button>
+                  </template>
+                  <template v-else>
+                    <button
+                      @click.stop="restoreFromTrash(doc)"
+                      class="w-7 h-7 rounded-lg bg-teal-100 text-teal-600 hover:bg-teal-200 flex items-center justify-center transition-all"
+                      title="Restore"
+                    >
+                      <i class="fas fa-undo text-xs"></i>
+                    </button>
+                    <button
+                      @click.stop="permanentlyDelete(doc)"
+                      class="w-7 h-7 rounded-lg bg-red-100 text-red-600 hover:bg-red-200 flex items-center justify-center transition-all"
+                      title="Delete permanently"
+                    >
+                      <i class="fas fa-trash text-xs"></i>
+                    </button>
+                  </template>
                 </div>
               </div>
             </div>
