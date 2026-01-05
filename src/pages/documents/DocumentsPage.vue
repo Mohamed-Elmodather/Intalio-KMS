@@ -776,9 +776,9 @@ function getFileIconBg(type: string): string {
               v-for="doc in starredDocuments.slice(0, 5)"
               :key="'starred-' + doc.id"
               @click="viewDocument(doc)"
-              class="group flex items-center gap-3 p-3 rounded-xl border border-gray-100 hover:border-teal-200 hover:bg-teal-50/30 cursor-pointer transition-all"
+              class="group flex items-center gap-3 p-3 rounded-xl bg-white/80 hover:bg-white border border-gray-100 hover:border-teal-200 hover:shadow-lg cursor-pointer transition-all"
             >
-              <div :class="['w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0', getFileIconBg(doc.type)]">
+              <div :class="['w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 transition-transform group-hover:scale-110 group-hover:shadow-md', getFileIconBg(doc.type)]">
                 <i :class="[getFileIcon(doc.type), getFileIconColor(doc.type), 'text-lg']"></i>
               </div>
               <div class="flex-1 min-w-0">
@@ -842,9 +842,9 @@ function getFileIconBg(type: string): string {
               v-for="doc in recentFiles.slice(0, 5)"
               :key="'recent-' + doc.id"
               @click="viewDocument(doc)"
-              class="group flex items-center gap-3 p-3 rounded-xl border border-gray-100 hover:border-teal-200 hover:bg-teal-50/30 cursor-pointer transition-all"
+              class="group flex items-center gap-3 p-3 rounded-xl bg-white/80 hover:bg-white border border-gray-100 hover:border-teal-200 hover:shadow-lg cursor-pointer transition-all"
             >
-              <div :class="['w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0', getFileIconBg(doc.type)]">
+              <div :class="['w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 transition-transform group-hover:scale-110 group-hover:shadow-md', getFileIconBg(doc.type)]">
                 <i :class="[getFileIcon(doc.type), getFileIconColor(doc.type), 'text-lg']"></i>
               </div>
               <div class="flex-1 min-w-0">
@@ -1490,7 +1490,7 @@ function getFileIconBg(type: string): string {
                 v-for="doc in filteredDocuments"
                 :key="doc.id"
                 @click="viewDocument(doc)"
-                class="group bg-gray-50 rounded-xl p-3 hover:bg-teal-50/50 hover:shadow-md cursor-pointer transition-all border border-transparent hover:border-teal-200"
+                class="group bg-white/80 hover:bg-white rounded-xl p-3 hover:shadow-lg cursor-pointer transition-all border border-gray-100 hover:border-teal-200"
               >
                 <!-- Thumbnail / Icon -->
                 <div class="relative mb-2">
@@ -1568,12 +1568,12 @@ function getFileIconBg(type: string): string {
                 :key="doc.id"
                 @click="viewDocument(doc)"
                 :class="[
-                  'group flex items-center gap-3 p-3 cursor-pointer hover:bg-teal-50/50 transition-colors',
+                  'group flex items-center gap-3 p-3 cursor-pointer bg-white/80 hover:bg-white hover:shadow-lg transition-all',
                   index !== filteredDocuments.length - 1 ? 'border-b border-gray-100' : ''
                 ]"
               >
                 <!-- Icon -->
-                <div :class="['w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0', getFileIconBg(doc.type)]">
+                <div :class="['w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 transition-transform group-hover:scale-110 group-hover:shadow-md', getFileIconBg(doc.type)]">
                   <i :class="[getFileIcon(doc.type), getFileIconColor(doc.type), 'text-lg']"></i>
                 </div>
 
