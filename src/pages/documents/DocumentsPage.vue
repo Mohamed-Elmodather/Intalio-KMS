@@ -502,91 +502,94 @@ function getFileIconBg(type: string): string {
     </div>
 
     <div class="px-8 py-6 space-y-6">
-      <!-- Quick Access / Pinned Documents -->
-      <div v-if="pinnedDocuments.length > 0" class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-        <div class="flex items-center justify-between mb-4">
-          <h2 class="text-lg font-bold text-gray-900 flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-lg">
-              <i class="fas fa-thumbtack text-white text-sm"></i>
-            </div>
-            <div>
-              <span class="block">Quick Access</span>
-              <span class="text-xs font-medium text-gray-500">Pinned documents</span>
-            </div>
-          </h2>
-        </div>
+      <!-- Quick Access & Recent Files Row -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Quick Access / Pinned Documents -->
+        <div v-if="pinnedDocuments.length > 0" class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-bold text-gray-900 flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-lg">
+                <i class="fas fa-thumbtack text-white text-sm"></i>
+              </div>
+              <div>
+                <span class="block">Quick Access</span>
+                <span class="text-xs font-medium text-gray-500">Pinned documents</span>
+              </div>
+            </h2>
+          </div>
 
-        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
-          <div
-            v-for="doc in pinnedDocuments"
-            :key="'pinned-' + doc.id"
-            @click="viewDocument(doc)"
-            class="group p-3 rounded-xl border border-gray-100 hover:border-teal-200 hover:bg-teal-50/50 cursor-pointer transition-all"
-          >
-            <div :class="['w-10 h-10 rounded-lg flex items-center justify-center mb-2', getFileIconBg(doc.type)]">
-              <i :class="[getFileIcon(doc.type), getFileIconColor(doc.type), 'text-lg']"></i>
+          <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+            <div
+              v-for="doc in pinnedDocuments"
+              :key="'pinned-' + doc.id"
+              @click="viewDocument(doc)"
+              class="group p-3 rounded-xl border border-gray-100 hover:border-teal-200 hover:bg-teal-50/50 cursor-pointer transition-all"
+            >
+              <div :class="['w-10 h-10 rounded-lg flex items-center justify-center mb-2', getFileIconBg(doc.type)]">
+                <i :class="[getFileIcon(doc.type), getFileIconColor(doc.type), 'text-lg']"></i>
+              </div>
+              <p class="text-xs font-medium text-gray-900 truncate group-hover:text-teal-700">{{ doc.name }}</p>
+              <p class="text-[10px] text-gray-400 mt-0.5">{{ formatFileSize(doc.size) }}</p>
             </div>
-            <p class="text-xs font-medium text-gray-900 truncate group-hover:text-teal-700">{{ doc.name }}</p>
-            <p class="text-[10px] text-gray-400 mt-0.5">{{ formatFileSize(doc.size) }}</p>
           </div>
         </div>
-      </div>
 
-      <!-- Recent Files Section -->
-      <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-        <div class="flex items-center justify-between mb-4">
-          <h2 class="text-lg font-bold text-gray-900 flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-200">
-              <i class="fas fa-clock-rotate-left text-white text-sm"></i>
-            </div>
-            <div>
-              <span class="block">Recent Files</span>
-              <span class="text-xs font-medium text-gray-500">Recently modified</span>
-            </div>
-          </h2>
-          <button class="text-sm text-teal-600 hover:text-teal-700 font-medium flex items-center gap-1">
-            View all
-            <i class="fas fa-arrow-right text-xs"></i>
-          </button>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div
-            v-for="doc in recentFiles"
-            :key="'recent-' + doc.id"
-            @click="viewDocument(doc)"
-            class="group flex items-center gap-3 p-3 rounded-xl border border-gray-100 hover:border-blue-200 hover:bg-blue-50/30 cursor-pointer transition-all"
-          >
-            <div :class="['w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0', getFileIconBg(doc.type)]">
-              <i :class="[getFileIcon(doc.type), getFileIconColor(doc.type), 'text-xl']"></i>
-            </div>
-            <div class="flex-1 min-w-0">
-              <p class="text-sm font-medium text-gray-900 truncate group-hover:text-blue-600 transition-colors">{{ doc.name }}</p>
-              <div class="flex items-center gap-2 mt-1">
-                <span class="text-[10px] text-gray-400 flex items-center gap-1">
-                  <i class="fas fa-clock text-[8px]"></i>
-                  {{ getRelativeTime(doc.updatedAt) }}
-                </span>
-                <span class="text-[10px] text-gray-300">•</span>
-                <span class="text-[10px] text-gray-400">{{ formatFileSize(doc.size) }}</span>
+        <!-- Recent Files Section -->
+        <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-bold text-gray-900 flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-200">
+                <i class="fas fa-clock-rotate-left text-white text-sm"></i>
               </div>
-            </div>
-            <div class="opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
-              <button
-                @click.stop="toggleFavorite(doc.id)"
-                :class="[
-                  'w-7 h-7 rounded-lg flex items-center justify-center transition-all',
-                  isFavorite(doc.id) ? 'bg-amber-100 text-amber-600' : 'bg-gray-100 text-gray-400 hover:bg-gray-200'
-                ]"
-              >
-                <i :class="isFavorite(doc.id) ? 'fas fa-star' : 'far fa-star'" class="text-xs"></i>
-              </button>
-              <button
-                @click.stop="downloadDocument(doc)"
-                class="w-7 h-7 rounded-lg bg-gray-100 text-gray-400 hover:bg-blue-100 hover:text-blue-600 flex items-center justify-center transition-all"
-              >
-                <i class="fas fa-download text-xs"></i>
-              </button>
+              <div>
+                <span class="block">Recent Files</span>
+                <span class="text-xs font-medium text-gray-500">Recently modified</span>
+              </div>
+            </h2>
+            <button class="text-sm text-teal-600 hover:text-teal-700 font-medium flex items-center gap-1">
+              View all
+              <i class="fas fa-arrow-right text-xs"></i>
+            </button>
+          </div>
+
+          <div class="space-y-2">
+            <div
+              v-for="doc in recentFiles.slice(0, 5)"
+              :key="'recent-' + doc.id"
+              @click="viewDocument(doc)"
+              class="group flex items-center gap-3 p-3 rounded-xl border border-gray-100 hover:border-blue-200 hover:bg-blue-50/30 cursor-pointer transition-all"
+            >
+              <div :class="['w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0', getFileIconBg(doc.type)]">
+                <i :class="[getFileIcon(doc.type), getFileIconColor(doc.type), 'text-lg']"></i>
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-medium text-gray-900 truncate group-hover:text-blue-600 transition-colors">{{ doc.name }}</p>
+                <div class="flex items-center gap-2 mt-0.5">
+                  <span class="text-[10px] text-gray-400 flex items-center gap-1">
+                    <i class="fas fa-clock text-[8px]"></i>
+                    {{ getRelativeTime(doc.updatedAt) }}
+                  </span>
+                  <span class="text-[10px] text-gray-300">•</span>
+                  <span class="text-[10px] text-gray-400">{{ formatFileSize(doc.size) }}</span>
+                </div>
+              </div>
+              <div class="opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
+                <button
+                  @click.stop="toggleFavorite(doc.id)"
+                  :class="[
+                    'w-7 h-7 rounded-lg flex items-center justify-center transition-all',
+                    isFavorite(doc.id) ? 'bg-amber-100 text-amber-600' : 'bg-gray-100 text-gray-400 hover:bg-gray-200'
+                  ]"
+                >
+                  <i :class="isFavorite(doc.id) ? 'fas fa-star' : 'far fa-star'" class="text-xs"></i>
+                </button>
+                <button
+                  @click.stop="downloadDocument(doc)"
+                  class="w-7 h-7 rounded-lg bg-gray-100 text-gray-400 hover:bg-blue-100 hover:text-blue-600 flex items-center justify-center transition-all"
+                >
+                  <i class="fas fa-download text-xs"></i>
+                </button>
+              </div>
             </div>
           </div>
         </div>
