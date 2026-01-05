@@ -395,11 +395,6 @@ function downloadDocument(doc: any, event: Event) {
 }
 
 function openDocument(docId: number) {
-  console.log('Opening document:', docId)
-  const doc = recentDocuments.value.find(d => d.id === docId)
-  if (doc) {
-    alert(`Opening: ${doc.name}`)
-  }
   router.push(`/documents/${docId}`)
 }
 
