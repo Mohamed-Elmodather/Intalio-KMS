@@ -561,10 +561,7 @@ function permanentlyDelete(doc: any) {
 }
 
 function viewDocument(doc: any) {
-  if (isSelectionMode.value) {
-    toggleDocumentSelection(doc.id)
-    return
-  }
+  // Always navigate to document view (checkbox handles selection)
   router.push({ name: 'DocumentView', params: { id: doc.id } })
 }
 
@@ -1728,15 +1725,16 @@ function getFileIconBg(type: string): string {
                     <i :class="[getFileIcon(doc.type), getFileIconColor(doc.type), 'text-4xl relative z-10 group-hover:scale-110 transition-transform duration-300']"></i>
                   </div>
 
-                  <!-- Selection Checkbox -->
+                  <!-- Selection Checkbox (Always visible) -->
                   <div
-                    v-if="isSelectionMode"
-                    @click.stop="toggleDocumentSelection(doc.id)"
+                    @click.stop="toggleDocumentSelection(doc.id); if (!isSelectionMode) isSelectionMode = true"
                     :class="[
                       'absolute top-2 left-2 w-6 h-6 rounded-lg border-2 flex items-center justify-center cursor-pointer transition-all z-20',
                       isDocumentSelected(doc.id)
                         ? 'bg-teal-500 border-teal-500 text-white'
-                        : 'bg-white/90 border-gray-300 hover:border-teal-400'
+                        : isSelectionMode
+                          ? 'bg-white/90 border-gray-300 hover:border-teal-400'
+                          : 'bg-white/90 border-gray-300 hover:border-teal-400 opacity-0 group-hover:opacity-100'
                     ]"
                   >
                     <i v-if="isDocumentSelected(doc.id)" class="fas fa-check text-xs"></i>
@@ -1750,7 +1748,7 @@ function getFileIconBg(type: string): string {
                   </div>
 
                   <!-- Quick Actions -->
-                  <div v-if="!isSelectionMode" class="absolute top-2 right-2 flex gap-1.5 opacity-0 group-hover:opacity-100 transition-all duration-200">
+                  <div class="absolute top-2 right-2 flex gap-1.5 opacity-0 group-hover:opacity-100 transition-all duration-200">
                     <button
                       v-if="currentView !== 'trash'"
                       @click.stop="toggleStar(doc)"
@@ -1796,8 +1794,8 @@ function getFileIconBg(type: string): string {
                     </button>
                   </div>
 
-                  <!-- Status Badges (hide when in selection mode) -->
-                  <div v-if="!isSelectionMode" class="absolute top-2 left-2 flex flex-col gap-1">
+                  <!-- Status Badges (positioned to avoid checkbox) -->
+                  <div class="absolute top-10 left-2 flex flex-col gap-1">
                     <span v-if="doc.isStarred && !doc.isShared" class="w-6 h-6 bg-amber-400 text-white rounded-lg flex items-center justify-center shadow-sm">
                       <i class="fas fa-star text-[10px]"></i>
                     </span>
@@ -1845,14 +1843,11 @@ function getFileIconBg(type: string): string {
             <!-- Documents List View -->
             <div v-else class="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm">
               <!-- Table Header -->
-              <div :class="[
-                'grid gap-4 px-4 py-3 bg-gray-50 border-b border-gray-100 text-xs font-semibold text-gray-500 uppercase tracking-wider',
-                isSelectionMode ? 'grid-cols-13' : 'grid-cols-12'
-              ]">
-                <!-- Select All Checkbox -->
-                <div v-if="isSelectionMode" class="col-span-1 flex items-center">
+              <div class="grid grid-cols-13 gap-4 px-4 py-3 bg-gray-50 border-b border-gray-100 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                <!-- Select All Checkbox (Always visible) -->
+                <div class="col-span-1 flex items-center">
                   <button
-                    @click="isAllSelected ? clearDocumentSelection() : selectAllDocuments()"
+                    @click="if (!isSelectionMode) isSelectionMode = true; isAllSelected ? clearDocumentSelection() : selectAllDocuments()"
                     :class="[
                       'w-5 h-5 rounded border-2 flex items-center justify-center transition-all',
                       isAllSelected ? 'bg-teal-500 border-teal-500 text-white' : isSomeSelected ? 'bg-teal-200 border-teal-400' : 'border-gray-300 hover:border-teal-400'
@@ -1862,7 +1857,7 @@ function getFileIconBg(type: string): string {
                     <i v-else-if="isSomeSelected" class="fas fa-minus text-[10px] text-teal-600"></i>
                   </button>
                 </div>
-                <div :class="isSelectionMode ? 'col-span-4' : 'col-span-5'" class="flex items-center gap-2">
+                <div class="col-span-4 flex items-center gap-2">
                   <i class="fas fa-file-alt text-gray-400"></i>
                   Name
                 </div>
@@ -1892,17 +1887,16 @@ function getFileIconBg(type: string): string {
                   :key="doc.id"
                   @click="viewDocument(doc)"
                   :class="[
-                    'group grid gap-4 px-4 py-3 cursor-pointer transition-all duration-200',
-                    isSelectionMode ? 'grid-cols-13' : 'grid-cols-12',
+                    'group grid grid-cols-13 gap-4 px-4 py-3 cursor-pointer transition-all duration-200',
                     isDocumentSelected(doc.id)
                       ? 'bg-teal-50 border-l-4 border-l-teal-500'
                       : 'bg-white hover:bg-gradient-to-r hover:from-teal-50/50 hover:to-white'
                   ]"
                 >
-                  <!-- Selection Checkbox -->
-                  <div v-if="isSelectionMode" class="col-span-1 flex items-center">
+                  <!-- Selection Checkbox (Always visible) -->
+                  <div class="col-span-1 flex items-center">
                     <div
-                      @click.stop="toggleDocumentSelection(doc.id)"
+                      @click.stop="toggleDocumentSelection(doc.id); if (!isSelectionMode) isSelectionMode = true"
                       :class="[
                         'w-5 h-5 rounded border-2 flex items-center justify-center cursor-pointer transition-all',
                         isDocumentSelected(doc.id)
@@ -1915,7 +1909,7 @@ function getFileIconBg(type: string): string {
                   </div>
 
                   <!-- Name Column -->
-                  <div :class="isSelectionMode ? 'col-span-4' : 'col-span-5'" class="flex items-center gap-3 min-w-0">
+                  <div class="col-span-4 flex items-center gap-3 min-w-0">
                     <div :class="['w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-all duration-200 group-hover:scale-110 group-hover:shadow-md', getFileIconBg(doc.type)]">
                       <i :class="[getFileIcon(doc.type), getFileIconColor(doc.type), 'text-lg']"></i>
                     </div>
