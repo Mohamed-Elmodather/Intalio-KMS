@@ -183,7 +183,6 @@ const documents = ref([
     author: { name: 'AFC Legal', initials: 'AL', color: '#006847' },
     tags: ['Regulations', 'Official'],
     downloads: 1245,
-    isPinned: true,
     isShared: true,
     isSharedWithMe: false,
     isTeamFile: true,
@@ -202,7 +201,6 @@ const documents = ref([
     author: { name: 'Events Team', initials: 'ET', color: '#8b5cf6' },
     tags: ['Ceremony', 'Script'],
     downloads: 89,
-    isPinned: true,
     isShared: false,
     isSharedWithMe: true,
     isTeamFile: false,
@@ -221,7 +219,6 @@ const documents = ref([
     author: { name: 'Venue Ops', initials: 'VO', color: '#f59e0b' },
     tags: ['Stadium', 'Seating'],
     downloads: 456,
-    isPinned: false,
     isShared: true,
     isSharedWithMe: true,
     isTeamFile: true,
@@ -240,7 +237,6 @@ const documents = ref([
     author: { name: 'Media Dept', initials: 'MD', color: '#3b82f6' },
     tags: ['Media', 'Guidelines'],
     downloads: 2341,
-    isPinned: false,
     isShared: true,
     isSharedWithMe: true,
     isTeamFile: false,
@@ -259,7 +255,6 @@ const documents = ref([
     author: { name: 'Brand Team', initials: 'BT', color: '#ef4444' },
     tags: ['Template', 'Presentation'],
     downloads: 567,
-    isPinned: true,
     isShared: false,
     isSharedWithMe: false,
     isTeamFile: true,
@@ -278,7 +273,6 @@ const documents = ref([
     author: { name: 'AFC Media', initials: 'AM', color: '#006847' },
     tags: ['Brand', 'Assets'],
     downloads: 3456,
-    isPinned: true,
     isShared: true,
     isSharedWithMe: false,
     isTeamFile: true,
@@ -297,7 +291,6 @@ const documents = ref([
     author: { name: 'Ops Manager', initials: 'OM', color: '#10b981' },
     tags: ['Operations', 'Checklist'],
     downloads: 789,
-    isPinned: false,
     isShared: false,
     isSharedWithMe: false,
     isTeamFile: false,
@@ -316,7 +309,6 @@ const documents = ref([
     author: { name: 'Press Office', initials: 'PO', color: '#8b5cf6' },
     tags: ['Schedule', 'Press'],
     downloads: 234,
-    isPinned: false,
     isShared: true,
     isSharedWithMe: true,
     isTeamFile: true,
@@ -335,7 +327,6 @@ const documents = ref([
     author: { name: 'HR Team', initials: 'HR', color: '#f59e0b' },
     tags: ['Training', 'Volunteers'],
     downloads: 1567,
-    isPinned: false,
     isShared: true,
     isSharedWithMe: false,
     isTeamFile: true,
@@ -354,7 +345,6 @@ const documents = ref([
     author: { name: 'IT Support', initials: 'IT', color: '#3b82f6' },
     tags: ['Technical', 'WiFi'],
     downloads: 432,
-    isPinned: false,
     isShared: false,
     isSharedWithMe: false,
     isTeamFile: false,
@@ -373,7 +363,6 @@ const documents = ref([
     author: { name: 'Photo Team', initials: 'PT', color: '#ef4444' },
     tags: ['Photo', 'Saudi Arabia'],
     downloads: 876,
-    isPinned: false,
     isShared: true,
     isSharedWithMe: true,
     isTeamFile: false,
@@ -392,7 +381,6 @@ const documents = ref([
     author: { name: 'Audio Team', initials: 'AT', color: '#8b5cf6' },
     tags: ['Audio', 'Anthem'],
     downloads: 2345,
-    isPinned: true,
     isShared: true,
     isSharedWithMe: false,
     isTeamFile: true,
@@ -495,7 +483,7 @@ const filteredDocuments = computed(() => {
   return result
 })
 
-const pinnedDocuments = computed(() => documents.value.filter(d => d.isPinned && !d.isTrashed))
+const starredDocuments = computed(() => documents.value.filter(d => d.isStarred && !d.isTrashed))
 
 const recentFiles = computed(() => {
   return [...documents.value]
@@ -545,11 +533,6 @@ function shareDocument(doc: any) {
   console.log('Sharing:', doc.name)
   // Could open share modal or copy link
   alert(`Share link copied for: ${doc.name}`)
-}
-
-function togglePin(doc: any) {
-  doc.isPinned = !doc.isPinned
-  console.log(doc.isPinned ? 'Pinned:' : 'Unpinned:', doc.name)
 }
 
 function toggleStar(doc: any) {
@@ -770,19 +753,19 @@ function getFileIconBg(type: string): string {
     <div class="px-8 py-6 space-y-6">
       <!-- Quick Access & Recent Files Row -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <!-- Quick Access / Pinned Documents -->
-        <div v-if="pinnedDocuments.length > 0" class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+        <!-- Starred Documents -->
+        <div v-if="starredDocuments.length > 0" class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
           <div class="flex items-center justify-between mb-4">
             <h2 class="text-lg font-bold text-gray-900 flex items-center gap-3">
-              <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-lg shadow-amber-200">
-                <i class="fas fa-thumbtack text-white text-sm"></i>
+              <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-amber-500 flex items-center justify-center shadow-lg shadow-amber-200">
+                <i class="fas fa-star text-white text-sm"></i>
               </div>
               <div>
-                <span class="block">Quick Access</span>
-                <span class="text-xs font-medium text-gray-500">Pinned documents</span>
+                <span class="block">Starred</span>
+                <span class="text-xs font-medium text-gray-500">Quick access to important files</span>
               </div>
             </h2>
-            <button class="text-sm text-teal-600 hover:text-teal-700 font-medium flex items-center gap-1">
+            <button @click="currentView = 'starred'" class="text-sm text-teal-600 hover:text-teal-700 font-medium flex items-center gap-1">
               View all
               <i class="fas fa-arrow-right text-xs"></i>
             </button>
@@ -790,8 +773,8 @@ function getFileIconBg(type: string): string {
 
           <div class="space-y-2">
             <div
-              v-for="doc in pinnedDocuments"
-              :key="'pinned-' + doc.id"
+              v-for="doc in starredDocuments.slice(0, 5)"
+              :key="'starred-' + doc.id"
               @click="viewDocument(doc)"
               class="group flex items-center gap-3 p-3 rounded-xl border border-gray-100 hover:border-teal-200 hover:bg-teal-50/30 cursor-pointer transition-all"
             >
@@ -811,11 +794,11 @@ function getFileIconBg(type: string): string {
               </div>
               <div class="opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
                 <button
-                  @click.stop="togglePin(doc)"
+                  @click.stop="toggleStar(doc)"
                   class="w-7 h-7 rounded-lg bg-amber-100 text-amber-600 hover:bg-amber-200 flex items-center justify-center transition-all"
-                  title="Unpin from Quick Access"
+                  title="Remove from Starred"
                 >
-                  <i class="fas fa-thumbtack text-xs"></i>
+                  <i class="fas fa-star text-xs"></i>
                 </button>
                 <button
                   @click.stop="shareDocument(doc)"
@@ -877,14 +860,14 @@ function getFileIconBg(type: string): string {
               </div>
               <div class="opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
                 <button
-                  @click.stop="togglePin(doc)"
+                  @click.stop="toggleStar(doc)"
                   :class="[
                     'w-7 h-7 rounded-lg flex items-center justify-center transition-all',
-                    doc.isPinned ? 'bg-amber-100 text-amber-600 hover:bg-amber-200' : 'bg-gray-100 text-gray-400 hover:bg-amber-100 hover:text-amber-600'
+                    doc.isStarred ? 'bg-amber-100 text-amber-600 hover:bg-amber-200' : 'bg-gray-100 text-gray-400 hover:bg-amber-100 hover:text-amber-600'
                   ]"
-                  :title="doc.isPinned ? 'Unpin from Quick Access' : 'Pin to Quick Access'"
+                  :title="doc.isStarred ? 'Remove from Starred' : 'Add to Starred'"
                 >
-                  <i class="fas fa-thumbtack text-xs"></i>
+                  <i class="fas fa-star text-xs"></i>
                 </button>
                 <button
                   @click.stop="shareDocument(doc)"
@@ -1527,18 +1510,9 @@ function getFileIconBg(type: string): string {
                         'w-6 h-6 rounded-md flex items-center justify-center transition-all',
                         doc.isStarred ? 'bg-amber-400 text-white' : 'bg-white/90 text-gray-500 hover:bg-white'
                       ]"
+                      :title="doc.isStarred ? 'Remove from Starred' : 'Add to Starred'"
                     >
                       <i class="fas fa-star text-[10px]"></i>
-                    </button>
-                    <button
-                      v-if="currentView !== 'trash'"
-                      @click.stop="togglePin(doc)"
-                      :class="[
-                        'w-6 h-6 rounded-md flex items-center justify-center transition-all',
-                        doc.isPinned ? 'bg-teal-500 text-white' : 'bg-white/90 text-gray-500 hover:bg-white'
-                      ]"
-                    >
-                      <i class="fas fa-thumbtack text-[10px]"></i>
                     </button>
                     <button
                       v-if="currentView === 'trash'"
@@ -1569,9 +1543,6 @@ function getFileIconBg(type: string): string {
                   <div class="absolute top-1.5 left-1.5 flex flex-col gap-0.5">
                     <span v-if="doc.isStarred" class="px-1.5 py-0.5 bg-amber-400 text-white text-[8px] font-bold rounded">
                       <i class="fas fa-star"></i>
-                    </span>
-                    <span v-if="doc.isPinned" class="px-1.5 py-0.5 bg-teal-500 text-white text-[8px] font-bold rounded">
-                      <i class="fas fa-thumbtack"></i>
                     </span>
                     <span v-if="doc.isShared" class="px-1.5 py-0.5 bg-blue-500 text-white text-[8px] font-bold rounded">
                       <i class="fas fa-share-alt"></i>
@@ -1613,9 +1584,6 @@ function getFileIconBg(type: string): string {
                     <span v-if="doc.isStarred" class="px-1 py-0.5 bg-amber-100 text-amber-600 text-[8px] font-bold rounded">
                       <i class="fas fa-star"></i>
                     </span>
-                    <span v-if="doc.isPinned" class="px-1 py-0.5 bg-teal-100 text-teal-700 text-[8px] font-bold rounded">
-                      <i class="fas fa-thumbtack"></i>
-                    </span>
                     <span v-if="doc.isShared" class="px-1 py-0.5 bg-blue-100 text-blue-700 text-[8px] font-bold rounded">
                       <i class="fas fa-share-alt"></i>
                     </span>
@@ -1638,17 +1606,9 @@ function getFileIconBg(type: string): string {
                         'w-7 h-7 rounded-lg flex items-center justify-center transition-all',
                         doc.isStarred ? 'bg-amber-100 text-amber-600' : 'bg-gray-100 text-gray-500 hover:bg-amber-100 hover:text-amber-600'
                       ]"
+                      :title="doc.isStarred ? 'Remove from Starred' : 'Add to Starred'"
                     >
                       <i class="fas fa-star text-xs"></i>
-                    </button>
-                    <button
-                      @click.stop="togglePin(doc)"
-                      :class="[
-                        'w-7 h-7 rounded-lg flex items-center justify-center transition-all',
-                        doc.isPinned ? 'bg-teal-100 text-teal-600' : 'bg-gray-100 text-gray-500 hover:bg-teal-100 hover:text-teal-600'
-                      ]"
-                    >
-                      <i class="fas fa-thumbtack text-xs"></i>
                     </button>
                     <button
                       @click.stop="downloadDocument(doc)"
