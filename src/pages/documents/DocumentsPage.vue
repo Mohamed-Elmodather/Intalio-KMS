@@ -623,6 +623,12 @@ function bulkShare() {
   alert(`Sharing ${selectedDocs.length} files...`)
 }
 
+function bulkExport() {
+  const selectedDocs = documents.value.filter(d => selectedDocuments.value.has(d.id))
+  console.log('Exporting:', selectedDocs.map(d => d.name))
+  alert(`Exporting ${selectedDocs.length} files to ZIP...`)
+}
+
 function bulkStar() {
   documents.value.forEach(doc => {
     if (selectedDocuments.value.has(doc.id)) {
@@ -1035,49 +1041,70 @@ function getFileIconBg(type: string): string {
                 <!-- Dropdown Menu -->
                 <div
                   v-if="showMoreOptions"
-                  class="absolute right-0 top-full mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
+                  class="absolute right-0 top-full mt-2 w-64 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden z-50"
                 >
-                  <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Actions</div>
-                  <button class="w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3 transition-colors">
-                    <i class="fas fa-download text-gray-400 w-4"></i>
-                    Download All
-                  </button>
-                  <button class="w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3 transition-colors">
-                    <i class="fas fa-file-export text-gray-400 w-4"></i>
-                    Export to ZIP
-                  </button>
-                  <button class="w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3 transition-colors">
-                    <i class="fas fa-share-alt text-gray-400 w-4"></i>
-                    Share Folder
-                  </button>
+                  <!-- Header -->
+                  <div class="px-4 py-3 bg-gradient-to-r from-gray-50 to-white border-b border-gray-100">
+                    <h3 class="text-sm font-semibold text-gray-800 flex items-center gap-2">
+                      <i class="fas fa-cog text-teal-500"></i>
+                      Quick Actions
+                    </h3>
+                  </div>
 
-                  <div class="my-2 border-t border-gray-100"></div>
+                  <!-- Actions -->
+                  <div class="p-2">
+                    <button class="w-full px-3 py-2.5 text-left text-sm text-gray-700 hover:bg-teal-50 hover:text-teal-700 rounded-xl flex items-center gap-3 transition-all group">
+                      <div class="w-8 h-8 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <i class="fas fa-download text-sm"></i>
+                      </div>
+                      <div>
+                        <span class="font-medium">Download All</span>
+                        <p class="text-[10px] text-gray-400">Download all files as ZIP</p>
+                      </div>
+                    </button>
+                    <button class="w-full px-3 py-2.5 text-left text-sm text-gray-700 hover:bg-teal-50 hover:text-teal-700 rounded-xl flex items-center gap-3 transition-all group">
+                      <div class="w-8 h-8 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <i class="fas fa-file-export text-sm"></i>
+                      </div>
+                      <div>
+                        <span class="font-medium">Export</span>
+                        <p class="text-[10px] text-gray-400">Export files to ZIP archive</p>
+                      </div>
+                    </button>
+                    <button class="w-full px-3 py-2.5 text-left text-sm text-gray-700 hover:bg-teal-50 hover:text-teal-700 rounded-xl flex items-center gap-3 transition-all group">
+                      <div class="w-8 h-8 rounded-lg bg-green-100 text-green-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <i class="fas fa-share-alt text-sm"></i>
+                      </div>
+                      <div>
+                        <span class="font-medium">Share Folder</span>
+                        <p class="text-[10px] text-gray-400">Share with team members</p>
+                      </div>
+                    </button>
+                  </div>
 
-                  <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Organize</div>
-                  <button class="w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3 transition-colors">
-                    <i class="fas fa-arrows-alt text-gray-400 w-4"></i>
-                    Move Selected
-                  </button>
-                  <button class="w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3 transition-colors">
-                    <i class="fas fa-copy text-gray-400 w-4"></i>
-                    Copy Selected
-                  </button>
-                  <button class="w-full px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-3 transition-colors">
-                    <i class="fas fa-trash-alt text-red-400 w-4"></i>
-                    Delete Selected
-                  </button>
+                  <div class="mx-3 border-t border-gray-100"></div>
 
-                  <div class="my-2 border-t border-gray-100"></div>
-
-                  <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">View</div>
-                  <button class="w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3 transition-colors">
-                    <i class="fas fa-info-circle text-gray-400 w-4"></i>
-                    Show Details Panel
-                  </button>
-                  <button class="w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3 transition-colors">
-                    <i class="fas fa-cog text-gray-400 w-4"></i>
-                    Folder Settings
-                  </button>
+                  <!-- Settings -->
+                  <div class="p-2">
+                    <button class="w-full px-3 py-2.5 text-left text-sm text-gray-700 hover:bg-gray-50 rounded-xl flex items-center gap-3 transition-all group">
+                      <div class="w-8 h-8 rounded-lg bg-gray-100 text-gray-500 flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <i class="fas fa-info-circle text-sm"></i>
+                      </div>
+                      <div>
+                        <span class="font-medium">Details Panel</span>
+                        <p class="text-[10px] text-gray-400">View file information</p>
+                      </div>
+                    </button>
+                    <button class="w-full px-3 py-2.5 text-left text-sm text-gray-700 hover:bg-gray-50 rounded-xl flex items-center gap-3 transition-all group">
+                      <div class="w-8 h-8 rounded-lg bg-gray-100 text-gray-500 flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <i class="fas fa-sliders-h text-sm"></i>
+                      </div>
+                      <div>
+                        <span class="font-medium">Folder Settings</span>
+                        <p class="text-[10px] text-gray-400">Configure folder options</p>
+                      </div>
+                    </button>
+                  </div>
                 </div>
 
                 <!-- Click outside to close -->
@@ -1622,6 +1649,14 @@ function getFileIconBg(type: string): string {
                   >
                     <i class="fas fa-share-alt"></i>
                     <span class="hidden sm:inline">Share</span>
+                  </button>
+                  <button
+                    @click="bulkExport"
+                    class="flex items-center gap-2 px-3 py-2 bg-white/20 hover:bg-white/30 text-white rounded-lg transition-all text-sm font-medium"
+                    title="Export selected"
+                  >
+                    <i class="fas fa-file-export"></i>
+                    <span class="hidden sm:inline">Export</span>
                   </button>
                   <div class="w-px h-6 bg-white/30 mx-1"></div>
                   <button
