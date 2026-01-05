@@ -1253,7 +1253,7 @@ onUnmounted(() => {
               </div>
             </div>
 
-            <div class="p-3 flex gap-3">
+            <div class="p-3 flex gap-3 h-full">
               <!-- Date Box -->
               <div :class="['w-14 h-14 rounded-xl bg-gradient-to-br flex flex-col items-center justify-center flex-shrink-0 shadow-md transition-transform group-hover:scale-110', event.gradientClass]">
                 <span class="text-[10px] font-semibold text-white/90 uppercase">{{ event.month }}</span>
@@ -1261,7 +1261,7 @@ onUnmounted(() => {
               </div>
 
               <!-- Event Info -->
-              <div class="flex-1 min-w-0">
+              <div class="flex-1 min-w-0 flex flex-col">
                 <div class="flex items-start justify-between gap-2">
                   <div class="min-w-0">
                     <h4 class="font-semibold text-gray-900 text-sm truncate group-hover:text-teal-600 transition-colors">{{ event.title }}</h4>
@@ -1276,37 +1276,9 @@ onUnmounted(() => {
                       </span>
                     </div>
                   </div>
-                </div>
 
-                <!-- Time & Location -->
-                <div class="flex flex-col gap-0.5 mt-2 text-[11px] text-gray-500">
-                  <div class="flex items-center gap-1.5">
-                    <i class="fas fa-clock text-teal-500 w-3"></i>
-                    <span>{{ event.time }}</span>
-                  </div>
-                  <div class="flex items-center gap-1.5">
-                    <i class="fas fa-map-marker-alt text-teal-500 w-3"></i>
-                    <span class="truncate">{{ event.location }}</span>
-                  </div>
-                </div>
-
-                <!-- Footer -->
-                <div class="flex items-center justify-between mt-2 pt-2 border-t border-gray-100">
-                  <!-- Attendees -->
-                  <div class="flex items-center gap-2">
-                    <div class="flex -space-x-1.5">
-                      <div v-for="(attendee, idx) in event.attendees.slice(0, 3)" :key="idx"
-                           class="w-5 h-5 rounded-full border-2 border-white flex items-center justify-center text-[7px] font-bold text-white transition-transform hover:scale-110 hover:z-10"
-                           :style="{ backgroundColor: attendee.color }"
-                           :title="attendee.name">
-                        {{ attendee.initials }}
-                      </div>
-                    </div>
-                    <span class="text-[10px] text-gray-400">{{ event.totalAttendees >= 1000 ? (event.totalAttendees / 1000).toFixed(0) + 'K' : event.totalAttendees }} attending</span>
-                  </div>
-
-                  <!-- Actions -->
-                  <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <!-- Actions moved to top right -->
+                  <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
                     <button @click="toggleEventRegistration(event.id, $event)"
                             :class="['w-7 h-7 rounded-lg flex items-center justify-center transition-all', isEventRegistered(event.id) ? 'bg-green-500 text-white hover:bg-green-600' : 'bg-teal-50 hover:bg-teal-100 text-teal-500 hover:text-teal-600']"
                             :title="isEventRegistered(event.id) ? 'Cancel Registration' : 'Register'">
@@ -1322,6 +1294,33 @@ onUnmounted(() => {
                             title="Share">
                       <i class="fas fa-share-alt text-[10px]"></i>
                     </button>
+                  </div>
+                </div>
+
+                <!-- Time & Location -->
+                <div class="flex flex-col gap-0.5 mt-2 text-[11px] text-gray-500">
+                  <div class="flex items-center gap-1.5">
+                    <i class="fas fa-clock text-teal-500 w-3"></i>
+                    <span>{{ event.time }}</span>
+                  </div>
+                  <div class="flex items-center gap-1.5">
+                    <i class="fas fa-map-marker-alt text-teal-500 w-3"></i>
+                    <span class="truncate">{{ event.location }}</span>
+                  </div>
+                </div>
+
+                <!-- Footer with Attendees -->
+                <div class="flex items-center mt-auto pt-2 border-t border-gray-100">
+                  <div class="flex items-center gap-2">
+                    <div class="flex -space-x-1.5">
+                      <div v-for="(attendee, idx) in event.attendees.slice(0, 3)" :key="idx"
+                           class="w-5 h-5 rounded-full border-2 border-white flex items-center justify-center text-[7px] font-bold text-white transition-transform hover:scale-110 hover:z-10"
+                           :style="{ backgroundColor: attendee.color }"
+                           :title="attendee.name">
+                        {{ attendee.initials }}
+                      </div>
+                    </div>
+                    <span class="text-[10px] text-gray-400">{{ event.totalAttendees >= 1000 ? (event.totalAttendees / 1000).toFixed(0) + 'K' : event.totalAttendees }} attending</span>
                   </div>
                 </div>
               </div>
