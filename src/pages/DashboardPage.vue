@@ -118,42 +118,115 @@ const recentArticles = ref([
 const upcomingEvents = ref([
   {
     id: 1,
-    title: 'All-Hands Town Hall Meeting',
-    month: 'Dec',
-    day: '24',
-    time: '10:00 AM - 11:30 AM',
+    title: 'Saudi Arabia vs Japan - Opening Match',
+    month: 'Jan',
+    day: '10',
+    year: '2027',
+    time: '8:00 PM',
+    location: 'King Fahd Stadium, Riyadh',
+    category: 'Match',
+    categoryIcon: 'fas fa-futbol',
+    categoryColor: 'bg-green-100 text-green-700',
+    gradientClass: 'from-green-500 to-emerald-600',
+    isRegistered: true,
+    isFeatured: true,
     attendees: [
-      { color: '#14B8A6' },
-      { color: '#3B82F6' },
-      { color: '#8B5CF6' },
-      { color: '#F59E0B' },
-      { color: '#EF4444' }
-    ]
+      { name: 'Ahmed', initials: 'AH', color: '#14B8A6' },
+      { name: 'Mohammed', initials: 'MO', color: '#3B82F6' },
+      { name: 'Sara', initials: 'SA', color: '#8B5CF6' },
+      { name: 'Khalid', initials: 'KH', color: '#F59E0B' },
+      { name: 'Fatima', initials: 'FA', color: '#EF4444' }
+    ],
+    totalAttendees: 68000
   },
   {
     id: 2,
-    title: 'Product Demo & Q&A Session',
-    month: 'Dec',
-    day: '26',
-    time: '2:00 PM - 3:00 PM',
+    title: 'Opening Ceremony Rehearsal',
+    month: 'Jan',
+    day: '09',
+    year: '2027',
+    time: '6:00 PM - 10:00 PM',
+    location: 'King Fahd Stadium, Riyadh',
+    category: 'Ceremony',
+    categoryIcon: 'fas fa-star',
+    categoryColor: 'bg-amber-100 text-amber-700',
+    gradientClass: 'from-amber-500 to-orange-600',
+    isRegistered: false,
+    isFeatured: false,
     attendees: [
-      { color: '#10B981' },
-      { color: '#6366F1' },
-      { color: '#EC4899' }
-    ]
+      { name: 'Event Team', initials: 'ET', color: '#10B981' },
+      { name: 'LOC', initials: 'LO', color: '#6366F1' },
+      { name: 'Media', initials: 'ME', color: '#EC4899' }
+    ],
+    totalAttendees: 5000
   },
   {
     id: 3,
-    title: 'Year-End Review Workshop',
-    month: 'Dec',
-    day: '30',
-    time: '9:00 AM - 12:00 PM',
+    title: 'Team Captains Press Conference',
+    month: 'Jan',
+    day: '08',
+    year: '2027',
+    time: '2:00 PM - 4:00 PM',
+    location: 'Media Center, Riyadh',
+    category: 'Media',
+    categoryIcon: 'fas fa-microphone',
+    categoryColor: 'bg-blue-100 text-blue-700',
+    gradientClass: 'from-blue-500 to-indigo-600',
+    isRegistered: true,
+    isFeatured: false,
     attendees: [
-      { color: '#F59E0B' },
-      { color: '#14B8A6' }
-    ]
+      { name: 'Press', initials: 'PR', color: '#F59E0B' },
+      { name: 'Media', initials: 'MD', color: '#14B8A6' }
+    ],
+    totalAttendees: 250
+  },
+  {
+    id: 4,
+    title: 'Fan Zone Opening Event',
+    month: 'Jan',
+    day: '10',
+    year: '2027',
+    time: '12:00 PM',
+    location: 'Boulevard Riyadh City',
+    category: 'Fan Event',
+    categoryIcon: 'fas fa-users',
+    categoryColor: 'bg-purple-100 text-purple-700',
+    gradientClass: 'from-purple-500 to-violet-600',
+    isRegistered: false,
+    isFeatured: false,
+    attendees: [
+      { name: 'Fans', initials: 'FN', color: '#EC4899' },
+      { name: 'Staff', initials: 'ST', color: '#8B5CF6' }
+    ],
+    totalAttendees: 15000
   }
 ])
+
+// Event actions
+const registeredEvents = ref<Set<number>>(new Set([1, 3]))
+
+function toggleEventRegistration(eventId: number, event: Event) {
+  event.stopPropagation()
+  if (registeredEvents.value.has(eventId)) {
+    registeredEvents.value.delete(eventId)
+  } else {
+    registeredEvents.value.add(eventId)
+  }
+}
+
+function isEventRegistered(eventId: number): boolean {
+  return registeredEvents.value.has(eventId)
+}
+
+function setEventReminder(eventId: number, event: Event) {
+  event.stopPropagation()
+  alert(`Reminder set for event #${eventId}`)
+}
+
+function shareEvent(eventId: number, event: Event) {
+  event.stopPropagation()
+  alert(`Share event #${eventId}`)
+}
 
 // Active Polls
 const activePolls = ref([
@@ -1067,41 +1140,117 @@ onUnmounted(() => {
 
     <!-- Main Grid Row 2 -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-      <!-- Events -->
-      <div class="card-animated rounded-2xl p-6 stagger-3">
+      <!-- Events - Enhanced -->
+      <div class="card-animated rounded-2xl p-6 stagger-3 bg-gradient-to-br from-white to-teal-50/30 border border-teal-100/50">
         <div class="flex items-center justify-between mb-5">
-          <h2 class="text-base font-semibold text-gray-900 flex items-center gap-3">
-            <div class="icon-soft w-9 h-9 rounded-xl flex items-center justify-center">
-              <i class="fas fa-calendar-alt text-sm"></i>
+          <h2 class="text-lg font-bold text-gray-900 flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center shadow-lg shadow-teal-200">
+              <i class="fas fa-calendar-alt text-white text-sm"></i>
             </div>
-            Upcoming Events
+            <div>
+              <span class="block">Upcoming Events</span>
+              <span class="text-xs font-medium text-teal-600">AFC Asian Cup 2027</span>
+            </div>
           </h2>
-          <router-link to="/events" class="text-sm text-primary-600 font-medium hover:text-primary-700">View All</router-link>
+          <router-link to="/events" class="px-3 py-1.5 text-sm text-teal-600 hover:text-white bg-teal-50 hover:bg-teal-500 rounded-lg font-medium flex items-center gap-1.5 transition-all">
+            View All <i class="fas fa-arrow-right text-xs"></i>
+          </router-link>
         </div>
+
         <div class="space-y-3">
           <div v-for="event in upcomingEvents" :key="event.id"
                @click="viewEvent(event.id)"
-               class="list-item-animated flex gap-3 p-3 rounded-xl cursor-pointer border border-transparent hover:border-gray-200 hover:bg-gray-50 hover:shadow-sm transition-all group">
-            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-primary-50 to-primary-100 flex flex-col items-center justify-center flex-shrink-0 transition-transform group-hover:scale-110">
-              <span class="text-[10px] font-semibold text-primary-600 uppercase">{{ event.month }}</span>
-              <span class="text-lg font-bold text-gray-900 -mt-0.5">{{ event.day }}</span>
+               class="event-card relative rounded-xl cursor-pointer border border-gray-100 hover:border-teal-200 hover:shadow-lg transition-all group overflow-hidden"
+               :class="event.isFeatured ? 'bg-gradient-to-r from-teal-50 to-emerald-50' : 'bg-white'">
+
+            <!-- Featured Badge -->
+            <div v-if="event.isFeatured" class="absolute top-0 right-0">
+              <div class="bg-gradient-to-r from-amber-400 to-orange-500 text-white text-[9px] font-bold px-2 py-0.5 rounded-bl-lg">
+                <i class="fas fa-star mr-0.5"></i> FEATURED
+              </div>
             </div>
-            <div class="flex-1 min-w-0">
-              <h4 class="font-medium text-gray-900 text-sm truncate group-hover:text-teal-600 transition-colors">{{ event.title }}</h4>
-              <p class="text-xs text-gray-500 mt-0.5">{{ event.time }}</p>
-              <div class="flex -space-x-1.5 mt-2">
-                <div v-for="(attendee, idx) in event.attendees.slice(0, 3)" :key="idx"
-                     class="w-5 h-5 rounded-md border border-white transition-transform hover:scale-110 hover:z-10"
-                     :style="{ backgroundColor: attendee.color }">
+
+            <div class="p-3 flex gap-3">
+              <!-- Date Box -->
+              <div :class="['w-14 h-14 rounded-xl bg-gradient-to-br flex flex-col items-center justify-center flex-shrink-0 shadow-md transition-transform group-hover:scale-110', event.gradientClass]">
+                <span class="text-[10px] font-semibold text-white/90 uppercase">{{ event.month }}</span>
+                <span class="text-xl font-bold text-white -mt-0.5">{{ event.day }}</span>
+              </div>
+
+              <!-- Event Info -->
+              <div class="flex-1 min-w-0">
+                <div class="flex items-start justify-between gap-2">
+                  <div class="min-w-0">
+                    <h4 class="font-semibold text-gray-900 text-sm truncate group-hover:text-teal-600 transition-colors">{{ event.title }}</h4>
+                    <div class="flex items-center gap-2 mt-1">
+                      <span :class="['text-[10px] font-semibold px-1.5 py-0.5 rounded-full flex items-center gap-1', event.categoryColor]">
+                        <i :class="event.categoryIcon" class="text-[8px]"></i>
+                        {{ event.category }}
+                      </span>
+                      <span v-if="isEventRegistered(event.id)" class="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-green-100 text-green-700 flex items-center gap-1">
+                        <i class="fas fa-check-circle text-[8px]"></i>
+                        Registered
+                      </span>
+                    </div>
+                  </div>
                 </div>
-                <div v-if="event.attendees.length > 3"
-                     class="w-5 h-5 rounded-md bg-gray-100 flex items-center justify-center text-[9px] text-gray-500 font-medium border border-white">
-                  +{{ event.attendees.length - 3 }}
+
+                <!-- Time & Location -->
+                <div class="flex flex-col gap-0.5 mt-2 text-[11px] text-gray-500">
+                  <div class="flex items-center gap-1.5">
+                    <i class="fas fa-clock text-teal-500 w-3"></i>
+                    <span>{{ event.time }}</span>
+                  </div>
+                  <div class="flex items-center gap-1.5">
+                    <i class="fas fa-map-marker-alt text-teal-500 w-3"></i>
+                    <span class="truncate">{{ event.location }}</span>
+                  </div>
+                </div>
+
+                <!-- Footer -->
+                <div class="flex items-center justify-between mt-2 pt-2 border-t border-gray-100">
+                  <!-- Attendees -->
+                  <div class="flex items-center gap-2">
+                    <div class="flex -space-x-1.5">
+                      <div v-for="(attendee, idx) in event.attendees.slice(0, 3)" :key="idx"
+                           class="w-5 h-5 rounded-full border-2 border-white flex items-center justify-center text-[7px] font-bold text-white transition-transform hover:scale-110 hover:z-10"
+                           :style="{ backgroundColor: attendee.color }"
+                           :title="attendee.name">
+                        {{ attendee.initials }}
+                      </div>
+                    </div>
+                    <span class="text-[10px] text-gray-400">{{ event.totalAttendees >= 1000 ? (event.totalAttendees / 1000).toFixed(0) + 'K' : event.totalAttendees }} attending</span>
+                  </div>
+
+                  <!-- Actions -->
+                  <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button @click="toggleEventRegistration(event.id, $event)"
+                            :class="['w-7 h-7 rounded-lg flex items-center justify-center transition-all', isEventRegistered(event.id) ? 'bg-green-500 text-white hover:bg-green-600' : 'bg-teal-50 hover:bg-teal-100 text-teal-500 hover:text-teal-600']"
+                            :title="isEventRegistered(event.id) ? 'Cancel Registration' : 'Register'">
+                      <i :class="isEventRegistered(event.id) ? 'fas fa-check' : 'fas fa-plus'" class="text-[10px]"></i>
+                    </button>
+                    <button @click="setEventReminder(event.id, $event)"
+                            class="w-7 h-7 rounded-lg bg-teal-50 hover:bg-teal-100 flex items-center justify-center text-teal-500 hover:text-teal-600 transition-all"
+                            title="Set Reminder">
+                      <i class="fas fa-bell text-[10px]"></i>
+                    </button>
+                    <button @click="shareEvent(event.id, $event)"
+                            class="w-7 h-7 rounded-lg bg-teal-50 hover:bg-teal-100 flex items-center justify-center text-teal-500 hover:text-teal-600 transition-all"
+                            title="Share">
+                      <i class="fas fa-share-alt text-[10px]"></i>
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
+
+        <!-- Add to Calendar Button -->
+        <button class="w-full mt-4 py-3 text-sm font-semibold text-teal-600 bg-teal-50 hover:bg-teal-100 border-2 border-dashed border-teal-200 hover:border-teal-300 rounded-xl transition-all flex items-center justify-center gap-2">
+          <i class="fas fa-calendar-plus"></i>
+          Sync with Calendar
+        </button>
       </div>
 
       <!-- Polls -->
