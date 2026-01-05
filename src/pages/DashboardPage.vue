@@ -1022,13 +1022,13 @@ onUnmounted(() => {
     <!-- Recent Updates Carousel - Featured Section -->
     <div class="card-animated rounded-3xl p-8 mb-10 stagger-1 bg-gradient-to-br from-white via-white to-teal-50/50 border-2 border-teal-100 shadow-xl shadow-teal-100/20" @mouseenter="pauseCarousel" @mouseleave="resumeCarousel">
       <div class="flex items-center justify-between mb-6">
-        <h2 class="text-2xl font-bold text-gray-900 flex items-center gap-4">
-          <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center shadow-lg shadow-teal-200">
-            <i class="fas fa-fire text-white text-lg"></i>
+        <h2 class="text-lg font-bold text-gray-900 flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center shadow-lg shadow-teal-200">
+            <i class="fas fa-fire text-white text-sm"></i>
           </div>
           <div>
             <span class="block">Latest Updates</span>
-            <span class="text-sm font-medium text-teal-600">AFC Asian Cup Saudi Arabia 2027</span>
+            <span class="text-xs font-medium text-teal-600">AFC Asian Cup Saudi Arabia 2027</span>
           </div>
         </h2>
         <div class="flex items-center gap-3">
@@ -1282,7 +1282,7 @@ onUnmounted(() => {
     <!-- Recent Media - Enhanced Section -->
     <div class="card-animated rounded-2xl p-5 mb-6 stagger-2 bg-gradient-to-br from-white to-teal-50/30 border border-teal-100/50">
       <div class="flex items-center justify-between mb-4">
-        <h2 class="text-base font-bold text-gray-900 flex items-center gap-3">
+        <h2 class="text-lg font-bold text-gray-900 flex items-center gap-3">
           <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center shadow-lg shadow-teal-200">
             <i class="fas fa-photo-film text-white text-sm"></i>
           </div>
