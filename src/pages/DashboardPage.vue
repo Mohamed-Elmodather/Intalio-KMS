@@ -395,7 +395,7 @@ function downloadDocument(doc: any, event: Event) {
 }
 
 function openDocument(docId: number) {
-  router.push(`/documents/${docId}`)
+  router.push({ path: '/documents', query: { id: docId.toString() } })
 }
 
 // Team Activities
