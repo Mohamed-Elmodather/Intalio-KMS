@@ -435,68 +435,61 @@ function getFileIconBg(type: string): string {
 <template>
   <div class="min-h-screen bg-gray-50">
     <!-- Hero Section -->
-    <div class="bg-gradient-to-br from-teal-600 via-teal-500 to-emerald-500 relative overflow-hidden">
+    <div class="hero-gradient relative overflow-hidden">
       <!-- Decorative elements -->
       <div class="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/3"></div>
       <div class="absolute bottom-0 left-0 w-64 h-64 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/3"></div>
 
-      <div class="relative px-8 py-10">
-        <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
-          <!-- Left Content -->
-          <div class="flex-1">
-            <div class="flex items-center gap-3 mb-4">
-              <div class="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-white text-xs font-semibold flex items-center gap-2">
-                <i class="fas fa-folder-open"></i>
-                AFC Asian Cup 2027
-              </div>
-            </div>
-
-            <h1 class="text-3xl font-bold text-white mb-2">Document Library</h1>
-            <p class="text-teal-100 max-w-lg">Access official tournament documents, media assets, and operational resources.</p>
-
-            <div class="flex flex-wrap gap-3 mt-6">
-              <button class="px-5 py-2.5 bg-white text-teal-600 rounded-xl font-semibold text-sm flex items-center gap-2 hover:bg-teal-50 transition-all shadow-lg">
-                <i class="fas fa-upload"></i>
-                Upload Document
-              </button>
-              <button class="px-5 py-2.5 bg-white/20 backdrop-blur-sm border border-white/30 text-white rounded-xl font-semibold text-sm hover:bg-white/30 transition-all flex items-center gap-2">
-                <i class="fas fa-folder-plus"></i>
-                New Folder
-              </button>
-            </div>
+      <!-- Stats - Absolute Top Right -->
+      <div class="stats-top-right">
+        <div class="stat-card-square">
+          <div class="stat-icon-box">
+            <i class="fas fa-file-alt"></i>
           </div>
-
-          <!-- Stats -->
-          <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            <div class="bg-white/20 backdrop-blur-sm rounded-xl p-4 text-center min-w-[100px]">
-              <div class="w-10 h-10 rounded-lg bg-white/20 flex items-center justify-center mx-auto mb-2">
-                <i class="fas fa-file-alt text-white"></i>
-              </div>
-              <p class="text-2xl font-bold text-white">{{ documentStats.totalDocuments }}</p>
-              <p class="text-xs text-white/70">Documents</p>
-            </div>
-            <div class="bg-white/20 backdrop-blur-sm rounded-xl p-4 text-center min-w-[100px]">
-              <div class="w-10 h-10 rounded-lg bg-white/20 flex items-center justify-center mx-auto mb-2">
-                <i class="fas fa-folder text-white"></i>
-              </div>
-              <p class="text-2xl font-bold text-white">{{ documentStats.totalLibraries }}</p>
-              <p class="text-xs text-white/70">Libraries</p>
-            </div>
-            <div class="bg-white/20 backdrop-blur-sm rounded-xl p-4 text-center min-w-[100px]">
-              <div class="w-10 h-10 rounded-lg bg-white/20 flex items-center justify-center mx-auto mb-2">
-                <i class="fas fa-hdd text-white"></i>
-              </div>
-              <p class="text-2xl font-bold text-white">{{ formatTotalSize(documentStats.totalSize) }}</p>
-              <p class="text-xs text-white/70">Total Size</p>
-            </div>
-            <div class="bg-white/20 backdrop-blur-sm rounded-xl p-4 text-center min-w-[100px]">
-              <div class="w-10 h-10 rounded-lg bg-white/20 flex items-center justify-center mx-auto mb-2">
-                <i class="fas fa-clock text-white"></i>
-              </div>
-              <p class="text-2xl font-bold text-white">{{ documentStats.recentUploads }}</p>
-              <p class="text-xs text-white/70">This Week</p>
-            </div>
+          <p class="stat-value-mini">{{ documentStats.totalDocuments }}</p>
+          <p class="stat-label-mini">Documents</p>
+        </div>
+        <div class="stat-card-square">
+          <div class="stat-icon-box">
+            <i class="fas fa-folder"></i>
           </div>
+          <p class="stat-value-mini">{{ documentStats.totalLibraries }}</p>
+          <p class="stat-label-mini">Libraries</p>
+        </div>
+        <div class="stat-card-square">
+          <div class="stat-icon-box">
+            <i class="fas fa-hdd"></i>
+          </div>
+          <p class="stat-value-mini">{{ formatTotalSize(documentStats.totalSize) }}</p>
+          <p class="stat-label-mini">Total Size</p>
+        </div>
+        <div class="stat-card-square">
+          <div class="stat-icon-box">
+            <i class="fas fa-clock"></i>
+          </div>
+          <p class="stat-value-mini">{{ documentStats.recentUploads }}</p>
+          <p class="stat-label-mini">This Week</p>
+        </div>
+      </div>
+
+      <div class="relative px-8 py-8">
+        <div class="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-white text-xs font-semibold inline-flex items-center gap-2 mb-4">
+          <i class="fas fa-folder-open"></i>
+          AFC Asian Cup 2027
+        </div>
+
+        <h1 class="text-3xl font-bold text-white mb-2">Document Library</h1>
+        <p class="text-teal-100 max-w-lg">Access official tournament documents, media assets, and operational resources.</p>
+
+        <div class="flex flex-wrap gap-3 mt-6">
+          <button class="px-5 py-2.5 bg-white text-teal-600 rounded-xl font-semibold text-sm flex items-center gap-2 hover:bg-teal-50 transition-all shadow-lg">
+            <i class="fas fa-upload"></i>
+            Upload Document
+          </button>
+          <button class="px-5 py-2.5 bg-white/20 backdrop-blur-sm border border-white/30 text-white rounded-xl font-semibold text-sm hover:bg-white/30 transition-all flex items-center gap-2">
+            <i class="fas fa-folder-plus"></i>
+            New Folder
+          </button>
         </div>
       </div>
     </div>
@@ -841,3 +834,82 @@ function getFileIconBg(type: string): string {
     </div>
   </div>
 </template>
+
+<style scoped>
+.hero-gradient {
+  background: linear-gradient(135deg, #0d9488 0%, #14b8a6 50%, #10b981 100%);
+}
+
+.stats-top-right {
+  position: absolute;
+  top: 24px;
+  right: 32px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  z-index: 10;
+}
+
+.stat-card-square {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(8px);
+  border-radius: 16px;
+  width: 115px;
+  height: 115px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-align: center;
+}
+
+.stat-icon-box {
+  color: white;
+  font-size: 20px;
+}
+
+.stat-value-mini {
+  font-size: 24px;
+  font-weight: 700;
+  color: white;
+  line-height: 1;
+}
+
+.stat-label-mini {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1;
+}
+
+@media (max-width: 1023px) {
+  .stats-top-right {
+    position: relative;
+    top: auto;
+    right: auto;
+    margin: 24px 32px 0;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+  }
+
+  .stat-card-square {
+    width: 100%;
+    height: 80px;
+  }
+
+  .stat-icon-box {
+    width: 24px;
+    height: 24px;
+    font-size: 10px;
+  }
+
+  .stat-value-mini {
+    font-size: 16px;
+  }
+
+  .stat-label-mini {
+    font-size: 8px;
+  }
+}
+</style>
