@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 
 // Time of day greeting
 const timeOfDay = computed(() => {
@@ -47,54 +50,67 @@ const animateCounter = (stat: any, duration = 2000) => {
   requestAnimationFrame(updateCounter)
 }
 
-// AI Actions
-const aiActions = ref([
-  { icon: 'fas fa-wand-magic-sparkles', label: 'Generate article summary' },
-  { icon: 'fas fa-language', label: 'Translate content' },
-  { icon: 'fas fa-magnifying-glass-plus', label: 'Find related documents' },
-  { icon: 'fas fa-chart-line', label: 'Analyze engagement' },
-])
-
 // Recent Articles
 const recentArticles = ref([
   {
     id: 1,
-    title: 'Best Practices for Remote Team Collaboration',
-    excerpt: 'Discover proven strategies to enhance productivity and communication in distributed teams.',
-    category: 'Collaboration',
-    categoryClass: 'bg-blue-100 text-blue-600',
+    title: 'Saudi Arabia Squad Announcement for AFC Asian Cup 2027',
+    excerpt: 'Head coach announces the final 26-man squad for the home tournament.',
+    category: 'Team News',
+    categoryClass: 'bg-green-100 text-green-700',
     readTime: '5 min read',
     icon: 'fas fa-users',
-    iconBg: 'bg-blue-100',
-    iconColor: 'text-blue-500',
-    author: { name: 'Sarah Chen', initials: 'SC' },
-    date: '2 hours ago'
+    iconBg: 'bg-gradient-to-br from-green-100 to-green-200',
+    iconColor: 'text-green-600',
+    image: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=100&h=100&fit=crop',
+    author: { name: 'AFC Media', initials: 'AF', color: '#006847' },
+    date: '2 hours ago',
+    views: '12.5K'
   },
   {
     id: 2,
-    title: 'Q4 Security Compliance Guidelines',
-    excerpt: 'Updated security protocols and compliance requirements for all departments.',
-    category: 'Security',
-    categoryClass: 'bg-rose-100 text-rose-600',
+    title: 'King Fahd Stadium: A Complete Guide for Fans',
+    excerpt: 'Everything you need to know about the iconic venue hosting the final.',
+    category: 'Venues',
+    categoryClass: 'bg-blue-100 text-blue-700',
     readTime: '8 min read',
-    icon: 'fas fa-shield-halved',
-    iconBg: 'bg-rose-100',
-    iconColor: 'text-rose-500',
-    author: { name: 'Mike Johnson', initials: 'MJ' },
-    date: '5 hours ago'
+    icon: 'fas fa-stadium',
+    iconBg: 'bg-gradient-to-br from-blue-100 to-blue-200',
+    iconColor: 'text-blue-600',
+    image: 'https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=100&h=100&fit=crop',
+    author: { name: 'Venue Team', initials: 'VT', color: '#2563eb' },
+    date: '5 hours ago',
+    views: '8.2K'
   },
   {
     id: 3,
-    title: 'New Product Launch Training Materials',
-    excerpt: 'Comprehensive training guide for the upcoming product release.',
-    category: 'Training',
-    categoryClass: 'bg-emerald-100 text-emerald-600',
-    readTime: '12 min read',
-    icon: 'fas fa-rocket',
-    iconBg: 'bg-emerald-100',
-    iconColor: 'text-emerald-500',
-    author: { name: 'Emily Davis', initials: 'ED' },
-    date: 'Yesterday'
+    title: 'AFC Asian Cup 2027: Complete Match Schedule Released',
+    excerpt: 'Full fixture list with dates, times, and venues for all 51 matches.',
+    category: 'Schedule',
+    categoryClass: 'bg-amber-100 text-amber-700',
+    readTime: '4 min read',
+    icon: 'fas fa-calendar-days',
+    iconBg: 'bg-gradient-to-br from-amber-100 to-amber-200',
+    iconColor: 'text-amber-600',
+    image: 'https://images.unsplash.com/photo-1459865264687-595d652de67e?w=100&h=100&fit=crop',
+    author: { name: 'LOC', initials: 'LO', color: '#d97706' },
+    date: 'Yesterday',
+    views: '15.8K'
+  },
+  {
+    id: 4,
+    title: 'Top 10 Players to Watch at AFC Asian Cup 2027',
+    excerpt: 'Star players from across Asia ready to shine on the biggest stage.',
+    category: 'Analysis',
+    categoryClass: 'bg-purple-100 text-purple-700',
+    readTime: '10 min read',
+    icon: 'fas fa-star',
+    iconBg: 'bg-gradient-to-br from-purple-100 to-purple-200',
+    iconColor: 'text-purple-600',
+    image: 'https://images.unsplash.com/photo-1551958219-acbc608c6377?w=100&h=100&fit=crop',
+    author: { name: 'Sports Desk', initials: 'SD', color: '#7c3aed' },
+    date: '2 days ago',
+    views: '22.1K'
   }
 ])
 
@@ -143,14 +159,32 @@ const upcomingEvents = ref([
 const activePolls = ref([
   {
     id: 1,
-    question: 'Preferred format for weekly updates?',
+    question: 'Who will win AFC Asian Cup 2027?',
+    icon: 'fas fa-trophy',
+    iconBg: 'bg-gradient-to-br from-yellow-400 to-amber-500',
     options: [
-      { label: 'Video briefing', votes: 45 },
-      { label: 'Newsletter email', votes: 32 },
-      { label: 'Slack summary', votes: 23 }
+      { label: 'Saudi Arabia', votes: 38, color: '#006847', flag: '🇸🇦' },
+      { label: 'Japan', votes: 28, color: '#BC002D', flag: '🇯🇵' },
+      { label: 'South Korea', votes: 18, color: '#003478', flag: '🇰🇷' },
+      { label: 'Iran', votes: 16, color: '#239F40', flag: '🇮🇷' }
     ],
-    totalVotes: 234,
-    endsIn: 'Ends in 2 days'
+    totalVotes: 12450,
+    endsIn: 'Ends when tournament starts',
+    hasVoted: false
+  },
+  {
+    id: 2,
+    question: 'Best stadium for the Final?',
+    icon: 'fas fa-futbol',
+    iconBg: 'bg-gradient-to-br from-teal-400 to-teal-600',
+    options: [
+      { label: 'King Fahd Stadium', votes: 45, color: '#14b8a6' },
+      { label: 'King Abdullah Sports City', votes: 32, color: '#0d9488' },
+      { label: 'Prince Abdullah Stadium', votes: 23, color: '#0f766e' }
+    ],
+    totalVotes: 8234,
+    endsIn: 'Ends in 5 days',
+    hasVoted: true
   }
 ])
 
@@ -189,77 +223,170 @@ const learningCourses = ref([
 const mediaItems = ref([
   {
     id: 1,
-    title: 'CEO Vision 2025 Address',
+    title: 'Saudi Arabia vs Japan Preview',
     type: 'video',
+    category: 'Match Preview',
     duration: '15:42',
-    views: '1.2K',
-    gradientClass: 'bg-gradient-to-br from-primary-400 to-primary-600'
+    views: '245K',
+    date: '2 hours ago',
+    progress: 65,
+    image: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=400&h=225&fit=crop',
+    gradientClass: 'bg-gradient-to-br from-green-600 to-green-800'
   },
   {
     id: 2,
-    title: 'Product Innovation Series',
+    title: 'Opening Ceremony Highlights',
     type: 'video',
+    category: 'Highlights',
     duration: '28:15',
-    views: '856',
-    gradientClass: 'bg-gradient-to-br from-blue-400 to-blue-600'
+    views: '189K',
+    date: '5 hours ago',
+    progress: 0,
+    image: 'https://images.unsplash.com/photo-1459865264687-595d652de67e?w=400&h=225&fit=crop',
+    gradientClass: 'bg-gradient-to-br from-teal-400 to-teal-600'
   },
   {
     id: 3,
-    title: 'Weekly Strategy Podcast',
+    title: 'AFC Asian Cup Podcast Ep. 12',
     type: 'audio',
+    category: 'Podcast',
     duration: '45:00',
-    views: '432',
+    views: '56K',
+    date: 'Yesterday',
+    progress: 30,
     gradientClass: 'bg-gradient-to-br from-violet-400 to-violet-600'
   },
   {
     id: 4,
-    title: 'Customer Success Stories',
+    title: 'Stadium Tour: King Fahd',
     type: 'video',
+    category: 'Behind the Scenes',
     duration: '12:30',
-    views: '678',
+    views: '98K',
+    date: '2 days ago',
+    progress: 100,
+    image: 'https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=400&h=225&fit=crop',
     gradientClass: 'bg-gradient-to-br from-amber-400 to-amber-600'
+  },
+  {
+    id: 5,
+    title: 'Top Goals - Group Stage',
+    type: 'video',
+    category: 'Highlights',
+    duration: '8:45',
+    views: '312K',
+    date: '3 days ago',
+    progress: 0,
+    image: 'https://images.unsplash.com/photo-1551958219-acbc608c6377?w=400&h=225&fit=crop',
+    gradientClass: 'bg-gradient-to-br from-rose-500 to-pink-600'
+  },
+  {
+    id: 6,
+    title: 'Fan Zone Experience',
+    type: 'video',
+    category: 'Fan Content',
+    duration: '6:20',
+    views: '45K',
+    date: '4 days ago',
+    progress: 0,
+    image: 'https://images.unsplash.com/photo-1489944440615-453fc2b6a9a9?w=400&h=225&fit=crop',
+    gradientClass: 'bg-gradient-to-br from-blue-500 to-indigo-600'
   }
 ])
+
+// Media actions
+function playMedia(mediaId: number) {
+  router.push(`/media/${mediaId}`)
+}
+
+function saveMedia(mediaId: number, event: Event) {
+  event.stopPropagation()
+  console.log('Save media:', mediaId)
+}
 
 // Recent Documents
 const recentDocuments = ref([
   {
     id: 1,
-    name: 'Q4 Financial Report 2024.xlsx',
-    size: '2.4 MB',
+    name: 'AFC Asian Cup 2027 Schedule.pdf',
+    size: '4.2 MB',
     modified: '2 hours ago',
-    icon: 'fas fa-file-excel',
-    iconBg: 'bg-emerald-100',
-    iconColor: 'text-emerald-600'
+    icon: 'fas fa-file-pdf',
+    iconBg: 'bg-rose-100',
+    iconColor: 'text-rose-600',
+    type: 'PDF'
   },
   {
     id: 2,
-    name: 'Brand Guidelines v3.pdf',
-    size: '8.7 MB',
-    modified: 'Yesterday',
-    icon: 'fas fa-file-pdf',
-    iconBg: 'bg-rose-100',
-    iconColor: 'text-rose-600'
+    name: 'Stadium Operations Manual.docx',
+    size: '12.5 MB',
+    modified: '5 hours ago',
+    icon: 'fas fa-file-word',
+    iconBg: 'bg-blue-100',
+    iconColor: 'text-blue-600',
+    type: 'Word'
   },
   {
     id: 3,
-    name: 'Project Roadmap 2025.pptx',
-    size: '5.2 MB',
-    modified: '3 days ago',
-    icon: 'fas fa-file-powerpoint',
-    iconBg: 'bg-orange-100',
-    iconColor: 'text-orange-600'
+    name: 'Team Statistics 2027.xlsx',
+    size: '3.8 MB',
+    modified: 'Yesterday',
+    icon: 'fas fa-file-excel',
+    iconBg: 'bg-emerald-100',
+    iconColor: 'text-emerald-600',
+    type: 'Excel'
   },
   {
     id: 4,
-    name: 'Employee Handbook.docx',
-    size: '1.8 MB',
-    modified: 'Last week',
-    icon: 'fas fa-file-word',
-    iconBg: 'bg-blue-100',
-    iconColor: 'text-blue-600'
+    name: 'Opening Ceremony Plan.pptx',
+    size: '28.4 MB',
+    modified: '2 days ago',
+    icon: 'fas fa-file-powerpoint',
+    iconBg: 'bg-orange-100',
+    iconColor: 'text-orange-600',
+    type: 'PowerPoint'
   }
 ])
+
+// Bookmarked articles state
+const bookmarkedArticles = ref<Set<number>>(new Set())
+
+// Article actions
+function goToArticle(articleId: number) {
+  router.push(`/articles/${articleId}`)
+}
+
+function bookmarkArticle(articleId: number, event: Event) {
+  event.stopPropagation()
+  if (bookmarkedArticles.value.has(articleId)) {
+    bookmarkedArticles.value.delete(articleId)
+  } else {
+    bookmarkedArticles.value.add(articleId)
+  }
+}
+
+function isBookmarked(articleId: number): boolean {
+  return bookmarkedArticles.value.has(articleId)
+}
+
+// Document actions
+function previewDocument(doc: any, event: Event) {
+  event.stopPropagation()
+  // Open document preview modal or navigate to preview page
+  console.log('Preview document:', doc.name)
+  alert(`Opening preview for: ${doc.name}`)
+}
+
+function downloadDocument(doc: any, event: Event) {
+  event.stopPropagation()
+  // Trigger document download
+  console.log('Download document:', doc.name)
+  alert(`Downloading: ${doc.name}`)
+}
+
+function openDocument(docId: number) {
+  router.push(`/documents/${docId}`)
+}
 
 // Team Activities
 const teamActivities = ref([
@@ -324,50 +451,87 @@ const recentUpdates = ref([
   {
     id: 1,
     type: 'announcement',
-    typeLabel: 'Announcement',
+    typeLabel: 'Breaking News',
     typeIcon: 'fas fa-bullhorn',
-    title: 'Company-Wide Town Hall Meeting Next Week',
-    description: 'Join us for our quarterly town hall meeting where the leadership team will share updates on company performance, upcoming initiatives, and answer your questions.',
-    icon: 'fas fa-users',
+    title: 'Saudi Arabia vs Japan: Opening Match Set for January 10 at King Fahd Stadium',
+    description: 'The host nation Saudi Arabia will kick off AFC Asian Cup 2027 against Japan in a blockbuster opening match. Over 68,000 fans expected at King Fahd International Stadium in Riyadh for this historic encounter.',
+    icon: 'fas fa-futbol',
+    image: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=600&h=400&fit=crop',
     gradientClass: 'bg-gradient-to-br from-amber-400 to-orange-500',
-    date: 'Dec 23, 2024',
-    author: { name: 'CEO Office', initials: 'CO', role: 'Executive Team', color: '#f59e0b' },
-    views: '1,247',
-    comments: '34',
+    date: 'Jan 5, 2027',
+    author: { name: 'AFC Media', initials: 'AF', role: 'Official News', color: '#006847' },
+    views: '245,847',
+    comments: '4,521',
     link: '/events',
-    actionText: 'View Details'
+    actionText: 'View Match Details'
   },
   {
     id: 2,
     type: 'article',
-    typeLabel: 'New Article',
+    typeLabel: 'Player Focus',
     typeIcon: 'fas fa-newspaper',
-    title: 'Best Practices for Remote Team Collaboration in 2025',
-    description: 'Discover the latest strategies and tools for effective remote collaboration. This comprehensive guide covers communication best practices and project management tips.',
-    icon: 'fas fa-laptop-house',
+    title: 'Salem Al-Dawsari: Leading the Green Falcons to Glory on Home Soil',
+    description: 'The Saudi captain and Al-Hilal star is ready to lead his nation in the biggest tournament on home ground. With 20 international goals, Al-Dawsari aims to inspire the next generation of Saudi football.',
+    icon: 'fas fa-user-star',
+    image: 'https://images.unsplash.com/photo-1551958219-acbc608c6377?w=600&h=400&fit=crop',
     gradientClass: 'bg-gradient-to-br from-blue-400 to-indigo-500',
-    date: 'Dec 22, 2024',
-    author: { name: 'Sarah Chen', initials: 'SC', role: 'HR Director', color: '#3b82f6' },
-    views: '856',
-    comments: '23',
+    date: 'Jan 4, 2027',
+    author: { name: 'Sports Desk', initials: 'SD', role: 'Football Analysis', color: '#006847' },
+    views: '189,562',
+    comments: '2,856',
     link: '/articles',
-    actionText: 'Read Article'
+    actionText: 'Read Full Story'
   },
   {
     id: 3,
     type: 'event',
-    typeLabel: 'Upcoming Event',
-    typeIcon: 'fas fa-calendar-star',
-    title: 'Annual Holiday Celebration & Awards Ceremony',
-    description: 'Join us for our annual holiday celebration featuring dinner, entertainment, and the presentation of employee excellence awards. RSVP by December 20th.',
-    icon: 'fas fa-champagne-glasses',
+    typeLabel: 'Tournament Update',
+    typeIcon: 'fas fa-trophy',
+    title: 'AFC Asian Cup 2027 Opening Ceremony - A Saudi Vision Unveiled',
+    description: 'Experience the grandeur of Saudi hospitality at the opening ceremony featuring world-class performances, stunning visuals celebrating Saudi culture, and a spectacular drone show over Riyadh skyline.',
+    icon: 'fas fa-star',
+    image: 'https://images.unsplash.com/photo-1459865264687-595d652de67e?w=600&h=400&fit=crop',
     gradientClass: 'bg-gradient-to-br from-emerald-400 to-teal-500',
-    date: 'Dec 28, 2024',
-    author: { name: 'Events Team', initials: 'ET', role: 'Culture & Events', color: '#10b981' },
-    views: '2,103',
-    comments: '67',
+    date: 'Jan 9, 2027',
+    author: { name: 'LOC Events', initials: 'LO', role: 'Local Organizing Committee', color: '#10b981' },
+    views: '167,103',
+    comments: '1,892',
     link: '/events',
-    actionText: 'RSVP Now'
+    actionText: 'Event Details'
+  },
+  {
+    id: 4,
+    type: 'venue',
+    typeLabel: 'Venues',
+    typeIcon: 'fas fa-stadium',
+    title: 'World-Class Stadiums Ready: From Riyadh to Jeddah',
+    description: 'Saudi Arabia\'s state-of-the-art stadiums are ready to host Asia\'s finest. King Fahd Stadium, King Abdullah Sports City, and Prince Abdullah Al-Faisal Stadium offer world-class facilities for 24 competing nations.',
+    icon: 'fas fa-building',
+    image: 'https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=600&h=400&fit=crop',
+    gradientClass: 'bg-gradient-to-br from-purple-400 to-violet-500',
+    date: 'Jan 3, 2027',
+    author: { name: 'Venue Operations', initials: 'VO', role: 'Stadium Management', color: '#8b5cf6' },
+    views: '98,543',
+    comments: '734',
+    link: '/events',
+    actionText: 'Explore Venues'
+  },
+  {
+    id: 5,
+    type: 'stats',
+    typeLabel: 'Statistics',
+    typeIcon: 'fas fa-chart-bar',
+    title: 'AFC Asian Cup History: Japan Leads with 4 Titles',
+    description: 'Japan leads the Asian Cup honors with 4 titles, followed by Saudi Arabia and Iran with 3 each. Explore the complete history of champions, top scorers, and legendary moments from 1956 to present.',
+    icon: 'fas fa-medal',
+    image: 'https://images.unsplash.com/photo-1560272564-c83b66b1ad12?w=600&h=400&fit=crop',
+    gradientClass: 'bg-gradient-to-br from-red-400 to-rose-500',
+    date: 'Jan 2, 2027',
+    author: { name: 'Stats Team', initials: 'ST', role: 'Data Analytics', color: '#ef4444' },
+    views: '145,876',
+    comments: '1,267',
+    link: '/articles',
+    actionText: 'View Statistics'
   }
 ])
 
@@ -428,7 +592,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div>
+  <div class="px-8 py-6">
     <!-- Welcome Section -->
     <div class="card-animated rounded-2xl p-8 mb-8 relative overflow-hidden stagger-1">
       <!-- Decorative elements -->
@@ -464,25 +628,28 @@ onUnmounted(() => {
       </div>
     </div>
 
-    <!-- Recent Updates Carousel -->
-    <div class="card-animated rounded-2xl p-6 mb-8 stagger-1" @mouseenter="pauseCarousel" @mouseleave="resumeCarousel">
-      <div class="flex items-center justify-between mb-4">
-        <h2 class="text-lg font-semibold text-gray-900 flex items-center gap-3">
-          <div class="icon-vibrant w-9 h-9 rounded-xl flex items-center justify-center">
-            <i class="fas fa-bullhorn text-white text-sm"></i>
+    <!-- Recent Updates Carousel - Featured Section -->
+    <div class="card-animated rounded-3xl p-8 mb-10 stagger-1 bg-gradient-to-br from-white via-white to-teal-50/50 border-2 border-teal-100 shadow-xl shadow-teal-100/20" @mouseenter="pauseCarousel" @mouseleave="resumeCarousel">
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="text-2xl font-bold text-gray-900 flex items-center gap-4">
+          <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center shadow-lg shadow-teal-200">
+            <i class="fas fa-fire text-white text-lg"></i>
           </div>
-          Recent Updates
+          <div>
+            <span class="block">Latest Updates</span>
+            <span class="text-sm font-medium text-teal-600">AFC Asian Cup Saudi Arabia 2027</span>
+          </div>
         </h2>
-        <div class="flex items-center gap-2">
-          <span class="text-xs text-gray-500">{{ currentSlide + 1 }} / {{ recentUpdates.length }}</span>
-          <button @click="toggleAutoPlay" class="p-2 rounded-lg hover:bg-primary-50 text-gray-500 hover:text-primary-600 transition-all">
-            <i :class="isAutoPlaying ? 'fas fa-pause' : 'fas fa-play'" class="text-xs"></i>
+        <div class="flex items-center gap-3">
+          <span class="px-3 py-1.5 rounded-full bg-teal-100 text-teal-700 text-sm font-semibold">{{ currentSlide + 1 }} / {{ recentUpdates.length }}</span>
+          <button @click="toggleAutoPlay" class="p-2.5 rounded-xl bg-white border border-gray-200 hover:bg-teal-50 hover:border-teal-200 text-gray-500 hover:text-teal-600 transition-all shadow-sm">
+            <i :class="isAutoPlaying ? 'fas fa-pause' : 'fas fa-play'" class="text-sm"></i>
           </button>
         </div>
       </div>
 
       <!-- Progress bar -->
-      <div class="h-1 bg-gray-100 rounded-full mb-4 overflow-hidden">
+      <div class="h-1.5 bg-gray-100 rounded-full mb-6 overflow-hidden">
         <div class="slide-progress rounded-full" :key="currentSlide" v-if="isAutoPlaying"></div>
       </div>
 
@@ -500,55 +667,69 @@ onUnmounted(() => {
           <div v-for="(update, index) in recentUpdates" :key="update.id"
                class="carousel-slide"
                :class="{ active: index === currentSlide }">
-            <div class="flex flex-col lg:flex-row gap-6 p-4">
-              <!-- Image/Icon Side -->
-              <div class="lg:w-1/3">
-                <div class="relative h-48 lg:h-full min-h-[180px] rounded-2xl overflow-hidden"
-                     :class="update.gradientClass">
-                  <div class="absolute inset-0 flex items-center justify-center">
-                    <div class="w-20 h-20 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                      <i :class="[update.icon, 'text-4xl text-white']"></i>
+            <div class="slide-content">
+              <!-- Image Side -->
+              <div class="slide-image">
+                <div class="relative h-64 lg:h-80 rounded-2xl overflow-hidden shadow-lg group">
+                  <img v-if="update.image" :src="update.image" :alt="update.title" class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
+                  <div v-else class="absolute inset-0" :class="update.gradientClass">
+                    <div class="absolute inset-0 flex items-center justify-center">
+                      <div class="w-20 h-20 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                        <i :class="[update.icon, 'text-4xl text-white']"></i>
+                      </div>
                     </div>
                   </div>
+                  <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
                   <div class="absolute top-4 left-4">
-                    <span :class="['update-badge', update.type]">
-                      <i :class="update.typeIcon"></i>
+                    <span :class="['update-badge', update.type]" class="text-sm px-4 py-1.5 shadow-lg">
+                      <i :class="update.typeIcon" class="mr-1"></i>
                       {{ update.typeLabel }}
                     </span>
                   </div>
-                  <div class="absolute bottom-4 right-4 px-3 py-1 rounded-lg bg-black/40 backdrop-blur-sm text-white text-xs">
-                    {{ update.date }}
+                  <div class="absolute bottom-4 left-4 right-4 flex justify-between items-center">
+                    <div class="flex items-center gap-2 text-white/90 text-sm">
+                      <i class="fas fa-eye"></i>
+                      <span>{{ update.views }} views</span>
+                    </div>
+                    <div class="px-3 py-1.5 rounded-lg bg-black/40 backdrop-blur-sm text-white text-sm font-medium">
+                      <i class="fas fa-calendar-alt mr-1"></i>
+                      {{ update.date }}
+                    </div>
                   </div>
                 </div>
               </div>
 
               <!-- Content Side -->
-              <div class="lg:w-2/3 flex flex-col justify-center">
-                <h3 class="text-xl font-bold text-gray-900 mb-3">{{ update.title }}</h3>
-                <p class="text-gray-600 mb-4 line-clamp-3">{{ update.description }}</p>
-                <div class="flex items-center gap-4 mb-4">
-                  <div class="flex items-center gap-2">
-                    <div class="w-8 h-8 rounded-lg flex items-center justify-center text-white text-xs font-semibold"
+              <div class="slide-text">
+                <h3 class="text-2xl lg:text-3xl font-bold text-gray-900 mb-4 leading-tight">{{ update.title }}</h3>
+                <p class="text-gray-600 mb-6 text-base leading-relaxed line-clamp-3">{{ update.description }}</p>
+                <div class="flex items-center gap-6 mb-6 pb-6 border-b border-gray-100">
+                  <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl flex items-center justify-center text-white text-sm font-bold shadow-md"
                          :style="{ backgroundColor: update.author.color }">
                       {{ update.author.initials }}
                     </div>
                     <div>
-                      <p class="text-sm font-medium text-gray-900">{{ update.author.name }}</p>
+                      <p class="text-sm font-semibold text-gray-900">{{ update.author.name }}</p>
                       <p class="text-xs text-gray-500">{{ update.author.role }}</p>
                     </div>
                   </div>
-                  <div class="flex items-center gap-3 text-xs text-gray-500">
-                    <span><i class="fas fa-eye mr-1"></i>{{ update.views }}</span>
-                    <span><i class="fas fa-comment mr-1"></i>{{ update.comments }}</span>
+                  <div class="flex items-center gap-4 text-sm text-gray-500">
+                    <span class="flex items-center gap-1.5"><i class="fas fa-comment text-teal-500"></i>{{ update.comments }} comments</span>
                   </div>
                 </div>
-                <div class="flex gap-3">
-                  <router-link :to="update.link" class="px-5 py-2.5 btn-vibrant text-white rounded-xl font-medium text-sm flex items-center gap-2">
-                    <i class="fas fa-arrow-right text-xs"></i>
+                <div class="flex gap-4">
+                  <router-link :to="update.link" class="px-6 py-3 bg-gradient-to-r from-teal-500 to-teal-600 text-white rounded-xl font-semibold text-sm flex items-center gap-2 shadow-lg shadow-teal-200 hover:shadow-xl hover:shadow-teal-300 transition-all hover:-translate-y-0.5">
                     {{ update.actionText }}
+                    <i class="fas fa-arrow-right text-xs"></i>
                   </router-link>
-                  <button class="px-4 py-2.5 bg-white border border-gray-200 text-gray-700 rounded-xl font-medium text-sm hover:bg-primary-50 hover:border-primary-200 hover:text-primary-700 transition-all">
+                  <button class="px-4 py-3 bg-white border-2 border-gray-200 text-gray-700 rounded-xl font-medium text-sm hover:bg-teal-50 hover:border-teal-200 hover:text-teal-700 transition-all flex items-center gap-2">
                     <i class="fas fa-bookmark"></i>
+                    Save
+                  </button>
+                  <button class="px-4 py-3 bg-white border-2 border-gray-200 text-gray-700 rounded-xl font-medium text-sm hover:bg-teal-50 hover:border-teal-200 hover:text-teal-700 transition-all flex items-center gap-2">
+                    <i class="fas fa-share-alt"></i>
+                    Share
                   </button>
                 </div>
               </div>
@@ -589,83 +770,193 @@ onUnmounted(() => {
       </div>
     </div>
 
-    <!-- Main Grid Row 1 -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+    <!-- Main Grid Row 1 - Articles & Documents -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
       <!-- Recent Articles -->
-      <div class="lg:col-span-2 card-animated rounded-2xl p-6 stagger-2">
+      <div class="card-animated rounded-2xl p-6 stagger-2 bg-gradient-to-br from-white to-teal-50/30 border border-teal-100/50">
         <div class="flex items-center justify-between mb-5">
-          <h2 class="text-lg font-semibold text-gray-900 flex items-center gap-3">
-            <div class="icon-vibrant w-9 h-9 rounded-xl flex items-center justify-center">
-              <i class="fas fa-newspaper text-white text-sm"></i>
+          <h2 class="text-lg font-bold text-gray-900 flex items-center gap-3">
+            <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center shadow-lg shadow-teal-200">
+              <i class="fas fa-newspaper text-white"></i>
             </div>
-            Recent Articles
+            <div>
+              <span class="block">Recent Articles</span>
+              <span class="text-xs font-medium text-teal-600">Latest news & updates</span>
+            </div>
           </h2>
-          <router-link to="/articles" class="text-sm text-primary-600 hover:text-primary-700 font-medium flex items-center gap-1 group">
-            View All <i class="fas fa-arrow-right text-xs group-hover:translate-x-1 transition-transform"></i>
+          <router-link to="/articles" class="px-3 py-1.5 text-sm text-teal-600 hover:text-white bg-teal-50 hover:bg-teal-500 rounded-lg font-medium flex items-center gap-1.5 transition-all">
+            View All <i class="fas fa-arrow-right text-xs"></i>
           </router-link>
         </div>
-        <div class="space-y-3">
-          <div v-for="article in recentArticles" :key="article.id"
-               class="list-item-animated flex gap-4 p-4 rounded-xl cursor-pointer">
-            <div class="w-16 h-16 rounded-xl flex-shrink-0 flex items-center justify-center transition-transform hover:scale-110 hover:rotate-3"
-                 :class="article.iconBg">
-              <i :class="[article.icon, 'text-xl', article.iconColor]"></i>
-            </div>
-            <div class="flex-1 min-w-0">
-              <div class="flex items-center gap-2 mb-1">
-                <span :class="['text-xs font-medium px-2 py-0.5 rounded-md', article.categoryClass]">
-                  {{ article.category }}
-                </span>
-                <span class="text-xs text-gray-400">{{ article.readTime }}</span>
+        <div class="space-y-2.5">
+          <div v-for="(article, index) in recentArticles" :key="article.id"
+               @click="goToArticle(article.id)"
+               class="dashboard-article-row flex flex-row items-center gap-3 p-3 rounded-xl bg-white/80 hover:bg-white border border-gray-100 hover:border-teal-200 hover:shadow-lg cursor-pointer transition-all group">
+            <!-- Article Image -->
+            <div class="relative flex-shrink-0">
+              <div class="w-12 h-12 rounded-xl overflow-hidden transition-all group-hover:scale-110 group-hover:shadow-md">
+                <img v-if="article.image" :src="article.image" :alt="article.title" class="w-full h-full object-cover">
+                <div v-else :class="[article.iconBg, 'w-full h-full flex items-center justify-center']">
+                  <i :class="[article.icon, 'text-base', article.iconColor]"></i>
+                </div>
               </div>
-              <h4 class="font-medium text-gray-900 hover:text-primary-600 transition-colors truncate">
+              <div v-if="index === 0" class="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center">
+                <span class="text-white text-[6px] font-bold">NEW</span>
+              </div>
+            </div>
+            <!-- Article Content -->
+            <div class="flex-1 min-w-0">
+              <h4 class="font-semibold text-gray-900 text-sm truncate group-hover:text-teal-600 transition-colors">
                 {{ article.title }}
               </h4>
-              <p class="text-sm text-gray-500 mt-1 line-clamp-1">{{ article.excerpt }}</p>
-              <div class="flex items-center gap-3 mt-2">
-                <div class="flex items-center gap-2">
-                  <div class="w-5 h-5 rounded-md bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center text-white text-[10px] font-semibold">
-                    {{ article.author.initials }}
-                  </div>
-                  <span class="text-xs text-gray-500">{{ article.author.name }}</span>
-                </div>
-                <span class="text-xs text-gray-400">{{ article.date }}</span>
+              <div class="flex items-center gap-2 mt-1">
+                <span :class="['text-[10px] font-semibold px-1.5 py-0.5 rounded-full', article.categoryClass]">
+                  {{ article.category }}
+                </span>
+                <span class="text-[10px] text-gray-400">{{ article.readTime }}</span>
+                <span class="text-[10px] text-gray-400"><i class="fas fa-eye mr-0.5"></i>{{ article.views }}</span>
               </div>
+            </div>
+            <!-- Actions -->
+            <div class="flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+              <button @click.stop="goToArticle(article.id)" class="w-8 h-8 rounded-lg bg-teal-50 hover:bg-teal-100 flex items-center justify-center text-teal-500 hover:text-teal-600 transition-all" title="Read">
+                <i class="fas fa-book-open text-xs"></i>
+              </button>
+              <button @click="bookmarkArticle(article.id, $event)" :class="['w-8 h-8 rounded-lg flex items-center justify-center transition-all', isBookmarked(article.id) ? 'bg-teal-500 text-white hover:bg-teal-600' : 'bg-teal-50 hover:bg-teal-100 text-teal-500 hover:text-teal-600']" title="Bookmark">
+                <i :class="[isBookmarked(article.id) ? 'fas' : 'far', 'fa-bookmark text-xs']"></i>
+              </button>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- AI Assistant -->
-      <div class="card-animated rounded-2xl p-6 relative overflow-hidden stagger-3">
-        <div class="welcome-decoration w-24 h-24 -top-12 -right-12"></div>
-        <div class="relative">
-          <div class="flex items-center gap-3 mb-5">
-            <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center ai-glow">
-              <i class="fas fa-robot text-white"></i>
+      <!-- Recent Documents -->
+      <div class="card-animated rounded-2xl p-6 stagger-3 bg-gradient-to-br from-white to-teal-50/30 border border-teal-100/50">
+        <div class="flex items-center justify-between mb-5">
+          <h2 class="text-lg font-bold text-gray-900 flex items-center gap-3">
+            <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center shadow-lg shadow-teal-200">
+              <i class="fas fa-folder-open text-white"></i>
             </div>
             <div>
-              <h3 class="font-semibold text-gray-900">AI Assistant</h3>
-              <p class="text-xs text-gray-500">Powered by AI</p>
+              <span class="block">Recent Documents</span>
+              <span class="text-xs font-medium text-teal-600">Files & resources</span>
+            </div>
+          </h2>
+          <router-link to="/documents" class="px-3 py-1.5 text-sm text-teal-600 hover:text-white bg-teal-50 hover:bg-teal-500 rounded-lg font-medium flex items-center gap-1.5 transition-all">
+            View All <i class="fas fa-arrow-right text-xs"></i>
+          </router-link>
+        </div>
+        <div class="space-y-2.5">
+          <div v-for="(doc, index) in recentDocuments.slice(0, 4)" :key="doc.id"
+               @click="openDocument(doc.id)"
+               class="document-card flex items-center gap-3 p-3 rounded-xl bg-white/80 hover:bg-white border border-gray-100 hover:border-teal-200 hover:shadow-lg cursor-pointer transition-all group">
+            <!-- Document Icon -->
+            <div class="relative">
+              <div :class="['w-12 h-12 rounded-xl flex items-center justify-center transition-all group-hover:scale-110 group-hover:shadow-md', doc.iconBg]">
+                <i :class="[doc.icon, doc.iconColor, 'text-xl']"></i>
+              </div>
+              <div v-if="index === 0" class="absolute -top-1 -right-1 w-4 h-4 bg-teal-500 rounded-full flex items-center justify-center">
+                <i class="fas fa-arrow-up text-white text-[8px]"></i>
+              </div>
+            </div>
+            <!-- Document Info -->
+            <div class="flex-1 min-w-0">
+              <h4 class="font-semibold text-gray-900 text-sm truncate group-hover:text-teal-600 transition-colors">{{ doc.name }}</h4>
+              <div class="flex items-center gap-2 mt-1">
+                <span class="text-[10px] px-1.5 py-0.5 rounded bg-gray-100 text-gray-600 font-medium">{{ doc.type }}</span>
+                <span class="text-[10px] text-gray-400">{{ doc.size }}</span>
+                <span class="text-[10px] text-gray-300">•</span>
+                <span class="text-[10px] text-gray-400">{{ doc.modified }}</span>
+              </div>
+            </div>
+            <!-- Actions -->
+            <div class="flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+              <button @click="previewDocument(doc, $event)" class="w-8 h-8 rounded-lg bg-teal-50 hover:bg-teal-100 flex items-center justify-center text-teal-500 hover:text-teal-600 transition-all" title="Preview">
+                <i class="fas fa-eye text-xs"></i>
+              </button>
+              <button @click="downloadDocument(doc, $event)" class="w-8 h-8 rounded-lg bg-teal-50 hover:bg-teal-100 flex items-center justify-center text-teal-500 hover:text-teal-600 transition-all" title="Download">
+                <i class="fas fa-download text-xs"></i>
+              </button>
             </div>
           </div>
+        </div>
+        <!-- Upload Button -->
+        <button class="w-full mt-4 py-3 text-sm font-semibold text-teal-600 bg-teal-50 hover:bg-teal-100 border-2 border-dashed border-teal-200 hover:border-teal-300 rounded-xl transition-all flex items-center justify-center gap-2">
+          <i class="fas fa-cloud-upload-alt"></i>
+          Upload New Document
+        </button>
+      </div>
+    </div>
 
-          <div class="space-y-2 mb-5">
-            <button v-for="(action, index) in aiActions" :key="action.label"
-                    class="w-full text-left p-3 rounded-xl bg-gray-50 hover:bg-primary-50 transition-all group flex items-center gap-3"
-                    :style="{ animationDelay: (index * 0.1) + 's' }">
-              <i :class="[action.icon, 'text-gray-400 group-hover:text-primary-500 transition-colors']"></i>
-              <span class="text-sm text-gray-600 group-hover:text-gray-900 transition-colors">{{ action.label }}</span>
+    <!-- Recent Media - Enhanced Section -->
+    <div class="card-animated rounded-2xl p-5 mb-6 stagger-2 bg-gradient-to-br from-white to-teal-50/30 border border-teal-100/50">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-base font-bold text-gray-900 flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center shadow-lg shadow-teal-200">
+            <i class="fas fa-photo-film text-white text-sm"></i>
+          </div>
+          <div>
+            <span class="block">Recent Media</span>
+            <span class="text-xs font-medium text-teal-600">Videos & podcasts</span>
+          </div>
+        </h2>
+        <router-link to="/media" class="px-3 py-1.5 text-sm text-teal-600 hover:text-white bg-teal-50 hover:bg-teal-500 rounded-lg font-medium flex items-center gap-1.5 transition-all">
+          View All <i class="fas fa-arrow-right text-xs"></i>
+        </router-link>
+      </div>
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+        <div v-for="media in mediaItems" :key="media.id"
+             @click="playMedia(media.id)"
+             class="media-card cursor-pointer group rounded-xl bg-white border border-gray-100 hover:border-teal-200 hover:shadow-lg transition-all overflow-hidden">
+          <!-- Thumbnail -->
+          <div class="relative aspect-video">
+            <img v-if="media.image" :src="media.image" :alt="media.title" class="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-105">
+            <div v-else class="absolute inset-0" :class="media.gradientClass"></div>
+            <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+
+            <!-- Play Button -->
+            <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+              <div class="w-10 h-10 rounded-full bg-white/95 flex items-center justify-center shadow-lg transform scale-75 group-hover:scale-100 transition-transform">
+                <i :class="media.type === 'audio' ? 'fas fa-headphones text-violet-600' : 'fas fa-play text-teal-600 ml-0.5'" class="text-sm"></i>
+              </div>
+            </div>
+
+            <!-- Duration Badge -->
+            <div class="absolute bottom-1.5 right-1.5 px-1.5 py-0.5 rounded bg-black/80 text-white text-[10px] font-semibold backdrop-blur-sm">
+              {{ media.duration }}
+            </div>
+
+            <!-- Type Badge -->
+            <div v-if="media.type === 'audio'" class="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded-full bg-violet-500 text-white text-[9px] font-semibold flex items-center gap-1">
+              <i class="fas fa-podcast"></i> Audio
+            </div>
+            <div v-else-if="media.progress === 100" class="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded-full bg-green-500 text-white text-[9px] font-semibold flex items-center gap-1">
+              <i class="fas fa-check"></i> Watched
+            </div>
+
+            <!-- Progress Bar -->
+            <div v-if="media.progress > 0 && media.progress < 100" class="absolute bottom-0 left-0 right-0 h-1 bg-black/30">
+              <div class="h-full bg-teal-500" :style="{ width: media.progress + '%' }"></div>
+            </div>
+
+            <!-- Save Button -->
+            <button @click="saveMedia(media.id, $event)"
+                    class="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-black/50 hover:bg-teal-500 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all backdrop-blur-sm">
+              <i class="far fa-bookmark text-white text-[10px]"></i>
             </button>
           </div>
 
-          <div class="relative">
-            <input type="text"
-                   placeholder="Ask anything..."
-                   class="w-full px-4 py-3 pr-12 rounded-xl bg-gray-50 border border-gray-100 focus:bg-white focus:border-primary-300 focus:ring-4 focus:ring-primary-100 outline-none text-sm text-gray-900 placeholder-gray-400 transition-all">
-            <button class="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-lg btn-vibrant text-white flex items-center justify-center">
-              <i class="fas fa-paper-plane text-xs"></i>
-            </button>
+          <!-- Content -->
+          <div class="p-2.5">
+            <div class="flex items-center gap-1.5 mb-1">
+              <span class="text-[9px] font-semibold px-1.5 py-0.5 rounded-full bg-teal-100 text-teal-600">{{ media.category }}</span>
+            </div>
+            <h4 class="font-semibold text-gray-900 text-xs leading-tight line-clamp-2 group-hover:text-teal-600 transition-colors mb-1">{{ media.title }}</h4>
+            <div class="flex items-center gap-2 text-[10px] text-gray-400">
+              <span><i class="fas fa-eye mr-0.5"></i>{{ media.views }}</span>
+              <span>•</span>
+              <span>{{ media.date }}</span>
+            </div>
           </div>
         </div>
       </div>
@@ -712,31 +1003,73 @@ onUnmounted(() => {
       <!-- Polls -->
       <div class="card-animated rounded-2xl p-6 stagger-4">
         <div class="flex items-center justify-between mb-5">
-          <h2 class="text-base font-semibold text-gray-900 flex items-center gap-3">
-            <div class="icon-soft w-9 h-9 rounded-xl flex items-center justify-center">
-              <i class="fas fa-chart-pie text-sm"></i>
+          <h2 class="text-lg font-semibold text-gray-900 flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-purple-200">
+              <i class="fas fa-chart-pie text-white text-sm"></i>
             </div>
             Active Polls
           </h2>
-          <router-link to="/polls" class="text-sm text-primary-600 font-medium hover:text-primary-700">View All</router-link>
+          <router-link to="/polls" class="text-sm text-primary-600 font-medium hover:text-primary-700 flex items-center gap-1">
+            View All <i class="fas fa-arrow-right text-xs"></i>
+          </router-link>
         </div>
-        <div class="space-y-4">
-          <div v-for="poll in activePolls" :key="poll.id" class="p-4 rounded-xl bg-gradient-to-br from-gray-50 to-primary-50/30">
-            <h4 class="font-medium text-gray-900 text-sm mb-3">{{ poll.question }}</h4>
-            <div class="space-y-2">
-              <div v-for="option in poll.options" :key="option.label">
-                <div class="flex items-center justify-between text-xs mb-1">
-                  <span class="text-gray-600">{{ option.label }}</span>
-                  <span class="text-gray-900 font-medium">{{ option.votes }}%</span>
-                </div>
-                <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
-                  <div class="h-full progress-animated rounded-full" :style="{ width: option.votes + '%' }"></div>
+        <div class="space-y-5">
+          <div v-for="poll in activePolls" :key="poll.id" class="poll-card p-5 rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow-md transition-all">
+            <!-- Poll Header -->
+            <div class="flex items-start gap-3 mb-4">
+              <div :class="[poll.iconBg, 'w-10 h-10 rounded-xl flex items-center justify-center shadow-md flex-shrink-0']">
+                <i :class="[poll.icon, 'text-white text-sm']"></i>
+              </div>
+              <div class="flex-1 min-w-0">
+                <h4 class="font-semibold text-gray-900 text-sm leading-tight">{{ poll.question }}</h4>
+                <div class="flex items-center gap-2 mt-1">
+                  <span class="text-xs text-gray-500">{{ poll.totalVotes.toLocaleString() }} votes</span>
+                  <span class="w-1 h-1 rounded-full bg-gray-300"></span>
+                  <span class="text-xs text-amber-600 font-medium"><i class="fas fa-clock mr-1"></i>{{ poll.endsIn }}</span>
                 </div>
               </div>
             </div>
-            <div class="flex items-center justify-between mt-3 pt-3 border-t border-gray-200/50">
-              <span class="text-xs text-gray-500">{{ poll.totalVotes }} votes</span>
-              <span class="text-xs text-primary-600 font-medium">{{ poll.endsIn }}</span>
+
+            <!-- Poll Options -->
+            <div class="space-y-3">
+              <div v-for="(option, index) in poll.options" :key="option.label"
+                   class="poll-option group cursor-pointer rounded-xl p-3 bg-gray-50 hover:bg-gray-100 transition-all relative overflow-hidden">
+                <!-- Progress Background -->
+                <div class="absolute inset-0 opacity-20 transition-all"
+                     :style="{ width: option.votes + '%', backgroundColor: option.color || '#14b8a6' }"></div>
+                <div class="relative flex items-center justify-between">
+                  <div class="flex items-center gap-2">
+                    <span v-if="option.flag" class="text-lg">{{ option.flag }}</span>
+                    <span v-else class="w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold text-white"
+                          :style="{ backgroundColor: option.color || '#14b8a6' }">{{ index + 1 }}</span>
+                    <span class="text-sm font-medium text-gray-700 group-hover:text-gray-900">{{ option.label }}</span>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <div class="w-16 h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                      <div class="h-full rounded-full transition-all duration-500"
+                           :style="{ width: option.votes + '%', backgroundColor: option.color || '#14b8a6' }"></div>
+                    </div>
+                    <span class="text-sm font-bold min-w-[40px] text-right" :style="{ color: option.color || '#14b8a6' }">{{ option.votes }}%</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Poll Footer -->
+            <div class="flex items-center justify-between mt-4 pt-4 border-t border-gray-100">
+              <div v-if="poll.hasVoted" class="flex items-center gap-1.5 text-xs text-green-600 font-medium">
+                <i class="fas fa-check-circle"></i>
+                <span>You voted</span>
+              </div>
+              <div v-else class="text-xs text-gray-500">
+                <i class="fas fa-users mr-1"></i> Cast your vote
+              </div>
+              <button class="px-4 py-2 text-xs font-semibold rounded-lg transition-all"
+                      :class="poll.hasVoted
+                        ? 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                        : 'bg-gradient-to-r from-teal-500 to-teal-600 text-white shadow-md shadow-teal-200 hover:shadow-lg'">
+                {{ poll.hasVoted ? 'View Results' : 'Vote Now' }}
+              </button>
             </div>
           </div>
         </div>
@@ -780,67 +1113,6 @@ onUnmounted(() => {
     </div>
 
     <!-- Main Grid Row 3 -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-      <!-- Media Center -->
-      <div class="card-animated rounded-2xl p-6 stagger-4">
-        <div class="flex items-center justify-between mb-5">
-          <h2 class="text-base font-semibold text-gray-900 flex items-center gap-3">
-            <div class="icon-soft w-9 h-9 rounded-xl flex items-center justify-center">
-              <i class="fas fa-play-circle text-sm"></i>
-            </div>
-            Media Center
-          </h2>
-          <router-link to="/media" class="text-sm text-primary-600 font-medium hover:text-primary-700">View All</router-link>
-        </div>
-        <div class="grid grid-cols-2 gap-4">
-          <div v-for="media in mediaItems" :key="media.id" class="media-card cursor-pointer">
-            <div class="relative rounded-xl overflow-hidden aspect-video mb-2 shadow-lg">
-              <div class="absolute inset-0" :class="media.gradientClass"></div>
-              <div class="absolute inset-0 flex items-center justify-center">
-                <div class="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center transition-transform hover:scale-110">
-                  <i :class="media.type === 'audio' ? 'fas fa-headphones' : 'fas fa-play'" class="text-white text-sm"></i>
-                </div>
-              </div>
-              <div class="absolute bottom-2 right-2 px-2 py-0.5 rounded bg-black/60 text-white text-xs">
-                {{ media.duration }}
-              </div>
-            </div>
-            <h4 class="font-medium text-gray-900 text-sm truncate">{{ media.title }}</h4>
-            <p class="text-xs text-gray-500 mt-0.5">{{ media.views }} views</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Recent Documents -->
-      <div class="card-animated rounded-2xl p-6 stagger-5">
-        <div class="flex items-center justify-between mb-5">
-          <h2 class="text-base font-semibold text-gray-900 flex items-center gap-3">
-            <div class="icon-soft w-9 h-9 rounded-xl flex items-center justify-center">
-              <i class="fas fa-folder-open text-sm"></i>
-            </div>
-            Recent Documents
-          </h2>
-          <router-link to="/documents" class="text-sm text-primary-600 font-medium hover:text-primary-700">View All</router-link>
-        </div>
-        <div class="space-y-2">
-          <div v-for="doc in recentDocuments" :key="doc.id"
-               class="list-item-animated flex items-center gap-3 p-3 rounded-xl cursor-pointer">
-            <div :class="['w-10 h-10 rounded-xl flex items-center justify-center transition-transform hover:scale-110', doc.iconBg]">
-              <i :class="[doc.icon, doc.iconColor]"></i>
-            </div>
-            <div class="flex-1 min-w-0">
-              <h4 class="font-medium text-gray-900 text-sm truncate">{{ doc.name }}</h4>
-              <p class="text-xs text-gray-500">{{ doc.size }} • {{ doc.modified }}</p>
-            </div>
-            <button class="w-8 h-8 rounded-lg bg-gray-100 hover:bg-primary-100 flex items-center justify-center text-gray-400 hover:text-primary-600 transition-all">
-              <i class="fas fa-download text-xs"></i>
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Main Grid Row 4 -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <!-- Team Activity -->
       <div class="card-animated rounded-2xl p-6 stagger-5">
@@ -905,16 +1177,59 @@ onUnmounted(() => {
 .updates-carousel {
   position: relative;
   overflow: hidden;
+  width: 100%;
 }
 
 .carousel-track {
   display: flex;
+  width: 100%;
   transition: transform 0.5s ease-in-out;
 }
 
 .carousel-slide {
   min-width: 100%;
-  flex-shrink: 0;
+  width: 100%;
+  flex: 0 0 100%;
+  display: flex;
+}
+
+.slide-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  padding: 0.5rem;
+  width: 100%;
+}
+
+@media (min-width: 1024px) {
+  .slide-content {
+    flex-direction: row;
+  }
+}
+
+.slide-image {
+  width: 100%;
+}
+
+@media (min-width: 1024px) {
+  .slide-image {
+    width: 40%;
+    flex-shrink: 0;
+  }
+}
+
+.slide-text {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 1rem 0;
+  width: 100%;
+}
+
+@media (min-width: 1024px) {
+  .slide-text {
+    width: 60%;
+  }
 }
 
 .carousel-nav-btn {
@@ -923,30 +1238,33 @@ onUnmounted(() => {
   transform: translateY(-50%);
   width: 40px;
   height: 40px;
-  border-radius: 12px;
-  background: white;
-  border: 1px solid #e5e7eb;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(20, 184, 166, 0.2);
+  color: #0d9488;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  transition: all 0.3s ease;
   z-index: 10;
-  transition: all 0.2s;
-  color: #6b7280;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
 .carousel-nav-btn:hover {
-  background: #f0fdfa;
-  border-color: #14b8a6;
-  color: #14b8a6;
+  background: linear-gradient(135deg, #14b8a6, #0d9488);
+  color: white;
+  transform: translateY(-50%) scale(1.1);
+  box-shadow: 0 8px 25px rgba(20, 184, 166, 0.4);
 }
 
 .carousel-nav-btn.prev {
-  left: 0;
+  left: 16px;
 }
 
 .carousel-nav-btn.next {
-  right: 0;
+  right: 16px;
 }
 
 .carousel-dots {
@@ -960,52 +1278,69 @@ onUnmounted(() => {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #e5e7eb;
+  background: #d1d5db;
   border: none;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.3s ease;
+  padding: 0;
+}
+
+.carousel-dot:hover {
+  background: #99f6e4;
+  transform: scale(1.2);
 }
 
 .carousel-dot.active {
-  background: #14b8a6;
+  background: linear-gradient(135deg, #14b8a6, #0d9488);
   width: 24px;
-  border-radius: 4px;
+  border-radius: 12px;
 }
 
 .update-badge {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 12px;
-  border-radius: 8px;
+  padding: 4px 12px;
+  border-radius: 20px;
   font-size: 12px;
-  font-weight: 500;
-  backdrop-filter: blur(8px);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .update-badge.announcement {
-  background: rgba(245, 158, 11, 0.9);
-  color: white;
+  background: linear-gradient(135deg, #fef3c7, #fde68a);
+  color: #92400e;
 }
 
 .update-badge.article {
-  background: rgba(59, 130, 246, 0.9);
-  color: white;
+  background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+  color: #1e40af;
 }
 
 .update-badge.event {
-  background: rgba(16, 185, 129, 0.9);
-  color: white;
+  background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+  color: #065f46;
 }
 
 .update-badge.course {
-  background: rgba(139, 92, 246, 0.9);
-  color: white;
+  background: linear-gradient(135deg, #ede9fe, #ddd6fe);
+  color: #5b21b6;
 }
 
 .update-badge.policy {
-  background: rgba(239, 68, 68, 0.9);
-  color: white;
+  background: linear-gradient(135deg, #fee2e2, #fecaca);
+  color: #991b1b;
+}
+
+.update-badge.venue {
+  background: linear-gradient(135deg, #ede9fe, #ddd6fe);
+  color: #5b21b6;
+}
+
+.update-badge.stats {
+  background: linear-gradient(135deg, #fee2e2, #fecaca);
+  color: #991b1b;
 }
 
 .slide-progress {
