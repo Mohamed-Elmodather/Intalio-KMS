@@ -22,6 +22,8 @@ const showTagFilter = ref(false)
 const selectedCategories = ref<string[]>([])
 const selectedTags = ref<string[]>([])
 const currentView = ref<'all' | 'shared' | 'team' | 'starred' | 'trash'>('all')
+const isSelectionMode = ref(false)
+const selectedDocuments = ref(new Set<string>())
 
 // View Navigation Items
 const viewNavItems = [
@@ -559,7 +561,104 @@ function permanentlyDelete(doc: any) {
 }
 
 function viewDocument(doc: any) {
+  if (isSelectionMode.value) {
+    toggleDocumentSelection(doc.id)
+    return
+  }
   router.push({ name: 'DocumentView', params: { id: doc.id } })
+}
+
+// Selection Functions
+function toggleSelectionMode() {
+  isSelectionMode.value = !isSelectionMode.value
+  if (!isSelectionMode.value) {
+    selectedDocuments.value.clear()
+  }
+}
+
+function toggleDocumentSelection(docId: string) {
+  if (selectedDocuments.value.has(docId)) {
+    selectedDocuments.value.delete(docId)
+  } else {
+    selectedDocuments.value.add(docId)
+  }
+  // Force reactivity update
+  selectedDocuments.value = new Set(selectedDocuments.value)
+}
+
+function isDocumentSelected(docId: string): boolean {
+  return selectedDocuments.value.has(docId)
+}
+
+function selectAllDocuments() {
+  filteredDocuments.value.forEach(doc => {
+    selectedDocuments.value.add(doc.id)
+  })
+  selectedDocuments.value = new Set(selectedDocuments.value)
+}
+
+function clearDocumentSelection() {
+  selectedDocuments.value.clear()
+  selectedDocuments.value = new Set(selectedDocuments.value)
+}
+
+const isAllSelected = computed(() => {
+  if (filteredDocuments.value.length === 0) return false
+  return filteredDocuments.value.every(doc => selectedDocuments.value.has(doc.id))
+})
+
+const isSomeSelected = computed(() => {
+  return selectedDocuments.value.size > 0 && !isAllSelected.value
+})
+
+const selectedCount = computed(() => selectedDocuments.value.size)
+
+// Bulk Actions
+function bulkDownload() {
+  const selectedDocs = documents.value.filter(d => selectedDocuments.value.has(d.id))
+  console.log('Downloading:', selectedDocs.map(d => d.name))
+  alert(`Downloading ${selectedDocs.length} files...`)
+}
+
+function bulkShare() {
+  const selectedDocs = documents.value.filter(d => selectedDocuments.value.has(d.id))
+  console.log('Sharing:', selectedDocs.map(d => d.name))
+  alert(`Sharing ${selectedDocs.length} files...`)
+}
+
+function bulkStar() {
+  documents.value.forEach(doc => {
+    if (selectedDocuments.value.has(doc.id)) {
+      doc.isStarred = true
+    }
+  })
+  clearDocumentSelection()
+}
+
+function bulkMoveToTrash() {
+  documents.value.forEach(doc => {
+    if (selectedDocuments.value.has(doc.id)) {
+      doc.isTrashed = true
+    }
+  })
+  clearDocumentSelection()
+  isSelectionMode.value = false
+}
+
+function bulkRestore() {
+  documents.value.forEach(doc => {
+    if (selectedDocuments.value.has(doc.id)) {
+      doc.isTrashed = false
+    }
+  })
+  clearDocumentSelection()
+}
+
+function bulkPermanentDelete() {
+  const idsToDelete = Array.from(selectedDocuments.value)
+  documents.value = documents.value.filter(d => !idsToDelete.includes(d.id))
+  clearDocumentSelection()
+  isSelectionMode.value = false
 }
 
 function clearFilters() {
@@ -922,8 +1021,15 @@ function getFileIconBg(type: string): string {
               <button class="w-9 h-9 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-800 flex items-center justify-center transition-all" title="Refresh">
                 <i class="fas fa-sync-alt text-sm"></i>
               </button>
-              <button class="w-9 h-9 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-800 flex items-center justify-center transition-all" title="Select multiple">
-                <i class="fas fa-check-square text-sm"></i>
+              <button
+                @click="toggleSelectionMode"
+                :class="[
+                  'w-9 h-9 rounded-lg flex items-center justify-center transition-all',
+                  isSelectionMode ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-800'
+                ]"
+                :title="isSelectionMode ? 'Exit selection mode' : 'Select multiple'"
+              >
+                <i :class="isSelectionMode ? 'fas fa-times' : 'fas fa-check-square'" class="text-sm"></i>
               </button>
 
               <!-- More Options Dropdown -->
@@ -1403,248 +1509,536 @@ function getFileIconBg(type: string): string {
           </div>
 
           <!-- Files Content Area -->
-          <div class="flex-1 p-4">
+          <div class="flex-1 p-5 bg-gradient-to-br from-gray-50/50 to-white">
             <!-- Active Filters -->
-            <div v-if="selectedFolder || selectedFileTypes.length > 0 || searchQuery || selectedCategories.length > 0 || selectedTags.length > 0" class="flex items-center gap-2 mb-4 pb-3 border-b border-gray-100">
-              <span class="text-xs text-gray-500">Filters:</span>
-              <div class="flex flex-wrap gap-1.5">
-                <span v-if="selectedFolder" class="px-2 py-0.5 bg-teal-100 text-teal-700 rounded-full text-xs font-medium flex items-center gap-1">
+            <div v-if="selectedFolder || selectedFileTypes.length > 0 || searchQuery || selectedCategories.length > 0 || selectedTags.length > 0" class="flex items-center gap-3 mb-5 p-3 bg-white rounded-xl border border-gray-100 shadow-sm">
+              <div class="flex items-center gap-2 px-2 py-1 bg-gray-100 rounded-lg">
+                <i class="fas fa-filter text-gray-400 text-xs"></i>
+                <span class="text-xs font-medium text-gray-600">Active Filters</span>
+              </div>
+              <div class="flex flex-wrap gap-2 flex-1">
+                <span v-if="selectedFolder" class="px-2.5 py-1 bg-teal-50 text-teal-700 rounded-lg text-xs font-medium flex items-center gap-1.5 border border-teal-100">
                   <i class="fas fa-folder text-[10px]"></i>
                   {{ selectedFolder }}
-                  <button @click="selectedFolder = null" class="ml-1 hover:text-teal-900"><i class="fas fa-times text-[10px]"></i></button>
+                  <button @click="selectedFolder = null" class="ml-1 hover:text-teal-900 hover:bg-teal-100 rounded-full w-4 h-4 flex items-center justify-center"><i class="fas fa-times text-[10px]"></i></button>
                 </span>
                 <span
                   v-for="categoryId in selectedCategories"
                   :key="'filter-category-' + categoryId"
-                  class="px-2 py-0.5 bg-teal-100 text-teal-700 rounded-full text-xs font-medium flex items-center gap-1"
+                  class="px-2.5 py-1 bg-purple-50 text-purple-700 rounded-lg text-xs font-medium flex items-center gap-1.5 border border-purple-100"
                 >
                   <i class="fas fa-layer-group text-[10px]"></i>
                   {{ libraries.find(l => l.id === categoryId)?.name }}
-                  <button @click="toggleCategory(categoryId)" class="ml-1 hover:text-teal-900"><i class="fas fa-times text-[10px]"></i></button>
+                  <button @click="toggleCategory(categoryId)" class="ml-1 hover:text-purple-900 hover:bg-purple-100 rounded-full w-4 h-4 flex items-center justify-center"><i class="fas fa-times text-[10px]"></i></button>
                 </span>
                 <span
                   v-for="typeId in selectedFileTypes"
                   :key="'filter-type-' + typeId"
-                  class="px-2 py-0.5 bg-teal-100 text-teal-700 rounded-full text-xs font-medium flex items-center gap-1"
+                  class="px-2.5 py-1 bg-blue-50 text-blue-700 rounded-lg text-xs font-medium flex items-center gap-1.5 border border-blue-100"
                 >
                   <i :class="[fileTypes.find(t => t.id === typeId)?.icon, 'text-[10px]']"></i>
                   {{ fileTypes.find(t => t.id === typeId)?.label }}
-                  <button @click="toggleFileType(typeId)" class="ml-1 hover:text-teal-900"><i class="fas fa-times text-[10px]"></i></button>
+                  <button @click="toggleFileType(typeId)" class="ml-1 hover:text-blue-900 hover:bg-blue-100 rounded-full w-4 h-4 flex items-center justify-center"><i class="fas fa-times text-[10px]"></i></button>
                 </span>
                 <span
                   v-for="tag in selectedTags"
                   :key="'filter-tag-' + tag"
-                  class="px-2 py-0.5 bg-teal-100 text-teal-700 rounded-full text-xs font-medium flex items-center gap-1"
+                  class="px-2.5 py-1 bg-amber-50 text-amber-700 rounded-lg text-xs font-medium flex items-center gap-1.5 border border-amber-100"
                 >
                   <i class="fas fa-tag text-[10px]"></i>
                   {{ tag }}
-                  <button @click="toggleTag(tag)" class="ml-1 hover:text-teal-900"><i class="fas fa-times text-[10px]"></i></button>
+                  <button @click="toggleTag(tag)" class="ml-1 hover:text-amber-900 hover:bg-amber-100 rounded-full w-4 h-4 flex items-center justify-center"><i class="fas fa-times text-[10px]"></i></button>
                 </span>
-                <span v-if="searchQuery" class="px-2 py-0.5 bg-gray-100 text-gray-700 rounded-full text-xs font-medium flex items-center gap-1">
+                <span v-if="searchQuery" class="px-2.5 py-1 bg-gray-100 text-gray-700 rounded-lg text-xs font-medium flex items-center gap-1.5 border border-gray-200">
                   <i class="fas fa-search text-[10px]"></i>
                   "{{ searchQuery }}"
-                  <button @click="searchQuery = ''" class="ml-1 hover:text-gray-900"><i class="fas fa-times text-[10px]"></i></button>
+                  <button @click="searchQuery = ''" class="ml-1 hover:text-gray-900 hover:bg-gray-200 rounded-full w-4 h-4 flex items-center justify-center"><i class="fas fa-times text-[10px]"></i></button>
                 </span>
               </div>
-              <button @click="clearFilters(); selectedFolder = null" class="text-xs text-gray-500 hover:text-gray-700 ml-auto">Clear all</button>
+              <button @click="clearFilters(); selectedFolder = null" class="px-3 py-1.5 text-xs font-medium text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors flex items-center gap-1.5">
+                <i class="fas fa-times-circle"></i>
+                Clear all
+              </button>
             </div>
 
             <!-- Breadcrumb -->
-            <div class="flex items-center gap-2 mb-4 text-sm">
-              <button @click="currentView = 'all'; selectedFolder = null" class="text-gray-500 hover:text-teal-600 transition-colors">
-                <i class="fas fa-home"></i>
-              </button>
-              <i class="fas fa-chevron-right text-gray-300 text-xs"></i>
-              <span class="text-gray-700 font-medium flex items-center gap-2">
-                <i :class="[viewNavItems.find(v => v.id === currentView)?.icon, viewNavItems.find(v => v.id === currentView)?.color, 'text-sm']"></i>
-                {{ viewNavItems.find(v => v.id === currentView)?.name }}
-              </span>
-              <template v-if="selectedFolder">
+            <div v-if="!isSelectionMode || selectedCount === 0" class="flex items-center justify-between mb-5">
+              <div class="flex items-center gap-2 text-sm bg-white px-4 py-2 rounded-xl border border-gray-100 shadow-sm">
+                <button @click="currentView = 'all'; selectedFolder = null" class="w-7 h-7 rounded-lg bg-gray-100 text-gray-500 hover:bg-teal-100 hover:text-teal-600 flex items-center justify-center transition-all">
+                  <i class="fas fa-home text-xs"></i>
+                </button>
                 <i class="fas fa-chevron-right text-gray-300 text-xs"></i>
-                <span class="text-gray-600">{{ selectedFolder }}</span>
-              </template>
-              <span class="text-gray-400 text-xs ml-2">({{ filteredDocuments.length }} items)</span>
+                <span class="text-gray-700 font-medium flex items-center gap-2 px-2 py-1 bg-gray-50 rounded-lg">
+                  <i :class="[viewNavItems.find(v => v.id === currentView)?.icon, viewNavItems.find(v => v.id === currentView)?.color, 'text-sm']"></i>
+                  {{ viewNavItems.find(v => v.id === currentView)?.name }}
+                </span>
+                <template v-if="selectedFolder">
+                  <i class="fas fa-chevron-right text-gray-300 text-xs"></i>
+                  <span class="text-gray-600 px-2 py-1 bg-gray-50 rounded-lg">{{ selectedFolder }}</span>
+                </template>
+              </div>
+              <div class="flex items-center gap-2 text-xs text-gray-500 bg-white px-3 py-2 rounded-lg border border-gray-100">
+                <i class="fas fa-file-alt text-teal-500"></i>
+                <span class="font-medium">{{ filteredDocuments.length }}</span>
+                <span>items</span>
+              </div>
+            </div>
+
+            <!-- Selection Toolbar -->
+            <div v-if="isSelectionMode && selectedCount > 0" class="flex items-center justify-between mb-5 p-3 bg-gradient-to-r from-teal-500 to-teal-600 rounded-xl shadow-lg shadow-teal-200/50 animate-slideDown">
+              <div class="flex items-center gap-4">
+                <!-- Select All Checkbox -->
+                <button
+                  @click="isAllSelected ? clearDocumentSelection() : selectAllDocuments()"
+                  class="flex items-center gap-2 text-white hover:bg-white/10 px-3 py-1.5 rounded-lg transition-all"
+                >
+                  <div :class="[
+                    'w-5 h-5 rounded border-2 flex items-center justify-center transition-all',
+                    isAllSelected ? 'bg-white border-white' : isSomeSelected ? 'bg-white/50 border-white' : 'border-white/70'
+                  ]">
+                    <i v-if="isAllSelected" class="fas fa-check text-teal-600 text-[10px]"></i>
+                    <i v-else-if="isSomeSelected" class="fas fa-minus text-teal-600 text-[10px]"></i>
+                  </div>
+                  <span class="text-sm font-medium">{{ isAllSelected ? 'Deselect all' : 'Select all' }}</span>
+                </button>
+
+                <!-- Selected Count -->
+                <div class="flex items-center gap-2 px-3 py-1.5 bg-white/20 rounded-lg">
+                  <i class="fas fa-check-circle text-white/80"></i>
+                  <span class="text-white text-sm font-semibold">{{ selectedCount }} selected</span>
+                </div>
+              </div>
+
+              <!-- Bulk Actions -->
+              <div class="flex items-center gap-2">
+                <template v-if="currentView !== 'trash'">
+                  <button
+                    @click="bulkStar"
+                    class="flex items-center gap-2 px-3 py-2 bg-white/20 hover:bg-white/30 text-white rounded-lg transition-all text-sm font-medium"
+                    title="Star selected"
+                  >
+                    <i class="fas fa-star"></i>
+                    <span class="hidden sm:inline">Star</span>
+                  </button>
+                  <button
+                    @click="bulkDownload"
+                    class="flex items-center gap-2 px-3 py-2 bg-white/20 hover:bg-white/30 text-white rounded-lg transition-all text-sm font-medium"
+                    title="Download selected"
+                  >
+                    <i class="fas fa-download"></i>
+                    <span class="hidden sm:inline">Download</span>
+                  </button>
+                  <button
+                    @click="bulkShare"
+                    class="flex items-center gap-2 px-3 py-2 bg-white/20 hover:bg-white/30 text-white rounded-lg transition-all text-sm font-medium"
+                    title="Share selected"
+                  >
+                    <i class="fas fa-share-alt"></i>
+                    <span class="hidden sm:inline">Share</span>
+                  </button>
+                  <div class="w-px h-6 bg-white/30 mx-1"></div>
+                  <button
+                    @click="bulkMoveToTrash"
+                    class="flex items-center gap-2 px-3 py-2 bg-red-500/80 hover:bg-red-500 text-white rounded-lg transition-all text-sm font-medium"
+                    title="Move to trash"
+                  >
+                    <i class="fas fa-trash-alt"></i>
+                    <span class="hidden sm:inline">Delete</span>
+                  </button>
+                </template>
+                <template v-else>
+                  <button
+                    @click="bulkRestore"
+                    class="flex items-center gap-2 px-3 py-2 bg-white/20 hover:bg-white/30 text-white rounded-lg transition-all text-sm font-medium"
+                    title="Restore selected"
+                  >
+                    <i class="fas fa-undo"></i>
+                    <span class="hidden sm:inline">Restore</span>
+                  </button>
+                  <button
+                    @click="bulkPermanentDelete"
+                    class="flex items-center gap-2 px-3 py-2 bg-red-500/80 hover:bg-red-500 text-white rounded-lg transition-all text-sm font-medium"
+                    title="Delete permanently"
+                  >
+                    <i class="fas fa-trash"></i>
+                    <span class="hidden sm:inline">Delete Forever</span>
+                  </button>
+                </template>
+
+                <!-- Cancel -->
+                <button
+                  @click="toggleSelectionMode"
+                  class="flex items-center gap-2 px-3 py-2 bg-white text-teal-600 hover:bg-gray-100 rounded-lg transition-all text-sm font-medium ml-2"
+                >
+                  <i class="fas fa-times"></i>
+                  <span class="hidden sm:inline">Cancel</span>
+                </button>
+              </div>
             </div>
 
             <!-- Loading State -->
-            <div v-if="isLoading" class="p-12 text-center">
-              <div class="w-10 h-10 border-4 border-teal-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-              <p class="text-gray-500 text-sm">Loading documents...</p>
+            <div v-if="isLoading" class="flex flex-col items-center justify-center py-20">
+              <div class="relative">
+                <div class="w-16 h-16 border-4 border-teal-100 rounded-full"></div>
+                <div class="w-16 h-16 border-4 border-teal-500 border-t-transparent rounded-full animate-spin absolute top-0 left-0"></div>
+              </div>
+              <p class="text-gray-500 text-sm mt-4 font-medium">Loading documents...</p>
             </div>
 
             <!-- Empty State -->
-            <div v-else-if="filteredDocuments.length === 0" class="p-12 text-center">
-              <div class="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <i class="fas fa-folder-open text-2xl text-gray-300"></i>
+            <div v-else-if="filteredDocuments.length === 0" class="flex flex-col items-center justify-center py-16 bg-white rounded-2xl border border-gray-100">
+              <div class="w-24 h-24 bg-gradient-to-br from-gray-100 to-gray-50 rounded-3xl flex items-center justify-center mb-6 shadow-inner">
+                <i class="fas fa-folder-open text-4xl text-gray-300"></i>
               </div>
-              <h3 class="text-base font-semibold text-gray-700">No files found</h3>
-              <p class="text-gray-500 text-sm mt-1 mb-4">Try adjusting your filters or upload a new file</p>
-              <button @click="clearFilters; selectedFolder = null" class="px-4 py-2 bg-teal-500 text-white rounded-lg text-sm font-medium hover:bg-teal-600 transition-colors">
-                Clear Filters
-              </button>
+              <h3 class="text-lg font-semibold text-gray-700 mb-2">No files found</h3>
+              <p class="text-gray-500 text-sm mb-6 max-w-xs text-center">Try adjusting your filters or upload a new file to get started</p>
+              <div class="flex items-center gap-3">
+                <button @click="clearFilters; selectedFolder = null" class="px-5 py-2.5 bg-gray-100 text-gray-700 rounded-xl text-sm font-medium hover:bg-gray-200 transition-colors flex items-center gap-2">
+                  <i class="fas fa-filter-circle-xmark"></i>
+                  Clear Filters
+                </button>
+                <button class="px-5 py-2.5 bg-gradient-to-r from-teal-500 to-teal-600 text-white rounded-xl text-sm font-medium hover:from-teal-600 hover:to-teal-700 transition-all shadow-sm shadow-teal-200 flex items-center gap-2">
+                  <i class="fas fa-cloud-arrow-up"></i>
+                  Upload Files
+                </button>
+              </div>
             </div>
 
             <!-- Documents Grid View -->
-            <div v-else-if="viewMode === 'grid'" class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3">
+            <div v-else-if="viewMode === 'grid'" class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
               <div
                 v-for="doc in filteredDocuments"
                 :key="doc.id"
                 @click="viewDocument(doc)"
-                class="group bg-white/80 hover:bg-white rounded-xl p-3 hover:shadow-lg cursor-pointer transition-all border border-gray-100 hover:border-teal-200"
+                :class="[
+                  'group bg-white rounded-2xl p-4 cursor-pointer transition-all duration-300 border-2',
+                  isDocumentSelected(doc.id)
+                    ? 'border-teal-500 shadow-lg shadow-teal-100 ring-2 ring-teal-200'
+                    : 'border-gray-100 hover:border-teal-200 hover:shadow-xl hover:-translate-y-1'
+                ]"
               >
                 <!-- Thumbnail / Icon -->
-                <div class="relative mb-2">
-                  <div v-if="doc.thumbnail" class="h-24 rounded-lg overflow-hidden">
-                    <img :src="doc.thumbnail" :alt="doc.name" class="w-full h-full object-cover group-hover:scale-105 transition-transform">
+                <div class="relative mb-3">
+                  <div v-if="doc.thumbnail" class="h-32 rounded-xl overflow-hidden shadow-sm">
+                    <img :src="doc.thumbnail" :alt="doc.name" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                   </div>
-                  <div v-else :class="['h-24 rounded-lg flex items-center justify-center', getFileIconBg(doc.type)]">
-                    <i :class="[getFileIcon(doc.type), getFileIconColor(doc.type), 'text-3xl']"></i>
+                  <div v-else :class="['h-32 rounded-xl flex items-center justify-center relative overflow-hidden', getFileIconBg(doc.type)]">
+                    <div class="absolute inset-0 opacity-30" :class="getFileIconBg(doc.type)"></div>
+                    <i :class="[getFileIcon(doc.type), getFileIconColor(doc.type), 'text-4xl relative z-10 group-hover:scale-110 transition-transform duration-300']"></i>
+                  </div>
+
+                  <!-- Selection Checkbox -->
+                  <div
+                    v-if="isSelectionMode"
+                    @click.stop="toggleDocumentSelection(doc.id)"
+                    :class="[
+                      'absolute top-2 left-2 w-6 h-6 rounded-lg border-2 flex items-center justify-center cursor-pointer transition-all z-20',
+                      isDocumentSelected(doc.id)
+                        ? 'bg-teal-500 border-teal-500 text-white'
+                        : 'bg-white/90 border-gray-300 hover:border-teal-400'
+                    ]"
+                  >
+                    <i v-if="isDocumentSelected(doc.id)" class="fas fa-check text-xs"></i>
+                  </div>
+
+                  <!-- File Type Badge -->
+                  <div class="absolute bottom-2 left-2">
+                    <span :class="['px-2 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wide shadow-sm', getFileIconBg(doc.type), getFileIconColor(doc.type)]">
+                      {{ doc.type }}
+                    </span>
                   </div>
 
                   <!-- Quick Actions -->
-                  <div class="absolute top-1.5 right-1.5 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div v-if="!isSelectionMode" class="absolute top-2 right-2 flex gap-1.5 opacity-0 group-hover:opacity-100 transition-all duration-200">
                     <button
                       v-if="currentView !== 'trash'"
                       @click.stop="toggleStar(doc)"
                       :class="[
-                        'w-6 h-6 rounded-md flex items-center justify-center transition-all',
-                        doc.isStarred ? 'bg-amber-400 text-white' : 'bg-white/90 text-gray-500 hover:bg-white'
-                      ]"
-                      :title="doc.isStarred ? 'Remove from Starred' : 'Add to Starred'"
-                    >
-                      <i class="fas fa-star text-[10px]"></i>
-                    </button>
-                    <button
-                      v-if="currentView === 'trash'"
-                      @click.stop="restoreFromTrash(doc)"
-                      class="w-6 h-6 rounded-md bg-teal-500 text-white hover:bg-teal-600 flex items-center justify-center transition-all"
-                      title="Restore"
-                    >
-                      <i class="fas fa-undo text-[10px]"></i>
-                    </button>
-                    <button
-                      v-if="currentView === 'trash'"
-                      @click.stop="permanentlyDelete(doc)"
-                      class="w-6 h-6 rounded-md bg-red-500 text-white hover:bg-red-600 flex items-center justify-center transition-all"
-                      title="Delete permanently"
-                    >
-                      <i class="fas fa-trash text-[10px]"></i>
-                    </button>
-                    <button
-                      v-if="currentView !== 'trash'"
-                      @click.stop="downloadDocument(doc)"
-                      class="w-6 h-6 rounded-md bg-white/90 text-gray-500 hover:bg-white flex items-center justify-center transition-all"
-                    >
-                      <i class="fas fa-download text-[10px]"></i>
-                    </button>
-                  </div>
-
-                  <!-- Badges -->
-                  <div class="absolute top-1.5 left-1.5 flex flex-col gap-0.5">
-                    <span v-if="doc.isStarred" class="px-1.5 py-0.5 bg-amber-400 text-white text-[8px] font-bold rounded">
-                      <i class="fas fa-star"></i>
-                    </span>
-                    <span v-if="doc.isShared" class="px-1.5 py-0.5 bg-blue-500 text-white text-[8px] font-bold rounded">
-                      <i class="fas fa-share-alt"></i>
-                    </span>
-                  </div>
-                </div>
-
-                <!-- Info -->
-                <h4 class="font-medium text-gray-900 text-xs truncate group-hover:text-teal-600 transition-colors">{{ doc.name }}</h4>
-
-                <!-- Meta -->
-                <div class="flex items-center justify-between mt-1.5 text-[10px] text-gray-400">
-                  <span>{{ getRelativeTime(doc.updatedAt) }}</span>
-                  <span>{{ formatFileSize(doc.size) }}</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Documents List View -->
-            <div v-else class="border border-gray-100 rounded-xl overflow-hidden">
-              <div
-                v-for="(doc, index) in filteredDocuments"
-                :key="doc.id"
-                @click="viewDocument(doc)"
-                :class="[
-                  'group flex items-center gap-3 p-3 cursor-pointer bg-white/80 hover:bg-white hover:shadow-lg transition-all',
-                  index !== filteredDocuments.length - 1 ? 'border-b border-gray-100' : ''
-                ]"
-              >
-                <!-- Icon -->
-                <div :class="['w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 transition-transform group-hover:scale-110 group-hover:shadow-md', getFileIconBg(doc.type)]">
-                  <i :class="[getFileIcon(doc.type), getFileIconColor(doc.type), 'text-lg']"></i>
-                </div>
-
-                <!-- Info -->
-                <div class="flex-1 min-w-0">
-                  <div class="flex items-center gap-2">
-                    <h4 class="font-medium text-gray-900 text-sm truncate hover:text-teal-600 transition-colors">{{ doc.name }}</h4>
-                    <span v-if="doc.isStarred" class="px-1 py-0.5 bg-amber-100 text-amber-600 text-[8px] font-bold rounded">
-                      <i class="fas fa-star"></i>
-                    </span>
-                    <span v-if="doc.isShared" class="px-1 py-0.5 bg-blue-100 text-blue-700 text-[8px] font-bold rounded">
-                      <i class="fas fa-share-alt"></i>
-                    </span>
-                  </div>
-                  <div class="flex items-center gap-2 mt-0.5 text-[10px] text-gray-500">
-                    <span>{{ formatFileSize(doc.size) }}</span>
-                    <span class="text-gray-300">•</span>
-                    <span>{{ getRelativeTime(doc.updatedAt) }}</span>
-                    <span class="text-gray-300">•</span>
-                    <span class="flex items-center gap-1"><i class="fas fa-download text-gray-400"></i> {{ doc.downloads }}</span>
-                  </div>
-                </div>
-
-                <!-- Actions -->
-                <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <template v-if="currentView !== 'trash'">
-                    <button
-                      @click.stop="toggleStar(doc)"
-                      :class="[
-                        'w-7 h-7 rounded-lg flex items-center justify-center transition-all',
-                        doc.isStarred ? 'bg-amber-100 text-amber-600' : 'bg-gray-100 text-gray-500 hover:bg-amber-100 hover:text-amber-600'
+                        'w-7 h-7 rounded-lg flex items-center justify-center transition-all shadow-sm backdrop-blur-sm',
+                        doc.isStarred ? 'bg-amber-400 text-white' : 'bg-white/95 text-gray-500 hover:bg-amber-400 hover:text-white'
                       ]"
                       :title="doc.isStarred ? 'Remove from Starred' : 'Add to Starred'"
                     >
                       <i class="fas fa-star text-xs"></i>
                     </button>
                     <button
-                      @click.stop="downloadDocument(doc)"
-                      class="w-7 h-7 rounded-lg bg-gray-100 text-gray-500 hover:bg-teal-100 hover:text-teal-600 flex items-center justify-center transition-all"
-                    >
-                      <i class="fas fa-download text-xs"></i>
-                    </button>
-                    <button
-                      @click.stop="shareDocument(doc)"
-                      class="w-7 h-7 rounded-lg bg-gray-100 text-gray-500 hover:bg-blue-100 hover:text-blue-600 flex items-center justify-center transition-all"
-                    >
-                      <i class="fas fa-share-alt text-xs"></i>
-                    </button>
-                    <button
-                      @click.stop="moveToTrash(doc)"
-                      class="w-7 h-7 rounded-lg bg-gray-100 text-gray-500 hover:bg-red-100 hover:text-red-600 flex items-center justify-center transition-all"
-                    >
-                      <i class="fas fa-trash-alt text-xs"></i>
-                    </button>
-                  </template>
-                  <template v-else>
-                    <button
+                      v-if="currentView === 'trash'"
                       @click.stop="restoreFromTrash(doc)"
-                      class="w-7 h-7 rounded-lg bg-teal-100 text-teal-600 hover:bg-teal-200 flex items-center justify-center transition-all"
+                      class="w-7 h-7 rounded-lg bg-teal-500 text-white hover:bg-teal-600 flex items-center justify-center transition-all shadow-sm"
                       title="Restore"
                     >
                       <i class="fas fa-undo text-xs"></i>
                     </button>
                     <button
+                      v-if="currentView === 'trash'"
                       @click.stop="permanentlyDelete(doc)"
-                      class="w-7 h-7 rounded-lg bg-red-100 text-red-600 hover:bg-red-200 flex items-center justify-center transition-all"
+                      class="w-7 h-7 rounded-lg bg-red-500 text-white hover:bg-red-600 flex items-center justify-center transition-all shadow-sm"
                       title="Delete permanently"
                     >
                       <i class="fas fa-trash text-xs"></i>
                     </button>
-                  </template>
+                    <button
+                      v-if="currentView !== 'trash'"
+                      @click.stop="downloadDocument(doc)"
+                      class="w-7 h-7 rounded-lg bg-white/95 text-gray-500 hover:bg-teal-500 hover:text-white flex items-center justify-center transition-all shadow-sm backdrop-blur-sm"
+                      title="Download"
+                    >
+                      <i class="fas fa-download text-xs"></i>
+                    </button>
+                    <button
+                      v-if="currentView !== 'trash'"
+                      @click.stop="shareDocument(doc)"
+                      class="w-7 h-7 rounded-lg bg-white/95 text-gray-500 hover:bg-blue-500 hover:text-white flex items-center justify-center transition-all shadow-sm backdrop-blur-sm"
+                      title="Share"
+                    >
+                      <i class="fas fa-share-alt text-xs"></i>
+                    </button>
+                  </div>
+
+                  <!-- Status Badges (hide when in selection mode) -->
+                  <div v-if="!isSelectionMode" class="absolute top-2 left-2 flex flex-col gap-1">
+                    <span v-if="doc.isStarred && !doc.isShared" class="w-6 h-6 bg-amber-400 text-white rounded-lg flex items-center justify-center shadow-sm">
+                      <i class="fas fa-star text-[10px]"></i>
+                    </span>
+                    <span v-if="doc.isShared" class="w-6 h-6 bg-blue-500 text-white rounded-lg flex items-center justify-center shadow-sm">
+                      <i class="fas fa-share-alt text-[10px]"></i>
+                    </span>
+                  </div>
+                </div>
+
+                <!-- Info -->
+                <h4 class="font-semibold text-gray-900 text-sm truncate group-hover:text-teal-600 transition-colors mb-2">{{ doc.name }}</h4>
+
+                <!-- Tags -->
+                <div v-if="doc.tags && doc.tags.length > 0" class="flex flex-wrap gap-1 mb-2">
+                  <span v-for="tag in doc.tags.slice(0, 2)" :key="tag" class="px-1.5 py-0.5 bg-gray-100 text-gray-500 text-[9px] rounded-md font-medium">
+                    {{ tag }}
+                  </span>
+                  <span v-if="doc.tags.length > 2" class="px-1.5 py-0.5 bg-gray-100 text-gray-400 text-[9px] rounded-md font-medium">
+                    +{{ doc.tags.length - 2 }}
+                  </span>
+                </div>
+
+                <!-- Meta Row -->
+                <div class="flex items-center justify-between pt-2 border-t border-gray-100">
+                  <!-- Author -->
+                  <div class="flex items-center gap-1.5">
+                    <div
+                      class="w-5 h-5 rounded-full flex items-center justify-center text-white text-[8px] font-bold"
+                      :style="{ backgroundColor: doc.author.color }"
+                    >
+                      {{ doc.author.initials }}
+                    </div>
+                    <span class="text-[10px] text-gray-500 truncate max-w-[60px]">{{ doc.author.name }}</span>
+                  </div>
+                  <!-- Size & Date -->
+                  <div class="flex items-center gap-2 text-[10px] text-gray-400">
+                    <span>{{ formatFileSize(doc.size) }}</span>
+                    <span class="w-1 h-1 bg-gray-300 rounded-full"></span>
+                    <span>{{ getRelativeTime(doc.updatedAt) }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Documents List View -->
+            <div v-else class="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm">
+              <!-- Table Header -->
+              <div :class="[
+                'grid gap-4 px-4 py-3 bg-gray-50 border-b border-gray-100 text-xs font-semibold text-gray-500 uppercase tracking-wider',
+                isSelectionMode ? 'grid-cols-13' : 'grid-cols-12'
+              ]">
+                <!-- Select All Checkbox -->
+                <div v-if="isSelectionMode" class="col-span-1 flex items-center">
+                  <button
+                    @click="isAllSelected ? clearDocumentSelection() : selectAllDocuments()"
+                    :class="[
+                      'w-5 h-5 rounded border-2 flex items-center justify-center transition-all',
+                      isAllSelected ? 'bg-teal-500 border-teal-500 text-white' : isSomeSelected ? 'bg-teal-200 border-teal-400' : 'border-gray-300 hover:border-teal-400'
+                    ]"
+                  >
+                    <i v-if="isAllSelected" class="fas fa-check text-[10px]"></i>
+                    <i v-else-if="isSomeSelected" class="fas fa-minus text-[10px] text-teal-600"></i>
+                  </button>
+                </div>
+                <div :class="isSelectionMode ? 'col-span-4' : 'col-span-5'" class="flex items-center gap-2">
+                  <i class="fas fa-file-alt text-gray-400"></i>
+                  Name
+                </div>
+                <div class="col-span-2 hidden md:flex items-center gap-2">
+                  <i class="fas fa-user text-gray-400"></i>
+                  Author
+                </div>
+                <div class="col-span-2 hidden lg:flex items-center gap-2">
+                  <i class="fas fa-tags text-gray-400"></i>
+                  Tags
+                </div>
+                <div class="col-span-1 hidden sm:flex items-center gap-2">
+                  <i class="fas fa-hdd text-gray-400"></i>
+                  Size
+                </div>
+                <div class="col-span-1 hidden sm:flex items-center gap-2">
+                  <i class="fas fa-clock text-gray-400"></i>
+                  Modified
+                </div>
+                <div class="col-span-1 text-right">Actions</div>
+              </div>
+
+              <!-- Table Body -->
+              <div class="divide-y divide-gray-50">
+                <div
+                  v-for="doc in filteredDocuments"
+                  :key="doc.id"
+                  @click="viewDocument(doc)"
+                  :class="[
+                    'group grid gap-4 px-4 py-3 cursor-pointer transition-all duration-200',
+                    isSelectionMode ? 'grid-cols-13' : 'grid-cols-12',
+                    isDocumentSelected(doc.id)
+                      ? 'bg-teal-50 border-l-4 border-l-teal-500'
+                      : 'bg-white hover:bg-gradient-to-r hover:from-teal-50/50 hover:to-white'
+                  ]"
+                >
+                  <!-- Selection Checkbox -->
+                  <div v-if="isSelectionMode" class="col-span-1 flex items-center">
+                    <div
+                      @click.stop="toggleDocumentSelection(doc.id)"
+                      :class="[
+                        'w-5 h-5 rounded border-2 flex items-center justify-center cursor-pointer transition-all',
+                        isDocumentSelected(doc.id)
+                          ? 'bg-teal-500 border-teal-500 text-white'
+                          : 'border-gray-300 hover:border-teal-400 group-hover:border-teal-300'
+                      ]"
+                    >
+                      <i v-if="isDocumentSelected(doc.id)" class="fas fa-check text-[10px]"></i>
+                    </div>
+                  </div>
+
+                  <!-- Name Column -->
+                  <div :class="isSelectionMode ? 'col-span-4' : 'col-span-5'" class="flex items-center gap-3 min-w-0">
+                    <div :class="['w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-all duration-200 group-hover:scale-110 group-hover:shadow-md', getFileIconBg(doc.type)]">
+                      <i :class="[getFileIcon(doc.type), getFileIconColor(doc.type), 'text-lg']"></i>
+                    </div>
+                    <div class="min-w-0 flex-1">
+                      <div class="flex items-center gap-2">
+                        <h4 class="font-medium text-gray-900 text-sm truncate group-hover:text-teal-600 transition-colors">{{ doc.name }}</h4>
+                        <span v-if="doc.isStarred" class="w-5 h-5 bg-amber-100 text-amber-500 rounded-md flex items-center justify-center flex-shrink-0">
+                          <i class="fas fa-star text-[8px]"></i>
+                        </span>
+                        <span v-if="doc.isShared" class="w-5 h-5 bg-blue-100 text-blue-500 rounded-md flex items-center justify-center flex-shrink-0">
+                          <i class="fas fa-share-alt text-[8px]"></i>
+                        </span>
+                      </div>
+                      <div class="flex items-center gap-2 mt-0.5 text-[10px] text-gray-400 md:hidden">
+                        <span>{{ formatFileSize(doc.size) }}</span>
+                        <span>•</span>
+                        <span>{{ getRelativeTime(doc.updatedAt) }}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Author Column -->
+                  <div class="col-span-2 hidden md:flex items-center gap-2">
+                    <div
+                      class="w-7 h-7 rounded-full flex items-center justify-center text-white text-[10px] font-bold shadow-sm"
+                      :style="{ backgroundColor: doc.author.color }"
+                    >
+                      {{ doc.author.initials }}
+                    </div>
+                    <span class="text-xs text-gray-600 truncate">{{ doc.author.name }}</span>
+                  </div>
+
+                  <!-- Tags Column -->
+                  <div class="col-span-2 hidden lg:flex items-center gap-1 flex-wrap">
+                    <span v-for="tag in doc.tags.slice(0, 2)" :key="tag" class="px-2 py-0.5 bg-gray-100 text-gray-600 text-[10px] rounded-md font-medium">
+                      {{ tag }}
+                    </span>
+                    <span v-if="doc.tags.length > 2" class="px-1.5 py-0.5 bg-gray-100 text-gray-400 text-[10px] rounded-md">
+                      +{{ doc.tags.length - 2 }}
+                    </span>
+                  </div>
+
+                  <!-- Size Column -->
+                  <div class="col-span-1 hidden sm:flex items-center">
+                    <span class="text-xs text-gray-500 font-medium">{{ formatFileSize(doc.size) }}</span>
+                  </div>
+
+                  <!-- Modified Column -->
+                  <div class="col-span-1 hidden sm:flex items-center">
+                    <span class="text-xs text-gray-500">{{ getRelativeTime(doc.updatedAt) }}</span>
+                  </div>
+
+                  <!-- Actions Column -->
+                  <div class="col-span-1 flex items-center justify-end gap-1">
+                    <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all duration-200">
+                      <template v-if="currentView !== 'trash'">
+                        <button
+                          @click.stop="toggleStar(doc)"
+                          :class="[
+                            'w-8 h-8 rounded-lg flex items-center justify-center transition-all',
+                            doc.isStarred ? 'bg-amber-100 text-amber-600 hover:bg-amber-200' : 'bg-gray-100 text-gray-500 hover:bg-amber-100 hover:text-amber-600'
+                          ]"
+                          :title="doc.isStarred ? 'Remove from Starred' : 'Add to Starred'"
+                        >
+                          <i class="fas fa-star text-xs"></i>
+                        </button>
+                        <button
+                          @click.stop="downloadDocument(doc)"
+                          class="w-8 h-8 rounded-lg bg-gray-100 text-gray-500 hover:bg-teal-100 hover:text-teal-600 flex items-center justify-center transition-all"
+                          title="Download"
+                        >
+                          <i class="fas fa-download text-xs"></i>
+                        </button>
+                        <button
+                          @click.stop="shareDocument(doc)"
+                          class="w-8 h-8 rounded-lg bg-gray-100 text-gray-500 hover:bg-blue-100 hover:text-blue-600 flex items-center justify-center transition-all"
+                          title="Share"
+                        >
+                          <i class="fas fa-share-alt text-xs"></i>
+                        </button>
+                        <button
+                          @click.stop="moveToTrash(doc)"
+                          class="w-8 h-8 rounded-lg bg-gray-100 text-gray-500 hover:bg-red-100 hover:text-red-600 flex items-center justify-center transition-all"
+                          title="Move to Trash"
+                        >
+                          <i class="fas fa-trash-alt text-xs"></i>
+                        </button>
+                      </template>
+                      <template v-else>
+                        <button
+                          @click.stop="restoreFromTrash(doc)"
+                          class="w-8 h-8 rounded-lg bg-teal-100 text-teal-600 hover:bg-teal-200 flex items-center justify-center transition-all"
+                          title="Restore"
+                        >
+                          <i class="fas fa-undo text-xs"></i>
+                        </button>
+                        <button
+                          @click.stop="permanentlyDelete(doc)"
+                          class="w-8 h-8 rounded-lg bg-red-100 text-red-600 hover:bg-red-200 flex items-center justify-center transition-all"
+                          title="Delete permanently"
+                        >
+                          <i class="fas fa-trash text-xs"></i>
+                        </button>
+                      </template>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Table Footer -->
+              <div class="px-4 py-3 bg-gray-50 border-t border-gray-100 flex items-center justify-between">
+                <span class="text-xs text-gray-500">
+                  Showing <span class="font-medium text-gray-700">{{ filteredDocuments.length }}</span> files
+                </span>
+                <div class="flex items-center gap-2">
+                  <button class="px-3 py-1.5 text-xs text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors flex items-center gap-1.5">
+                    <i class="fas fa-chevron-left text-[10px]"></i>
+                    Previous
+                  </button>
+                  <button class="px-3 py-1.5 text-xs text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors flex items-center gap-1.5">
+                    Next
+                    <i class="fas fa-chevron-right text-[10px]"></i>
+                  </button>
                 </div>
               </div>
             </div>
@@ -1791,5 +2185,26 @@ function getFileIconBg(type: string): string {
   .stat-label-mini {
     font-size: 8px;
   }
+}
+
+/* Selection Mode Animations */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slideDown {
+  animation: slideDown 0.3s ease-out;
+}
+
+/* Custom grid for 13 columns in selection mode */
+.grid-cols-13 {
+  grid-template-columns: 40px repeat(11, minmax(0, 1fr));
 }
 </style>
