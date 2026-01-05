@@ -105,6 +105,8 @@ const mockDocuments = [
 ]
 
 const documentId = computed(() => Number(route.params.id))
+const isPreviewMode = computed(() => route.query.preview === 'true')
+const isFullscreen = ref(false)
 
 onMounted(() => {
   // Simulate API call
@@ -119,9 +121,29 @@ function goBack() {
 }
 
 function downloadDocument() {
-  if (document.value) {
-    alert(`Downloading: ${document.value.name}`)
+  if (!document.value) return
+
+  // Simulate file download
+  const mimeTypes: Record<string, string> = {
+    'PDF': 'application/pdf',
+    'Word': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'Excel': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    'PowerPoint': 'application/vnd.openxmlformats-officedocument.presentationml.presentation'
   }
+
+  // Create a placeholder blob for demo purposes
+  const content = `This is a placeholder for: ${document.value.name}\n\nDocument Details:\n- Type: ${document.value.type}\n- Size: ${document.value.size}\n- Version: ${document.value.version}\n- Pages: ${document.value.pages || 'N/A'}\n\nIn production, this would download the actual file from the server.`
+  const blob = new Blob([content], { type: mimeTypes[document.value.type] || 'application/octet-stream' })
+  const url = URL.createObjectURL(blob)
+
+  // Create download link and trigger click
+  const link = window.document.createElement('a')
+  link.href = url
+  link.download = document.value.name
+  window.document.body.appendChild(link)
+  link.click()
+  window.document.body.removeChild(link)
+  URL.revokeObjectURL(url)
 }
 
 function shareDocument() {
@@ -133,6 +155,14 @@ function shareDocument() {
 
 function printDocument() {
   window.print()
+}
+
+function toggleFullscreen() {
+  isFullscreen.value = !isFullscreen.value
+}
+
+function closeFullscreen() {
+  isFullscreen.value = false
 }
 
 function formatDate(dateString: string): string {
@@ -227,15 +257,22 @@ const relatedDocuments = computed(() => {
           </div>
 
           <!-- Document Preview -->
-          <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-            <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-              <i class="fas fa-eye text-teal-500"></i>
-              Preview
-            </h2>
-            <div class="aspect-[4/3] bg-gray-100 rounded-xl flex items-center justify-center border-2 border-dashed border-gray-200">
-              <div class="text-center">
-                <div :class="[document.iconBg, 'w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-4']">
-                  <i :class="[document.icon, document.iconColor, 'text-3xl']"></i>
+          <div :class="['bg-white rounded-2xl shadow-sm border border-gray-100 p-6', isPreviewMode ? 'ring-2 ring-teal-500' : '']">
+            <div class="flex items-center justify-between mb-4">
+              <h2 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                <i class="fas fa-eye text-teal-500"></i>
+                Preview
+                <span v-if="isPreviewMode" class="px-2 py-0.5 bg-teal-100 text-teal-700 text-xs rounded-full font-medium">Active</span>
+              </h2>
+              <button @click="toggleFullscreen" class="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors">
+                <i class="fas fa-expand"></i>
+                Fullscreen
+              </button>
+            </div>
+            <div :class="['bg-gray-100 rounded-xl flex items-center justify-center border-2 border-dashed border-gray-200', isPreviewMode ? 'aspect-[3/2]' : 'aspect-[4/3]']">
+              <div class="text-center p-8">
+                <div :class="[document.iconBg, 'w-24 h-24 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg']">
+                  <i :class="[document.icon, document.iconColor, 'text-4xl']"></i>
                 </div>
                 <p class="text-gray-500 mb-4">Preview not available</p>
                 <button @click="downloadDocument" class="px-4 py-2 bg-teal-500 hover:bg-teal-600 text-white rounded-lg text-sm font-medium transition-colors">
@@ -381,6 +418,54 @@ const relatedDocuments = computed(() => {
         </button>
       </div>
     </div>
+
+    <!-- Fullscreen Preview Modal -->
+    <Teleport to="body">
+      <div v-if="isFullscreen && document" class="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-8">
+        <!-- Close Button -->
+        <button @click="closeFullscreen" class="absolute top-6 right-6 w-12 h-12 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-colors">
+          <i class="fas fa-times text-xl"></i>
+        </button>
+
+        <!-- Document Info -->
+        <div class="absolute top-6 left-6 text-white">
+          <h3 class="text-xl font-semibold">{{ document.name }}</h3>
+          <p class="text-white/70 text-sm">{{ document.type }} • {{ document.size }}</p>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-4">
+          <button @click="downloadDocument" class="px-6 py-3 bg-teal-500 hover:bg-teal-600 text-white rounded-xl font-medium flex items-center gap-2 transition-colors">
+            <i class="fas fa-download"></i>
+            Download
+          </button>
+          <button @click="printDocument" class="px-6 py-3 bg-white/10 hover:bg-white/20 text-white rounded-xl font-medium flex items-center gap-2 transition-colors">
+            <i class="fas fa-print"></i>
+            Print
+          </button>
+          <button @click="shareDocument" class="px-6 py-3 bg-white/10 hover:bg-white/20 text-white rounded-xl font-medium flex items-center gap-2 transition-colors">
+            <i class="fas fa-share-alt"></i>
+            Share
+          </button>
+        </div>
+
+        <!-- Preview Content -->
+        <div class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full aspect-[4/3] flex items-center justify-center">
+          <div class="text-center p-12">
+            <div :class="[document.iconBg, 'w-32 h-32 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-xl']">
+              <i :class="[document.icon, document.iconColor, 'text-6xl']"></i>
+            </div>
+            <h4 class="text-2xl font-bold text-gray-900 mb-2">{{ document.name }}</h4>
+            <p class="text-gray-500 mb-6">{{ document.description }}</p>
+            <div class="flex items-center justify-center gap-6 text-sm text-gray-500">
+              <span><i class="fas fa-file-alt mr-2"></i>{{ document.pages || 'N/A' }} pages</span>
+              <span><i class="fas fa-hdd mr-2"></i>{{ document.size }}</span>
+              <span><i class="fas fa-code-branch mr-2"></i>v{{ document.version }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Teleport>
   </div>
 </template>
 

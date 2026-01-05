@@ -382,16 +382,33 @@ function isBookmarked(articleId: number): boolean {
 // Document actions
 function previewDocument(doc: any, event: Event) {
   event.stopPropagation()
-  // Open document preview modal or navigate to preview page
-  console.log('Preview document:', doc.name)
-  alert(`Opening preview for: ${doc.name}`)
+  // Navigate to document view page with preview mode
+  router.push({ path: `/documents/${doc.id}`, query: { preview: 'true' } })
 }
 
 function downloadDocument(doc: any, event: Event) {
   event.stopPropagation()
-  // Trigger document download
-  console.log('Download document:', doc.name)
-  alert(`Downloading: ${doc.name}`)
+  // Simulate file download
+  const mimeTypes: Record<string, string> = {
+    'PDF': 'application/pdf',
+    'Word': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'Excel': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    'PowerPoint': 'application/vnd.openxmlformats-officedocument.presentationml.presentation'
+  }
+
+  // Create a placeholder blob for demo purposes
+  const content = `This is a placeholder for: ${doc.name}\n\nIn production, this would download the actual file from the server.`
+  const blob = new Blob([content], { type: mimeTypes[doc.type] || 'application/octet-stream' })
+  const url = URL.createObjectURL(blob)
+
+  // Create download link and trigger click
+  const link = document.createElement('a')
+  link.href = url
+  link.download = doc.name
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
+  URL.revokeObjectURL(url)
 }
 
 function openDocument(docId: number) {
