@@ -402,9 +402,11 @@ function openDocument(docId: number) {
 const teamActivities = ref([
   {
     id: 1,
-    user: { name: 'Sarah Chen', initials: 'SC', color: '#8B5CF6' },
+    user: { id: 101, name: 'Sarah Chen', initials: 'SC', color: '#8B5CF6' },
     action: 'published a new article',
     target: '"Remote Work Best Practices"',
+    targetId: 1,
+    targetType: 'article',
     time: '5 minutes ago',
     actionIcon: 'fas fa-pen',
     actionBg: 'bg-violet-100',
@@ -412,9 +414,11 @@ const teamActivities = ref([
   },
   {
     id: 2,
-    user: { name: 'Mike Johnson', initials: 'MJ', color: '#3B82F6' },
+    user: { id: 102, name: 'Mike Johnson', initials: 'MJ', color: '#3B82F6' },
     action: 'uploaded document to',
     target: 'IT Knowledge Base',
+    targetId: 2,
+    targetType: 'document',
     time: '15 minutes ago',
     actionIcon: 'fas fa-upload',
     actionBg: 'bg-blue-100',
@@ -422,9 +426,11 @@ const teamActivities = ref([
   },
   {
     id: 3,
-    user: { name: 'Emily Davis', initials: 'ED', color: '#10B981' },
+    user: { id: 103, name: 'Emily Davis', initials: 'ED', color: '#10B981' },
     action: 'completed course',
     target: '"Leadership Essentials"',
+    targetId: 1,
+    targetType: 'course',
     time: '1 hour ago',
     actionIcon: 'fas fa-check',
     actionBg: 'bg-emerald-100',
@@ -432,15 +438,56 @@ const teamActivities = ref([
   },
   {
     id: 4,
-    user: { name: 'Alex Thompson', initials: 'AT', color: '#F59E0B' },
+    user: { id: 104, name: 'Alex Thompson', initials: 'AT', color: '#F59E0B' },
     action: 'created new event',
     target: '"Q1 Planning Session"',
+    targetId: 1,
+    targetType: 'event',
     time: '2 hours ago',
     actionIcon: 'fas fa-calendar-plus',
     actionBg: 'bg-amber-100',
     actionColor: 'text-amber-600'
   }
 ])
+
+// Team Activity actions
+function viewUserProfile(userId: number) {
+  router.push(`/users/${userId}`)
+}
+
+function viewActivityTarget(activity: any) {
+  const routes: Record<string, string> = {
+    article: '/articles',
+    document: '/documents',
+    course: '/learning',
+    event: '/events'
+  }
+  const basePath = routes[activity.targetType] || '/'
+  router.push(`${basePath}/${activity.targetId}`)
+}
+
+// Event actions
+function viewEvent(eventId: number) {
+  router.push(`/events/${eventId}`)
+}
+
+// Learning actions
+function viewCourse(courseId: number) {
+  router.push(`/learning/${courseId}`)
+}
+
+// Self Service actions
+function openService(service: any) {
+  const routes: Record<string, string> = {
+    'IT Support': '/self-services/it-support',
+    'HR Portal': '/self-services/hr',
+    'Facilities': '/self-services/facilities',
+    'Finance': '/self-services/finance',
+    'Travel': '/self-services/travel',
+    'Benefits': '/self-services/benefits'
+  }
+  router.push(routes[service.label] || '/self-services')
+}
 
 // Self Services
 const selfServices = ref([
@@ -987,13 +1034,14 @@ onUnmounted(() => {
         </div>
         <div class="space-y-3">
           <div v-for="event in upcomingEvents" :key="event.id"
-               class="list-item-animated flex gap-3 p-3 rounded-xl cursor-pointer">
-            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-primary-50 to-primary-100 flex flex-col items-center justify-center flex-shrink-0 transition-transform hover:scale-110">
+               @click="viewEvent(event.id)"
+               class="list-item-animated flex gap-3 p-3 rounded-xl cursor-pointer border border-transparent hover:border-gray-200 hover:bg-gray-50 hover:shadow-sm transition-all group">
+            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-primary-50 to-primary-100 flex flex-col items-center justify-center flex-shrink-0 transition-transform group-hover:scale-110">
               <span class="text-[10px] font-semibold text-primary-600 uppercase">{{ event.month }}</span>
               <span class="text-lg font-bold text-gray-900 -mt-0.5">{{ event.day }}</span>
             </div>
             <div class="flex-1 min-w-0">
-              <h4 class="font-medium text-gray-900 text-sm truncate">{{ event.title }}</h4>
+              <h4 class="font-medium text-gray-900 text-sm truncate group-hover:text-teal-600 transition-colors">{{ event.title }}</h4>
               <p class="text-xs text-gray-500 mt-0.5">{{ event.time }}</p>
               <div class="flex -space-x-1.5 mt-2">
                 <div v-for="(attendee, idx) in event.attendees.slice(0, 3)" :key="idx"
@@ -1098,13 +1146,14 @@ onUnmounted(() => {
         </div>
         <div class="space-y-3">
           <div v-for="course in learningCourses" :key="course.id"
-               class="list-item-animated p-4 rounded-xl bg-gray-50 hover:bg-primary-50/50 cursor-pointer">
+               @click="viewCourse(course.id)"
+               class="list-item-animated p-4 rounded-xl bg-gray-50 hover:bg-primary-50/50 cursor-pointer border border-transparent hover:border-teal-200 hover:shadow-sm transition-all group">
             <div class="flex items-start gap-3">
-              <div :class="['w-10 h-10 rounded-xl flex items-center justify-center transition-transform hover:scale-110', course.iconBg]">
+              <div :class="['w-10 h-10 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110', course.iconBg]">
                 <i :class="[course.icon, course.iconColor]"></i>
               </div>
               <div class="flex-1 min-w-0">
-                <h4 class="font-medium text-gray-900 text-sm truncate">{{ course.title }}</h4>
+                <h4 class="font-medium text-gray-900 text-sm truncate group-hover:text-teal-600 transition-colors">{{ course.title }}</h4>
                 <p class="text-xs text-gray-500 mt-0.5">{{ course.instructor }}</p>
               </div>
             </div>
@@ -1133,24 +1182,28 @@ onUnmounted(() => {
             </div>
             Team Activity
           </h2>
-          <button class="text-sm text-primary-600 font-medium hover:text-primary-700">View All</button>
+          <router-link to="/collaboration" class="text-sm text-primary-600 font-medium hover:text-primary-700">View All</router-link>
         </div>
         <div class="space-y-3">
           <div v-for="activity in teamActivities" :key="activity.id"
-               class="flex items-start gap-3 p-3 rounded-xl hover:bg-gray-50 transition-all">
-            <div class="w-9 h-9 rounded-lg flex items-center justify-center text-white text-xs font-semibold flex-shrink-0"
-                 :style="{ backgroundColor: activity.user.color }">
+               class="flex items-start gap-3 p-3 rounded-xl hover:bg-gray-50 cursor-pointer transition-all group border border-transparent hover:border-gray-200 hover:shadow-sm">
+            <div @click.stop="viewUserProfile(activity.user.id)"
+                 class="w-9 h-9 rounded-lg flex items-center justify-center text-white text-xs font-semibold flex-shrink-0 cursor-pointer transition-transform hover:scale-110 hover:ring-2 hover:ring-offset-2"
+                 :style="{ backgroundColor: activity.user.color }"
+                 :title="'View ' + activity.user.name + '\'s profile'">
               {{ activity.user.initials }}
             </div>
-            <div class="flex-1 min-w-0">
+            <div class="flex-1 min-w-0" @click="viewActivityTarget(activity)">
               <p class="text-sm text-gray-900">
-                <span class="font-medium">{{ activity.user.name }}</span>
+                <span @click.stop="viewUserProfile(activity.user.id)" class="font-medium hover:text-teal-600 cursor-pointer transition-colors">{{ activity.user.name }}</span>
                 <span class="text-gray-500"> {{ activity.action }} </span>
-                <span class="font-medium text-primary-600">{{ activity.target }}</span>
+                <span class="font-medium text-teal-600 hover:text-teal-700 cursor-pointer transition-colors">{{ activity.target }}</span>
               </p>
               <p class="text-xs text-gray-400 mt-1">{{ activity.time }}</p>
             </div>
-            <div :class="['w-7 h-7 rounded-lg flex items-center justify-center', activity.actionBg]">
+            <div @click="viewActivityTarget(activity)"
+                 :class="['w-7 h-7 rounded-lg flex items-center justify-center cursor-pointer transition-transform hover:scale-110', activity.actionBg]"
+                 title="View details">
               <i :class="[activity.actionIcon, 'text-xs', activity.actionColor]"></i>
             </div>
           </div>
@@ -1170,11 +1223,12 @@ onUnmounted(() => {
         </div>
         <div class="grid grid-cols-3 gap-3">
           <button v-for="service in selfServices" :key="service.id"
-                  class="flex flex-col items-center gap-2 p-4 rounded-xl bg-gray-50 hover:bg-primary-50 transition-all group">
+                  @click="openService(service)"
+                  class="flex flex-col items-center gap-2 p-4 rounded-xl bg-gray-50 hover:bg-primary-50 hover:shadow-sm border border-transparent hover:border-teal-200 transition-all group">
             <div :class="['w-10 h-10 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110', service.iconBg]">
               <i :class="[service.icon, service.iconColor]"></i>
             </div>
-            <span class="text-xs font-medium text-gray-700 group-hover:text-gray-900 text-center">{{ service.label }}</span>
+            <span class="text-xs font-medium text-gray-700 group-hover:text-teal-600 text-center transition-colors">{{ service.label }}</span>
           </button>
         </div>
       </div>
