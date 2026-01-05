@@ -17,6 +17,10 @@ const expandedFolders = ref(new Set<string>(['root', 'tournament', 'media']))
 const isSidebarCollapsed = ref(false)
 const showMoreOptions = ref(false)
 const showMoreFileTypes = ref(false)
+const showCategoryFilter = ref(false)
+const showTagFilter = ref(false)
+const selectedCategory = ref<string | null>(null)
+const selectedTags = ref<string[]>([])
 
 // Folder Tree Structure
 const folderTree = ref([
@@ -351,7 +355,15 @@ const fileTypes = [
   { id: 'archive', label: 'Archives', icon: 'fas fa-file-archive', color: 'text-yellow-600' }
 ]
 
-// Computed
+// Computed - All unique tags from documents
+const allTags = computed(() => {
+  const tags = new Set<string>()
+  documents.value.forEach(doc => {
+    doc.tags.forEach(tag => tags.add(tag))
+  })
+  return Array.from(tags).sort()
+})
+
 const filteredDocuments = computed(() => {
   let result = [...documents.value]
 
@@ -359,8 +371,18 @@ const filteredDocuments = computed(() => {
     result = result.filter(d => d.libraryId === selectedLibrary.value)
   }
 
+  if (selectedCategory.value) {
+    result = result.filter(d => d.libraryId === selectedCategory.value)
+  }
+
   if (selectedFileType.value) {
     result = result.filter(d => d.type === selectedFileType.value)
+  }
+
+  if (selectedTags.value.length > 0) {
+    result = result.filter(d =>
+      selectedTags.value.some(tag => d.tags.includes(tag))
+    )
   }
 
   if (searchQuery.value) {
@@ -449,7 +471,22 @@ function viewDocument(doc: any) {
 function clearFilters() {
   selectedLibrary.value = null
   selectedFileType.value = null
+  selectedCategory.value = null
+  selectedTags.value = []
   searchQuery.value = ''
+}
+
+function toggleTag(tag: string) {
+  const index = selectedTags.value.indexOf(tag)
+  if (index > -1) {
+    selectedTags.value.splice(index, 1)
+  } else {
+    selectedTags.value.push(tag)
+  }
+}
+
+function isTagSelected(tag: string): boolean {
+  return selectedTags.value.includes(tag)
 }
 
 // Helpers
@@ -919,6 +956,122 @@ function getFileIconBg(type: string): string {
               </div>
             </div>
 
+            <!-- Category Filter -->
+            <div class="relative">
+              <button
+                @click="showCategoryFilter = !showCategoryFilter"
+                :class="[
+                  'flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border',
+                  selectedCategory ? 'bg-teal-50 border-teal-200 text-teal-700' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+                ]"
+              >
+                <i class="fas fa-folder text-sm"></i>
+                <span>{{ selectedCategory ? libraries.find(l => l.id === selectedCategory)?.name : 'Category' }}</span>
+                <i :class="showCategoryFilter ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ml-1"></i>
+              </button>
+
+              <!-- Dropdown Menu -->
+              <div
+                v-if="showCategoryFilter"
+                class="absolute left-0 top-full mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
+              >
+                <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Categories</div>
+                <button
+                  v-for="lib in libraries"
+                  :key="lib.id"
+                  @click="selectedCategory = selectedCategory === lib.id ? null : lib.id; showCategoryFilter = false"
+                  :class="[
+                    'w-full px-3 py-2 text-left text-sm flex items-center gap-3 transition-colors',
+                    selectedCategory === lib.id ? 'bg-teal-50 text-teal-700' : 'text-gray-700 hover:bg-gray-50'
+                  ]"
+                >
+                  <div
+                    class="w-6 h-6 rounded-lg flex items-center justify-center text-white text-xs"
+                    :style="{ backgroundColor: lib.color }"
+                  >
+                    <i :class="lib.icon"></i>
+                  </div>
+                  <span class="flex-1">{{ lib.name }}</span>
+                  <span class="text-xs text-gray-400">{{ lib.documentCount }}</span>
+                </button>
+
+                <div class="my-2 border-t border-gray-100"></div>
+
+                <button
+                  @click="selectedCategory = null; showCategoryFilter = false"
+                  class="w-full px-3 py-2 text-left text-sm text-gray-500 hover:bg-gray-50 flex items-center gap-3 transition-colors"
+                >
+                  <i class="fas fa-times-circle w-6 text-center"></i>
+                  Clear Category
+                </button>
+              </div>
+
+              <!-- Click outside to close -->
+              <div v-if="showCategoryFilter" @click="showCategoryFilter = false" class="fixed inset-0 z-40"></div>
+            </div>
+
+            <!-- Tags Filter -->
+            <div class="relative">
+              <button
+                @click="showTagFilter = !showTagFilter"
+                :class="[
+                  'flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border',
+                  selectedTags.length > 0 ? 'bg-purple-50 border-purple-200 text-purple-700' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+                ]"
+              >
+                <i class="fas fa-tags text-sm"></i>
+                <span>{{ selectedTags.length > 0 ? `${selectedTags.length} Tags` : 'Tags' }}</span>
+                <i :class="showTagFilter ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ml-1"></i>
+              </button>
+
+              <!-- Dropdown Menu -->
+              <div
+                v-if="showTagFilter"
+                class="absolute left-0 top-full mt-2 w-64 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
+              >
+                <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Select Tags</div>
+                <div class="max-h-48 overflow-y-auto">
+                  <button
+                    v-for="tag in allTags"
+                    :key="tag"
+                    @click="toggleTag(tag)"
+                    :class="[
+                      'w-full px-3 py-2 text-left text-sm flex items-center gap-3 transition-colors',
+                      isTagSelected(tag) ? 'bg-purple-50 text-purple-700' : 'text-gray-700 hover:bg-gray-50'
+                    ]"
+                  >
+                    <div :class="[
+                      'w-4 h-4 rounded border-2 flex items-center justify-center transition-all',
+                      isTagSelected(tag) ? 'bg-purple-500 border-purple-500' : 'border-gray-300'
+                    ]">
+                      <i v-if="isTagSelected(tag)" class="fas fa-check text-white text-[8px]"></i>
+                    </div>
+                    <span class="flex-1">{{ tag }}</span>
+                  </button>
+                </div>
+
+                <div class="my-2 border-t border-gray-100"></div>
+
+                <div class="px-3 flex gap-2">
+                  <button
+                    @click="selectedTags = []; showTagFilter = false"
+                    class="flex-1 px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                  >
+                    Clear All
+                  </button>
+                  <button
+                    @click="showTagFilter = false"
+                    class="flex-1 px-3 py-1.5 text-xs font-medium text-white bg-purple-500 rounded-lg hover:bg-purple-600 transition-colors"
+                  >
+                    Apply
+                  </button>
+                </div>
+              </div>
+
+              <!-- Click outside to close -->
+              <div v-if="showTagFilter" @click="showTagFilter = false" class="fixed inset-0 z-40"></div>
+            </div>
+
             <!-- Sort Options -->
             <div class="flex items-center gap-1 bg-white border border-gray-200 rounded-lg p-1">
               <select
@@ -1079,7 +1232,7 @@ function getFileIconBg(type: string): string {
           <!-- Files Content Area -->
           <div class="flex-1 p-4">
             <!-- Active Filters -->
-            <div v-if="selectedFolder || selectedFileType || searchQuery" class="flex items-center gap-2 mb-4 pb-3 border-b border-gray-100">
+            <div v-if="selectedFolder || selectedFileType || searchQuery || selectedCategory || selectedTags.length > 0" class="flex items-center gap-2 mb-4 pb-3 border-b border-gray-100">
               <span class="text-xs text-gray-500">Filters:</span>
               <div class="flex flex-wrap gap-1.5">
                 <span v-if="selectedFolder" class="px-2 py-0.5 bg-teal-100 text-teal-700 rounded-full text-xs font-medium flex items-center gap-1">
@@ -1087,16 +1240,31 @@ function getFileIconBg(type: string): string {
                   {{ selectedFolder }}
                   <button @click="selectedFolder = null" class="ml-1 hover:text-teal-900"><i class="fas fa-times text-[10px]"></i></button>
                 </span>
+                <span v-if="selectedCategory" class="px-2 py-0.5 bg-amber-100 text-amber-700 rounded-full text-xs font-medium flex items-center gap-1">
+                  <i class="fas fa-layer-group text-[10px]"></i>
+                  {{ libraries.find(l => l.id === selectedCategory)?.name }}
+                  <button @click="selectedCategory = null" class="ml-1 hover:text-amber-900"><i class="fas fa-times text-[10px]"></i></button>
+                </span>
                 <span v-if="selectedFileType" class="px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full text-xs font-medium flex items-center gap-1">
                   {{ fileTypes.find(t => t.id === selectedFileType)?.label }}
                   <button @click="selectedFileType = null" class="ml-1 hover:text-blue-900"><i class="fas fa-times text-[10px]"></i></button>
                 </span>
-                <span v-if="searchQuery" class="px-2 py-0.5 bg-purple-100 text-purple-700 rounded-full text-xs font-medium flex items-center gap-1">
+                <span
+                  v-for="tag in selectedTags"
+                  :key="'filter-tag-' + tag"
+                  class="px-2 py-0.5 bg-purple-100 text-purple-700 rounded-full text-xs font-medium flex items-center gap-1"
+                >
+                  <i class="fas fa-tag text-[10px]"></i>
+                  {{ tag }}
+                  <button @click="toggleTag(tag)" class="ml-1 hover:text-purple-900"><i class="fas fa-times text-[10px]"></i></button>
+                </span>
+                <span v-if="searchQuery" class="px-2 py-0.5 bg-gray-100 text-gray-700 rounded-full text-xs font-medium flex items-center gap-1">
+                  <i class="fas fa-search text-[10px]"></i>
                   "{{ searchQuery }}"
-                  <button @click="searchQuery = ''" class="ml-1 hover:text-purple-900"><i class="fas fa-times text-[10px]"></i></button>
+                  <button @click="searchQuery = ''" class="ml-1 hover:text-gray-900"><i class="fas fa-times text-[10px]"></i></button>
                 </span>
               </div>
-              <button @click="clearFilters; selectedFolder = null" class="text-xs text-gray-500 hover:text-gray-700 ml-auto">Clear all</button>
+              <button @click="clearFilters(); selectedFolder = null" class="text-xs text-gray-500 hover:text-gray-700 ml-auto">Clear all</button>
             </div>
 
             <!-- Breadcrumb -->
