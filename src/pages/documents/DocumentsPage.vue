@@ -1018,16 +1018,6 @@ function getFileIconBg(type: string): string {
               <button class="w-9 h-9 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-800 flex items-center justify-center transition-all" title="Refresh">
                 <i class="fas fa-sync-alt text-sm"></i>
               </button>
-              <button
-                @click="toggleSelectionMode"
-                :class="[
-                  'w-9 h-9 rounded-lg flex items-center justify-center transition-all',
-                  isSelectionMode ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-800'
-                ]"
-                :title="isSelectionMode ? 'Exit selection mode' : 'Select multiple'"
-              >
-                <i :class="isSelectionMode ? 'fas fa-times' : 'fas fa-check-square'" class="text-sm"></i>
-              </button>
 
               <!-- More Options Dropdown -->
               <div class="relative">
