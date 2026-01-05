@@ -1436,7 +1436,7 @@ function getFileIconBg(type: string): string {
           </div>
 
           <!-- Files Content Area -->
-          <div class="flex-1 p-5 bg-gradient-to-br from-gray-50/50 to-white">
+          <div class="flex-1 min-w-0 p-5 bg-gradient-to-br from-gray-50/50 to-white">
             <!-- Active Filters -->
             <div v-if="selectedFolder || selectedFileTypes.length > 0 || searchQuery || selectedCategories.length > 0 || selectedTags.length > 0" class="flex items-center gap-3 mb-5 p-3 bg-white rounded-xl border border-gray-100 shadow-sm">
               <div class="flex items-center gap-2 px-2 py-1 bg-gray-100 rounded-lg">
@@ -1769,12 +1769,12 @@ function getFileIconBg(type: string): string {
               </div>
             </div>
 
-            <!-- Documents List View -->
-            <div v-else class="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm">
+            <!-- Documents List View (Enhanced) -->
+            <div v-else class="w-full bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm">
               <!-- Table Header -->
-              <div class="grid grid-cols-13 gap-4 px-4 py-3 bg-gray-50 border-b border-gray-100 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                <!-- Select All Checkbox (Always visible) -->
-                <div class="col-span-1 flex items-center">
+              <div class="list-row px-4 py-3 bg-gradient-to-r from-gray-50 to-white border-b border-gray-100">
+                <!-- Select All Checkbox -->
+                <div class="col-checkbox flex items-center">
                   <button
                     @click="if (!isSelectionMode) isSelectionMode = true; isAllSelected ? clearDocumentSelection() : selectAllDocuments()"
                     :class="[
@@ -1786,44 +1786,48 @@ function getFileIconBg(type: string): string {
                     <i v-else-if="isSomeSelected" class="fas fa-minus text-[10px] text-teal-600"></i>
                   </button>
                 </div>
-                <div class="col-span-4 flex items-center gap-2">
-                  <i class="fas fa-file-alt text-gray-400"></i>
-                  Name
+                <div class="col-file flex items-center gap-2 text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  <i class="fas fa-file-alt text-teal-500"></i>
+                  File Details
                 </div>
-                <div class="col-span-2 hidden md:flex items-center gap-2">
-                  <i class="fas fa-user text-gray-400"></i>
+                <div class="col-author hidden md:flex items-center gap-2 text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  <i class="fas fa-user text-blue-500"></i>
                   Author
                 </div>
-                <div class="col-span-2 hidden lg:flex items-center gap-2">
-                  <i class="fas fa-tags text-gray-400"></i>
-                  Tags
+                <div class="col-category hidden lg:flex items-center gap-2 text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  <i class="fas fa-layer-group text-purple-500"></i>
+                  Category
                 </div>
-                <div class="col-span-1 hidden sm:flex items-center gap-2">
-                  <i class="fas fa-hdd text-gray-400"></i>
+                <div class="col-stats hidden xl:flex items-center gap-2 text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  <i class="fas fa-download text-green-500"></i>
+                  Stats
+                </div>
+                <div class="col-size hidden sm:flex items-center gap-2 text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  <i class="fas fa-hdd text-amber-500"></i>
                   Size
                 </div>
-                <div class="col-span-1 hidden sm:flex items-center gap-2">
+                <div class="col-modified hidden sm:flex items-center gap-2 text-xs font-semibold text-gray-600 uppercase tracking-wider">
                   <i class="fas fa-clock text-gray-400"></i>
                   Modified
                 </div>
-                <div class="col-span-1 text-right">Actions</div>
+                <div class="col-actions text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">Actions</div>
               </div>
 
               <!-- Table Body -->
-              <div class="divide-y divide-gray-50">
+              <div class="w-full divide-y divide-gray-50">
                 <div
                   v-for="doc in filteredDocuments"
                   :key="doc.id"
                   @click="viewDocument(doc)"
                   :class="[
-                    'group grid grid-cols-13 gap-4 px-4 py-3 cursor-pointer transition-all duration-200',
+                    'group list-row px-4 py-4 cursor-pointer transition-all duration-200',
                     isDocumentSelected(doc.id)
-                      ? 'bg-teal-50 border-l-4 border-l-teal-500'
-                      : 'bg-white hover:bg-gradient-to-r hover:from-teal-50/50 hover:to-white'
+                      ? 'bg-teal-50/70 border-l-4 border-l-teal-500'
+                      : 'bg-white hover:bg-gradient-to-r hover:from-teal-50/30 hover:to-transparent'
                   ]"
                 >
-                  <!-- Selection Checkbox (Always visible) -->
-                  <div class="col-span-1 flex items-center">
+                  <!-- Selection Checkbox -->
+                  <div class="col-checkbox flex items-center">
                     <div
                       @click.stop="toggleDocumentSelection(doc.id); if (!isSelectionMode) isSelectionMode = true"
                       :class="[
@@ -1837,62 +1841,105 @@ function getFileIconBg(type: string): string {
                     </div>
                   </div>
 
-                  <!-- Name Column -->
-                  <div class="col-span-4 flex items-center gap-3 min-w-0">
-                    <div :class="['w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-all duration-200 group-hover:scale-110 group-hover:shadow-md', getFileIconBg(doc.type)]">
-                      <i :class="[getFileIcon(doc.type), getFileIconColor(doc.type), 'text-lg']"></i>
+                  <!-- File Details Column (Name, Type, Tags) -->
+                  <div class="col-file flex items-center gap-3">
+                    <!-- File Icon with Type Badge -->
+                    <div class="relative flex-shrink-0">
+                      <div :class="['w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-200 group-hover:scale-110 group-hover:shadow-lg', getFileIconBg(doc.type)]">
+                        <i :class="[getFileIcon(doc.type), getFileIconColor(doc.type), 'text-xl']"></i>
+                      </div>
+                      <span :class="['absolute -bottom-1 -right-1 px-1.5 py-0.5 text-[8px] font-bold uppercase rounded-md shadow-sm', getFileIconBg(doc.type), getFileIconColor(doc.type)]">
+                        {{ doc.type }}
+                      </span>
                     </div>
+                    <!-- File Info -->
                     <div class="min-w-0 flex-1">
-                      <div class="flex items-center gap-2">
-                        <h4 class="font-medium text-gray-900 text-sm truncate group-hover:text-teal-600 transition-colors">{{ doc.name }}</h4>
+                      <div class="flex items-center gap-2 mb-1">
+                        <h4 class="font-semibold text-gray-900 text-sm truncate group-hover:text-teal-600 transition-colors">{{ doc.name }}</h4>
                         <span v-if="doc.isStarred" class="w-5 h-5 bg-amber-100 text-amber-500 rounded-md flex items-center justify-center flex-shrink-0">
                           <i class="fas fa-star text-[8px]"></i>
                         </span>
                         <span v-if="doc.isShared" class="w-5 h-5 bg-blue-100 text-blue-500 rounded-md flex items-center justify-center flex-shrink-0">
                           <i class="fas fa-share-alt text-[8px]"></i>
                         </span>
+                        <span v-if="doc.isSharedWithMe" class="w-5 h-5 bg-purple-100 text-purple-500 rounded-md flex items-center justify-center flex-shrink-0">
+                          <i class="fas fa-user-friends text-[8px]"></i>
+                        </span>
+                        <span v-if="doc.isTeamFile" class="w-5 h-5 bg-teal-100 text-teal-500 rounded-md flex items-center justify-center flex-shrink-0">
+                          <i class="fas fa-users text-[8px]"></i>
+                        </span>
                       </div>
-                      <div class="flex items-center gap-2 mt-0.5 text-[10px] text-gray-400 md:hidden">
+                      <!-- Tags inline -->
+                      <div class="flex items-center gap-1.5 flex-wrap">
+                        <span v-for="tag in doc.tags.slice(0, 3)" :key="tag" class="px-2 py-0.5 bg-gray-100 text-gray-500 text-[10px] rounded-full font-medium hover:bg-teal-100 hover:text-teal-600 transition-colors cursor-pointer">
+                          #{{ tag }}
+                        </span>
+                        <span v-if="doc.tags.length > 3" class="text-[10px] text-gray-400">
+                          +{{ doc.tags.length - 3 }} more
+                        </span>
+                      </div>
+                      <!-- Mobile meta info -->
+                      <div class="flex items-center gap-2 mt-1 text-[10px] text-gray-400 md:hidden">
                         <span>{{ formatFileSize(doc.size) }}</span>
                         <span>•</span>
                         <span>{{ getRelativeTime(doc.updatedAt) }}</span>
+                        <span>•</span>
+                        <span><i class="fas fa-download mr-1"></i>{{ doc.downloads }}</span>
                       </div>
                     </div>
                   </div>
 
                   <!-- Author Column -->
-                  <div class="col-span-2 hidden md:flex items-center gap-2">
+                  <div class="col-author hidden md:flex items-center gap-2">
                     <div
-                      class="w-7 h-7 rounded-full flex items-center justify-center text-white text-[10px] font-bold shadow-sm"
+                      class="w-9 h-9 rounded-full flex items-center justify-center text-white text-xs font-bold shadow-md ring-2 ring-white"
                       :style="{ backgroundColor: doc.author.color }"
                     >
                       {{ doc.author.initials }}
                     </div>
-                    <span class="text-xs text-gray-600 truncate">{{ doc.author.name }}</span>
+                    <div class="min-w-0">
+                      <p class="text-xs font-medium text-gray-700 truncate">{{ doc.author.name }}</p>
+                      <p class="text-[10px] text-gray-400">Owner</p>
+                    </div>
                   </div>
 
-                  <!-- Tags Column -->
-                  <div class="col-span-2 hidden lg:flex items-center gap-1 flex-wrap">
-                    <span v-for="tag in doc.tags.slice(0, 2)" :key="tag" class="px-2 py-0.5 bg-gray-100 text-gray-600 text-[10px] rounded-md font-medium">
-                      {{ tag }}
-                    </span>
-                    <span v-if="doc.tags.length > 2" class="px-1.5 py-0.5 bg-gray-100 text-gray-400 text-[10px] rounded-md">
-                      +{{ doc.tags.length - 2 }}
-                    </span>
+                  <!-- Category Column -->
+                  <div class="col-category hidden lg:flex items-center">
+                    <div class="flex items-center gap-2 px-2.5 py-1.5 bg-purple-50 rounded-lg">
+                      <i class="fas fa-folder text-purple-400 text-xs"></i>
+                      <span class="text-xs text-purple-700 font-medium truncate">{{ doc.category || 'Uncategorized' }}</span>
+                    </div>
+                  </div>
+
+                  <!-- Stats Column (Downloads) -->
+                  <div class="col-stats hidden xl:flex items-center">
+                    <div class="flex flex-col items-center gap-0.5">
+                      <div class="flex items-center gap-1 text-green-600">
+                        <i class="fas fa-download text-[10px]"></i>
+                        <span class="text-xs font-semibold">{{ doc.downloads }}</span>
+                      </div>
+                      <span class="text-[9px] text-gray-400">downloads</span>
+                    </div>
                   </div>
 
                   <!-- Size Column -->
-                  <div class="col-span-1 hidden sm:flex items-center">
-                    <span class="text-xs text-gray-500 font-medium">{{ formatFileSize(doc.size) }}</span>
+                  <div class="col-size hidden sm:flex items-center">
+                    <div class="flex flex-col">
+                      <span class="text-xs font-semibold text-gray-700">{{ formatFileSize(doc.size) }}</span>
+                      <span class="text-[9px] text-gray-400">File size</span>
+                    </div>
                   </div>
 
                   <!-- Modified Column -->
-                  <div class="col-span-1 hidden sm:flex items-center">
-                    <span class="text-xs text-gray-500">{{ getRelativeTime(doc.updatedAt) }}</span>
+                  <div class="col-modified hidden sm:flex items-center">
+                    <div class="flex flex-col">
+                      <span class="text-xs font-medium text-gray-700">{{ getRelativeTime(doc.updatedAt) }}</span>
+                      <span class="text-[9px] text-gray-400">{{ new Date(doc.updatedAt).toLocaleDateString() }}</span>
+                    </div>
                   </div>
 
                   <!-- Actions Column -->
-                  <div class="col-span-1 flex items-center justify-end gap-1">
+                  <div class="col-actions flex items-center justify-end">
                     <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all duration-200">
                       <template v-if="currentView !== 'trash'">
                         <button
@@ -1944,24 +1991,47 @@ function getFileIconBg(type: string): string {
                         </button>
                       </template>
                     </div>
+                    <!-- Always visible quick preview button -->
+                    <button
+                      @click.stop="viewDocument(doc)"
+                      class="w-8 h-8 rounded-lg bg-teal-50 text-teal-600 hover:bg-teal-100 flex items-center justify-center transition-all ml-1"
+                      title="Quick Preview"
+                    >
+                      <i class="fas fa-eye text-xs"></i>
+                    </button>
                   </div>
                 </div>
               </div>
 
-              <!-- Table Footer -->
-              <div class="px-4 py-3 bg-gray-50 border-t border-gray-100 flex items-center justify-between">
-                <span class="text-xs text-gray-500">
-                  Showing <span class="font-medium text-gray-700">{{ filteredDocuments.length }}</span> files
-                </span>
-                <div class="flex items-center gap-2">
-                  <button class="px-3 py-1.5 text-xs text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors flex items-center gap-1.5">
-                    <i class="fas fa-chevron-left text-[10px]"></i>
-                    Previous
-                  </button>
-                  <button class="px-3 py-1.5 text-xs text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors flex items-center gap-1.5">
-                    Next
-                    <i class="fas fa-chevron-right text-[10px]"></i>
-                  </button>
+              <!-- Table Footer with Stats -->
+              <div class="w-full px-4 py-3 bg-gradient-to-r from-gray-50 to-white border-t border-gray-100">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-4">
+                    <span class="text-xs text-gray-500">
+                      Showing <span class="font-semibold text-gray-700">{{ filteredDocuments.length }}</span> files
+                    </span>
+                    <div class="hidden sm:flex items-center gap-3 text-xs text-gray-400">
+                      <span class="flex items-center gap-1">
+                        <i class="fas fa-hdd text-amber-500"></i>
+                        {{ formatTotalSize(filteredDocuments.reduce((sum, d) => sum + d.size, 0)) }} total
+                      </span>
+                      <span class="flex items-center gap-1">
+                        <i class="fas fa-download text-green-500"></i>
+                        {{ filteredDocuments.reduce((sum, d) => sum + d.downloads, 0).toLocaleString() }} downloads
+                      </span>
+                    </div>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <button class="px-3 py-1.5 text-xs text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors flex items-center gap-1.5 border border-gray-200">
+                      <i class="fas fa-chevron-left text-[10px]"></i>
+                      Previous
+                    </button>
+                    <span class="px-3 py-1.5 text-xs font-medium text-teal-600 bg-teal-50 rounded-lg">1</span>
+                    <button class="px-3 py-1.5 text-xs text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors flex items-center gap-1.5 border border-gray-200">
+                      Next
+                      <i class="fas fa-chevron-right text-[10px]"></i>
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -2129,5 +2199,39 @@ function getFileIconBg(type: string): string {
 /* Custom grid for 13 columns in selection mode */
 .grid-cols-13 {
   grid-template-columns: 40px repeat(11, minmax(0, 1fr));
+}
+
+/* List view table row */
+.list-row {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 12px;
+}
+
+.list-row > * {
+  flex-shrink: 0;
+}
+
+.col-checkbox { width: 40px; }
+.col-file { flex: 1 1 auto; min-width: 200px; }
+.col-author { width: 150px; }
+.col-category { width: 140px; }
+.col-stats { width: 80px; }
+.col-size { width: 80px; }
+.col-modified { width: 120px; }
+.col-actions { width: 140px; flex-shrink: 0; }
+
+/* Hide columns properly on responsive */
+@media (max-width: 1279px) {
+  .col-stats { display: none !important; }
+}
+@media (max-width: 1023px) {
+  .col-category { display: none !important; }
+}
+@media (max-width: 767px) {
+  .col-author { display: none !important; }
+  .col-size { display: none !important; }
+  .col-modified { display: none !important; }
 }
 </style>
