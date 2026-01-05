@@ -647,49 +647,6 @@ function getFileIconBg(type: string): string {
         </div>
       </div>
 
-      <!-- Libraries Section -->
-      <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-        <div class="flex items-center justify-between mb-4">
-          <h2 class="text-lg font-bold text-gray-900 flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center shadow-lg shadow-teal-200">
-              <i class="fas fa-folder-tree text-white text-sm"></i>
-            </div>
-            <div>
-              <span class="block">Libraries</span>
-              <span class="text-xs font-medium text-teal-600">Browse by category</span>
-            </div>
-          </h2>
-          <button v-if="selectedLibrary" @click="selectedLibrary = null" class="text-sm text-teal-600 hover:text-teal-700 font-medium flex items-center gap-1">
-            <i class="fas fa-times"></i>
-            Clear selection
-          </button>
-        </div>
-
-        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-          <button
-            v-for="lib in libraries"
-            :key="lib.id"
-            @click="selectedLibrary = selectedLibrary === lib.id ? null : lib.id"
-            :class="[
-              'p-4 rounded-xl text-left transition-all border-2',
-              selectedLibrary === lib.id
-                ? 'border-teal-500 bg-teal-50 shadow-lg shadow-teal-100'
-                : 'border-transparent bg-gray-50 hover:bg-gray-100 hover:shadow-md'
-            ]"
-          >
-            <div
-              class="w-12 h-12 rounded-xl flex items-center justify-center text-white mb-3 shadow-lg"
-              :style="{ backgroundColor: lib.color }"
-            >
-              <i :class="[lib.icon, 'text-lg']"></i>
-            </div>
-            <p class="font-semibold text-gray-900 text-sm truncate">{{ lib.name }}</p>
-            <p class="text-xs text-gray-500 mt-0.5">{{ lib.documentCount }} files</p>
-            <p class="text-[10px] text-gray-400 mt-1">{{ lib.lastUpdated }}</p>
-          </button>
-        </div>
-      </div>
-
       <!-- Filters & Search -->
       <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
         <div class="flex flex-col lg:flex-row gap-4">
