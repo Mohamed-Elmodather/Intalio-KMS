@@ -1426,18 +1426,18 @@ onUnmounted(() => {
       </div>
 
       <!-- Learning Progress - Enhanced -->
-      <div class="card-animated rounded-2xl p-6 stagger-5 bg-gradient-to-br from-white to-violet-50/30 border border-violet-100/50">
+      <div class="card-animated rounded-2xl p-6 stagger-5 bg-gradient-to-br from-white to-teal-50/30 border border-teal-100/50">
         <div class="flex items-center justify-between mb-5">
           <h2 class="text-lg font-bold text-gray-900 flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center shadow-lg shadow-violet-200">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center shadow-lg shadow-teal-200">
               <i class="fas fa-graduation-cap text-white text-sm"></i>
             </div>
             <div>
               <span class="block">My Learning</span>
-              <span class="text-xs font-medium text-violet-600">Continue your journey</span>
+              <span class="text-xs font-medium text-teal-600">Continue your journey</span>
             </div>
           </h2>
-          <router-link to="/learning" class="px-3 py-1.5 text-sm text-violet-600 hover:text-white bg-violet-50 hover:bg-violet-500 rounded-lg font-medium flex items-center gap-1.5 transition-all">
+          <router-link to="/learning" class="px-3 py-1.5 text-sm text-teal-600 hover:text-white bg-teal-50 hover:bg-teal-500 rounded-lg font-medium flex items-center gap-1.5 transition-all">
             Browse <i class="fas fa-arrow-right text-xs"></i>
           </router-link>
         </div>
@@ -1445,7 +1445,7 @@ onUnmounted(() => {
         <!-- Quick Stats -->
         <div class="grid grid-cols-4 gap-2 mb-4">
           <div class="text-center p-2 rounded-lg bg-white border border-gray-100">
-            <p class="text-lg font-bold text-violet-600">{{ learningStats.inProgress }}</p>
+            <p class="text-lg font-bold text-teal-600">{{ learningStats.inProgress }}</p>
             <p class="text-[9px] text-gray-500 font-medium">In Progress</p>
           </div>
           <div class="text-center p-2 rounded-lg bg-white border border-gray-100">
@@ -1466,7 +1466,7 @@ onUnmounted(() => {
         <div class="space-y-3">
           <div v-for="course in learningCourses" :key="course.id"
                @click="viewCourse(course.id)"
-               class="course-card relative rounded-xl cursor-pointer border border-gray-100 hover:border-violet-200 hover:shadow-lg transition-all group overflow-hidden bg-white">
+               class="course-card relative rounded-xl cursor-pointer border border-gray-100 hover:border-teal-200 hover:shadow-lg transition-all group overflow-hidden bg-white">
 
             <div class="p-3">
               <div class="flex gap-3">
@@ -1482,29 +1482,29 @@ onUnmounted(() => {
                   <div class="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-white shadow-md flex items-center justify-center">
                     <svg class="w-5 h-5 -rotate-90">
                       <circle cx="10" cy="10" r="8" fill="none" stroke="#e5e7eb" stroke-width="2"/>
-                      <circle cx="10" cy="10" r="8" fill="none" stroke="#8b5cf6" stroke-width="2"
+                      <circle cx="10" cy="10" r="8" fill="none" stroke="#14b8a6" stroke-width="2"
                               :stroke-dasharray="50.3"
                               :stroke-dashoffset="50.3 - (50.3 * course.progress / 100)"
                               stroke-linecap="round"/>
                     </svg>
-                    <span class="absolute text-[8px] font-bold text-violet-600">{{ course.progress }}%</span>
+                    <span class="absolute text-[8px] font-bold text-teal-600">{{ course.progress }}%</span>
                   </div>
                 </div>
 
                 <!-- Course Info -->
                 <div class="flex-1 min-w-0">
                   <div class="flex items-start justify-between gap-2">
-                    <h4 class="font-semibold text-gray-900 text-sm leading-tight group-hover:text-violet-600 transition-colors line-clamp-2">{{ course.title }}</h4>
+                    <h4 class="font-semibold text-gray-900 text-sm leading-tight group-hover:text-teal-600 transition-colors line-clamp-2">{{ course.title }}</h4>
                     <!-- Bookmark -->
                     <button @click="toggleCourseBookmark(course.id, $event)"
-                            :class="['w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 transition-all', isCourseBookmarked(course.id) ? 'bg-violet-500 text-white' : 'bg-gray-100 text-gray-400 hover:bg-violet-100 hover:text-violet-500']">
+                            :class="['w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 transition-all', isCourseBookmarked(course.id) ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-400 hover:bg-teal-100 hover:text-teal-500']">
                       <i :class="[isCourseBookmarked(course.id) ? 'fas' : 'far', 'fa-bookmark text-[10px]']"></i>
                     </button>
                   </div>
 
                   <!-- Category & Difficulty -->
                   <div class="flex items-center gap-2 mt-1">
-                    <span class="text-[9px] font-semibold px-1.5 py-0.5 rounded-full bg-violet-100 text-violet-700">{{ course.category }}</span>
+                    <span class="text-[9px] font-semibold px-1.5 py-0.5 rounded-full bg-teal-100 text-teal-700">{{ course.category }}</span>
                     <span :class="['text-[9px] font-semibold px-1.5 py-0.5 rounded-full',
                       course.difficulty === 'Beginner' ? 'bg-green-100 text-green-700' :
                       course.difficulty === 'Intermediate' ? 'bg-amber-100 text-amber-700' :
@@ -1528,13 +1528,13 @@ onUnmounted(() => {
               <div class="mt-3 pt-3 border-t border-gray-100">
                 <div class="flex items-center justify-between mb-1.5">
                   <div class="flex items-center gap-3 text-[10px] text-gray-500">
-                    <span><i class="fas fa-book-open mr-1 text-violet-400"></i>{{ course.lessonsCompleted }}/{{ course.totalLessons }} lessons</span>
-                    <span><i class="fas fa-clock mr-1 text-violet-400"></i>{{ course.duration }}</span>
+                    <span><i class="fas fa-book-open mr-1 text-teal-400"></i>{{ course.lessonsCompleted }}/{{ course.totalLessons }} lessons</span>
+                    <span><i class="fas fa-clock mr-1 text-teal-400"></i>{{ course.duration }}</span>
                   </div>
                   <span class="text-[10px] text-gray-400">{{ course.lastAccessed }}</span>
                 </div>
                 <div class="h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                  <div class="h-full bg-gradient-to-r from-violet-500 to-purple-500 rounded-full transition-all duration-500" :style="{ width: course.progress + '%' }"></div>
+                  <div class="h-full bg-gradient-to-r from-teal-500 to-teal-600 rounded-full transition-all duration-500" :style="{ width: course.progress + '%' }"></div>
                 </div>
               </div>
 
@@ -1548,12 +1548,12 @@ onUnmounted(() => {
 
                 <div class="flex items-center gap-1.5">
                   <button @click="shareCourse(course.id, $event)"
-                          class="w-7 h-7 rounded-lg bg-gray-100 hover:bg-violet-100 flex items-center justify-center text-gray-400 hover:text-violet-500 transition-all"
+                          class="w-7 h-7 rounded-lg bg-gray-100 hover:bg-teal-100 flex items-center justify-center text-gray-400 hover:text-teal-500 transition-all"
                           title="Share">
                     <i class="fas fa-share-alt text-[10px]"></i>
                   </button>
                   <button @click="continueCourse(course.id, $event)"
-                          class="px-3 py-1.5 text-[10px] font-semibold bg-gradient-to-r from-violet-500 to-purple-600 text-white rounded-lg shadow-md shadow-violet-200 hover:shadow-lg transition-all flex items-center gap-1">
+                          class="px-3 py-1.5 text-[10px] font-semibold bg-gradient-to-r from-teal-500 to-teal-600 text-white rounded-lg shadow-md shadow-teal-200 hover:shadow-lg transition-all flex items-center gap-1">
                     <i class="fas fa-play text-[8px]"></i>
                     {{ course.progress > 0 ? 'Continue' : 'Start' }}
                   </button>
@@ -1564,7 +1564,7 @@ onUnmounted(() => {
         </div>
 
         <!-- Browse More Button -->
-        <router-link to="/learning" class="block w-full mt-4 py-3 text-sm font-semibold text-violet-600 bg-violet-50 hover:bg-violet-100 border-2 border-dashed border-violet-200 hover:border-violet-300 rounded-xl transition-all text-center">
+        <router-link to="/learning" class="block w-full mt-4 py-3 text-sm font-semibold text-teal-600 bg-teal-50 hover:bg-teal-100 border-2 border-dashed border-teal-200 hover:border-teal-300 rounded-xl transition-all text-center">
           <i class="fas fa-compass mr-2"></i>
           Explore More Courses
         </router-link>
