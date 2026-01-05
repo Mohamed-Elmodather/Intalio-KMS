@@ -1814,16 +1814,16 @@ function getFileIconBg(type: string): string {
               </div>
 
               <!-- Table Body -->
-              <div class="w-full divide-y divide-gray-50">
+              <div class="w-full divide-y divide-gray-100/80">
                 <div
                   v-for="doc in filteredDocuments"
                   :key="doc.id"
                   @click="viewDocument(doc)"
                   :class="[
-                    'group list-row px-4 py-4 cursor-pointer transition-all duration-200',
+                    'group list-row list-row-enhanced px-5 py-5 cursor-pointer transition-all duration-300',
                     isDocumentSelected(doc.id)
-                      ? 'bg-teal-50/70 border-l-4 border-l-teal-500'
-                      : 'bg-white hover:bg-gradient-to-r hover:from-teal-50/30 hover:to-transparent'
+                      ? 'bg-gradient-to-r from-teal-50 to-teal-25 shadow-sm'
+                      : 'bg-white hover:bg-gradient-to-r hover:from-slate-50/80 hover:to-white hover:shadow-sm'
                   ]"
                 >
                   <!-- Selection Checkbox -->
@@ -1831,166 +1831,190 @@ function getFileIconBg(type: string): string {
                     <div
                       @click.stop="toggleDocumentSelection(doc.id); if (!isSelectionMode) isSelectionMode = true"
                       :class="[
-                        'w-5 h-5 rounded border-2 flex items-center justify-center cursor-pointer transition-all',
+                        'w-6 h-6 rounded-lg border-2 flex items-center justify-center cursor-pointer transition-all duration-200',
                         isDocumentSelected(doc.id)
-                          ? 'bg-teal-500 border-teal-500 text-white'
-                          : 'border-gray-300 hover:border-teal-400 group-hover:border-teal-300'
+                          ? 'bg-teal-500 border-teal-500 text-white shadow-md shadow-teal-200'
+                          : 'border-gray-300 hover:border-teal-400 hover:bg-teal-50 group-hover:border-teal-300'
                       ]"
                     >
-                      <i v-if="isDocumentSelected(doc.id)" class="fas fa-check text-[10px]"></i>
+                      <i v-if="isDocumentSelected(doc.id)" class="fas fa-check text-xs"></i>
                     </div>
                   </div>
 
                   <!-- File Details Column (Name, Type, Tags) -->
-                  <div class="col-file flex items-center gap-3">
-                    <!-- File Icon with Type Badge -->
+                  <div class="col-file flex items-center gap-4">
+                    <!-- File Icon with Glow Effect -->
                     <div class="relative flex-shrink-0">
-                      <div :class="['w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-200 group-hover:scale-110 group-hover:shadow-lg', getFileIconBg(doc.type)]">
-                        <i :class="[getFileIcon(doc.type), getFileIconColor(doc.type), 'text-xl']"></i>
+                      <div :class="['file-icon-glow w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-300 group-hover:scale-105 group-hover:shadow-xl', getFileIconBg(doc.type)]">
+                        <i :class="[getFileIcon(doc.type), getFileIconColor(doc.type), 'text-2xl']"></i>
                       </div>
-                      <span :class="['absolute -bottom-1 -right-1 px-1.5 py-0.5 text-[8px] font-bold uppercase rounded-md shadow-sm', getFileIconBg(doc.type), getFileIconColor(doc.type)]">
+                      <span :class="['absolute -bottom-1.5 -right-1.5 px-2 py-0.5 text-[9px] font-bold uppercase rounded-lg shadow-md border-2 border-white', getFileIconBg(doc.type), getFileIconColor(doc.type)]">
                         {{ doc.type }}
                       </span>
                     </div>
                     <!-- File Info -->
-                    <div class="min-w-0 flex-1">
-                      <div class="flex items-center gap-2 mb-1">
-                        <h4 class="font-semibold text-gray-900 text-sm truncate group-hover:text-teal-600 transition-colors">{{ doc.name }}</h4>
-                        <span v-if="doc.isStarred" class="w-5 h-5 bg-amber-100 text-amber-500 rounded-md flex items-center justify-center flex-shrink-0">
-                          <i class="fas fa-star text-[8px]"></i>
-                        </span>
-                        <span v-if="doc.isShared" class="w-5 h-5 bg-blue-100 text-blue-500 rounded-md flex items-center justify-center flex-shrink-0">
-                          <i class="fas fa-share-alt text-[8px]"></i>
-                        </span>
-                        <span v-if="doc.isSharedWithMe" class="w-5 h-5 bg-purple-100 text-purple-500 rounded-md flex items-center justify-center flex-shrink-0">
-                          <i class="fas fa-user-friends text-[8px]"></i>
-                        </span>
-                        <span v-if="doc.isTeamFile" class="w-5 h-5 bg-teal-100 text-teal-500 rounded-md flex items-center justify-center flex-shrink-0">
-                          <i class="fas fa-users text-[8px]"></i>
-                        </span>
+                    <div class="min-w-0 flex-1 space-y-1.5">
+                      <div class="flex items-center gap-2">
+                        <h4 class="font-semibold text-gray-900 text-base truncate group-hover:text-teal-600 transition-colors">{{ doc.name }}</h4>
+                        <!-- Status Badges -->
+                        <div class="flex items-center gap-1.5 flex-shrink-0">
+                          <span v-if="doc.isStarred" class="w-6 h-6 bg-gradient-to-br from-amber-100 to-amber-50 text-amber-500 rounded-lg flex items-center justify-center shadow-sm">
+                            <i class="fas fa-star text-[10px]"></i>
+                          </span>
+                          <span v-if="doc.isShared" class="w-6 h-6 bg-gradient-to-br from-blue-100 to-blue-50 text-blue-500 rounded-lg flex items-center justify-center shadow-sm">
+                            <i class="fas fa-share-alt text-[10px]"></i>
+                          </span>
+                          <span v-if="doc.isTeamFile" class="w-6 h-6 bg-gradient-to-br from-teal-100 to-teal-50 text-teal-500 rounded-lg flex items-center justify-center shadow-sm">
+                            <i class="fas fa-users text-[10px]"></i>
+                          </span>
+                        </div>
                       </div>
-                      <!-- Tags inline -->
-                      <div class="flex items-center gap-1.5 flex-wrap">
-                        <span v-for="tag in doc.tags.slice(0, 3)" :key="tag" class="px-2 py-0.5 bg-gray-100 text-gray-500 text-[10px] rounded-full font-medium hover:bg-teal-100 hover:text-teal-600 transition-colors cursor-pointer">
-                          #{{ tag }}
+                      <!-- Tags with improved styling -->
+                      <div class="flex items-center gap-2 flex-wrap">
+                        <span v-for="tag in doc.tags.slice(0, 4)" :key="tag" class="px-2.5 py-1 bg-gradient-to-r from-gray-100 to-gray-50 text-gray-600 text-[11px] rounded-lg font-medium hover:from-teal-100 hover:to-teal-50 hover:text-teal-700 transition-all cursor-pointer border border-gray-100 hover:border-teal-200">
+                          {{ tag }}
                         </span>
-                        <span v-if="doc.tags.length > 3" class="text-[10px] text-gray-400">
-                          +{{ doc.tags.length - 3 }} more
+                        <span v-if="doc.tags.length > 4" class="text-[11px] text-gray-400 font-medium">
+                          +{{ doc.tags.length - 4 }} more
                         </span>
                       </div>
                       <!-- Mobile meta info -->
-                      <div class="flex items-center gap-2 mt-1 text-[10px] text-gray-400 md:hidden">
-                        <span>{{ formatFileSize(doc.size) }}</span>
-                        <span>•</span>
-                        <span>{{ getRelativeTime(doc.updatedAt) }}</span>
-                        <span>•</span>
-                        <span><i class="fas fa-download mr-1"></i>{{ doc.downloads }}</span>
+                      <div class="flex items-center gap-3 mt-2 text-xs text-gray-400 md:hidden">
+                        <span class="flex items-center gap-1">
+                          <i class="fas fa-hdd text-[10px]"></i>
+                          {{ formatFileSize(doc.size) }}
+                        </span>
+                        <span class="flex items-center gap-1">
+                          <i class="fas fa-clock text-[10px]"></i>
+                          {{ getRelativeTime(doc.updatedAt) }}
+                        </span>
+                        <span class="flex items-center gap-1">
+                          <i class="fas fa-download text-[10px]"></i>
+                          {{ doc.downloads }}
+                        </span>
                       </div>
                     </div>
                   </div>
 
-                  <!-- Author Column -->
-                  <div class="col-author hidden md:flex items-center gap-2">
-                    <div
-                      class="w-9 h-9 rounded-full flex items-center justify-center text-white text-xs font-bold shadow-md ring-2 ring-white"
-                      :style="{ backgroundColor: doc.author.color }"
-                    >
-                      {{ doc.author.initials }}
+                  <!-- Author Column - Enhanced -->
+                  <div class="col-author hidden md:flex items-center gap-3">
+                    <div class="relative">
+                      <div
+                        class="w-10 h-10 rounded-xl flex items-center justify-center text-white text-sm font-bold shadow-lg ring-2 ring-white"
+                        :style="{ backgroundColor: doc.author.color }"
+                      >
+                        {{ doc.author.initials }}
+                      </div>
+                      <span class="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-400 border-2 border-white rounded-full"></span>
                     </div>
                     <div class="min-w-0">
-                      <p class="text-xs font-medium text-gray-700 truncate">{{ doc.author.name }}</p>
-                      <p class="text-[10px] text-gray-400">Owner</p>
+                      <p class="text-sm font-medium text-gray-800 truncate">{{ doc.author.name }}</p>
+                      <p class="text-[11px] text-gray-400 flex items-center gap-1">
+                        <i class="fas fa-crown text-amber-400 text-[9px]"></i>
+                        Owner
+                      </p>
                     </div>
                   </div>
 
-                  <!-- Category Column -->
+                  <!-- Category Column - Enhanced -->
                   <div class="col-category hidden lg:flex items-center">
-                    <div class="flex items-center gap-2 px-2.5 py-1.5 bg-purple-50 rounded-lg">
-                      <i class="fas fa-folder text-purple-400 text-xs"></i>
-                      <span class="text-xs text-purple-700 font-medium truncate">{{ doc.category || 'Uncategorized' }}</span>
-                    </div>
-                  </div>
-
-                  <!-- Stats Column (Downloads) -->
-                  <div class="col-stats hidden xl:flex items-center">
-                    <div class="flex flex-col items-center gap-0.5">
-                      <div class="flex items-center gap-1 text-green-600">
-                        <i class="fas fa-download text-[10px]"></i>
-                        <span class="text-xs font-semibold">{{ doc.downloads }}</span>
+                    <div class="flex items-center gap-2.5 px-3 py-2 bg-gradient-to-r from-purple-50 to-violet-50 rounded-xl border border-purple-100/50">
+                      <div class="w-7 h-7 bg-purple-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-folder text-purple-500 text-xs"></i>
                       </div>
-                      <span class="text-[9px] text-gray-400">downloads</span>
+                      <span class="text-sm text-purple-700 font-medium truncate">{{ doc.category || 'General' }}</span>
                     </div>
                   </div>
 
-                  <!-- Size Column -->
+                  <!-- Stats Column - Enhanced with mini chart -->
+                  <div class="col-stats hidden xl:flex flex-col items-center justify-center">
+                    <div class="text-center">
+                      <div class="flex items-center justify-center gap-1.5 text-emerald-600 mb-1">
+                        <i class="fas fa-arrow-down text-[10px]"></i>
+                        <span class="text-lg font-bold">{{ doc.downloads.toLocaleString() }}</span>
+                      </div>
+                      <div class="download-bar w-16">
+                        <div class="download-bar-fill" :style="{ width: Math.min(doc.downloads / 20, 100) + '%' }"></div>
+                      </div>
+                      <span class="text-[10px] text-gray-400 mt-1 block">downloads</span>
+                    </div>
+                  </div>
+
+                  <!-- Size Column - Enhanced -->
                   <div class="col-size hidden sm:flex items-center">
-                    <div class="flex flex-col">
-                      <span class="text-xs font-semibold text-gray-700">{{ formatFileSize(doc.size) }}</span>
-                      <span class="text-[9px] text-gray-400">File size</span>
+                    <div class="text-center">
+                      <div class="flex items-center gap-1.5 text-gray-700 mb-0.5">
+                        <i class="fas fa-database text-amber-500 text-xs"></i>
+                        <span class="text-sm font-semibold">{{ formatFileSize(doc.size) }}</span>
+                      </div>
+                      <span class="text-[10px] text-gray-400">file size</span>
                     </div>
                   </div>
 
-                  <!-- Modified Column -->
+                  <!-- Modified Column - Enhanced -->
                   <div class="col-modified hidden sm:flex items-center">
-                    <div class="flex flex-col">
-                      <span class="text-xs font-medium text-gray-700">{{ getRelativeTime(doc.updatedAt) }}</span>
-                      <span class="text-[9px] text-gray-400">{{ new Date(doc.updatedAt).toLocaleDateString() }}</span>
+                    <div class="space-y-0.5">
+                      <div class="flex items-center gap-1.5 text-gray-700">
+                        <i class="fas fa-history text-blue-400 text-xs"></i>
+                        <span class="text-sm font-medium">{{ getRelativeTime(doc.updatedAt) }}</span>
+                      </div>
+                      <span class="text-[10px] text-gray-400 pl-5">{{ new Date(doc.updatedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) }}</span>
                     </div>
                   </div>
 
-                  <!-- Actions Column -->
-                  <div class="col-actions flex items-center justify-end">
-                    <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all duration-200">
+                  <!-- Actions Column - Enhanced -->
+                  <div class="col-actions flex items-center justify-end gap-1">
+                    <div class="flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-2 group-hover:translate-x-0">
                       <template v-if="currentView !== 'trash'">
                         <button
                           @click.stop="toggleStar(doc)"
                           :class="[
-                            'w-8 h-8 rounded-lg flex items-center justify-center transition-all',
-                            doc.isStarred ? 'bg-amber-100 text-amber-600 hover:bg-amber-200' : 'bg-gray-100 text-gray-500 hover:bg-amber-100 hover:text-amber-600'
+                            'w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-200 shadow-sm',
+                            doc.isStarred ? 'bg-amber-100 text-amber-600 hover:bg-amber-200 hover:shadow-md' : 'bg-gray-100 text-gray-500 hover:bg-amber-100 hover:text-amber-600 hover:shadow-md'
                           ]"
                           :title="doc.isStarred ? 'Remove from Starred' : 'Add to Starred'"
                         >
-                          <i class="fas fa-star text-xs"></i>
+                          <i class="fas fa-star text-sm"></i>
                         </button>
                         <button
                           @click.stop="downloadDocument(doc)"
-                          class="w-8 h-8 rounded-lg bg-gray-100 text-gray-500 hover:bg-teal-100 hover:text-teal-600 flex items-center justify-center transition-all"
+                          class="w-9 h-9 rounded-xl bg-gray-100 text-gray-500 hover:bg-teal-100 hover:text-teal-600 flex items-center justify-center transition-all duration-200 shadow-sm hover:shadow-md"
                           title="Download"
                         >
-                          <i class="fas fa-download text-xs"></i>
+                          <i class="fas fa-download text-sm"></i>
                         </button>
                         <button
                           @click.stop="shareDocument(doc)"
-                          class="w-8 h-8 rounded-lg bg-gray-100 text-gray-500 hover:bg-blue-100 hover:text-blue-600 flex items-center justify-center transition-all"
+                          class="w-9 h-9 rounded-xl bg-gray-100 text-gray-500 hover:bg-blue-100 hover:text-blue-600 flex items-center justify-center transition-all duration-200 shadow-sm hover:shadow-md"
                           title="Share"
                         >
-                          <i class="fas fa-share-alt text-xs"></i>
+                          <i class="fas fa-share-alt text-sm"></i>
                         </button>
                       </template>
                       <template v-else>
                         <button
                           @click.stop="restoreFromTrash(doc)"
-                          class="w-8 h-8 rounded-lg bg-teal-100 text-teal-600 hover:bg-teal-200 flex items-center justify-center transition-all"
+                          class="w-9 h-9 rounded-xl bg-teal-100 text-teal-600 hover:bg-teal-200 flex items-center justify-center transition-all duration-200 shadow-sm hover:shadow-md"
                           title="Restore"
                         >
-                          <i class="fas fa-undo text-xs"></i>
+                          <i class="fas fa-undo text-sm"></i>
                         </button>
                         <button
                           @click.stop="permanentlyDelete(doc)"
-                          class="w-8 h-8 rounded-lg bg-red-100 text-red-600 hover:bg-red-200 flex items-center justify-center transition-all"
+                          class="w-9 h-9 rounded-xl bg-red-100 text-red-600 hover:bg-red-200 flex items-center justify-center transition-all duration-200 shadow-sm hover:shadow-md"
                           title="Delete permanently"
                         >
-                          <i class="fas fa-trash text-xs"></i>
+                          <i class="fas fa-trash text-sm"></i>
                         </button>
                       </template>
                     </div>
                     <!-- Always visible quick preview button -->
                     <button
                       @click.stop="viewDocument(doc)"
-                      class="w-8 h-8 rounded-lg bg-teal-50 text-teal-600 hover:bg-teal-100 flex items-center justify-center transition-all ml-1"
+                      class="w-9 h-9 rounded-xl bg-gradient-to-br from-teal-50 to-teal-100 text-teal-600 hover:from-teal-100 hover:to-teal-200 flex items-center justify-center transition-all duration-200 shadow-sm hover:shadow-md"
                       title="Quick Preview"
                     >
-                      <i class="fas fa-eye text-xs"></i>
+                      <i class="fas fa-eye text-sm"></i>
                     </button>
                   </div>
                 </div>
@@ -2199,7 +2223,7 @@ function getFileIconBg(type: string): string {
   display: flex;
   align-items: center;
   width: 100%;
-  gap: 12px;
+  gap: 16px;
 }
 
 .list-row > * {
@@ -2207,13 +2231,13 @@ function getFileIconBg(type: string): string {
 }
 
 .col-checkbox { width: 40px; }
-.col-file { flex: 1 1 auto; min-width: 200px; }
-.col-author { width: 150px; }
-.col-category { width: 140px; }
-.col-stats { width: 80px; }
-.col-size { width: 80px; }
-.col-modified { width: 120px; }
-.col-actions { width: 140px; flex-shrink: 0; }
+.col-file { flex: 1 1 auto; min-width: 280px; }
+.col-author { width: 180px; }
+.col-category { width: 160px; }
+.col-stats { width: 100px; }
+.col-size { width: 100px; }
+.col-modified { width: 140px; }
+.col-actions { width: 120px; flex-shrink: 0; }
 
 /* Hide columns properly on responsive */
 @media (max-width: 1279px) {
@@ -2226,5 +2250,63 @@ function getFileIconBg(type: string): string {
   .col-author { display: none !important; }
   .col-size { display: none !important; }
   .col-modified { display: none !important; }
+}
+
+/* Enhanced list row hover */
+.list-row-enhanced {
+  position: relative;
+  overflow: hidden;
+}
+
+.list-row-enhanced::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: linear-gradient(180deg, #14b8a6, #0d9488);
+  transform: scaleY(0);
+  transition: transform 0.2s ease;
+}
+
+.list-row-enhanced:hover::before {
+  transform: scaleY(1);
+}
+
+/* File icon glow effect */
+.file-icon-glow {
+  position: relative;
+}
+
+.file-icon-glow::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 16px;
+  background: inherit;
+  opacity: 0;
+  filter: blur(8px);
+  transition: opacity 0.3s ease;
+  z-index: -1;
+}
+
+.group:hover .file-icon-glow::after {
+  opacity: 0.4;
+}
+
+/* Download progress bar */
+.download-bar {
+  height: 4px;
+  border-radius: 2px;
+  background: #e5e7eb;
+  overflow: hidden;
+}
+
+.download-bar-fill {
+  height: 100%;
+  border-radius: 2px;
+  background: linear-gradient(90deg, #10b981, #14b8a6);
+  transition: width 0.3s ease;
 }
 </style>
