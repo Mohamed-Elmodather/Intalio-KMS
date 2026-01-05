@@ -974,94 +974,47 @@ onUnmounted(() => {
   <div class="px-8 py-6">
     <!-- Welcome Section - Enhanced -->
     <div class="welcome-hero rounded-2xl mb-8 relative overflow-hidden stagger-1">
-      <!-- Decorative elements -->
-      <div class="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/3"></div>
-      <div class="absolute bottom-0 left-0 w-64 h-64 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/3"></div>
-      <div class="absolute top-1/2 right-1/4 w-32 h-32 bg-white/10 rounded-full"></div>
+      <!-- Decorative elements with drift animations -->
+      <div class="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full circle-drift-1"></div>
+      <div class="absolute bottom-0 left-0 w-64 h-64 bg-white/5 rounded-full circle-drift-2"></div>
+      <div class="absolute top-1/2 right-1/4 w-32 h-32 bg-white/10 rounded-full circle-drift-3"></div>
+
+      <!-- Trophy Icon - Top Right with glow animation -->
+      <div class="absolute top-6 right-6 w-20 h-20 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center trophy-glow">
+        <i class="fas fa-trophy text-white text-3xl"></i>
+      </div>
 
       <div class="relative p-8">
-        <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
-          <!-- Left Content -->
-          <div class="flex-1">
-            <div class="flex items-center gap-3 mb-4">
-              <div class="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-white text-xs font-semibold flex items-center gap-2">
-                <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-                AFC Asian Cup Saudi Arabia 2027
-              </div>
-            </div>
-
-            <h1 class="text-3xl font-bold text-white mb-3 fade-in-up" style="animation-delay: 0.3s;">
-              Good {{ timeOfDay }}, Ahmed! <span class="text-2xl inline-block icon-float">👋</span>
-            </h1>
-            <p class="text-teal-100 max-w-lg fade-in-up text-base" style="animation-delay: 0.4s;">
-              Welcome to the Knowledge Management System. You have
-              <span class="font-semibold text-white">3 pending tasks</span> and
-              <span class="font-semibold text-white">5 new updates</span> to review.
-            </p>
-
-            <!-- Quick Action Buttons -->
-            <div class="flex flex-wrap gap-3 mt-6 fade-in-up" style="animation-delay: 0.5s;">
-              <router-link to="/learning" class="px-5 py-2.5 bg-white text-teal-600 rounded-xl font-semibold text-sm flex items-center gap-2 hover:bg-teal-50 transition-all shadow-lg shadow-black/10">
-                <i class="fas fa-play text-xs"></i>
-                Continue Learning
-              </router-link>
-              <router-link to="/articles/new" class="px-5 py-2.5 bg-white/20 backdrop-blur-sm border border-white/30 text-white rounded-xl font-semibold text-sm hover:bg-white/30 transition-all flex items-center gap-2">
-                <i class="fas fa-plus text-xs"></i>
-                Create Content
-              </router-link>
-              <router-link to="/events" class="px-5 py-2.5 bg-white/20 backdrop-blur-sm border border-white/30 text-white rounded-xl font-semibold text-sm hover:bg-white/30 transition-all flex items-center gap-2">
-                <i class="fas fa-calendar text-xs"></i>
-                View Events
-              </router-link>
-            </div>
+        <div class="flex items-center gap-3 mb-4">
+          <div class="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-white text-xs font-semibold flex items-center gap-2">
+            <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+            AFC Asian Cup Saudi Arabia 2027
           </div>
+        </div>
 
-          <!-- Right Content - Countdown & Stats -->
-          <div class="flex flex-col items-center gap-4 scale-in" style="animation-delay: 0.6s;">
-            <!-- Tournament Logo/Icon -->
-            <div class="w-24 h-24 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center shadow-xl icon-float">
-              <i class="fas fa-trophy text-white text-4xl"></i>
-            </div>
+        <h1 class="text-3xl font-bold text-white mb-3 fade-in-up" style="animation-delay: 0.3s;">
+          Good {{ timeOfDay }}, Ahmed! <span class="text-2xl inline-block icon-float">👋</span>
+        </h1>
+        <p class="text-teal-100 max-w-lg fade-in-up text-base" style="animation-delay: 0.4s;">
+          Welcome to the Knowledge Management System. You have
+          <span class="font-semibold text-white">3 pending tasks</span> and
+          <span class="font-semibold text-white">5 new updates</span> to review.
+        </p>
 
-            <!-- Countdown -->
-            <div class="bg-white/20 backdrop-blur-sm rounded-xl p-4 text-center">
-              <p class="text-white/80 text-xs font-medium mb-2">Tournament Starts In</p>
-              <div class="flex items-center gap-2">
-                <div class="bg-white/20 rounded-lg px-3 py-2 min-w-[50px]">
-                  <p class="text-2xl font-bold text-white">5</p>
-                  <p class="text-[9px] text-white/70 uppercase">Days</p>
-                </div>
-                <span class="text-white text-xl font-bold">:</span>
-                <div class="bg-white/20 rounded-lg px-3 py-2 min-w-[50px]">
-                  <p class="text-2xl font-bold text-white">12</p>
-                  <p class="text-[9px] text-white/70 uppercase">Hours</p>
-                </div>
-                <span class="text-white text-xl font-bold">:</span>
-                <div class="bg-white/20 rounded-lg px-3 py-2 min-w-[50px]">
-                  <p class="text-2xl font-bold text-white">48</p>
-                  <p class="text-[9px] text-white/70 uppercase">Mins</p>
-                </div>
-              </div>
-            </div>
-
-            <!-- Quick Stats -->
-            <div class="flex items-center gap-4 text-white/90 text-xs">
-              <div class="flex items-center gap-1.5">
-                <i class="fas fa-users"></i>
-                <span>24 Teams</span>
-              </div>
-              <div class="w-1 h-1 bg-white/50 rounded-full"></div>
-              <div class="flex items-center gap-1.5">
-                <i class="fas fa-futbol"></i>
-                <span>51 Matches</span>
-              </div>
-              <div class="w-1 h-1 bg-white/50 rounded-full"></div>
-              <div class="flex items-center gap-1.5">
-                <i class="fas fa-stadium"></i>
-                <span>5 Venues</span>
-              </div>
-            </div>
-          </div>
+        <!-- Quick Action Buttons -->
+        <div class="flex flex-wrap gap-3 mt-6 fade-in-up" style="animation-delay: 0.5s;">
+          <router-link to="/learning" class="px-5 py-2.5 bg-white text-teal-600 rounded-xl font-semibold text-sm flex items-center gap-2 hover:bg-teal-50 transition-all shadow-lg shadow-black/10">
+            <i class="fas fa-play text-xs"></i>
+            Continue Learning
+          </router-link>
+          <router-link to="/articles/new" class="px-5 py-2.5 bg-white/20 backdrop-blur-sm border border-white/30 text-white rounded-xl font-semibold text-sm hover:bg-white/30 transition-all flex items-center gap-2">
+            <i class="fas fa-plus text-xs"></i>
+            Create Content
+          </router-link>
+          <router-link to="/events" class="px-5 py-2.5 bg-white/20 backdrop-blur-sm border border-white/30 text-white rounded-xl font-semibold text-sm hover:bg-white/30 transition-all flex items-center gap-2">
+            <i class="fas fa-calendar text-xs"></i>
+            View Events
+          </router-link>
         </div>
       </div>
     </div>
@@ -1874,6 +1827,78 @@ onUnmounted(() => {
 .welcome-hero {
   background: linear-gradient(135deg, #0d9488 0%, #14b8a6 50%, #10b981 100%);
   box-shadow: 0 10px 40px rgba(13, 148, 136, 0.3);
+}
+
+/* Trophy Animation */
+.trophy-glow {
+  animation: trophy-pulse 3s ease-in-out infinite, trophy-float 4s ease-in-out infinite;
+}
+
+@keyframes trophy-pulse {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.2), 0 0 40px rgba(255, 255, 255, 0.1);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(255, 255, 255, 0.4), 0 0 60px rgba(255, 255, 255, 0.2);
+  }
+}
+
+@keyframes trophy-float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+/* Decorative Circle Animations */
+.circle-drift-1 {
+  animation: drift-1 20s ease-in-out infinite;
+}
+
+.circle-drift-2 {
+  animation: drift-2 25s ease-in-out infinite;
+}
+
+.circle-drift-3 {
+  animation: drift-3 18s ease-in-out infinite;
+}
+
+@keyframes drift-1 {
+  0%, 100% {
+    transform: translate(33%, -50%);
+  }
+  25% {
+    transform: translate(28%, -45%);
+  }
+  50% {
+    transform: translate(35%, -55%);
+  }
+  75% {
+    transform: translate(30%, -48%);
+  }
+}
+
+@keyframes drift-2 {
+  0%, 100% {
+    transform: translate(-33%, 50%);
+  }
+  33% {
+    transform: translate(-28%, 45%);
+  }
+  66% {
+    transform: translate(-38%, 55%);
+  }
+}
+
+@keyframes drift-3 {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(10px, -10px) scale(1.1);
+  }
 }
 
 /* Carousel Styles */
