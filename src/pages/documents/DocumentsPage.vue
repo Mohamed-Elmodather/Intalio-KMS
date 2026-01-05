@@ -1881,21 +1881,6 @@ function getFileIconBg(type: string): string {
                           +{{ doc.tags.length - 3 }}
                         </span>
                       </div>
-                      <!-- Mobile meta info -->
-                      <div class="flex items-center gap-3 text-[10px] text-gray-400 md:hidden">
-                        <span class="flex items-center gap-1">
-                          <i class="fas fa-hdd"></i>
-                          {{ formatFileSize(doc.size) }}
-                        </span>
-                        <span class="flex items-center gap-1">
-                          <i class="fas fa-clock"></i>
-                          {{ getRelativeTime(doc.updatedAt) }}
-                        </span>
-                        <span class="flex items-center gap-1">
-                          <i class="fas fa-download"></i>
-                          {{ doc.downloads }}
-                        </span>
-                      </div>
                     </div>
                   </div>
 
