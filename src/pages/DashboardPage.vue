@@ -1329,11 +1329,6 @@ onUnmounted(() => {
           </div>
         </div>
 
-        <!-- Add to Calendar Button -->
-        <button class="w-full mt-4 py-3 text-sm font-semibold text-teal-600 bg-teal-50 hover:bg-teal-100 border-2 border-dashed border-teal-200 hover:border-teal-300 rounded-xl transition-all flex items-center justify-center gap-2">
-          <i class="fas fa-calendar-plus"></i>
-          Sync with Calendar
-        </button>
       </div>
 
       <!-- Polls -->
@@ -1563,11 +1558,6 @@ onUnmounted(() => {
           </div>
         </div>
 
-        <!-- Browse More Button -->
-        <router-link to="/learning" class="block w-full mt-4 py-3 text-sm font-semibold text-teal-600 bg-teal-50 hover:bg-teal-100 border-2 border-dashed border-teal-200 hover:border-teal-300 rounded-xl transition-all text-center">
-          <i class="fas fa-compass mr-2"></i>
-          Explore More Courses
-        </router-link>
       </div>
     </div>
 
