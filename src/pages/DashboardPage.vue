@@ -1465,7 +1465,7 @@ onUnmounted(() => {
                @click="viewCourse(course.id)"
                class="course-card relative rounded-xl cursor-pointer border border-gray-100 hover:border-teal-200 hover:shadow-lg transition-all group overflow-hidden bg-white">
 
-            <div class="p-3">
+            <div class="p-3 h-full flex flex-col">
               <div class="flex gap-3">
                 <!-- Course Thumbnail -->
                 <div class="relative flex-shrink-0">
@@ -1489,14 +1489,28 @@ onUnmounted(() => {
                 </div>
 
                 <!-- Course Info -->
-                <div class="flex-1 min-w-0">
+                <div class="flex-1 min-w-0 flex flex-col">
                   <div class="flex items-start justify-between gap-2">
-                    <h4 class="font-semibold text-gray-900 text-sm leading-tight group-hover:text-teal-600 transition-colors line-clamp-2">{{ course.title }}</h4>
-                    <!-- Bookmark -->
-                    <button @click="toggleCourseBookmark(course.id, $event)"
-                            :class="['w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 transition-all', isCourseBookmarked(course.id) ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-400 hover:bg-teal-100 hover:text-teal-500']">
-                      <i :class="[isCourseBookmarked(course.id) ? 'fas' : 'far', 'fa-bookmark text-[10px]']"></i>
-                    </button>
+                    <h4 class="font-semibold text-gray-900 text-sm leading-tight group-hover:text-teal-600 transition-colors line-clamp-1">{{ course.title }}</h4>
+
+                    <!-- Actions moved to top right -->
+                    <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
+                      <button @click="toggleCourseBookmark(course.id, $event)"
+                              :class="['w-7 h-7 rounded-lg flex items-center justify-center transition-all', isCourseBookmarked(course.id) ? 'bg-teal-500 text-white' : 'bg-teal-50 hover:bg-teal-100 text-teal-500 hover:text-teal-600']"
+                              title="Bookmark">
+                        <i :class="[isCourseBookmarked(course.id) ? 'fas' : 'far', 'fa-bookmark text-[10px]']"></i>
+                      </button>
+                      <button @click="shareCourse(course.id, $event)"
+                              class="w-7 h-7 rounded-lg bg-teal-50 hover:bg-teal-100 flex items-center justify-center text-teal-500 hover:text-teal-600 transition-all"
+                              title="Share">
+                        <i class="fas fa-share-alt text-[10px]"></i>
+                      </button>
+                      <button @click="continueCourse(course.id, $event)"
+                              class="w-7 h-7 rounded-lg bg-teal-500 hover:bg-teal-600 flex items-center justify-center text-white transition-all"
+                              title="Continue">
+                        <i class="fas fa-play text-[10px]"></i>
+                      </button>
+                    </div>
                   </div>
 
                   <!-- Category & Difficulty -->
@@ -1521,8 +1535,8 @@ onUnmounted(() => {
                 </div>
               </div>
 
-              <!-- Progress Bar & Stats -->
-              <div class="mt-3 pt-3 border-t border-gray-100">
+              <!-- Progress Bar & Stats - pushed to bottom -->
+              <div class="mt-auto pt-3 border-t border-gray-100">
                 <div class="flex items-center justify-between mb-1.5">
                   <div class="flex items-center gap-3 text-[10px] text-gray-500">
                     <span><i class="fas fa-book-open mr-1 text-teal-400"></i>{{ course.lessonsCompleted }}/{{ course.totalLessons }} lessons</span>
@@ -1532,28 +1546,6 @@ onUnmounted(() => {
                 </div>
                 <div class="h-1.5 bg-gray-100 rounded-full overflow-hidden">
                   <div class="h-full bg-gradient-to-r from-teal-500 to-teal-600 rounded-full transition-all duration-500" :style="{ width: course.progress + '%' }"></div>
-                </div>
-              </div>
-
-              <!-- Actions -->
-              <div class="flex items-center justify-between mt-3">
-                <button v-if="course.certificateAvailable && course.progress === 100"
-                        class="text-[10px] font-semibold text-amber-600 flex items-center gap-1">
-                  <i class="fas fa-certificate"></i> Get Certificate
-                </button>
-                <span v-else></span>
-
-                <div class="flex items-center gap-1.5">
-                  <button @click="shareCourse(course.id, $event)"
-                          class="w-7 h-7 rounded-lg bg-gray-100 hover:bg-teal-100 flex items-center justify-center text-gray-400 hover:text-teal-500 transition-all"
-                          title="Share">
-                    <i class="fas fa-share-alt text-[10px]"></i>
-                  </button>
-                  <button @click="continueCourse(course.id, $event)"
-                          class="px-3 py-1.5 text-[10px] font-semibold bg-gradient-to-r from-teal-500 to-teal-600 text-white rounded-lg shadow-md shadow-teal-200 hover:shadow-lg transition-all flex items-center gap-1">
-                    <i class="fas fa-play text-[8px]"></i>
-                    {{ course.progress > 0 ? 'Continue' : 'Start' }}
-                  </button>
                 </div>
               </div>
             </div>
