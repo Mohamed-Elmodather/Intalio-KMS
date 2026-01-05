@@ -51,6 +51,7 @@ const articles = ref([
     category: 'Getting Started',
     readTime: '5 min',
     icon: 'fas fa-rocket',
+    image: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=400&h=300&fit=crop',
     author: { name: 'Sarah Chen', initials: 'SC' },
     date: '2h ago',
     views: 1250,
@@ -66,6 +67,7 @@ const articles = ref([
     category: 'Best Practices',
     readTime: '8 min',
     icon: 'fas fa-users',
+    image: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=400&h=300&fit=crop',
     author: { name: 'Mike Johnson', initials: 'MJ' },
     date: '5h ago',
     views: 890,
@@ -81,6 +83,7 @@ const articles = ref([
     category: 'Security',
     readTime: '12 min',
     icon: 'fas fa-shield-halved',
+    image: 'https://images.unsplash.com/photo-1563986768609-322da13575f3?w=400&h=300&fit=crop',
     author: { name: 'Emily Davis', initials: 'ED' },
     date: 'Yesterday',
     views: 2100,
@@ -96,6 +99,7 @@ const articles = ref([
     category: 'HR & Benefits',
     readTime: '10 min',
     icon: 'fas fa-heart',
+    image: 'https://images.unsplash.com/photo-1521791136064-7986c2920216?w=400&h=300&fit=crop',
     author: { name: 'Lisa Wong', initials: 'LW' },
     date: '2 days ago',
     views: 1567,
@@ -111,6 +115,7 @@ const articles = ref([
     category: 'Tutorials',
     readTime: '15 min',
     icon: 'fas fa-code',
+    image: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=400&h=300&fit=crop',
     author: { name: 'Alex Thompson', initials: 'AT' },
     date: '3 days ago',
     views: 3200,
@@ -126,6 +131,7 @@ const articles = ref([
     category: 'Technology',
     readTime: '20 min',
     icon: 'fas fa-cloud',
+    image: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=400&h=300&fit=crop',
     author: { name: 'David Kim', initials: 'DK' },
     date: '4 days ago',
     views: 1890,
@@ -141,6 +147,7 @@ const articles = ref([
     category: 'Getting Started',
     readTime: '7 min',
     icon: 'fas fa-clipboard-check',
+    image: 'https://images.unsplash.com/photo-1553877522-43269d4ea984?w=400&h=300&fit=crop',
     author: { name: 'Rachel Green', initials: 'RG' },
     date: '5 days ago',
     views: 4500,
@@ -156,6 +163,7 @@ const articles = ref([
     category: 'Policies',
     readTime: '18 min',
     icon: 'fas fa-user-shield',
+    image: 'https://images.unsplash.com/photo-1633265486064-086b219458ec?w=400&h=300&fit=crop',
     author: { name: 'James Wilson', initials: 'JW' },
     date: '1 week ago',
     views: 2340,
@@ -171,6 +179,7 @@ const articles = ref([
     category: 'Best Practices',
     readTime: '6 min',
     icon: 'fas fa-video',
+    image: 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=400&h=300&fit=crop',
     author: { name: 'Nancy Drew', initials: 'ND' },
     date: '1 week ago',
     views: 1678,
@@ -186,6 +195,7 @@ const articles = ref([
     category: 'Tutorials',
     readTime: '25 min',
     icon: 'fas fa-cube',
+    image: 'https://images.unsplash.com/photo-1605745341112-85968b19335b?w=400&h=300&fit=crop',
     author: { name: 'Chris Evans', initials: 'CE' },
     date: '2 weeks ago',
     views: 5600,
@@ -201,6 +211,7 @@ const articles = ref([
     category: 'HR & Benefits',
     readTime: '4 min',
     icon: 'fas fa-umbrella-beach',
+    image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400&h=300&fit=crop',
     author: { name: 'Lisa Wong', initials: 'LW' },
     date: '2 weeks ago',
     views: 3400,
@@ -216,6 +227,7 @@ const articles = ref([
     category: 'Technology',
     readTime: '30 min',
     icon: 'fas fa-brain',
+    image: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=400&h=300&fit=crop',
     author: { name: 'Dr. Sarah Mitchell', initials: 'SM' },
     date: '2 weeks ago',
     views: 4200,
@@ -659,57 +671,61 @@ onUnmounted(() => {
 <template>
   <div class="page-view">
     <!-- Hero Section -->
-    <div class="hero-section">
+    <div class="hero-section fade-in-up">
       <div class="hero-content">
-        <div class="hero-text">
-          <div class="hero-icon">
-            <i class="fas fa-book-open"></i>
+        <div class="hero-left">
+          <div class="hero-header">
+            <div class="hero-icon">
+              <i class="fas fa-book-open"></i>
+            </div>
+            <div>
+              <h1 class="hero-title"><span class="hero-title-highlight">Articles</span> Hub</h1>
+              <p class="hero-subtitle">Discover articles, tutorials, and resources</p>
+            </div>
           </div>
-          <h1 class="hero-title">Articles</h1>
-          <p class="hero-subtitle">Discover articles, tutorials, and resources</p>
+          <a @click="navigateToEditor" class="hero-btn">
+            <i class="fas fa-plus"></i>
+            <span>New Article</span>
+          </a>
         </div>
-        <button @click="navigateToEditor" class="btn-secondary">
-          <i class="fas fa-plus"></i>
-          <span>New Article</span>
-        </button>
-      </div>
 
-      <!-- Stats -->
-      <div class="hero-stats">
-        <div class="stat-card-hero teal">
-          <div class="stat-icon">
-            <i class="fas fa-newspaper"></i>
+        <!-- Stats -->
+        <div class="hero-stats">
+          <div class="stat-card-hero">
+            <div class="stat-card-hero-icon teal">
+              <i class="fas fa-newspaper"></i>
+            </div>
+            <div class="stat-card-hero-content">
+              <p class="stat-card-hero-value">{{ articles.length }}<span class="stat-card-hero-suffix">+</span></p>
+              <p class="stat-card-hero-label">Total Articles</p>
+            </div>
           </div>
-          <div class="stat-content">
-            <span class="stat-value">{{ articles.length }}+</span>
-            <span class="stat-label">Total Articles</span>
+          <div class="stat-card-hero">
+            <div class="stat-card-hero-icon blue">
+              <i class="fas fa-layer-group"></i>
+            </div>
+            <div class="stat-card-hero-content">
+              <p class="stat-card-hero-value">{{ categories.length }}</p>
+              <p class="stat-card-hero-label">Categories</p>
+            </div>
           </div>
-        </div>
-        <div class="stat-card-hero blue">
-          <div class="stat-icon">
-            <i class="fas fa-layer-group"></i>
+          <div class="stat-card-hero">
+            <div class="stat-card-hero-icon orange">
+              <i class="fas fa-eye"></i>
+            </div>
+            <div class="stat-card-hero-content">
+              <p class="stat-card-hero-value">{{ totalViews }}<span class="stat-card-hero-suffix">+</span></p>
+              <p class="stat-card-hero-label">Total Views</p>
+            </div>
           </div>
-          <div class="stat-content">
-            <span class="stat-value">{{ categories.length }}</span>
-            <span class="stat-label">Categories</span>
-          </div>
-        </div>
-        <div class="stat-card-hero orange">
-          <div class="stat-icon">
-            <i class="fas fa-eye"></i>
-          </div>
-          <div class="stat-content">
-            <span class="stat-value">{{ totalViews }}+</span>
-            <span class="stat-label">Total Views</span>
-          </div>
-        </div>
-        <div class="stat-card-hero purple">
-          <div class="stat-icon">
-            <i class="fas fa-users"></i>
-          </div>
-          <div class="stat-content">
-            <span class="stat-value">{{ contributors }}</span>
-            <span class="stat-label">Contributors</span>
+          <div class="stat-card-hero">
+            <div class="stat-card-hero-icon purple">
+              <i class="fas fa-users"></i>
+            </div>
+            <div class="stat-card-hero-content">
+              <p class="stat-card-hero-value">{{ contributors }}</p>
+              <p class="stat-card-hero-label">Contributors</p>
+            </div>
           </div>
         </div>
       </div>
@@ -719,29 +735,6 @@ onUnmounted(() => {
          PERSONALIZATION SECTION
          ============================================ -->
     <div class="px-6 pt-6">
-
-      <!-- Recently Viewed Section -->
-      <section v-if="recentlyViewedArticles.length > 0" class="mb-10 fade-in-up">
-        <div class="section-header-row">
-          <h2 class="section-title-sm">
-            <i class="fas fa-clock text-teal-500"></i>
-            Recently Viewed
-          </h2>
-          <router-link to="#" class="view-all-link">View All <i class="fas fa-arrow-right"></i></router-link>
-        </div>
-        <div class="section-scroll scrollbar-elegant">
-          <div v-for="article in recentlyViewedArticles" :key="'recent-' + article!.id"
-               class="mini-article-card" @click="goToArticle(article!.id)">
-            <div class="mini-card-icon bg-gradient-to-br from-teal-50 to-teal-100">
-              <i :class="article!.icon || 'fas fa-newspaper'" class="text-teal-600"></i>
-            </div>
-            <div class="flex-1 min-w-0">
-              <h4 class="text-sm font-semibold text-gray-900 truncate">{{ article!.title }}</h4>
-              <p class="text-xs text-gray-500">{{ article!.category }} · {{ article!.readTime }}</p>
-            </div>
-          </div>
-        </div>
-      </section>
 
       <!-- Continue Reading & Bookmarks Side by Side -->
       <div class="personalization-row mb-10 fade-in-up" style="animation-delay: 0.1s">
@@ -758,7 +751,13 @@ onUnmounted(() => {
             <div v-for="article in continueReadingArticles" :key="'continue-' + article!.id"
                  class="continue-reading-card group" @click="goToArticle(article!.id)">
               <div class="continue-card-media">
-                <div class="continue-card-placeholder">
+                <img
+                  v-if="article!.image"
+                  :src="article!.image"
+                  :alt="article!.title"
+                  class="continue-card-image"
+                >
+                <div v-else class="continue-card-placeholder">
                   <i :class="article!.icon || 'fas fa-newspaper'" class="text-teal-600 text-xl"></i>
                 </div>
                 <span class="resume-badge"><i class="fas fa-play mr-1"></i> Resume</span>
@@ -791,7 +790,13 @@ onUnmounted(() => {
             <div v-for="article in bookmarkedArticles" :key="'bookmark-' + article!.id"
                  class="bookmark-card group" @click="goToArticle(article!.id)">
               <div class="bookmark-card-visual">
-                <div class="bookmark-card-icon">
+                <img
+                  v-if="article!.image"
+                  :src="article!.image"
+                  :alt="article!.title"
+                  class="bookmark-card-image"
+                >
+                <div v-else class="bookmark-card-icon">
                   <i :class="article!.icon || 'fas fa-newspaper'" class="text-teal-600 text-xl"></i>
                 </div>
                 <span class="bookmark-indicator">
@@ -940,51 +945,107 @@ onUnmounted(() => {
         </div>
       </section>
 
-      <!-- Trending -->
-      <section class="mb-10 fade-in-up" style="animation-delay: 0.4s">
-        <div class="section-header">
-          <h2 class="section-title text-base">
-            <i class="fas fa-fire text-red-500 text-sm"></i>
-            Trending
-          </h2>
-          <router-link to="#" class="view-all-link text-xs">
-            View All <i class="fas fa-arrow-right"></i>
-          </router-link>
-        </div>
-        <div class="trending-scroll scrollbar-elegant">
-          <div v-for="(article, index) in trendingThisWeek" :key="'trending-' + article.id"
-               @click="goToArticle(article.id)"
-               class="trending-card cursor-pointer group relative">
-            <div class="relative aspect-video rounded-xl overflow-hidden shadow-md">
-              <div class="absolute inset-0 bg-gradient-to-br from-teal-500 to-teal-700 flex items-center justify-center">
-                <i :class="article.icon || 'fas fa-newspaper'" class="text-white text-2xl"></i>
-              </div>
-              <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors"></div>
-              <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                <div class="w-12 h-12 rounded-full bg-white/95 flex items-center justify-center shadow-lg">
-                  <i class="fas fa-arrow-right text-teal-600"></i>
+      <!-- Trending & Recently Viewed Side by Side -->
+      <div class="discovery-row mb-10 fade-in-up" style="animation-delay: 0.4s">
+        <!-- Trending -->
+        <section class="discovery-column">
+          <div class="section-header-row">
+            <h2 class="section-title-sm">
+              <i class="fas fa-fire text-red-500"></i>
+              Trending
+            </h2>
+            <router-link to="#" class="view-all-link">
+              View All <i class="fas fa-arrow-right"></i>
+            </router-link>
+          </div>
+          <div class="trending-scroll scrollbar-elegant">
+            <div v-for="(article, index) in trendingThisWeek" :key="'trending-' + article.id"
+                 @click="goToArticle(article.id)"
+                 class="trending-card cursor-pointer group relative">
+              <div class="relative aspect-video rounded-xl overflow-hidden shadow-md">
+                <img
+                  v-if="article.image"
+                  :src="article.image"
+                  :alt="article.title"
+                  class="absolute inset-0 w-full h-full object-cover"
+                >
+                <div v-else class="absolute inset-0 bg-gradient-to-br from-teal-500 to-teal-700 flex items-center justify-center">
+                  <i :class="article.icon || 'fas fa-newspaper'" class="text-white text-2xl"></i>
+                </div>
+                <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors"></div>
+                <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div class="w-12 h-12 rounded-full bg-white/95 flex items-center justify-center shadow-lg">
+                    <i class="fas fa-arrow-right text-teal-600"></i>
+                  </div>
+                </div>
+                <div v-if="index < 3" class="absolute top-2 left-2 flex gap-1">
+                  <span class="new-badge bg-orange-500">
+                    <i class="fas fa-fire"></i> Hot
+                  </span>
+                </div>
+                <div class="absolute bottom-2 right-2 px-2 py-0.5 rounded bg-black/70 text-white text-xs font-medium backdrop-blur-sm">
+                  {{ article.readTime }}
                 </div>
               </div>
-              <div v-if="index < 3" class="absolute top-2 left-2 flex gap-1">
-                <span class="new-badge bg-orange-500">
-                  <i class="fas fa-fire"></i> Hot
-                </span>
+              <div class="mt-3">
+                <h4 class="font-medium text-sm text-gray-900 line-clamp-2 group-hover:text-teal-700 transition-colors">{{ article.title }}</h4>
+                <p class="text-xs text-gray-500 mt-1 flex items-center gap-2">
+                  <span><i class="fas fa-fire text-red-500 mr-1"></i>{{ formatNumber(article.views) }} views</span>
+                  <span class="text-gray-300">|</span>
+                  <span>{{ article.category }}</span>
+                </p>
               </div>
-              <div class="absolute bottom-2 right-2 px-2 py-0.5 rounded bg-black/70 text-white text-xs font-medium backdrop-blur-sm">
-                {{ article.readTime }}
-              </div>
-            </div>
-            <div class="mt-3">
-              <h4 class="font-medium text-sm text-gray-900 line-clamp-2 group-hover:text-teal-700 transition-colors">{{ article.title }}</h4>
-              <p class="text-xs text-gray-500 mt-1 flex items-center gap-2">
-                <span><i class="fas fa-fire text-red-500 mr-1"></i>{{ formatNumber(article.views) }} views</span>
-                <span class="text-gray-300">|</span>
-                <span>{{ article.category }}</span>
-              </p>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+
+        <!-- Recently Viewed -->
+        <section class="discovery-column">
+          <div class="section-header-row">
+            <h2 class="section-title-sm">
+              <i class="fas fa-history text-blue-500"></i>
+              Recently Viewed
+            </h2>
+            <router-link to="#" class="view-all-link">
+              View All <i class="fas fa-arrow-right"></i>
+            </router-link>
+          </div>
+          <div class="recently-viewed-scroll scrollbar-elegant">
+            <div v-for="article in recentlyViewedArticles" :key="'recent-' + article.id"
+                 @click="goToArticle(article.id)"
+                 class="recently-viewed-card cursor-pointer group">
+              <div class="relative aspect-video rounded-xl overflow-hidden shadow-md">
+                <img
+                  v-if="article.image"
+                  :src="article.image"
+                  :alt="article.title"
+                  class="absolute inset-0 w-full h-full object-cover"
+                >
+                <div v-else class="absolute inset-0 bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center">
+                  <i :class="article.icon || 'fas fa-newspaper'" class="text-white text-2xl"></i>
+                </div>
+                <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors"></div>
+                <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div class="w-12 h-12 rounded-full bg-white/95 flex items-center justify-center shadow-lg">
+                    <i class="fas fa-arrow-right text-blue-600"></i>
+                  </div>
+                </div>
+                <div class="absolute bottom-2 right-2 px-2 py-0.5 rounded bg-black/70 text-white text-xs font-medium backdrop-blur-sm">
+                  {{ article.readTime }}
+                </div>
+              </div>
+              <div class="mt-3">
+                <h4 class="font-medium text-sm text-gray-900 line-clamp-2 group-hover:text-blue-700 transition-colors">{{ article.title }}</h4>
+                <p class="text-xs text-gray-500 mt-1 flex items-center gap-2">
+                  <span>{{ article.category }}</span>
+                  <span class="text-gray-300">|</span>
+                  <span><i class="fas fa-eye text-gray-400 mr-1"></i>{{ formatNumber(article.views) }}</span>
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
 
     </div>
 
@@ -993,7 +1054,7 @@ onUnmounted(() => {
          ============================================ -->
 
     <!-- Main Content Area -->
-    <div class="main-content">
+    <div class="px-6 pb-6">
       <!-- Toolbar -->
       <div class="toolbar">
         <div class="toolbar-left">
@@ -1114,7 +1175,14 @@ onUnmounted(() => {
               @click="goToArticle(article.id)"
               :class="['article-card card-animated', { featured: article.featured }, `delay-${(index % 4) + 1}`]">
               <div class="card-media">
-                <div class="card-placeholder">
+                <img
+                  v-if="article.image"
+                  :src="article.image"
+                  :alt="article.title"
+                  class="card-image"
+                  @error="($event.target as HTMLImageElement).style.display = 'none'; ($event.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden')"
+                >
+                <div :class="['card-placeholder', { 'hidden': article.image }]">
                   <i :class="article.icon || 'fas fa-newspaper'"></i>
                 </div>
                 <div class="card-badges">
@@ -1253,161 +1321,23 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
+/* Utility classes */
+.hidden {
+  display: none !important;
+}
+
 .page-view {
   padding: 0;
   min-height: 100vh;
   background: linear-gradient(180deg, #f0fdfa 0%, #f8fafc 15%, #ffffff 100%);
 }
 
-/* Hero Section */
-.hero-section {
-  padding: 2rem;
-  background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 50%, #e0f2fe 100%);
-  border-bottom: 1px solid #e2e8f0;
-}
-
-.hero-content {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  max-width: 1600px;
-  margin: 0 auto;
-  margin-bottom: 1.5rem;
-}
-
-.hero-text {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.hero-icon {
-  width: 48px;
-  height: 48px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
-  border-radius: 0.75rem;
-  color: white;
-  font-size: 1.25rem;
-}
-
-.hero-title {
-  font-size: 1.75rem;
-  font-weight: 700;
-  color: #0f172a;
-  margin: 0;
-}
-
-.hero-subtitle {
-  font-size: 0.875rem;
-  color: #64748b;
-  margin: 0;
-}
-
-.hero-stats {
-  display: flex;
-  gap: 1rem;
-  max-width: 1600px;
-  margin: 0 auto;
-}
-
-.stat-card-hero {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 1rem 1.25rem;
-  background: white;
-  border-radius: 0.75rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  flex: 1;
-}
-
-.stat-card-hero .stat-icon {
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 0.5rem;
-  font-size: 1rem;
-}
-
-.stat-card-hero.teal .stat-icon {
-  background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 100%);
-  color: #0d9488;
-}
-
-.stat-card-hero.blue .stat-icon {
-  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
-  color: #2563eb;
-}
-
-.stat-card-hero.orange .stat-icon {
-  background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
-  color: #ea580c;
-}
-
-.stat-card-hero.purple .stat-icon {
-  background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%);
-  color: #9333ea;
-}
-
-.stat-card-hero .stat-content {
-  display: flex;
-  flex-direction: column;
-}
-
-.stat-card-hero .stat-value {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: #0f172a;
-}
-
-.stat-card-hero .stat-label {
-  font-size: 0.75rem;
-  color: #64748b;
-}
-
-.btn-secondary {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1.5rem;
-  background: white;
-  border: 1.5px solid #e2e8f0;
-  border-radius: 0.75rem;
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: #475569;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.btn-secondary:hover {
-  border-color: #14b8a6;
-  color: #0d9488;
-  background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 100%);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgba(20, 184, 166, 0.15);
-}
-
-.btn-secondary i {
-  transition: transform 0.3s ease;
-}
-
-.btn-secondary:hover i {
-  transform: rotate(15deg) scale(1.1);
-}
-
 /* ============================================
    MAIN CONTENT
    ============================================ */
 .main-content {
-  padding: 1.5rem 2rem 2rem;
-  max-width: 1600px;
-  margin: 0 auto;
+  padding: 1.5rem;
+  width: 100%;
 }
 
 /* Toolbar */
@@ -1868,6 +1798,19 @@ onUnmounted(() => {
   height: 160px;
   overflow: hidden;
   background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 50%, #e0f2fe 100%);
+}
+
+.card-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.article-card:hover .card-image {
+  transform: scale(1.08);
 }
 
 .card-placeholder {
@@ -2416,8 +2359,8 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-size: 0.9375rem;
-  font-weight: 600;
+  font-size: 1.125rem;
+  font-weight: 700;
   color: #1e293b;
   margin: 0;
 }
@@ -2493,11 +2436,27 @@ onUnmounted(() => {
 .personalization-row {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 2rem;
+  gap: 4rem;
 }
 
 .personalization-column {
   min-width: 0;
+}
+
+.discovery-row {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 4rem;
+}
+
+.discovery-column {
+  min-width: 0;
+}
+
+@media (max-width: 1024px) {
+  .discovery-row {
+    grid-template-columns: 1fr;
+  }
 }
 
 .continue-reading-card {
@@ -2519,6 +2478,19 @@ onUnmounted(() => {
   position: relative;
   height: 100px;
   background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 100%);
+  overflow: hidden;
+  border-radius: 0.75rem 0.75rem 0 0;
+}
+
+.continue-card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.continue-reading-card:hover .continue-card-image {
+  transform: scale(1.05);
 }
 
 .continue-card-placeholder {
@@ -2579,6 +2551,19 @@ onUnmounted(() => {
   position: relative;
   height: 80px;
   background: linear-gradient(135deg, #fefce8 0%, #fef3c7 100%);
+  overflow: hidden;
+  border-radius: 0.75rem 0.75rem 0 0;
+}
+
+.bookmark-card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.bookmark-card:hover .bookmark-card-image {
+  transform: scale(1.05);
 }
 
 .bookmark-card-icon {
@@ -2649,30 +2634,49 @@ onUnmounted(() => {
 }
 
 .featured-carousel {
-  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 
 .carousel-container {
-  border-radius: 1rem;
+  position: relative;
   overflow: hidden;
 }
 
 .featured-spotlight {
-  display: grid;
-  grid-template-columns: 1fr 280px;
-  background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%);
-  border-radius: 1rem;
+  background: white;
+  border-radius: 1.5rem;
   overflow: hidden;
+  border: 1px solid #f1f5f9;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
 }
 
 .featured-spotlight-main {
-  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(135deg, #0f766e 0%, #0d9488 50%, #14b8a6 100%);
+  color: white;
+  position: relative;
+  overflow: hidden;
+}
+
+.featured-spotlight-main::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+  pointer-events: none;
 }
 
 .featured-spotlight-content {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
+  flex: 1;
+  padding: 2rem;
 }
 
 .featured-badge-lg {
@@ -2792,52 +2796,91 @@ onUnmounted(() => {
 }
 
 .related-articles-panel {
-  background: rgba(0, 0, 0, 0.2);
   padding: 1.5rem;
+  background: #f8fafc;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 .related-articles-header {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1e293b;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  font-size: 0.875rem;
-  font-weight: 600;
+  gap: 0.625rem;
+  margin: 0 0 1.25rem 0;
+}
+
+.related-articles-header i {
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+  border-radius: 0.5rem;
   color: white;
-  margin-bottom: 1rem;
+  font-size: 0.875rem;
 }
 
 .related-articles-list {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+  flex: 1;
 }
 
 .related-article-card {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0.75rem;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 0.5rem;
+  gap: 1rem;
+  padding: 1rem;
+  background: white;
+  border-radius: 0.875rem;
+  border: 1px solid #e2e8f0;
   text-decoration: none;
-  transition: all 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.related-article-card::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: linear-gradient(180deg, #14b8a6 0%, #0d9488 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
 .related-article-card:hover {
-  background: rgba(255, 255, 255, 0.2);
+  border-color: #99f6e4;
+  background: #fafffe;
+  transform: translateX(4px);
+  box-shadow: 0 4px 12px rgba(20, 184, 166, 0.1);
+}
+
+.related-article-card:hover::before {
+  opacity: 1;
 }
 
 .related-article-number {
-  width: 24px;
-  height: 24px;
+  width: 28px;
+  height: 28px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.2);
+  background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 100%);
   border-radius: 50%;
-  color: white;
+  color: #0d9488;
   font-size: 0.75rem;
-  font-weight: 600;
+  font-weight: 700;
+  flex-shrink: 0;
 }
 
 .related-article-content {
@@ -2846,82 +2889,105 @@ onUnmounted(() => {
 }
 
 .related-article-title {
-  font-size: 0.8125rem;
-  font-weight: 500;
-  color: white;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #1e293b;
   margin: 0;
-  line-height: 1.3;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.related-article-card:hover .related-article-title {
+  color: #0d9488;
 }
 
 .related-article-meta {
-  font-size: 0.6875rem;
-  color: #99f6e4;
-  margin: 0.25rem 0 0;
+  font-size: 0.75rem;
+  color: #64748b;
+  margin: 0.375rem 0 0;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.related-article-meta i {
+  color: #94a3b8;
 }
 
 .related-article-arrow {
-  color: rgba(255, 255, 255, 0.5);
-  font-size: 0.75rem;
-  transition: transform 0.2s ease;
+  color: #cbd5e1;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
 }
 
 .related-article-card:hover .related-article-arrow {
-  transform: translateX(3px);
-  color: white;
+  transform: translateX(4px);
+  color: #0d9488;
 }
 
 .carousel-nav {
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
   gap: 1rem;
-  margin-top: 1rem;
 }
 
 .carousel-nav-btn {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
   background: white;
   border: 1px solid #e2e8f0;
-  border-radius: 50%;
+  border-radius: 0.5rem;
   color: #64748b;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .carousel-nav-btn:hover:not(:disabled) {
-  background: #f0fdfa;
-  border-color: #14b8a6;
-  color: #0d9488;
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+  border-color: transparent;
+  color: white;
+  transform: scale(1.05);
 }
 
 .carousel-nav-btn:disabled {
-  opacity: 0.5;
+  opacity: 0.4;
   cursor: not-allowed;
 }
 
 .carousel-dots {
   display: flex;
+  align-items: center;
   gap: 0.5rem;
 }
 
 .carousel-dot {
-  width: 8px;
-  height: 8px;
-  background: #cbd5e1;
-  border: none;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
+  background: #e2e8f0;
+  border: none;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
+  padding: 0;
+}
+
+.carousel-dot:hover {
+  background: #99f6e4;
+  transform: scale(1.2);
 }
 
 .carousel-dot.active {
-  background: #14b8a6;
-  width: 24px;
-  border-radius: 4px;
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+  width: 28px;
+  border-radius: 5px;
 }
 
 /* Carousel Transition */
@@ -2946,41 +3012,78 @@ onUnmounted(() => {
   border-radius: 1rem;
   border: 1px solid #f1f5f9;
   padding: 1.25rem;
+  transition: all 0.3s ease;
+}
+
+.contributors-card:hover {
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+  border-color: rgba(20, 184, 166, 0.2);
+}
+
+.contributors-card h3 i {
+  animation: trophyBounce 2s ease-in-out infinite;
+}
+
+@keyframes trophyBounce {
+  0%, 100% { transform: rotate(-5deg) scale(1); }
+  50% { transform: rotate(5deg) scale(1.1); }
 }
 
 .contributor-item {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 0.75rem 0;
-  border-bottom: 1px solid #f1f5f9;
+  padding: 0.75rem;
+  margin: 0 -0.5rem;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
 
-.contributor-item:last-child {
-  border-bottom: none;
+.contributor-item:hover {
+  background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 100%);
+}
+
+.contributor-item:nth-child(1) { animation: contributorSlideIn 0.4s ease-out backwards; animation-delay: 0.1s; }
+.contributor-item:nth-child(2) { animation: contributorSlideIn 0.4s ease-out backwards; animation-delay: 0.2s; }
+.contributor-item:nth-child(3) { animation: contributorSlideIn 0.4s ease-out backwards; animation-delay: 0.3s; }
+.contributor-item:nth-child(4) { animation: contributorSlideIn 0.4s ease-out backwards; animation-delay: 0.4s; }
+.contributor-item:nth-child(5) { animation: contributorSlideIn 0.4s ease-out backwards; animation-delay: 0.5s; }
+
+@keyframes contributorSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 .contributor-avatar {
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
+  border-radius: 0.75rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 50%;
+  font-weight: 700;
   color: white;
-  font-size: 0.75rem;
-  font-weight: 600;
+  font-size: 0.875rem;
+  flex-shrink: 0;
 }
 
 .contributor-badge {
-  display: inline-block;
-  padding: 0.125rem 0.375rem;
-  background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 100%);
-  color: #0d9488;
+  padding: 0.25rem 0.5rem;
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  color: white;
   font-size: 0.625rem;
-  font-weight: 600;
-  border-radius: 0.25rem;
+  font-weight: 700;
+  border-radius: 100px;
+  text-transform: uppercase;
 }
+
 
 /* ============================================
    TRENDING SECTION STYLES
@@ -2997,21 +3100,76 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-weight: 600;
+  font-size: 1.125rem;
+  font-weight: 700;
   color: #1e293b;
   margin: 0;
 }
 
 .trending-scroll {
   display: flex;
-  gap: 1rem;
+  gap: 1.5rem;
   overflow-x: auto;
-  padding-bottom: 0.5rem;
+  overflow-y: hidden;
+  padding: 1rem 0 0.5rem 1rem;
+  scroll-snap-type: x mandatory;
+}
+
+.trending-scroll::-webkit-scrollbar {
+  height: 3px;
+}
+
+.trending-scroll::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 3px;
+}
+
+.trending-scroll::-webkit-scrollbar-thumb {
+  background: linear-gradient(90deg, #14b8a6, #0d9488);
+  border-radius: 3px;
 }
 
 .trending-card {
-  min-width: 240px;
-  flex-shrink: 0;
+  flex: 0 0 240px;
+  scroll-snap-align: start;
+  transition: all 0.3s ease;
+}
+
+.trending-card:hover {
+  transform: translateY(-6px);
+}
+
+.recently-viewed-scroll {
+  display: flex;
+  gap: 1.5rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 1rem 0 0.5rem 1rem;
+  scroll-snap-type: x mandatory;
+}
+
+.recently-viewed-scroll::-webkit-scrollbar {
+  height: 3px;
+}
+
+.recently-viewed-scroll::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 3px;
+}
+
+.recently-viewed-scroll::-webkit-scrollbar-thumb {
+  background: linear-gradient(90deg, #3b82f6, #2563eb);
+  border-radius: 3px;
+}
+
+.recently-viewed-card {
+  flex: 0 0 240px;
+  scroll-snap-align: start;
+  transition: all 0.3s ease;
+}
+
+.recently-viewed-card:hover {
+  transform: translateY(-6px);
 }
 
 .new-badge {
@@ -3061,16 +3219,12 @@ onUnmounted(() => {
     justify-content: space-between;
   }
 
-  .hero-content {
-    flex-direction: column;
-    gap: 1rem;
-  }
-
   .hero-stats {
     flex-wrap: wrap;
   }
 
-  .hero-stats .stat-card-hero {
+  .stat-card-hero {
+    min-width: calc(50% - 0.5rem);
     flex: 1 1 calc(50% - 0.5rem);
   }
 
