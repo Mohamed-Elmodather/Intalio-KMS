@@ -1966,13 +1966,6 @@ function getFileIconBg(type: string): string {
                         >
                           <i class="fas fa-share-alt text-xs"></i>
                         </button>
-                        <button
-                          @click.stop="moveToTrash(doc)"
-                          class="w-8 h-8 rounded-lg bg-gray-100 text-gray-500 hover:bg-red-100 hover:text-red-600 flex items-center justify-center transition-all"
-                          title="Move to Trash"
-                        >
-                          <i class="fas fa-trash-alt text-xs"></i>
-                        </button>
                       </template>
                       <template v-else>
                         <button
