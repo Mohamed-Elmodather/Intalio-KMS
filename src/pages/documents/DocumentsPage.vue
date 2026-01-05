@@ -436,9 +436,10 @@ function getFileIconBg(type: string): string {
   <div class="min-h-screen bg-gray-50">
     <!-- Hero Section -->
     <div class="hero-gradient relative overflow-hidden">
-      <!-- Decorative elements -->
-      <div class="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/3"></div>
-      <div class="absolute bottom-0 left-0 w-64 h-64 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/3"></div>
+      <!-- Decorative elements with animations -->
+      <div class="circle-drift-1 absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full"></div>
+      <div class="circle-drift-2 absolute bottom-0 left-0 w-64 h-64 bg-white/5 rounded-full"></div>
+      <div class="circle-drift-3 absolute top-1/2 right-1/4 w-32 h-32 bg-white/10 rounded-full"></div>
 
       <!-- Stats - Absolute Top Right -->
       <div class="stats-top-right">
@@ -862,11 +863,24 @@ function getFileIconBg(type: string): string {
   justify-content: center;
   gap: 8px;
   text-align: center;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.stat-card-square:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+.stat-card-square:hover .stat-icon-box {
+  transform: scale(1.1);
 }
 
 .stat-icon-box {
   color: white;
   font-size: 20px;
+  transition: transform 0.3s ease;
 }
 
 .stat-value-mini {
@@ -880,6 +894,55 @@ function getFileIconBg(type: string): string {
   font-size: 11px;
   color: rgba(255, 255, 255, 0.7);
   line-height: 1;
+}
+
+/* Circle Drift Animations */
+.circle-drift-1 {
+  animation: drift-1 20s ease-in-out infinite;
+}
+
+.circle-drift-2 {
+  animation: drift-2 25s ease-in-out infinite;
+}
+
+.circle-drift-3 {
+  animation: drift-3 18s ease-in-out infinite;
+}
+
+@keyframes drift-1 {
+  0%, 100% {
+    transform: translate(33%, -50%);
+  }
+  25% {
+    transform: translate(28%, -45%);
+  }
+  50% {
+    transform: translate(35%, -55%);
+  }
+  75% {
+    transform: translate(30%, -48%);
+  }
+}
+
+@keyframes drift-2 {
+  0%, 100% {
+    transform: translate(-33%, 50%);
+  }
+  33% {
+    transform: translate(-28%, 45%);
+  }
+  66% {
+    transform: translate(-38%, 55%);
+  }
+}
+
+@keyframes drift-3 {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(10px, -10px) scale(1.1);
+  }
 }
 
 @media (max-width: 1023px) {
@@ -899,9 +962,7 @@ function getFileIconBg(type: string): string {
   }
 
   .stat-icon-box {
-    width: 24px;
-    height: 24px;
-    font-size: 10px;
+    font-size: 14px;
   }
 
   .stat-value-mini {
