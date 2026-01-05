@@ -348,6 +348,13 @@ function downloadDocument(doc: any) {
 
 function shareDocument(doc: any) {
   console.log('Sharing:', doc.name)
+  // Could open share modal or copy link
+  alert(`Share link copied for: ${doc.name}`)
+}
+
+function togglePin(doc: any) {
+  doc.isPinned = !doc.isPinned
+  console.log(doc.isPinned ? 'Pinned:' : 'Unpinned:', doc.name)
 }
 
 function viewDocument(doc: any) {
@@ -545,17 +552,23 @@ function getFileIconBg(type: string): string {
               </div>
               <div class="opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
                 <button
-                  @click.stop="toggleFavorite(doc.id)"
-                  :class="[
-                    'w-7 h-7 rounded-lg flex items-center justify-center transition-all',
-                    isFavorite(doc.id) ? 'bg-amber-100 text-amber-600' : 'bg-gray-100 text-gray-400 hover:bg-gray-200'
-                  ]"
+                  @click.stop="togglePin(doc)"
+                  class="w-7 h-7 rounded-lg bg-amber-100 text-amber-600 hover:bg-amber-200 flex items-center justify-center transition-all"
+                  title="Unpin from Quick Access"
                 >
-                  <i :class="isFavorite(doc.id) ? 'fas fa-star' : 'far fa-star'" class="text-xs"></i>
+                  <i class="fas fa-thumbtack text-xs"></i>
+                </button>
+                <button
+                  @click.stop="shareDocument(doc)"
+                  class="w-7 h-7 rounded-lg bg-gray-100 text-gray-400 hover:bg-blue-100 hover:text-blue-600 flex items-center justify-center transition-all"
+                  title="Share"
+                >
+                  <i class="fas fa-share-alt text-xs"></i>
                 </button>
                 <button
                   @click.stop="downloadDocument(doc)"
                   class="w-7 h-7 rounded-lg bg-gray-100 text-gray-400 hover:bg-teal-100 hover:text-teal-600 flex items-center justify-center transition-all"
+                  title="Download"
                 >
                   <i class="fas fa-download text-xs"></i>
                 </button>
@@ -605,17 +618,26 @@ function getFileIconBg(type: string): string {
               </div>
               <div class="opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
                 <button
-                  @click.stop="toggleFavorite(doc.id)"
+                  @click.stop="togglePin(doc)"
                   :class="[
                     'w-7 h-7 rounded-lg flex items-center justify-center transition-all',
-                    isFavorite(doc.id) ? 'bg-amber-100 text-amber-600' : 'bg-gray-100 text-gray-400 hover:bg-gray-200'
+                    doc.isPinned ? 'bg-amber-100 text-amber-600 hover:bg-amber-200' : 'bg-gray-100 text-gray-400 hover:bg-amber-100 hover:text-amber-600'
                   ]"
+                  :title="doc.isPinned ? 'Unpin from Quick Access' : 'Pin to Quick Access'"
                 >
-                  <i :class="isFavorite(doc.id) ? 'fas fa-star' : 'far fa-star'" class="text-xs"></i>
+                  <i class="fas fa-thumbtack text-xs"></i>
+                </button>
+                <button
+                  @click.stop="shareDocument(doc)"
+                  class="w-7 h-7 rounded-lg bg-gray-100 text-gray-400 hover:bg-blue-100 hover:text-blue-600 flex items-center justify-center transition-all"
+                  title="Share"
+                >
+                  <i class="fas fa-share-alt text-xs"></i>
                 </button>
                 <button
                   @click.stop="downloadDocument(doc)"
                   class="w-7 h-7 rounded-lg bg-gray-100 text-gray-400 hover:bg-teal-100 hover:text-teal-600 flex items-center justify-center transition-all"
+                  title="Download"
                 >
                   <i class="fas fa-download text-xs"></i>
                 </button>
