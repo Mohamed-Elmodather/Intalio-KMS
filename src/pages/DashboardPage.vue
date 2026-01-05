@@ -188,6 +188,35 @@ const activePolls = ref([
   }
 ])
 
+// Poll actions
+const selectedPollOptions = ref<Record<number, string>>({})
+
+function selectPollOption(pollId: number, optionLabel: string) {
+  selectedPollOptions.value[pollId] = optionLabel
+}
+
+function isOptionSelected(pollId: number, optionLabel: string): boolean {
+  return selectedPollOptions.value[pollId] === optionLabel
+}
+
+function votePoll(poll: any) {
+  const selectedOption = selectedPollOptions.value[poll.id]
+  if (!poll.hasVoted && selectedOption) {
+    // Submit vote
+    poll.hasVoted = true
+    alert(`You voted for: ${selectedOption}`)
+  } else if (poll.hasVoted) {
+    // View results - navigate to poll page
+    router.push(`/polls/${poll.id}`)
+  } else {
+    alert('Please select an option first')
+  }
+}
+
+function viewPoll(pollId: number) {
+  router.push(`/polls/${pollId}`)
+}
+
 // Learning Courses
 const learningCourses = ref([
   {
@@ -1091,12 +1120,12 @@ onUnmounted(() => {
         <div class="space-y-5">
           <div v-for="poll in activePolls" :key="poll.id" class="poll-card p-5 rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow-md transition-all">
             <!-- Poll Header -->
-            <div class="flex items-start gap-3 mb-4">
-              <div :class="[poll.iconBg, 'w-10 h-10 rounded-xl flex items-center justify-center shadow-md flex-shrink-0']">
+            <div @click="viewPoll(poll.id)" class="flex items-start gap-3 mb-4 cursor-pointer group">
+              <div :class="[poll.iconBg, 'w-10 h-10 rounded-xl flex items-center justify-center shadow-md flex-shrink-0 transition-transform group-hover:scale-110']">
                 <i :class="[poll.icon, 'text-white text-sm']"></i>
               </div>
               <div class="flex-1 min-w-0">
-                <h4 class="font-semibold text-gray-900 text-sm leading-tight">{{ poll.question }}</h4>
+                <h4 class="font-semibold text-gray-900 text-sm leading-tight group-hover:text-teal-600 transition-colors">{{ poll.question }}</h4>
                 <div class="flex items-center gap-2 mt-1">
                   <span class="text-xs text-gray-500">{{ poll.totalVotes.toLocaleString() }} votes</span>
                   <span class="w-1 h-1 rounded-full bg-gray-300"></span>
@@ -1108,14 +1137,24 @@ onUnmounted(() => {
             <!-- Poll Options -->
             <div class="space-y-3">
               <div v-for="(option, index) in poll.options" :key="option.label"
-                   class="poll-option group cursor-pointer rounded-xl p-3 bg-gray-50 hover:bg-gray-100 transition-all relative overflow-hidden">
+                   @click="!poll.hasVoted && selectPollOption(poll.id, option.label)"
+                   :class="[
+                     'poll-option group rounded-xl p-3 transition-all relative overflow-hidden',
+                     poll.hasVoted ? 'cursor-default' : 'cursor-pointer hover:bg-gray-100',
+                     isOptionSelected(poll.id, option.label) && !poll.hasVoted ? 'ring-2 ring-teal-500 bg-teal-50' : 'bg-gray-50'
+                   ]">
                 <!-- Progress Background -->
                 <div class="absolute inset-0 opacity-20 transition-all"
                      :style="{ width: option.votes + '%', backgroundColor: option.color || '#14b8a6' }"></div>
                 <div class="relative flex items-center justify-between">
                   <div class="flex items-center gap-2">
+                    <!-- Selection indicator for unvoted polls -->
+                    <div v-if="!poll.hasVoted" class="w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all"
+                         :class="isOptionSelected(poll.id, option.label) ? 'border-teal-500 bg-teal-500' : 'border-gray-300'">
+                      <i v-if="isOptionSelected(poll.id, option.label)" class="fas fa-check text-white text-[8px]"></i>
+                    </div>
                     <span v-if="option.flag" class="text-lg">{{ option.flag }}</span>
-                    <span v-else class="w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold text-white"
+                    <span v-else-if="poll.hasVoted" class="w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold text-white"
                           :style="{ backgroundColor: option.color || '#14b8a6' }">{{ index + 1 }}</span>
                     <span class="text-sm font-medium text-gray-700 group-hover:text-gray-900">{{ option.label }}</span>
                   </div>
@@ -1137,12 +1176,16 @@ onUnmounted(() => {
                 <span>You voted</span>
               </div>
               <div v-else class="text-xs text-gray-500">
-                <i class="fas fa-users mr-1"></i> Cast your vote
+                <i class="fas fa-users mr-1"></i> {{ selectedPollOptions[poll.id] ? 'Ready to vote' : 'Select an option' }}
               </div>
-              <button class="px-4 py-2 text-xs font-semibold rounded-lg transition-all"
+              <button @click="votePoll(poll)"
+                      class="px-4 py-2 text-xs font-semibold rounded-lg transition-all"
                       :class="poll.hasVoted
                         ? 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                        : 'bg-gradient-to-r from-teal-500 to-teal-600 text-white shadow-md shadow-teal-200 hover:shadow-lg'">
+                        : selectedPollOptions[poll.id]
+                          ? 'bg-gradient-to-r from-teal-500 to-teal-600 text-white shadow-md shadow-teal-200 hover:shadow-lg'
+                          : 'bg-gray-200 text-gray-400 cursor-not-allowed'"
+                      :disabled="!poll.hasVoted && !selectedPollOptions[poll.id]">
                 {{ poll.hasVoted ? 'View Results' : 'Vote Now' }}
               </button>
             </div>
