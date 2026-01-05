@@ -1794,15 +1794,6 @@ function getFileIconBg(type: string): string {
                     </button>
                   </div>
 
-                  <!-- Status Badges (positioned to avoid checkbox) -->
-                  <div class="absolute top-10 left-2 flex flex-col gap-1">
-                    <span v-if="doc.isStarred && !doc.isShared" class="w-6 h-6 bg-amber-400 text-white rounded-lg flex items-center justify-center shadow-sm">
-                      <i class="fas fa-star text-[10px]"></i>
-                    </span>
-                    <span v-if="doc.isShared" class="w-6 h-6 bg-blue-500 text-white rounded-lg flex items-center justify-center shadow-sm">
-                      <i class="fas fa-share-alt text-[10px]"></i>
-                    </span>
-                  </div>
                 </div>
 
                 <!-- Info -->
