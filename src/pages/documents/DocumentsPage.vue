@@ -14,6 +14,7 @@ const sortBy = ref<'name' | 'date' | 'size'>('date')
 const sortOrder = ref<'asc' | 'desc'>('desc')
 const selectedFolder = ref<string | null>(null)
 const expandedFolders = ref(new Set<string>(['root', 'tournament', 'media']))
+const isSidebarCollapsed = ref(false)
 
 // Folder Tree Structure
 const folderTree = ref([
@@ -756,86 +757,119 @@ function getFileIconBg(type: string): string {
 
         <div class="flex min-h-[500px]">
           <!-- Folder Tree Sidebar -->
-          <div class="w-64 min-w-[256px] border-r border-gray-100 bg-gray-50/50 p-4">
-            <div class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Folders</div>
+          <div
+            :class="[
+              'border-r border-gray-100 bg-gray-50/50 transition-all duration-300 relative',
+              isSidebarCollapsed ? 'w-12 min-w-[48px]' : 'w-64 min-w-[256px]'
+            ]"
+          >
+            <!-- Collapse/Expand Button -->
+            <button
+              @click="isSidebarCollapsed = !isSidebarCollapsed"
+              class="absolute -right-3 top-4 w-6 h-6 bg-white border border-gray-200 rounded-full shadow-sm flex items-center justify-center text-gray-500 hover:text-teal-600 hover:border-teal-300 transition-all z-10"
+              :title="isSidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'"
+            >
+              <i :class="isSidebarCollapsed ? 'fas fa-chevron-right' : 'fas fa-chevron-left'" class="text-[10px]"></i>
+            </button>
 
-            <!-- Recursive Folder Tree -->
-            <div class="space-y-1">
-              <template v-for="folder in folderTree" :key="folder.id">
-                <!-- Root Folder -->
-                <div>
-                  <div
-                    @click="selectFolder(folder.id)"
-                    :class="[
-                      'flex items-center gap-2 px-2 py-1.5 rounded-lg cursor-pointer transition-all group',
-                      selectedFolder === folder.id ? 'bg-teal-100 text-teal-700' : 'hover:bg-gray-100 text-gray-700'
-                    ]"
-                  >
-                    <button
-                      v-if="folder.children && folder.children.length > 0"
-                      @click.stop="toggleFolder(folder.id)"
-                      class="w-4 h-4 flex items-center justify-center text-gray-400 hover:text-gray-600"
-                    >
-                      <i :class="isFolderExpanded(folder.id) ? 'fas fa-chevron-down' : 'fas fa-chevron-right'" class="text-[10px]"></i>
-                    </button>
-                    <span v-else class="w-4"></span>
-                    <i :class="[folder.icon, selectedFolder === folder.id ? 'text-teal-600' : 'text-amber-500']" class="text-sm"></i>
-                    <span class="text-sm font-medium truncate">{{ folder.name }}</span>
-                  </div>
-
-                  <!-- Level 1 Children -->
-                  <div v-if="isFolderExpanded(folder.id) && folder.children" class="ml-4 mt-1 space-y-1">
-                    <template v-for="child in folder.children" :key="child.id">
-                      <div>
-                        <div
-                          @click="selectFolder(child.id)"
-                          :class="[
-                            'flex items-center gap-2 px-2 py-1.5 rounded-lg cursor-pointer transition-all',
-                            selectedFolder === child.id ? 'bg-teal-100 text-teal-700' : 'hover:bg-gray-100 text-gray-600'
-                          ]"
-                        >
-                          <button
-                            v-if="child.children && child.children.length > 0"
-                            @click.stop="toggleFolder(child.id)"
-                            class="w-4 h-4 flex items-center justify-center text-gray-400 hover:text-gray-600"
-                          >
-                            <i :class="isFolderExpanded(child.id) ? 'fas fa-chevron-down' : 'fas fa-chevron-right'" class="text-[10px]"></i>
-                          </button>
-                          <span v-else class="w-4"></span>
-                          <i :class="[selectedFolder === child.id ? 'fas fa-folder-open text-teal-500' : 'fas fa-folder text-amber-400']" class="text-sm"></i>
-                          <span class="text-sm truncate">{{ child.name }}</span>
-                        </div>
-
-                        <!-- Level 2 Children -->
-                        <div v-if="isFolderExpanded(child.id) && child.children && child.children.length > 0" class="ml-4 mt-1 space-y-1">
-                          <div
-                            v-for="subChild in child.children"
-                            :key="subChild.id"
-                            @click="selectFolder(subChild.id)"
-                            :class="[
-                              'flex items-center gap-2 px-2 py-1.5 rounded-lg cursor-pointer transition-all',
-                              selectedFolder === subChild.id ? 'bg-teal-100 text-teal-700' : 'hover:bg-gray-100 text-gray-500'
-                            ]"
-                          >
-                            <span class="w-4"></span>
-                            <i :class="[selectedFolder === subChild.id ? 'fas fa-folder-open text-teal-500' : 'fas fa-folder text-amber-300']" class="text-sm"></i>
-                            <span class="text-sm truncate">{{ subChild.name }}</span>
-                          </div>
-                        </div>
-                      </div>
-                    </template>
-                  </div>
-                </div>
-              </template>
+            <!-- Collapsed State - Icons Only -->
+            <div v-if="isSidebarCollapsed" class="p-2 pt-4 space-y-2">
+              <button
+                v-for="folder in folderTree[0].children"
+                :key="folder.id"
+                @click="selectFolder(folder.id); isSidebarCollapsed = false"
+                :class="[
+                  'w-8 h-8 rounded-lg flex items-center justify-center transition-all',
+                  selectedFolder === folder.id ? 'bg-teal-100 text-teal-600' : 'hover:bg-gray-100 text-amber-500'
+                ]"
+                :title="folder.name"
+              >
+                <i class="fas fa-folder text-sm"></i>
+              </button>
             </div>
 
-            <!-- Storage Info -->
-            <div class="mt-6 pt-4 border-t border-gray-200">
-              <div class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Storage</div>
-              <div class="bg-gray-200 rounded-full h-2 overflow-hidden">
-                <div class="bg-gradient-to-r from-teal-500 to-teal-400 h-full rounded-full" style="width: 45%"></div>
+            <!-- Expanded State - Full Tree -->
+            <div v-else class="p-4">
+              <div class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Folders</div>
+
+              <!-- Recursive Folder Tree -->
+              <div class="space-y-1">
+                <template v-for="folder in folderTree" :key="folder.id">
+                  <!-- Root Folder -->
+                  <div>
+                    <div
+                      @click="selectFolder(folder.id)"
+                      :class="[
+                        'flex items-center gap-2 px-2 py-1.5 rounded-lg cursor-pointer transition-all group',
+                        selectedFolder === folder.id ? 'bg-teal-100 text-teal-700' : 'hover:bg-gray-100 text-gray-700'
+                      ]"
+                    >
+                      <button
+                        v-if="folder.children && folder.children.length > 0"
+                        @click.stop="toggleFolder(folder.id)"
+                        class="w-4 h-4 flex items-center justify-center text-gray-400 hover:text-gray-600"
+                      >
+                        <i :class="isFolderExpanded(folder.id) ? 'fas fa-chevron-down' : 'fas fa-chevron-right'" class="text-[10px]"></i>
+                      </button>
+                      <span v-else class="w-4"></span>
+                      <i :class="[folder.icon, selectedFolder === folder.id ? 'text-teal-600' : 'text-amber-500']" class="text-sm"></i>
+                      <span class="text-sm font-medium truncate">{{ folder.name }}</span>
+                    </div>
+
+                    <!-- Level 1 Children -->
+                    <div v-if="isFolderExpanded(folder.id) && folder.children" class="ml-4 mt-1 space-y-1">
+                      <template v-for="child in folder.children" :key="child.id">
+                        <div>
+                          <div
+                            @click="selectFolder(child.id)"
+                            :class="[
+                              'flex items-center gap-2 px-2 py-1.5 rounded-lg cursor-pointer transition-all',
+                              selectedFolder === child.id ? 'bg-teal-100 text-teal-700' : 'hover:bg-gray-100 text-gray-600'
+                            ]"
+                          >
+                            <button
+                              v-if="child.children && child.children.length > 0"
+                              @click.stop="toggleFolder(child.id)"
+                              class="w-4 h-4 flex items-center justify-center text-gray-400 hover:text-gray-600"
+                            >
+                              <i :class="isFolderExpanded(child.id) ? 'fas fa-chevron-down' : 'fas fa-chevron-right'" class="text-[10px]"></i>
+                            </button>
+                            <span v-else class="w-4"></span>
+                            <i :class="[selectedFolder === child.id ? 'fas fa-folder-open text-teal-500' : 'fas fa-folder text-amber-400']" class="text-sm"></i>
+                            <span class="text-sm truncate">{{ child.name }}</span>
+                          </div>
+
+                          <!-- Level 2 Children -->
+                          <div v-if="isFolderExpanded(child.id) && child.children && child.children.length > 0" class="ml-4 mt-1 space-y-1">
+                            <div
+                              v-for="subChild in child.children"
+                              :key="subChild.id"
+                              @click="selectFolder(subChild.id)"
+                              :class="[
+                                'flex items-center gap-2 px-2 py-1.5 rounded-lg cursor-pointer transition-all',
+                                selectedFolder === subChild.id ? 'bg-teal-100 text-teal-700' : 'hover:bg-gray-100 text-gray-500'
+                              ]"
+                            >
+                              <span class="w-4"></span>
+                              <i :class="[selectedFolder === subChild.id ? 'fas fa-folder-open text-teal-500' : 'fas fa-folder text-amber-300']" class="text-sm"></i>
+                              <span class="text-sm truncate">{{ subChild.name }}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </template>
+                    </div>
+                  </div>
+                </template>
               </div>
-              <p class="text-xs text-gray-500 mt-2">{{ formatTotalSize(documentStats.totalSize) }} used</p>
+
+              <!-- Storage Info -->
+              <div class="mt-6 pt-4 border-t border-gray-200">
+                <div class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Storage</div>
+                <div class="bg-gray-200 rounded-full h-2 overflow-hidden">
+                  <div class="bg-gradient-to-r from-teal-500 to-teal-400 h-full rounded-full" style="width: 45%"></div>
+                </div>
+                <p class="text-xs text-gray-500 mt-2">{{ formatTotalSize(documentStats.totalSize) }} used</p>
+              </div>
             </div>
           </div>
 
