@@ -921,7 +921,7 @@ function getFileIconBg(type: string): string {
                 @click="showFileTypeFilter = !showFileTypeFilter"
                 :class="[
                   'flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border',
-                  selectedFileTypes.length > 0 ? 'bg-blue-50 border-blue-200 text-blue-700' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+                  selectedFileTypes.length > 0 ? 'bg-teal-50 border-teal-200 text-teal-700' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
                 ]"
               >
                 <i class="fas fa-file text-sm"></i>
@@ -942,12 +942,12 @@ function getFileIconBg(type: string): string {
                     @click="toggleFileType(type.id)"
                     :class="[
                       'w-full px-3 py-2 text-left text-sm flex items-center gap-3 transition-colors',
-                      isFileTypeSelected(type.id) ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50'
+                      isFileTypeSelected(type.id) ? 'bg-teal-50 text-teal-700' : 'text-gray-700 hover:bg-gray-50'
                     ]"
                   >
                     <div :class="[
                       'w-4 h-4 rounded border-2 flex items-center justify-center transition-all',
-                      isFileTypeSelected(type.id) ? 'bg-blue-500 border-blue-500' : 'border-gray-300'
+                      isFileTypeSelected(type.id) ? 'bg-teal-500 border-teal-500' : 'border-gray-300'
                     ]">
                       <i v-if="isFileTypeSelected(type.id)" class="fas fa-check text-white text-[8px]"></i>
                     </div>
@@ -967,7 +967,7 @@ function getFileIconBg(type: string): string {
                   </button>
                   <button
                     @click="showFileTypeFilter = false"
-                    class="flex-1 px-3 py-1.5 text-xs font-medium text-white bg-blue-500 rounded-lg hover:bg-blue-600 transition-colors"
+                    class="flex-1 px-3 py-1.5 text-xs font-medium text-white bg-teal-500 rounded-lg hover:bg-teal-600 transition-colors"
                   >
                     Apply
                   </button>
@@ -984,7 +984,7 @@ function getFileIconBg(type: string): string {
                 @click="showCategoryFilter = !showCategoryFilter"
                 :class="[
                   'flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border',
-                  selectedCategories.length > 0 ? 'bg-amber-50 border-amber-200 text-amber-700' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+                  selectedCategories.length > 0 ? 'bg-teal-50 border-teal-200 text-teal-700' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
                 ]"
               >
                 <i class="fas fa-layer-group text-sm"></i>
@@ -1005,12 +1005,12 @@ function getFileIconBg(type: string): string {
                     @click="toggleCategory(lib.id)"
                     :class="[
                       'w-full px-3 py-2 text-left text-sm flex items-center gap-3 transition-colors',
-                      isCategorySelected(lib.id) ? 'bg-amber-50 text-amber-700' : 'text-gray-700 hover:bg-gray-50'
+                      isCategorySelected(lib.id) ? 'bg-teal-50 text-teal-700' : 'text-gray-700 hover:bg-gray-50'
                     ]"
                   >
                     <div :class="[
                       'w-4 h-4 rounded border-2 flex items-center justify-center transition-all',
-                      isCategorySelected(lib.id) ? 'bg-amber-500 border-amber-500' : 'border-gray-300'
+                      isCategorySelected(lib.id) ? 'bg-teal-500 border-teal-500' : 'border-gray-300'
                     ]">
                       <i v-if="isCategorySelected(lib.id)" class="fas fa-check text-white text-[8px]"></i>
                     </div>
@@ -1036,7 +1036,7 @@ function getFileIconBg(type: string): string {
                   </button>
                   <button
                     @click="showCategoryFilter = false"
-                    class="flex-1 px-3 py-1.5 text-xs font-medium text-white bg-amber-500 rounded-lg hover:bg-amber-600 transition-colors"
+                    class="flex-1 px-3 py-1.5 text-xs font-medium text-white bg-teal-500 rounded-lg hover:bg-teal-600 transition-colors"
                   >
                     Apply
                   </button>
@@ -1053,7 +1053,7 @@ function getFileIconBg(type: string): string {
                 @click="showTagFilter = !showTagFilter"
                 :class="[
                   'flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border',
-                  selectedTags.length > 0 ? 'bg-purple-50 border-purple-200 text-purple-700' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+                  selectedTags.length > 0 ? 'bg-teal-50 border-teal-200 text-teal-700' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
                 ]"
               >
                 <i class="fas fa-tags text-sm"></i>
@@ -1074,12 +1074,12 @@ function getFileIconBg(type: string): string {
                     @click="toggleTag(tag)"
                     :class="[
                       'w-full px-3 py-2 text-left text-sm flex items-center gap-3 transition-colors',
-                      isTagSelected(tag) ? 'bg-purple-50 text-purple-700' : 'text-gray-700 hover:bg-gray-50'
+                      isTagSelected(tag) ? 'bg-teal-50 text-teal-700' : 'text-gray-700 hover:bg-gray-50'
                     ]"
                   >
                     <div :class="[
                       'w-4 h-4 rounded border-2 flex items-center justify-center transition-all',
-                      isTagSelected(tag) ? 'bg-purple-500 border-purple-500' : 'border-gray-300'
+                      isTagSelected(tag) ? 'bg-teal-500 border-teal-500' : 'border-gray-300'
                     ]">
                       <i v-if="isTagSelected(tag)" class="fas fa-check text-white text-[8px]"></i>
                     </div>
@@ -1098,7 +1098,7 @@ function getFileIconBg(type: string): string {
                   </button>
                   <button
                     @click="showTagFilter = false"
-                    class="flex-1 px-3 py-1.5 text-xs font-medium text-white bg-purple-500 rounded-lg hover:bg-purple-600 transition-colors"
+                    class="flex-1 px-3 py-1.5 text-xs font-medium text-white bg-teal-500 rounded-lg hover:bg-teal-600 transition-colors"
                   >
                     Apply
                   </button>
@@ -1280,29 +1280,29 @@ function getFileIconBg(type: string): string {
                 <span
                   v-for="categoryId in selectedCategories"
                   :key="'filter-category-' + categoryId"
-                  class="px-2 py-0.5 bg-amber-100 text-amber-700 rounded-full text-xs font-medium flex items-center gap-1"
+                  class="px-2 py-0.5 bg-teal-100 text-teal-700 rounded-full text-xs font-medium flex items-center gap-1"
                 >
                   <i class="fas fa-layer-group text-[10px]"></i>
                   {{ libraries.find(l => l.id === categoryId)?.name }}
-                  <button @click="toggleCategory(categoryId)" class="ml-1 hover:text-amber-900"><i class="fas fa-times text-[10px]"></i></button>
+                  <button @click="toggleCategory(categoryId)" class="ml-1 hover:text-teal-900"><i class="fas fa-times text-[10px]"></i></button>
                 </span>
                 <span
                   v-for="typeId in selectedFileTypes"
                   :key="'filter-type-' + typeId"
-                  class="px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full text-xs font-medium flex items-center gap-1"
+                  class="px-2 py-0.5 bg-teal-100 text-teal-700 rounded-full text-xs font-medium flex items-center gap-1"
                 >
                   <i :class="[fileTypes.find(t => t.id === typeId)?.icon, 'text-[10px]']"></i>
                   {{ fileTypes.find(t => t.id === typeId)?.label }}
-                  <button @click="toggleFileType(typeId)" class="ml-1 hover:text-blue-900"><i class="fas fa-times text-[10px]"></i></button>
+                  <button @click="toggleFileType(typeId)" class="ml-1 hover:text-teal-900"><i class="fas fa-times text-[10px]"></i></button>
                 </span>
                 <span
                   v-for="tag in selectedTags"
                   :key="'filter-tag-' + tag"
-                  class="px-2 py-0.5 bg-purple-100 text-purple-700 rounded-full text-xs font-medium flex items-center gap-1"
+                  class="px-2 py-0.5 bg-teal-100 text-teal-700 rounded-full text-xs font-medium flex items-center gap-1"
                 >
                   <i class="fas fa-tag text-[10px]"></i>
                   {{ tag }}
-                  <button @click="toggleTag(tag)" class="ml-1 hover:text-purple-900"><i class="fas fa-times text-[10px]"></i></button>
+                  <button @click="toggleTag(tag)" class="ml-1 hover:text-teal-900"><i class="fas fa-times text-[10px]"></i></button>
                 </span>
                 <span v-if="searchQuery" class="px-2 py-0.5 bg-gray-100 text-gray-700 rounded-full text-xs font-medium flex items-center gap-1">
                   <i class="fas fa-search text-[10px]"></i>
