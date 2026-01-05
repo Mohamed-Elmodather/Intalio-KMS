@@ -604,53 +604,121 @@ function openDocument(docId: number) {
 const teamActivities = ref([
   {
     id: 1,
-    user: { id: 101, name: 'Sarah Chen', initials: 'SC', color: '#8B5CF6' },
-    action: 'published a new article',
-    target: '"Remote Work Best Practices"',
+    user: { id: 101, name: 'Ahmed Al-Farsi', initials: 'AF', color: '#14b8a6', role: 'Media Director' },
+    action: 'published article',
+    target: 'Opening Match Preview: Saudi Arabia vs Japan',
     targetId: 1,
     targetType: 'article',
     time: '5 minutes ago',
-    actionIcon: 'fas fa-pen',
-    actionBg: 'bg-violet-100',
-    actionColor: 'text-violet-600'
+    actionIcon: 'fas fa-newspaper',
+    actionBg: 'bg-teal-100',
+    actionColor: 'text-teal-600',
+    likes: 24,
+    comments: 8,
+    isLiked: false
   },
   {
     id: 2,
-    user: { id: 102, name: 'Mike Johnson', initials: 'MJ', color: '#3B82F6' },
-    action: 'uploaded document to',
-    target: 'IT Knowledge Base',
+    user: { id: 102, name: 'Fatima Hassan', initials: 'FH', color: '#3b82f6', role: 'Operations Lead' },
+    action: 'uploaded document',
+    target: 'Stadium Security Protocol v2.0',
     targetId: 2,
     targetType: 'document',
     time: '15 minutes ago',
-    actionIcon: 'fas fa-upload',
+    actionIcon: 'fas fa-file-alt',
     actionBg: 'bg-blue-100',
-    actionColor: 'text-blue-600'
+    actionColor: 'text-blue-600',
+    likes: 12,
+    comments: 3,
+    isLiked: true
   },
   {
     id: 3,
-    user: { id: 103, name: 'Emily Davis', initials: 'ED', color: '#10B981' },
+    user: { id: 103, name: 'Mohammed Khalid', initials: 'MK', color: '#10b981', role: 'Training Manager' },
     action: 'completed course',
-    target: '"Leadership Essentials"',
+    target: 'Stadium Operations Management',
     targetId: 1,
     targetType: 'course',
     time: '1 hour ago',
-    actionIcon: 'fas fa-check',
+    actionIcon: 'fas fa-graduation-cap',
     actionBg: 'bg-emerald-100',
-    actionColor: 'text-emerald-600'
+    actionColor: 'text-emerald-600',
+    likes: 18,
+    comments: 5,
+    isLiked: false
   },
   {
     id: 4,
-    user: { id: 104, name: 'Alex Thompson', initials: 'AT', color: '#F59E0B' },
-    action: 'created new event',
-    target: '"Q1 Planning Session"',
+    user: { id: 104, name: 'Sara Al-Rashid', initials: 'SR', color: '#f59e0b', role: 'Event Coordinator' },
+    action: 'scheduled event',
+    target: 'Opening Ceremony Rehearsal',
     targetId: 1,
     targetType: 'event',
     time: '2 hours ago',
-    actionIcon: 'fas fa-calendar-plus',
+    actionIcon: 'fas fa-calendar-check',
     actionBg: 'bg-amber-100',
-    actionColor: 'text-amber-600'
+    actionColor: 'text-amber-600',
+    likes: 32,
+    comments: 12,
+    isLiked: true
+  },
+  {
+    id: 5,
+    user: { id: 105, name: 'Khalid Omar', initials: 'KO', color: '#8b5cf6', role: 'Volunteer Lead' },
+    action: 'added media',
+    target: 'Fan Zone Setup Photos',
+    targetId: 3,
+    targetType: 'media',
+    time: '3 hours ago',
+    actionIcon: 'fas fa-images',
+    actionBg: 'bg-violet-100',
+    actionColor: 'text-violet-600',
+    likes: 45,
+    comments: 15,
+    isLiked: false
+  },
+  {
+    id: 6,
+    user: { id: 106, name: 'Layla Ahmed', initials: 'LA', color: '#ec4899', role: 'Communications' },
+    action: 'created poll',
+    target: 'Best Stadium for the Final?',
+    targetId: 2,
+    targetType: 'poll',
+    time: '4 hours ago',
+    actionIcon: 'fas fa-chart-pie',
+    actionBg: 'bg-pink-100',
+    actionColor: 'text-pink-600',
+    likes: 67,
+    comments: 28,
+    isLiked: true
   }
 ])
+
+// Activity actions
+const likedActivities = ref<Set<number>>(new Set([2, 4, 6]))
+
+function toggleActivityLike(activityId: number, event: Event) {
+  event.stopPropagation()
+  const activity = teamActivities.value.find(a => a.id === activityId)
+  if (activity) {
+    if (likedActivities.value.has(activityId)) {
+      likedActivities.value.delete(activityId)
+      activity.likes--
+    } else {
+      likedActivities.value.add(activityId)
+      activity.likes++
+    }
+  }
+}
+
+function isActivityLiked(activityId: number): boolean {
+  return likedActivities.value.has(activityId)
+}
+
+function commentOnActivity(activityId: number, event: Event) {
+  event.stopPropagation()
+  alert(`Comment on activity #${activityId}`)
+}
 
 // Team Activity actions
 function viewUserProfile(userId: number) {
@@ -1557,38 +1625,77 @@ onUnmounted(() => {
 
     <!-- Main Grid Row 3 -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      <!-- Team Activity -->
-      <div class="card-animated rounded-2xl p-6 stagger-5">
+      <!-- Team Activity - Enhanced -->
+      <div class="card-animated rounded-2xl p-6 stagger-5 bg-gradient-to-br from-white to-teal-50/30 border border-teal-100/50">
         <div class="flex items-center justify-between mb-5">
-          <h2 class="text-base font-semibold text-gray-900 flex items-center gap-3">
-            <div class="icon-soft w-9 h-9 rounded-xl flex items-center justify-center">
-              <i class="fas fa-clock-rotate-left text-sm"></i>
+          <h2 class="text-lg font-bold text-gray-900 flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center shadow-lg shadow-teal-200">
+              <i class="fas fa-users text-white text-sm"></i>
             </div>
-            Team Activity
+            <div>
+              <span class="block">Team Activity</span>
+              <span class="text-xs font-medium text-teal-600">Recent updates</span>
+            </div>
           </h2>
-          <router-link to="/collaboration" class="text-sm text-primary-600 font-medium hover:text-primary-700">View All</router-link>
+          <router-link to="/collaboration" class="px-3 py-1.5 text-sm text-teal-600 hover:text-white bg-teal-50 hover:bg-teal-500 rounded-lg font-medium flex items-center gap-1.5 transition-all">
+            View All <i class="fas fa-arrow-right text-xs"></i>
+          </router-link>
         </div>
-        <div class="space-y-3">
+
+        <div class="space-y-3 max-h-[400px] overflow-y-auto pr-1 custom-scrollbar">
           <div v-for="activity in teamActivities" :key="activity.id"
-               class="flex items-start gap-3 p-3 rounded-xl hover:bg-gray-50 cursor-pointer transition-all group border border-transparent hover:border-gray-200 hover:shadow-sm">
-            <div @click.stop="viewUserProfile(activity.user.id)"
-                 class="w-9 h-9 rounded-lg flex items-center justify-center text-white text-xs font-semibold flex-shrink-0 cursor-pointer transition-transform hover:scale-110 hover:ring-2 hover:ring-offset-2"
-                 :style="{ backgroundColor: activity.user.color }"
-                 :title="'View ' + activity.user.name + '\'s profile'">
-              {{ activity.user.initials }}
-            </div>
-            <div class="flex-1 min-w-0" @click="viewActivityTarget(activity)">
-              <p class="text-sm text-gray-900">
-                <span @click.stop="viewUserProfile(activity.user.id)" class="font-medium hover:text-teal-600 cursor-pointer transition-colors">{{ activity.user.name }}</span>
-                <span class="text-gray-500"> {{ activity.action }} </span>
-                <span class="font-medium text-teal-600 hover:text-teal-700 cursor-pointer transition-colors">{{ activity.target }}</span>
-              </p>
-              <p class="text-xs text-gray-400 mt-1">{{ activity.time }}</p>
-            </div>
-            <div @click="viewActivityTarget(activity)"
-                 :class="['w-7 h-7 rounded-lg flex items-center justify-center cursor-pointer transition-transform hover:scale-110', activity.actionBg]"
-                 title="View details">
-              <i :class="[activity.actionIcon, 'text-xs', activity.actionColor]"></i>
+               @click="viewActivityTarget(activity)"
+               class="activity-card p-3 rounded-xl bg-white border border-gray-100 hover:border-teal-200 hover:shadow-lg cursor-pointer transition-all group">
+
+            <div class="flex gap-3">
+              <!-- User Avatar -->
+              <div class="relative flex-shrink-0">
+                <div @click.stop="viewUserProfile(activity.user.id)"
+                     class="w-10 h-10 rounded-xl flex items-center justify-center text-white text-xs font-bold cursor-pointer transition-transform group-hover:scale-110 shadow-md"
+                     :style="{ backgroundColor: activity.user.color }"
+                     :title="'View ' + activity.user.name + '\'s profile'">
+                  {{ activity.user.initials }}
+                </div>
+                <!-- Action Icon Badge -->
+                <div :class="['absolute -bottom-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center border-2 border-white', activity.actionBg]">
+                  <i :class="[activity.actionIcon, 'text-[8px]', activity.actionColor]"></i>
+                </div>
+              </div>
+
+              <!-- Activity Content -->
+              <div class="flex-1 min-w-0">
+                <div class="flex items-start justify-between gap-2">
+                  <div class="min-w-0">
+                    <p class="text-sm text-gray-900 leading-snug">
+                      <span @click.stop="viewUserProfile(activity.user.id)" class="font-semibold hover:text-teal-600 cursor-pointer transition-colors">{{ activity.user.name }}</span>
+                      <span class="text-gray-500"> {{ activity.action }}</span>
+                    </p>
+                    <p class="text-sm font-medium text-teal-600 hover:text-teal-700 truncate mt-0.5 cursor-pointer transition-colors">{{ activity.target }}</p>
+                  </div>
+
+                  <!-- Time -->
+                  <span class="text-[10px] text-gray-400 whitespace-nowrap flex-shrink-0">{{ activity.time }}</span>
+                </div>
+
+                <!-- User Role & Stats -->
+                <div class="flex items-center justify-between mt-2 pt-2 border-t border-gray-50">
+                  <span class="text-[10px] text-gray-400">{{ activity.user.role }}</span>
+
+                  <!-- Engagement Stats & Actions -->
+                  <div class="flex items-center gap-3">
+                    <button @click="toggleActivityLike(activity.id, $event)"
+                            :class="['flex items-center gap-1 text-[10px] transition-colors', isActivityLiked(activity.id) ? 'text-rose-500' : 'text-gray-400 hover:text-rose-500']">
+                      <i :class="[isActivityLiked(activity.id) ? 'fas' : 'far', 'fa-heart']"></i>
+                      <span>{{ activity.likes }}</span>
+                    </button>
+                    <button @click="commentOnActivity(activity.id, $event)"
+                            class="flex items-center gap-1 text-[10px] text-gray-400 hover:text-teal-500 transition-colors">
+                      <i class="far fa-comment"></i>
+                      <span>{{ activity.comments }}</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -1818,5 +1925,24 @@ onUnmounted(() => {
 .media-card:hover .rounded-xl {
   transform: scale(1.02);
   transition: transform 0.3s ease;
+}
+
+/* Custom scrollbar for activity feed */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #14b8a6, #0d9488);
+  border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #0d9488, #0f766e);
 }
 </style>
