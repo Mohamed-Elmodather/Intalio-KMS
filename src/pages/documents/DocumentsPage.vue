@@ -15,7 +15,6 @@ const sortOrder = ref<'asc' | 'desc'>('desc')
 const selectedFolder = ref<string | null>(null)
 const expandedFolders = ref(new Set<string>(['root', 'tournament', 'media']))
 const isSidebarCollapsed = ref(false)
-const showMoreOptions = ref(false)
 const showFileTypeFilter = ref(false)
 const showCategoryFilter = ref(false)
 const showTagFilter = ref(false)
@@ -1024,92 +1023,6 @@ function getFileIconBg(type: string): string {
               <button class="w-9 h-9 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-800 flex items-center justify-center transition-all" title="Refresh">
                 <i class="fas fa-sync-alt text-sm"></i>
               </button>
-
-              <!-- More Options Dropdown -->
-              <div class="relative">
-                <button
-                  @click="showMoreOptions = !showMoreOptions"
-                  :class="[
-                    'w-9 h-9 rounded-lg flex items-center justify-center transition-all',
-                    showMoreOptions ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-800'
-                  ]"
-                  title="More options"
-                >
-                  <i class="fas fa-ellipsis-v text-sm"></i>
-                </button>
-
-                <!-- Dropdown Menu -->
-                <div
-                  v-if="showMoreOptions"
-                  class="absolute right-0 top-full mt-2 w-64 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden z-50"
-                >
-                  <!-- Header -->
-                  <div class="px-4 py-3 bg-gradient-to-r from-gray-50 to-white border-b border-gray-100">
-                    <h3 class="text-sm font-semibold text-gray-800 flex items-center gap-2">
-                      <i class="fas fa-cog text-teal-500"></i>
-                      Quick Actions
-                    </h3>
-                  </div>
-
-                  <!-- Actions -->
-                  <div class="p-2">
-                    <button class="w-full px-3 py-2.5 text-left text-sm text-gray-700 hover:bg-teal-50 hover:text-teal-700 rounded-xl flex items-center gap-3 transition-all group">
-                      <div class="w-8 h-8 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center group-hover:scale-110 transition-transform">
-                        <i class="fas fa-download text-sm"></i>
-                      </div>
-                      <div>
-                        <span class="font-medium">Download All</span>
-                        <p class="text-[10px] text-gray-400">Download all files as ZIP</p>
-                      </div>
-                    </button>
-                    <button class="w-full px-3 py-2.5 text-left text-sm text-gray-700 hover:bg-teal-50 hover:text-teal-700 rounded-xl flex items-center gap-3 transition-all group">
-                      <div class="w-8 h-8 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center group-hover:scale-110 transition-transform">
-                        <i class="fas fa-file-export text-sm"></i>
-                      </div>
-                      <div>
-                        <span class="font-medium">Export</span>
-                        <p class="text-[10px] text-gray-400">Export files to ZIP archive</p>
-                      </div>
-                    </button>
-                    <button class="w-full px-3 py-2.5 text-left text-sm text-gray-700 hover:bg-teal-50 hover:text-teal-700 rounded-xl flex items-center gap-3 transition-all group">
-                      <div class="w-8 h-8 rounded-lg bg-green-100 text-green-600 flex items-center justify-center group-hover:scale-110 transition-transform">
-                        <i class="fas fa-share-alt text-sm"></i>
-                      </div>
-                      <div>
-                        <span class="font-medium">Share Folder</span>
-                        <p class="text-[10px] text-gray-400">Share with team members</p>
-                      </div>
-                    </button>
-                  </div>
-
-                  <div class="mx-3 border-t border-gray-100"></div>
-
-                  <!-- Settings -->
-                  <div class="p-2">
-                    <button class="w-full px-3 py-2.5 text-left text-sm text-gray-700 hover:bg-gray-50 rounded-xl flex items-center gap-3 transition-all group">
-                      <div class="w-8 h-8 rounded-lg bg-gray-100 text-gray-500 flex items-center justify-center group-hover:scale-110 transition-transform">
-                        <i class="fas fa-info-circle text-sm"></i>
-                      </div>
-                      <div>
-                        <span class="font-medium">Details Panel</span>
-                        <p class="text-[10px] text-gray-400">View file information</p>
-                      </div>
-                    </button>
-                    <button class="w-full px-3 py-2.5 text-left text-sm text-gray-700 hover:bg-gray-50 rounded-xl flex items-center gap-3 transition-all group">
-                      <div class="w-8 h-8 rounded-lg bg-gray-100 text-gray-500 flex items-center justify-center group-hover:scale-110 transition-transform">
-                        <i class="fas fa-sliders-h text-sm"></i>
-                      </div>
-                      <div>
-                        <span class="font-medium">Folder Settings</span>
-                        <p class="text-[10px] text-gray-400">Configure folder options</p>
-                      </div>
-                    </button>
-                  </div>
-                </div>
-
-                <!-- Click outside to close -->
-                <div v-if="showMoreOptions" @click="showMoreOptions = false" class="fixed inset-0 z-40"></div>
-              </div>
             </div>
           </div>
 
