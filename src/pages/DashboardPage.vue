@@ -395,8 +395,6 @@ function downloadDocument(doc: any, event: Event) {
 }
 
 function openDocument(docId: number) {
-  console.log('openDocument called with id:', docId)
-  alert(`Navigating to document ${docId}`)
   router.push(`/documents/${docId}`)
 }
 
