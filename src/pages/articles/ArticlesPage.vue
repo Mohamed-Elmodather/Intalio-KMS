@@ -10,9 +10,11 @@ const router = useRouter()
 const searchQuery = ref('')
 const selectedCategory = ref('')
 const sortBy = ref('recent')
+const sortOrder = ref<'asc' | 'desc'>('desc')
 const viewMode = ref<'grid' | 'list'>('grid')
 const showFilters = ref(false)
 const showFeaturedOnly = ref(false)
+const showCategoryFilter = ref(false)
 const currentPage = ref(1)
 const itemsPerPage = ref(12)
 const toasts = ref<Array<{ id: number; type: string; message: string }>>([])
@@ -1068,113 +1070,165 @@ onUnmounted(() => {
         </h2>
       </div>
 
-      <!-- Toolbar -->
-      <div class="toolbar bg-white rounded-2xl p-4 shadow-sm border border-gray-100 mb-4">
-        <div class="toolbar-left">
-          <!-- Search Box -->
-          <div class="search-box">
-            <i class="fas fa-search"></i>
+      <!-- Toolbar (Documents Style) -->
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 mb-4 overflow-hidden">
+        <div class="px-4 py-3 bg-gray-50/50 flex flex-wrap items-center gap-3">
+          <!-- Search -->
+          <div class="flex-1 min-w-[200px] max-w-md relative">
+            <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
             <input
-              type="text"
               v-model="searchQuery"
               @input="filterArticles"
+              type="text"
               placeholder="Search articles..."
-              class="search-input">
+              class="w-full pl-9 pr-4 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all"
+            >
+            <button v-if="searchQuery" @click="searchQuery = ''; filterArticles()" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+              <i class="fas fa-times text-xs"></i>
+            </button>
           </div>
 
-          <!-- Filter Button -->
-          <button
-            @click="showFilters = !showFilters"
-            :class="['filter-btn', { active: showFilters || activeFiltersCount > 0 }]">
-            <i class="fas fa-filter"></i>
-            <span>Filters</span>
-            <span v-if="activeFiltersCount > 0" class="filter-badge">{{ activeFiltersCount }}</span>
-          </button>
-        </div>
+          <!-- Category Filter -->
+          <div class="relative">
+            <button
+              @click="showCategoryFilter = !showCategoryFilter"
+              :class="[
+                'flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border',
+                selectedCategory ? 'bg-teal-50 border-teal-200 text-teal-700' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+              ]"
+            >
+              <i class="fas fa-layer-group text-sm"></i>
+              <span>{{ selectedCategory ? getCategoryName(selectedCategory) : 'Category' }}</span>
+              <i :class="showCategoryFilter ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ml-1"></i>
+            </button>
 
-        <div class="toolbar-right">
-          <!-- Sort -->
-          <select v-model="sortBy" @change="filterArticles" class="sort-select">
-            <option v-for="opt in sortOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
-          </select>
+            <!-- Dropdown Menu -->
+            <div
+              v-if="showCategoryFilter"
+              class="absolute left-0 top-full mt-2 w-64 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
+            >
+              <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Select Category</div>
+              <div class="max-h-48 overflow-y-auto">
+                <button
+                  v-for="cat in categories"
+                  :key="cat.id"
+                  @click="toggleCategoryFilter(cat.id); showCategoryFilter = false"
+                  :class="[
+                    'w-full px-3 py-2 text-left text-sm flex items-center gap-3 transition-colors',
+                    selectedCategory === cat.id ? 'bg-teal-50 text-teal-700' : 'text-gray-700 hover:bg-gray-50'
+                  ]"
+                >
+                  <div :class="[
+                    'w-4 h-4 rounded border-2 flex items-center justify-center transition-all',
+                    selectedCategory === cat.id ? 'bg-teal-500 border-teal-500' : 'border-gray-300'
+                  ]">
+                    <i v-if="selectedCategory === cat.id" class="fas fa-check text-white text-[8px]"></i>
+                  </div>
+                  <i :class="[cat.icon, 'text-teal-500 text-sm']"></i>
+                  <span class="flex-1">{{ cat.name }}</span>
+                  <span class="text-xs text-gray-400">{{ cat.count }}</span>
+                </button>
+              </div>
+
+              <div class="my-2 border-t border-gray-100"></div>
+
+              <div class="px-3 flex gap-2">
+                <button
+                  @click="selectedCategory = ''; filterArticles(); showCategoryFilter = false"
+                  class="flex-1 px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                >
+                  Clear
+                </button>
+                <button
+                  @click="showCategoryFilter = false"
+                  class="flex-1 px-3 py-1.5 text-xs font-medium text-white bg-teal-500 rounded-lg hover:bg-teal-600 transition-colors"
+                >
+                  Apply
+                </button>
+              </div>
+            </div>
+
+            <!-- Click outside to close -->
+            <div v-if="showCategoryFilter" @click="showCategoryFilter = false" class="fixed inset-0 z-40"></div>
+          </div>
+
+          <!-- Featured Toggle -->
+          <button
+            @click="showFeaturedOnly = !showFeaturedOnly; filterArticles()"
+            :class="[
+              'flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border',
+              showFeaturedOnly ? 'bg-amber-50 border-amber-200 text-amber-700' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+            ]"
+          >
+            <i class="fas fa-star text-sm"></i>
+            <span>Featured</span>
+          </button>
+
+          <!-- Sort Options -->
+          <div class="flex items-center gap-1 bg-white border border-gray-200 rounded-lg p-1">
+            <select
+              v-model="sortBy"
+              @change="filterArticles"
+              class="px-2 py-1 text-xs text-gray-700 bg-transparent border-0 focus:outline-none focus:ring-0 cursor-pointer"
+            >
+              <option v-for="opt in sortOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
+            </select>
+            <button
+              @click="sortOrder = sortOrder === 'asc' ? 'desc' : 'asc'; filterArticles()"
+              class="px-2 py-1 rounded-md text-gray-500 hover:bg-gray-100 transition-all"
+              :title="sortOrder === 'asc' ? 'Ascending' : 'Descending'"
+            >
+              <i :class="sortOrder === 'asc' ? 'fas fa-arrow-up' : 'fas fa-arrow-down'" class="text-xs"></i>
+            </button>
+          </div>
 
           <!-- View Toggle -->
-          <div class="view-toggle">
-            <button @click="viewMode = 'grid'" :class="{ active: viewMode === 'grid' }">
-              <i class="fas fa-th-large"></i>
+          <div class="flex items-center gap-0.5 bg-white border border-gray-200 rounded-lg p-1">
+            <button
+              @click="viewMode = 'grid'"
+              :class="['px-2.5 py-1 rounded-md transition-all', viewMode === 'grid' ? 'bg-teal-500 text-white' : 'text-gray-500 hover:bg-gray-100']"
+              title="Grid view"
+            >
+              <i class="fas fa-th-large text-xs"></i>
             </button>
-            <button @click="viewMode = 'list'" :class="{ active: viewMode === 'list' }">
-              <i class="fas fa-list"></i>
+            <button
+              @click="viewMode = 'list'"
+              :class="['px-2.5 py-1 rounded-md transition-all', viewMode === 'list' ? 'bg-teal-500 text-white' : 'text-gray-500 hover:bg-gray-100']"
+              title="List view"
+            >
+              <i class="fas fa-list text-xs"></i>
             </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Filters Panel -->
-      <div v-if="showFilters" class="filters-panel">
-        <div class="filters-header">
-          <div class="filters-title">
-            <i class="fas fa-sliders"></i>
-            <span>Filters</span>
-          </div>
-          <button v-if="activeFiltersCount > 0" @click="clearFilters" class="clear-filters-btn">
-            Clear All
-          </button>
-        </div>
-
-        <div class="filter-groups">
-          <div class="filter-group">
-            <div class="filter-group-label">Category</div>
-            <div class="filter-chips">
-              <button
-                v-for="cat in categories"
-                :key="cat.id"
-                @click="toggleCategoryFilter(cat.id)"
-                :class="['filter-chip', { active: selectedCategory === cat.id }]">
-                {{ cat.name }}
-                <span class="count">({{ cat.count }})</span>
-              </button>
-            </div>
-          </div>
-
-          <div class="filter-group">
-            <div class="filter-group-label">Type</div>
-            <div class="filter-chips">
-              <button
-                @click="showFeaturedOnly = !showFeaturedOnly; filterArticles()"
-                :class="['filter-chip', { active: showFeaturedOnly }]">
-                <i class="fas fa-star"></i>
-                Featured
-              </button>
-            </div>
           </div>
         </div>
       </div>
 
       <!-- Active Filters Bar -->
-      <div v-if="activeFiltersCount > 0 && !showFilters" class="active-filters-bar">
-        <span class="active-filters-label">Filters:</span>
-        <div class="active-filter-tags">
-          <span v-if="searchQuery" class="active-filter-tag">
+      <div v-if="activeFiltersCount > 0" class="flex items-center gap-3 mb-4 p-3 bg-white rounded-xl border border-gray-100 shadow-sm">
+        <div class="flex items-center gap-2 px-2 py-1 bg-gray-100 rounded-lg">
+          <i class="fas fa-filter text-gray-400 text-xs"></i>
+          <span class="text-xs font-medium text-gray-600">Active Filters</span>
+        </div>
+        <div class="flex flex-wrap gap-2 flex-1">
+          <span v-if="searchQuery" class="px-2.5 py-1 bg-gray-100 text-gray-700 rounded-lg text-xs font-medium flex items-center gap-1.5 border border-gray-200">
+            <i class="fas fa-search text-[10px]"></i>
             "{{ searchQuery }}"
-            <button @click="searchQuery = ''; filterArticles()" class="remove-btn">
-              <i class="fas fa-times"></i>
-            </button>
+            <button @click="searchQuery = ''; filterArticles()" class="ml-1 hover:text-gray-900 hover:bg-gray-200 rounded-full w-4 h-4 flex items-center justify-center"><i class="fas fa-times text-[10px]"></i></button>
           </span>
-          <span v-if="selectedCategory" class="active-filter-tag">
+          <span v-if="selectedCategory" class="px-2.5 py-1 bg-teal-50 text-teal-700 rounded-lg text-xs font-medium flex items-center gap-1.5 border border-teal-100">
+            <i class="fas fa-layer-group text-[10px]"></i>
             {{ getCategoryName(selectedCategory) }}
-            <button @click="selectedCategory = ''; filterArticles()" class="remove-btn">
-              <i class="fas fa-times"></i>
-            </button>
+            <button @click="selectedCategory = ''; filterArticles()" class="ml-1 hover:text-teal-900 hover:bg-teal-100 rounded-full w-4 h-4 flex items-center justify-center"><i class="fas fa-times text-[10px]"></i></button>
           </span>
-          <span v-if="showFeaturedOnly" class="active-filter-tag">
-            Featured
-            <button @click="showFeaturedOnly = false; filterArticles()" class="remove-btn">
-              <i class="fas fa-times"></i>
-            </button>
+          <span v-if="showFeaturedOnly" class="px-2.5 py-1 bg-amber-50 text-amber-700 rounded-lg text-xs font-medium flex items-center gap-1.5 border border-amber-100">
+            <i class="fas fa-star text-[10px]"></i>
+            Featured Only
+            <button @click="showFeaturedOnly = false; filterArticles()" class="ml-1 hover:text-amber-900 hover:bg-amber-100 rounded-full w-4 h-4 flex items-center justify-center"><i class="fas fa-times text-[10px]"></i></button>
           </span>
         </div>
-        <button @click="clearFilters" class="clear-all-btn">Clear All</button>
+        <button @click="clearFilters" class="px-3 py-1.5 text-xs font-medium text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors flex items-center gap-1.5">
+          <i class="fas fa-times-circle"></i>
+          Clear all
+        </button>
       </div>
 
       <!-- Content Area -->
