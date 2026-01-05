@@ -732,26 +732,126 @@ function getFileIconBg(type: string): string {
 
       <!-- All Files Section with Folder Tree -->
       <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <!-- Section Header -->
-        <div class="p-4 border-b border-gray-100 flex items-center justify-between">
-          <h2 class="text-lg font-bold text-gray-900 flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center shadow-lg shadow-teal-200">
-              <i class="fas fa-folder-tree text-white text-sm"></i>
+        <!-- Section Header / Toolbar -->
+        <div class="border-b border-gray-100">
+          <!-- Top Row - Title and Primary Actions -->
+          <div class="px-4 py-3 flex items-center justify-between">
+            <h2 class="text-lg font-bold text-gray-900 flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center shadow-lg shadow-teal-200">
+                <i class="fas fa-folder-tree text-white text-sm"></i>
+              </div>
+              <div>
+                <span class="block">All Files</span>
+                <span class="text-xs font-medium text-gray-500">{{ filteredDocuments.length }} items • {{ formatTotalSize(documentStats.totalSize) }}</span>
+              </div>
+            </h2>
+            <div class="flex items-center gap-2">
+              <!-- Primary Actions -->
+              <button class="px-4 py-2 bg-gradient-to-r from-teal-500 to-teal-600 text-white rounded-lg text-sm font-medium hover:from-teal-600 hover:to-teal-700 transition-all flex items-center gap-2 shadow-sm shadow-teal-200">
+                <i class="fas fa-cloud-arrow-up"></i>
+                Upload Files
+              </button>
+              <button class="px-3 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 hover:border-gray-300 transition-all flex items-center gap-2">
+                <i class="fas fa-folder-plus text-amber-500"></i>
+                New Folder
+              </button>
+
+              <!-- Divider -->
+              <div class="w-px h-8 bg-gray-200 mx-1"></div>
+
+              <!-- Secondary Actions -->
+              <button class="w-9 h-9 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-800 flex items-center justify-center transition-all" title="Refresh">
+                <i class="fas fa-sync-alt text-sm"></i>
+              </button>
+              <button class="w-9 h-9 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-800 flex items-center justify-center transition-all" title="Select multiple">
+                <i class="fas fa-check-square text-sm"></i>
+              </button>
+              <button class="w-9 h-9 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-800 flex items-center justify-center transition-all" title="More options">
+                <i class="fas fa-ellipsis-v text-sm"></i>
+              </button>
             </div>
-            <div>
-              <span class="block">All Files</span>
-              <span class="text-xs font-medium text-gray-500">Browse and manage documents</span>
+          </div>
+
+          <!-- Bottom Row - Search, Filters, View Options -->
+          <div class="px-4 py-2 bg-gray-50/50 flex flex-wrap items-center gap-3">
+            <!-- Search -->
+            <div class="flex-1 min-w-[200px] max-w-md relative">
+              <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+              <input
+                v-model="searchQuery"
+                type="text"
+                placeholder="Search files and folders..."
+                class="w-full pl-9 pr-4 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all"
+              >
+              <button v-if="searchQuery" @click="searchQuery = ''" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                <i class="fas fa-times text-xs"></i>
+              </button>
             </div>
-          </h2>
-          <div class="flex items-center gap-2">
-            <button class="px-3 py-2 bg-teal-500 text-white rounded-lg text-sm font-medium hover:bg-teal-600 transition-all flex items-center gap-2">
-              <i class="fas fa-upload"></i>
-              Upload
-            </button>
-            <button class="px-3 py-2 bg-gray-100 text-gray-600 rounded-lg text-sm font-medium hover:bg-gray-200 transition-all flex items-center gap-2">
-              <i class="fas fa-folder-plus"></i>
-              New Folder
-            </button>
+
+            <!-- File Type Filters -->
+            <div class="flex items-center gap-1 bg-white border border-gray-200 rounded-lg p-1">
+              <button
+                @click="selectedFileType = null"
+                :class="[
+                  'px-2.5 py-1 rounded-md text-xs font-medium transition-all',
+                  !selectedFileType ? 'bg-teal-500 text-white' : 'text-gray-600 hover:bg-gray-100'
+                ]"
+              >
+                All
+              </button>
+              <button
+                v-for="type in fileTypes.slice(0, 4)"
+                :key="type.id"
+                @click="selectedFileType = selectedFileType === type.id ? null : type.id"
+                :class="[
+                  'px-2.5 py-1 rounded-md text-xs font-medium transition-all flex items-center gap-1',
+                  selectedFileType === type.id ? 'bg-teal-500 text-white' : 'text-gray-600 hover:bg-gray-100'
+                ]"
+              >
+                <i :class="[type.icon, 'text-[10px]', selectedFileType === type.id ? '' : type.color]"></i>
+                {{ type.label }}
+              </button>
+              <button class="px-2 py-1 rounded-md text-xs font-medium text-gray-500 hover:bg-gray-100 transition-all">
+                <i class="fas fa-ellipsis-h"></i>
+              </button>
+            </div>
+
+            <!-- Sort Options -->
+            <div class="flex items-center gap-1 bg-white border border-gray-200 rounded-lg p-1">
+              <select
+                v-model="sortBy"
+                class="px-2 py-1 text-xs text-gray-700 bg-transparent border-0 focus:outline-none focus:ring-0 cursor-pointer"
+              >
+                <option value="date">Modified</option>
+                <option value="name">Name</option>
+                <option value="size">Size</option>
+              </select>
+              <button
+                @click="sortOrder = sortOrder === 'asc' ? 'desc' : 'asc'"
+                class="px-2 py-1 rounded-md text-gray-500 hover:bg-gray-100 transition-all"
+                :title="sortOrder === 'asc' ? 'Ascending' : 'Descending'"
+              >
+                <i :class="sortOrder === 'asc' ? 'fas fa-arrow-up' : 'fas fa-arrow-down'" class="text-xs"></i>
+              </button>
+            </div>
+
+            <!-- View Toggle -->
+            <div class="flex items-center gap-0.5 bg-white border border-gray-200 rounded-lg p-1">
+              <button
+                @click="viewMode = 'grid'"
+                :class="['px-2.5 py-1 rounded-md transition-all', viewMode === 'grid' ? 'bg-teal-500 text-white' : 'text-gray-500 hover:bg-gray-100']"
+                title="Grid view"
+              >
+                <i class="fas fa-th-large text-xs"></i>
+              </button>
+              <button
+                @click="viewMode = 'list'"
+                :class="['px-2.5 py-1 rounded-md transition-all', viewMode === 'list' ? 'bg-teal-500 text-white' : 'text-gray-500 hover:bg-gray-100']"
+                title="List view"
+              >
+                <i class="fas fa-list text-xs"></i>
+              </button>
+            </div>
           </div>
         </div>
 
@@ -875,72 +975,6 @@ function getFileIconBg(type: string): string {
 
           <!-- Files Content Area -->
           <div class="flex-1 p-4">
-            <!-- Search & Filters Bar -->
-            <div class="flex flex-col lg:flex-row gap-3 mb-4">
-              <!-- Search -->
-              <div class="flex-1 relative">
-                <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
-                <input
-                  v-model="searchQuery"
-                  type="text"
-                  placeholder="Search files..."
-                  class="w-full pl-9 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all"
-                >
-              </div>
-
-              <!-- File Type Filter -->
-              <div class="flex items-center gap-1 overflow-x-auto">
-                <button
-                  v-for="type in fileTypes"
-                  :key="type.id"
-                  @click="selectedFileType = selectedFileType === type.id ? null : type.id"
-                  :class="[
-                    'flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-all',
-                    selectedFileType === type.id
-                      ? 'bg-teal-500 text-white'
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                  ]"
-                >
-                  <i :class="[type.icon, selectedFileType === type.id ? 'text-white' : type.color]" class="text-[10px]"></i>
-                  {{ type.label }}
-                </button>
-              </div>
-
-              <!-- Sort & View Toggle -->
-              <div class="flex items-center gap-2">
-                <select
-                  v-model="sortBy"
-                  class="px-2 py-1.5 bg-gray-100 border-0 rounded-lg text-xs text-gray-700 focus:outline-none focus:ring-2 focus:ring-teal-500"
-                >
-                  <option value="date">Date</option>
-                  <option value="name">Name</option>
-                  <option value="size">Size</option>
-                </select>
-
-                <button
-                  @click="sortOrder = sortOrder === 'asc' ? 'desc' : 'asc'"
-                  class="p-1.5 bg-gray-100 rounded-lg text-gray-600 hover:bg-gray-200 transition-all"
-                >
-                  <i :class="sortOrder === 'asc' ? 'fas fa-sort-amount-up' : 'fas fa-sort-amount-down'" class="text-sm"></i>
-                </button>
-
-                <div class="flex gap-0.5 bg-gray-100 p-0.5 rounded-lg">
-                  <button
-                    @click="viewMode = 'grid'"
-                    :class="['p-1.5 rounded transition-all', viewMode === 'grid' ? 'bg-white shadow-sm text-teal-600' : 'text-gray-500 hover:text-gray-700']"
-                  >
-                    <i class="fas fa-th-large text-sm"></i>
-                  </button>
-                  <button
-                    @click="viewMode = 'list'"
-                    :class="['p-1.5 rounded transition-all', viewMode === 'list' ? 'bg-white shadow-sm text-teal-600' : 'text-gray-500 hover:text-gray-700']"
-                  >
-                    <i class="fas fa-list text-sm"></i>
-                  </button>
-                </div>
-              </div>
-            </div>
-
             <!-- Active Filters -->
             <div v-if="selectedFolder || selectedFileType || searchQuery" class="flex items-center gap-2 mb-4 pb-3 border-b border-gray-100">
               <span class="text-xs text-gray-500">Filters:</span>
