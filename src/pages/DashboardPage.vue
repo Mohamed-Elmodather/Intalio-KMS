@@ -295,13 +295,23 @@ const mediaItems = ref([
 ])
 
 // Media actions
+const savedMedia = ref<Set<number>>(new Set())
+
 function playMedia(mediaId: number) {
   router.push(`/media/${mediaId}`)
 }
 
 function saveMedia(mediaId: number, event: Event) {
   event.stopPropagation()
-  console.log('Save media:', mediaId)
+  if (savedMedia.value.has(mediaId)) {
+    savedMedia.value.delete(mediaId)
+  } else {
+    savedMedia.value.add(mediaId)
+  }
+}
+
+function isMediaSaved(mediaId: number): boolean {
+  return savedMedia.value.has(mediaId)
 }
 
 // Recent Documents
@@ -941,8 +951,8 @@ onUnmounted(() => {
 
             <!-- Save Button -->
             <button @click="saveMedia(media.id, $event)"
-                    class="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-black/50 hover:bg-teal-500 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all backdrop-blur-sm">
-              <i class="far fa-bookmark text-white text-[10px]"></i>
+                    :class="['absolute top-1.5 right-1.5 w-6 h-6 rounded-full flex items-center justify-center transition-all backdrop-blur-sm', isMediaSaved(media.id) ? 'bg-teal-500 opacity-100' : 'bg-black/50 hover:bg-teal-500 opacity-0 group-hover:opacity-100']">
+              <i :class="[isMediaSaved(media.id) ? 'fas' : 'far', 'fa-bookmark text-white text-[10px]']"></i>
             </button>
           </div>
 
