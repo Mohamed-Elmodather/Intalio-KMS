@@ -9,17 +9,17 @@ const isLoading = ref(false)
 const selectedLibrary = ref<string | null>(null)
 const searchQuery = ref('')
 const viewMode = ref<'grid' | 'list'>('grid')
-const selectedFileType = ref<string | null>(null)
+const selectedFileTypes = ref<string[]>([])
 const sortBy = ref<'name' | 'date' | 'size'>('date')
 const sortOrder = ref<'asc' | 'desc'>('desc')
 const selectedFolder = ref<string | null>(null)
 const expandedFolders = ref(new Set<string>(['root', 'tournament', 'media']))
 const isSidebarCollapsed = ref(false)
 const showMoreOptions = ref(false)
-const showMoreFileTypes = ref(false)
+const showFileTypeFilter = ref(false)
 const showCategoryFilter = ref(false)
 const showTagFilter = ref(false)
-const selectedCategory = ref<string | null>(null)
+const selectedCategories = ref<string[]>([])
 const selectedTags = ref<string[]>([])
 
 // Folder Tree Structure
@@ -371,12 +371,12 @@ const filteredDocuments = computed(() => {
     result = result.filter(d => d.libraryId === selectedLibrary.value)
   }
 
-  if (selectedCategory.value) {
-    result = result.filter(d => d.libraryId === selectedCategory.value)
+  if (selectedCategories.value.length > 0) {
+    result = result.filter(d => selectedCategories.value.includes(d.libraryId))
   }
 
-  if (selectedFileType.value) {
-    result = result.filter(d => d.type === selectedFileType.value)
+  if (selectedFileTypes.value.length > 0) {
+    result = result.filter(d => selectedFileTypes.value.includes(d.type))
   }
 
   if (selectedTags.value.length > 0) {
@@ -470,10 +470,36 @@ function viewDocument(doc: any) {
 
 function clearFilters() {
   selectedLibrary.value = null
-  selectedFileType.value = null
-  selectedCategory.value = null
+  selectedFileTypes.value = []
+  selectedCategories.value = []
   selectedTags.value = []
   searchQuery.value = ''
+}
+
+function toggleFileType(typeId: string) {
+  const index = selectedFileTypes.value.indexOf(typeId)
+  if (index > -1) {
+    selectedFileTypes.value.splice(index, 1)
+  } else {
+    selectedFileTypes.value.push(typeId)
+  }
+}
+
+function isFileTypeSelected(typeId: string): boolean {
+  return selectedFileTypes.value.includes(typeId)
+}
+
+function toggleCategory(categoryId: string) {
+  const index = selectedCategories.value.indexOf(categoryId)
+  if (index > -1) {
+    selectedCategories.value.splice(index, 1)
+  } else {
+    selectedCategories.value.push(categoryId)
+  }
+}
+
+function isCategorySelected(categoryId: string): boolean {
+  return selectedCategories.value.includes(categoryId)
 }
 
 function toggleTag(tag: string) {
@@ -889,71 +915,67 @@ function getFileIconBg(type: string): string {
               </button>
             </div>
 
-            <!-- File Type Filters -->
-            <div class="flex items-center gap-1 bg-white border border-gray-200 rounded-lg p-1">
+            <!-- File Type Filter -->
+            <div class="relative">
               <button
-                @click="selectedFileType = null"
+                @click="showFileTypeFilter = !showFileTypeFilter"
                 :class="[
-                  'px-2.5 py-1 rounded-md text-xs font-medium transition-all',
-                  !selectedFileType ? 'bg-teal-500 text-white' : 'text-gray-600 hover:bg-gray-100'
+                  'flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border',
+                  selectedFileTypes.length > 0 ? 'bg-blue-50 border-blue-200 text-blue-700' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
                 ]"
               >
-                All
+                <i class="fas fa-file text-sm"></i>
+                <span>{{ selectedFileTypes.length > 0 ? `${selectedFileTypes.length} Types` : 'File Type' }}</span>
+                <i :class="showFileTypeFilter ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ml-1"></i>
               </button>
-              <button
-                v-for="type in fileTypes.slice(0, 4)"
-                :key="type.id"
-                @click="selectedFileType = selectedFileType === type.id ? null : type.id"
-                :class="[
-                  'px-2.5 py-1 rounded-md text-xs font-medium transition-all flex items-center gap-1',
-                  selectedFileType === type.id ? 'bg-teal-500 text-white' : 'text-gray-600 hover:bg-gray-100'
-                ]"
-              >
-                <i :class="[type.icon, 'text-[10px]', selectedFileType === type.id ? '' : type.color]"></i>
-                {{ type.label }}
-              </button>
-              <!-- More File Types Dropdown -->
-              <div class="relative">
-                <button
-                  @click="showMoreFileTypes = !showMoreFileTypes"
-                  :class="[
-                    'px-2 py-1 rounded-md text-xs font-medium transition-all',
-                    showMoreFileTypes ? 'bg-teal-500 text-white' : 'text-gray-500 hover:bg-gray-100'
-                  ]"
-                >
-                  <i class="fas fa-ellipsis-h"></i>
-                </button>
 
-                <!-- Dropdown Menu -->
-                <div
-                  v-if="showMoreFileTypes"
-                  class="absolute left-0 top-full mt-2 w-44 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
-                >
-                  <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">More Types</div>
+              <!-- Dropdown Menu -->
+              <div
+                v-if="showFileTypeFilter"
+                class="absolute left-0 top-full mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
+              >
+                <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Select File Types</div>
+                <div class="max-h-48 overflow-y-auto">
                   <button
-                    v-for="type in fileTypes.slice(4)"
+                    v-for="type in fileTypes"
                     :key="type.id"
-                    @click="selectedFileType = type.id; showMoreFileTypes = false"
-                    class="w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3 transition-colors"
+                    @click="toggleFileType(type.id)"
+                    :class="[
+                      'w-full px-3 py-2 text-left text-sm flex items-center gap-3 transition-colors',
+                      isFileTypeSelected(type.id) ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50'
+                    ]"
                   >
-                    <i :class="[type.icon, type.color, 'w-4']"></i>
-                    {{ type.label }}
-                  </button>
-
-                  <div class="my-2 border-t border-gray-100"></div>
-
-                  <button
-                    @click="selectedFileType = null; showMoreFileTypes = false"
-                    class="w-full px-3 py-2 text-left text-sm text-gray-500 hover:bg-gray-50 flex items-center gap-3 transition-colors"
-                  >
-                    <i class="fas fa-times-circle w-4"></i>
-                    Clear Filter
+                    <div :class="[
+                      'w-4 h-4 rounded border-2 flex items-center justify-center transition-all',
+                      isFileTypeSelected(type.id) ? 'bg-blue-500 border-blue-500' : 'border-gray-300'
+                    ]">
+                      <i v-if="isFileTypeSelected(type.id)" class="fas fa-check text-white text-[8px]"></i>
+                    </div>
+                    <i :class="[type.icon, type.color, 'text-sm']"></i>
+                    <span class="flex-1">{{ type.label }}</span>
                   </button>
                 </div>
 
-                <!-- Click outside to close -->
-                <div v-if="showMoreFileTypes" @click="showMoreFileTypes = false" class="fixed inset-0 z-40"></div>
+                <div class="my-2 border-t border-gray-100"></div>
+
+                <div class="px-3 flex gap-2">
+                  <button
+                    @click="selectedFileTypes = []; showFileTypeFilter = false"
+                    class="flex-1 px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                  >
+                    Clear All
+                  </button>
+                  <button
+                    @click="showFileTypeFilter = false"
+                    class="flex-1 px-3 py-1.5 text-xs font-medium text-white bg-blue-500 rounded-lg hover:bg-blue-600 transition-colors"
+                  >
+                    Apply
+                  </button>
+                </div>
               </div>
+
+              <!-- Click outside to close -->
+              <div v-if="showFileTypeFilter" @click="showFileTypeFilter = false" class="fixed inset-0 z-40"></div>
             </div>
 
             <!-- Category Filter -->
@@ -962,48 +984,63 @@ function getFileIconBg(type: string): string {
                 @click="showCategoryFilter = !showCategoryFilter"
                 :class="[
                   'flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border',
-                  selectedCategory ? 'bg-teal-50 border-teal-200 text-teal-700' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+                  selectedCategories.length > 0 ? 'bg-amber-50 border-amber-200 text-amber-700' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
                 ]"
               >
-                <i class="fas fa-folder text-sm"></i>
-                <span>{{ selectedCategory ? libraries.find(l => l.id === selectedCategory)?.name : 'Category' }}</span>
+                <i class="fas fa-layer-group text-sm"></i>
+                <span>{{ selectedCategories.length > 0 ? `${selectedCategories.length} Categories` : 'Category' }}</span>
                 <i :class="showCategoryFilter ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ml-1"></i>
               </button>
 
               <!-- Dropdown Menu -->
               <div
                 v-if="showCategoryFilter"
-                class="absolute left-0 top-full mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
+                class="absolute left-0 top-full mt-2 w-64 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
               >
-                <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Categories</div>
-                <button
-                  v-for="lib in libraries"
-                  :key="lib.id"
-                  @click="selectedCategory = selectedCategory === lib.id ? null : lib.id; showCategoryFilter = false"
-                  :class="[
-                    'w-full px-3 py-2 text-left text-sm flex items-center gap-3 transition-colors',
-                    selectedCategory === lib.id ? 'bg-teal-50 text-teal-700' : 'text-gray-700 hover:bg-gray-50'
-                  ]"
-                >
-                  <div
-                    class="w-6 h-6 rounded-lg flex items-center justify-center text-white text-xs"
-                    :style="{ backgroundColor: lib.color }"
+                <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Select Categories</div>
+                <div class="max-h-48 overflow-y-auto">
+                  <button
+                    v-for="lib in libraries"
+                    :key="lib.id"
+                    @click="toggleCategory(lib.id)"
+                    :class="[
+                      'w-full px-3 py-2 text-left text-sm flex items-center gap-3 transition-colors',
+                      isCategorySelected(lib.id) ? 'bg-amber-50 text-amber-700' : 'text-gray-700 hover:bg-gray-50'
+                    ]"
                   >
-                    <i :class="lib.icon"></i>
-                  </div>
-                  <span class="flex-1">{{ lib.name }}</span>
-                  <span class="text-xs text-gray-400">{{ lib.documentCount }}</span>
-                </button>
+                    <div :class="[
+                      'w-4 h-4 rounded border-2 flex items-center justify-center transition-all',
+                      isCategorySelected(lib.id) ? 'bg-amber-500 border-amber-500' : 'border-gray-300'
+                    ]">
+                      <i v-if="isCategorySelected(lib.id)" class="fas fa-check text-white text-[8px]"></i>
+                    </div>
+                    <div
+                      class="w-6 h-6 rounded-lg flex items-center justify-center text-white text-xs"
+                      :style="{ backgroundColor: lib.color }"
+                    >
+                      <i :class="lib.icon"></i>
+                    </div>
+                    <span class="flex-1">{{ lib.name }}</span>
+                    <span class="text-xs text-gray-400">{{ lib.documentCount }}</span>
+                  </button>
+                </div>
 
                 <div class="my-2 border-t border-gray-100"></div>
 
-                <button
-                  @click="selectedCategory = null; showCategoryFilter = false"
-                  class="w-full px-3 py-2 text-left text-sm text-gray-500 hover:bg-gray-50 flex items-center gap-3 transition-colors"
-                >
-                  <i class="fas fa-times-circle w-6 text-center"></i>
-                  Clear Category
-                </button>
+                <div class="px-3 flex gap-2">
+                  <button
+                    @click="selectedCategories = []; showCategoryFilter = false"
+                    class="flex-1 px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                  >
+                    Clear All
+                  </button>
+                  <button
+                    @click="showCategoryFilter = false"
+                    class="flex-1 px-3 py-1.5 text-xs font-medium text-white bg-amber-500 rounded-lg hover:bg-amber-600 transition-colors"
+                  >
+                    Apply
+                  </button>
+                </div>
               </div>
 
               <!-- Click outside to close -->
@@ -1232,7 +1269,7 @@ function getFileIconBg(type: string): string {
           <!-- Files Content Area -->
           <div class="flex-1 p-4">
             <!-- Active Filters -->
-            <div v-if="selectedFolder || selectedFileType || searchQuery || selectedCategory || selectedTags.length > 0" class="flex items-center gap-2 mb-4 pb-3 border-b border-gray-100">
+            <div v-if="selectedFolder || selectedFileTypes.length > 0 || searchQuery || selectedCategories.length > 0 || selectedTags.length > 0" class="flex items-center gap-2 mb-4 pb-3 border-b border-gray-100">
               <span class="text-xs text-gray-500">Filters:</span>
               <div class="flex flex-wrap gap-1.5">
                 <span v-if="selectedFolder" class="px-2 py-0.5 bg-teal-100 text-teal-700 rounded-full text-xs font-medium flex items-center gap-1">
@@ -1240,14 +1277,23 @@ function getFileIconBg(type: string): string {
                   {{ selectedFolder }}
                   <button @click="selectedFolder = null" class="ml-1 hover:text-teal-900"><i class="fas fa-times text-[10px]"></i></button>
                 </span>
-                <span v-if="selectedCategory" class="px-2 py-0.5 bg-amber-100 text-amber-700 rounded-full text-xs font-medium flex items-center gap-1">
+                <span
+                  v-for="categoryId in selectedCategories"
+                  :key="'filter-category-' + categoryId"
+                  class="px-2 py-0.5 bg-amber-100 text-amber-700 rounded-full text-xs font-medium flex items-center gap-1"
+                >
                   <i class="fas fa-layer-group text-[10px]"></i>
-                  {{ libraries.find(l => l.id === selectedCategory)?.name }}
-                  <button @click="selectedCategory = null" class="ml-1 hover:text-amber-900"><i class="fas fa-times text-[10px]"></i></button>
+                  {{ libraries.find(l => l.id === categoryId)?.name }}
+                  <button @click="toggleCategory(categoryId)" class="ml-1 hover:text-amber-900"><i class="fas fa-times text-[10px]"></i></button>
                 </span>
-                <span v-if="selectedFileType" class="px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full text-xs font-medium flex items-center gap-1">
-                  {{ fileTypes.find(t => t.id === selectedFileType)?.label }}
-                  <button @click="selectedFileType = null" class="ml-1 hover:text-blue-900"><i class="fas fa-times text-[10px]"></i></button>
+                <span
+                  v-for="typeId in selectedFileTypes"
+                  :key="'filter-type-' + typeId"
+                  class="px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full text-xs font-medium flex items-center gap-1"
+                >
+                  <i :class="[fileTypes.find(t => t.id === typeId)?.icon, 'text-[10px]']"></i>
+                  {{ fileTypes.find(t => t.id === typeId)?.label }}
+                  <button @click="toggleFileType(typeId)" class="ml-1 hover:text-blue-900"><i class="fas fa-times text-[10px]"></i></button>
                 </span>
                 <span
                   v-for="tag in selectedTags"
