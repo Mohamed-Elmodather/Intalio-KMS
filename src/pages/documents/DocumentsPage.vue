@@ -1686,9 +1686,10 @@ function getFileIconBg(type: string): string {
             </div>
 
             <!-- Documents Grid View -->
-            <div v-else-if="viewMode === 'grid'" class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
-              <div
-                v-for="doc in paginatedDocuments"
+            <div v-else-if="viewMode === 'grid'">
+              <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
+                <div
+                  v-for="doc in paginatedDocuments"
                 :key="doc.id"
                 @click="viewDocument(doc)"
                 :class="[
@@ -1813,8 +1814,9 @@ function getFileIconBg(type: string): string {
                   </div>
                 </div>
               </div>
+            </div>
 
-              <!-- Grid View Pagination Footer -->
+            <!-- Grid View Pagination Footer -->
               <div class="mt-4 px-4 py-3 bg-white rounded-2xl border border-gray-100 shadow-sm">
                 <div class="flex items-center justify-between flex-wrap gap-3">
                   <!-- Left: Stats & Items Per Page -->
