@@ -838,11 +838,18 @@ const recentUpdates = ref([
     image: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=600&h=400&fit=crop',
     gradientClass: 'bg-gradient-to-br from-amber-400 to-orange-500',
     date: 'Jan 5, 2027',
+    timeAgo: '2 hours ago',
+    readTime: '3 min read',
     author: { name: 'AFC Media', initials: 'AF', role: 'Official News', color: '#006847' },
     views: '245,847',
+    likes: '12,543',
     comments: '4,521',
+    shares: '3,201',
     link: '/events',
-    actionText: 'View Match Details'
+    actionText: 'View Match Details',
+    tags: ['Opening Match', 'Saudi Arabia', 'Japan'],
+    isFeatured: true,
+    isTrending: true
   },
   {
     id: 2,
@@ -855,11 +862,18 @@ const recentUpdates = ref([
     image: 'https://images.unsplash.com/photo-1551958219-acbc608c6377?w=600&h=400&fit=crop',
     gradientClass: 'bg-gradient-to-br from-blue-400 to-indigo-500',
     date: 'Jan 4, 2027',
+    timeAgo: '1 day ago',
+    readTime: '5 min read',
     author: { name: 'Sports Desk', initials: 'SD', role: 'Football Analysis', color: '#006847' },
     views: '189,562',
+    likes: '8,721',
     comments: '2,856',
+    shares: '1,892',
     link: '/articles',
-    actionText: 'Read Full Story'
+    actionText: 'Read Full Story',
+    tags: ['Player Profile', 'Al-Dawsari', 'Captain'],
+    isFeatured: false,
+    isTrending: true
   },
   {
     id: 3,
@@ -872,11 +886,18 @@ const recentUpdates = ref([
     image: 'https://images.unsplash.com/photo-1459865264687-595d652de67e?w=600&h=400&fit=crop',
     gradientClass: 'bg-gradient-to-br from-emerald-400 to-teal-500',
     date: 'Jan 9, 2027',
+    timeAgo: '3 days ago',
+    readTime: '4 min read',
     author: { name: 'LOC Events', initials: 'LO', role: 'Local Organizing Committee', color: '#10b981' },
     views: '167,103',
+    likes: '9,432',
     comments: '1,892',
+    shares: '2,156',
     link: '/events',
-    actionText: 'Event Details'
+    actionText: 'Event Details',
+    tags: ['Opening Ceremony', 'Entertainment', 'Culture'],
+    isFeatured: true,
+    isTrending: false
   },
   {
     id: 4,
@@ -889,11 +910,18 @@ const recentUpdates = ref([
     image: 'https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=600&h=400&fit=crop',
     gradientClass: 'bg-gradient-to-br from-purple-400 to-violet-500',
     date: 'Jan 3, 2027',
+    timeAgo: '4 days ago',
+    readTime: '6 min read',
     author: { name: 'Venue Operations', initials: 'VO', role: 'Stadium Management', color: '#8b5cf6' },
     views: '98,543',
+    likes: '5,123',
     comments: '734',
+    shares: '892',
     link: '/events',
-    actionText: 'Explore Venues'
+    actionText: 'Explore Venues',
+    tags: ['Stadiums', 'Infrastructure', 'Facilities'],
+    isFeatured: false,
+    isTrending: false
   },
   {
     id: 5,
@@ -906,13 +934,52 @@ const recentUpdates = ref([
     image: 'https://images.unsplash.com/photo-1560272564-c83b66b1ad12?w=600&h=400&fit=crop',
     gradientClass: 'bg-gradient-to-br from-red-400 to-rose-500',
     date: 'Jan 2, 2027',
+    timeAgo: '5 days ago',
+    readTime: '8 min read',
     author: { name: 'Stats Team', initials: 'ST', role: 'Data Analytics', color: '#ef4444' },
     views: '145,876',
+    likes: '6,789',
     comments: '1,267',
+    shares: '1,543',
     link: '/articles',
-    actionText: 'View Statistics'
+    actionText: 'View Statistics',
+    tags: ['History', 'Champions', 'Records'],
+    isFeatured: false,
+    isTrending: true
   }
 ])
+
+// Update interactions
+const savedUpdates = ref(new Set<number>())
+const likedUpdates = ref(new Set<number>())
+
+function toggleSaveUpdate(id: number) {
+  if (savedUpdates.value.has(id)) {
+    savedUpdates.value.delete(id)
+  } else {
+    savedUpdates.value.add(id)
+  }
+}
+
+function toggleLikeUpdate(id: number) {
+  if (likedUpdates.value.has(id)) {
+    likedUpdates.value.delete(id)
+  } else {
+    likedUpdates.value.add(id)
+  }
+}
+
+function isUpdateSaved(id: number): boolean {
+  return savedUpdates.value.has(id)
+}
+
+function isUpdateLiked(id: number): boolean {
+  return likedUpdates.value.has(id)
+}
+
+function shareUpdate(update: any) {
+  console.log('Sharing update:', update.title)
+}
 
 // Carousel Methods
 const nextSlide = () => {
@@ -1071,20 +1138,59 @@ onUnmounted(() => {
                     </div>
                   </div>
                   <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
-                  <div class="absolute top-4 left-4">
-                    <span :class="['update-badge', update.type]" class="text-sm px-4 py-1.5 shadow-lg">
-                      <i :class="update.typeIcon" class="mr-1"></i>
-                      {{ update.typeLabel }}
-                    </span>
-                  </div>
-                  <div class="absolute bottom-4 left-4 right-4 flex justify-between items-center">
-                    <div class="flex items-center gap-2 text-white/90 text-sm">
-                      <i class="fas fa-eye"></i>
-                      <span>{{ update.views }} views</span>
+
+                  <!-- Top badges row -->
+                  <div class="absolute top-4 left-4 right-4 flex items-start justify-between">
+                    <div class="flex flex-wrap gap-2">
+                      <span :class="['update-badge', update.type]" class="text-sm px-4 py-1.5 shadow-lg">
+                        <i :class="update.typeIcon" class="mr-1"></i>
+                        {{ update.typeLabel }}
+                      </span>
+                      <span v-if="update.isFeatured" class="px-3 py-1.5 rounded-full bg-amber-500 text-white text-xs font-bold shadow-lg flex items-center gap-1">
+                        <i class="fas fa-star"></i> Featured
+                      </span>
+                      <span v-if="update.isTrending" class="px-3 py-1.5 rounded-full bg-rose-500 text-white text-xs font-bold shadow-lg flex items-center gap-1">
+                        <i class="fas fa-fire-alt"></i> Trending
+                      </span>
                     </div>
-                    <div class="px-3 py-1.5 rounded-lg bg-black/40 backdrop-blur-sm text-white text-sm font-medium">
-                      <i class="fas fa-calendar-alt mr-1"></i>
-                      {{ update.date }}
+                    <!-- Quick actions on image -->
+                    <div class="flex gap-2">
+                      <button
+                        @click.stop="toggleLikeUpdate(update.id)"
+                        class="w-9 h-9 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center text-white hover:bg-black/60 transition-all"
+                        :class="{ '!bg-rose-500': isUpdateLiked(update.id) }"
+                      >
+                        <i :class="isUpdateLiked(update.id) ? 'fas fa-heart' : 'far fa-heart'"></i>
+                      </button>
+                      <button
+                        @click.stop="toggleSaveUpdate(update.id)"
+                        class="w-9 h-9 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center text-white hover:bg-black/60 transition-all"
+                        :class="{ '!bg-teal-500': isUpdateSaved(update.id) }"
+                      >
+                        <i :class="isUpdateSaved(update.id) ? 'fas fa-bookmark' : 'far fa-bookmark'"></i>
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Bottom stats row -->
+                  <div class="absolute bottom-4 left-4 right-4 flex justify-between items-center">
+                    <div class="flex items-center gap-4 text-white/90 text-sm">
+                      <span class="flex items-center gap-1.5">
+                        <i class="fas fa-eye"></i>
+                        {{ update.views }}
+                      </span>
+                      <span class="flex items-center gap-1.5">
+                        <i class="fas fa-heart"></i>
+                        {{ update.likes }}
+                      </span>
+                      <span class="flex items-center gap-1.5">
+                        <i class="fas fa-share-alt"></i>
+                        {{ update.shares }}
+                      </span>
+                    </div>
+                    <div class="px-3 py-1.5 rounded-lg bg-black/40 backdrop-blur-sm text-white text-xs font-medium flex items-center gap-2">
+                      <i class="fas fa-clock"></i>
+                      {{ update.readTime }}
                     </div>
                   </div>
                 </div>
@@ -1092,9 +1198,27 @@ onUnmounted(() => {
 
               <!-- Content Side -->
               <div class="slide-text">
-                <h3 class="text-2xl lg:text-3xl font-bold text-gray-900 mb-4 leading-tight">{{ update.title }}</h3>
-                <p class="text-gray-600 mb-6 text-base leading-relaxed line-clamp-3">{{ update.description }}</p>
-                <div class="flex items-center gap-6 mb-6 pb-6 border-b border-gray-100">
+                <!-- Time ago -->
+                <div class="flex items-center gap-2 text-xs text-gray-500 mb-3">
+                  <i class="fas fa-clock text-teal-500"></i>
+                  <span>{{ update.timeAgo }}</span>
+                  <span class="w-1 h-1 bg-gray-300 rounded-full"></span>
+                  <span>{{ update.date }}</span>
+                </div>
+
+                <h3 class="text-2xl lg:text-3xl font-bold text-gray-900 mb-3 leading-tight">{{ update.title }}</h3>
+
+                <!-- Tags -->
+                <div class="flex flex-wrap gap-2 mb-4">
+                  <span v-for="tag in update.tags" :key="tag" class="px-2.5 py-1 rounded-lg bg-teal-50 text-teal-700 text-xs font-medium hover:bg-teal-100 transition-colors cursor-pointer">
+                    #{{ tag }}
+                  </span>
+                </div>
+
+                <p class="text-gray-600 mb-5 text-base leading-relaxed line-clamp-3">{{ update.description }}</p>
+
+                <!-- Author & Stats -->
+                <div class="flex items-center justify-between mb-5 pb-5 border-b border-gray-100">
                   <div class="flex items-center gap-3">
                     <div class="w-10 h-10 rounded-xl flex items-center justify-center text-white text-sm font-bold shadow-md"
                          :style="{ backgroundColor: update.author.color }">
@@ -1106,21 +1230,53 @@ onUnmounted(() => {
                     </div>
                   </div>
                   <div class="flex items-center gap-4 text-sm text-gray-500">
-                    <span class="flex items-center gap-1.5"><i class="fas fa-comment text-teal-500"></i>{{ update.comments }} comments</span>
+                    <span class="flex items-center gap-1.5">
+                      <i class="fas fa-comment text-teal-500"></i>
+                      {{ update.comments }}
+                    </span>
+                    <span class="flex items-center gap-1.5">
+                      <i class="fas fa-share text-teal-500"></i>
+                      {{ update.shares }}
+                    </span>
                   </div>
                 </div>
-                <div class="flex gap-4">
+
+                <!-- Action Buttons -->
+                <div class="flex flex-wrap gap-3">
                   <router-link :to="update.link" class="px-6 py-3 bg-gradient-to-r from-teal-500 to-teal-600 text-white rounded-xl font-semibold text-sm flex items-center gap-2 shadow-lg shadow-teal-200 hover:shadow-xl hover:shadow-teal-300 transition-all hover:-translate-y-0.5">
                     {{ update.actionText }}
                     <i class="fas fa-arrow-right text-xs"></i>
                   </router-link>
-                  <button class="px-4 py-3 bg-white border-2 border-gray-200 text-gray-700 rounded-xl font-medium text-sm hover:bg-teal-50 hover:border-teal-200 hover:text-teal-700 transition-all flex items-center gap-2">
-                    <i class="fas fa-bookmark"></i>
-                    Save
+                  <button
+                    @click="toggleSaveUpdate(update.id)"
+                    :class="[
+                      'px-4 py-3 rounded-xl font-medium text-sm transition-all flex items-center gap-2',
+                      isUpdateSaved(update.id)
+                        ? 'bg-teal-500 text-white shadow-lg shadow-teal-200'
+                        : 'bg-white border-2 border-gray-200 text-gray-700 hover:bg-teal-50 hover:border-teal-200 hover:text-teal-700'
+                    ]"
+                  >
+                    <i :class="isUpdateSaved(update.id) ? 'fas fa-bookmark' : 'far fa-bookmark'"></i>
+                    {{ isUpdateSaved(update.id) ? 'Saved' : 'Save' }}
                   </button>
-                  <button class="px-4 py-3 bg-white border-2 border-gray-200 text-gray-700 rounded-xl font-medium text-sm hover:bg-teal-50 hover:border-teal-200 hover:text-teal-700 transition-all flex items-center gap-2">
+                  <button
+                    @click="shareUpdate(update)"
+                    class="px-4 py-3 bg-white border-2 border-gray-200 text-gray-700 rounded-xl font-medium text-sm hover:bg-teal-50 hover:border-teal-200 hover:text-teal-700 transition-all flex items-center gap-2"
+                  >
                     <i class="fas fa-share-alt"></i>
                     Share
+                  </button>
+                  <button
+                    @click="toggleLikeUpdate(update.id)"
+                    :class="[
+                      'px-4 py-3 rounded-xl font-medium text-sm transition-all flex items-center gap-2',
+                      isUpdateLiked(update.id)
+                        ? 'bg-rose-500 text-white shadow-lg shadow-rose-200'
+                        : 'bg-white border-2 border-gray-200 text-gray-700 hover:bg-rose-50 hover:border-rose-200 hover:text-rose-600'
+                    ]"
+                  >
+                    <i :class="isUpdateLiked(update.id) ? 'fas fa-heart' : 'far fa-heart'"></i>
+                    {{ isUpdateLiked(update.id) ? 'Liked' : 'Like' }}
                   </button>
                 </div>
               </div>
@@ -1129,13 +1285,26 @@ onUnmounted(() => {
         </div>
       </div>
 
-      <!-- Dots Navigation -->
-      <div class="carousel-dots">
-        <button v-for="(update, index) in recentUpdates" :key="'dot-' + index"
-                @click="goToSlide(index)"
-                class="carousel-dot"
-                :class="{ active: index === currentSlide }">
-        </button>
+      <!-- Thumbnail Gallery Navigation -->
+      <div class="mt-6 pt-6 border-t border-gray-100">
+        <div class="flex items-center gap-4">
+          <span class="text-xs font-semibold text-gray-500 uppercase tracking-wider">More Updates</span>
+          <div class="flex-1 flex gap-3 overflow-x-auto pb-2 scrollbar-thin">
+            <button
+              v-for="(update, index) in recentUpdates"
+              :key="'thumb-' + index"
+              @click="goToSlide(index)"
+              :class="[
+                'flex-shrink-0 w-20 h-14 rounded-lg overflow-hidden relative group transition-all',
+                index === currentSlide ? 'ring-2 ring-teal-500 ring-offset-2' : 'opacity-60 hover:opacity-100'
+              ]"
+            >
+              <img :src="update.image" :alt="update.title" class="w-full h-full object-cover">
+              <div class="absolute inset-0 bg-black/30 group-hover:bg-black/10 transition-colors"></div>
+              <div v-if="index === currentSlide" class="absolute bottom-0 left-0 right-0 h-1 bg-teal-500"></div>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
 
