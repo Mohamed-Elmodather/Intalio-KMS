@@ -972,36 +972,95 @@ onUnmounted(() => {
 
 <template>
   <div class="px-8 py-6">
-    <!-- Welcome Section -->
-    <div class="card-animated rounded-2xl p-8 mb-8 relative overflow-hidden stagger-1">
+    <!-- Welcome Section - Enhanced -->
+    <div class="welcome-hero rounded-2xl mb-8 relative overflow-hidden stagger-1">
       <!-- Decorative elements -->
-      <div class="welcome-decoration w-64 h-64 -top-32 -right-32" style="animation-delay: 0s;"></div>
-      <div class="welcome-decoration w-48 h-48 -bottom-24 -left-24" style="animation-delay: 2s;"></div>
-      <div class="welcome-decoration w-32 h-32 top-1/2 right-1/4" style="animation-delay: 4s;"></div>
+      <div class="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/3"></div>
+      <div class="absolute bottom-0 left-0 w-64 h-64 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/3"></div>
+      <div class="absolute top-1/2 right-1/4 w-32 h-32 bg-white/10 rounded-full"></div>
 
-      <div class="relative flex items-center justify-between">
-        <div>
-          <h1 class="text-2xl font-bold text-gray-900 mb-2 fade-in-up" style="animation-delay: 0.3s;">
-            Good {{ timeOfDay }}, Ahmed <span class="text-xl inline-block icon-float">👋</span>
-          </h1>
-          <p class="text-gray-500 max-w-lg fade-in-up" style="animation-delay: 0.4s;">
-            You have <span class="font-medium text-primary-600">3 pending approvals</span> and
-            <span class="font-medium text-primary-600">2 new courses</span> waiting for you.
-          </p>
-          <div class="flex gap-3 mt-6 fade-in-up" style="animation-delay: 0.5s;">
-            <router-link to="/learning" class="px-5 py-2.5 btn-vibrant text-white rounded-xl font-medium text-sm flex items-center gap-2 ripple">
-              <i class="fas fa-play text-xs"></i>
-              Continue Learning
-            </router-link>
-            <router-link to="/articles/new" class="px-5 py-2.5 bg-white border border-gray-200 text-gray-700 rounded-xl font-medium text-sm hover:bg-primary-50 hover:border-primary-200 hover:text-primary-700 transition-all flex items-center gap-2 ripple">
-              <i class="fas fa-plus text-xs"></i>
-              Create Content
-            </router-link>
+      <div class="relative p-8">
+        <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+          <!-- Left Content -->
+          <div class="flex-1">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-white text-xs font-semibold flex items-center gap-2">
+                <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+                AFC Asian Cup Saudi Arabia 2027
+              </div>
+            </div>
+
+            <h1 class="text-3xl font-bold text-white mb-3 fade-in-up" style="animation-delay: 0.3s;">
+              Good {{ timeOfDay }}, Ahmed! <span class="text-2xl inline-block icon-float">👋</span>
+            </h1>
+            <p class="text-teal-100 max-w-lg fade-in-up text-base" style="animation-delay: 0.4s;">
+              Welcome to the Knowledge Management System. You have
+              <span class="font-semibold text-white">3 pending tasks</span> and
+              <span class="font-semibold text-white">5 new updates</span> to review.
+            </p>
+
+            <!-- Quick Action Buttons -->
+            <div class="flex flex-wrap gap-3 mt-6 fade-in-up" style="animation-delay: 0.5s;">
+              <router-link to="/learning" class="px-5 py-2.5 bg-white text-teal-600 rounded-xl font-semibold text-sm flex items-center gap-2 hover:bg-teal-50 transition-all shadow-lg shadow-black/10">
+                <i class="fas fa-play text-xs"></i>
+                Continue Learning
+              </router-link>
+              <router-link to="/articles/new" class="px-5 py-2.5 bg-white/20 backdrop-blur-sm border border-white/30 text-white rounded-xl font-semibold text-sm hover:bg-white/30 transition-all flex items-center gap-2">
+                <i class="fas fa-plus text-xs"></i>
+                Create Content
+              </router-link>
+              <router-link to="/events" class="px-5 py-2.5 bg-white/20 backdrop-blur-sm border border-white/30 text-white rounded-xl font-semibold text-sm hover:bg-white/30 transition-all flex items-center gap-2">
+                <i class="fas fa-calendar text-xs"></i>
+                View Events
+              </router-link>
+            </div>
           </div>
-        </div>
-        <div class="hidden lg:flex items-center justify-center scale-in" style="animation-delay: 0.6s;">
-          <div class="w-36 h-36 rounded-2xl bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center shadow-2xl shadow-primary-500/30 icon-float">
-            <i class="fas fa-lightbulb text-white text-5xl"></i>
+
+          <!-- Right Content - Countdown & Stats -->
+          <div class="flex flex-col items-center gap-4 scale-in" style="animation-delay: 0.6s;">
+            <!-- Tournament Logo/Icon -->
+            <div class="w-24 h-24 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center shadow-xl icon-float">
+              <i class="fas fa-trophy text-white text-4xl"></i>
+            </div>
+
+            <!-- Countdown -->
+            <div class="bg-white/20 backdrop-blur-sm rounded-xl p-4 text-center">
+              <p class="text-white/80 text-xs font-medium mb-2">Tournament Starts In</p>
+              <div class="flex items-center gap-2">
+                <div class="bg-white/20 rounded-lg px-3 py-2 min-w-[50px]">
+                  <p class="text-2xl font-bold text-white">5</p>
+                  <p class="text-[9px] text-white/70 uppercase">Days</p>
+                </div>
+                <span class="text-white text-xl font-bold">:</span>
+                <div class="bg-white/20 rounded-lg px-3 py-2 min-w-[50px]">
+                  <p class="text-2xl font-bold text-white">12</p>
+                  <p class="text-[9px] text-white/70 uppercase">Hours</p>
+                </div>
+                <span class="text-white text-xl font-bold">:</span>
+                <div class="bg-white/20 rounded-lg px-3 py-2 min-w-[50px]">
+                  <p class="text-2xl font-bold text-white">48</p>
+                  <p class="text-[9px] text-white/70 uppercase">Mins</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Quick Stats -->
+            <div class="flex items-center gap-4 text-white/90 text-xs">
+              <div class="flex items-center gap-1.5">
+                <i class="fas fa-users"></i>
+                <span>24 Teams</span>
+              </div>
+              <div class="w-1 h-1 bg-white/50 rounded-full"></div>
+              <div class="flex items-center gap-1.5">
+                <i class="fas fa-futbol"></i>
+                <span>51 Matches</span>
+              </div>
+              <div class="w-1 h-1 bg-white/50 rounded-full"></div>
+              <div class="flex items-center gap-1.5">
+                <i class="fas fa-stadium"></i>
+                <span>5 Venues</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -1811,6 +1870,12 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
+/* Welcome Hero Section */
+.welcome-hero {
+  background: linear-gradient(135deg, #0d9488 0%, #14b8a6 50%, #10b981 100%);
+  box-shadow: 0 10px 40px rgba(13, 148, 136, 0.3);
+}
+
 /* Carousel Styles */
 .updates-carousel {
   position: relative;
