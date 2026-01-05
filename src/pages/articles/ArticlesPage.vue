@@ -8,15 +8,20 @@ const router = useRouter()
 // CORE STATE
 // ============================================
 const searchQuery = ref('')
-const selectedCategory = ref('')
+const selectedCategories = ref<string[]>([])
+const selectedTypes = ref<string[]>([])
+const selectedTags = ref<string[]>([])
 const sortBy = ref('recent')
 const sortOrder = ref<'asc' | 'desc'>('desc')
 const viewMode = ref<'grid' | 'list'>('grid')
 const showFilters = ref(false)
 const showFeaturedOnly = ref(false)
 const showCategoryFilter = ref(false)
+const showTypeFilter = ref(false)
+const showTagFilter = ref(false)
 const currentPage = ref(1)
-const itemsPerPage = ref(12)
+const itemsPerPage = ref(10)
+const itemsPerPageOptions = [5, 10, 20, 50, 100]
 const toasts = ref<Array<{ id: number; type: string; message: string }>>([])
 
 const sortOptions = ref([
@@ -36,14 +41,33 @@ const currentUser = ref({
 // DATA
 // ============================================
 const categories = ref([
-  { id: 'getting-started', name: 'Getting Started', count: 15, icon: 'fas fa-rocket' },
-  { id: 'tutorials', name: 'Tutorials', count: 28, icon: 'fas fa-graduation-cap' },
-  { id: 'best-practices', name: 'Best Practices', count: 22, icon: 'fas fa-lightbulb' },
-  { id: 'policies', name: 'Policies', count: 18, icon: 'fas fa-file-contract' },
-  { id: 'tech', name: 'Technology', count: 34, icon: 'fas fa-microchip' },
-  { id: 'hr', name: 'HR & Benefits', count: 12, icon: 'fas fa-heart' },
-  { id: 'security', name: 'Security', count: 9, icon: 'fas fa-shield-halved' },
+  { id: 'getting-started', name: 'Getting Started', count: 15, icon: 'fas fa-rocket', color: '#14b8a6' },
+  { id: 'tutorials', name: 'Tutorials', count: 28, icon: 'fas fa-graduation-cap', color: '#8b5cf6' },
+  { id: 'best-practices', name: 'Best Practices', count: 22, icon: 'fas fa-lightbulb', color: '#f59e0b' },
+  { id: 'policies', name: 'Policies', count: 18, icon: 'fas fa-file-contract', color: '#6366f1' },
+  { id: 'tech', name: 'Technology', count: 34, icon: 'fas fa-microchip', color: '#3b82f6' },
+  { id: 'hr', name: 'HR & Benefits', count: 12, icon: 'fas fa-heart', color: '#ec4899' },
+  { id: 'security', name: 'Security', count: 9, icon: 'fas fa-shield-halved', color: '#ef4444' },
 ])
+
+const articleTypes = ref([
+  { id: 'guide', name: 'Guide', icon: 'fas fa-book', color: '#14b8a6' },
+  { id: 'tutorial', name: 'Tutorial', icon: 'fas fa-graduation-cap', color: '#8b5cf6' },
+  { id: 'news', name: 'News', icon: 'fas fa-newspaper', color: '#3b82f6' },
+  { id: 'announcement', name: 'Announcement', icon: 'fas fa-bullhorn', color: '#f59e0b' },
+  { id: 'policy', name: 'Policy', icon: 'fas fa-file-contract', color: '#6366f1' },
+  { id: 'how-to', name: 'How-To', icon: 'fas fa-list-check', color: '#10b981' },
+  { id: 'faq', name: 'FAQ', icon: 'fas fa-circle-question', color: '#f97316' },
+])
+
+// All available tags (computed from articles)
+const allTags = computed(() => {
+  const tags = new Set<string>()
+  articles.value.forEach(article => {
+    article.tags?.forEach(tag => tags.add(tag))
+  })
+  return Array.from(tags).sort()
+})
 
 const articles = ref([
   {
@@ -60,6 +84,7 @@ const articles = ref([
     likes: 48,
     featured: true,
     categoryId: 'getting-started',
+    type: 'guide',
     tags: ['Onboarding', 'Guide', 'Basics']
   },
   {
@@ -76,6 +101,7 @@ const articles = ref([
     likes: 32,
     featured: true,
     categoryId: 'best-practices',
+    type: 'guide',
     tags: ['Remote', 'Collaboration']
   },
   {
@@ -92,6 +118,7 @@ const articles = ref([
     likes: 67,
     featured: true,
     categoryId: 'security',
+    type: 'policy',
     tags: ['Security', 'Compliance']
   },
   {
@@ -108,6 +135,7 @@ const articles = ref([
     likes: 45,
     featured: false,
     categoryId: 'hr',
+    type: 'guide',
     tags: ['Benefits', 'Insurance']
   },
   {
@@ -124,6 +152,7 @@ const articles = ref([
     likes: 89,
     featured: false,
     categoryId: 'tutorials',
+    type: 'tutorial',
     tags: ['API', 'Development']
   },
   {
@@ -140,6 +169,7 @@ const articles = ref([
     likes: 56,
     featured: false,
     categoryId: 'tech',
+    type: 'how-to',
     tags: ['Cloud', 'AWS']
   },
   {
@@ -156,6 +186,7 @@ const articles = ref([
     likes: 112,
     featured: false,
     categoryId: 'getting-started',
+    type: 'how-to',
     tags: ['Onboarding', 'Checklist']
   },
   {
@@ -172,6 +203,7 @@ const articles = ref([
     likes: 78,
     featured: false,
     categoryId: 'policies',
+    type: 'policy',
     tags: ['GDPR', 'Privacy']
   },
   {
@@ -188,6 +220,7 @@ const articles = ref([
     likes: 41,
     featured: false,
     categoryId: 'best-practices',
+    type: 'how-to',
     tags: ['Meetings', 'Tips']
   },
   {
@@ -204,6 +237,7 @@ const articles = ref([
     likes: 156,
     featured: false,
     categoryId: 'tutorials',
+    type: 'tutorial',
     tags: ['Docker', 'Microservices']
   },
   {
@@ -220,6 +254,7 @@ const articles = ref([
     likes: 95,
     featured: false,
     categoryId: 'hr',
+    type: 'announcement',
     tags: ['Leave', 'Policy']
   },
   {
@@ -236,6 +271,7 @@ const articles = ref([
     likes: 128,
     featured: false,
     categoryId: 'tech',
+    type: 'tutorial',
     tags: ['ML', 'AI']
   },
 ])
@@ -447,7 +483,9 @@ const filteredArticles = ref([...articles.value])
 const activeFiltersCount = computed(() => {
   let count = 0
   if (searchQuery.value) count++
-  if (selectedCategory.value) count++
+  count += selectedCategories.value.length
+  count += selectedTypes.value.length
+  count += selectedTags.value.length
   if (showFeaturedOnly.value) count++
   return count
 })
@@ -479,6 +517,33 @@ const paginationPages = computed(() => {
 })
 
 // ============================================
+// PAGINATION FUNCTIONS
+// ============================================
+
+function goToPage(page: number) {
+  if (page >= 1 && page <= totalPages.value) {
+    currentPage.value = page
+  }
+}
+
+function nextPage() {
+  if (currentPage.value < totalPages.value) {
+    currentPage.value++
+  }
+}
+
+function prevPage() {
+  if (currentPage.value > 1) {
+    currentPage.value--
+  }
+}
+
+function changeItemsPerPage(count: number) {
+  itemsPerPage.value = count
+  currentPage.value = 1
+}
+
+// ============================================
 // FUNCTIONS
 // ============================================
 
@@ -486,6 +551,7 @@ function filterArticles() {
   currentPage.value = 1
   let result = [...articles.value]
 
+  // Search filter
   if (searchQuery.value) {
     const query = searchQuery.value.toLowerCase()
     result = result.filter(a =>
@@ -496,35 +562,97 @@ function filterArticles() {
     )
   }
 
-  if (selectedCategory.value) {
-    result = result.filter(a => a.categoryId === selectedCategory.value)
+  // Category filter (multi-select)
+  if (selectedCategories.value.length > 0) {
+    result = result.filter(a => selectedCategories.value.includes(a.categoryId))
   }
 
+  // Type filter (multi-select)
+  if (selectedTypes.value.length > 0) {
+    result = result.filter(a => a.type && selectedTypes.value.includes(a.type))
+  }
+
+  // Tags filter (multi-select)
+  if (selectedTags.value.length > 0) {
+    result = result.filter(a => a.tags?.some(tag => selectedTags.value.includes(tag)))
+  }
+
+  // Featured filter
   if (showFeaturedOnly.value) {
     result = result.filter(a => a.featured)
   }
 
+  // Sorting
   switch (sortBy.value) {
     case 'popular':
-      result.sort((a, b) => b.views - a.views)
+      result.sort((a, b) => sortOrder.value === 'desc' ? b.views - a.views : a.views - b.views)
       break
     case 'title':
-      result.sort((a, b) => a.title.localeCompare(b.title))
+      result.sort((a, b) => sortOrder.value === 'desc' ? b.title.localeCompare(a.title) : a.title.localeCompare(b.title))
+      break
+    case 'recent':
+    default:
+      // Keep default order (most recent first for desc)
+      if (sortOrder.value === 'asc') {
+        result.reverse()
+      }
       break
   }
 
   filteredArticles.value = result
 }
 
+// Toggle functions for multi-select filters
 function toggleCategoryFilter(categoryId: string) {
-  selectedCategory.value = selectedCategory.value === categoryId ? '' : categoryId
+  const index = selectedCategories.value.indexOf(categoryId)
+  if (index > -1) {
+    selectedCategories.value.splice(index, 1)
+  } else {
+    selectedCategories.value.push(categoryId)
+  }
   filterArticles()
+}
+
+function toggleTypeFilter(typeId: string) {
+  const index = selectedTypes.value.indexOf(typeId)
+  if (index > -1) {
+    selectedTypes.value.splice(index, 1)
+  } else {
+    selectedTypes.value.push(typeId)
+  }
+  filterArticles()
+}
+
+function toggleTagFilter(tag: string) {
+  const index = selectedTags.value.indexOf(tag)
+  if (index > -1) {
+    selectedTags.value.splice(index, 1)
+  } else {
+    selectedTags.value.push(tag)
+  }
+  filterArticles()
+}
+
+// Check functions for filter state
+function isCategorySelected(categoryId: string) {
+  return selectedCategories.value.includes(categoryId)
+}
+
+function isTypeSelected(typeId: string) {
+  return selectedTypes.value.includes(typeId)
+}
+
+function isTagSelected(tag: string) {
+  return selectedTags.value.includes(tag)
 }
 
 function clearFilters() {
   searchQuery.value = ''
-  selectedCategory.value = ''
+  selectedCategories.value = []
+  selectedTypes.value = []
+  selectedTags.value = []
   sortBy.value = 'recent'
+  sortOrder.value = 'desc'
   showFeaturedOnly.value = false
   filterArticles()
 }
@@ -532,6 +660,11 @@ function clearFilters() {
 function getCategoryName(id: string) {
   const cat = categories.value.find(c => c.id === id)
   return cat ? cat.name : id
+}
+
+function getTypeName(id: string) {
+  const type = articleTypes.value.find(t => t.id === id)
+  return type ? type.name : id
 }
 
 function formatNumber(num: number): string {
@@ -1071,8 +1204,8 @@ onUnmounted(() => {
       </div>
 
       <!-- Toolbar (Documents Style) -->
-      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 mb-4 overflow-hidden">
-        <div class="px-4 py-3 bg-gray-50/50 flex flex-wrap items-center gap-3">
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 mb-4">
+        <div class="px-4 py-3 bg-gray-50/50 rounded-2xl flex flex-wrap items-center gap-3">
           <!-- Search -->
           <div class="flex-1 min-w-[200px] max-w-md relative">
             <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
@@ -1094,35 +1227,38 @@ onUnmounted(() => {
               @click="showCategoryFilter = !showCategoryFilter"
               :class="[
                 'flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border',
-                selectedCategory ? 'bg-teal-50 border-teal-200 text-teal-700' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+                selectedCategories.length > 0 ? 'bg-teal-50 border-teal-200 text-teal-700' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
               ]"
             >
               <i class="fas fa-layer-group text-sm"></i>
-              <span>{{ selectedCategory ? getCategoryName(selectedCategory) : 'Category' }}</span>
+              <span>{{ selectedCategories.length > 0 ? `Category (${selectedCategories.length})` : 'Category' }}</span>
               <i :class="showCategoryFilter ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ml-1"></i>
             </button>
+
+            <!-- Click outside to close (must be before dropdown) -->
+            <div v-if="showCategoryFilter" @click="showCategoryFilter = false" class="fixed inset-0 z-40"></div>
 
             <!-- Dropdown Menu -->
             <div
               v-if="showCategoryFilter"
               class="absolute left-0 top-full mt-2 w-64 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
             >
-              <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Select Category</div>
+              <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Select Categories</div>
               <div class="max-h-48 overflow-y-auto">
                 <button
                   v-for="cat in categories"
                   :key="cat.id"
-                  @click="toggleCategoryFilter(cat.id); showCategoryFilter = false"
+                  @click="toggleCategoryFilter(cat.id)"
                   :class="[
                     'w-full px-3 py-2 text-left text-sm flex items-center gap-3 transition-colors',
-                    selectedCategory === cat.id ? 'bg-teal-50 text-teal-700' : 'text-gray-700 hover:bg-gray-50'
+                    isCategorySelected(cat.id) ? 'bg-teal-50 text-teal-700' : 'text-gray-700 hover:bg-gray-50'
                   ]"
                 >
                   <div :class="[
                     'w-4 h-4 rounded border-2 flex items-center justify-center transition-all',
-                    selectedCategory === cat.id ? 'bg-teal-500 border-teal-500' : 'border-gray-300'
+                    isCategorySelected(cat.id) ? 'bg-teal-500 border-teal-500' : 'border-gray-300'
                   ]">
-                    <i v-if="selectedCategory === cat.id" class="fas fa-check text-white text-[8px]"></i>
+                    <i v-if="isCategorySelected(cat.id)" class="fas fa-check text-white text-[8px]"></i>
                   </div>
                   <i :class="[cat.icon, 'text-teal-500 text-sm']"></i>
                   <span class="flex-1">{{ cat.name }}</span>
@@ -1134,7 +1270,7 @@ onUnmounted(() => {
 
               <div class="px-3 flex gap-2">
                 <button
-                  @click="selectedCategory = ''; filterArticles(); showCategoryFilter = false"
+                  @click="selectedCategories = []; filterArticles(); showCategoryFilter = false"
                   class="flex-1 px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
                 >
                   Clear
@@ -1147,9 +1283,132 @@ onUnmounted(() => {
                 </button>
               </div>
             </div>
+          </div>
 
-            <!-- Click outside to close -->
-            <div v-if="showCategoryFilter" @click="showCategoryFilter = false" class="fixed inset-0 z-40"></div>
+          <!-- Type Filter -->
+          <div class="relative">
+            <button
+              @click="showTypeFilter = !showTypeFilter"
+              :class="[
+                'flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border',
+                selectedTypes.length > 0 ? 'bg-teal-50 border-teal-200 text-teal-700' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+              ]"
+            >
+              <i class="fas fa-file-alt text-sm"></i>
+              <span>{{ selectedTypes.length > 0 ? `Type (${selectedTypes.length})` : 'Type' }}</span>
+              <i :class="showTypeFilter ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ml-1"></i>
+            </button>
+
+            <!-- Click outside to close (must be before dropdown) -->
+            <div v-if="showTypeFilter" @click="showTypeFilter = false" class="fixed inset-0 z-40"></div>
+
+            <!-- Dropdown Menu -->
+            <div
+              v-if="showTypeFilter"
+              class="absolute left-0 top-full mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
+            >
+              <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Select Types</div>
+              <div class="max-h-48 overflow-y-auto">
+                <button
+                  v-for="type in articleTypes"
+                  :key="type.id"
+                  @click="toggleTypeFilter(type.id)"
+                  :class="[
+                    'w-full px-3 py-2 text-left text-sm flex items-center gap-3 transition-colors',
+                    isTypeSelected(type.id) ? 'bg-teal-50 text-teal-700' : 'text-gray-700 hover:bg-gray-50'
+                  ]"
+                >
+                  <div :class="[
+                    'w-4 h-4 rounded border-2 flex items-center justify-center transition-all',
+                    isTypeSelected(type.id) ? 'bg-teal-500 border-teal-500' : 'border-gray-300'
+                  ]">
+                    <i v-if="isTypeSelected(type.id)" class="fas fa-check text-white text-[8px]"></i>
+                  </div>
+                  <i :class="[type.icon, 'text-teal-500 text-sm']"></i>
+                  <span class="flex-1">{{ type.name }}</span>
+                </button>
+              </div>
+
+              <div class="my-2 border-t border-gray-100"></div>
+
+              <div class="px-3 flex gap-2">
+                <button
+                  @click="selectedTypes = []; filterArticles(); showTypeFilter = false"
+                  class="flex-1 px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                >
+                  Clear
+                </button>
+                <button
+                  @click="showTypeFilter = false"
+                  class="flex-1 px-3 py-1.5 text-xs font-medium text-white bg-teal-500 rounded-lg hover:bg-teal-600 transition-colors"
+                >
+                  Apply
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tags Filter -->
+          <div class="relative">
+            <button
+              @click="showTagFilter = !showTagFilter"
+              :class="[
+                'flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border',
+                selectedTags.length > 0 ? 'bg-teal-50 border-teal-200 text-teal-700' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+              ]"
+            >
+              <i class="fas fa-tags text-sm"></i>
+              <span>{{ selectedTags.length > 0 ? `Tags (${selectedTags.length})` : 'Tags' }}</span>
+              <i :class="showTagFilter ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ml-1"></i>
+            </button>
+
+            <!-- Click outside to close (must be before dropdown) -->
+            <div v-if="showTagFilter" @click="showTagFilter = false" class="fixed inset-0 z-40"></div>
+
+            <!-- Dropdown Menu -->
+            <div
+              v-if="showTagFilter"
+              class="absolute left-0 top-full mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
+            >
+              <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Select Tags</div>
+              <div class="max-h-48 overflow-y-auto">
+                <button
+                  v-for="tag in allTags"
+                  :key="tag"
+                  @click="toggleTagFilter(tag)"
+                  :class="[
+                    'w-full px-3 py-2 text-left text-sm flex items-center gap-3 transition-colors',
+                    isTagSelected(tag) ? 'bg-teal-50 text-teal-700' : 'text-gray-700 hover:bg-gray-50'
+                  ]"
+                >
+                  <div :class="[
+                    'w-4 h-4 rounded border-2 flex items-center justify-center transition-all',
+                    isTagSelected(tag) ? 'bg-teal-500 border-teal-500' : 'border-gray-300'
+                  ]">
+                    <i v-if="isTagSelected(tag)" class="fas fa-check text-white text-[8px]"></i>
+                  </div>
+                  <i class="fas fa-tag text-teal-500 text-sm"></i>
+                  <span class="flex-1">{{ tag }}</span>
+                </button>
+              </div>
+
+              <div class="my-2 border-t border-gray-100"></div>
+
+              <div class="px-3 flex gap-2">
+                <button
+                  @click="selectedTags = []; filterArticles(); showTagFilter = false"
+                  class="flex-1 px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                >
+                  Clear
+                </button>
+                <button
+                  @click="showTagFilter = false"
+                  class="flex-1 px-3 py-1.5 text-xs font-medium text-white bg-teal-500 rounded-lg hover:bg-teal-600 transition-colors"
+                >
+                  Apply
+                </button>
+              </div>
+            </div>
           </div>
 
           <!-- Featured Toggle -->
@@ -1209,16 +1468,43 @@ onUnmounted(() => {
           <span class="text-xs font-medium text-gray-600">Active Filters</span>
         </div>
         <div class="flex flex-wrap gap-2 flex-1">
+          <!-- Search Filter -->
           <span v-if="searchQuery" class="px-2.5 py-1 bg-gray-100 text-gray-700 rounded-lg text-xs font-medium flex items-center gap-1.5 border border-gray-200">
             <i class="fas fa-search text-[10px]"></i>
             "{{ searchQuery }}"
             <button @click="searchQuery = ''; filterArticles()" class="ml-1 hover:text-gray-900 hover:bg-gray-200 rounded-full w-4 h-4 flex items-center justify-center"><i class="fas fa-times text-[10px]"></i></button>
           </span>
-          <span v-if="selectedCategory" class="px-2.5 py-1 bg-teal-50 text-teal-700 rounded-lg text-xs font-medium flex items-center gap-1.5 border border-teal-100">
+          <!-- Category Filters (multiple) -->
+          <span
+            v-for="catId in selectedCategories"
+            :key="'cat-' + catId"
+            class="px-2.5 py-1 bg-teal-50 text-teal-700 rounded-lg text-xs font-medium flex items-center gap-1.5 border border-teal-100"
+          >
             <i class="fas fa-layer-group text-[10px]"></i>
-            {{ getCategoryName(selectedCategory) }}
-            <button @click="selectedCategory = ''; filterArticles()" class="ml-1 hover:text-teal-900 hover:bg-teal-100 rounded-full w-4 h-4 flex items-center justify-center"><i class="fas fa-times text-[10px]"></i></button>
+            {{ getCategoryName(catId) }}
+            <button @click="toggleCategoryFilter(catId)" class="ml-1 hover:text-teal-900 hover:bg-teal-100 rounded-full w-4 h-4 flex items-center justify-center"><i class="fas fa-times text-[10px]"></i></button>
           </span>
+          <!-- Type Filters (multiple) -->
+          <span
+            v-for="typeId in selectedTypes"
+            :key="'type-' + typeId"
+            class="px-2.5 py-1 bg-teal-50 text-teal-700 rounded-lg text-xs font-medium flex items-center gap-1.5 border border-teal-100"
+          >
+            <i class="fas fa-file-alt text-[10px]"></i>
+            {{ getTypeName(typeId) }}
+            <button @click="toggleTypeFilter(typeId)" class="ml-1 hover:text-teal-900 hover:bg-teal-100 rounded-full w-4 h-4 flex items-center justify-center"><i class="fas fa-times text-[10px]"></i></button>
+          </span>
+          <!-- Tag Filters (multiple) -->
+          <span
+            v-for="tag in selectedTags"
+            :key="'tag-' + tag"
+            class="px-2.5 py-1 bg-teal-50 text-teal-700 rounded-lg text-xs font-medium flex items-center gap-1.5 border border-teal-100"
+          >
+            <i class="fas fa-tag text-[10px]"></i>
+            {{ tag }}
+            <button @click="toggleTagFilter(tag)" class="ml-1 hover:text-teal-900 hover:bg-teal-100 rounded-full w-4 h-4 flex items-center justify-center"><i class="fas fa-times text-[10px]"></i></button>
+          </span>
+          <!-- Featured Filter -->
           <span v-if="showFeaturedOnly" class="px-2.5 py-1 bg-amber-50 text-amber-700 rounded-lg text-xs font-medium flex items-center gap-1.5 border border-amber-100">
             <i class="fas fa-star text-[10px]"></i>
             Featured Only
@@ -1330,42 +1616,85 @@ onUnmounted(() => {
             </article>
           </div>
 
-          <!-- Pagination -->
-          <div class="pagination-container">
-            <div class="pagination-info">
-              Showing {{ paginationStart }} to {{ paginationEnd }} of {{ filteredArticles.length }} articles
-            </div>
-            <div class="pagination-controls">
-              <button
-                class="pagination-btn"
-                :disabled="currentPage === 1"
-                @click="currentPage--">
-                <i class="fas fa-chevron-left"></i>
-              </button>
-              <template v-for="page in paginationPages" :key="page">
-                <span v-if="page === '...'" class="pagination-ellipsis">...</span>
+          <!-- Pagination Footer (Documents Style) -->
+          <div class="mt-4 px-4 py-3 bg-white rounded-2xl border border-gray-100 shadow-sm">
+            <div class="flex items-center justify-between flex-wrap gap-3">
+              <!-- Left: Stats & Items Per Page -->
+              <div class="flex items-center gap-4 flex-wrap">
+                <span class="text-xs text-gray-500">
+                  Showing <span class="font-semibold text-gray-700">{{ Math.min((currentPage - 1) * itemsPerPage + 1, filteredArticles.length) }}</span>
+                  to <span class="font-semibold text-gray-700">{{ Math.min(currentPage * itemsPerPage, filteredArticles.length) }}</span>
+                  of <span class="font-semibold text-gray-700">{{ filteredArticles.length }}</span> articles
+                </span>
+
+                <!-- Items Per Page Selector -->
+                <div class="flex items-center gap-2">
+                  <span class="text-xs text-gray-500">Show:</span>
+                  <select
+                    v-model="itemsPerPage"
+                    @change="changeItemsPerPage(Number(($event.target as HTMLSelectElement).value))"
+                    class="text-xs px-2 py-1.5 rounded-lg border border-gray-200 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 cursor-pointer"
+                  >
+                    <option v-for="option in itemsPerPageOptions" :key="option" :value="option">
+                      {{ option }}
+                    </option>
+                  </select>
+                  <span class="text-xs text-gray-500">per page</span>
+                </div>
+              </div>
+
+              <!-- Right: Pagination Controls -->
+              <div class="flex items-center gap-2">
                 <button
-                  v-else
-                  :class="['pagination-btn', { active: currentPage === page }]"
-                  @click="currentPage = page as number">
-                  {{ page }}
+                  @click="prevPage"
+                  :disabled="currentPage === 1"
+                  :class="[
+                    'px-3 py-1.5 text-xs rounded-lg transition-colors flex items-center gap-1.5 border',
+                    currentPage === 1
+                      ? 'text-gray-300 border-gray-100 cursor-not-allowed'
+                      : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100 border-gray-200'
+                  ]"
+                >
+                  <i class="fas fa-chevron-left text-[10px]"></i>
+                  Previous
                 </button>
-              </template>
-              <button
-                class="pagination-btn"
-                :disabled="currentPage === totalPages"
-                @click="currentPage++">
-                <i class="fas fa-chevron-right"></i>
-              </button>
-            </div>
-            <div class="per-page-control">
-              <span class="per-page-label">Per page:</span>
-              <select v-model="itemsPerPage" class="per-page-select" @change="currentPage = 1">
-                <option :value="8">8</option>
-                <option :value="12">12</option>
-                <option :value="24">24</option>
-                <option :value="48">48</option>
-              </select>
+
+                <!-- Page Numbers -->
+                <div class="flex items-center gap-1">
+                  <template v-for="page in totalPages" :key="page">
+                    <button
+                      v-if="page === 1 || page === totalPages || (page >= currentPage - 1 && page <= currentPage + 1)"
+                      @click="goToPage(page)"
+                      :class="[
+                        'w-8 h-8 text-xs rounded-lg transition-colors flex items-center justify-center',
+                        page === currentPage
+                          ? 'font-medium text-teal-600 bg-teal-50'
+                          : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
+                      ]"
+                    >
+                      {{ page }}
+                    </button>
+                    <span
+                      v-else-if="page === currentPage - 2 || page === currentPage + 2"
+                      class="text-xs text-gray-400 px-1"
+                    >...</span>
+                  </template>
+                </div>
+
+                <button
+                  @click="nextPage"
+                  :disabled="currentPage === totalPages"
+                  :class="[
+                    'px-3 py-1.5 text-xs rounded-lg transition-colors flex items-center gap-1.5 border',
+                    currentPage === totalPages
+                      ? 'text-gray-300 border-gray-100 cursor-not-allowed'
+                      : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100 border-gray-200'
+                  ]"
+                >
+                  Next
+                  <i class="fas fa-chevron-right text-[10px]"></i>
+                </button>
+              </div>
             </div>
           </div>
         </div>
