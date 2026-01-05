@@ -15,6 +15,8 @@ const sortOrder = ref<'asc' | 'desc'>('desc')
 const selectedFolder = ref<string | null>(null)
 const expandedFolders = ref(new Set<string>(['root', 'tournament', 'media']))
 const isSidebarCollapsed = ref(false)
+const showMoreOptions = ref(false)
+const showMoreFileTypes = ref(false)
 
 // Folder Tree Structure
 const folderTree = ref([
@@ -766,9 +768,71 @@ function getFileIconBg(type: string): string {
               <button class="w-9 h-9 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-800 flex items-center justify-center transition-all" title="Select multiple">
                 <i class="fas fa-check-square text-sm"></i>
               </button>
-              <button class="w-9 h-9 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-800 flex items-center justify-center transition-all" title="More options">
-                <i class="fas fa-ellipsis-v text-sm"></i>
-              </button>
+
+              <!-- More Options Dropdown -->
+              <div class="relative">
+                <button
+                  @click="showMoreOptions = !showMoreOptions"
+                  :class="[
+                    'w-9 h-9 rounded-lg flex items-center justify-center transition-all',
+                    showMoreOptions ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-800'
+                  ]"
+                  title="More options"
+                >
+                  <i class="fas fa-ellipsis-v text-sm"></i>
+                </button>
+
+                <!-- Dropdown Menu -->
+                <div
+                  v-if="showMoreOptions"
+                  class="absolute right-0 top-full mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
+                >
+                  <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Actions</div>
+                  <button class="w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3 transition-colors">
+                    <i class="fas fa-download text-gray-400 w-4"></i>
+                    Download All
+                  </button>
+                  <button class="w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3 transition-colors">
+                    <i class="fas fa-file-export text-gray-400 w-4"></i>
+                    Export to ZIP
+                  </button>
+                  <button class="w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3 transition-colors">
+                    <i class="fas fa-share-alt text-gray-400 w-4"></i>
+                    Share Folder
+                  </button>
+
+                  <div class="my-2 border-t border-gray-100"></div>
+
+                  <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Organize</div>
+                  <button class="w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3 transition-colors">
+                    <i class="fas fa-arrows-alt text-gray-400 w-4"></i>
+                    Move Selected
+                  </button>
+                  <button class="w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3 transition-colors">
+                    <i class="fas fa-copy text-gray-400 w-4"></i>
+                    Copy Selected
+                  </button>
+                  <button class="w-full px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-3 transition-colors">
+                    <i class="fas fa-trash-alt text-red-400 w-4"></i>
+                    Delete Selected
+                  </button>
+
+                  <div class="my-2 border-t border-gray-100"></div>
+
+                  <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">View</div>
+                  <button class="w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3 transition-colors">
+                    <i class="fas fa-info-circle text-gray-400 w-4"></i>
+                    Show Details Panel
+                  </button>
+                  <button class="w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3 transition-colors">
+                    <i class="fas fa-cog text-gray-400 w-4"></i>
+                    Folder Settings
+                  </button>
+                </div>
+
+                <!-- Click outside to close -->
+                <div v-if="showMoreOptions" @click="showMoreOptions = false" class="fixed inset-0 z-40"></div>
+              </div>
             </div>
           </div>
 
@@ -811,9 +875,48 @@ function getFileIconBg(type: string): string {
                 <i :class="[type.icon, 'text-[10px]', selectedFileType === type.id ? '' : type.color]"></i>
                 {{ type.label }}
               </button>
-              <button class="px-2 py-1 rounded-md text-xs font-medium text-gray-500 hover:bg-gray-100 transition-all">
-                <i class="fas fa-ellipsis-h"></i>
-              </button>
+              <!-- More File Types Dropdown -->
+              <div class="relative">
+                <button
+                  @click="showMoreFileTypes = !showMoreFileTypes"
+                  :class="[
+                    'px-2 py-1 rounded-md text-xs font-medium transition-all',
+                    showMoreFileTypes ? 'bg-teal-500 text-white' : 'text-gray-500 hover:bg-gray-100'
+                  ]"
+                >
+                  <i class="fas fa-ellipsis-h"></i>
+                </button>
+
+                <!-- Dropdown Menu -->
+                <div
+                  v-if="showMoreFileTypes"
+                  class="absolute left-0 top-full mt-2 w-44 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
+                >
+                  <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">More Types</div>
+                  <button
+                    v-for="type in fileTypes.slice(4)"
+                    :key="type.id"
+                    @click="selectedFileType = type.id; showMoreFileTypes = false"
+                    class="w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3 transition-colors"
+                  >
+                    <i :class="[type.icon, type.color, 'w-4']"></i>
+                    {{ type.label }}
+                  </button>
+
+                  <div class="my-2 border-t border-gray-100"></div>
+
+                  <button
+                    @click="selectedFileType = null; showMoreFileTypes = false"
+                    class="w-full px-3 py-2 text-left text-sm text-gray-500 hover:bg-gray-50 flex items-center gap-3 transition-colors"
+                  >
+                    <i class="fas fa-times-circle w-4"></i>
+                    Clear Filter
+                  </button>
+                </div>
+
+                <!-- Click outside to close -->
+                <div v-if="showMoreFileTypes" @click="showMoreFileTypes = false" class="fixed inset-0 z-40"></div>
+              </div>
             </div>
 
             <!-- Sort Options -->
