@@ -7,6 +7,7 @@ const ArticlesPage = () => import('@/pages/articles/ArticlesPage.vue')
 const ArticleViewPage = () => import('@/pages/articles/ArticleViewPage.vue')
 const ArticleEditorPage = () => import('@/pages/articles/ArticleEditorPage.vue')
 const DocumentsPage = () => import('@/pages/documents/DocumentsPage.vue')
+const DocumentViewPage = () => import('@/pages/documents/DocumentViewPage.vue')
 const EventsPage = () => import('@/pages/events/EventsPage.vue')
 const EventDetailPage = () => import('@/pages/events/EventDetailPage.vue')
 const MediaCenterPage = () => import('@/pages/media/MediaCenterPage.vue')
@@ -77,6 +78,12 @@ export const routes: RouteRecordRaw[] = [
     name: 'Documents',
     component: DocumentsPage,
     meta: { requiresAuth: true, title: 'Document Library' },
+  },
+  {
+    path: '/documents/:id',
+    name: 'DocumentView',
+    component: DocumentViewPage,
+    meta: { requiresAuth: true, title: 'Document' },
   },
 
   // Events
