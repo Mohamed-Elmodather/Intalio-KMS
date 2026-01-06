@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
@@ -122,19 +122,141 @@ const categoryCards = ref([
 ])
 
 // Featured Video
-const featuredVideo = ref({
-  id: 1,
-  title: 'CEO Vision 2025: Building the Future Together',
-  description: 'Join our CEO for an inspiring look at the company\'s vision and strategic direction for the coming year.',
-  duration: '32:15',
-  views: '2.4K'
-})
+// Featured Videos Carousel
+const featuredVideos = ref([
+  {
+    id: 1,
+    title: 'AFC Asian Cup 2027: Tournament Preview',
+    description: 'Get an exclusive behind-the-scenes look at the preparations for the biggest football event in Asia.',
+    duration: '32:15',
+    views: '24.5K',
+    thumbnail: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=1200&h=675&fit=crop',
+    category: 'Tournament',
+    author: 'AFC Media Team',
+    date: '2 days ago',
+    likes: 1250,
+    comments: 89
+  },
+  {
+    id: 2,
+    title: 'Opening Ceremony Preparations Unveiled',
+    description: 'A sneak peek at the spectacular opening ceremony planned for the tournament.',
+    duration: '18:42',
+    views: '18.2K',
+    thumbnail: 'https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=1200&h=675&fit=crop',
+    category: 'Events',
+    author: 'Sports Network',
+    date: '3 days ago',
+    likes: 890,
+    comments: 56
+  },
+  {
+    id: 3,
+    title: 'Top 10 Goals from Qualifying Rounds',
+    description: 'Relive the most spectacular goals scored during the qualification matches.',
+    duration: '12:30',
+    views: '45.8K',
+    thumbnail: 'https://images.unsplash.com/photo-1551958219-acbc608c6377?w=1200&h=675&fit=crop',
+    category: 'Highlights',
+    author: 'AFC Media Team',
+    date: '1 week ago',
+    likes: 2340,
+    comments: 178
+  },
+  {
+    id: 4,
+    title: 'Meet the Teams: Group Stage Draw Analysis',
+    description: 'Expert analysis of the group stage draw and predictions for the tournament.',
+    duration: '28:15',
+    views: '12.1K',
+    thumbnail: 'https://images.unsplash.com/photo-1489944440615-453fc2b6a9a9?w=1200&h=675&fit=crop',
+    category: 'Analysis',
+    author: 'Football Experts',
+    date: '5 days ago',
+    likes: 567,
+    comments: 42
+  }
+])
+
+const currentFeaturedIndex = ref(0)
+const featuredVideo = computed(() => featuredVideos.value[currentFeaturedIndex.value])
+const carouselInterval = ref<number | null>(null)
+const autoPlayDelay = 5000 // 5 seconds
+
+// Carousel Navigation
+function nextFeatured() {
+  currentFeaturedIndex.value = (currentFeaturedIndex.value + 1) % featuredVideos.value.length
+}
+
+function prevFeatured() {
+  currentFeaturedIndex.value = (currentFeaturedIndex.value - 1 + featuredVideos.value.length) % featuredVideos.value.length
+}
+
+function goToFeatured(index: number) {
+  currentFeaturedIndex.value = index
+}
+
+// Auto-play functions
+function startAutoPlay() {
+  if (carouselInterval.value) return
+  carouselInterval.value = window.setInterval(() => {
+    nextFeatured()
+  }, autoPlayDelay)
+}
+
+function stopAutoPlay() {
+  if (carouselInterval.value) {
+    clearInterval(carouselInterval.value)
+    carouselInterval.value = null
+  }
+}
+
+function pauseAutoPlay() {
+  stopAutoPlay()
+}
+
+function resumeAutoPlay() {
+  startAutoPlay()
+}
 
 // Up Next Videos
 const upNextVideos = ref([
-  { id: 2, title: 'Q4 Product Roadmap Overview', duration: '18:42', views: '1.2K', gradientClass: 'from-teal-500 to-teal-700' },
-  { id: 3, title: 'New Employee Onboarding Guide', duration: '24:30', views: '3.5K', gradientClass: 'from-teal-500 to-teal-700' },
-  { id: 4, title: 'Security Best Practices 2024', duration: '15:20', views: '890', gradientClass: 'from-teal-500 to-teal-700' },
+  {
+    id: 2,
+    title: 'Stadium Tour: King Fahd International',
+    duration: '18:42',
+    views: '12.3K',
+    thumbnail: 'https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=400&h=225&fit=crop',
+    category: 'Venues',
+    author: 'Sports Network'
+  },
+  {
+    id: 3,
+    title: 'Top 10 Goals from Qualifiers',
+    duration: '24:30',
+    views: '35.8K',
+    thumbnail: 'https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?w=400&h=225&fit=crop',
+    category: 'Highlights',
+    author: 'AFC Highlights'
+  },
+  {
+    id: 4,
+    title: 'Team Japan: Road to 2027',
+    duration: '15:20',
+    views: '8.9K',
+    thumbnail: 'https://images.unsplash.com/photo-1489944440615-453fc2b6a9a9?w=400&h=225&fit=crop',
+    category: 'Teams',
+    author: 'Sports Documentary'
+  },
+  {
+    id: 5,
+    title: 'Opening Ceremony Preparations',
+    duration: '12:45',
+    views: '6.2K',
+    thumbnail: 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?w=400&h=225&fit=crop',
+    category: 'Events',
+    author: 'Event Coverage'
+  },
 ])
 
 // Media Items
@@ -277,6 +399,11 @@ function createParticles() {
 
 onMounted(() => {
   createParticles()
+  startAutoPlay()
+})
+
+onUnmounted(() => {
+  stopAutoPlay()
 })
 </script>
 
@@ -349,130 +476,127 @@ onMounted(() => {
     <!-- Content Area with Padding -->
     <div class="px-6 py-6">
 
-      <!-- Continue Watching + Upload Section -->
-      <div v-if="watchHistory.length > 0" class="continue-watching-row mb-10 fade-in-up">
-        <!-- Continue Watching -->
-        <section class="continue-watching-column">
+      <!-- Featured + Continue Watching Row -->
+      <div class="featured-continue-row mb-10 fade-in-up">
+        <!-- Featured Content (Left) -->
+        <section class="featured-column">
           <div class="section-header-row">
             <h2 class="section-title-sm">
-              <i class="fas fa-history text-purple-500"></i>
-              Continue Watching
+              <i class="fas fa-star text-amber-500"></i>
+              Featured Content
             </h2>
-            <router-link to="/media" class="view-all-link">View All ({{ watchHistory.length }}) <i class="fas fa-arrow-right"></i></router-link>
+            <router-link to="/media" class="view-all-link">View All <i class="fas fa-arrow-right"></i></router-link>
           </div>
-          <div class="continue-watching-scroll scrollbar-elegant">
-            <div v-for="item in watchHistory" :key="item.id"
-                 @click="goToMedia(item)"
-                 class="continue-watching-card group">
-              <!-- Card Media -->
-              <div class="continue-card-media">
-                <div class="continue-card-thumbnail">
-                  <!-- Thumbnail Image -->
-                  <img :src="item.thumbnail" :alt="item.title" class="continue-thumbnail-img" />
-                  <!-- Gradient Overlay -->
-                  <div class="continue-thumbnail-overlay"></div>
-                  <!-- Category Badge -->
-                  <span class="continue-category-badge">{{ item.category }}</span>
-                  <!-- Duration Badge -->
-                  <span class="continue-duration-badge">
-                    <i class="fas fa-clock mr-1"></i>{{ item.duration }}
-                  </span>
+          <!-- Featured Grid: Main + Up Next side by side -->
+          <div class="featured-inner-grid">
+            <!-- Main Featured Card with Carousel -->
+            <div class="featured-carousel-wrapper" @mouseenter="pauseAutoPlay" @mouseleave="resumeAutoPlay">
+              <div class="featured-main-card group" @click="playFeatured">
+                <transition name="carousel-fade" mode="out-in">
+                  <img :key="featuredVideo.id" :src="featuredVideo.thumbnail" :alt="featuredVideo.title" class="featured-main-img" />
+                </transition>
+                <div class="featured-main-overlay"></div>
+                <!-- Badges -->
+                <div class="featured-main-badges">
+                  <span class="badge-featured"><i class="fas fa-star"></i> Featured</span>
+                  <span class="badge-category">{{ featuredVideo.category }}</span>
                 </div>
-                <!-- Resume Badge -->
-                <span class="continue-resume-badge"><i class="fas fa-play mr-1"></i> Resume</span>
-                <!-- Progress Bar -->
-                <div class="continue-progress-bar">
-                  <div class="continue-progress-fill" :style="{ width: item.progress + '%' }"></div>
+                <!-- Play Button -->
+                <div class="featured-main-play">
+                  <i class="fas fa-play"></i>
+                </div>
+                <!-- Content -->
+                <div class="featured-main-content">
+                  <div class="featured-main-meta">
+                    <span><i class="fas fa-eye"></i> {{ featuredVideo.views }}</span>
+                    <span><i class="fas fa-clock"></i> {{ featuredVideo.duration }}</span>
+                    <span><i class="fas fa-heart"></i> {{ featuredVideo.likes }}</span>
+                  </div>
+                  <h3 class="featured-main-title">{{ featuredVideo.title }}</h3>
+                  <p class="featured-main-desc">{{ featuredVideo.description }}</p>
+                  <div class="featured-main-author">
+                    <div class="author-avatar-sm">{{ getInitials(featuredVideo.author) }}</div>
+                    <span>{{ featuredVideo.author }}</span>
+                    <span class="dot">•</span>
+                    <span>{{ featuredVideo.date }}</span>
+                  </div>
+                </div>
+                <!-- Carousel Navigation Arrows -->
+                <button class="carousel-arrow carousel-prev" @click.stop="prevFeatured">
+                  <i class="fas fa-chevron-left"></i>
+                </button>
+                <button class="carousel-arrow carousel-next" @click.stop="nextFeatured">
+                  <i class="fas fa-chevron-right"></i>
+                </button>
+                <!-- Carousel Dots -->
+                <div class="carousel-dots">
+                  <button
+                    v-for="(video, index) in featuredVideos"
+                    :key="video.id"
+                    :class="['carousel-dot', { active: index === currentFeaturedIndex }]"
+                    @click.stop="goToFeatured(index)"
+                  ></button>
                 </div>
               </div>
-              <!-- Card Content -->
-              <div class="continue-card-content">
-                <div class="continue-progress-text">
-                  <span class="text-teal-600 font-semibold">{{ item.progress }}%</span> complete
-                  <span class="text-gray-400 mx-1">•</span>
-                  <span class="text-gray-500">{{ item.timeRemaining }}</span>
-                </div>
-                <h4 class="continue-card-title">{{ item.title }}</h4>
-                <div class="continue-card-meta">
-                  <div class="continue-author">
-                    <div class="continue-author-avatar">{{ getInitials(item.author) }}</div>
-                    <span>{{ item.author }}</span>
+            </div>
+
+            <!-- Up Next Videos (Vertical Stack) -->
+            <div class="up-next-column">
+              <h3 class="up-next-title"><i class="fas fa-list"></i> Up Next</h3>
+              <div class="up-next-vertical">
+                <div v-for="video in upNextVideos.slice(0, 3)" :key="video.id"
+                     @click="goToMedia(video)"
+                     class="up-next-card-compact group">
+                  <div class="up-next-thumb-sm">
+                    <img :src="video.thumbnail" :alt="video.title" class="up-next-img" />
+                    <div class="up-next-play-sm"><i class="fas fa-play"></i></div>
+                    <span class="up-next-duration">{{ video.duration }}</span>
                   </div>
-                  <span class="continue-last-watched">
-                    <i class="fas fa-history mr-1"></i>{{ item.lastWatched }}
-                  </span>
+                  <div class="up-next-info-sm">
+                    <span class="up-next-category">{{ video.category }}</span>
+                    <h4 class="up-next-card-title">{{ video.title }}</h4>
+                    <span class="up-next-views"><i class="fas fa-eye"></i> {{ video.views }}</span>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </section>
 
-      </div>
-
-      <!-- Featured Content -->
-      <section class="mb-10 animate-in delay-1">
-        <div class="section-header">
-          <h2 class="section-title text-base">
-            <i class="fas fa-star"></i>
-            Featured Content
-          </h2>
-        </div>
-        <div class="featured-card">
-          <div class="flex flex-col lg:flex-row">
-            <div class="lg:w-2/3 relative aspect-video lg:aspect-[16/9]">
-              <div class="absolute inset-0 featured-gradient">
-                <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
-                <div class="absolute inset-0 flex items-center justify-center">
-                  <button @click="playFeatured" class="featured-play-btn w-20 h-20 rounded-full bg-white/95 flex items-center justify-center shadow-2xl group ripple hover:scale-110 transition-transform">
-                    <i class="fas fa-play text-teal-600 text-2xl ml-1 group-hover:text-teal-700"></i>
-                  </button>
-                </div>
-                <div class="absolute bottom-6 left-6 right-6">
-                  <div class="flex items-center gap-2 mb-3">
-                    <span class="px-3 py-1 rounded-full bg-amber-500 text-white text-xs font-semibold">
-                      <i class="fas fa-star mr-1"></i> Featured
-                    </span>
-                    <span class="px-3 py-1 rounded-full bg-white/20 text-white text-xs font-medium backdrop-blur-sm">
-                      <i class="fas fa-eye mr-1"></i> {{ featuredVideo.views }} views
-                    </span>
-                  </div>
-                  <h2 class="text-2xl lg:text-3xl font-bold text-white mb-2">{{ featuredVideo.title }}</h2>
-                  <p class="text-gray-200 text-sm line-clamp-2 max-w-2xl">{{ featuredVideo.description }}</p>
-                  <button @click="playFeatured" class="mt-4 px-6 py-2.5 rounded-xl bg-white text-gray-900 font-semibold hover:bg-gray-100 transition-colors shadow-lg">
-                    <i class="fas fa-play mr-2"></i> Watch Now
-                  </button>
-                </div>
-                <div class="absolute top-4 right-4 px-3 py-1.5 rounded-lg bg-black/60 text-white text-sm font-medium backdrop-blur-sm">
-                  <i class="fas fa-clock mr-1"></i> {{ featuredVideo.duration }}
+        <!-- Continue Watching (Right) -->
+        <section class="continue-column">
+          <div class="section-header-row">
+            <h2 class="section-title-sm">
+              <i class="fas fa-history text-teal-500"></i>
+              Continue Watching
+            </h2>
+            <router-link to="/media" class="view-all-link">View All ({{ watchHistory.length }}) <i class="fas fa-arrow-right"></i></router-link>
+          </div>
+          <div class="continue-vertical-scroll">
+            <div v-for="item in watchHistory.slice(0, 3)" :key="item.id"
+                 @click="goToMedia(item)"
+                 class="continue-compact-card group">
+              <div class="continue-compact-thumb">
+                <img :src="item.thumbnail" :alt="item.title" class="continue-compact-img" />
+                <div class="continue-compact-play"><i class="fas fa-play"></i></div>
+                <span class="continue-compact-duration">{{ item.duration }}</span>
+                <!-- Progress Bar -->
+                <div class="continue-compact-progress">
+                  <div class="continue-compact-progress-fill" :style="{ width: item.progress + '%' }"></div>
                 </div>
               </div>
-            </div>
-            <div class="lg:w-1/3 p-6 flex flex-col bg-gradient-to-br from-gray-50 to-white">
-              <h3 class="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                <i class="fas fa-list text-teal-600"></i> Up Next
-              </h3>
-              <div class="space-y-2 flex-1">
-                <div v-for="(video, index) in upNextVideos" :key="video.id"
-                     @click="goToMedia(video)"
-                     class="up-next-item group">
-                  <div class="up-next-thumbnail bg-gradient-to-br" :class="video.gradientClass">
-                    <div class="absolute inset-0 flex items-center justify-center">
-                      <div class="w-8 h-8 rounded-full bg-white/90 flex items-center justify-center shadow-sm">
-                        <i class="fas fa-play text-teal-600 text-xs ml-0.5 group-hover:scale-110 transition-transform"></i>
-                      </div>
-                    </div>
-                    <span class="absolute bottom-1 right-1 text-[10px] bg-black/70 text-white px-1.5 py-0.5 rounded">{{ video.duration }}</span>
-                  </div>
-                  <div class="flex-1 min-w-0">
-                    <h4 class="up-next-title">{{ video.title }}</h4>
-                    <p class="up-next-meta"><i class="fas fa-eye mr-1"></i>{{ video.views }} views</p>
-                  </div>
+              <div class="continue-compact-info">
+                <span class="continue-compact-category">{{ item.category }}</span>
+                <h4 class="continue-compact-title">{{ item.title }}</h4>
+                <div class="continue-compact-meta">
+                  <span><i class="fas fa-redo"></i> {{ item.progress }}%</span>
+                  <span><i class="fas fa-clock"></i> {{ item.timeRemaining }}</span>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </div>
 
       <!-- Trending -->
       <section class="mb-10 animate-in delay-2">
@@ -1286,10 +1410,10 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%);
+  background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 100%);
   border-radius: 0.5rem;
   font-size: 0.75rem;
-  box-shadow: 0 2px 8px rgba(168, 85, 247, 0.2);
+  box-shadow: 0 2px 8px rgba(20, 184, 166, 0.2);
 }
 
 /* Continue Watching Scroll */
@@ -1512,6 +1636,756 @@ onMounted(() => {
   align-items: center;
 }
 
+/* ============================================
+   FEATURED CONTENT SECTION (Redesigned)
+   ============================================ */
+.featured-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+@media (min-width: 1024px) {
+  .featured-grid {
+    grid-template-columns: 2fr 1fr;
+  }
+}
+
+/* Main Featured Card */
+.featured-main-card {
+  position: relative;
+  border-radius: 1rem;
+  overflow: hidden;
+  cursor: pointer;
+  background: #0f172a;
+  aspect-ratio: 16/9;
+}
+
+@media (min-width: 1024px) {
+  .featured-main-card {
+    aspect-ratio: 2/1;
+  }
+}
+
+.featured-main-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.featured-main-card:hover .featured-main-img {
+  transform: scale(1.05);
+}
+
+.featured-main-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.1) 100%);
+}
+
+.featured-main-badges {
+  position: absolute;
+  top: 0.75rem;
+  left: 0.75rem;
+  display: flex;
+  gap: 0.5rem;
+  z-index: 5;
+}
+
+.badge-featured {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.3rem 0.6rem;
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: white;
+  font-size: 0.625rem;
+  font-weight: 700;
+  border-radius: 100px;
+  text-transform: uppercase;
+}
+
+.badge-category {
+  padding: 0.3rem 0.6rem;
+  background: white;
+  color: #0f172a;
+  font-size: 0.625rem;
+  font-weight: 600;
+  border-radius: 100px;
+}
+
+.featured-main-play {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  border-radius: 50%;
+  color: #0d9488;
+  font-size: 1.25rem;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  transition: all 0.3s ease;
+  z-index: 5;
+}
+
+.featured-main-card:hover .featured-main-play {
+  transform: translate(-50%, -50%) scale(1.1);
+  box-shadow: 0 6px 25px rgba(0,0,0,0.4);
+}
+
+.featured-main-play i {
+  margin-left: 3px;
+}
+
+.featured-main-content {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 1rem;
+  z-index: 5;
+}
+
+.featured-main-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.6875rem;
+  color: rgba(255,255,255,0.8);
+}
+
+.featured-main-meta span {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.featured-main-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: white;
+  margin: 0 0 0.375rem 0;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.featured-main-desc {
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.7);
+  margin: 0 0 0.5rem 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.featured-main-author {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.6875rem;
+  color: rgba(255,255,255,0.7);
+}
+
+.author-avatar-sm {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #14b8a6, #0d9488);
+  border-radius: 50%;
+  color: white;
+  font-size: 0.5rem;
+  font-weight: 600;
+}
+
+.featured-main-author .dot {
+  color: rgba(255,255,255,0.4);
+}
+
+/* Side Cards */
+.featured-side-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+}
+
+.featured-side-card {
+  display: flex;
+  gap: 0.75rem;
+  padding: 0.625rem;
+  background: white;
+  border: 1px solid #f1f5f9;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.featured-side-card:hover {
+  border-color: #e2e8f0;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+  transform: translateX(4px);
+}
+
+.side-card-thumb {
+  position: relative;
+  width: 100px;
+  height: 60px;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: #1e293b;
+}
+
+.side-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.featured-side-card:hover .side-card-img {
+  transform: scale(1.1);
+}
+
+.side-card-play {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.3);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.featured-side-card:hover .side-card-play {
+  opacity: 1;
+}
+
+.side-card-play i {
+  color: white;
+  font-size: 0.875rem;
+}
+
+.side-card-duration {
+  position: absolute;
+  bottom: 3px;
+  right: 3px;
+  padding: 0.125rem 0.375rem;
+  background: rgba(0,0,0,0.8);
+  color: white;
+  font-size: 0.5625rem;
+  font-weight: 500;
+  border-radius: 0.25rem;
+}
+
+.side-card-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.side-card-category {
+  font-size: 0.5625rem;
+  font-weight: 600;
+  color: #14b8a6;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  margin-bottom: 0.25rem;
+}
+
+.side-card-title {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #0f172a;
+  margin: 0 0 0.25rem 0;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  transition: color 0.2s ease;
+}
+
+.featured-side-card:hover .side-card-title {
+  color: #0d9488;
+}
+
+.side-card-meta {
+  font-size: 0.625rem;
+  color: #94a3b8;
+}
+
+.side-card-meta i {
+  margin-right: 0.25rem;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .featured-side-cards {
+    flex-direction: row;
+    overflow-x: auto;
+    gap: 0.75rem;
+    padding-bottom: 0.5rem;
+  }
+
+  .featured-side-card {
+    flex: 0 0 260px;
+  }
+}
+
+/* ============================================
+   FEATURED + CONTINUE WATCHING ROW
+   ============================================ */
+.featured-continue-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .featured-continue-row {
+    grid-template-columns: 1.5fr 1fr;
+  }
+}
+
+@media (min-width: 1024px) {
+  .featured-continue-row {
+    grid-template-columns: 2fr 1fr;
+  }
+}
+
+.featured-column {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Featured Inner Grid: Main + Up Next */
+.featured-inner-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  flex: 1;
+}
+
+@media (min-width: 640px) {
+  .featured-inner-grid {
+    grid-template-columns: 1.8fr 1fr;
+  }
+}
+
+.featured-carousel-wrapper {
+  position: relative;
+}
+
+.featured-inner-grid .featured-main-card {
+  aspect-ratio: 16/9;
+  height: 100%;
+}
+
+/* Carousel Arrows */
+.carousel-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  border-radius: 50%;
+  color: #0f172a;
+  font-size: 0.875rem;
+  cursor: pointer;
+  opacity: 0;
+  transition: all 0.3s ease;
+  z-index: 10;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.featured-main-card:hover .carousel-arrow {
+  opacity: 1;
+}
+
+.carousel-arrow:hover {
+  background: white;
+  transform: translateY(-50%) scale(1.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.carousel-prev {
+  left: 12px;
+}
+
+.carousel-next {
+  right: 12px;
+}
+
+/* Carousel Dots */
+.carousel-dots {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  z-index: 10;
+}
+
+.carousel-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 0;
+}
+
+.carousel-dot:hover {
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.carousel-dot.active {
+  background: white;
+  width: 24px;
+  border-radius: 4px;
+}
+
+/* Carousel Fade Transition */
+.carousel-fade-enter-active,
+.carousel-fade-leave-active {
+  transition: opacity 0.4s ease;
+}
+
+.carousel-fade-enter-from,
+.carousel-fade-leave-to {
+  opacity: 0;
+}
+
+.continue-column {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.continue-column .continue-vertical-scroll {
+  flex: 1;
+}
+
+/* Up Next Column */
+.up-next-column {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.up-next-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #334155;
+  margin: 0 0 0.625rem 0;
+}
+
+.up-next-title i {
+  color: #14b8a6;
+}
+
+.up-next-vertical {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex: 1;
+}
+
+/* Compact Up Next Card */
+.up-next-card-compact {
+  display: flex;
+  gap: 0.625rem;
+  padding: 0.5rem;
+  background: white;
+  border: 1px solid #f1f5f9;
+  border-radius: 0.625rem;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.up-next-card-compact:hover {
+  border-color: #e2e8f0;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+  transform: translateX(4px);
+}
+
+.up-next-thumb-sm {
+  position: relative;
+  width: 90px;
+  height: 54px;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: #1e293b;
+}
+
+.up-next-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.up-next-card-compact:hover .up-next-img {
+  transform: scale(1.1);
+}
+
+.up-next-play-sm {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.3);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.up-next-card-compact:hover .up-next-play-sm {
+  opacity: 1;
+}
+
+.up-next-play-sm i {
+  color: white;
+  font-size: 0.75rem;
+}
+
+.up-next-duration {
+  position: absolute;
+  bottom: 3px;
+  right: 3px;
+  padding: 0.125rem 0.3rem;
+  background: rgba(0,0,0,0.8);
+  color: white;
+  font-size: 0.5625rem;
+  font-weight: 500;
+  border-radius: 0.25rem;
+}
+
+.up-next-info-sm {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.up-next-category {
+  font-size: 0.5625rem;
+  font-weight: 600;
+  color: #14b8a6;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.up-next-card-title {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #0f172a;
+  margin: 0.125rem 0;
+  line-height: 1.25;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  transition: color 0.2s ease;
+}
+
+.up-next-card-compact:hover .up-next-card-title {
+  color: #0d9488;
+}
+
+.up-next-views {
+  font-size: 0.5625rem;
+  color: #94a3b8;
+}
+
+.up-next-views i {
+  margin-right: 0.25rem;
+}
+
+/* Continue Watching Vertical Scroll */
+.continue-vertical-scroll {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+}
+
+/* Continue Compact Card */
+.continue-compact-card {
+  display: flex;
+  gap: 0.75rem;
+  padding: 0.625rem;
+  background: white;
+  border: 1px solid #f1f5f9;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.continue-compact-card:hover {
+  border-color: #e2e8f0;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+  transform: translateX(4px);
+}
+
+.continue-compact-thumb {
+  position: relative;
+  width: 100px;
+  height: 60px;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: #1e293b;
+}
+
+.continue-compact-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.continue-compact-card:hover .continue-compact-img {
+  transform: scale(1.1);
+}
+
+.continue-compact-play {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.3);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.continue-compact-card:hover .continue-compact-play {
+  opacity: 1;
+}
+
+.continue-compact-play i {
+  color: white;
+  font-size: 0.875rem;
+}
+
+.continue-compact-duration {
+  position: absolute;
+  bottom: 3px;
+  right: 3px;
+  padding: 0.125rem 0.375rem;
+  background: rgba(0,0,0,0.8);
+  color: white;
+  font-size: 0.5625rem;
+  font-weight: 500;
+  border-radius: 0.25rem;
+}
+
+.continue-compact-progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: rgba(255,255,255,0.3);
+}
+
+.continue-compact-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #14b8a6, #0d9488);
+  border-radius: 0 0 0.5rem 0.5rem;
+}
+
+.continue-compact-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.continue-compact-category {
+  font-size: 0.5625rem;
+  font-weight: 600;
+  color: #14b8a6;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  margin-bottom: 0.25rem;
+}
+
+.continue-compact-title {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #0f172a;
+  margin: 0 0 0.25rem 0;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  transition: color 0.2s ease;
+}
+
+.continue-compact-card:hover .continue-compact-title {
+  color: #0d9488;
+}
+
+.continue-compact-meta {
+  display: flex;
+  gap: 0.75rem;
+  font-size: 0.625rem;
+  color: #94a3b8;
+}
+
+.continue-compact-meta i {
+  margin-right: 0.25rem;
+  color: #14b8a6;
+}
+
+/* Responsive - Stack on mobile */
+@media (max-width: 1024px) {
+  .continue-vertical-scroll {
+    flex-direction: row;
+    overflow-x: auto;
+    gap: 0.75rem;
+    padding-bottom: 0.5rem;
+  }
+
+  .continue-compact-card {
+    flex: 0 0 260px;
+  }
+}
 
 
 /* Trending Cards */
@@ -1593,9 +2467,9 @@ onMounted(() => {
 }
 
 .section-title i.fa-history {
-  background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%);
-  box-shadow: 0 2px 8px rgba(168, 85, 247, 0.25);
-  color: #a855f7;
+  background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 100%);
+  box-shadow: 0 2px 8px rgba(20, 184, 166, 0.25);
+  color: #14b8a6;
 }
 
 .section-title i.fa-star {
