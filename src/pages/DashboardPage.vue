@@ -826,6 +826,14 @@ const currentSlide = ref(0)
 const isAutoPlaying = ref(true)
 let carouselInterval: number | null = null
 
+// Computed property for current featured update
+const featuredUpdate = computed(() => recentUpdates.value[currentSlide.value])
+
+// Computed property for up next items (excludes current featured)
+const upNextUpdates = computed(() => {
+  return recentUpdates.value.filter((_, index) => index !== currentSlide.value).slice(0, 4)
+})
+
 const recentUpdates = ref([
   {
     id: 1,
@@ -1086,117 +1094,123 @@ onUnmounted(() => {
       </div>
     </div>
 
-    <!-- Latest Updates - Magazine Layout -->
-    <div class="magazine-section mb-10">
-      <!-- Section Header -->
-      <div class="magazine-header">
-        <div class="flex items-center gap-3">
-          <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center shadow-lg shadow-teal-200">
-            <i class="fas fa-fire text-white text-lg"></i>
+    <!-- Latest Updates Section -->
+    <section class="updates-section mb-8">
+      <div class="updates-header">
+        <h2 class="text-lg font-bold text-gray-900 flex items-center gap-3">
+          <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-lg shadow-orange-200">
+            <i class="fas fa-fire text-white"></i>
           </div>
           <div>
-            <h2 class="text-2xl font-bold text-gray-900">Latest Updates</h2>
-            <p class="text-sm text-gray-500">AFC Asian Cup Saudi Arabia 2027</p>
+            <span class="block">Latest Updates</span>
+            <span class="text-xs font-medium text-orange-600">AFC Asian Cup 2027</span>
           </div>
-        </div>
-        <router-link to="/articles" class="view-all-btn">
-          View All <i class="fas fa-arrow-right"></i>
+        </h2>
+        <router-link to="/articles" class="px-3 py-1.5 text-sm text-teal-600 hover:text-white bg-teal-50 hover:bg-teal-500 rounded-lg font-medium flex items-center gap-1.5 transition-all">
+          View All <i class="fas fa-arrow-right text-xs"></i>
         </router-link>
       </div>
 
-      <!-- Magazine Grid -->
-      <div class="magazine-grid">
-        <!-- Hero Article (First Update) -->
-        <div class="magazine-hero" v-if="recentUpdates[0]">
-          <router-link :to="recentUpdates[0].link" class="hero-card group">
-            <div class="hero-image">
-              <img :src="recentUpdates[0].image" :alt="recentUpdates[0].title">
-              <div class="hero-overlay"></div>
-
-              <!-- Badges -->
-              <div class="hero-badges">
-                <span class="hero-type-badge">
-                  <i :class="recentUpdates[0].typeIcon"></i>
-                  {{ recentUpdates[0].typeLabel }}
-                </span>
-                <span v-if="recentUpdates[0].isFeatured" class="hero-featured-badge">
-                  <i class="fas fa-star"></i> Featured
-                </span>
-                <span v-if="recentUpdates[0].isTrending" class="hero-trending-badge">
-                  <i class="fas fa-fire-alt"></i> Trending
-                </span>
+      <!-- Updates Grid: Featured + Up Next -->
+      <div class="updates-grid">
+        <!-- Featured Article Card with Carousel -->
+        <div class="updates-featured" @mouseenter="pauseCarousel" @mouseleave="resumeCarousel">
+          <router-link :to="featuredUpdate.link" class="featured-main-card group">
+            <transition name="carousel-fade" mode="out-in">
+              <img :key="featuredUpdate.id" :src="featuredUpdate.image" :alt="featuredUpdate.title" class="featured-main-img" />
+            </transition>
+            <div class="featured-main-overlay"></div>
+            <!-- Badges -->
+            <div class="featured-main-badges">
+              <span class="badge-featured"><i class="fas fa-star"></i> Featured</span>
+              <span class="badge-category">{{ featuredUpdate.typeLabel }}</span>
+            </div>
+            <!-- Play Button -->
+            <div class="featured-main-play">
+              <i class="fas fa-arrow-right"></i>
+            </div>
+            <!-- Content -->
+            <div class="featured-main-content">
+              <div class="featured-main-meta">
+                <span><i class="fas fa-eye"></i> {{ featuredUpdate.views }}</span>
+                <span><i class="fas fa-clock"></i> {{ featuredUpdate.readTime }}</span>
+                <span><i class="fas fa-heart"></i> {{ featuredUpdate.likes }}</span>
               </div>
-
-              <!-- Hero Content -->
-              <div class="hero-content">
-                <div class="hero-meta">
-                  <span class="hero-author">
-                    <div class="hero-avatar" :style="{ backgroundColor: recentUpdates[0].author.color }">
-                      {{ recentUpdates[0].author.initials }}
-                    </div>
-                    {{ recentUpdates[0].author.name }}
-                  </span>
-                  <span class="hero-divider">•</span>
-                  <span>{{ recentUpdates[0].timeAgo }}</span>
-                  <span class="hero-divider">•</span>
-                  <span>{{ recentUpdates[0].readTime }}</span>
-                </div>
-                <h3 class="hero-title">{{ recentUpdates[0].title }}</h3>
-                <p class="hero-description">{{ recentUpdates[0].description }}</p>
-                <div class="hero-stats">
-                  <span><i class="fas fa-eye"></i> {{ recentUpdates[0].views }}</span>
-                  <span><i class="fas fa-heart"></i> {{ recentUpdates[0].likes }}</span>
-                  <span><i class="fas fa-comment"></i> {{ recentUpdates[0].comments }}</span>
-                </div>
+              <h3 class="featured-main-title">{{ featuredUpdate.title }}</h3>
+              <p class="featured-main-desc">{{ featuredUpdate.description }}</p>
+              <div class="featured-main-author">
+                <div class="author-avatar-sm" :style="{ backgroundColor: featuredUpdate.author.color }">{{ featuredUpdate.author.initials }}</div>
+                <span>{{ featuredUpdate.author.name }}</span>
+                <span class="dot">•</span>
+                <span>{{ featuredUpdate.timeAgo }}</span>
               </div>
+            </div>
+            <!-- Carousel Navigation Arrows -->
+            <button class="carousel-arrow carousel-prev" @click.prevent="prevSlide">
+              <i class="fas fa-chevron-left"></i>
+            </button>
+            <button class="carousel-arrow carousel-next" @click.prevent="nextSlide">
+              <i class="fas fa-chevron-right"></i>
+            </button>
+            <!-- Carousel Dots -->
+            <div class="carousel-dots">
+              <button
+                v-for="(update, index) in recentUpdates.slice(0, 5)"
+                :key="update.id"
+                :class="['carousel-dot', { active: index === currentSlide }]"
+                @click.prevent="goToSlide(index)"
+              ></button>
             </div>
           </router-link>
         </div>
 
-        <!-- Secondary Articles Grid -->
-        <div class="magazine-secondary">
-          <div
-            v-for="update in recentUpdates.slice(1, 5)"
-            :key="update.id"
-            class="secondary-card group"
-          >
-            <router-link :to="update.link" class="secondary-link">
-              <div class="secondary-image">
-                <img :src="update.image" :alt="update.title">
-                <div class="secondary-overlay"></div>
-                <span :class="['secondary-badge', update.type]">
-                  <i :class="update.typeIcon"></i>
-                  {{ update.typeLabel }}
-                </span>
-                <span v-if="update.isTrending" class="secondary-trending">
-                  <i class="fas fa-fire-alt"></i>
-                </span>
-              </div>
-              <div class="secondary-content">
-                <div class="secondary-meta">
-                  <span class="secondary-time">{{ update.timeAgo }}</span>
-                  <span class="secondary-read">{{ update.readTime }}</span>
+        <!-- Up Next Column -->
+        <div class="up-next-column">
+          <h3 class="up-next-title"><i class="fas fa-list"></i> Up Next</h3>
+          <div class="up-next-list">
+            <div
+              v-for="update in upNextUpdates"
+              :key="update.id"
+              class="secondary-card group"
+            >
+              <router-link :to="update.link" class="secondary-link">
+                <div class="secondary-image">
+                  <img :src="update.image" :alt="update.title">
+                  <div class="secondary-overlay"></div>
+                  <span :class="['secondary-badge', update.type]">
+                    <i :class="update.typeIcon"></i>
+                    {{ update.typeLabel }}
+                  </span>
+                  <span v-if="update.isTrending" class="secondary-trending">
+                    <i class="fas fa-fire-alt"></i>
+                  </span>
                 </div>
-                <h4 class="secondary-title">{{ update.title }}</h4>
-                <p class="secondary-description">{{ update.description }}</p>
-                <div class="secondary-footer">
-                  <div class="secondary-author">
-                    <div class="secondary-avatar" :style="{ backgroundColor: update.author.color }">
-                      {{ update.author.initials }}
+                <div class="secondary-content">
+                  <div class="secondary-meta">
+                    <span class="secondary-time">{{ update.timeAgo }}</span>
+                    <span class="secondary-read">{{ update.readTime }}</span>
+                  </div>
+                  <h4 class="secondary-title">{{ update.title }}</h4>
+                  <p class="secondary-description">{{ update.description }}</p>
+                  <div class="secondary-footer">
+                    <div class="secondary-author">
+                      <div class="secondary-avatar" :style="{ backgroundColor: update.author.color }">
+                        {{ update.author.initials }}
+                      </div>
+                      <span>{{ update.author.name }}</span>
                     </div>
-                    <span>{{ update.author.name }}</span>
-                  </div>
-                  <div class="secondary-stats">
-                    <span><i class="fas fa-eye"></i> {{ update.views }}</span>
-                    <span><i class="fas fa-heart"></i> {{ update.likes }}</span>
+                    <div class="secondary-stats">
+                      <span><i class="fas fa-eye"></i> {{ update.views }}</span>
+                      <span><i class="fas fa-heart"></i> {{ update.likes }}</span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </router-link>
+              </router-link>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </section>
 
     <!-- Stats Grid -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
@@ -1960,253 +1974,340 @@ onUnmounted(() => {
   }
 }
 
-/* Magazine Layout Styles */
-.magazine-section {
-  background: linear-gradient(135deg, #ffffff 0%, #f0fdfa 100%);
-  border-radius: 1.5rem;
-  padding: 1.5rem;
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+/* Latest Updates Section - Media Center Featured Style */
+.updates-section {
+  min-width: 0;
 }
 
-.magazine-header {
+.updates-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1.5rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid #e2e8f0;
-}
-
-.view-all-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.625rem 1.25rem;
-  background: white;
-  border: 2px solid #14b8a6;
-  color: #0d9488;
-  border-radius: 0.75rem;
-  font-weight: 600;
-  font-size: 0.875rem;
-  transition: all 0.3s ease;
-}
-
-.view-all-btn:hover {
-  background: linear-gradient(135deg, #14b8a6, #0d9488);
-  color: white;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgba(20, 184, 166, 0.4);
-}
-
-.magazine-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 1.5rem;
-}
-
-@media (min-width: 1024px) {
-  .magazine-grid {
-    grid-template-columns: 1.5fr 1fr;
-  }
-}
-
-/* Hero Article */
-.magazine-hero {
-  min-height: 400px;
-}
-
-.hero-card {
-  display: block;
-  height: 100%;
-  border-radius: 1rem;
-  overflow: hidden;
-}
-
-.hero-image {
-  position: relative;
-  height: 100%;
-  min-height: 400px;
-}
-
-.hero-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.5s ease;
-}
-
-.hero-card:hover .hero-image img {
-  transform: scale(1.05);
-}
-
-.hero-overlay {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.4) 50%, rgba(0, 0, 0, 0.1) 100%);
-}
-
-.hero-badges {
-  position: absolute;
-  top: 1.25rem;
-  left: 1.25rem;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  z-index: 2;
-}
-
-.hero-type-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.375rem;
-  padding: 0.5rem 1rem;
-  background: rgba(20, 184, 166, 0.95);
-  color: white;
-  border-radius: 2rem;
-  font-size: 0.75rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  backdrop-filter: blur(8px);
-}
-
-.hero-featured-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.25rem;
-  padding: 0.5rem 0.875rem;
-  background: linear-gradient(135deg, #f59e0b, #d97706);
-  color: white;
-  border-radius: 2rem;
-  font-size: 0.6875rem;
-  font-weight: 700;
-  text-transform: uppercase;
-}
-
-.hero-trending-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.25rem;
-  padding: 0.5rem 0.875rem;
-  background: linear-gradient(135deg, #ef4444, #dc2626);
-  color: white;
-  border-radius: 2rem;
-  font-size: 0.6875rem;
-  font-weight: 700;
-  text-transform: uppercase;
-}
-
-.hero-content {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 2rem 1.5rem;
-  z-index: 2;
-}
-
-.hero-meta {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
-  color: rgba(255, 255, 255, 0.85);
-  font-size: 0.8125rem;
-}
-
-.hero-author {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-weight: 600;
-}
-
-.hero-avatar {
-  width: 1.75rem;
-  height: 1.75rem;
-  border-radius: 0.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-size: 0.625rem;
-  font-weight: 700;
-}
-
-.hero-divider {
-  opacity: 0.5;
-}
-
-.hero-title {
-  font-size: 1.75rem;
-  font-weight: 800;
-  color: white;
-  line-height: 1.25;
   margin-bottom: 0.75rem;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  transition: color 0.3s ease;
 }
 
-@media (min-width: 1024px) {
-  .hero-title {
-    font-size: 2rem;
-  }
-}
-
-.hero-card:hover .hero-title {
-  color: #99f6e4;
-}
-
-.hero-description {
-  font-size: 0.9375rem;
-  color: rgba(255, 255, 255, 0.8);
-  line-height: 1.6;
-  margin-bottom: 1rem;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.hero-stats {
-  display: flex;
-  gap: 1.25rem;
-  color: rgba(255, 255, 255, 0.75);
-  font-size: 0.8125rem;
-}
-
-.hero-stats span {
+.updates-title {
   display: flex;
   align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0;
+}
+
+.updates-view-all {
+  display: inline-flex;
+  align-items: center;
   gap: 0.375rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #0d9488;
+  transition: all 0.2s ease;
 }
 
-.hero-stats i {
-  color: #5eead4;
+.updates-view-all:hover {
+  color: #0f766e;
+  gap: 0.5rem;
 }
 
-/* Secondary Articles */
-.magazine-secondary {
+/* Updates Grid */
+.updates-grid {
   display: grid;
   grid-template-columns: 1fr;
   gap: 1rem;
 }
 
 @media (min-width: 640px) {
-  .magazine-secondary {
-    grid-template-columns: repeat(2, 1fr);
+  .updates-grid {
+    grid-template-columns: 1.8fr 1fr;
   }
 }
 
+/* Featured Main Card - Media Center Style */
+.updates-featured {
+  position: relative;
+}
+
+.featured-main-card {
+  position: relative;
+  display: block;
+  border-radius: 1rem;
+  overflow: hidden;
+  cursor: pointer;
+  background: #0f172a;
+  aspect-ratio: 16/9;
+}
+
 @media (min-width: 1024px) {
-  .magazine-secondary {
-    grid-template-columns: 1fr;
+  .featured-main-card {
+    aspect-ratio: 2/1;
   }
+}
+
+.featured-main-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.featured-main-card:hover .featured-main-img {
+  transform: scale(1.05);
+}
+
+.featured-main-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.1) 100%);
+}
+
+.featured-main-badges {
+  position: absolute;
+  top: 0.75rem;
+  left: 0.75rem;
+  display: flex;
+  gap: 0.5rem;
+  z-index: 2;
+}
+
+.badge-featured {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.375rem 0.75rem;
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: white;
+  border-radius: 0.375rem;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.badge-category {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.375rem 0.75rem;
+  background: rgba(20, 184, 166, 0.9);
+  color: white;
+  border-radius: 0.375rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.featured-main-play {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.95);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  color: #0d9488;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  z-index: 2;
+}
+
+.featured-main-card:hover .featured-main-play {
+  transform: translate(-50%, -50%) scale(1.1);
+  box-shadow: 0 6px 25px rgba(0,0,0,0.4);
+}
+
+.featured-main-content {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 1rem;
+  z-index: 2;
+}
+
+.featured-main-meta {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+  color: rgba(255,255,255,0.8);
+  font-size: 0.75rem;
+}
+
+.featured-main-meta span {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.featured-main-meta i {
+  color: #5eead4;
+}
+
+.featured-main-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: white;
+  line-height: 1.3;
+  margin: 0 0 0.375rem 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  transition: color 0.3s ease;
+}
+
+.featured-main-card:hover .featured-main-title {
+  color: #99f6e4;
+}
+
+.featured-main-desc {
+  font-size: 0.8125rem;
+  color: rgba(255,255,255,0.7);
+  line-height: 1.5;
+  margin: 0 0 0.5rem 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.featured-main-author {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.8);
+}
+
+.author-avatar-sm {
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 0.375rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 0.5625rem;
+  font-weight: 700;
+}
+
+.dot {
+  opacity: 0.5;
+}
+
+/* Up Next Column */
+.up-next-column {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.up-next-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #334155;
+  margin: 0 0 0.625rem 0;
+}
+
+.up-next-title i {
+  color: #64748b;
+  font-size: 0.6875rem;
+}
+
+.up-next-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* Carousel Navigation */
+.carousel-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  opacity: 0;
+  z-index: 10;
+  color: #334155;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.featured-main-card:hover .carousel-arrow {
+  opacity: 1;
+}
+
+.carousel-arrow:hover {
+  background: white;
+  transform: translateY(-50%) scale(1.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.carousel-prev {
+  left: 0.75rem;
+}
+
+.carousel-next {
+  right: 0.75rem;
+}
+
+/* Carousel Dots */
+.carousel-dots {
+  position: absolute;
+  bottom: 0.75rem;
+  right: 0.75rem;
+  display: flex;
+  gap: 0.375rem;
+  z-index: 10;
+}
+
+.carousel-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 0;
+}
+
+.carousel-dot:hover {
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.carousel-dot.active {
+  background: white;
+  width: 20px;
+  border-radius: 4px;
+}
+
+/* Carousel Fade Transition */
+.carousel-fade-enter-active,
+.carousel-fade-leave-active {
+  transition: opacity 0.4s ease;
+}
+
+.carousel-fade-enter-from,
+.carousel-fade-leave-to {
+  opacity: 0;
 }
 
 .secondary-card {
