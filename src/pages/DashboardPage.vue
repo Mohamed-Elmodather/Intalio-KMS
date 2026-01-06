@@ -981,6 +981,13 @@ const goToSlide = (index: number) => {
   currentSlide.value = index
 }
 
+const goToSlideById = (id: number) => {
+  const index = recentUpdates.value.findIndex(item => item.id === id)
+  if (index !== -1) {
+    currentSlide.value = index
+  }
+}
+
 const startAutoPlay = () => {
   if (carouselInterval) clearInterval(carouselInterval)
   carouselInterval = window.setInterval(() => {
@@ -1102,10 +1109,23 @@ onUnmounted(() => {
               <span class="badge-featured"><i class="fas fa-star"></i> Featured</span>
               <span class="badge-category">{{ featuredUpdate.typeLabel }}</span>
             </div>
-            <!-- Hover Button -->
-            <div class="featured-hover-btn">
-              <span>Read Article</span>
-              <i class="fas fa-arrow-right"></i>
+            <!-- Hover Actions -->
+            <div class="featured-hover-actions">
+              <router-link :to="featuredUpdate.link" class="featured-hover-btn primary">
+                <i class="fas fa-book-open"></i>
+                <span>Read Article</span>
+              </router-link>
+              <div class="featured-hover-icons">
+                <button class="hover-icon-btn" @click.stop="toggleLikeUpdate(featuredUpdate.id)" :class="{ active: isUpdateLiked(featuredUpdate.id) }">
+                  <i :class="isUpdateLiked(featuredUpdate.id) ? 'fas fa-heart' : 'far fa-heart'"></i>
+                </button>
+                <button class="hover-icon-btn" @click.stop="toggleSaveUpdate(featuredUpdate.id)" :class="{ active: isUpdateSaved(featuredUpdate.id) }">
+                  <i :class="isUpdateSaved(featuredUpdate.id) ? 'fas fa-bookmark' : 'far fa-bookmark'"></i>
+                </button>
+                <button class="hover-icon-btn" @click.stop="shareUpdate(featuredUpdate)">
+                  <i class="fas fa-share-alt"></i>
+                </button>
+              </div>
             </div>
             <!-- Content -->
             <div class="featured-main-content">
@@ -1150,8 +1170,9 @@ onUnmounted(() => {
               v-for="update in upNextUpdates"
               :key="update.id"
               :class="['secondary-card group', { 'is-active': isCurrentlyFeatured(update.id) }]"
+              @click="goToSlideById(update.id)"
             >
-              <router-link :to="update.link" class="secondary-link">
+              <div class="secondary-link">
                 <div class="secondary-image">
                   <img :src="update.image" :alt="update.title">
                   <div class="secondary-overlay"></div>
@@ -1162,6 +1183,18 @@ onUnmounted(() => {
                   <span v-if="update.isTrending" class="secondary-trending">
                     <i class="fas fa-fire-alt"></i>
                   </span>
+                  <!-- Hover Actions -->
+                  <div class="secondary-hover-actions">
+                    <router-link :to="update.link" class="secondary-action-btn view" @click.stop>
+                      <i class="fas fa-external-link-alt"></i>
+                    </router-link>
+                    <button class="secondary-action-btn" @click.stop="toggleLikeUpdate(update.id)" :class="{ active: isUpdateLiked(update.id) }">
+                      <i :class="isUpdateLiked(update.id) ? 'fas fa-heart' : 'far fa-heart'"></i>
+                    </button>
+                    <button class="secondary-action-btn" @click.stop="toggleSaveUpdate(update.id)" :class="{ active: isUpdateSaved(update.id) }">
+                      <i :class="isUpdateSaved(update.id) ? 'fas fa-bookmark' : 'far fa-bookmark'"></i>
+                    </button>
+                  </div>
                 </div>
                 <div class="secondary-content">
                   <div class="secondary-meta">
@@ -1183,7 +1216,7 @@ onUnmounted(() => {
                     </div>
                   </div>
                 </div>
-              </router-link>
+              </div>
             </div>
           </div>
         </div>
@@ -2040,6 +2073,11 @@ onUnmounted(() => {
   position: absolute;
   inset: 0;
   background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.1) 100%);
+  transition: background 0.3s ease;
+}
+
+.featured-main-card:hover .featured-main-overlay {
+  background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.5) 50%, rgba(0,0,0,0.4) 100%);
 }
 
 .featured-main-badges {
@@ -2076,33 +2114,83 @@ onUnmounted(() => {
   text-transform: uppercase;
 }
 
-.featured-hover-btn {
+.featured-hover-actions {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  padding: 0.75rem 1.5rem;
-  border-radius: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  z-index: 10;
+}
+
+.featured-main-card:hover .featured-hover-actions {
+  opacity: 1;
+  visibility: visible;
+}
+
+.featured-hover-btn {
+  padding: 0.875rem 1.75rem;
+  border-radius: 0.75rem;
   background: rgba(255, 255, 255, 0.95);
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  font-size: 0.875rem;
+  font-size: 0.9375rem;
   font-weight: 600;
   color: #0d9488;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-  z-index: 2;
-  opacity: 0;
-  visibility: hidden;
+  cursor: pointer;
+  text-decoration: none;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
 }
 
-.featured-main-card:hover .featured-hover-btn {
-  opacity: 1;
-  visibility: visible;
-  transform: translate(-50%, -50%) scale(1.05);
-  box-shadow: 0 6px 25px rgba(0,0,0,0.4);
+.featured-hover-btn:hover {
+  background: #0d9488;
+  color: white;
+  transform: scale(1.05);
+  box-shadow: 0 6px 25px rgba(0,0,0,0.3);
+}
+
+.featured-hover-icons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.hover-icon-btn {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: #64748b;
+  font-size: 0.875rem;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+}
+
+.hover-icon-btn:hover {
+  background: white;
+  transform: scale(1.1);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+.hover-icon-btn.active {
+  color: #ef4444;
+}
+
+.hover-icon-btn:nth-child(2).active {
+  color: #f59e0b;
 }
 
 .featured-main-content {
@@ -2300,6 +2388,7 @@ onUnmounted(() => {
   overflow: hidden;
   border: 1px solid #e2e8f0;
   transition: all 0.3s ease;
+  cursor: pointer;
 }
 
 .secondary-card:hover {
@@ -2353,10 +2442,67 @@ onUnmounted(() => {
   transform: scale(1.1);
 }
 
+.secondary-hover-actions {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  gap: 0.375rem;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  z-index: 5;
+}
+
+.secondary-card:hover .secondary-hover-actions {
+  opacity: 1;
+  visibility: visible;
+}
+
+.secondary-action-btn {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.95);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: #64748b;
+  font-size: 0.75rem;
+  text-decoration: none;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.secondary-action-btn:hover {
+  transform: scale(1.15);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.secondary-action-btn.view {
+  background: #0d9488;
+  color: white;
+}
+
+.secondary-action-btn.view:hover {
+  background: #0f766e;
+}
+
+.secondary-action-btn.active {
+  color: #ef4444;
+}
+
+.secondary-action-btn:nth-child(3).active {
+  color: #f59e0b;
+}
+
 .secondary-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.3));
+  background: rgba(0, 0, 0, 0.4);
   opacity: 0;
   transition: opacity 0.3s ease;
 }
