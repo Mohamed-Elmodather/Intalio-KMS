@@ -44,11 +44,71 @@ const mediaStats = ref({
 
 // Watch History (Continue Watching)
 const watchHistory = ref([
-  { id: 1, title: 'CEO Vision 2025: Building the Future', progress: 65, duration: '32:15', thumbnail: 'teal' },
-  { id: 2, title: 'Q4 Product Roadmap Overview', progress: 30, duration: '18:42', thumbnail: 'blue' },
-  { id: 3, title: 'Security Best Practices 2024', progress: 80, duration: '15:20', thumbnail: 'emerald' },
-  { id: 4, title: 'Leadership Workshop', progress: 45, duration: '45:00', thumbnail: 'amber' },
-  { id: 5, title: 'Tech Talk: Microservices', progress: 12, duration: '38:15', thumbnail: 'purple' },
+  {
+    id: 1,
+    title: 'CEO Vision 2025: Building the Future',
+    progress: 65,
+    duration: '32:15',
+    timeRemaining: '11 min left',
+    thumbnail: 'https://images.unsplash.com/photo-1560439514-4e9645039924?w=400&h=225&fit=crop',
+    category: 'Leadership',
+    type: 'video',
+    author: 'John Smith',
+    lastWatched: '2 hours ago',
+    views: '2.4K'
+  },
+  {
+    id: 2,
+    title: 'Q4 Product Roadmap Overview',
+    progress: 30,
+    duration: '18:42',
+    timeRemaining: '13 min left',
+    thumbnail: 'https://images.unsplash.com/photo-1551434678-e076c223a692?w=400&h=225&fit=crop',
+    category: 'Product Updates',
+    type: 'video',
+    author: 'Sarah Chen',
+    lastWatched: 'Yesterday',
+    views: '1.2K'
+  },
+  {
+    id: 3,
+    title: 'Security Best Practices 2024',
+    progress: 80,
+    duration: '15:20',
+    timeRemaining: '3 min left',
+    thumbnail: 'https://images.unsplash.com/photo-1563986768609-322da13575f3?w=400&h=225&fit=crop',
+    category: 'Technical',
+    type: 'video',
+    author: 'David Kim',
+    lastWatched: '3 days ago',
+    views: '890'
+  },
+  {
+    id: 4,
+    title: 'Leadership Workshop: Building High-Performing Teams',
+    progress: 45,
+    duration: '45:00',
+    timeRemaining: '25 min left',
+    thumbnail: 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=400&h=225&fit=crop',
+    category: 'Training',
+    type: 'video',
+    author: 'Emily Davis',
+    lastWatched: '1 week ago',
+    views: '1.8K'
+  },
+  {
+    id: 5,
+    title: 'Tech Talk: Microservices Architecture Deep Dive',
+    progress: 12,
+    duration: '38:15',
+    timeRemaining: '34 min left',
+    thumbnail: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=400&h=225&fit=crop',
+    category: 'Technical',
+    type: 'video',
+    author: 'Alex Thompson',
+    lastWatched: '2 weeks ago',
+    views: '956'
+  },
 ])
 
 // Category Cards
@@ -290,59 +350,63 @@ onMounted(() => {
     <div class="px-6 py-6">
 
       <!-- Continue Watching + Upload Section -->
-      <div v-if="watchHistory.length > 0" class="flex gap-6 mb-10 animate-in">
+      <div v-if="watchHistory.length > 0" class="continue-watching-row mb-10 fade-in-up">
         <!-- Continue Watching -->
-        <section class="flex-1 min-w-0">
-          <div class="section-header">
-            <h2 class="section-title text-base">
-              <i class="fas fa-history"></i>
+        <section class="continue-watching-column">
+          <div class="section-header-row">
+            <h2 class="section-title-sm">
+              <i class="fas fa-history text-purple-500"></i>
               Continue Watching
             </h2>
-            <router-link to="/media" class="view-all-link text-xs">
-              View All <i class="fas fa-arrow-right"></i>
-            </router-link>
+            <router-link to="/media" class="view-all-link">View All ({{ watchHistory.length }}) <i class="fas fa-arrow-right"></i></router-link>
           </div>
           <div class="continue-watching-scroll scrollbar-elegant">
             <div v-for="item in watchHistory" :key="item.id"
                  @click="goToMedia(item)"
-                 class="continue-card cursor-pointer group">
-              <div class="relative aspect-video rounded-xl overflow-hidden shadow-md">
-                <div class="absolute inset-0 thumbnail-gradient" :class="'bg-gradient-to-br from-' + item.thumbnail + '-600 to-' + item.thumbnail + '-800'"></div>
-                <div class="resume-overlay absolute inset-0 bg-black/40 flex items-center justify-center">
-                  <button class="px-4 py-2 rounded-full bg-white text-gray-900 text-sm font-medium shadow-lg hover:bg-gray-100 transition-colors">
-                    <i class="fas fa-play mr-2"></i>Resume
-                  </button>
+                 class="continue-watching-card group">
+              <!-- Card Media -->
+              <div class="continue-card-media">
+                <div class="continue-card-thumbnail">
+                  <!-- Thumbnail Image -->
+                  <img :src="item.thumbnail" :alt="item.title" class="continue-thumbnail-img" />
+                  <!-- Gradient Overlay -->
+                  <div class="continue-thumbnail-overlay"></div>
+                  <!-- Category Badge -->
+                  <span class="continue-category-badge">{{ item.category }}</span>
+                  <!-- Duration Badge -->
+                  <span class="continue-duration-badge">
+                    <i class="fas fa-clock mr-1"></i>{{ item.duration }}
+                  </span>
                 </div>
-                <div class="absolute bottom-0 left-0 right-0">
-                  <div class="watch-progress">
-                    <div class="watch-progress-bar" :style="{ width: item.progress + '%' }"></div>
-                  </div>
-                </div>
-                <div class="absolute top-2 right-2 px-2 py-0.5 rounded bg-black/70 text-white text-xs font-medium">
-                  {{ item.duration }}
+                <!-- Resume Badge -->
+                <span class="continue-resume-badge"><i class="fas fa-play mr-1"></i> Resume</span>
+                <!-- Progress Bar -->
+                <div class="continue-progress-bar">
+                  <div class="continue-progress-fill" :style="{ width: item.progress + '%' }"></div>
                 </div>
               </div>
-              <h4 class="text-sm font-medium text-gray-900 mt-2 line-clamp-1 group-hover:text-teal-700 transition-colors">{{ item.title }}</h4>
-              <p class="text-xs text-gray-500">{{ item.progress }}% watched</p>
+              <!-- Card Content -->
+              <div class="continue-card-content">
+                <div class="continue-progress-text">
+                  <span class="text-teal-600 font-semibold">{{ item.progress }}%</span> complete
+                  <span class="text-gray-400 mx-1">•</span>
+                  <span class="text-gray-500">{{ item.timeRemaining }}</span>
+                </div>
+                <h4 class="continue-card-title">{{ item.title }}</h4>
+                <div class="continue-card-meta">
+                  <div class="continue-author">
+                    <div class="continue-author-avatar">{{ getInitials(item.author) }}</div>
+                    <span>{{ item.author }}</span>
+                  </div>
+                  <span class="continue-last-watched">
+                    <i class="fas fa-history mr-1"></i>{{ item.lastWatched }}
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
         </section>
 
-        <!-- Upload Media Dropzone -->
-        <div class="dropzone-card flex-shrink-0 self-stretch flex flex-col justify-center"
-             @dragover.prevent="isDragging = true"
-             @dragleave="isDragging = false"
-             @drop.prevent="handleDrop"
-             @click="showUploadModal = true"
-             :class="{ dragover: isDragging }"
-             style="width: 220px;">
-          <div class="dropzone-card-icon">
-            <i class="fas fa-cloud-upload-alt"></i>
-          </div>
-          <p>Drop media to upload</p>
-          <p class="text-xs text-gray-400 mt-1">or click to browse</p>
-          <button class="dropzone-card-btn mt-3">Browse Files</button>
-        </div>
       </div>
 
       <!-- Featured Content -->
@@ -1186,7 +1250,49 @@ onMounted(() => {
 .fade-in-up-delay-3 { animation-delay: 0.3s; animation-fill-mode: both; }
 .fade-in-up-delay-4 { animation-delay: 0.4s; animation-fill-mode: both; }
 
-/* Continue Watching Carousel */
+/* ============================================
+   CONTINUE WATCHING SECTION (Enhanced)
+   ============================================ */
+.continue-watching-row {
+  display: flex;
+  gap: 1.5rem;
+  align-items: stretch;
+}
+
+.continue-watching-column {
+  flex: 1;
+  min-width: 0;
+}
+
+.section-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.section-title-sm {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.section-title-sm i {
+  width: 1.75rem;
+  height: 1.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%);
+  border-radius: 0.5rem;
+  font-size: 0.75rem;
+  box-shadow: 0 2px 8px rgba(168, 85, 247, 0.2);
+}
+
+/* Continue Watching Scroll */
 .continue-watching-scroll {
   display: flex;
   gap: 1rem;
@@ -1194,6 +1300,7 @@ onMounted(() => {
   scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
   padding-bottom: 0.5rem;
+  padding-top: 0.25rem;
 }
 
 .continue-watching-scroll::-webkit-scrollbar {
@@ -1210,92 +1317,202 @@ onMounted(() => {
   border-radius: 4px;
 }
 
-.continue-card {
-  flex: 0 0 220px;
+/* Continue Watching Card */
+.continue-watching-card {
+  flex: 0 0 280px;
   scroll-snap-align: start;
-  transition: all 0.3s ease;
+  background: white;
+  border-radius: 1rem;
+  border: 1px solid #f1f5f9;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
-.continue-card:hover {
-  transform: translateY(-4px);
+.continue-watching-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 30px rgba(20, 184, 166, 0.15);
+  border-color: #99f6e4;
 }
 
-.continue-card .resume-overlay {
+/* Card Media */
+.continue-card-media {
+  position: relative;
+  overflow: hidden;
+}
+
+.continue-card-thumbnail {
+  position: relative;
+  aspect-ratio: 16/9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: #1e293b;
+}
+
+.continue-thumbnail-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.continue-watching-card:hover .continue-thumbnail-img {
+  transform: scale(1.08);
+}
+
+.continue-thumbnail-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0.1) 50%, rgba(0, 0, 0, 0.2) 100%);
+  pointer-events: none;
+}
+
+/* Category Badge */
+.continue-category-badge {
+  position: absolute;
+  top: 0.625rem;
+  left: 0.625rem;
+  padding: 0.25rem 0.625rem;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+  border-radius: 100px;
+  font-size: 0.625rem;
+  font-weight: 600;
+  color: #0f172a;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Duration Badge */
+.continue-duration-badge {
+  position: absolute;
+  bottom: 0.625rem;
+  right: 0.625rem;
+  padding: 0.25rem 0.5rem;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(4px);
+  border-radius: 0.375rem;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  color: white;
+  display: flex;
+  align-items: center;
+}
+
+/* Resume Badge */
+.continue-resume-badge {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 0.5rem 1rem;
+  background: white;
+  border-radius: 100px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #0f172a;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
   opacity: 0;
-  transition: opacity 0.3s ease;
+  transition: all 0.3s ease;
+  z-index: 10;
 }
 
-.continue-card:hover .resume-overlay {
+.continue-watching-card:hover .continue-resume-badge {
   opacity: 1;
 }
 
-/* Upload Media Dropzone Card */
-.dropzone-card {
-  width: 160px;
-  flex-shrink: 0;
-  background: linear-gradient(135deg, #f0fdfa 0%, #fff 100%);
-  border: 2px dashed rgba(20, 184, 166, 0.3);
-  border-radius: 1rem;
-  padding: 1rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  cursor: pointer;
-  transition: all 0.3s ease;
+/* Progress Bar */
+.continue-progress-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.3);
 }
 
-.dropzone-card:hover {
-  border-color: rgba(20, 184, 166, 0.5);
-  background: linear-gradient(135deg, #ccfbf1 0%, #f0fdfa 100%);
+.continue-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #14b8a6 0%, #0d9488 100%);
+  border-radius: 0 2px 0 0;
+  transition: width 0.3s ease;
+  box-shadow: 0 0 8px rgba(20, 184, 166, 0.5);
 }
 
-.dropzone-card.dragover {
-  border-color: #14b8a6;
-  background: #ccfbf1;
-  transform: scale(1.02);
-  box-shadow: 0 8px 20px rgba(20, 184, 166, 0.2);
+/* Card Content */
+.continue-card-content {
+  padding: 0.875rem 1rem;
 }
 
-.dropzone-card-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 0.75rem;
-  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-size: 1rem;
-  margin-bottom: 0.5rem;
-  transition: transform 0.3s ease;
-}
-
-.dropzone-card:hover .dropzone-card-icon {
-  transform: scale(1.1);
-}
-
-.dropzone-card p {
-  font-size: 0.75rem;
+.continue-progress-text {
+  font-size: 0.6875rem;
   color: #64748b;
-  margin: 0 0 0.5rem;
+  margin-bottom: 0.375rem;
 }
 
-.dropzone-card-btn {
-  font-size: 0.75rem;
+.continue-card-title {
+  font-size: 0.875rem;
   font-weight: 600;
-  color: #0d9488;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  text-decoration: underline;
-  text-underline-offset: 2px;
+  color: #0f172a;
+  line-height: 1.4;
+  margin: 0 0 0.625rem 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  transition: color 0.3s ease;
 }
 
-.dropzone-card-btn:hover {
-  color: #0f766e;
+.continue-watching-card:hover .continue-card-title {
+  color: #0d9488;
 }
+
+.continue-card-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.continue-author {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.continue-author-avatar {
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+  border-radius: 50%;
+  color: white;
+  font-size: 0.5rem;
+  font-weight: 600;
+}
+
+.continue-author span {
+  font-size: 0.6875rem;
+  font-weight: 500;
+  color: #475569;
+}
+
+.continue-last-watched {
+  font-size: 0.625rem;
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+}
+
+
 
 /* Trending Cards */
 .trending-scroll {
