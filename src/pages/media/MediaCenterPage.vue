@@ -15,6 +15,8 @@ const currentPage = ref(1)
 const itemsPerPage = ref(6)
 const showFilters = ref(false)
 const trendingScrollRef = ref<HTMLElement | null>(null)
+const likedMedia = ref(new Set<number>())
+const savedMedia = ref(new Set<number>())
 const viewMode = ref('grid')
 
 // Sort Options
@@ -344,11 +346,11 @@ const totalViews = computed(() => {
 
 // Methods
 function playFeatured() {
-  router.push({ name: 'media-player', params: { id: featuredVideo.value.id.toString() } })
+  router.push({ name: 'MediaPlayer', params: { id: featuredVideo.value.id.toString() } })
 }
 
 function goToMedia(media: any) {
-  router.push({ name: 'media-player', params: { id: media.id.toString() } })
+  router.push({ name: 'MediaPlayer', params: { id: media.id.toString() } })
 }
 
 function scrollTrending(direction: 'left' | 'right') {
@@ -359,6 +361,43 @@ function scrollTrending(direction: 'left' | 'right') {
       left: direction === 'left' ? currentScroll - scrollAmount : currentScroll + scrollAmount,
       behavior: 'smooth'
     })
+  }
+}
+
+function toggleLikeMedia(id: number) {
+  if (likedMedia.value.has(id)) {
+    likedMedia.value.delete(id)
+  } else {
+    likedMedia.value.add(id)
+  }
+}
+
+function toggleSaveMedia(id: number) {
+  if (savedMedia.value.has(id)) {
+    savedMedia.value.delete(id)
+  } else {
+    savedMedia.value.add(id)
+  }
+}
+
+function isMediaLiked(id: number): boolean {
+  return likedMedia.value.has(id)
+}
+
+function isMediaSaved(id: number): boolean {
+  return savedMedia.value.has(id)
+}
+
+function shareMedia(media: any) {
+  if (navigator.share) {
+    navigator.share({
+      title: media.title,
+      text: `Check out: ${media.title}`,
+      url: window.location.origin + '/media/' + media.id
+    })
+  } else {
+    navigator.clipboard.writeText(window.location.origin + '/media/' + media.id)
+    alert('Link copied to clipboard!')
   }
 }
 
@@ -673,13 +712,21 @@ onUnmounted(() => {
                 </div>
                 <!-- Hover Actions -->
                 <div class="trending-actions">
-                  <button class="trending-action-btn" @click.stop title="Like">
-                    <i class="far fa-heart"></i>
+                  <button
+                    class="trending-action-btn"
+                    :class="{ active: isMediaLiked(media.id) }"
+                    @click.stop="toggleLikeMedia(media.id)"
+                    title="Like">
+                    <i :class="isMediaLiked(media.id) ? 'fas fa-heart' : 'far fa-heart'"></i>
                   </button>
-                  <button class="trending-action-btn" @click.stop title="Save">
-                    <i class="far fa-bookmark"></i>
+                  <button
+                    class="trending-action-btn"
+                    :class="{ 'saved': isMediaSaved(media.id) }"
+                    @click.stop="toggleSaveMedia(media.id)"
+                    title="Save">
+                    <i :class="isMediaSaved(media.id) ? 'fas fa-bookmark' : 'far fa-bookmark'"></i>
                   </button>
-                  <button class="trending-action-btn" @click.stop title="Share">
+                  <button class="trending-action-btn" @click.stop="shareMedia(media)" title="Share">
                     <i class="fas fa-share-alt"></i>
                   </button>
                 </div>
@@ -2763,6 +2810,26 @@ onUnmounted(() => {
   transform: scale(1.1);
 }
 
+.trending-action-btn.active {
+  background: #fee2e2;
+  color: #ef4444;
+}
+
+.trending-action-btn.active:hover {
+  background: #ef4444;
+  color: white;
+}
+
+.trending-action-btn.saved {
+  background: #fef3c7;
+  color: #f59e0b;
+}
+
+.trending-action-btn.saved:hover {
+  background: #f59e0b;
+  color: white;
+}
+
 .trending-info {
   padding: 0.875rem;
 }
@@ -2770,18 +2837,28 @@ onUnmounted(() => {
 .trending-info-header {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.375rem;
   margin-bottom: 0.5rem;
+}
+
+.trending-info-header .category-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.0625rem 0.25rem;
+  font-size: 0.5rem;
+  font-weight: 600;
+  border-radius: 0.1875rem;
+  text-transform: uppercase;
 }
 
 .trending-type-badge {
   display: inline-flex;
   align-items: center;
-  gap: 0.25rem;
-  padding: 0.1875rem 0.5rem;
-  font-size: 0.625rem;
+  gap: 0.125rem;
+  padding: 0.0625rem 0.25rem;
+  font-size: 0.5rem;
   font-weight: 600;
-  border-radius: 0.375rem;
+  border-radius: 0.1875rem;
   text-transform: uppercase;
 }
 
@@ -2898,11 +2975,12 @@ onUnmounted(() => {
 }
 
 .trending-category .category-tag {
-  display: inline-block;
-  padding: 0.125rem 0.5rem;
-  font-size: 0.625rem;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.0625rem 0.25rem;
+  font-size: 0.5rem;
   font-weight: 600;
-  border-radius: 1rem;
+  border-radius: 0.1875rem;
   text-transform: uppercase;
 }
 
