@@ -829,10 +829,11 @@ let carouselInterval: number | null = null
 // Computed property for current featured update
 const featuredUpdate = computed(() => recentUpdates.value[currentSlide.value])
 
-// Computed property for up next items (excludes current featured)
-const upNextUpdates = computed(() => {
-  return recentUpdates.value.filter((_, index) => index !== currentSlide.value).slice(0, 4)
-})
+// Computed property for up next items (shows all items)
+const upNextUpdates = computed(() => recentUpdates.value)
+
+// Check if an item is currently featured
+const isCurrentlyFeatured = (id: number) => featuredUpdate.value?.id === id
 
 const recentUpdates = ref([
   {
@@ -853,7 +854,7 @@ const recentUpdates = ref([
     likes: '12,543',
     comments: '4,521',
     shares: '3,201',
-    link: '/events',
+    link: '/articles/saudi-arabia-vs-japan-opening-match',
     actionText: 'View Match Details',
     tags: ['Opening Match', 'Saudi Arabia', 'Japan'],
     isFeatured: true,
@@ -877,7 +878,7 @@ const recentUpdates = ref([
     likes: '8,721',
     comments: '2,856',
     shares: '1,892',
-    link: '/articles',
+    link: '/articles/salem-al-dawsari-profile',
     actionText: 'Read Full Story',
     tags: ['Player Profile', 'Al-Dawsari', 'Captain'],
     isFeatured: false,
@@ -901,7 +902,7 @@ const recentUpdates = ref([
     likes: '9,432',
     comments: '1,892',
     shares: '2,156',
-    link: '/events',
+    link: '/events/1',
     actionText: 'Event Details',
     tags: ['Opening Ceremony', 'Entertainment', 'Culture'],
     isFeatured: true,
@@ -925,35 +926,11 @@ const recentUpdates = ref([
     likes: '5,123',
     comments: '734',
     shares: '892',
-    link: '/events',
+    link: '/articles/world-class-stadiums',
     actionText: 'Explore Venues',
     tags: ['Stadiums', 'Infrastructure', 'Facilities'],
     isFeatured: false,
     isTrending: false
-  },
-  {
-    id: 5,
-    type: 'stats',
-    typeLabel: 'Statistics',
-    typeIcon: 'fas fa-chart-bar',
-    title: 'AFC Asian Cup History: Japan Leads with 4 Titles',
-    description: 'Japan leads the Asian Cup honors with 4 titles, followed by Saudi Arabia and Iran with 3 each. Explore the complete history of champions, top scorers, and legendary moments from 1956 to present.',
-    icon: 'fas fa-medal',
-    image: 'https://images.unsplash.com/photo-1560272564-c83b66b1ad12?w=600&h=400&fit=crop',
-    gradientClass: 'bg-gradient-to-br from-red-400 to-rose-500',
-    date: 'Jan 2, 2027',
-    timeAgo: '5 days ago',
-    readTime: '8 min read',
-    author: { name: 'Stats Team', initials: 'ST', role: 'Data Analytics', color: '#ef4444' },
-    views: '145,876',
-    likes: '6,789',
-    comments: '1,267',
-    shares: '1,543',
-    link: '/articles',
-    actionText: 'View Statistics',
-    tags: ['History', 'Champions', 'Records'],
-    isFeatured: false,
-    isTrending: true
   }
 ])
 
@@ -1125,8 +1102,9 @@ onUnmounted(() => {
               <span class="badge-featured"><i class="fas fa-star"></i> Featured</span>
               <span class="badge-category">{{ featuredUpdate.typeLabel }}</span>
             </div>
-            <!-- Play Button -->
-            <div class="featured-main-play">
+            <!-- Hover Button -->
+            <div class="featured-hover-btn">
+              <span>Read Article</span>
               <i class="fas fa-arrow-right"></i>
             </div>
             <!-- Content -->
@@ -1171,7 +1149,7 @@ onUnmounted(() => {
             <div
               v-for="update in upNextUpdates"
               :key="update.id"
-              class="secondary-card group"
+              :class="['secondary-card group', { 'is-active': isCurrentlyFeatured(update.id) }]"
             >
               <router-link :to="update.link" class="secondary-link">
                 <div class="secondary-image">
@@ -2098,27 +2076,32 @@ onUnmounted(() => {
   text-transform: uppercase;
 }
 
-.featured-main-play {
+.featured-hover-btn {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 3.5rem;
-  height: 3.5rem;
-  border-radius: 50%;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
   background: rgba(255, 255, 255, 0.95);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1rem;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
   color: #0d9488;
   transition: all 0.3s ease;
   box-shadow: 0 4px 15px rgba(0,0,0,0.3);
   z-index: 2;
+  opacity: 0;
+  visibility: hidden;
 }
 
-.featured-main-card:hover .featured-main-play {
-  transform: translate(-50%, -50%) scale(1.1);
+.featured-main-card:hover .featured-hover-btn {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(-50%, -50%) scale(1.05);
   box-shadow: 0 6px 25px rgba(0,0,0,0.4);
 }
 
@@ -2127,16 +2110,16 @@ onUnmounted(() => {
   bottom: 0;
   left: 0;
   right: 0;
-  padding: 1rem;
+  padding: 1.5rem;
   z-index: 2;
 }
 
 .featured-main-meta {
   display: flex;
   gap: 1rem;
-  margin-bottom: 0.5rem;
-  color: rgba(255,255,255,0.8);
-  font-size: 0.75rem;
+  margin-bottom: 0.75rem;
+  color: rgba(255,255,255,0.9);
+  font-size: 0.875rem;
 }
 
 .featured-main-meta span {
@@ -2146,15 +2129,15 @@ onUnmounted(() => {
 }
 
 .featured-main-meta i {
-  color: #5eead4;
+  color: white;
 }
 
 .featured-main-title {
-  font-size: 1.125rem;
+  font-size: 1.5rem;
   font-weight: 700;
   color: white;
   line-height: 1.3;
-  margin: 0 0 0.375rem 0;
+  margin: 0 0 0.5rem 0;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -2167,10 +2150,10 @@ onUnmounted(() => {
 }
 
 .featured-main-desc {
-  font-size: 0.8125rem;
-  color: rgba(255,255,255,0.7);
+  font-size: 1rem;
+  color: rgba(255,255,255,0.85);
   line-height: 1.5;
-  margin: 0 0 0.5rem 0;
+  margin: 0 0 0.75rem 0;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -2181,13 +2164,13 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-size: 0.75rem;
-  color: rgba(255,255,255,0.8);
+  font-size: 0.875rem;
+  color: rgba(255,255,255,0.9);
 }
 
 .author-avatar-sm {
-  width: 1.5rem;
-  height: 1.5rem;
+  width: 1.75rem;
+  height: 1.75rem;
   border-radius: 0.375rem;
   display: flex;
   align-items: center;
@@ -2311,6 +2294,7 @@ onUnmounted(() => {
 }
 
 .secondary-card {
+  position: relative;
   background: white;
   border-radius: 1rem;
   overflow: hidden;
@@ -2322,6 +2306,13 @@ onUnmounted(() => {
   border-color: #14b8a6;
   box-shadow: 0 8px 25px rgba(20, 184, 166, 0.15);
   transform: translateY(-4px);
+}
+
+.secondary-card.is-active {
+  border-color: #14b8a6;
+  border-left: 4px solid #14b8a6;
+  background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 100%);
+  box-shadow: 0 4px 15px rgba(20, 184, 166, 0.2);
 }
 
 .secondary-link {
