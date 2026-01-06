@@ -344,6 +344,11 @@ const totalViews = computed(() => {
   return total >= 1000 ? (total / 1000).toFixed(1) + 'K' : total.toString()
 })
 
+// Get count by media type
+function getMediaTypeCount(type: string): number {
+  return mediaItems.value.filter(m => m.type === type).length
+}
+
 // Methods
 function playFeatured() {
   router.push({ name: 'MediaPlayer', params: { id: featuredVideo.value.id.toString() } })
@@ -764,12 +769,55 @@ onUnmounted(() => {
       </section>
 
       <!-- All Media Section -->
-      <section class="mb-10 animate-in delay-3">
-        <div class="section-header">
-          <h2 class="section-title text-base">
-            <i class="fas fa-th-large"></i>
-            All Media
-          </h2>
+      <section class="all-media-section mb-10 animate-in delay-3">
+        <!-- Section Header with Stats -->
+        <div class="all-media-header">
+          <div class="all-media-title-row">
+            <h2 class="all-media-title">
+              <div class="all-media-icon">
+                <i class="fas fa-photo-film"></i>
+              </div>
+              <div>
+                <span class="all-media-heading">Media Library</span>
+                <span class="all-media-subtitle">Browse and discover all content</span>
+              </div>
+            </h2>
+            <div class="all-media-stats">
+              <div class="media-stat-item">
+                <i class="fas fa-video"></i>
+                <span class="stat-count">{{ mediaStats.totalVideos }}</span>
+                <span class="stat-label">Videos</span>
+              </div>
+              <div class="media-stat-item">
+                <i class="fas fa-headphones"></i>
+                <span class="stat-count">{{ mediaStats.audio }}</span>
+                <span class="stat-label">Audio</span>
+              </div>
+              <div class="media-stat-item">
+                <i class="fas fa-image"></i>
+                <span class="stat-count">{{ mediaStats.images }}</span>
+                <span class="stat-label">Images</span>
+              </div>
+              <div class="media-stat-item">
+                <i class="fas fa-images"></i>
+                <span class="stat-count">{{ mediaStats.galleries }}</span>
+                <span class="stat-label">Galleries</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Media Type Tabs -->
+          <div class="media-type-tabs">
+            <button
+              v-for="tab in mediaTabs"
+              :key="tab.id"
+              @click="activeTab = tab.id"
+              :class="['media-type-tab', { active: activeTab === tab.id }]">
+              <i :class="tab.icon"></i>
+              <span>{{ tab.label }}</span>
+              <span v-if="tab.id !== 'all'" class="tab-count">{{ getMediaTypeCount(tab.id) }}</span>
+            </button>
+          </div>
         </div>
 
         <!-- Toolbar -->
@@ -779,32 +827,41 @@ onUnmounted(() => {
             <div class="search-box">
               <i class="fas fa-search"></i>
               <input type="text" v-model="searchQuery" placeholder="Search media..." class="search-input">
+              <button v-if="searchQuery" @click="searchQuery = ''" class="search-clear">
+                <i class="fas fa-times"></i>
+              </button>
             </div>
 
             <!-- Filter Button -->
             <button
               @click="showFilters = !showFilters"
               :class="['filter-btn', { active: showFilters || activeFiltersCount > 0 }]">
-              <i class="fas fa-filter"></i>
+              <i class="fas fa-sliders-h"></i>
               <span>Filters</span>
               <span v-if="activeFiltersCount > 0" class="filter-badge">{{ activeFiltersCount }}</span>
             </button>
           </div>
 
           <div class="toolbar-right">
+            <!-- Results Count -->
+            <span class="results-count">{{ filteredMedia.length }} results</span>
+
             <!-- Sort -->
-            <select v-model="sortBy" class="sort-select">
-              <option v-for="option in sortOptions" :key="option.value" :value="option.value">
-                {{ option.label }}
-              </option>
-            </select>
+            <div class="sort-wrapper">
+              <i class="fas fa-sort-amount-down"></i>
+              <select v-model="sortBy" class="sort-select">
+                <option v-for="option in sortOptions" :key="option.value" :value="option.value">
+                  {{ option.label }}
+                </option>
+              </select>
+            </div>
 
             <!-- View Toggle -->
             <div class="view-toggle">
-              <button @click="viewMode = 'grid'" :class="{ active: viewMode === 'grid' }">
+              <button @click="viewMode = 'grid'" :class="{ active: viewMode === 'grid' }" title="Grid view">
                 <i class="fas fa-th-large"></i>
               </button>
-              <button @click="viewMode = 'list'" :class="{ active: viewMode === 'list' }">
+              <button @click="viewMode = 'list'" :class="{ active: viewMode === 'list' }" title="List view">
                 <i class="fas fa-list"></i>
               </button>
             </div>
@@ -863,48 +920,59 @@ onUnmounted(() => {
                    class="media-card-enhanced rounded-2xl overflow-hidden cursor-pointer group bg-white">
                 <!-- Card Media/Thumbnail -->
                 <div class="card-thumbnail relative aspect-video">
-                  <!-- Gallery Stacked Photos -->
-                  <template v-if="media.type === 'gallery'">
-                    <div class="gallery-stack">
-                      <div v-for="(gradient, idx) in media.coverPhotos" :key="idx"
-                           class="gallery-stack-photo"
-                           :class="'bg-gradient-to-br ' + gradient"
-                           :style="{ transform: 'rotate(' + (idx - 1) * 3 + 'deg) translateY(' + idx * 2 + 'px)', zIndex: 3 - idx }">
-                      </div>
-                    </div>
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent z-10"></div>
-                  </template>
-                  <!-- Video/Audio Thumbnail -->
-                  <template v-else>
-                    <div class="absolute inset-0 thumbnail-gradient" :class="media.gradientClass"></div>
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent"></div>
-                  </template>
+                  <!-- Actual Thumbnail Image -->
+                  <img :src="media.thumbnail" :alt="media.title" class="absolute inset-0 w-full h-full object-cover" />
+                  <div class="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent"></div>
 
                   <!-- Card Badges -->
                   <div class="absolute top-3 left-3 flex gap-1.5 z-20">
                     <span v-if="media.isNew" class="new-badge">
                       <i class="fas fa-sparkles"></i> New
                     </span>
-                    <span v-if="media.hasTranscript" class="category-badge">
-                      <i class="fas fa-closed-captioning mr-1"></i>CC
+                    <span v-if="media.hasTranscript" class="transcript-badge">
+                      <i class="fas fa-closed-captioning"></i> CC
                     </span>
                   </div>
 
                   <!-- Duration/Photo Count Badge -->
-                  <div class="absolute bottom-3 right-3 px-2.5 py-1 rounded-lg bg-black/70 text-white text-xs font-medium backdrop-blur-sm z-20">
+                  <div class="absolute bottom-3 right-3 media-duration-badge z-20">
                     <template v-if="media.type === 'gallery'">
-                      <i class="fas fa-images mr-1"></i>{{ media.photoCount }} photos
+                      <i class="fas fa-images"></i> {{ media.photoCount }} photos
+                    </template>
+                    <template v-else-if="media.type === 'image'">
+                      <i class="fas fa-image"></i> Image
                     </template>
                     <template v-else>
-                      {{ media.duration }}
+                      <i :class="media.type === 'video' ? 'fas fa-play-circle' : 'fas fa-headphones'"></i> {{ media.duration }}
                     </template>
                   </div>
 
-                  <!-- Action Button Overlay -->
-                  <div class="card-overlay z-20">
-                    <button class="overlay-btn">
-                      <i :class="media.type === 'video' ? 'fas fa-play' : media.type === 'audio' ? 'fas fa-headphones' : media.type === 'image' ? 'fas fa-expand' : 'fas fa-images'"></i>
-                      {{ media.type === 'video' ? 'Watch Now' : media.type === 'audio' ? 'Listen Now' : media.type === 'image' ? 'View Image' : 'View Gallery' }}
+                  <!-- Play Button Overlay -->
+                  <div class="card-play-btn z-20">
+                    <i :class="media.type === 'video' ? 'fas fa-play' : media.type === 'audio' ? 'fas fa-headphones' : media.type === 'image' ? 'fas fa-expand' : 'fas fa-images'"></i>
+                  </div>
+
+                  <!-- Hover Action Buttons -->
+                  <div class="card-hover-actions z-20">
+                    <button
+                      class="card-action-btn"
+                      :class="{ active: isMediaLiked(media.id) }"
+                      @click.stop="toggleLikeMedia(media.id)"
+                      title="Like">
+                      <i :class="isMediaLiked(media.id) ? 'fas fa-heart' : 'far fa-heart'"></i>
+                    </button>
+                    <button
+                      class="card-action-btn"
+                      :class="{ saved: isMediaSaved(media.id) }"
+                      @click.stop="toggleSaveMedia(media.id)"
+                      title="Save">
+                      <i :class="isMediaSaved(media.id) ? 'fas fa-bookmark' : 'far fa-bookmark'"></i>
+                    </button>
+                    <button
+                      class="card-action-btn"
+                      @click.stop="shareMedia(media)"
+                      title="Share">
+                      <i class="fas fa-share-alt"></i>
                     </button>
                   </div>
 
@@ -917,17 +985,11 @@ onUnmounted(() => {
                 <!-- Card Body -->
                 <div class="card-body-enhanced">
                   <div class="card-meta-row">
-                    <span :class="['px-2.5 py-1 rounded-full text-[11px] font-semibold',
-                      media.category === 'Training' ? 'bg-indigo-100 text-indigo-700' :
-                      media.category === 'Product Updates' ? 'bg-teal-100 text-teal-700' :
-                      media.category === 'Leadership' ? 'bg-amber-100 text-amber-700' :
-                      media.category === 'Technical' ? 'bg-blue-100 text-blue-700' :
-                      media.category === 'Culture' ? 'bg-pink-100 text-pink-700' :
-                      'bg-emerald-100 text-emerald-700']">{{ media.category }}</span>
-                    <span class="flex items-center gap-1">
-                      <i :class="media.type === 'video' ? 'fas fa-video' : media.type === 'gallery' ? 'fas fa-images' : 'fas fa-podcast'"></i>
-                      {{ media.type === 'video' ? 'Video' : media.type === 'gallery' ? 'Gallery' : 'Podcast' }}
+                    <span :class="['media-type-badge', media.type]">
+                      <i :class="media.type === 'video' ? 'fas fa-video' : media.type === 'audio' ? 'fas fa-headphones' : media.type === 'image' ? 'fas fa-image' : 'fas fa-images'"></i>
+                      {{ media.type === 'video' ? 'Video' : media.type === 'audio' ? 'Audio' : media.type === 'image' ? 'Image' : 'Gallery' }}
                     </span>
+                    <span :class="['media-category-tag', media.category.toLowerCase().split(' ')[0]]">{{ media.category }}</span>
                   </div>
 
                   <h3 class="card-title-enhanced">{{ media.title }}</h3>
@@ -937,11 +999,11 @@ onUnmounted(() => {
                       <div class="author-avatar">
                         <span class="avatar-text">{{ getInitials(media.author) }}</span>
                       </div>
-                      <span class="author-name">{{ media.author || 'Intalio' }}</span>
+                      <span class="author-name">{{ media.author || 'AFC Media' }}</span>
                     </div>
                     <div class="card-stats">
-                      <span><i class="fas fa-eye"></i>{{ media.views }}</span>
-                      <span><i class="fas fa-calendar"></i>{{ media.date }}</span>
+                      <span><i class="fas fa-eye"></i> {{ media.views }}</span>
+                      <span><i class="fas fa-clock"></i> {{ media.date }}</span>
                     </div>
                   </div>
                 </div>
@@ -955,24 +1017,17 @@ onUnmounted(() => {
                    class="media-list-item cursor-pointer group">
                 <!-- Thumbnail -->
                 <div class="list-item-thumbnail">
-                  <template v-if="media.type === 'gallery'">
-                    <div class="gallery-mini-stack">
-                      <div v-for="(gradient, idx) in media.coverPhotos?.slice(0, 2)" :key="idx"
-                           class="gallery-mini-photo"
-                           :class="'bg-gradient-to-br ' + gradient"
-                           :style="{ transform: 'rotate(' + (idx - 0.5) * 4 + 'deg)' }">
-                      </div>
-                    </div>
-                  </template>
-                  <template v-else>
-                    <div class="absolute inset-0 thumbnail-gradient" :class="media.gradientClass"></div>
-                  </template>
+                  <img :src="media.thumbnail" :alt="media.title" class="absolute inset-0 w-full h-full object-cover rounded-lg" />
+                  <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent rounded-lg"></div>
                   <div class="list-play-overlay">
-                    <i :class="media.type === 'video' ? 'fas fa-play' : media.type === 'gallery' ? 'fas fa-images' : 'fas fa-headphones'"></i>
+                    <i :class="media.type === 'video' ? 'fas fa-play' : media.type === 'audio' ? 'fas fa-headphones' : media.type === 'image' ? 'fas fa-expand' : 'fas fa-images'"></i>
                   </div>
                   <div class="list-duration-badge">
                     <template v-if="media.type === 'gallery'">
                       {{ media.photoCount }} photos
+                    </template>
+                    <template v-else-if="media.type === 'image'">
+                      Image
                     </template>
                     <template v-else>
                       {{ media.duration }}
@@ -984,17 +1039,11 @@ onUnmounted(() => {
                 <div class="list-item-content">
                   <div class="list-item-header">
                     <div class="list-badges">
-                      <span :class="['list-category-badge',
-                        media.category === 'Training' ? 'bg-indigo-100 text-indigo-700' :
-                        media.category === 'Product Updates' ? 'bg-teal-100 text-teal-700' :
-                        media.category === 'Leadership' ? 'bg-amber-100 text-amber-700' :
-                        media.category === 'Technical' ? 'bg-blue-100 text-blue-700' :
-                        media.category === 'Culture' ? 'bg-pink-100 text-pink-700' :
-                        'bg-emerald-100 text-emerald-700']">{{ media.category }}</span>
-                      <span class="list-type-badge">
-                        <i :class="media.type === 'video' ? 'fas fa-video' : media.type === 'gallery' ? 'fas fa-images' : 'fas fa-podcast'"></i>
-                        {{ media.type === 'video' ? 'Video' : media.type === 'gallery' ? 'Gallery' : 'Podcast' }}
+                      <span :class="['list-type-badge', media.type]">
+                        <i :class="media.type === 'video' ? 'fas fa-video' : media.type === 'audio' ? 'fas fa-headphones' : media.type === 'image' ? 'fas fa-image' : 'fas fa-images'"></i>
+                        {{ media.type === 'video' ? 'Video' : media.type === 'audio' ? 'Audio' : media.type === 'image' ? 'Image' : 'Gallery' }}
                       </span>
+                      <span :class="['list-category-badge', media.category.toLowerCase().split(' ')[0]]">{{ media.category }}</span>
                       <span v-if="media.isNew" class="list-new-badge">
                         <i class="fas fa-sparkles"></i> New
                       </span>
@@ -1006,21 +1055,35 @@ onUnmounted(() => {
                       <div class="list-author-avatar">
                         {{ getInitials(media.author) }}
                       </div>
-                      <span>{{ media.author || 'Intalio' }}</span>
+                      <span>{{ media.author || 'AFC Media' }}</span>
                     </div>
                     <div class="list-stats">
                       <span><i class="fas fa-eye"></i> {{ media.views }}</span>
-                      <span><i class="fas fa-calendar"></i> {{ media.date }}</span>
+                      <span><i class="fas fa-clock"></i> {{ media.date }}</span>
                     </div>
                   </div>
                 </div>
 
                 <!-- Actions -->
                 <div class="list-item-actions">
-                  <button class="list-action-btn" @click.stop>
-                    <i class="far fa-bookmark"></i>
+                  <button
+                    class="list-action-btn"
+                    :class="{ active: isMediaLiked(media.id) }"
+                    @click.stop="toggleLikeMedia(media.id)"
+                    title="Like">
+                    <i :class="isMediaLiked(media.id) ? 'fas fa-heart' : 'far fa-heart'"></i>
                   </button>
-                  <button class="list-action-btn" @click.stop>
+                  <button
+                    class="list-action-btn"
+                    :class="{ saved: isMediaSaved(media.id) }"
+                    @click.stop="toggleSaveMedia(media.id)"
+                    title="Save">
+                    <i :class="isMediaSaved(media.id) ? 'fas fa-bookmark' : 'far fa-bookmark'"></i>
+                  </button>
+                  <button
+                    class="list-action-btn"
+                    @click.stop="shareMedia(media)"
+                    title="Share">
                     <i class="fas fa-share-alt"></i>
                   </button>
                 </div>
@@ -3342,10 +3405,9 @@ onUnmounted(() => {
 .filters-panel {
   margin-bottom: 1.25rem;
   padding: 1rem;
-  background: white;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
   border-radius: 0.875rem;
-  border: 1px solid #f1f5f9;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  border: 1px solid #e2e8f0;
   animation: slideDown 0.25s ease-out;
 }
 
@@ -3447,18 +3509,538 @@ onUnmounted(() => {
   box-shadow: 0 6px 20px rgba(20, 184, 166, 0.4);
 }
 
+/* All Media Section Header */
+.all-media-section {
+  background: white;
+  border-radius: 1.25rem;
+  border: 1px solid #e2e8f0;
+  padding: 1.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+}
+
+.all-media-header {
+  margin-bottom: 1.25rem;
+}
+
+.all-media-title-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1.5rem;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.all-media-title {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  margin: 0;
+}
+
+.all-media-icon {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+  border-radius: 0.875rem;
+  color: white;
+  font-size: 1.25rem;
+  box-shadow: 0 4px 12px rgba(20, 184, 166, 0.3);
+}
+
+.all-media-heading {
+  display: block;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #0f172a;
+  line-height: 1.3;
+}
+
+.all-media-subtitle {
+  display: block;
+  font-size: 0.8125rem;
+  font-weight: 400;
+  color: #64748b;
+  margin-top: 0.125rem;
+}
+
+.all-media-stats {
+  display: flex;
+  gap: 1rem;
+}
+
+.media-stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border-radius: 0.75rem;
+  border: 1px solid #e2e8f0;
+  min-width: 70px;
+  transition: all 0.3s ease;
+}
+
+.media-stat-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border-color: #14b8a6;
+}
+
+.media-stat-item i {
+  font-size: 1rem;
+  color: #14b8a6;
+  margin-bottom: 0.25rem;
+}
+
+.media-stat-item .stat-count {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #0f172a;
+  line-height: 1.2;
+}
+
+.media-stat-item .stat-label {
+  font-size: 0.625rem;
+  font-weight: 500;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+/* Media Type Tabs */
+.media-type-tabs {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.375rem;
+  background: #f1f5f9;
+  border-radius: 0.75rem;
+  overflow-x: auto;
+}
+
+.media-type-tab {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1rem;
+  background: transparent;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  white-space: nowrap;
+}
+
+.media-type-tab:hover {
+  color: #0f172a;
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.media-type-tab.active {
+  background: white;
+  color: #0d9488;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.media-type-tab i {
+  font-size: 0.875rem;
+}
+
+.tab-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  background: #e2e8f0;
+  border-radius: 100px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.media-type-tab.active .tab-count {
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+  color: white;
+}
+
+/* Search Clear Button */
+.search-clear {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #e2e8f0;
+  border: none;
+  border-radius: 50%;
+  color: #64748b;
+  font-size: 0.625rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.search-clear:hover {
+  background: #ef4444;
+  color: white;
+}
+
+/* Results Count */
+.results-count {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #64748b;
+}
+
+/* Sort Wrapper */
+.sort-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+}
+
+.sort-wrapper i {
+  font-size: 0.75rem;
+  color: #64748b;
+}
+
+.sort-wrapper .sort-select {
+  border: none;
+  background: transparent;
+  padding: 0;
+  height: auto;
+}
+
+/* Card Play Button */
+.card-play-btn {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.8);
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 50%;
+  color: #0f172a;
+  font-size: 1rem;
+  opacity: 0;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.media-card-enhanced:hover .card-play-btn {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.card-play-btn i {
+  margin-left: 2px;
+}
+
+/* Card Hover Actions */
+.card-hover-actions {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  opacity: 0;
+  transform: translateX(10px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.media-card-enhanced:hover .card-hover-actions {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.card-action-btn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.95);
+  border: none;
+  border-radius: 50%;
+  color: #475569;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.card-action-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.card-action-btn.active {
+  background: #fee2e2;
+  color: #ef4444;
+}
+
+.card-action-btn.active:hover {
+  background: #ef4444;
+  color: white;
+}
+
+.card-action-btn.saved {
+  background: #fef3c7;
+  color: #f59e0b;
+}
+
+.card-action-btn.saved:hover {
+  background: #f59e0b;
+  color: white;
+}
+
+/* Media Type Badge */
+.media-type-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.625rem;
+  font-weight: 600;
+  border-radius: 0.25rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.media-type-badge.video {
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+  color: #1d4ed8;
+}
+
+.media-type-badge.audio {
+  background: linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 100%);
+  color: #7c3aed;
+}
+
+.media-type-badge.image {
+  background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+  color: #16a34a;
+}
+
+.media-type-badge.gallery {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  color: #d97706;
+}
+
+/* Media Category Tag */
+.media-category-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.625rem;
+  font-weight: 600;
+  border-radius: 0.25rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.media-category-tag.highlights {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+.media-category-tag.interviews {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.media-category-tag.behind {
+  background: #f3e8ff;
+  color: #7c3aed;
+}
+
+.media-category-tag.matches {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.media-category-tag.teams {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.media-category-tag.venues {
+  background: #ccfbf1;
+  color: #0d9488;
+}
+
+.media-category-tag.fans {
+  background: #fce7f3;
+  color: #db2777;
+}
+
+/* Media Duration Badge */
+.media-duration-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.375rem 0.625rem;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(4px);
+  border-radius: 0.375rem;
+  color: white;
+  font-size: 0.6875rem;
+  font-weight: 600;
+}
+
+.media-duration-badge i {
+  font-size: 0.625rem;
+  opacity: 0.8;
+}
+
+/* Transcript Badge */
+.transcript-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(4px);
+  border-radius: 0.25rem;
+  color: #475569;
+  font-size: 0.625rem;
+  font-weight: 600;
+}
+
+/* List View Type Badge */
+.list-type-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.625rem;
+  font-weight: 600;
+  border-radius: 0.25rem;
+  text-transform: uppercase;
+}
+
+.list-type-badge.video {
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+  color: #1d4ed8;
+}
+
+.list-type-badge.audio {
+  background: linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 100%);
+  color: #7c3aed;
+}
+
+.list-type-badge.image {
+  background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+  color: #16a34a;
+}
+
+.list-type-badge.gallery {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  color: #d97706;
+}
+
+/* List Category Badge */
+.list-category-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.625rem;
+  font-weight: 600;
+  border-radius: 0.25rem;
+  text-transform: uppercase;
+}
+
+.list-category-badge.highlights {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+.list-category-badge.interviews {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.list-category-badge.behind {
+  background: #f3e8ff;
+  color: #7c3aed;
+}
+
+.list-category-badge.matches {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.list-category-badge.teams {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.list-category-badge.venues {
+  background: #ccfbf1;
+  color: #0d9488;
+}
+
+.list-category-badge.fans {
+  background: #fce7f3;
+  color: #db2777;
+}
+
+/* List Action Button States */
+.list-action-btn.active {
+  background: #fee2e2;
+  color: #ef4444;
+}
+
+.list-action-btn.active:hover {
+  background: #ef4444;
+  color: white;
+}
+
+.list-action-btn.saved {
+  background: #fef3c7;
+  color: #f59e0b;
+}
+
+.list-action-btn.saved:hover {
+  background: #f59e0b;
+  color: white;
+}
+
 /* Content Area Wrapper */
 .content-area {
-  background: white;
+  background: #f8fafc;
   border-radius: 1rem;
-  border: 1px solid #f1f5f9;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  border: 1px solid #e2e8f0;
   overflow: hidden;
   animation: fadeInUp 0.5s ease-out;
 }
 
 .content-area-inner {
   padding: 1.25rem;
+}
+
+.all-media-section .content-area {
+  margin-top: 0;
 }
 
 /* Media Grid */
@@ -4358,6 +4940,40 @@ onUnmounted(() => {
     opacity: 1;
     justify-content: flex-end;
     margin-top: 0.5rem;
+  }
+
+  .all-media-title-row {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .all-media-stats {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+  }
+
+  .media-type-tabs {
+    gap: 0.25rem;
+  }
+
+  .media-type-tab {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.75rem;
+  }
+
+  .media-type-tab span:not(.tab-count) {
+    display: none;
+  }
+
+  .all-media-section {
+    padding: 1rem;
+  }
+
+  .card-hover-actions {
+    opacity: 1;
+    transform: translateX(0);
   }
 }
 </style>
