@@ -14,6 +14,7 @@ const sortBy = ref('recent')
 const currentPage = ref(1)
 const itemsPerPage = ref(6)
 const showFilters = ref(false)
+const trendingScrollRef = ref<HTMLElement | null>(null)
 const viewMode = ref('grid')
 
 // Sort Options
@@ -27,19 +28,20 @@ const sortOptions = ref([
 const mediaTabs = ref([
   { id: 'all', label: 'All', icon: 'fas fa-th-large' },
   { id: 'video', label: 'Videos', icon: 'fas fa-video' },
-  { id: 'audio', label: 'Podcasts', icon: 'fas fa-podcast' },
+  { id: 'audio', label: 'Audio', icon: 'fas fa-headphones' },
+  { id: 'image', label: 'Images', icon: 'fas fa-image' },
   { id: 'gallery', label: 'Galleries', icon: 'fas fa-images' },
-  { id: 'webinar', label: 'Webinars', icon: 'fas fa-users' },
 ])
 
 // Categories
-const categories = ref(['Company News', 'Training', 'Product Updates', 'Leadership', 'Culture', 'Technical'])
+const categories = ref(['Highlights', 'Interviews', 'Behind the Scenes', 'Matches', 'Teams', 'Venues', 'Fans'])
 
 // Media Stats
 const mediaStats = ref({
   totalVideos: 156,
   galleries: 42,
-  podcasts: 24
+  audio: 38,
+  images: 245
 })
 
 // Watch History (Continue Watching)
@@ -261,19 +263,26 @@ const upNextVideos = ref([
 
 // Media Items
 const mediaItems = ref([
-  { id: 5, title: 'Leadership Workshop: Building High-Performing Teams', type: 'video', category: 'Leadership', duration: '45:00', views: '1.8K', date: '2 days ago', gradientClass: 'bg-gradient-to-br from-amber-500 to-amber-700', isNew: true, hasTranscript: true, author: 'Sarah Chen' },
-  { id: 6, title: 'Tech Talk: Microservices Architecture', type: 'video', category: 'Technical', duration: '38:15', views: '956', date: '3 days ago', gradientClass: 'bg-gradient-to-br from-blue-500 to-blue-700', isNew: true, hasTranscript: true, author: 'David Kim' },
-  { id: 13, title: 'Annual Company Summit 2024', type: 'gallery', category: 'Company News', photoCount: 48, views: '3.2K', date: '1 day ago', gradientClass: 'bg-gradient-to-br from-teal-500 to-teal-700', isNew: true, author: 'Marketing Team', coverPhotos: ['from-teal-400 to-teal-600', 'from-cyan-400 to-cyan-600', 'from-emerald-400 to-emerald-600'] },
-  { id: 7, title: 'Weekly Strategy Podcast - Episode 42', type: 'audio', category: 'Leadership', duration: '52:30', views: '2.1K', date: '1 week ago', gradientClass: 'bg-gradient-to-br from-amber-500 to-amber-700', isNew: false, hasTranscript: false, author: 'Mike Johnson' },
-  { id: 14, title: 'New Office Grand Opening', type: 'gallery', category: 'Culture', photoCount: 32, views: '2.8K', date: '3 days ago', gradientClass: 'bg-gradient-to-br from-pink-500 to-pink-700', isNew: true, author: 'HR Team', coverPhotos: ['from-pink-400 to-pink-600', 'from-rose-400 to-rose-600', 'from-fuchsia-400 to-fuchsia-600'] },
-  { id: 8, title: 'Customer Success Stories: Enterprise Solutions', type: 'video', category: 'Company News', duration: '28:45', views: '1.4K', date: '1 week ago', gradientClass: 'bg-gradient-to-br from-emerald-500 to-emerald-700', isNew: false, hasTranscript: true, author: 'Lisa Wong' },
-  { id: 9, title: 'Product Demo: New Dashboard Features', type: 'video', category: 'Product Updates', duration: '22:10', views: '2.8K', date: '2 weeks ago', gradientClass: 'bg-gradient-to-br from-teal-500 to-teal-700', isNew: false, hasTranscript: true, author: 'Chris Evans' },
-  { id: 15, title: 'Team Building Retreat 2024', type: 'gallery', category: 'Culture', photoCount: 65, views: '4.1K', date: '1 week ago', gradientClass: 'bg-gradient-to-br from-amber-500 to-amber-700', isNew: false, author: 'Events Team', coverPhotos: ['from-amber-400 to-amber-600', 'from-orange-400 to-orange-600', 'from-yellow-400 to-yellow-600'] },
-  { id: 10, title: 'Company Culture: Our Values in Action', type: 'video', category: 'Culture', duration: '18:30', views: '3.2K', date: '2 weeks ago', gradientClass: 'bg-gradient-to-br from-pink-500 to-pink-700', isNew: false, hasTranscript: false, author: 'Emily Davis' },
-  { id: 16, title: 'Product Launch Event Photos', type: 'gallery', category: 'Product Updates', photoCount: 28, views: '1.9K', date: '2 weeks ago', gradientClass: 'bg-gradient-to-br from-indigo-500 to-indigo-700', isNew: false, author: 'Product Team', coverPhotos: ['from-indigo-400 to-indigo-600', 'from-violet-400 to-violet-600', 'from-purple-400 to-purple-600'] },
-  { id: 11, title: 'Training: Advanced Excel Techniques', type: 'video', category: 'Training', duration: '55:00', views: '4.5K', date: '3 weeks ago', gradientClass: 'bg-gradient-to-br from-indigo-500 to-indigo-700', isNew: false, hasTranscript: true, author: 'Rachel Green' },
-  { id: 12, title: 'Innovation Podcast - AI in Business', type: 'audio', category: 'Technical', duration: '48:20', views: '1.9K', date: '3 weeks ago', gradientClass: 'bg-gradient-to-br from-blue-500 to-blue-700', isNew: false, hasTranscript: false, author: 'Alex Thompson' },
-  { id: 17, title: 'Leadership Training Workshop', type: 'gallery', category: 'Training', photoCount: 42, views: '1.5K', date: '3 weeks ago', gradientClass: 'bg-gradient-to-br from-blue-500 to-blue-700', isNew: false, author: 'L&D Team', coverPhotos: ['from-blue-400 to-blue-600', 'from-sky-400 to-sky-600', 'from-cyan-400 to-cyan-600'] },
+  { id: 5, title: 'Saudi Arabia vs Japan: Opening Match Preview', type: 'video', category: 'Highlights', duration: '12:45', views: '45.2K', date: '2 days ago', thumbnail: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=400&h=225&fit=crop', isNew: true, hasTranscript: true, author: 'AFC Media' },
+  { id: 6, title: 'King Fahd Stadium: Behind the Scenes Tour', type: 'video', category: 'Behind the Scenes', duration: '18:30', views: '32.1K', date: '3 days ago', thumbnail: 'https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=400&h=225&fit=crop', isNew: true, hasTranscript: true, author: 'Venue Team' },
+  { id: 13, title: 'AFC Asian Cup 2027 Official Draw Ceremony', type: 'gallery', category: 'Highlights', photoCount: 48, views: '28.5K', date: '1 day ago', thumbnail: 'https://images.unsplash.com/photo-1459865264687-595d652de67e?w=400&h=225&fit=crop', isNew: true, author: 'AFC Media' },
+  { id: 18, title: 'AFC Asian Cup Official Podcast: Episode 1', type: 'audio', category: 'Interviews', duration: '45:30', views: '12.3K', date: '2 days ago', thumbnail: 'https://images.unsplash.com/photo-1478737270239-2f02b77fc618?w=400&h=225&fit=crop', isNew: true, hasTranscript: true, author: 'AFC Media' },
+  { id: 19, title: 'King Fahd Stadium Aerial View', type: 'image', category: 'Venues', views: '18.5K', date: '1 day ago', thumbnail: 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?w=400&h=225&fit=crop', isNew: true, author: 'AFC Media' },
+  { id: 7, title: 'Coach Interview: Saudi Arabia Tactics Analysis', type: 'video', category: 'Interviews', duration: '25:15', views: '18.7K', date: '1 week ago', thumbnail: 'https://images.unsplash.com/photo-1551958219-acbc608c6377?w=400&h=225&fit=crop', isNew: false, hasTranscript: true, author: 'Sports Desk' },
+  { id: 20, title: 'Match Day Commentary: Live Analysis', type: 'audio', category: 'Matches', duration: '90:00', views: '8.7K', date: '4 days ago', thumbnail: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=400&h=225&fit=crop', isNew: true, author: 'AFC Radio' },
+  { id: 21, title: 'Saudi Arabia Team Photo 2027', type: 'image', category: 'Teams', views: '35.2K', date: '3 days ago', thumbnail: 'https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=400&h=225&fit=crop', isNew: true, author: 'AFC Media' },
+  { id: 14, title: 'Fan Zone Setup: Riyadh Boulevard', type: 'gallery', category: 'Fans', photoCount: 32, views: '15.3K', date: '3 days ago', thumbnail: 'https://images.unsplash.com/photo-1560272564-c83b66b1ad12?w=400&h=225&fit=crop', isNew: true, author: 'Events Team' },
+  { id: 8, title: 'Top 10 Goals: AFC Asian Cup History', type: 'video', category: 'Highlights', duration: '15:20', views: '89.4K', date: '1 week ago', thumbnail: 'https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?w=400&h=225&fit=crop', isNew: false, hasTranscript: true, author: 'AFC Media' },
+  { id: 22, title: 'Trophy Unveiling Ceremony', type: 'image', category: 'Highlights', views: '42.1K', date: '1 week ago', thumbnail: 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=400&h=225&fit=crop', isNew: false, author: 'AFC Media' },
+  { id: 9, title: 'Team Japan: Road to Saudi Arabia 2027', type: 'video', category: 'Teams', duration: '22:10', views: '41.2K', date: '2 weeks ago', thumbnail: 'https://images.unsplash.com/photo-1606925797300-0b35e9d1794e?w=400&h=225&fit=crop', isNew: false, hasTranscript: true, author: 'AFC Media' },
+  { id: 23, title: 'Pre-Match Analysis Podcast: Group A', type: 'audio', category: 'Matches', duration: '32:15', views: '6.4K', date: '1 week ago', thumbnail: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=400&h=225&fit=crop', isNew: false, author: 'AFC Analysts' },
+  { id: 15, title: 'Volunteer Training Program Launch', type: 'gallery', category: 'Behind the Scenes', photoCount: 65, views: '12.8K', date: '1 week ago', thumbnail: 'https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=400&h=225&fit=crop', isNew: false, author: 'LOC Team' },
+  { id: 10, title: 'Salem Al-Dawsari: Exclusive Interview', type: 'video', category: 'Interviews', duration: '18:30', views: '67.3K', date: '2 weeks ago', thumbnail: 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=400&h=225&fit=crop', isNew: false, hasTranscript: false, author: 'Sports Desk' },
+  { id: 24, title: 'Fans Celebrating at Boulevard', type: 'image', category: 'Fans', views: '28.9K', date: '2 weeks ago', thumbnail: 'https://images.unsplash.com/photo-1459865264687-595d652de67e?w=400&h=225&fit=crop', isNew: false, author: 'Events Team' },
+  { id: 16, title: 'Stadium Infrastructure Progress Photos', type: 'gallery', category: 'Venues', photoCount: 28, views: '9.5K', date: '2 weeks ago', thumbnail: 'https://images.unsplash.com/photo-1489944440615-453fc2b6a9a9?w=400&h=225&fit=crop', isNew: false, author: 'Venue Operations' },
+  { id: 11, title: 'Group Stage Draw Analysis', type: 'video', category: 'Highlights', duration: '35:00', views: '52.1K', date: '3 weeks ago', thumbnail: 'https://images.unsplash.com/photo-1518091043644-c1d4457512c6?w=400&h=225&fit=crop', isNew: false, hasTranscript: true, author: 'AFC Analysts' },
+  { id: 12, title: 'AFC Podcast: Tournament Predictions', type: 'audio', category: 'Interviews', duration: '48:20', views: '8.9K', date: '3 weeks ago', thumbnail: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=400&h=225&fit=crop', isNew: false, hasTranscript: false, author: 'AFC Media' },
+  { id: 17, title: 'Media Accreditation Workshop', type: 'gallery', category: 'Behind the Scenes', photoCount: 42, views: '6.2K', date: '3 weeks ago', thumbnail: 'https://images.unsplash.com/photo-1504450758481-7338eba7524a?w=400&h=225&fit=crop', isNew: false, author: 'Media Team' },
 ])
 
 // Computed: Active Filters Count
@@ -340,6 +349,17 @@ function playFeatured() {
 
 function goToMedia(media: any) {
   router.push({ name: 'media-player', params: { id: media.id.toString() } })
+}
+
+function scrollTrending(direction: 'left' | 'right') {
+  if (trendingScrollRef.value) {
+    const scrollAmount = 280
+    const currentScroll = trendingScrollRef.value.scrollLeft
+    trendingScrollRef.value.scrollTo({
+      left: direction === 'left' ? currentScroll - scrollAmount : currentScroll + scrollAmount,
+      behavior: 'smooth'
+    })
+  }
 }
 
 function handleDrop(e: DragEvent) {
@@ -430,24 +450,24 @@ onUnmounted(() => {
         </div>
         <div class="stat-card-square">
           <div class="stat-icon-box">
+            <i class="fas fa-headphones"></i>
+          </div>
+          <p class="stat-value-mini">{{ mediaStats.audio }}</p>
+          <p class="stat-label-mini">Audio</p>
+        </div>
+        <div class="stat-card-square">
+          <div class="stat-icon-box">
+            <i class="fas fa-image"></i>
+          </div>
+          <p class="stat-value-mini">{{ mediaStats.images }}</p>
+          <p class="stat-label-mini">Images</p>
+        </div>
+        <div class="stat-card-square">
+          <div class="stat-icon-box">
             <i class="fas fa-images"></i>
           </div>
           <p class="stat-value-mini">{{ mediaStats.galleries }}</p>
           <p class="stat-label-mini">Galleries</p>
-        </div>
-        <div class="stat-card-square">
-          <div class="stat-icon-box">
-            <i class="fas fa-podcast"></i>
-          </div>
-          <p class="stat-value-mini">{{ mediaStats.podcasts }}</p>
-          <p class="stat-label-mini">Podcasts</p>
-        </div>
-        <div class="stat-card-square">
-          <div class="stat-icon-box">
-            <i class="fas fa-eye"></i>
-          </div>
-          <p class="stat-value-mini">{{ totalViews }}</p>
-          <p class="stat-label-mini">Total Views</p>
         </div>
       </div>
 
@@ -458,7 +478,7 @@ onUnmounted(() => {
         </div>
 
         <h1 class="text-3xl font-bold text-white mb-2">Media Center</h1>
-        <p class="text-teal-100 max-w-lg">Videos, podcasts, photo galleries and multimedia content for the tournament.</p>
+        <p class="text-teal-100 max-w-lg">Videos, audio, images, and photo galleries - all the multimedia content for AFC Asian Cup 2027.</p>
 
         <div class="flex flex-wrap gap-3 mt-6">
           <button @click="showUploadModal = true" class="px-5 py-2.5 bg-white text-teal-600 rounded-xl font-semibold text-sm flex items-center gap-2 hover:bg-teal-50 transition-all shadow-lg">
@@ -599,44 +619,98 @@ onUnmounted(() => {
       </div>
 
       <!-- Trending -->
-      <section class="mb-10 animate-in delay-2">
-        <div class="section-header">
-          <h2 class="section-title text-base">
-            <i class="fas fa-fire"></i>
-            Trending
+      <section class="trending-section mb-10 animate-in delay-2">
+        <div class="trending-header">
+          <h2 class="trending-title">
+            <div class="trending-icon-wrapper">
+              <i class="fas fa-fire"></i>
+            </div>
+            <div>
+              <span class="block">Trending Now</span>
+              <span class="trending-subtitle">Most watched this week</span>
+            </div>
           </h2>
-          <router-link to="/media" class="view-all-link text-xs">
-            View All <i class="fas fa-arrow-right"></i>
-          </router-link>
+          <div class="trending-nav">
+            <button class="trending-nav-btn" @click="scrollTrending('left')">
+              <i class="fas fa-chevron-left"></i>
+            </button>
+            <button class="trending-nav-btn" @click="scrollTrending('right')">
+              <i class="fas fa-chevron-right"></i>
+            </button>
+            <router-link to="/media" class="trending-view-all">
+              View All <i class="fas fa-arrow-right"></i>
+            </router-link>
+          </div>
         </div>
-        <div class="trending-scroll scrollbar-elegant">
+        <div class="trending-scroll" ref="trendingScrollRef">
           <div v-for="(media, index) in trendingMedia" :key="media.id"
-               @click="goToMedia(media)"
-               class="trending-card cursor-pointer group relative">
-            <div class="relative aspect-video rounded-xl overflow-hidden shadow-md">
-              <div class="absolute inset-0 thumbnail-gradient" :class="media.gradientClass"></div>
-              <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors"></div>
-              <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                <div class="w-12 h-12 rounded-full bg-white/95 flex items-center justify-center shadow-lg">
-                  <i class="fas fa-play text-teal-600 ml-0.5"></i>
+               class="trending-card group">
+            <!-- Rank Number -->
+            <div class="trending-rank">
+              {{ index + 1 }}
+            </div>
+            <div class="trending-card-inner" @click="goToMedia(media)">
+              <div class="trending-thumbnail">
+                <img :src="media.thumbnail" :alt="media.title" class="trending-img" />
+                <div class="trending-overlay"></div>
+                <!-- Play Button -->
+                <div class="trending-play-btn">
+                  <i :class="media.type === 'video' ? 'fas fa-play' : media.type === 'audio' ? 'fas fa-headphones' : media.type === 'image' ? 'fas fa-expand' : 'fas fa-images'"></i>
+                </div>
+                <!-- Badges -->
+                <div class="trending-badges">
+                  <span v-if="media.isNew" class="trending-new-badge">
+                    <i class="fas fa-sparkles"></i> New
+                  </span>
+                  <span v-if="index < 3" class="trending-hot-badge">
+                    <i class="fas fa-fire-alt"></i> Hot
+                  </span>
+                </div>
+                <!-- Duration -->
+                <div class="trending-duration">
+                  <i :class="media.type === 'video' ? 'fas fa-play-circle' : media.type === 'audio' ? 'fas fa-headphones' : media.type === 'image' ? 'fas fa-image' : 'fas fa-images'"></i>
+                  {{ media.duration || (media.photoCount ? media.photoCount + ' photos' : 'View') }}
+                </div>
+                <!-- Hover Actions -->
+                <div class="trending-actions">
+                  <button class="trending-action-btn" @click.stop title="Like">
+                    <i class="far fa-heart"></i>
+                  </button>
+                  <button class="trending-action-btn" @click.stop title="Save">
+                    <i class="far fa-bookmark"></i>
+                  </button>
+                  <button class="trending-action-btn" @click.stop title="Share">
+                    <i class="fas fa-share-alt"></i>
+                  </button>
                 </div>
               </div>
-              <div class="absolute top-2 left-2 flex gap-1">
-                <span v-if="media.isNew" class="new-badge">
-                  <i class="fas fa-sparkles"></i> New
-                </span>
+              <div class="trending-info">
+                <div class="trending-info-header">
+                  <span :class="['trending-type-badge', media.type]">
+                    <i :class="media.type === 'video' ? 'fas fa-video' : media.type === 'audio' ? 'fas fa-headphones' : media.type === 'image' ? 'fas fa-image' : 'fas fa-images'"></i>
+                    {{ media.type === 'video' ? 'Video' : media.type === 'audio' ? 'Audio' : media.type === 'image' ? 'Image' : 'Gallery' }}
+                  </span>
+                  <span :class="['category-tag', media.category.toLowerCase().split(' ')[0]]">{{ media.category }}</span>
+                </div>
+                <h4 class="trending-card-title">{{ media.title }}</h4>
+                <div class="trending-author">
+                  <div class="trending-author-avatar">
+                    {{ media.author.charAt(0) }}
+                  </div>
+                  <span class="trending-author-name">{{ media.author }}</span>
+                </div>
+                <div class="trending-stats">
+                  <span class="trending-stat">
+                    <i class="fas fa-eye"></i> {{ media.views }}
+                  </span>
+                  <span class="trending-stat">
+                    <i class="fas fa-heart"></i> {{ Math.floor(Math.random() * 500) + 100 }}
+                  </span>
+                  <span class="trending-stat">
+                    <i class="fas fa-clock"></i> {{ media.date }}
+                  </span>
+                </div>
               </div>
-              <div class="absolute bottom-2 right-2 px-2 py-0.5 rounded bg-black/70 text-white text-xs font-medium backdrop-blur-sm">
-                {{ media.duration || media.photoCount + ' photos' }}
-              </div>
-            </div>
-            <div class="mt-3">
-              <h4 class="font-medium text-sm text-gray-900 line-clamp-2 group-hover:text-teal-700 transition-colors">{{ media.title }}</h4>
-              <p class="text-xs text-gray-500 mt-1 flex items-center gap-2">
-                <span><i class="fas fa-fire text-red-500 mr-1"></i>{{ media.views }} views</span>
-                <span class="text-gray-300">|</span>
-                <span>{{ media.date }}</span>
-              </p>
             </div>
           </div>
         </div>
@@ -782,8 +856,8 @@ onUnmounted(() => {
                   <!-- Action Button Overlay -->
                   <div class="card-overlay z-20">
                     <button class="overlay-btn">
-                      <i :class="media.type === 'video' ? 'fas fa-play' : media.type === 'gallery' ? 'fas fa-images' : 'fas fa-headphones'"></i>
-                      {{ media.type === 'video' ? 'Watch Now' : media.type === 'gallery' ? 'View Gallery' : 'Listen Now' }}
+                      <i :class="media.type === 'video' ? 'fas fa-play' : media.type === 'audio' ? 'fas fa-headphones' : media.type === 'image' ? 'fas fa-expand' : 'fas fa-images'"></i>
+                      {{ media.type === 'video' ? 'Watch Now' : media.type === 'audio' ? 'Listen Now' : media.type === 'image' ? 'View Image' : 'View Gallery' }}
                     </button>
                   </div>
 
@@ -2388,38 +2462,498 @@ onUnmounted(() => {
 }
 
 
-/* Trending Cards */
+/* Trending Section */
+.trending-section {
+  background: linear-gradient(135deg, #fefefe 0%, #f8fafc 100%);
+  border-radius: 1.5rem;
+  padding: 1.5rem;
+  border: 1px solid #e2e8f0;
+}
+
+.trending-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+}
+
+.trending-title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.trending-icon-wrapper {
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 0.75rem;
+  background: linear-gradient(135deg, #ef4444 0%, #f97316 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.trending-icon-wrapper i {
+  color: white;
+  font-size: 1rem;
+  animation: flicker 1.5s ease-in-out infinite;
+}
+
+@keyframes flicker {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.trending-subtitle {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #64748b;
+}
+
+.trending-nav {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.trending-nav-btn {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.5rem;
+  background: white;
+  border: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #64748b;
+}
+
+.trending-nav-btn:hover {
+  background: #0d9488;
+  border-color: #0d9488;
+  color: white;
+}
+
+.trending-view-all {
+  padding: 0.5rem 1rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #0d9488;
+  background: #f0fdfa;
+  border-radius: 0.5rem;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  transition: all 0.2s ease;
+}
+
+.trending-view-all:hover {
+  background: #0d9488;
+  color: white;
+}
+
 .trending-scroll {
   display: flex;
-  gap: 1.5rem;
+  gap: 1rem;
   overflow-x: auto;
-  overflow-y: hidden;
-  padding: 1rem 0 0.5rem 1rem;
+  overflow-y: visible;
+  padding: 0.5rem 0.25rem 1rem;
   scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
 }
 
 .trending-scroll::-webkit-scrollbar {
-  height: 3px;
+  height: 4px;
 }
 
 .trending-scroll::-webkit-scrollbar-track {
   background: #f1f5f9;
-  border-radius: 3px;
+  border-radius: 4px;
 }
 
 .trending-scroll::-webkit-scrollbar-thumb {
   background: linear-gradient(90deg, #14b8a6, #0d9488);
-  border-radius: 3px;
+  border-radius: 4px;
 }
 
 .trending-card {
-  flex: 0 0 240px;
+  flex: 0 0 290px;
   scroll-snap-align: start;
+  position: relative;
+  display: flex;
+  gap: 0.75rem;
+}
+
+.trending-rank {
+  flex-shrink: 0;
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.125rem;
+  font-weight: 800;
+  color: white;
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 8px rgba(20, 184, 166, 0.3);
+}
+
+.trending-card-inner {
+  flex: 1;
+  background: white;
+  border-radius: 1rem;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+  cursor: pointer;
   transition: all 0.3s ease;
 }
 
-.trending-card:hover {
-  transform: translateY(-6px);
+.trending-card-inner:hover {
+  border-color: #14b8a6;
+  box-shadow: 0 8px 25px rgba(20, 184, 166, 0.15);
+  transform: translateY(-4px);
+}
+
+.trending-thumbnail {
+  position: relative;
+  aspect-ratio: 16/9;
+  overflow: hidden;
+}
+
+.trending-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.trending-card-inner:hover .trending-img {
+  transform: scale(1.08);
+}
+
+.trending-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.1);
+  transition: background 0.3s ease;
+}
+
+.trending-card-inner:hover .trending-overlay {
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.trending-play-btn {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.8);
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.95);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.trending-play-btn i {
+  color: #0d9488;
+  font-size: 1rem;
+  margin-left: 2px;
+}
+
+.trending-card-inner:hover .trending-play-btn {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.trending-badges {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  display: flex;
+  gap: 0.375rem;
+}
+
+.trending-new-badge {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.625rem;
+  font-weight: 600;
+  background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+  color: white;
+  border-radius: 0.375rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.trending-hot-badge {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.625rem;
+  font-weight: 600;
+  background: linear-gradient(135deg, #ef4444 0%, #f97316 100%);
+  color: white;
+  border-radius: 0.375rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.trending-duration {
+  position: absolute;
+  bottom: 0.5rem;
+  right: 0.5rem;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  background: rgba(0, 0, 0, 0.75);
+  color: white;
+  border-radius: 0.375rem;
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.trending-actions {
+  position: absolute;
+  bottom: 0.5rem;
+  left: 0.5rem;
+  display: flex;
+  gap: 0.375rem;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: all 0.3s ease;
+}
+
+.trending-card-inner:hover .trending-actions {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.trending-action-btn {
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.95);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #64748b;
+  font-size: 0.6875rem;
+}
+
+.trending-action-btn:hover {
+  background: #0d9488;
+  color: white;
+  transform: scale(1.1);
+}
+
+.trending-info {
+  padding: 0.875rem;
+}
+
+.trending-info-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.trending-type-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.1875rem 0.5rem;
+  font-size: 0.625rem;
+  font-weight: 600;
+  border-radius: 0.375rem;
+  text-transform: uppercase;
+}
+
+.trending-type-badge.video {
+  background: #dbeafe;
+  color: #2563eb;
+}
+
+.trending-type-badge.audio {
+  background: #fce7f3;
+  color: #db2777;
+}
+
+.trending-type-badge.image {
+  background: #d1fae5;
+  color: #059669;
+}
+
+.trending-type-badge.gallery {
+  background: #ede9fe;
+  color: #7c3aed;
+}
+
+.trending-card-title {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #1e293b;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin-bottom: 0.5rem;
+  transition: color 0.2s ease;
+  min-height: 2.275rem; /* 2 lines: font-size * line-height * 2 */
+}
+
+.trending-card-inner:hover .trending-card-title {
+  color: #0d9488;
+}
+
+.trending-author {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.trending-author-avatar {
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.625rem;
+  font-weight: 700;
+  color: white;
+}
+
+.trending-author-name {
+  font-size: 0.6875rem;
+  font-weight: 500;
+  color: #475569;
+}
+
+.trending-stats {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid #f1f5f9;
+}
+
+.trending-stat {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.625rem;
+  color: #64748b;
+}
+
+.trending-stat i {
+  font-size: 0.5625rem;
+  color: #94a3b8;
+}
+
+.trending-stat:first-child i {
+  color: #ef4444;
+}
+
+.trending-stat:nth-child(2) i {
+  color: #f472b6;
+}
+
+.trending-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.6875rem;
+  color: #64748b;
+  margin-bottom: 0.5rem;
+}
+
+.trending-views {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.trending-views i {
+  color: #ef4444;
+}
+
+.trending-category .category-tag {
+  display: inline-block;
+  padding: 0.125rem 0.5rem;
+  font-size: 0.625rem;
+  font-weight: 600;
+  border-radius: 1rem;
+  text-transform: uppercase;
+}
+
+.category-tag.videos {
+  background: #dbeafe;
+  color: #2563eb;
+}
+
+.category-tag.highlights {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+.category-tag.interviews {
+  background: #d1fae5;
+  color: #059669;
+}
+
+.category-tag.behind {
+  background: #fce7f3;
+  color: #db2777;
+}
+
+.category-tag.galleries {
+  background: #ede9fe;
+  color: #7c3aed;
+}
+
+.category-tag.teams {
+  background: #dbeafe;
+  color: #2563eb;
+}
+
+.category-tag.venues {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+.category-tag.fans {
+  background: #fce7f3;
+  color: #db2777;
+}
+
+.category-tag.matches {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.category-tag.behind {
+  background: #f1f5f9;
+  color: #475569;
 }
 
 /* Progress Bar on Cards */
