@@ -142,6 +142,15 @@ const totalPages = computed(() => {
   return Math.ceil(filteredMedia.value.length / itemsPerPage.value)
 })
 
+// Computed: Total Views
+const totalViews = computed(() => {
+  const total = mediaItems.value.reduce((sum, media) => {
+    const views = parseFloat(media.views.replace('K', '')) * (media.views.includes('K') ? 1000 : 1)
+    return sum + views
+  }, 0)
+  return total >= 1000 ? (total / 1000).toFixed(1) + 'K' : total.toString()
+})
+
 // Methods
 function playFeatured() {
   router.push({ name: 'media-player', params: { id: featuredVideo.value.id.toString() } })
@@ -216,48 +225,63 @@ onMounted(() => {
     <!-- Particles Background -->
     <div class="particles" id="media-particles"></div>
 
-    <!-- Page Hero Section -->
-    <div class="hero-section fade-in-up">
-      <div class="hero-content">
-        <div class="hero-left">
-          <div class="hero-header">
-            <div class="hero-icon">
-              <i class="fas fa-photo-video"></i>
-            </div>
-            <div>
-              <h1 class="hero-title"><span class="hero-title-highlight">Media</span> Center</h1>
-              <p class="hero-subtitle">Videos, podcasts, photo galleries and multimedia content</p>
-            </div>
+    <!-- Hero Section (Matching Articles Page) -->
+    <div class="hero-gradient relative overflow-hidden">
+      <!-- Decorative elements with animations -->
+      <div class="circle-drift-1 absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full"></div>
+      <div class="circle-drift-2 absolute bottom-0 left-0 w-64 h-64 bg-white/5 rounded-full"></div>
+      <div class="circle-drift-3 absolute top-1/2 right-1/4 w-32 h-32 bg-white/10 rounded-full"></div>
+
+      <!-- Stats - Absolute Top Right -->
+      <div class="stats-top-right">
+        <div class="stat-card-square">
+          <div class="stat-icon-box">
+            <i class="fas fa-video"></i>
           </div>
+          <p class="stat-value-mini">{{ mediaStats.totalVideos }}</p>
+          <p class="stat-label-mini">Videos</p>
         </div>
-        <div class="hero-stats">
-          <div class="stat-card-hero">
-            <div class="stat-card-hero-icon teal">
-              <i class="fas fa-video"></i>
-            </div>
-            <div class="stat-card-hero-content">
-              <p class="stat-card-hero-value">{{ mediaStats.totalVideos }}</p>
-              <p class="stat-card-hero-label">Videos</p>
-            </div>
+        <div class="stat-card-square">
+          <div class="stat-icon-box">
+            <i class="fas fa-images"></i>
           </div>
-          <div class="stat-card-hero">
-            <div class="stat-card-hero-icon orange">
-              <i class="fas fa-images"></i>
-            </div>
-            <div class="stat-card-hero-content">
-              <p class="stat-card-hero-value">{{ mediaStats.galleries }}</p>
-              <p class="stat-card-hero-label">Galleries</p>
-            </div>
+          <p class="stat-value-mini">{{ mediaStats.galleries }}</p>
+          <p class="stat-label-mini">Galleries</p>
+        </div>
+        <div class="stat-card-square">
+          <div class="stat-icon-box">
+            <i class="fas fa-podcast"></i>
           </div>
-          <div class="stat-card-hero">
-            <div class="stat-card-hero-icon purple">
-              <i class="fas fa-podcast"></i>
-            </div>
-            <div class="stat-card-hero-content">
-              <p class="stat-card-hero-value">{{ mediaStats.podcasts }}</p>
-              <p class="stat-card-hero-label">Podcasts</p>
-            </div>
+          <p class="stat-value-mini">{{ mediaStats.podcasts }}</p>
+          <p class="stat-label-mini">Podcasts</p>
+        </div>
+        <div class="stat-card-square">
+          <div class="stat-icon-box">
+            <i class="fas fa-eye"></i>
           </div>
+          <p class="stat-value-mini">{{ totalViews }}</p>
+          <p class="stat-label-mini">Total Views</p>
+        </div>
+      </div>
+
+      <div class="relative px-8 py-8">
+        <div class="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-white text-xs font-semibold inline-flex items-center gap-2 mb-4">
+          <i class="fas fa-photo-video"></i>
+          AFC Asian Cup 2027
+        </div>
+
+        <h1 class="text-3xl font-bold text-white mb-2">Media Center</h1>
+        <p class="text-teal-100 max-w-lg">Videos, podcasts, photo galleries and multimedia content for the tournament.</p>
+
+        <div class="flex flex-wrap gap-3 mt-6">
+          <button @click="showUploadModal = true" class="px-5 py-2.5 bg-white text-teal-600 rounded-xl font-semibold text-sm flex items-center gap-2 hover:bg-teal-50 transition-all shadow-lg">
+            <i class="fas fa-cloud-upload-alt"></i>
+            Upload Media
+          </button>
+          <button @click="playFeatured" class="px-5 py-2.5 bg-white/20 backdrop-blur-sm border border-white/30 text-white rounded-xl font-semibold text-sm hover:bg-white/30 transition-all flex items-center gap-2">
+            <i class="fas fa-play-circle"></i>
+            Watch Featured
+          </button>
         </div>
       </div>
     </div>
@@ -520,10 +544,11 @@ onMounted(() => {
           </div>
         </div>
 
-        <!-- Content Area with Media Grid -->
+        <!-- Content Area with Media Grid/List -->
         <div class="content-area">
           <div class="content-area-inner">
-            <div class="media-grid">
+            <!-- Grid View -->
+            <div v-if="viewMode === 'grid'" class="media-grid">
               <div v-for="media in paginatedMedia" :key="media.id"
                    @click="goToMedia(media)"
                    class="media-card-enhanced rounded-2xl overflow-hidden cursor-pointer group bg-white">
@@ -614,6 +639,85 @@ onMounted(() => {
               </div>
             </div>
 
+            <!-- List View -->
+            <div v-else class="media-list">
+              <div v-for="media in paginatedMedia" :key="media.id"
+                   @click="goToMedia(media)"
+                   class="media-list-item cursor-pointer group">
+                <!-- Thumbnail -->
+                <div class="list-item-thumbnail">
+                  <template v-if="media.type === 'gallery'">
+                    <div class="gallery-mini-stack">
+                      <div v-for="(gradient, idx) in media.coverPhotos?.slice(0, 2)" :key="idx"
+                           class="gallery-mini-photo"
+                           :class="'bg-gradient-to-br ' + gradient"
+                           :style="{ transform: 'rotate(' + (idx - 0.5) * 4 + 'deg)' }">
+                      </div>
+                    </div>
+                  </template>
+                  <template v-else>
+                    <div class="absolute inset-0 thumbnail-gradient" :class="media.gradientClass"></div>
+                  </template>
+                  <div class="list-play-overlay">
+                    <i :class="media.type === 'video' ? 'fas fa-play' : media.type === 'gallery' ? 'fas fa-images' : 'fas fa-headphones'"></i>
+                  </div>
+                  <div class="list-duration-badge">
+                    <template v-if="media.type === 'gallery'">
+                      {{ media.photoCount }} photos
+                    </template>
+                    <template v-else>
+                      {{ media.duration }}
+                    </template>
+                  </div>
+                </div>
+
+                <!-- Content -->
+                <div class="list-item-content">
+                  <div class="list-item-header">
+                    <div class="list-badges">
+                      <span :class="['list-category-badge',
+                        media.category === 'Training' ? 'bg-indigo-100 text-indigo-700' :
+                        media.category === 'Product Updates' ? 'bg-teal-100 text-teal-700' :
+                        media.category === 'Leadership' ? 'bg-amber-100 text-amber-700' :
+                        media.category === 'Technical' ? 'bg-blue-100 text-blue-700' :
+                        media.category === 'Culture' ? 'bg-pink-100 text-pink-700' :
+                        'bg-emerald-100 text-emerald-700']">{{ media.category }}</span>
+                      <span class="list-type-badge">
+                        <i :class="media.type === 'video' ? 'fas fa-video' : media.type === 'gallery' ? 'fas fa-images' : 'fas fa-podcast'"></i>
+                        {{ media.type === 'video' ? 'Video' : media.type === 'gallery' ? 'Gallery' : 'Podcast' }}
+                      </span>
+                      <span v-if="media.isNew" class="list-new-badge">
+                        <i class="fas fa-sparkles"></i> New
+                      </span>
+                    </div>
+                    <h3 class="list-item-title">{{ media.title }}</h3>
+                  </div>
+                  <div class="list-item-footer">
+                    <div class="list-author">
+                      <div class="list-author-avatar">
+                        {{ getInitials(media.author) }}
+                      </div>
+                      <span>{{ media.author || 'Intalio' }}</span>
+                    </div>
+                    <div class="list-stats">
+                      <span><i class="fas fa-eye"></i> {{ media.views }}</span>
+                      <span><i class="fas fa-calendar"></i> {{ media.date }}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="list-item-actions">
+                  <button class="list-action-btn" @click.stop>
+                    <i class="far fa-bookmark"></i>
+                  </button>
+                  <button class="list-action-btn" @click.stop>
+                    <i class="fas fa-share-alt"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+
             <!-- Empty State -->
             <div v-if="filteredMedia.length === 0" class="empty-state">
               <div class="empty-state-icon">
@@ -628,13 +732,15 @@ onMounted(() => {
           </div>
         </div>
 
-        <!-- Pagination -->
+        <!-- Pagination (Documents Style) -->
         <div v-if="filteredMedia.length > 0" class="mt-8">
           <div class="pagination-container">
-            <div class="pagination-info">
-              Showing {{ (currentPage - 1) * itemsPerPage + 1 }} - {{ Math.min(currentPage * itemsPerPage, filteredMedia.length) }} of {{ filteredMedia.length }} media
+            <div class="pagination-left">
+              <div class="pagination-info">
+                Showing {{ (currentPage - 1) * itemsPerPage + 1 }} - {{ Math.min(currentPage * itemsPerPage, filteredMedia.length) }} of {{ filteredMedia.length }} media
+              </div>
             </div>
-            <div class="pagination-controls">
+            <div class="pagination-center">
               <button
                 @click="handlePageChange(currentPage - 1)"
                 :disabled="currentPage === 1"
@@ -654,6 +760,17 @@ onMounted(() => {
                 class="pagination-btn">
                 <i class="fas fa-chevron-right"></i>
               </button>
+            </div>
+            <div class="pagination-right">
+              <span class="per-page-label">Items per page:</span>
+              <div class="per-page-select-wrapper">
+                <select v-model="itemsPerPage" @change="handlePerPageChange(itemsPerPage)" class="per-page-select">
+                  <option :value="6">6</option>
+                  <option :value="9">9</option>
+                  <option :value="12">12</option>
+                  <option :value="24">24</option>
+                </select>
+              </div>
             </div>
           </div>
         </div>
@@ -726,6 +843,136 @@ onMounted(() => {
   min-height: 100vh;
   background: linear-gradient(180deg, #f0fdfa 0%, #f8fafc 15%, #ffffff 100%);
   position: relative;
+}
+
+/* ============================================
+   HERO SECTION (Matching Articles Page)
+   ============================================ */
+.hero-gradient {
+  background: linear-gradient(135deg, #0d9488 0%, #14b8a6 50%, #10b981 100%);
+}
+
+.stats-top-right {
+  position: absolute;
+  top: 24px;
+  right: 32px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  z-index: 10;
+}
+
+.stat-card-square {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(8px);
+  border-radius: 16px;
+  width: 115px;
+  height: 115px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-align: center;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.stat-card-square:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+.stat-card-square:hover .stat-icon-box {
+  transform: scale(1.1);
+}
+
+.stat-icon-box {
+  color: white;
+  font-size: 20px;
+  transition: transform 0.3s ease;
+}
+
+.stat-value-mini {
+  font-size: 24px;
+  font-weight: 700;
+  color: white;
+  line-height: 1;
+  margin: 0;
+}
+
+.stat-label-mini {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1;
+  margin: 0;
+}
+
+/* Circle Drift Animations */
+.circle-drift-1 {
+  animation: drift-1 20s ease-in-out infinite;
+}
+
+.circle-drift-2 {
+  animation: drift-2 25s ease-in-out infinite;
+}
+
+.circle-drift-3 {
+  animation: drift-3 18s ease-in-out infinite;
+}
+
+@keyframes drift-1 {
+  0%, 100% { transform: translate(33%, -50%); }
+  25% { transform: translate(28%, -45%); }
+  50% { transform: translate(35%, -55%); }
+  75% { transform: translate(30%, -48%); }
+}
+
+@keyframes drift-2 {
+  0%, 100% { transform: translate(-33%, 50%); }
+  33% { transform: translate(-28%, 45%); }
+  66% { transform: translate(-38%, 55%); }
+}
+
+@keyframes drift-3 {
+  0%, 100% { transform: translate(0, -50%); }
+  50% { transform: translate(10%, -40%); }
+}
+
+/* Responsive Hero */
+@media (max-width: 1024px) {
+  .stats-top-right {
+    position: relative;
+    top: 0;
+    right: 0;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: 16px;
+    gap: 8px;
+  }
+
+  .stat-card-square {
+    width: 100px;
+    height: 100px;
+  }
+
+  .stat-value-mini {
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 640px) {
+  .stats-top-right {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+
+  .stat-card-square {
+    width: 100%;
+    height: 90px;
+  }
 }
 
 /* Particles Effect */
@@ -1851,23 +2098,72 @@ onMounted(() => {
 .delay-3 { animation-delay: 0.15s; }
 .delay-4 { animation-delay: 0.2s; }
 
-/* Pagination */
+/* Pagination (Documents Style) */
 .pagination-container {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1rem 0;
+  padding: 1rem 1.5rem;
+  background: white;
+  border-radius: 0.75rem;
+  border: 1px solid #f1f5f9;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.pagination-left {
+  flex: 1;
+}
+
+.pagination-center {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.pagination-right {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
 }
 
 .pagination-info {
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   color: #64748b;
 }
 
-.pagination-controls {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+.per-page-label {
+  font-size: 0.8125rem;
+  color: #64748b;
+}
+
+.per-page-select-wrapper {
+  position: relative;
+}
+
+.per-page-select {
+  height: 34px;
+  padding: 0 2rem 0 0.75rem;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 0.5rem;
+  background: white url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 0.5rem center;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #334155;
+  cursor: pointer;
+  appearance: none;
+  transition: all 0.2s ease;
+}
+
+.per-page-select:hover {
+  border-color: #cbd5e1;
+}
+
+.per-page-select:focus {
+  outline: none;
+  border-color: #14b8a6;
+  box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.1);
 }
 
 .pagination-btn {
@@ -2053,6 +2349,245 @@ onMounted(() => {
   transform: scale(0.95) translateY(20px);
 }
 
+/* List View Styles */
+.media-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.media-list-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.875rem;
+  background: white;
+  border: 1px solid #f1f5f9;
+  border-radius: 0.875rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.media-list-item:hover {
+  border-color: #e2e8f0;
+  box-shadow: 0 4px 15px rgba(20, 184, 166, 0.08);
+  transform: translateX(4px);
+}
+
+.list-item-thumbnail {
+  position: relative;
+  width: 160px;
+  height: 90px;
+  border-radius: 0.625rem;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.gallery-mini-stack {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gallery-mini-photo {
+  position: absolute;
+  width: 80%;
+  height: 80%;
+  border-radius: 0.375rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.list-play-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.2);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.media-list-item:hover .list-play-overlay {
+  opacity: 1;
+}
+
+.list-play-overlay i {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  border-radius: 50%;
+  color: #0d9488;
+  font-size: 0.75rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.list-duration-badge {
+  position: absolute;
+  bottom: 0.375rem;
+  right: 0.375rem;
+  padding: 0.1875rem 0.5rem;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(4px);
+  color: white;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  border-radius: 0.25rem;
+}
+
+.list-item-content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.list-item-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.list-badges {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.list-category-badge {
+  padding: 0.25rem 0.625rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  border-radius: 100px;
+}
+
+.list-type-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.6875rem;
+  color: #64748b;
+}
+
+.list-type-badge i {
+  font-size: 0.625rem;
+}
+
+.list-new-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.1875rem;
+  padding: 0.1875rem 0.5rem;
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+  color: white;
+  font-size: 0.625rem;
+  font-weight: 700;
+  border-radius: 100px;
+  text-transform: uppercase;
+}
+
+.list-item-title {
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #0f172a;
+  line-height: 1.4;
+  transition: color 0.3s ease;
+}
+
+.media-list-item:hover .list-item-title {
+  color: #0d9488;
+}
+
+.list-item-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.list-author {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.list-author-avatar {
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+  border-radius: 50%;
+  color: white;
+  font-size: 0.5625rem;
+  font-weight: 600;
+}
+
+.list-author span {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #475569;
+}
+
+.list-stats {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  font-size: 0.75rem;
+  color: #94a3b8;
+}
+
+.list-stats span {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.list-stats i {
+  font-size: 0.625rem;
+}
+
+.list-item-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.media-list-item:hover .list-item-actions {
+  opacity: 1;
+}
+
+.list-action-btn {
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  color: #64748b;
+  font-size: 0.8125rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.list-action-btn:hover {
+  background: #f0fdfa;
+  border-color: #99f6e4;
+  color: #0d9488;
+}
+
 /* Responsive Adjustments */
 @media (max-width: 1024px) {
   .search-box {
@@ -2093,6 +2628,33 @@ onMounted(() => {
   .toolbar-right {
     width: 100%;
     justify-content: space-between;
+  }
+
+  .pagination-container {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+
+  .pagination-left,
+  .pagination-right {
+    justify-content: center;
+  }
+
+  .media-list-item {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .list-item-thumbnail {
+    width: 100%;
+    height: 140px;
+  }
+
+  .list-item-actions {
+    opacity: 1;
+    justify-content: flex-end;
+    margin-top: 0.5rem;
   }
 }
 </style>
