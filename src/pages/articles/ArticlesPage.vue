@@ -1518,59 +1518,133 @@ onUnmounted(() => {
       </div>
 
       <!-- Content Area -->
-      <div class="content-area">
+      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
         <div v-if="filteredArticles.length > 0">
           <!-- Grid View -->
-          <div v-if="viewMode === 'grid'" class="articles-grid">
+          <div v-if="viewMode === 'grid'" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
             <article
-              v-for="(article, index) in paginatedArticles"
+              v-for="article in paginatedArticles"
               :key="article.id"
               @click="goToArticle(article.id)"
-              :class="['article-card card-animated', { featured: article.featured }, `delay-${(index % 4) + 1}`]">
-              <div class="card-media">
+              :class="[
+                'group bg-white rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 hover:-translate-y-1.5 border',
+                article.featured
+                  ? 'border-teal-200 shadow-lg shadow-teal-100/50 hover:shadow-xl hover:shadow-teal-200/50'
+                  : 'border-gray-100 shadow-sm hover:shadow-lg hover:border-teal-200'
+              ]"
+            >
+              <!-- Card Image -->
+              <div class="relative h-44 overflow-hidden bg-gradient-to-br from-teal-50 to-cyan-50">
                 <img
                   v-if="article.image"
                   :src="article.image"
                   :alt="article.title"
-                  class="card-image"
-                  @error="($event.target as HTMLImageElement).style.display = 'none'; ($event.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden')"
+                  class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  @error="($event.target as HTMLImageElement).style.display = 'none'"
                 >
-                <div :class="['card-placeholder', { 'hidden': article.image }]">
-                  <i :class="article.icon || 'fas fa-newspaper'"></i>
+                <div v-if="!article.image" class="absolute inset-0 flex items-center justify-center">
+                  <i :class="[article.icon || 'fas fa-newspaper', 'text-4xl text-teal-300']"></i>
                 </div>
-                <div class="card-badges">
-                  <span v-if="article.featured" class="featured-badge">
-                    <i class="fas fa-star"></i> Featured
+
+                <!-- Gradient Overlay -->
+                <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+
+                <!-- Top Badges -->
+                <div class="absolute top-3 left-3 right-3 flex items-start justify-between">
+                  <div class="flex flex-wrap gap-1.5">
+                    <!-- Featured Badge -->
+                    <span v-if="article.featured" class="px-2 py-1 bg-amber-500 text-white text-[10px] font-semibold rounded-full flex items-center gap-1 shadow-sm">
+                      <i class="fas fa-star text-[8px]"></i> Featured
+                    </span>
+                    <!-- Article Type Badge -->
+                    <span
+                      v-if="article.type"
+                      class="px-2 py-1 bg-white/90 backdrop-blur-sm text-teal-700 text-[10px] font-semibold rounded-full flex items-center gap-1 shadow-sm"
+                    >
+                      <i :class="[articleTypes.find(t => t.id === article.type)?.icon || 'fas fa-file', 'text-[8px]']"></i>
+                      {{ getTypeName(article.type) }}
+                    </span>
+                  </div>
+                  <!-- Bookmark Button -->
+                  <button
+                    @click.stop
+                    class="w-7 h-7 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center text-gray-400 hover:text-teal-600 hover:bg-white transition-all shadow-sm opacity-0 group-hover:opacity-100"
+                  >
+                    <i class="fas fa-bookmark text-xs"></i>
+                  </button>
+                </div>
+
+                <!-- Category Badge (Bottom) -->
+                <div class="absolute bottom-3 left-3">
+                  <span class="px-2.5 py-1 bg-teal-500 text-white text-[10px] font-semibold rounded-full shadow-sm">
+                    {{ article.category }}
                   </span>
-                  <span class="category-badge">{{ article.category }}</span>
                 </div>
-                <div class="card-overlay">
-                  <button class="overlay-btn">
-                    <i class="fas fa-arrow-right"></i>
-                    Read
+
+                <!-- Read Button (Hover) -->
+                <div class="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0">
+                  <button class="px-3 py-1.5 bg-white text-teal-600 text-xs font-semibold rounded-full flex items-center gap-1.5 shadow-md hover:bg-teal-500 hover:text-white transition-colors">
+                    <span>Read</span>
+                    <i class="fas fa-arrow-right text-[10px]"></i>
                   </button>
                 </div>
               </div>
-              <div class="card-body">
-                <div class="card-meta">
-                  <span><i class="fas fa-clock"></i> {{ article.readTime }}</span>
-                  <span><i class="fas fa-calendar"></i> {{ article.date }}</span>
+
+              <!-- Card Content -->
+              <div class="p-4">
+                <!-- Meta Info -->
+                <div class="flex items-center gap-3 text-[11px] text-gray-400 mb-2">
+                  <span class="flex items-center gap-1">
+                    <i class="fas fa-clock text-[9px]"></i>
+                    {{ article.readTime }}
+                  </span>
+                  <span class="flex items-center gap-1">
+                    <i class="fas fa-calendar text-[9px]"></i>
+                    {{ article.date }}
+                  </span>
                 </div>
-                <h3 class="card-title">{{ article.title }}</h3>
-                <p class="card-excerpt">{{ article.excerpt }}</p>
-                <div class="card-tags">
-                  <span v-for="tag in article.tags?.slice(0, 3)" :key="tag" class="tag">{{ tag }}</span>
+
+                <!-- Title -->
+                <h3 class="text-sm font-semibold text-gray-800 mb-2 line-clamp-2 group-hover:text-teal-600 transition-colors leading-snug">
+                  {{ article.title }}
+                </h3>
+
+                <!-- Excerpt -->
+                <p class="text-xs text-gray-500 mb-3 line-clamp-2 leading-relaxed">
+                  {{ article.excerpt }}
+                </p>
+
+                <!-- Tags -->
+                <div class="flex flex-wrap gap-1.5 mb-3">
+                  <span
+                    v-for="tag in article.tags?.slice(0, 3)"
+                    :key="tag"
+                    class="px-2 py-0.5 bg-gray-100 text-gray-600 text-[10px] font-medium rounded-full hover:bg-teal-50 hover:text-teal-600 transition-colors"
+                  >
+                    {{ tag }}
+                  </span>
                 </div>
-                <div class="card-footer">
-                  <div class="author-info">
-                    <div class="author-avatar">
-                      <span class="avatar-text">{{ article.author?.initials || 'U' }}</span>
+
+                <!-- Footer -->
+                <div class="flex items-center justify-between pt-3 border-t border-gray-100">
+                  <!-- Author -->
+                  <div class="flex items-center gap-2">
+                    <div class="w-7 h-7 rounded-full bg-gradient-to-br from-teal-400 to-cyan-500 flex items-center justify-center text-white text-[10px] font-semibold shadow-sm">
+                      {{ article.author?.initials || 'U' }}
                     </div>
-                    <span class="author-name">{{ article.author?.name }}</span>
+                    <span class="text-xs text-gray-600 font-medium">{{ article.author?.name }}</span>
                   </div>
-                  <div class="card-stats">
-                    <span><i class="fas fa-eye"></i> {{ formatNumber(article.views) }}</span>
-                    <span><i class="fas fa-heart"></i> {{ article.likes || 0 }}</span>
+
+                  <!-- Stats -->
+                  <div class="flex items-center gap-3 text-[11px] text-gray-400">
+                    <span class="flex items-center gap-1 hover:text-teal-500 transition-colors">
+                      <i class="fas fa-eye text-[9px]"></i>
+                      {{ formatNumber(article.views) }}
+                    </span>
+                    <span class="flex items-center gap-1 hover:text-red-400 transition-colors">
+                      <i class="fas fa-heart text-[9px]"></i>
+                      {{ article.likes || 0 }}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -1578,40 +1652,120 @@ onUnmounted(() => {
           </div>
 
           <!-- List View -->
-          <div v-else class="articles-list">
+          <div v-else class="space-y-3">
             <article
-              v-for="(article, index) in paginatedArticles"
+              v-for="article in paginatedArticles"
               :key="article.id"
               @click="goToArticle(article.id)"
-              :class="['article-list-item list-item-animated', `delay-${(index % 4) + 1}`]">
-              <div class="list-item-media">
-                <i :class="article.icon || 'fas fa-newspaper'"></i>
-              </div>
-              <div class="list-item-content">
-                <div class="list-item-header">
-                  <span class="category-badge">{{ article.category }}</span>
-                  <span class="card-meta"><i class="fas fa-clock"></i> {{ article.readTime }}</span>
-                  <span v-if="article.featured" class="featured-badge">
-                    <i class="fas fa-star"></i> Featured
+              :class="[
+                'group flex gap-4 p-4 bg-white rounded-2xl cursor-pointer transition-all duration-300 border',
+                article.featured
+                  ? 'border-teal-200 shadow-md hover:shadow-lg hover:border-teal-300'
+                  : 'border-gray-100 shadow-sm hover:shadow-md hover:border-teal-200'
+              ]"
+            >
+              <!-- Thumbnail -->
+              <div class="relative w-32 h-24 flex-shrink-0 rounded-xl overflow-hidden bg-gradient-to-br from-teal-50 to-cyan-50">
+                <img
+                  v-if="article.image"
+                  :src="article.image"
+                  :alt="article.title"
+                  class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                >
+                <div v-else class="absolute inset-0 flex items-center justify-center">
+                  <i :class="[article.icon || 'fas fa-newspaper', 'text-2xl text-teal-300']"></i>
+                </div>
+                <!-- Featured Star -->
+                <div v-if="article.featured" class="absolute top-1.5 left-1.5">
+                  <span class="w-5 h-5 bg-amber-500 rounded-full flex items-center justify-center shadow-sm">
+                    <i class="fas fa-star text-white text-[8px]"></i>
                   </span>
                 </div>
-                <h3 class="list-item-title">{{ article.title }}</h3>
-                <p class="list-item-excerpt">{{ article.excerpt }}</p>
-                <div class="list-item-footer">
-                  <div class="author-info">
-                    <div class="author-avatar">
-                      <span class="avatar-text">{{ article.author?.initials || 'U' }}</span>
+              </div>
+
+              <!-- Content -->
+              <div class="flex-1 min-w-0">
+                <!-- Header Badges -->
+                <div class="flex flex-wrap items-center gap-2 mb-1.5">
+                  <span class="px-2 py-0.5 bg-teal-500 text-white text-[10px] font-semibold rounded-full">
+                    {{ article.category }}
+                  </span>
+                  <span
+                    v-if="article.type"
+                    class="px-2 py-0.5 bg-teal-50 text-teal-700 text-[10px] font-semibold rounded-full flex items-center gap-1"
+                  >
+                    <i :class="[articleTypes.find(t => t.id === article.type)?.icon || 'fas fa-file', 'text-[8px]']"></i>
+                    {{ getTypeName(article.type) }}
+                  </span>
+                  <span class="text-[10px] text-gray-400 flex items-center gap-1">
+                    <i class="fas fa-clock text-[8px]"></i>
+                    {{ article.readTime }}
+                  </span>
+                </div>
+
+                <!-- Title -->
+                <h3 class="text-sm font-semibold text-gray-800 mb-1 truncate group-hover:text-teal-600 transition-colors">
+                  {{ article.title }}
+                </h3>
+
+                <!-- Excerpt -->
+                <p class="text-xs text-gray-500 mb-2 line-clamp-1">
+                  {{ article.excerpt }}
+                </p>
+
+                <!-- Footer -->
+                <div class="flex items-center justify-between">
+                  <!-- Author & Date -->
+                  <div class="flex items-center gap-2">
+                    <div class="w-5 h-5 rounded-full bg-gradient-to-br from-teal-400 to-cyan-500 flex items-center justify-center text-white text-[8px] font-semibold">
+                      {{ article.author?.initials || 'U' }}
                     </div>
-                    <span class="author-name">{{ article.author?.name }} &middot; {{ article.date }}</span>
+                    <span class="text-[11px] text-gray-500">
+                      {{ article.author?.name }} <span class="text-gray-300">·</span> {{ article.date }}
+                    </span>
                   </div>
-                  <div class="card-stats">
-                    <span><i class="fas fa-eye"></i> {{ formatNumber(article.views) }}</span>
+
+                  <!-- Stats & Tags -->
+                  <div class="flex items-center gap-3">
+                    <div class="hidden sm:flex items-center gap-1.5">
+                      <span
+                        v-for="tag in article.tags?.slice(0, 2)"
+                        :key="tag"
+                        class="px-1.5 py-0.5 bg-gray-100 text-gray-500 text-[9px] rounded-full"
+                      >
+                        {{ tag }}
+                      </span>
+                    </div>
+                    <div class="flex items-center gap-2 text-[10px] text-gray-400">
+                      <span class="flex items-center gap-1">
+                        <i class="fas fa-eye text-[8px]"></i>
+                        {{ formatNumber(article.views) }}
+                      </span>
+                      <span class="flex items-center gap-1">
+                        <i class="fas fa-heart text-[8px]"></i>
+                        {{ article.likes || 0 }}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
-              <div class="list-item-actions">
-                <button class="action-btn" title="Bookmark"><i class="fas fa-bookmark"></i></button>
-                <button class="action-btn" title="Share"><i class="fas fa-share-alt"></i></button>
+
+              <!-- Actions -->
+              <div class="flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                <button
+                  @click.stop
+                  class="w-8 h-8 rounded-lg bg-gray-50 text-gray-400 hover:bg-teal-50 hover:text-teal-600 flex items-center justify-center transition-colors"
+                  title="Bookmark"
+                >
+                  <i class="fas fa-bookmark text-xs"></i>
+                </button>
+                <button
+                  @click.stop
+                  class="w-8 h-8 rounded-lg bg-gray-50 text-gray-400 hover:bg-teal-50 hover:text-teal-600 flex items-center justify-center transition-colors"
+                  title="Share"
+                >
+                  <i class="fas fa-share-alt text-xs"></i>
+                </button>
               </div>
             </article>
           </div>
