@@ -677,6 +677,10 @@ function goToArticle(id: number) {
   router.push({ name: 'ArticleView', params: { slug: id.toString() } })
 }
 
+function goToProfile(userId: number) {
+  router.push({ name: 'Profile', query: { user: userId.toString() } })
+}
+
 function dismissToast(id: number) {
   toasts.value = toasts.value.filter(t => t.id !== id)
 }
@@ -1060,7 +1064,12 @@ onUnmounted(() => {
               <i class="fas fa-trophy text-orange-500"></i> Top Contributors
             </h3>
             <div class="space-y-0">
-              <div v-for="contributor in topContributors" :key="contributor.id" class="contributor-item">
+              <div
+                v-for="contributor in topContributors"
+                :key="contributor.id"
+                @click="goToProfile(contributor.id)"
+                class="contributor-item cursor-pointer"
+              >
                 <div :class="['contributor-avatar', 'bg-gradient-to-br', contributor.gradient]">
                   {{ contributor.initials }}
                 </div>
