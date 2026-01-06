@@ -1087,8 +1087,8 @@ onUnmounted(() => {
     </div>
 
     <!-- Recent Updates Carousel - Featured Section -->
-    <div class="card-animated rounded-3xl p-8 mb-10 stagger-1 bg-gradient-to-br from-white via-white to-teal-50/50 border-2 border-teal-100 shadow-xl shadow-teal-100/20" @mouseenter="pauseCarousel" @mouseleave="resumeCarousel">
-      <div class="flex items-center justify-between mb-6">
+    <div class="card-animated rounded-3xl p-6 mb-10 stagger-1 bg-gradient-to-br from-white via-white to-teal-50/50 border-2 border-teal-100 shadow-xl shadow-teal-100/20" @mouseenter="pauseCarousel" @mouseleave="resumeCarousel">
+      <div class="flex items-center justify-between mb-4">
         <h2 class="text-lg font-bold text-gray-900 flex items-center gap-3">
           <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center shadow-lg shadow-teal-200">
             <i class="fas fa-fire text-white text-sm"></i>
@@ -1107,202 +1107,231 @@ onUnmounted(() => {
       </div>
 
       <!-- Progress bar -->
-      <div class="h-1.5 bg-gray-100 rounded-full mb-6 overflow-hidden">
+      <div class="h-1.5 bg-gray-100 rounded-full mb-4 overflow-hidden">
         <div class="slide-progress rounded-full" :key="currentSlide" v-if="isAutoPlaying"></div>
       </div>
 
-      <div class="updates-carousel">
-        <!-- Navigation Buttons -->
-        <button @click="prevSlide" class="carousel-nav-btn prev">
-          <i class="fas fa-chevron-left"></i>
-        </button>
-        <button @click="nextSlide" class="carousel-nav-btn next">
-          <i class="fas fa-chevron-right"></i>
-        </button>
+      <!-- Updates Layout: Carousel + More Updates Side by Side -->
+      <div class="updates-layout">
+        <!-- Main Carousel -->
+        <div class="updates-carousel">
+          <!-- Navigation Buttons -->
+          <button @click="prevSlide" class="carousel-nav-btn prev">
+            <i class="fas fa-chevron-left"></i>
+          </button>
+          <button @click="nextSlide" class="carousel-nav-btn next">
+            <i class="fas fa-chevron-right"></i>
+          </button>
 
-        <!-- Slides -->
-        <div class="carousel-track" :style="{ transform: 'translateX(-' + (currentSlide * 100) + '%)' }">
-          <div v-for="(update, index) in recentUpdates" :key="update.id"
-               class="carousel-slide"
-               :class="{ active: index === currentSlide }">
-            <div class="slide-content">
-              <!-- Image Side -->
-              <div class="slide-image">
-                <div class="relative h-64 lg:h-80 rounded-2xl overflow-hidden shadow-lg group">
-                  <img v-if="update.image" :src="update.image" :alt="update.title" class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
-                  <div v-else class="absolute inset-0" :class="update.gradientClass">
-                    <div class="absolute inset-0 flex items-center justify-center">
-                      <div class="w-20 h-20 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                        <i :class="[update.icon, 'text-4xl text-white']"></i>
+          <!-- Slides -->
+          <div class="carousel-track" :style="{ transform: 'translateX(-' + (currentSlide * 100) + '%)' }">
+            <div v-for="(update, index) in recentUpdates" :key="update.id"
+                 class="carousel-slide"
+                 :class="{ active: index === currentSlide }">
+              <div class="slide-content">
+                <!-- Image Side -->
+                <div class="slide-image">
+                  <div class="relative h-64 lg:h-full min-h-[280px] rounded-2xl overflow-hidden shadow-lg group">
+                    <img v-if="update.image" :src="update.image" :alt="update.title" class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
+                    <div v-else class="absolute inset-0" :class="update.gradientClass">
+                      <div class="absolute inset-0 flex items-center justify-center">
+                        <div class="w-20 h-20 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                          <i :class="[update.icon, 'text-4xl text-white']"></i>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
+
+                    <!-- Top badges row -->
+                    <div class="absolute top-4 left-4 right-4 flex items-start justify-between">
+                      <div class="flex flex-wrap gap-2">
+                        <span :class="['update-badge', update.type]" class="text-sm px-4 py-1.5 shadow-lg">
+                          <i :class="update.typeIcon" class="mr-1"></i>
+                          {{ update.typeLabel }}
+                        </span>
+                        <span v-if="update.isFeatured" class="px-3 py-1.5 rounded-full bg-amber-500 text-white text-xs font-bold shadow-lg flex items-center gap-1">
+                          <i class="fas fa-star"></i> Featured
+                        </span>
+                        <span v-if="update.isTrending" class="px-3 py-1.5 rounded-full bg-rose-500 text-white text-xs font-bold shadow-lg flex items-center gap-1">
+                          <i class="fas fa-fire-alt"></i> Trending
+                        </span>
+                      </div>
+                      <!-- Quick actions on image -->
+                      <div class="flex gap-2">
+                        <button
+                          @click.stop="toggleLikeUpdate(update.id)"
+                          class="w-9 h-9 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center text-white hover:bg-black/60 transition-all"
+                          :class="{ '!bg-rose-500': isUpdateLiked(update.id) }"
+                        >
+                          <i :class="isUpdateLiked(update.id) ? 'fas fa-heart' : 'far fa-heart'"></i>
+                        </button>
+                        <button
+                          @click.stop="toggleSaveUpdate(update.id)"
+                          class="w-9 h-9 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center text-white hover:bg-black/60 transition-all"
+                          :class="{ '!bg-teal-500': isUpdateSaved(update.id) }"
+                        >
+                          <i :class="isUpdateSaved(update.id) ? 'fas fa-bookmark' : 'far fa-bookmark'"></i>
+                        </button>
+                      </div>
+                    </div>
+
+                    <!-- Bottom stats row -->
+                    <div class="absolute bottom-4 left-4 right-4 flex justify-between items-center">
+                      <div class="flex items-center gap-4 text-white/90 text-sm">
+                        <span class="flex items-center gap-1.5">
+                          <i class="fas fa-eye"></i>
+                          {{ update.views }}
+                        </span>
+                        <span class="flex items-center gap-1.5">
+                          <i class="fas fa-heart"></i>
+                          {{ update.likes }}
+                        </span>
+                        <span class="flex items-center gap-1.5">
+                          <i class="fas fa-share-alt"></i>
+                          {{ update.shares }}
+                        </span>
+                      </div>
+                      <div class="px-3 py-1.5 rounded-lg bg-black/40 backdrop-blur-sm text-white text-xs font-medium flex items-center gap-2">
+                        <i class="fas fa-clock"></i>
+                        {{ update.readTime }}
                       </div>
                     </div>
                   </div>
-                  <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
+                </div>
 
-                  <!-- Top badges row -->
-                  <div class="absolute top-4 left-4 right-4 flex items-start justify-between">
-                    <div class="flex flex-wrap gap-2">
-                      <span :class="['update-badge', update.type]" class="text-sm px-4 py-1.5 shadow-lg">
-                        <i :class="update.typeIcon" class="mr-1"></i>
+                <!-- Content Side -->
+                <div class="slide-text">
+                  <!-- Header Section -->
+                  <div class="slide-text-header">
+                    <!-- Time & Type Badge -->
+                    <div class="flex items-center gap-3 mb-4">
+                      <span :class="['update-type-badge', update.type]">
+                        <i :class="update.typeIcon"></i>
                         {{ update.typeLabel }}
                       </span>
-                      <span v-if="update.isFeatured" class="px-3 py-1.5 rounded-full bg-amber-500 text-white text-xs font-bold shadow-lg flex items-center gap-1">
-                        <i class="fas fa-star"></i> Featured
-                      </span>
-                      <span v-if="update.isTrending" class="px-3 py-1.5 rounded-full bg-rose-500 text-white text-xs font-bold shadow-lg flex items-center gap-1">
-                        <i class="fas fa-fire-alt"></i> Trending
+                      <span class="flex items-center gap-1.5 text-xs text-gray-500">
+                        <i class="fas fa-clock text-teal-500"></i>
+                        {{ update.timeAgo }}
                       </span>
                     </div>
-                    <!-- Quick actions on image -->
-                    <div class="flex gap-2">
+
+                    <h3 class="text-2xl lg:text-3xl font-bold text-gray-900 mb-4 leading-tight">{{ update.title }}</h3>
+
+                    <!-- Tags -->
+                    <div class="flex flex-wrap gap-2">
+                      <span v-for="tag in update.tags" :key="tag" class="px-3 py-1.5 rounded-lg bg-teal-50 text-teal-700 text-xs font-semibold hover:bg-teal-100 transition-colors cursor-pointer">
+                        #{{ tag }}
+                      </span>
+                    </div>
+                  </div>
+
+                  <!-- Body Section -->
+                  <div class="slide-text-body">
+                    <p class="text-gray-600 text-base leading-relaxed line-clamp-3">{{ update.description }}</p>
+                  </div>
+
+                  <!-- Footer Section -->
+                  <div class="slide-text-footer">
+                    <!-- Author & Stats -->
+                    <div class="flex items-center justify-between pb-4 mb-4 border-b border-gray-100">
+                      <div class="flex items-center gap-3">
+                        <div class="w-11 h-11 rounded-xl flex items-center justify-center text-white text-sm font-bold shadow-md"
+                             :style="{ backgroundColor: update.author.color }">
+                          {{ update.author.initials }}
+                        </div>
+                        <div>
+                          <p class="text-sm font-semibold text-gray-900">{{ update.author.name }}</p>
+                          <p class="text-xs text-gray-500">{{ update.author.role }}</p>
+                        </div>
+                      </div>
+                      <div class="flex items-center gap-4 text-sm text-gray-500">
+                        <span class="flex items-center gap-1.5">
+                          <i class="fas fa-eye text-teal-500"></i>
+                          {{ update.views }}
+                        </span>
+                        <span class="flex items-center gap-1.5">
+                          <i class="fas fa-comment text-teal-500"></i>
+                          {{ update.comments }}
+                        </span>
+                        <span class="flex items-center gap-1.5">
+                          <i class="fas fa-heart text-rose-400"></i>
+                          {{ update.likes }}
+                        </span>
+                      </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="flex flex-wrap gap-3">
+                      <router-link :to="update.link" class="px-6 py-3 bg-gradient-to-r from-teal-500 to-teal-600 text-white rounded-xl font-semibold text-sm flex items-center gap-2 shadow-lg shadow-teal-200 hover:shadow-xl hover:shadow-teal-300 transition-all hover:-translate-y-0.5">
+                        {{ update.actionText }}
+                        <i class="fas fa-arrow-right text-xs"></i>
+                      </router-link>
                       <button
-                        @click.stop="toggleLikeUpdate(update.id)"
-                        class="w-9 h-9 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center text-white hover:bg-black/60 transition-all"
-                        :class="{ '!bg-rose-500': isUpdateLiked(update.id) }"
-                      >
-                        <i :class="isUpdateLiked(update.id) ? 'fas fa-heart' : 'far fa-heart'"></i>
-                      </button>
-                      <button
-                        @click.stop="toggleSaveUpdate(update.id)"
-                        class="w-9 h-9 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center text-white hover:bg-black/60 transition-all"
-                        :class="{ '!bg-teal-500': isUpdateSaved(update.id) }"
+                        @click="toggleSaveUpdate(update.id)"
+                        :class="[
+                          'px-4 py-3 rounded-xl font-medium text-sm transition-all flex items-center gap-2',
+                          isUpdateSaved(update.id)
+                            ? 'bg-teal-500 text-white shadow-lg shadow-teal-200'
+                            : 'bg-white border-2 border-gray-200 text-gray-700 hover:bg-teal-50 hover:border-teal-200 hover:text-teal-700'
+                        ]"
                       >
                         <i :class="isUpdateSaved(update.id) ? 'fas fa-bookmark' : 'far fa-bookmark'"></i>
+                        {{ isUpdateSaved(update.id) ? 'Saved' : 'Save' }}
+                      </button>
+                      <button
+                        @click="shareUpdate(update)"
+                        class="px-4 py-3 bg-white border-2 border-gray-200 text-gray-700 rounded-xl font-medium text-sm hover:bg-teal-50 hover:border-teal-200 hover:text-teal-700 transition-all flex items-center gap-2"
+                      >
+                        <i class="fas fa-share-alt"></i>
+                        Share
+                      </button>
+                      <button
+                        @click="toggleLikeUpdate(update.id)"
+                        :class="[
+                          'px-4 py-3 rounded-xl font-medium text-sm transition-all flex items-center gap-2',
+                          isUpdateLiked(update.id)
+                            ? 'bg-rose-500 text-white shadow-lg shadow-rose-200'
+                            : 'bg-white border-2 border-gray-200 text-gray-700 hover:bg-rose-50 hover:border-rose-200 hover:text-rose-600'
+                        ]"
+                      >
+                        <i :class="isUpdateLiked(update.id) ? 'fas fa-heart' : 'far fa-heart'"></i>
+                        {{ isUpdateLiked(update.id) ? 'Liked' : 'Like' }}
                       </button>
                     </div>
                   </div>
-
-                  <!-- Bottom stats row -->
-                  <div class="absolute bottom-4 left-4 right-4 flex justify-between items-center">
-                    <div class="flex items-center gap-4 text-white/90 text-sm">
-                      <span class="flex items-center gap-1.5">
-                        <i class="fas fa-eye"></i>
-                        {{ update.views }}
-                      </span>
-                      <span class="flex items-center gap-1.5">
-                        <i class="fas fa-heart"></i>
-                        {{ update.likes }}
-                      </span>
-                      <span class="flex items-center gap-1.5">
-                        <i class="fas fa-share-alt"></i>
-                        {{ update.shares }}
-                      </span>
-                    </div>
-                    <div class="px-3 py-1.5 rounded-lg bg-black/40 backdrop-blur-sm text-white text-xs font-medium flex items-center gap-2">
-                      <i class="fas fa-clock"></i>
-                      {{ update.readTime }}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Content Side -->
-              <div class="slide-text">
-                <!-- Time ago -->
-                <div class="flex items-center gap-2 text-xs text-gray-500 mb-3">
-                  <i class="fas fa-clock text-teal-500"></i>
-                  <span>{{ update.timeAgo }}</span>
-                  <span class="w-1 h-1 bg-gray-300 rounded-full"></span>
-                  <span>{{ update.date }}</span>
-                </div>
-
-                <h3 class="text-2xl lg:text-3xl font-bold text-gray-900 mb-3 leading-tight">{{ update.title }}</h3>
-
-                <!-- Tags -->
-                <div class="flex flex-wrap gap-2 mb-4">
-                  <span v-for="tag in update.tags" :key="tag" class="px-2.5 py-1 rounded-lg bg-teal-50 text-teal-700 text-xs font-medium hover:bg-teal-100 transition-colors cursor-pointer">
-                    #{{ tag }}
-                  </span>
-                </div>
-
-                <p class="text-gray-600 mb-5 text-base leading-relaxed line-clamp-3">{{ update.description }}</p>
-
-                <!-- Author & Stats -->
-                <div class="flex items-center justify-between mb-5 pb-5 border-b border-gray-100">
-                  <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl flex items-center justify-center text-white text-sm font-bold shadow-md"
-                         :style="{ backgroundColor: update.author.color }">
-                      {{ update.author.initials }}
-                    </div>
-                    <div>
-                      <p class="text-sm font-semibold text-gray-900">{{ update.author.name }}</p>
-                      <p class="text-xs text-gray-500">{{ update.author.role }}</p>
-                    </div>
-                  </div>
-                  <div class="flex items-center gap-4 text-sm text-gray-500">
-                    <span class="flex items-center gap-1.5">
-                      <i class="fas fa-comment text-teal-500"></i>
-                      {{ update.comments }}
-                    </span>
-                    <span class="flex items-center gap-1.5">
-                      <i class="fas fa-share text-teal-500"></i>
-                      {{ update.shares }}
-                    </span>
-                  </div>
-                </div>
-
-                <!-- Action Buttons -->
-                <div class="flex flex-wrap gap-3">
-                  <router-link :to="update.link" class="px-6 py-3 bg-gradient-to-r from-teal-500 to-teal-600 text-white rounded-xl font-semibold text-sm flex items-center gap-2 shadow-lg shadow-teal-200 hover:shadow-xl hover:shadow-teal-300 transition-all hover:-translate-y-0.5">
-                    {{ update.actionText }}
-                    <i class="fas fa-arrow-right text-xs"></i>
-                  </router-link>
-                  <button
-                    @click="toggleSaveUpdate(update.id)"
-                    :class="[
-                      'px-4 py-3 rounded-xl font-medium text-sm transition-all flex items-center gap-2',
-                      isUpdateSaved(update.id)
-                        ? 'bg-teal-500 text-white shadow-lg shadow-teal-200'
-                        : 'bg-white border-2 border-gray-200 text-gray-700 hover:bg-teal-50 hover:border-teal-200 hover:text-teal-700'
-                    ]"
-                  >
-                    <i :class="isUpdateSaved(update.id) ? 'fas fa-bookmark' : 'far fa-bookmark'"></i>
-                    {{ isUpdateSaved(update.id) ? 'Saved' : 'Save' }}
-                  </button>
-                  <button
-                    @click="shareUpdate(update)"
-                    class="px-4 py-3 bg-white border-2 border-gray-200 text-gray-700 rounded-xl font-medium text-sm hover:bg-teal-50 hover:border-teal-200 hover:text-teal-700 transition-all flex items-center gap-2"
-                  >
-                    <i class="fas fa-share-alt"></i>
-                    Share
-                  </button>
-                  <button
-                    @click="toggleLikeUpdate(update.id)"
-                    :class="[
-                      'px-4 py-3 rounded-xl font-medium text-sm transition-all flex items-center gap-2',
-                      isUpdateLiked(update.id)
-                        ? 'bg-rose-500 text-white shadow-lg shadow-rose-200'
-                        : 'bg-white border-2 border-gray-200 text-gray-700 hover:bg-rose-50 hover:border-rose-200 hover:text-rose-600'
-                    ]"
-                  >
-                    <i :class="isUpdateLiked(update.id) ? 'fas fa-heart' : 'far fa-heart'"></i>
-                    {{ isUpdateLiked(update.id) ? 'Liked' : 'Like' }}
-                  </button>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- Thumbnail Gallery Navigation -->
-      <div class="mt-6 pt-6 border-t border-gray-100">
-        <div class="flex items-center gap-4">
-          <span class="text-xs font-semibold text-gray-500 uppercase tracking-wider">More Updates</span>
-          <div class="flex-1 flex gap-3 overflow-x-auto pb-2 scrollbar-thin">
-            <button
-              v-for="(update, index) in recentUpdates"
+        <!-- More Updates Sidebar -->
+        <div class="more-updates-sidebar">
+          <h3 class="more-updates-title"><i class="fas fa-list"></i> More Updates</h3>
+          <div class="more-updates-list">
+            <div
+              v-for="(update, index) in recentUpdates.slice(0, 5)"
               :key="'thumb-' + index"
               @click="goToSlide(index)"
               :class="[
-                'flex-shrink-0 w-20 h-14 rounded-lg overflow-hidden relative group transition-all',
-                index === currentSlide ? 'ring-2 ring-teal-500 ring-offset-2' : 'opacity-60 hover:opacity-100'
+                'more-update-card group',
+                index === currentSlide ? 'active' : ''
               ]"
             >
-              <img :src="update.image" :alt="update.title" class="w-full h-full object-cover">
-              <div class="absolute inset-0 bg-black/30 group-hover:bg-black/10 transition-colors"></div>
-              <div v-if="index === currentSlide" class="absolute bottom-0 left-0 right-0 h-1 bg-teal-500"></div>
-            </button>
+              <div class="more-update-thumb">
+                <img :src="update.image" :alt="update.title" class="more-update-img">
+                <div class="more-update-play"><i class="fas fa-play"></i></div>
+                <span class="more-update-badge">{{ update.typeLabel }}</span>
+              </div>
+              <div class="more-update-info">
+                <span class="more-update-category">{{ update.type }}</span>
+                <h4 class="more-update-title">{{ update.title }}</h4>
+                <div class="more-update-meta">
+                  <span><i class="fas fa-clock"></i> {{ update.timeAgo }}</span>
+                  <span><i class="fas fa-eye"></i> {{ update.views }}</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -2070,17 +2099,190 @@ onUnmounted(() => {
   }
 }
 
+/* Updates Layout - Side by Side */
+.updates-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  align-items: stretch;
+}
+
+@media (min-width: 1024px) {
+  .updates-layout {
+    grid-template-columns: 3fr 1fr;
+  }
+}
+
+/* More Updates Sidebar */
+.more-updates-sidebar {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .more-updates-sidebar {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+}
+
+.more-updates-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #334155;
+  margin: 0 0 0.75rem 0;
+}
+
+.more-updates-title i {
+  color: #14b8a6;
+}
+
+.more-updates-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* More Update Card - Matching Up Next Style */
+.more-update-card {
+  display: flex;
+  gap: 0.625rem;
+  padding: 0.5rem;
+  background: white;
+  border: 1px solid #f1f5f9;
+  border-radius: 0.625rem;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.more-update-card:hover {
+  border-color: #e2e8f0;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+  transform: translateX(4px);
+}
+
+.more-update-card.active {
+  border-color: #14b8a6;
+  background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 100%);
+}
+
+.more-update-thumb {
+  position: relative;
+  width: 88px;
+  height: 56px;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: #1e293b;
+}
+
+.more-update-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.more-update-card:hover .more-update-img {
+  transform: scale(1.1);
+}
+
+.more-update-play {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.3);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.more-update-card:hover .more-update-play {
+  opacity: 1;
+}
+
+.more-update-play i {
+  color: white;
+  font-size: 0.875rem;
+}
+
+.more-update-badge {
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+  padding: 0.125rem 0.375rem;
+  background: rgba(0,0,0,0.8);
+  color: white;
+  font-size: 0.5625rem;
+  font-weight: 500;
+  border-radius: 0.25rem;
+}
+
+.more-update-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.more-update-category {
+  font-size: 0.5625rem;
+  font-weight: 600;
+  color: #14b8a6;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  margin-bottom: 0.25rem;
+}
+
+.more-update-title {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #0f172a;
+  margin: 0 0 0.25rem 0;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  transition: color 0.2s ease;
+}
+
+.more-update-card:hover .more-update-title {
+  color: #0d9488;
+}
+
+.more-update-meta {
+  display: flex;
+  gap: 0.75rem;
+  font-size: 0.625rem;
+  color: #94a3b8;
+}
+
+.more-update-meta i {
+  margin-right: 0.25rem;
+  color: #14b8a6;
+}
+
 /* Carousel Styles */
 .updates-carousel {
   position: relative;
   overflow: hidden;
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 .carousel-track {
   display: flex;
   width: 100%;
   transition: transform 0.5s ease-in-out;
+  flex: 1;
 }
 
 .carousel-slide {
@@ -2093,9 +2295,10 @@ onUnmounted(() => {
 .slide-content {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
-  padding: 0.5rem;
+  gap: 1rem;
+  padding: 0;
   width: 100%;
+  height: 100%;
 }
 
 @media (min-width: 1024px) {
@@ -2112,21 +2315,81 @@ onUnmounted(() => {
   .slide-image {
     width: 40%;
     flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .slide-image > div {
+    flex: 1;
+    height: 100%;
   }
 }
 
 .slide-text {
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  padding: 1rem 0;
+  justify-content: space-between;
+  padding: 0;
   width: 100%;
+  gap: 1rem;
 }
 
 @media (min-width: 1024px) {
   .slide-text {
     width: 60%;
+    padding-left: 0.5rem;
   }
+}
+
+.slide-text-header {
+  flex-shrink: 0;
+}
+
+.slide-text-body {
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+.slide-text-footer {
+  flex-shrink: 0;
+}
+
+.update-type-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.375rem 0.75rem;
+  border-radius: 100px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.update-type-badge.announcement {
+  background: linear-gradient(135deg, #fef3c7, #fde68a);
+  color: #92400e;
+}
+
+.update-type-badge.venue {
+  background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+  color: #1e40af;
+}
+
+.update-type-badge.event {
+  background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+  color: #065f46;
+}
+
+.update-type-badge.article {
+  background: linear-gradient(135deg, #f3e8ff, #e9d5ff);
+  color: #6b21a8;
+}
+
+.update-type-badge.stats {
+  background: linear-gradient(135deg, #ffe4e6, #fecdd3);
+  color: #be123c;
 }
 
 .carousel-nav-btn {
