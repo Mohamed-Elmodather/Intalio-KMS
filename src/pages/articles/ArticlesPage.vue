@@ -681,6 +681,13 @@ function goToProfile(userId: number) {
   router.push({ name: 'Profile', query: { user: userId.toString() } })
 }
 
+function scrollToBookmarks() {
+  const bookmarksSection = document.querySelector('.bookmarks-section')
+  if (bookmarksSection) {
+    bookmarksSection.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+}
+
 function dismissToast(id: number) {
   toasts.value = toasts.value.filter(t => t.id !== id)
 }
@@ -862,7 +869,7 @@ onUnmounted(() => {
             <i class="fas fa-plus"></i>
             New Article
           </button>
-          <button class="px-5 py-2.5 bg-white/20 backdrop-blur-sm border border-white/30 text-white rounded-xl font-semibold text-sm hover:bg-white/30 transition-all flex items-center gap-2">
+          <button @click="scrollToBookmarks" class="px-5 py-2.5 bg-white/20 backdrop-blur-sm border border-white/30 text-white rounded-xl font-semibold text-sm hover:bg-white/30 transition-all flex items-center gap-2">
             <i class="fas fa-bookmark"></i>
             My Bookmarks
           </button>
@@ -917,7 +924,7 @@ onUnmounted(() => {
         </section>
 
         <!-- Your Bookmarks Section -->
-        <section v-if="bookmarkedArticles.length > 0" class="personalization-column">
+        <section v-if="bookmarkedArticles.length > 0" class="personalization-column bookmarks-section">
           <div class="section-header-row">
             <h2 class="section-title-sm">
               <i class="fas fa-bookmark text-yellow-500"></i>
@@ -1576,10 +1583,13 @@ onUnmounted(() => {
                   </div>
                   <!-- Bookmark Button -->
                   <button
-                    @click.stop
-                    class="w-7 h-7 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center text-gray-400 hover:text-teal-600 hover:bg-white transition-all shadow-sm opacity-0 group-hover:opacity-100"
+                    @click.stop="toggleBookmark(article.id)"
+                    :class="[
+                      'w-7 h-7 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center transition-all shadow-sm opacity-0 group-hover:opacity-100',
+                      bookmarks.includes(article.id) ? 'text-teal-600' : 'text-gray-400 hover:text-teal-600 hover:bg-white'
+                    ]"
                   >
-                    <i class="fas fa-bookmark text-xs"></i>
+                    <i :class="bookmarks.includes(article.id) ? 'fas fa-bookmark' : 'far fa-bookmark'" class="text-xs"></i>
                   </button>
                 </div>
 
@@ -1592,7 +1602,7 @@ onUnmounted(() => {
 
                 <!-- Read Button (Hover) -->
                 <div class="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0">
-                  <button class="px-3 py-1.5 bg-white text-teal-600 text-xs font-semibold rounded-full flex items-center gap-1.5 shadow-md hover:bg-teal-500 hover:text-white transition-colors">
+                  <button @click.stop="goToArticle(article.id)" class="px-3 py-1.5 bg-white text-teal-600 text-xs font-semibold rounded-full flex items-center gap-1.5 shadow-md hover:bg-teal-500 hover:text-white transition-colors">
                     <span>Read</span>
                     <i class="fas fa-arrow-right text-[10px]"></i>
                   </button>
@@ -1762,14 +1772,17 @@ onUnmounted(() => {
               <!-- Actions -->
               <div class="flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                 <button
-                  @click.stop
-                  class="w-8 h-8 rounded-lg bg-gray-50 text-gray-400 hover:bg-teal-50 hover:text-teal-600 flex items-center justify-center transition-colors"
+                  @click.stop="toggleBookmark(article.id)"
+                  :class="[
+                    'w-8 h-8 rounded-lg flex items-center justify-center transition-colors',
+                    bookmarks.includes(article.id) ? 'bg-teal-50 text-teal-600' : 'bg-gray-50 text-gray-400 hover:bg-teal-50 hover:text-teal-600'
+                  ]"
                   title="Bookmark"
                 >
-                  <i class="fas fa-bookmark text-xs"></i>
+                  <i :class="bookmarks.includes(article.id) ? 'fas fa-bookmark' : 'far fa-bookmark'" class="text-xs"></i>
                 </button>
                 <button
-                  @click.stop
+                  @click.stop="openShareModal(article)"
                   class="w-8 h-8 rounded-lg bg-gray-50 text-gray-400 hover:bg-teal-50 hover:text-teal-600 flex items-center justify-center transition-colors"
                   title="Share"
                 >
