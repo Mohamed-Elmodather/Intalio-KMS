@@ -1086,252 +1086,113 @@ onUnmounted(() => {
       </div>
     </div>
 
-    <!-- Recent Updates Carousel - Featured Section -->
-    <div class="card-animated rounded-3xl p-6 mb-10 stagger-1 bg-gradient-to-br from-white via-white to-teal-50/50 border-2 border-teal-100 shadow-xl shadow-teal-100/20" @mouseenter="pauseCarousel" @mouseleave="resumeCarousel">
-      <div class="flex items-center justify-between mb-4">
-        <h2 class="text-lg font-bold text-gray-900 flex items-center gap-3">
-          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center shadow-lg shadow-teal-200">
-            <i class="fas fa-fire text-white text-sm"></i>
+    <!-- Latest Updates - Magazine Layout -->
+    <div class="magazine-section mb-10">
+      <!-- Section Header -->
+      <div class="magazine-header">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center shadow-lg shadow-teal-200">
+            <i class="fas fa-fire text-white text-lg"></i>
           </div>
           <div>
-            <span class="block">Latest Updates</span>
-            <span class="text-xs font-medium text-teal-600">AFC Asian Cup Saudi Arabia 2027</span>
+            <h2 class="text-2xl font-bold text-gray-900">Latest Updates</h2>
+            <p class="text-sm text-gray-500">AFC Asian Cup Saudi Arabia 2027</p>
           </div>
-        </h2>
-        <div class="flex items-center gap-3">
-          <span class="px-3 py-1.5 rounded-full bg-teal-100 text-teal-700 text-sm font-semibold">{{ currentSlide + 1 }} / {{ recentUpdates.length }}</span>
-          <button @click="toggleAutoPlay" class="p-2.5 rounded-xl bg-white border border-gray-200 hover:bg-teal-50 hover:border-teal-200 text-gray-500 hover:text-teal-600 transition-all shadow-sm">
-            <i :class="isAutoPlaying ? 'fas fa-pause' : 'fas fa-play'" class="text-sm"></i>
-          </button>
         </div>
+        <router-link to="/articles" class="view-all-btn">
+          View All <i class="fas fa-arrow-right"></i>
+        </router-link>
       </div>
 
-      <!-- Progress bar -->
-      <div class="h-1.5 bg-gray-100 rounded-full mb-4 overflow-hidden">
-        <div class="slide-progress rounded-full" :key="currentSlide" v-if="isAutoPlaying"></div>
-      </div>
+      <!-- Magazine Grid -->
+      <div class="magazine-grid">
+        <!-- Hero Article (First Update) -->
+        <div class="magazine-hero" v-if="recentUpdates[0]">
+          <router-link :to="recentUpdates[0].link" class="hero-card group">
+            <div class="hero-image">
+              <img :src="recentUpdates[0].image" :alt="recentUpdates[0].title">
+              <div class="hero-overlay"></div>
 
-      <!-- Updates Layout: Carousel + More Updates Side by Side -->
-      <div class="updates-layout">
-        <!-- Main Carousel -->
-        <div class="updates-carousel">
-          <!-- Navigation Buttons -->
-          <button @click="prevSlide" class="carousel-nav-btn prev">
-            <i class="fas fa-chevron-left"></i>
-          </button>
-          <button @click="nextSlide" class="carousel-nav-btn next">
-            <i class="fas fa-chevron-right"></i>
-          </button>
+              <!-- Badges -->
+              <div class="hero-badges">
+                <span class="hero-type-badge">
+                  <i :class="recentUpdates[0].typeIcon"></i>
+                  {{ recentUpdates[0].typeLabel }}
+                </span>
+                <span v-if="recentUpdates[0].isFeatured" class="hero-featured-badge">
+                  <i class="fas fa-star"></i> Featured
+                </span>
+                <span v-if="recentUpdates[0].isTrending" class="hero-trending-badge">
+                  <i class="fas fa-fire-alt"></i> Trending
+                </span>
+              </div>
 
-          <!-- Slides -->
-          <div class="carousel-track" :style="{ transform: 'translateX(-' + (currentSlide * 100) + '%)' }">
-            <div v-for="(update, index) in recentUpdates" :key="update.id"
-                 class="carousel-slide"
-                 :class="{ active: index === currentSlide }">
-              <div class="slide-content">
-                <!-- Image Side -->
-                <div class="slide-image">
-                  <div class="relative h-64 lg:h-full min-h-[280px] rounded-2xl overflow-hidden shadow-lg group">
-                    <img v-if="update.image" :src="update.image" :alt="update.title" class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
-                    <div v-else class="absolute inset-0" :class="update.gradientClass">
-                      <div class="absolute inset-0 flex items-center justify-center">
-                        <div class="w-20 h-20 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                          <i :class="[update.icon, 'text-4xl text-white']"></i>
-                        </div>
-                      </div>
+              <!-- Hero Content -->
+              <div class="hero-content">
+                <div class="hero-meta">
+                  <span class="hero-author">
+                    <div class="hero-avatar" :style="{ backgroundColor: recentUpdates[0].author.color }">
+                      {{ recentUpdates[0].author.initials }}
                     </div>
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
-
-                    <!-- Top badges row -->
-                    <div class="absolute top-4 left-4 right-4 flex items-start justify-between">
-                      <div class="flex flex-wrap gap-2">
-                        <span :class="['update-badge', update.type]" class="text-sm px-4 py-1.5 shadow-lg">
-                          <i :class="update.typeIcon" class="mr-1"></i>
-                          {{ update.typeLabel }}
-                        </span>
-                        <span v-if="update.isFeatured" class="px-3 py-1.5 rounded-full bg-amber-500 text-white text-xs font-bold shadow-lg flex items-center gap-1">
-                          <i class="fas fa-star"></i> Featured
-                        </span>
-                        <span v-if="update.isTrending" class="px-3 py-1.5 rounded-full bg-rose-500 text-white text-xs font-bold shadow-lg flex items-center gap-1">
-                          <i class="fas fa-fire-alt"></i> Trending
-                        </span>
-                      </div>
-                      <!-- Quick actions on image -->
-                      <div class="flex gap-2">
-                        <button
-                          @click.stop="toggleLikeUpdate(update.id)"
-                          class="w-9 h-9 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center text-white hover:bg-black/60 transition-all"
-                          :class="{ '!bg-rose-500': isUpdateLiked(update.id) }"
-                        >
-                          <i :class="isUpdateLiked(update.id) ? 'fas fa-heart' : 'far fa-heart'"></i>
-                        </button>
-                        <button
-                          @click.stop="toggleSaveUpdate(update.id)"
-                          class="w-9 h-9 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center text-white hover:bg-black/60 transition-all"
-                          :class="{ '!bg-teal-500': isUpdateSaved(update.id) }"
-                        >
-                          <i :class="isUpdateSaved(update.id) ? 'fas fa-bookmark' : 'far fa-bookmark'"></i>
-                        </button>
-                      </div>
-                    </div>
-
-                    <!-- Bottom stats row -->
-                    <div class="absolute bottom-4 left-4 right-4 flex justify-between items-center">
-                      <div class="flex items-center gap-4 text-white/90 text-sm">
-                        <span class="flex items-center gap-1.5">
-                          <i class="fas fa-eye"></i>
-                          {{ update.views }}
-                        </span>
-                        <span class="flex items-center gap-1.5">
-                          <i class="fas fa-heart"></i>
-                          {{ update.likes }}
-                        </span>
-                        <span class="flex items-center gap-1.5">
-                          <i class="fas fa-share-alt"></i>
-                          {{ update.shares }}
-                        </span>
-                      </div>
-                      <div class="px-3 py-1.5 rounded-lg bg-black/40 backdrop-blur-sm text-white text-xs font-medium flex items-center gap-2">
-                        <i class="fas fa-clock"></i>
-                        {{ update.readTime }}
-                      </div>
-                    </div>
-                  </div>
+                    {{ recentUpdates[0].author.name }}
+                  </span>
+                  <span class="hero-divider">•</span>
+                  <span>{{ recentUpdates[0].timeAgo }}</span>
+                  <span class="hero-divider">•</span>
+                  <span>{{ recentUpdates[0].readTime }}</span>
                 </div>
-
-                <!-- Content Side -->
-                <div class="slide-text">
-                  <!-- Header Section -->
-                  <div class="slide-text-header">
-                    <!-- Time & Type Badge -->
-                    <div class="flex items-center gap-3 mb-4">
-                      <span :class="['update-type-badge', update.type]">
-                        <i :class="update.typeIcon"></i>
-                        {{ update.typeLabel }}
-                      </span>
-                      <span class="flex items-center gap-1.5 text-xs text-gray-500">
-                        <i class="fas fa-clock text-teal-500"></i>
-                        {{ update.timeAgo }}
-                      </span>
-                    </div>
-
-                    <h3 class="text-2xl lg:text-3xl font-bold text-gray-900 mb-4 leading-tight">{{ update.title }}</h3>
-
-                    <!-- Tags -->
-                    <div class="flex flex-wrap gap-2">
-                      <span v-for="tag in update.tags" :key="tag" class="px-3 py-1.5 rounded-lg bg-teal-50 text-teal-700 text-xs font-semibold hover:bg-teal-100 transition-colors cursor-pointer">
-                        #{{ tag }}
-                      </span>
-                    </div>
-                  </div>
-
-                  <!-- Body Section -->
-                  <div class="slide-text-body">
-                    <p class="text-gray-600 text-base leading-relaxed line-clamp-3">{{ update.description }}</p>
-                  </div>
-
-                  <!-- Footer Section -->
-                  <div class="slide-text-footer">
-                    <!-- Author & Stats -->
-                    <div class="flex items-center justify-between pb-4 mb-4 border-b border-gray-100">
-                      <div class="flex items-center gap-3">
-                        <div class="w-11 h-11 rounded-xl flex items-center justify-center text-white text-sm font-bold shadow-md"
-                             :style="{ backgroundColor: update.author.color }">
-                          {{ update.author.initials }}
-                        </div>
-                        <div>
-                          <p class="text-sm font-semibold text-gray-900">{{ update.author.name }}</p>
-                          <p class="text-xs text-gray-500">{{ update.author.role }}</p>
-                        </div>
-                      </div>
-                      <div class="flex items-center gap-4 text-sm text-gray-500">
-                        <span class="flex items-center gap-1.5">
-                          <i class="fas fa-eye text-teal-500"></i>
-                          {{ update.views }}
-                        </span>
-                        <span class="flex items-center gap-1.5">
-                          <i class="fas fa-comment text-teal-500"></i>
-                          {{ update.comments }}
-                        </span>
-                        <span class="flex items-center gap-1.5">
-                          <i class="fas fa-heart text-rose-400"></i>
-                          {{ update.likes }}
-                        </span>
-                      </div>
-                    </div>
-
-                    <!-- Action Buttons -->
-                    <div class="flex flex-wrap gap-3">
-                      <router-link :to="update.link" class="px-6 py-3 bg-gradient-to-r from-teal-500 to-teal-600 text-white rounded-xl font-semibold text-sm flex items-center gap-2 shadow-lg shadow-teal-200 hover:shadow-xl hover:shadow-teal-300 transition-all hover:-translate-y-0.5">
-                        {{ update.actionText }}
-                        <i class="fas fa-arrow-right text-xs"></i>
-                      </router-link>
-                      <button
-                        @click="toggleSaveUpdate(update.id)"
-                        :class="[
-                          'px-4 py-3 rounded-xl font-medium text-sm transition-all flex items-center gap-2',
-                          isUpdateSaved(update.id)
-                            ? 'bg-teal-500 text-white shadow-lg shadow-teal-200'
-                            : 'bg-white border-2 border-gray-200 text-gray-700 hover:bg-teal-50 hover:border-teal-200 hover:text-teal-700'
-                        ]"
-                      >
-                        <i :class="isUpdateSaved(update.id) ? 'fas fa-bookmark' : 'far fa-bookmark'"></i>
-                        {{ isUpdateSaved(update.id) ? 'Saved' : 'Save' }}
-                      </button>
-                      <button
-                        @click="shareUpdate(update)"
-                        class="px-4 py-3 bg-white border-2 border-gray-200 text-gray-700 rounded-xl font-medium text-sm hover:bg-teal-50 hover:border-teal-200 hover:text-teal-700 transition-all flex items-center gap-2"
-                      >
-                        <i class="fas fa-share-alt"></i>
-                        Share
-                      </button>
-                      <button
-                        @click="toggleLikeUpdate(update.id)"
-                        :class="[
-                          'px-4 py-3 rounded-xl font-medium text-sm transition-all flex items-center gap-2',
-                          isUpdateLiked(update.id)
-                            ? 'bg-rose-500 text-white shadow-lg shadow-rose-200'
-                            : 'bg-white border-2 border-gray-200 text-gray-700 hover:bg-rose-50 hover:border-rose-200 hover:text-rose-600'
-                        ]"
-                      >
-                        <i :class="isUpdateLiked(update.id) ? 'fas fa-heart' : 'far fa-heart'"></i>
-                        {{ isUpdateLiked(update.id) ? 'Liked' : 'Like' }}
-                      </button>
-                    </div>
-                  </div>
+                <h3 class="hero-title">{{ recentUpdates[0].title }}</h3>
+                <p class="hero-description">{{ recentUpdates[0].description }}</p>
+                <div class="hero-stats">
+                  <span><i class="fas fa-eye"></i> {{ recentUpdates[0].views }}</span>
+                  <span><i class="fas fa-heart"></i> {{ recentUpdates[0].likes }}</span>
+                  <span><i class="fas fa-comment"></i> {{ recentUpdates[0].comments }}</span>
                 </div>
               </div>
             </div>
-          </div>
+          </router-link>
         </div>
 
-        <!-- More Updates Sidebar -->
-        <div class="more-updates-sidebar">
-          <h3 class="more-updates-title"><i class="fas fa-list"></i> More Updates</h3>
-          <div class="more-updates-list">
-            <div
-              v-for="(update, index) in recentUpdates.slice(0, 5)"
-              :key="'thumb-' + index"
-              @click="goToSlide(index)"
-              :class="[
-                'more-update-card group',
-                index === currentSlide ? 'active' : ''
-              ]"
-            >
-              <div class="more-update-thumb">
-                <img :src="update.image" :alt="update.title" class="more-update-img">
-                <div class="more-update-play"><i class="fas fa-play"></i></div>
-                <span class="more-update-badge">{{ update.typeLabel }}</span>
+        <!-- Secondary Articles Grid -->
+        <div class="magazine-secondary">
+          <div
+            v-for="update in recentUpdates.slice(1, 5)"
+            :key="update.id"
+            class="secondary-card group"
+          >
+            <router-link :to="update.link" class="secondary-link">
+              <div class="secondary-image">
+                <img :src="update.image" :alt="update.title">
+                <div class="secondary-overlay"></div>
+                <span :class="['secondary-badge', update.type]">
+                  <i :class="update.typeIcon"></i>
+                  {{ update.typeLabel }}
+                </span>
+                <span v-if="update.isTrending" class="secondary-trending">
+                  <i class="fas fa-fire-alt"></i>
+                </span>
               </div>
-              <div class="more-update-info">
-                <span class="more-update-category">{{ update.type }}</span>
-                <h4 class="more-update-title">{{ update.title }}</h4>
-                <div class="more-update-meta">
-                  <span><i class="fas fa-clock"></i> {{ update.timeAgo }}</span>
-                  <span><i class="fas fa-eye"></i> {{ update.views }}</span>
+              <div class="secondary-content">
+                <div class="secondary-meta">
+                  <span class="secondary-time">{{ update.timeAgo }}</span>
+                  <span class="secondary-read">{{ update.readTime }}</span>
+                </div>
+                <h4 class="secondary-title">{{ update.title }}</h4>
+                <p class="secondary-description">{{ update.description }}</p>
+                <div class="secondary-footer">
+                  <div class="secondary-author">
+                    <div class="secondary-avatar" :style="{ backgroundColor: update.author.color }">
+                      {{ update.author.initials }}
+                    </div>
+                    <span>{{ update.author.name }}</span>
+                  </div>
+                  <div class="secondary-stats">
+                    <span><i class="fas fa-eye"></i> {{ update.views }}</span>
+                    <span><i class="fas fa-heart"></i> {{ update.likes }}</span>
+                  </div>
                 </div>
               </div>
-            </div>
+            </router-link>
           </div>
         </div>
       </div>
@@ -2099,419 +1960,475 @@ onUnmounted(() => {
   }
 }
 
-/* Updates Layout - Side by Side */
-.updates-layout {
+/* Magazine Layout Styles */
+.magazine-section {
+  background: linear-gradient(135deg, #ffffff 0%, #f0fdfa 100%);
+  border-radius: 1.5rem;
+  padding: 1.5rem;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.magazine-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.view-all-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.25rem;
+  background: white;
+  border: 2px solid #14b8a6;
+  color: #0d9488;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  transition: all 0.3s ease;
+}
+
+.view-all-btn:hover {
+  background: linear-gradient(135deg, #14b8a6, #0d9488);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(20, 184, 166, 0.4);
+}
+
+.magazine-grid {
   display: grid;
   grid-template-columns: 1fr;
   gap: 1.5rem;
-  align-items: stretch;
 }
 
 @media (min-width: 1024px) {
-  .updates-layout {
-    grid-template-columns: 3fr 1fr;
+  .magazine-grid {
+    grid-template-columns: 1.5fr 1fr;
   }
 }
 
-/* More Updates Sidebar */
-.more-updates-sidebar {
-  display: none;
+/* Hero Article */
+.magazine-hero {
+  min-height: 400px;
 }
 
-@media (min-width: 1024px) {
-  .more-updates-sidebar {
-    display: flex;
-    flex-direction: column;
-    min-width: 0;
-  }
-}
-
-.more-updates-title {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: #334155;
-  margin: 0 0 0.75rem 0;
-}
-
-.more-updates-title i {
-  color: #14b8a6;
-}
-
-.more-updates-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-/* More Update Card - Matching Up Next Style */
-.more-update-card {
-  display: flex;
-  gap: 0.625rem;
-  padding: 0.5rem;
-  background: white;
-  border: 1px solid #f1f5f9;
-  border-radius: 0.625rem;
-  cursor: pointer;
-  transition: all 0.25s ease;
-}
-
-.more-update-card:hover {
-  border-color: #e2e8f0;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
-  transform: translateX(4px);
-}
-
-.more-update-card.active {
-  border-color: #14b8a6;
-  background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 100%);
-}
-
-.more-update-thumb {
-  position: relative;
-  width: 88px;
-  height: 56px;
-  border-radius: 0.5rem;
+.hero-card {
+  display: block;
+  height: 100%;
+  border-radius: 1rem;
   overflow: hidden;
-  flex-shrink: 0;
-  background: #1e293b;
 }
 
-.more-update-img {
+.hero-image {
+  position: relative;
+  height: 100%;
+  min-height: 400px;
+}
+
+.hero-image img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.3s ease;
+  transition: transform 0.5s ease;
 }
 
-.more-update-card:hover .more-update-img {
-  transform: scale(1.1);
+.hero-card:hover .hero-image img {
+  transform: scale(1.05);
 }
 
-.more-update-play {
+.hero-overlay {
   position: absolute;
   inset: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.4) 50%, rgba(0, 0, 0, 0.1) 100%);
+}
+
+.hero-badges {
+  position: absolute;
+  top: 1.25rem;
+  left: 1.25rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  z-index: 2;
+}
+
+.hero-type-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem 1rem;
+  background: rgba(20, 184, 166, 0.95);
+  color: white;
+  border-radius: 2rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  backdrop-filter: blur(8px);
+}
+
+.hero-featured-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.5rem 0.875rem;
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: white;
+  border-radius: 2rem;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.hero-trending-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.5rem 0.875rem;
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: white;
+  border-radius: 2rem;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.hero-content {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 2rem 1.5rem;
+  z-index: 2;
+}
+
+.hero-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.8125rem;
+}
+
+.hero-author {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+}
+
+.hero-avatar {
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 0.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(0,0,0,0.3);
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.more-update-card:hover .more-update-play {
-  opacity: 1;
-}
-
-.more-update-play i {
   color: white;
-  font-size: 0.875rem;
+  font-size: 0.625rem;
+  font-weight: 700;
 }
 
-.more-update-badge {
-  position: absolute;
-  bottom: 4px;
-  right: 4px;
-  padding: 0.125rem 0.375rem;
-  background: rgba(0,0,0,0.8);
+.hero-divider {
+  opacity: 0.5;
+}
+
+.hero-title {
+  font-size: 1.75rem;
+  font-weight: 800;
   color: white;
-  font-size: 0.5625rem;
-  font-weight: 500;
-  border-radius: 0.25rem;
+  line-height: 1.25;
+  margin-bottom: 0.75rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  transition: color 0.3s ease;
 }
 
-.more-update-info {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+@media (min-width: 1024px) {
+  .hero-title {
+    font-size: 2rem;
+  }
 }
 
-.more-update-category {
-  font-size: 0.5625rem;
-  font-weight: 600;
-  color: #14b8a6;
-  text-transform: uppercase;
-  letter-spacing: 0.02em;
-  margin-bottom: 0.25rem;
+.hero-card:hover .hero-title {
+  color: #99f6e4;
 }
 
-.more-update-title {
-  font-size: 0.8125rem;
-  font-weight: 600;
-  color: #0f172a;
-  margin: 0 0 0.25rem 0;
-  line-height: 1.3;
+.hero-description {
+  font-size: 0.9375rem;
+  color: rgba(255, 255, 255, 0.8);
+  line-height: 1.6;
+  margin-bottom: 1rem;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  transition: color 0.2s ease;
 }
 
-.more-update-card:hover .more-update-title {
-  color: #0d9488;
-}
-
-.more-update-meta {
+.hero-stats {
   display: flex;
-  gap: 0.75rem;
-  font-size: 0.625rem;
-  color: #94a3b8;
+  gap: 1.25rem;
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 0.8125rem;
 }
 
-.more-update-meta i {
-  margin-right: 0.25rem;
-  color: #14b8a6;
-}
-
-/* Carousel Styles */
-.updates-carousel {
-  position: relative;
-  overflow: hidden;
-  width: 100%;
+.hero-stats span {
   display: flex;
-  flex-direction: column;
-  height: 100%;
+  align-items: center;
+  gap: 0.375rem;
 }
 
-.carousel-track {
-  display: flex;
-  width: 100%;
-  transition: transform 0.5s ease-in-out;
-  flex: 1;
+.hero-stats i {
+  color: #5eead4;
 }
 
-.carousel-slide {
-  min-width: 100%;
-  width: 100%;
-  flex: 0 0 100%;
-  display: flex;
-}
-
-.slide-content {
-  display: flex;
-  flex-direction: column;
+/* Secondary Articles */
+.magazine-secondary {
+  display: grid;
+  grid-template-columns: 1fr;
   gap: 1rem;
-  padding: 0;
-  width: 100%;
+}
+
+@media (min-width: 640px) {
+  .magazine-secondary {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .magazine-secondary {
+    grid-template-columns: 1fr;
+  }
+}
+
+.secondary-card {
+  background: white;
+  border-radius: 1rem;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+  transition: all 0.3s ease;
+}
+
+.secondary-card:hover {
+  border-color: #14b8a6;
+  box-shadow: 0 8px 25px rgba(20, 184, 166, 0.15);
+  transform: translateY(-4px);
+}
+
+.secondary-link {
+  display: flex;
+  flex-direction: column;
   height: 100%;
 }
 
 @media (min-width: 1024px) {
-  .slide-content {
+  .secondary-link {
     flex-direction: row;
   }
 }
 
-.slide-image {
-  width: 100%;
+.secondary-image {
+  position: relative;
+  height: 140px;
+  flex-shrink: 0;
+  overflow: hidden;
 }
 
 @media (min-width: 1024px) {
-  .slide-image {
-    width: 40%;
-    flex-shrink: 0;
-    display: flex;
-    flex-direction: column;
-  }
-
-  .slide-image > div {
-    flex: 1;
-    height: 100%;
+  .secondary-image {
+    width: 140px;
+    height: auto;
+    min-height: 120px;
   }
 }
 
-.slide-text {
+.secondary-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.secondary-card:hover .secondary-image img {
+  transform: scale(1.1);
+}
+
+.secondary-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.3));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.secondary-card:hover .secondary-overlay {
+  opacity: 1;
+}
+
+.secondary-badge {
+  position: absolute;
+  top: 0.625rem;
+  left: 0.625rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.625rem;
+  border-radius: 1rem;
+  font-size: 0.625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.secondary-badge.announcement {
+  background: linear-gradient(135deg, #fef3c7, #fde68a);
+  color: #92400e;
+}
+
+.secondary-badge.article {
+  background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+  color: #1e40af;
+}
+
+.secondary-badge.event {
+  background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+  color: #065f46;
+}
+
+.secondary-badge.venue {
+  background: linear-gradient(135deg, #ede9fe, #ddd6fe);
+  color: #5b21b6;
+}
+
+.secondary-badge.stats {
+  background: linear-gradient(135deg, #fee2e2, #fecaca);
+  color: #991b1b;
+}
+
+.secondary-trending {
+  position: absolute;
+  top: 0.625rem;
+  right: 0.625rem;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.625rem;
+}
+
+.secondary-content {
+  flex: 1;
+  padding: 1rem;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  padding: 0;
-  width: 100%;
-  gap: 1rem;
 }
 
-@media (min-width: 1024px) {
-  .slide-text {
-    width: 60%;
-    padding-left: 0.5rem;
-  }
-}
-
-.slide-text-header {
-  flex-shrink: 0;
-}
-
-.slide-text-body {
-  flex: 1;
+.secondary-meta {
   display: flex;
   align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.6875rem;
+  color: #64748b;
 }
 
-.slide-text-footer {
-  flex-shrink: 0;
-}
-
-.update-type-badge {
-  display: inline-flex;
+.secondary-time {
+  display: flex;
   align-items: center;
-  gap: 0.375rem;
-  padding: 0.375rem 0.75rem;
-  border-radius: 100px;
-  font-size: 0.75rem;
+  gap: 0.25rem;
+}
+
+.secondary-read {
+  color: #14b8a6;
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.025em;
 }
 
-.update-type-badge.announcement {
-  background: linear-gradient(135deg, #fef3c7, #fde68a);
-  color: #92400e;
+.secondary-title {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: #0f172a;
+  line-height: 1.4;
+  margin-bottom: 0.5rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  transition: color 0.3s ease;
 }
 
-.update-type-badge.venue {
-  background: linear-gradient(135deg, #dbeafe, #bfdbfe);
-  color: #1e40af;
-}
-
-.update-type-badge.event {
-  background: linear-gradient(135deg, #d1fae5, #a7f3d0);
-  color: #065f46;
-}
-
-.update-type-badge.article {
-  background: linear-gradient(135deg, #f3e8ff, #e9d5ff);
-  color: #6b21a8;
-}
-
-.update-type-badge.stats {
-  background: linear-gradient(135deg, #ffe4e6, #fecdd3);
-  color: #be123c;
-}
-
-.carousel-nav-btn {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(20, 184, 166, 0.2);
+.secondary-card:hover .secondary-title {
   color: #0d9488;
+}
+
+.secondary-description {
+  font-size: 0.8125rem;
+  color: #64748b;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin-bottom: 0.75rem;
+  flex: 1;
+}
+
+.secondary-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 0.75rem;
+  border-top: 1px solid #f1f5f9;
+}
+
+.secondary-author {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  color: #475569;
+  font-weight: 500;
+}
+
+.secondary-avatar {
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 0.375rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  z-index: 10;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-}
-
-.carousel-nav-btn:hover {
-  background: linear-gradient(135deg, #14b8a6, #0d9488);
   color: white;
-  transform: translateY(-50%) scale(1.1);
-  box-shadow: 0 8px 25px rgba(20, 184, 166, 0.4);
+  font-size: 0.5625rem;
+  font-weight: 700;
 }
 
-.carousel-nav-btn.prev {
-  left: 16px;
-}
-
-.carousel-nav-btn.next {
-  right: 16px;
-}
-
-.carousel-dots {
+.secondary-stats {
   display: flex;
-  justify-content: center;
-  gap: 8px;
-  margin-top: 16px;
+  gap: 0.75rem;
+  font-size: 0.6875rem;
+  color: #94a3b8;
 }
 
-.carousel-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #d1d5db;
-  border: none;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  padding: 0;
-}
-
-.carousel-dot:hover {
-  background: #99f6e4;
-  transform: scale(1.2);
-}
-
-.carousel-dot.active {
-  background: linear-gradient(135deg, #14b8a6, #0d9488);
-  width: 24px;
-  border-radius: 12px;
-}
-
-.update-badge {
-  display: inline-flex;
+.secondary-stats span {
+  display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 4px 12px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+  gap: 0.25rem;
 }
 
-.update-badge.announcement {
-  background: linear-gradient(135deg, #fef3c7, #fde68a);
-  color: #92400e;
-}
-
-.update-badge.article {
-  background: linear-gradient(135deg, #dbeafe, #bfdbfe);
-  color: #1e40af;
-}
-
-.update-badge.event {
-  background: linear-gradient(135deg, #d1fae5, #a7f3d0);
-  color: #065f46;
-}
-
-.update-badge.course {
-  background: linear-gradient(135deg, #ede9fe, #ddd6fe);
-  color: #5b21b6;
-}
-
-.update-badge.policy {
-  background: linear-gradient(135deg, #fee2e2, #fecaca);
-  color: #991b1b;
-}
-
-.update-badge.venue {
-  background: linear-gradient(135deg, #ede9fe, #ddd6fe);
-  color: #5b21b6;
-}
-
-.update-badge.stats {
-  background: linear-gradient(135deg, #fee2e2, #fecaca);
-  color: #991b1b;
-}
-
-.slide-progress {
-  height: 100%;
-  background: linear-gradient(90deg, #14b8a6, #0d9488);
-  animation: slideProgress 5s linear;
-}
-
-@keyframes slideProgress {
-  from { width: 0%; }
-  to { width: 100%; }
+.secondary-stats i {
+  color: #14b8a6;
+  font-size: 0.625rem;
 }
 
 /* Progress bar animation */
