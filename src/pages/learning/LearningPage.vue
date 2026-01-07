@@ -2324,107 +2324,146 @@ function resumeFeaturedAutoPlay() {
           </div>
         </div>
 
-        <!-- Explore Learning Paths - Premium Section -->
-        <div class="explore-paths-section">
-          <div class="explore-paths-header">
-            <div class="explore-paths-title-wrap">
-              <div class="explore-paths-icon">
-                <i class="fas fa-compass"></i>
+        <!-- Explore Learning Paths Section (Using All Courses Card Style) -->
+        <div class="all-courses-wrapper bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+          <!-- Section Header -->
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-200">
+                <i class="fas fa-route text-white text-sm"></i>
               </div>
               <div>
-                <h2 class="explore-paths-title">Explore Learning Paths</h2>
-                <p class="explore-paths-subtitle">{{ filteredPaths.length }} structured learning journeys to master</p>
+                <span class="block text-lg font-bold text-gray-900">Explore Learning Paths</span>
+                <span class="text-xs text-gray-500">{{ filteredPaths.length }} structured learning journeys</span>
               </div>
             </div>
-            <div class="explore-paths-controls">
-              <select v-model="pathFilter" class="explore-paths-filter">
+            <div class="flex items-center gap-2">
+              <select v-model="pathFilter" class="text-xs px-3 py-2 rounded-lg border border-gray-200 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-teal-500 cursor-pointer">
                 <option value="all">All Paths</option>
                 <option value="enrolled">My Enrolled</option>
                 <option value="available">Available</option>
               </select>
-              <button class="explore-paths-see-all">
-                See All <i class="fas fa-arrow-right"></i>
-              </button>
             </div>
           </div>
 
-          <div class="explore-paths-grid">
-            <div v-for="path in filteredPaths" :key="path.id" class="explore-path-card">
-              <!-- Save Button -->
-              <button class="explore-path-save-btn">
-                <i class="far fa-bookmark"></i>
+          <!-- Paths Grid -->
+          <div class="p-4">
+            <div class="all-courses-grid">
+              <div v-for="path in filteredPaths" :key="path.id"
+                   class="all-course-card group bg-white rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 hover:-translate-y-1.5 border border-gray-100 shadow-sm hover:shadow-lg hover:border-teal-200">
+                <!-- Card Thumbnail -->
+                <div class="relative aspect-video">
+                  <img :src="path.image" :alt="path.title" class="absolute inset-0 w-full h-full object-cover" />
+                  <div class="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent"></div>
+
+                  <!-- Save Button -->
+                  <button
+                    class="absolute top-2 right-2 w-8 h-8 rounded-full flex items-center justify-center transition-all z-10 bg-white/90 text-gray-600 opacity-0 group-hover:opacity-100 hover:bg-teal-500 hover:text-white"
+                  >
+                    <i class="far fa-bookmark text-sm"></i>
+                  </button>
+
+                  <!-- Badges -->
+                  <div class="absolute top-2 left-2 flex gap-1.5 z-10">
+                    <span v-if="path.isEnrolled" :class="['px-2 py-0.5 text-[10px] font-semibold rounded-full', path.progress === 100 ? 'bg-green-500 text-white' : path.progress > 0 ? 'bg-blue-500 text-white' : 'bg-gray-500 text-white']">
+                      {{ path.progress === 100 ? 'Completed' : path.progress > 0 ? 'In Progress' : 'Not Started' }}
+                    </span>
+                    <span v-if="path.enrolled > 1000" class="all-course-new-badge" style="background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);">
+                      <i class="fas fa-fire"></i> Popular
+                    </span>
+                  </div>
+
+                  <!-- Duration Badge -->
+                  <div class="absolute bottom-3 right-3 all-course-duration-badge z-10">
+                    <i class="fas fa-clock"></i> {{ path.duration }}
+                  </div>
+
+                  <!-- Play Button -->
+                  <div class="all-course-play-btn">
+                    <i class="fas fa-play"></i>
+                  </div>
+
+                  <!-- Progress Bar for Enrolled Paths -->
+                  <div v-if="path.isEnrolled" class="absolute bottom-0 left-0 right-0 h-1.5 bg-black/30 z-10">
+                    <div class="h-full bg-gradient-to-r from-teal-400 to-teal-500 transition-all" :style="{ width: path.progress + '%' }"></div>
+                  </div>
+                </div>
+
+                <!-- Card Body -->
+                <div class="p-4">
+                  <!-- Meta Info -->
+                  <div class="flex items-center gap-3 text-[11px] text-gray-400 mb-2">
+                    <span class="flex items-center gap-1">
+                      <i class="fas fa-book text-[9px]"></i>
+                      {{ path.totalCourses }} courses
+                    </span>
+                    <span class="flex items-center gap-1">
+                      <i class="fas fa-signal text-[9px]"></i>
+                      {{ path.level }}
+                    </span>
+                  </div>
+
+                  <!-- Title -->
+                  <h3 class="text-sm font-semibold text-gray-800 mb-2 line-clamp-2 group-hover:text-teal-600 transition-colors leading-snug">
+                    {{ path.title }}
+                  </h3>
+
+                  <!-- Description -->
+                  <p class="text-xs text-gray-500 mb-3 line-clamp-2">{{ path.description }}</p>
+
+                  <!-- Skills Tags -->
+                  <div class="flex flex-wrap gap-1.5 mb-3">
+                    <span
+                      v-for="skill in path.skills.slice(0, 3)"
+                      :key="skill"
+                      class="px-2 py-0.5 bg-gray-100 text-gray-600 text-[10px] font-medium rounded-full hover:bg-teal-50 hover:text-teal-600 transition-colors"
+                    >
+                      {{ skill }}
+                    </span>
+                    <span v-if="path.skills.length > 3" class="px-2 py-0.5 bg-gray-100 text-gray-500 text-[10px] rounded-full">
+                      +{{ path.skills.length - 3 }}
+                    </span>
+                  </div>
+
+                  <!-- Footer -->
+                  <div class="flex items-center justify-between pt-3 border-t border-gray-100">
+                    <!-- Path Icon -->
+                    <div class="flex items-center gap-2">
+                      <div class="w-7 h-7 rounded-full flex items-center justify-center text-white text-[10px] font-semibold shadow-sm" :style="{ background: `linear-gradient(135deg, ${path.color} 0%, ${path.color}dd 100%)` }">
+                        <i :class="[path.icon, 'text-xs']"></i>
+                      </div>
+                      <span class="text-xs text-gray-600 font-medium">Learning Path</span>
+                    </div>
+
+                    <!-- Stats -->
+                    <div class="flex items-center gap-3 text-[11px] text-gray-400">
+                      <span class="flex items-center gap-1 hover:text-amber-500 transition-colors">
+                        <i class="fas fa-star text-[9px] text-amber-400"></i>
+                        {{ path.rating }}
+                      </span>
+                      <span v-if="path.isEnrolled" class="font-bold text-teal-600 text-sm">
+                        {{ path.progress }}%
+                      </span>
+                      <span v-else class="flex items-center gap-1 hover:text-teal-500 transition-colors">
+                        <i class="fas fa-users text-[9px]"></i>
+                        {{ (path.enrolled / 1000).toFixed(1) }}k
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Empty State -->
+            <div v-if="filteredPaths.length === 0" class="all-courses-empty">
+              <div class="all-courses-empty-icon">
+                <i class="fas fa-route"></i>
+              </div>
+              <h3 class="all-courses-empty-title">No learning paths found</h3>
+              <p class="all-courses-empty-text">Try adjusting your filter selection</p>
+              <button @click="pathFilter = 'all'" class="all-courses-clear-btn">
+                <i class="fas fa-redo"></i> Reset Filters
               </button>
-
-              <!-- Popular Badge -->
-              <div v-if="path.enrolled > 1000" class="explore-path-popular">
-                <i class="fas fa-fire"></i> Popular
-              </div>
-
-              <!-- Path Image -->
-              <div class="explore-path-image">
-                <img :src="path.image" :alt="path.title">
-                <div class="explore-path-overlay"></div>
-
-                <!-- Badges -->
-                <div class="explore-path-top-badges">
-                  <span :class="['explore-path-level', path.levelClass]">{{ path.level }}</span>
-                  <span v-if="path.isEnrolled" class="explore-path-enrolled">
-                    <i class="fas fa-check"></i> Enrolled
-                  </span>
-                </div>
-
-                <!-- Icon & Title Overlay -->
-                <div class="explore-path-image-content">
-                  <div class="explore-path-icon-wrap" :style="{ backgroundColor: path.color }">
-                    <i :class="[path.icon, 'text-white']"></i>
-                  </div>
-                  <h3 class="explore-path-image-title">{{ path.title }}</h3>
-                </div>
-
-                <!-- Duration Badge -->
-                <div class="explore-path-duration">
-                  <i class="fas fa-clock"></i> {{ path.duration }}
-                </div>
-              </div>
-
-              <!-- Path Content -->
-              <div class="explore-path-content">
-                <p class="explore-path-description">{{ path.description }}</p>
-
-                <!-- Skills Tags -->
-                <div class="explore-path-skills">
-                  <span v-for="skill in path.skills.slice(0, 3)" :key="skill" class="explore-path-skill">
-                    {{ skill }}
-                  </span>
-                  <span v-if="path.skills.length > 3" class="explore-path-skill more">
-                    +{{ path.skills.length - 3 }}
-                  </span>
-                </div>
-
-                <!-- Stats Row -->
-                <div class="explore-path-stats">
-                  <span><i class="fas fa-book"></i> {{ path.totalCourses }} courses</span>
-                  <span><i class="fas fa-users"></i> {{ path.enrolled.toLocaleString() }}</span>
-                  <span><i class="fas fa-star"></i> {{ path.rating }}</span>
-                </div>
-
-                <!-- Progress (for enrolled paths) -->
-                <div v-if="path.isEnrolled && path.progress > 0" class="explore-path-progress">
-                  <div class="progress-header">
-                    <span>Progress</span>
-                    <span class="progress-value">{{ path.progress }}%</span>
-                  </div>
-                  <div class="progress-bar">
-                    <div class="progress-fill" :style="{ width: path.progress + '%' }"></div>
-                  </div>
-                </div>
-
-                <!-- Action Button -->
-                <button :class="['explore-path-btn', { enrolled: path.isEnrolled }]">
-                  <i :class="path.isEnrolled ? 'fas fa-play' : 'fas fa-plus'"></i>
-                  {{ path.isEnrolled ? (path.progress > 0 ? 'Continue Path' : 'Start Path') : 'Enroll in Path' }}
-                </button>
-              </div>
             </div>
           </div>
         </div>
@@ -5253,466 +5292,6 @@ function resumeFeaturedAutoPlay() {
   font-size: 0.5rem;
 }
 
-/* ========================================
-   EXPLORE LEARNING PATHS SECTION
-   ======================================== */
-.explore-paths-section {
-  background: white;
-  border: 1px solid #e5e7eb;
-  border-radius: 1rem;
-  padding: 1.25rem;
-  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-}
-
-.explore-paths-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 1.25rem;
-}
-
-.explore-paths-title-wrap {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.explore-paths-icon {
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: 0.75rem;
-  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
-  animation: pulse-explore 2s ease-in-out infinite;
-}
-
-@keyframes pulse-explore {
-  0%, 100% { box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3); }
-  50% { box-shadow: 0 4px 20px rgba(99, 102, 241, 0.5); }
-}
-
-.explore-paths-icon i {
-  color: white;
-  font-size: 0.875rem;
-}
-
-.explore-paths-title {
-  font-size: 1.125rem;
-  font-weight: 700;
-  color: #1e293b;
-  margin: 0;
-}
-
-.explore-paths-subtitle {
-  font-size: 0.75rem;
-  color: #64748b;
-  margin: 0;
-}
-
-.explore-paths-controls {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.explore-paths-filter {
-  padding: 0.5rem 0.75rem;
-  border: 1px solid #e2e8f0;
-  border-radius: 0.5rem;
-  font-size: 0.75rem;
-  color: #475569;
-  background: white;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.explore-paths-filter:focus {
-  outline: none;
-  border-color: #6366f1;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
-}
-
-.explore-paths-see-all {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 1rem;
-  background: transparent;
-  border: 1px solid #e2e8f0;
-  border-radius: 0.5rem;
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: #64748b;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.explore-paths-see-all:hover {
-  background: #eef2ff;
-  color: #6366f1;
-  border-color: #6366f1;
-}
-
-.explore-paths-see-all i {
-  font-size: 0.625rem;
-  transition: transform 0.2s ease;
-}
-
-.explore-paths-see-all:hover i {
-  transform: translateX(3px);
-}
-
-.explore-paths-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1.25rem;
-}
-
-.explore-path-card {
-  position: relative;
-  background: white;
-  border: 1px solid #e2e8f0;
-  border-radius: 1rem;
-  overflow: hidden;
-  transition: all 0.3s ease;
-  cursor: pointer;
-}
-
-.explore-path-card:hover {
-  border-color: #6366f1;
-  box-shadow: 0 12px 32px rgba(99, 102, 241, 0.15);
-  transform: translateY(-4px);
-}
-
-/* Save Button */
-.explore-path-save-btn {
-  position: absolute;
-  top: 0.75rem;
-  right: 0.75rem;
-  width: 2rem;
-  height: 2rem;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.95);
-  border: 1px solid #e2e8f0;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-  z-index: 10;
-  opacity: 0;
-  transform: scale(0.8);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-}
-
-.explore-path-card:hover .explore-path-save-btn {
-  opacity: 1;
-  transform: scale(1);
-}
-
-.explore-path-save-btn:hover {
-  transform: scale(1.1);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.explore-path-save-btn i {
-  font-size: 0.75rem;
-  color: #64748b;
-  transition: all 0.2s ease;
-}
-
-.explore-path-save-btn:hover i {
-  color: #6366f1;
-}
-
-/* Popular Badge */
-.explore-path-popular {
-  position: absolute;
-  top: 0.75rem;
-  left: 0.75rem;
-  padding: 0.25rem 0.5rem;
-  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
-  color: white;
-  font-size: 0.625rem;
-  font-weight: 600;
-  border-radius: 0.375rem;
-  z-index: 10;
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-  box-shadow: 0 2px 8px rgba(249, 115, 22, 0.4);
-}
-
-.explore-path-popular i {
-  font-size: 0.5rem;
-}
-
-/* Path Image */
-.explore-path-image {
-  position: relative;
-  height: 140px;
-  overflow: hidden;
-}
-
-.explore-path-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.5s ease;
-}
-
-.explore-path-card:hover .explore-path-image img {
-  transform: scale(1.08);
-}
-
-.explore-path-overlay {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.3) 50%, transparent 100%);
-  pointer-events: none;
-}
-
-.explore-path-top-badges {
-  position: absolute;
-  top: 0.75rem;
-  left: 0.75rem;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.explore-path-level {
-  padding: 0.25rem 0.5rem;
-  font-size: 0.625rem;
-  font-weight: 600;
-  border-radius: 0.375rem;
-  text-transform: uppercase;
-  backdrop-filter: blur(4px);
-}
-
-.explore-path-level.beginner {
-  background: rgba(34, 197, 94, 0.9);
-  color: white;
-}
-
-.explore-path-level.intermediate {
-  background: rgba(245, 158, 11, 0.9);
-  color: white;
-}
-
-.explore-path-level.advanced {
-  background: rgba(239, 68, 68, 0.9);
-  color: white;
-}
-
-.explore-path-enrolled {
-  padding: 0.25rem 0.5rem;
-  background: rgba(20, 184, 166, 0.9);
-  color: white;
-  font-size: 0.625rem;
-  font-weight: 600;
-  border-radius: 0.375rem;
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-  backdrop-filter: blur(4px);
-}
-
-.explore-path-enrolled i {
-  font-size: 0.5rem;
-}
-
-.explore-path-image-content {
-  position: absolute;
-  bottom: 0.75rem;
-  left: 0.75rem;
-  right: 0.75rem;
-  display: flex;
-  align-items: center;
-  gap: 0.625rem;
-}
-
-.explore-path-icon-wrap {
-  width: 2.25rem;
-  height: 2.25rem;
-  min-width: 2.25rem;
-  border-radius: 0.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
-}
-
-.explore-path-icon-wrap i {
-  font-size: 0.875rem;
-}
-
-.explore-path-image-title {
-  font-size: 0.875rem;
-  font-weight: 700;
-  color: white;
-  margin: 0;
-  line-height: 1.3;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-}
-
-.explore-path-duration {
-  position: absolute;
-  bottom: 0.75rem;
-  right: 0.75rem;
-  padding: 0.25rem 0.5rem;
-  background: rgba(0, 0, 0, 0.75);
-  backdrop-filter: blur(4px);
-  color: white;
-  font-size: 0.625rem;
-  font-weight: 600;
-  border-radius: 0.375rem;
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-}
-
-.explore-path-duration i {
-  font-size: 0.5rem;
-}
-
-/* Path Content */
-.explore-path-content {
-  padding: 1rem;
-}
-
-.explore-path-description {
-  font-size: 0.75rem;
-  color: #64748b;
-  line-height: 1.5;
-  margin: 0 0 0.75rem 0;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.explore-path-skills {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.375rem;
-  margin-bottom: 0.75rem;
-}
-
-.explore-path-skill {
-  padding: 0.25rem 0.5rem;
-  background: #f1f5f9;
-  color: #475569;
-  font-size: 0.625rem;
-  font-weight: 500;
-  border-radius: 9999px;
-}
-
-.explore-path-skill.more {
-  background: #e2e8f0;
-  color: #64748b;
-}
-
-.explore-path-stats {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  margin-bottom: 0.75rem;
-}
-
-.explore-path-stats span {
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-  font-size: 0.6875rem;
-  color: #64748b;
-}
-
-.explore-path-stats i {
-  font-size: 0.5625rem;
-  color: #94a3b8;
-}
-
-.explore-path-stats i.fa-star {
-  color: #f59e0b;
-}
-
-/* Progress */
-.explore-path-progress {
-  margin-bottom: 0.75rem;
-  padding: 0.625rem;
-  background: #f8fafc;
-  border-radius: 0.5rem;
-}
-
-.explore-path-progress .progress-header {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.6875rem;
-  color: #64748b;
-  margin-bottom: 0.375rem;
-}
-
-.explore-path-progress .progress-value {
-  font-weight: 600;
-  color: #14b8a6;
-}
-
-.explore-path-progress .progress-bar {
-  height: 4px;
-  background: #e2e8f0;
-  border-radius: 2px;
-  overflow: hidden;
-}
-
-.explore-path-progress .progress-fill {
-  height: 100%;
-  background: linear-gradient(90deg, #14b8a6 0%, #0d9488 100%);
-  border-radius: 2px;
-  transition: width 0.5s ease;
-}
-
-/* Action Button */
-.explore-path-btn {
-  width: 100%;
-  padding: 0.625rem 1rem;
-  background: white;
-  border: 2px solid #6366f1;
-  border-radius: 0.5rem;
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: #6366f1;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.375rem;
-  transition: all 0.2s ease;
-}
-
-.explore-path-btn:hover {
-  background: #eef2ff;
-}
-
-.explore-path-btn.enrolled {
-  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
-  border-color: transparent;
-  color: white;
-  box-shadow: 0 4px 12px rgba(20, 184, 166, 0.25);
-}
-
-.explore-path-btn.enrolled:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(20, 184, 166, 0.35);
-}
-
-.explore-path-btn i {
-  font-size: 0.625rem;
-}
-
 /* All Courses Section */
 .all-courses-wrapper {
   margin-bottom: 1.5rem;
@@ -6316,68 +5895,6 @@ function resumeFeaturedAutoPlay() {
     justify-content: center;
   }
 
-  /* Explore Learning Paths Responsive */
-  .explore-paths-section {
-    padding: 1rem;
-  }
-
-  .explore-paths-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.75rem;
-  }
-
-  .explore-paths-controls {
-    width: 100%;
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-
-  .explore-paths-filter {
-    width: 100%;
-  }
-
-  .explore-paths-see-all {
-    width: 100%;
-    justify-content: center;
-  }
-
-  .explore-paths-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.75rem;
-  }
-
-  .explore-path-card {
-    border-radius: 0.75rem;
-  }
-
-  .explore-path-image {
-    height: 110px;
-  }
-
-  .explore-path-save-btn {
-    opacity: 1;
-    transform: scale(1);
-  }
-
-  .explore-path-content {
-    padding: 0.75rem;
-  }
-
-  .explore-path-description {
-    font-size: 0.6875rem;
-    -webkit-line-clamp: 1;
-  }
-
-  .explore-path-image-title {
-    font-size: 0.75rem;
-  }
-
-  .explore-path-btn {
-    padding: 0.5rem 0.75rem;
-    font-size: 0.6875rem;
-  }
-
   /* All Courses Responsive */
   .all-courses-grid {
     grid-template-columns: 1fr;
@@ -6432,28 +5949,6 @@ function resumeFeaturedAutoPlay() {
 
   .my-path-skills {
     display: none;
-  }
-
-  /* Explore Learning Paths Mobile */
-  .explore-paths-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .explore-path-image {
-    height: 100px;
-  }
-
-  .explore-path-description {
-    display: none;
-  }
-
-  .explore-path-skills {
-    display: none;
-  }
-
-  .explore-path-stats {
-    flex-wrap: wrap;
-    gap: 0.5rem;
   }
 }
 </style>
