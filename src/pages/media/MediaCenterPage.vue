@@ -371,26 +371,28 @@ const upNextVideos = ref([
 
 // Media Items
 const mediaItems = ref([
-  { id: 5, title: 'Saudi Arabia vs Japan: Opening Match Preview', type: 'video', category: 'Highlights', duration: '12:45', views: '45.2K', date: '2 days ago', thumbnail: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=400&h=225&fit=crop', isNew: true, hasTranscript: true, author: 'AFC Media', tags: ['Saudi Arabia', 'Japan', 'Group A', 'Preview'], sharedWithMe: true, sharedBy: 'John Smith' },
-  { id: 6, title: 'King Fahd Stadium: Behind the Scenes Tour', type: 'video', category: 'Behind the Scenes', duration: '18:30', views: '32.1K', date: '3 days ago', thumbnail: 'https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=400&h=225&fit=crop', isNew: true, hasTranscript: true, author: 'Venue Team', tags: ['Stadium', 'Riyadh', 'Exclusive'], sharedWithMe: false },
-  { id: 13, title: 'AFC Asian Cup 2027 Official Draw Ceremony', type: 'gallery', category: 'Highlights', photoCount: 48, views: '28.5K', date: '1 day ago', thumbnail: 'https://images.unsplash.com/photo-1459865264687-595d652de67e?w=400&h=225&fit=crop', isNew: true, author: 'AFC Media', tags: ['Draw', 'Official', 'Ceremony'], sharedWithMe: true, sharedBy: 'Sarah Wilson' },
-  { id: 18, title: 'AFC Asian Cup Official Podcast: Episode 1', type: 'audio', category: 'Interviews', duration: '45:30', views: '12.3K', date: '2 days ago', thumbnail: 'https://images.unsplash.com/photo-1478737270239-2f02b77fc618?w=400&h=225&fit=crop', isNew: true, hasTranscript: true, author: 'AFC Media', tags: ['Podcast', 'Official', 'Analysis'], sharedWithMe: false },
-  { id: 19, title: 'King Fahd Stadium Aerial View', type: 'image', category: 'Venues', views: '18.5K', date: '1 day ago', thumbnail: 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?w=400&h=225&fit=crop', isNew: true, author: 'AFC Media', tags: ['Stadium', 'Riyadh', 'Aerial'], sharedWithMe: false },
-  { id: 7, title: 'Coach Interview: Saudi Arabia Tactics Analysis', type: 'video', category: 'Interviews', duration: '25:15', views: '18.7K', date: '1 week ago', thumbnail: 'https://images.unsplash.com/photo-1551958219-acbc608c6377?w=400&h=225&fit=crop', isNew: false, hasTranscript: true, author: 'Sports Desk', tags: ['Saudi Arabia', 'Coach', 'Tactics'], sharedWithMe: true, sharedBy: 'Mike Johnson' },
-  { id: 20, title: 'Match Day Commentary: Live Analysis', type: 'audio', category: 'Matches', duration: '90:00', views: '8.7K', date: '4 days ago', thumbnail: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=400&h=225&fit=crop', isNew: true, author: 'AFC Radio', tags: ['Commentary', 'Live', 'Analysis'], sharedWithMe: false },
-  { id: 21, title: 'Saudi Arabia Team Photo 2027', type: 'image', category: 'Teams', views: '35.2K', date: '3 days ago', thumbnail: 'https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=400&h=225&fit=crop', isNew: true, author: 'AFC Media', tags: ['Saudi Arabia', 'Team', 'Official'], sharedWithMe: false },
-  { id: 14, title: 'Fan Zone Setup: Riyadh Boulevard', type: 'gallery', category: 'Fans', photoCount: 32, views: '15.3K', date: '3 days ago', thumbnail: 'https://images.unsplash.com/photo-1560272564-c83b66b1ad12?w=400&h=225&fit=crop', isNew: true, author: 'Events Team', tags: ['Fans', 'Riyadh', 'Fan Zone'], sharedWithMe: false },
-  { id: 8, title: 'Top 10 Goals: AFC Asian Cup History', type: 'video', category: 'Highlights', duration: '15:20', views: '89.4K', date: '1 week ago', thumbnail: 'https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?w=400&h=225&fit=crop', isNew: false, hasTranscript: true, author: 'AFC Media', tags: ['Goals', 'History', 'Top 10'], sharedWithMe: false },
-  { id: 22, title: 'Trophy Unveiling Ceremony', type: 'image', category: 'Highlights', views: '42.1K', date: '1 week ago', thumbnail: 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=400&h=225&fit=crop', isNew: false, author: 'AFC Media', tags: ['Trophy', 'Ceremony', 'Official'], sharedWithMe: true, sharedBy: 'Emily Davis' },
-  { id: 9, title: 'Team Japan: Road to Saudi Arabia 2027', type: 'video', category: 'Teams', duration: '22:10', views: '41.2K', date: '2 weeks ago', thumbnail: 'https://images.unsplash.com/photo-1606925797300-0b35e9d1794e?w=400&h=225&fit=crop', isNew: false, hasTranscript: true, author: 'AFC Media', tags: ['Japan', 'Team', 'Documentary'], sharedWithMe: false },
-  { id: 23, title: 'Pre-Match Analysis Podcast: Group A', type: 'audio', category: 'Matches', duration: '32:15', views: '6.4K', date: '1 week ago', thumbnail: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=400&h=225&fit=crop', isNew: false, author: 'AFC Analysts', tags: ['Podcast', 'Group A', 'Analysis'], sharedWithMe: false },
-  { id: 15, title: 'Volunteer Training Program Launch', type: 'gallery', category: 'Behind the Scenes', photoCount: 65, views: '12.8K', date: '1 week ago', thumbnail: 'https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=400&h=225&fit=crop', isNew: false, author: 'LOC Team', tags: ['Volunteers', 'Training', 'Behind the Scenes'], sharedWithMe: false },
-  { id: 10, title: 'Salem Al-Dawsari: Exclusive Interview', type: 'video', category: 'Interviews', duration: '18:30', views: '67.3K', date: '2 weeks ago', thumbnail: 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=400&h=225&fit=crop', isNew: false, hasTranscript: false, author: 'Sports Desk', tags: ['Saudi Arabia', 'Player', 'Exclusive'], sharedWithMe: false },
-  { id: 24, title: 'Fans Celebrating at Boulevard', type: 'image', category: 'Fans', views: '28.9K', date: '2 weeks ago', thumbnail: 'https://images.unsplash.com/photo-1459865264687-595d652de67e?w=400&h=225&fit=crop', isNew: false, author: 'Events Team', tags: ['Fans', 'Celebration', 'Riyadh'], sharedWithMe: false },
-  { id: 16, title: 'Stadium Infrastructure Progress Photos', type: 'gallery', category: 'Venues', photoCount: 28, views: '9.5K', date: '2 weeks ago', thumbnail: 'https://images.unsplash.com/photo-1489944440615-453fc2b6a9a9?w=400&h=225&fit=crop', isNew: false, author: 'Venue Operations', tags: ['Stadium', 'Infrastructure', 'Progress'], sharedWithMe: false },
-  { id: 11, title: 'Group Stage Draw Analysis', type: 'video', category: 'Highlights', duration: '35:00', views: '52.1K', date: '3 weeks ago', thumbnail: 'https://images.unsplash.com/photo-1518091043644-c1d4457512c6?w=400&h=225&fit=crop', isNew: false, hasTranscript: true, author: 'AFC Analysts', tags: ['Draw', 'Analysis', 'Groups'], sharedWithMe: false },
-  { id: 12, title: 'AFC Podcast: Tournament Predictions', type: 'audio', category: 'Interviews', duration: '48:20', views: '8.9K', date: '3 weeks ago', thumbnail: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=400&h=225&fit=crop', isNew: false, hasTranscript: false, author: 'AFC Media', tags: ['Podcast', 'Predictions', 'Analysis'], sharedWithMe: false },
-  { id: 17, title: 'Media Accreditation Workshop', type: 'gallery', category: 'Behind the Scenes', photoCount: 42, views: '6.2K', date: '3 weeks ago', thumbnail: 'https://images.unsplash.com/photo-1504450758481-7338eba7524a?w=400&h=225&fit=crop', isNew: false, author: 'Media Team', tags: ['Media', 'Workshop', 'Behind the Scenes'], sharedWithMe: false },
+  { id: 5, title: 'Saudi Arabia vs Japan: Opening Match Preview', type: 'video', category: 'Highlights', folderId: 'highlights', duration: '12:45', views: '45.2K', date: '2 days ago', thumbnail: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=400&h=225&fit=crop', isNew: true, hasTranscript: true, author: 'AFC Media', tags: ['Saudi Arabia', 'Japan', 'Group A', 'Preview'], sharedWithMe: true, sharedBy: 'John Smith' },
+  { id: 6, title: 'King Fahd Stadium: Behind the Scenes Tour', type: 'video', category: 'Behind the Scenes', folderId: 'venues', duration: '18:30', views: '32.1K', date: '3 days ago', thumbnail: 'https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=400&h=225&fit=crop', isNew: true, hasTranscript: true, author: 'Venue Team', tags: ['Stadium', 'Riyadh', 'Exclusive'], sharedWithMe: false },
+  { id: 13, title: 'AFC Asian Cup 2027 Official Draw Ceremony', type: 'gallery', category: 'Highlights', folderId: 'ceremonies', photoCount: 48, views: '28.5K', date: '1 day ago', thumbnail: 'https://images.unsplash.com/photo-1459865264687-595d652de67e?w=400&h=225&fit=crop', isNew: true, author: 'AFC Media', tags: ['Draw', 'Official', 'Ceremony'], sharedWithMe: true, sharedBy: 'Sarah Wilson' },
+  { id: 18, title: 'AFC Asian Cup Official Podcast: Episode 1', type: 'audio', category: 'Interviews', folderId: 'audio', duration: '45:30', views: '12.3K', date: '2 days ago', thumbnail: 'https://images.unsplash.com/photo-1478737270239-2f02b77fc618?w=400&h=225&fit=crop', isNew: true, hasTranscript: true, author: 'AFC Media', tags: ['Podcast', 'Official', 'Analysis'], sharedWithMe: false },
+  { id: 19, title: 'King Fahd Stadium Aerial View', type: 'image', category: 'Venues', folderId: 'venues', views: '18.5K', date: '1 day ago', thumbnail: 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?w=400&h=225&fit=crop', isNew: true, author: 'AFC Media', tags: ['Stadium', 'Riyadh', 'Aerial'], sharedWithMe: false },
+  { id: 7, title: 'Coach Interview: Saudi Arabia Tactics Analysis', type: 'video', category: 'Interviews', folderId: 'interviews', duration: '25:15', views: '18.7K', date: '1 week ago', thumbnail: 'https://images.unsplash.com/photo-1551958219-acbc608c6377?w=400&h=225&fit=crop', isNew: false, hasTranscript: true, author: 'Sports Desk', tags: ['Saudi Arabia', 'Coach', 'Tactics'], sharedWithMe: true, sharedBy: 'Mike Johnson' },
+  { id: 20, title: 'Match Day Commentary: Live Analysis', type: 'audio', category: 'Matches', folderId: 'audio', duration: '90:00', views: '8.7K', date: '4 days ago', thumbnail: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=400&h=225&fit=crop', isNew: true, author: 'AFC Radio', tags: ['Commentary', 'Live', 'Analysis'], sharedWithMe: false },
+  { id: 21, title: 'Saudi Arabia Team Photo 2027', type: 'image', category: 'Teams', folderId: 'team-profiles', views: '35.2K', date: '3 days ago', thumbnail: 'https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=400&h=225&fit=crop', isNew: true, author: 'AFC Media', tags: ['Saudi Arabia', 'Team', 'Official'], sharedWithMe: false },
+  { id: 14, title: 'Fan Zone Setup: Riyadh Boulevard', type: 'gallery', category: 'Fans', folderId: 'fan-zone', photoCount: 32, views: '15.3K', date: '3 days ago', thumbnail: 'https://images.unsplash.com/photo-1560272564-c83b66b1ad12?w=400&h=225&fit=crop', isNew: true, author: 'Events Team', tags: ['Fans', 'Riyadh', 'Fan Zone'], sharedWithMe: false },
+  { id: 8, title: 'Top 10 Goals: AFC Asian Cup History', type: 'video', category: 'Highlights', folderId: 'highlights', duration: '15:20', views: '89.4K', date: '1 week ago', thumbnail: 'https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?w=400&h=225&fit=crop', isNew: false, hasTranscript: true, author: 'AFC Media', tags: ['Goals', 'History', 'Top 10'], sharedWithMe: false },
+  { id: 22, title: 'Trophy Unveiling Ceremony', type: 'image', category: 'Highlights', folderId: 'ceremonies', views: '42.1K', date: '1 week ago', thumbnail: 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=400&h=225&fit=crop', isNew: false, author: 'AFC Media', tags: ['Trophy', 'Ceremony', 'Official'], sharedWithMe: true, sharedBy: 'Emily Davis' },
+  { id: 9, title: 'Team Japan: Road to Saudi Arabia 2027', type: 'video', category: 'Teams', folderId: 'team-profiles', duration: '22:10', views: '41.2K', date: '2 weeks ago', thumbnail: 'https://images.unsplash.com/photo-1606925797300-0b35e9d1794e?w=400&h=225&fit=crop', isNew: false, hasTranscript: true, author: 'AFC Media', tags: ['Japan', 'Team', 'Documentary'], sharedWithMe: false },
+  { id: 23, title: 'Pre-Match Analysis Podcast: Group A', type: 'audio', category: 'Matches', folderId: 'audio', duration: '32:15', views: '6.4K', date: '1 week ago', thumbnail: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=400&h=225&fit=crop', isNew: false, author: 'AFC Analysts', tags: ['Podcast', 'Group A', 'Analysis'], sharedWithMe: false },
+  { id: 15, title: 'Volunteer Training Program Launch', type: 'gallery', category: 'Behind the Scenes', folderId: 'photos', photoCount: 65, views: '12.8K', date: '1 week ago', thumbnail: 'https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=400&h=225&fit=crop', isNew: false, author: 'LOC Team', tags: ['Volunteers', 'Training', 'Behind the Scenes'], sharedWithMe: false },
+  { id: 10, title: 'Salem Al-Dawsari: Exclusive Interview', type: 'video', category: 'Interviews', folderId: 'interviews', duration: '18:30', views: '67.3K', date: '2 weeks ago', thumbnail: 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=400&h=225&fit=crop', isNew: false, hasTranscript: false, author: 'Sports Desk', tags: ['Saudi Arabia', 'Player', 'Exclusive'], sharedWithMe: false },
+  { id: 24, title: 'Fans Celebrating at Boulevard', type: 'image', category: 'Fans', folderId: 'fan-zone', views: '28.9K', date: '2 weeks ago', thumbnail: 'https://images.unsplash.com/photo-1459865264687-595d652de67e?w=400&h=225&fit=crop', isNew: false, author: 'Events Team', tags: ['Fans', 'Celebration', 'Riyadh'], sharedWithMe: false },
+  { id: 16, title: 'Stadium Infrastructure Progress Photos', type: 'gallery', category: 'Venues', folderId: 'venues', photoCount: 28, views: '9.5K', date: '2 weeks ago', thumbnail: 'https://images.unsplash.com/photo-1489944440615-453fc2b6a9a9?w=400&h=225&fit=crop', isNew: false, author: 'Venue Operations', tags: ['Stadium', 'Infrastructure', 'Progress'], sharedWithMe: false },
+  { id: 11, title: 'Group Stage Draw Analysis', type: 'video', category: 'Highlights', folderId: 'highlights', duration: '35:00', views: '52.1K', date: '3 weeks ago', thumbnail: 'https://images.unsplash.com/photo-1518091043644-c1d4457512c6?w=400&h=225&fit=crop', isNew: false, hasTranscript: true, author: 'AFC Analysts', tags: ['Draw', 'Analysis', 'Groups'], sharedWithMe: false },
+  { id: 12, title: 'AFC Podcast: Tournament Predictions', type: 'audio', category: 'Interviews', folderId: 'audio', duration: '48:20', views: '8.9K', date: '3 weeks ago', thumbnail: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=400&h=225&fit=crop', isNew: false, hasTranscript: false, author: 'AFC Media', tags: ['Podcast', 'Predictions', 'Analysis'], sharedWithMe: false },
+  { id: 17, title: 'Media Accreditation Workshop', type: 'gallery', category: 'Behind the Scenes', folderId: 'photos', photoCount: 42, views: '6.2K', date: '3 weeks ago', thumbnail: 'https://images.unsplash.com/photo-1504450758481-7338eba7524a?w=400&h=225&fit=crop', isNew: false, author: 'Media Team', tags: ['Media', 'Workshop', 'Behind the Scenes'], sharedWithMe: false },
+  { id: 25, title: 'Player Training Session Highlights', type: 'video', category: 'Teams', folderId: 'player-content', duration: '8:45', views: '22.3K', date: '5 days ago', thumbnail: 'https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?w=400&h=225&fit=crop', isNew: true, hasTranscript: false, author: 'AFC Media', tags: ['Training', 'Players', 'Exclusive'], sharedWithMe: false },
+  { id: 26, title: 'Official Tournament Videos Collection', type: 'video', category: 'Highlights', folderId: 'videos', duration: '25:00', views: '15.8K', date: '1 week ago', thumbnail: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=400&h=225&fit=crop', isNew: false, hasTranscript: true, author: 'AFC Media', tags: ['Official', 'Tournament', 'Collection'], sharedWithMe: false },
 ])
 
 // Computed: All available tags from media items
@@ -406,6 +408,7 @@ const allTags = computed(() => {
 const activeFiltersCount = computed(() => {
   let count = 0
   if (searchQuery.value) count++
+  if (selectedFolder.value) count++
   count += selectedMediaTypes.value.length
   count += selectedCategories.value.length
   count += selectedTags.value.length
@@ -455,6 +458,12 @@ const filteredMedia = computed(() => {
       if (selectedStatusFilters.value.includes('shared') && m.sharedWithMe) return true
       return false
     })
+  }
+
+  // Filter by selected folder (including children folders)
+  if (selectedFolder.value) {
+    const folderIds = getAllFolderIds(selectedFolder.value)
+    result = result.filter(m => m.folderId && folderIds.includes(m.folderId))
   }
 
   return result
@@ -611,6 +620,37 @@ function getFolderName(folderId: string): string {
   return findFolder(folderTree.value) || folderId
 }
 
+// Get all folder IDs including the selected folder and all its children (recursive)
+function getAllFolderIds(folderId: string): string[] {
+  const ids: string[] = [folderId]
+
+  function findAndCollectChildren(folders: any[]): boolean {
+    for (const folder of folders) {
+      if (folder.id === folderId) {
+        // Found the folder, collect all children recursively
+        collectAllChildIds(folder.children || [])
+        return true
+      }
+      if (folder.children?.length) {
+        if (findAndCollectChildren(folder.children)) return true
+      }
+    }
+    return false
+  }
+
+  function collectAllChildIds(children: any[]) {
+    for (const child of children) {
+      ids.push(child.id)
+      if (child.children?.length) {
+        collectAllChildIds(child.children)
+      }
+    }
+  }
+
+  findAndCollectChildren(folderTree.value)
+  return ids
+}
+
 // Selection mode functions
 function toggleSelectionMode() {
   isSelectionMode.value = !isSelectionMode.value
@@ -748,6 +788,7 @@ function toggleMediaTypeFilter(typeId: string) {
 
 function clearAllFilters() {
   searchQuery.value = ''
+  selectedFolder.value = null
   selectedMediaTypes.value = []
   selectedCategories.value = []
   selectedTags.value = []
@@ -1487,6 +1528,12 @@ onUnmounted(() => {
               <i class="fas fa-search text-[10px]"></i>
               "{{ searchQuery }}"
               <button @click="searchQuery = ''" class="ml-1 hover:text-gray-900 hover:bg-gray-200 rounded-full w-4 h-4 flex items-center justify-center"><i class="fas fa-times text-[10px]"></i></button>
+            </span>
+            <!-- Folder Filter -->
+            <span v-if="selectedFolder" class="px-2.5 py-1 bg-blue-50 text-blue-700 rounded-lg text-xs font-medium flex items-center gap-1.5 border border-blue-100">
+              <i class="fas fa-folder text-[10px]"></i>
+              {{ getFolderName(selectedFolder) }}
+              <button @click="selectedFolder = null" class="ml-1 hover:text-blue-900 hover:bg-blue-100 rounded-full w-4 h-4 flex items-center justify-center"><i class="fas fa-times text-[10px]"></i></button>
             </span>
             <!-- Media Type Filters -->
             <span
