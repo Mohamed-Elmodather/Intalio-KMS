@@ -8,6 +8,8 @@ const ArticleViewPage = () => import('@/pages/articles/ArticleViewPage.vue')
 const ArticleEditorPage = () => import('@/pages/articles/ArticleEditorPage.vue')
 const DocumentsPage = () => import('@/pages/documents/DocumentsPage.vue')
 const DocumentViewPage = () => import('@/pages/documents/DocumentViewPage.vue')
+const CollectionsPage = () => import('@/pages/collections/CollectionsPage.vue')
+const CollectionDetailPage = () => import('@/pages/collections/CollectionDetailPage.vue')
 const EventsPage = () => import('@/pages/events/EventsPage.vue')
 const EventDetailPage = () => import('@/pages/events/EventDetailPage.vue')
 const MediaCenterPage = () => import('@/pages/media/MediaCenterPage.vue')
@@ -84,6 +86,20 @@ export const routes: RouteRecordRaw[] = [
     name: 'DocumentView',
     component: DocumentViewPage,
     meta: { requiresAuth: true, title: 'Document' },
+  },
+
+  // Collections
+  {
+    path: '/collections',
+    name: 'Collections',
+    component: CollectionsPage,
+    meta: { requiresAuth: true, title: 'Collections' },
+  },
+  {
+    path: '/collections/:id',
+    name: 'CollectionDetail',
+    component: CollectionDetailPage,
+    meta: { requiresAuth: true, title: 'Collection' },
   },
 
   // Events

@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
+import ContentActionsDropdown from '@/components/common/ContentActionsDropdown.vue'
+import AddToCollectionModal from '@/components/common/AddToCollectionModal.vue'
 
 const router = useRouter()
 
@@ -29,6 +31,14 @@ const currentView = ref<'all' | 'recent' | 'popular' | 'saved' | 'trash'>('all')
 // Selection mode
 const isSelectionMode = ref(false)
 const selectedMedia = ref(new Set<number>())
+
+// Add to Collection modal
+const showAddToCollectionModal = ref(false)
+const selectedItemForCollection = ref<{
+  id: number
+  title: string
+  thumbnail?: string
+} | null>(null)
 
 // Dropdown filter states
 const showMediaTypeFilter = ref(false)
@@ -561,6 +571,23 @@ function shareMedia(media: any) {
     navigator.clipboard.writeText(window.location.origin + '/media/' + media.id)
     alert('Link copied to clipboard!')
   }
+}
+
+function openAddToCollection(media: any) {
+  selectedItemForCollection.value = {
+    id: media.id,
+    title: media.title,
+    thumbnail: media.thumbnail
+  }
+  showAddToCollectionModal.value = true
+}
+
+function handleAddedToCollection(collectionIds: string[]) {
+  if (collectionIds.length > 0) {
+    alert(`Added to ${collectionIds.length} collection(s)!`)
+  }
+  showAddToCollectionModal.value = false
+  selectedItemForCollection.value = null
 }
 
 function handleDrop(e: DragEvent) {
@@ -1119,9 +1146,13 @@ onUnmounted(() => {
                     title="Save">
                     <i :class="isMediaSaved(media.id) ? 'fas fa-bookmark' : 'far fa-bookmark'"></i>
                   </button>
-                  <button class="trending-action-btn" @click.stop="shareMedia(media)" title="Share">
-                    <i class="fas fa-share-alt"></i>
-                  </button>
+                  <ContentActionsDropdown
+                    :show-download="true"
+                    @add-to-collection="openAddToCollection(media)"
+                    @share="shareMedia(media)"
+                    @download="() => alert('Download: ' + media.title)"
+                    @copy-link="() => navigator.clipboard.writeText(window.location.origin + '/media/' + media.id)"
+                  />
                 </div>
               </div>
               <div class="trending-info">
@@ -2252,6 +2283,17 @@ onUnmounted(() => {
         </div>
       </Transition>
     </Teleport>
+
+    <!-- Add to Collection Modal -->
+    <AddToCollectionModal
+      :show="showAddToCollectionModal"
+      content-type="media"
+      :content-id="selectedItemForCollection?.id ?? 0"
+      :content-title="selectedItemForCollection?.title ?? ''"
+      :content-thumbnail="selectedItemForCollection?.thumbnail"
+      @close="showAddToCollectionModal = false; selectedItemForCollection = null"
+      @added="handleAddedToCollection"
+    />
   </div>
 </template>
 
