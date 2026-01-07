@@ -14,17 +14,19 @@ const continueLearningRef = ref<HTMLElement | null>(null)
 const currentFeaturedCourseIndex = ref(0)
 const featuredCourseInterval = ref<number | null>(null)
 
-// Get in-progress courses for carousel
+// Featured course from all enrolled courses
+const featuredCourse = computed(() =>
+  enrolledCourses.value[currentFeaturedCourseIndex.value] || enrolledCourses.value[0]
+)
+
+// Other courses (excluding the currently featured one)
+const otherCourses = computed(() =>
+  enrolledCourses.value.filter((_, idx) => idx !== currentFeaturedCourseIndex.value).slice(0, 4)
+)
+
+// Keep inProgressCourses for stats
 const inProgressCourses = computed(() =>
   enrolledCourses.value.filter(c => c.progress > 0 && c.progress < 100)
-)
-
-const featuredCourse = computed(() =>
-  inProgressCourses.value[currentFeaturedCourseIndex.value] || inProgressCourses.value[0]
-)
-
-const upNextCourses = computed(() =>
-  inProgressCourses.value.filter((_, idx) => idx !== currentFeaturedCourseIndex.value).slice(0, 3)
 )
 
 // Tab state
@@ -507,12 +509,12 @@ function scrollContinueLearning(direction: 'left' | 'right') {
 
 // Featured course carousel functions
 function nextFeaturedCourse() {
-  currentFeaturedCourseIndex.value = (currentFeaturedCourseIndex.value + 1) % inProgressCourses.value.length
+  currentFeaturedCourseIndex.value = (currentFeaturedCourseIndex.value + 1) % enrolledCourses.value.length
 }
 
 function prevFeaturedCourse() {
   currentFeaturedCourseIndex.value = currentFeaturedCourseIndex.value === 0
-    ? inProgressCourses.value.length - 1
+    ? enrolledCourses.value.length - 1
     : currentFeaturedCourseIndex.value - 1
 }
 
@@ -628,21 +630,21 @@ function resumeFeaturedAutoPlay() {
 
       <!-- My Courses Tab -->
       <div v-if="activeTab === 'my-courses'" class="space-y-6">
-        <!-- Continue Learning Featured Section -->
-        <div v-if="inProgressCourses.length > 0" class="continue-learning-section">
-          <div class="continue-learning-header">
+        <!-- Featured Courses Section -->
+        <div v-if="enrolledCourses.length > 0" class="featured-courses-section">
+          <div class="featured-courses-header">
             <div class="flex items-center gap-3">
-              <div class="continue-learning-icon">
-                <i class="fas fa-play"></i>
+              <div class="featured-courses-icon">
+                <i class="fas fa-star"></i>
               </div>
               <div>
-                <h2 class="continue-learning-title">Continue Learning</h2>
-                <p class="continue-learning-subtitle">Pick up where you left off</p>
+                <h2 class="featured-courses-title">Featured Courses</h2>
+                <p class="featured-courses-subtitle">Explore our top recommended courses</p>
               </div>
             </div>
-            <div class="continue-learning-nav">
-              <span class="continue-streak-badge">
-                <i class="fas fa-fire"></i>{{ streak }} Day Streak
+            <div class="featured-courses-nav">
+              <span class="featured-courses-badge">
+                <i class="fas fa-graduation-cap"></i>{{ enrolledCourses.length }} Courses
               </span>
             </div>
           </div>
@@ -659,7 +661,7 @@ function resumeFeaturedAutoPlay() {
 
                 <!-- Badges -->
                 <div class="featured-course-badges">
-                  <span class="badge-continue"><i class="fas fa-redo"></i> Resume</span>
+                  <span class="badge-featured"><i class="fas fa-star"></i> Featured</span>
                   <span :class="['badge-level', featuredCourse.levelClass]">{{ featuredCourse.level }}</span>
                 </div>
 
@@ -668,16 +670,11 @@ function resumeFeaturedAutoPlay() {
                   <i class="fas fa-play"></i>
                 </div>
 
-                <!-- Progress Bar -->
-                <div class="featured-course-progress-bar">
-                  <div class="featured-course-progress-fill" :style="{ width: featuredCourse.progress + '%' }"></div>
-                </div>
-
                 <!-- Content -->
                 <div class="featured-course-content">
                   <div class="featured-course-meta">
                     <span><i class="fas fa-clock"></i> {{ featuredCourse.duration }}</span>
-                    <span><i class="fas fa-play-circle"></i> {{ featuredCourse.completedLessons }}/{{ featuredCourse.totalLessons }} lessons</span>
+                    <span><i class="fas fa-play-circle"></i> {{ featuredCourse.totalLessons }} lessons</span>
                     <span><i class="fas fa-star text-amber-400"></i> {{ featuredCourse.rating }}</span>
                   </div>
                   <h3 class="featured-course-title">{{ featuredCourse.title }}</h3>
@@ -685,50 +682,43 @@ function resumeFeaturedAutoPlay() {
                     <div class="author-avatar">{{ featuredCourse.instructorInitials }}</div>
                     <span>{{ featuredCourse.instructor }}</span>
                     <span class="dot">•</span>
-                    <span class="progress-label">{{ featuredCourse.progress }}% complete</span>
+                    <span class="students-label"><i class="fas fa-users"></i> {{ featuredCourse.students?.toLocaleString() }} students</span>
                   </div>
                 </div>
 
-                <!-- Syllabus Overlay -->
-                <div class="syllabus-overlay" @click.stop>
-                  <div class="syllabus-overlay-header">
-                    <h3 class="syllabus-overlay-title"><i class="fas fa-list-ol"></i> Syllabus</h3>
-                    <span class="syllabus-overlay-count">{{ featuredCourse.completedLessons }}/{{ featuredCourse.totalLessons }}</span>
+                <!-- Syllabus Panel - Always Visible -->
+                <div class="syllabus-panel" @click.stop>
+                  <div class="syllabus-panel-header">
+                    <h3 class="syllabus-panel-title"><i class="fas fa-list-ol"></i> Course Syllabus</h3>
+                    <span class="syllabus-panel-count">{{ featuredCourse.syllabus?.length }} lessons</span>
                   </div>
-                  <div class="syllabus-overlay-list">
+                  <div class="syllabus-panel-list">
                     <div
                       v-for="(lesson, index) in featuredCourse.syllabus"
                       :key="lesson.id"
-                      :class="['syllabus-overlay-item', {
-                        'completed': lesson.completed,
-                        'current': lesson.current
-                      }]"
+                      class="syllabus-panel-item"
                     >
-                      <div class="syllabus-overlay-number">
-                        <i v-if="lesson.completed" class="fas fa-check"></i>
-                        <i v-else-if="lesson.current" class="fas fa-play"></i>
-                        <span v-else>{{ index + 1 }}</span>
-                      </div>
-                      <div class="syllabus-overlay-info">
-                        <span class="syllabus-overlay-lesson-title">{{ lesson.title }}</span>
-                        <span class="syllabus-overlay-duration">{{ lesson.duration }}</span>
+                      <div class="syllabus-panel-number">{{ index + 1 }}</div>
+                      <div class="syllabus-panel-info">
+                        <span class="syllabus-panel-lesson-title">{{ lesson.title }}</span>
+                        <span class="syllabus-panel-duration"><i class="fas fa-clock"></i> {{ lesson.duration }}</span>
                       </div>
                     </div>
                   </div>
                 </div>
 
                 <!-- Carousel Navigation -->
-                <button v-if="inProgressCourses.length > 1" class="course-carousel-arrow course-carousel-prev" @click.stop="prevFeaturedCourse">
+                <button v-if="enrolledCourses.length > 1" class="course-carousel-arrow course-carousel-prev" @click.stop="prevFeaturedCourse">
                   <i class="fas fa-chevron-left"></i>
                 </button>
-                <button v-if="inProgressCourses.length > 1" class="course-carousel-arrow course-carousel-next" @click.stop="nextFeaturedCourse">
+                <button v-if="enrolledCourses.length > 1" class="course-carousel-arrow course-carousel-next" @click.stop="nextFeaturedCourse">
                   <i class="fas fa-chevron-right"></i>
                 </button>
 
                 <!-- Carousel Dots -->
-                <div v-if="inProgressCourses.length > 1" class="course-carousel-dots">
+                <div v-if="enrolledCourses.length > 1" class="course-carousel-dots">
                   <button
-                    v-for="(course, index) in inProgressCourses"
+                    v-for="(course, index) in enrolledCourses"
                     :key="course.id"
                     :class="['course-carousel-dot', { active: index === currentFeaturedCourseIndex }]"
                     @click.stop="goToFeaturedCourse(index)"
@@ -740,12 +730,12 @@ function resumeFeaturedAutoPlay() {
             <!-- Up Next Column -->
             <div class="up-next-courses">
               <div class="up-next-header">
-                <h3 class="up-next-title"><i class="fas fa-list"></i> Up Next</h3>
-                <span class="up-next-count">{{ upNextCourses.length }} courses</span>
+                <h3 class="up-next-title"><i class="fas fa-th-list"></i> More Courses</h3>
+                <span class="up-next-count">{{ otherCourses.length }} courses</span>
               </div>
               <div class="up-next-list">
-                <div v-for="(course, index) in upNextCourses" :key="course.id"
-                     @click="navigateToCourse(course.id)"
+                <div v-for="(course, index) in otherCourses" :key="course.id"
+                     @click="goToFeaturedCourse(enrolledCourses.findIndex(c => c.id === course.id))"
                      class="up-next-course-card group">
                   <!-- Thumbnail -->
                   <div class="up-next-thumb">
@@ -753,17 +743,12 @@ function resumeFeaturedAutoPlay() {
                     <div class="up-next-overlay"></div>
                     <div class="up-next-play"><i class="fas fa-play"></i></div>
                     <span class="up-next-duration">{{ course.duration }}</span>
-                    <!-- Progress Bar -->
-                    <div class="up-next-progress">
-                      <div class="up-next-progress-fill" :style="{ width: course.progress + '%' }"></div>
-                    </div>
                   </div>
 
                   <!-- Info -->
                   <div class="up-next-info">
                     <div class="up-next-badges">
                       <span :class="['up-next-level', course.levelClass]">{{ course.level }}</span>
-                      <span class="up-next-progress-badge">{{ course.progress }}%</span>
                     </div>
                     <h4 class="up-next-course-title">{{ course.title }}</h4>
                     <div class="up-next-instructor">
@@ -772,11 +757,11 @@ function resumeFeaturedAutoPlay() {
                     </div>
                     <div class="up-next-footer">
                       <div class="up-next-meta">
-                        <span><i class="fas fa-play-circle"></i> {{ course.completedLessons }}/{{ course.totalLessons }}</span>
+                        <span><i class="fas fa-play-circle"></i> {{ course.totalLessons }} lessons</span>
                         <span><i class="fas fa-star text-amber-400"></i> {{ course.rating }}</span>
                       </div>
-                      <button class="up-next-resume-btn" @click.stop="navigateToCourse(course.id)">
-                        <i class="fas fa-play"></i> Resume
+                      <button class="up-next-view-btn" @click.stop="goToFeaturedCourse(enrolledCourses.findIndex(c => c.id === course.id))">
+                        <i class="fas fa-eye"></i> View
                       </button>
                     </div>
                   </div>
@@ -1922,22 +1907,22 @@ function resumeFeaturedAutoPlay() {
   }
 }
 
-/* Continue Learning Section */
-.continue-learning-section {
+/* Featured Courses Section */
+.featured-courses-section {
   background: linear-gradient(135deg, #f0fdfa 0%, #f8fafc 100%);
   border-radius: 1rem;
   padding: 1.25rem;
   border: 1px solid #e2e8f0;
 }
 
-.continue-learning-header {
+.featured-courses-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 1rem;
 }
 
-.continue-learning-icon {
+.featured-courses-icon {
   width: 2.5rem;
   height: 2.5rem;
   border-radius: 0.75rem;
@@ -1948,43 +1933,43 @@ function resumeFeaturedAutoPlay() {
   box-shadow: 0 4px 12px rgba(20, 184, 166, 0.3);
 }
 
-.continue-learning-icon i {
+.featured-courses-icon i {
   color: white;
   font-size: 0.875rem;
 }
 
-.continue-learning-title {
+.featured-courses-title {
   font-size: 1rem;
   font-weight: 700;
   color: #0f172a;
   margin: 0;
 }
 
-.continue-learning-subtitle {
+.featured-courses-subtitle {
   font-size: 0.6875rem;
   color: #64748b;
   margin: 0;
 }
 
-.continue-learning-nav {
+.featured-courses-nav {
   display: flex;
   align-items: center;
   gap: 0.5rem;
 }
 
-.continue-streak-badge {
+.featured-courses-badge {
   display: flex;
   align-items: center;
   gap: 0.375rem;
   padding: 0.375rem 0.75rem;
-  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
-  color: #78350f;
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+  color: white;
   font-size: 0.6875rem;
   font-weight: 600;
   border-radius: 9999px;
 }
 
-.continue-streak-badge i {
+.featured-courses-badge i {
   font-size: 0.625rem;
 }
 
@@ -2051,6 +2036,23 @@ function resumeFeaturedAutoPlay() {
   display: flex;
   align-items: center;
   gap: 0.25rem;
+}
+
+.badge-featured {
+  padding: 0.25rem 0.625rem;
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  color: white;
+  font-size: 0.625rem;
+  font-weight: 600;
+  border-radius: 0.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+}
+
+.badge-featured i {
+  font-size: 0.5rem;
 }
 
 .badge-level {
@@ -2184,6 +2186,18 @@ function resumeFeaturedAutoPlay() {
   font-weight: 600;
 }
 
+.featured-course-author .students-label {
+  color: rgba(255, 255, 255, 0.8);
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.featured-course-author .students-label i {
+  font-size: 0.5rem;
+  color: #5eead4;
+}
+
 /* Carousel Arrows */
 .course-carousel-arrow {
   position: absolute;
@@ -2267,141 +2281,111 @@ function resumeFeaturedAutoPlay() {
   opacity: 0;
 }
 
-/* Syllabus Overlay on Featured Course */
-.syllabus-overlay {
+/* Syllabus Panel - Always Visible */
+.syllabus-panel {
   position: absolute;
   top: 0.75rem;
   right: 0.75rem;
-  width: 280px;
+  width: 260px;
   max-height: calc(100% - 1.5rem);
-  background: rgba(15, 23, 42, 0.92);
+  background: rgba(15, 23, 42, 0.88);
   backdrop-filter: blur(12px);
   border-radius: 0.75rem;
   border: 1px solid rgba(255, 255, 255, 0.1);
   overflow: hidden;
   z-index: 10;
-  opacity: 0;
-  transform: translateX(10px);
-  transition: all 0.3s ease;
 }
 
-.featured-course-card:hover .syllabus-overlay {
-  opacity: 1;
-  transform: translateX(0);
-}
-
-.syllabus-overlay-header {
+.syllabus-panel-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.75rem 1rem;
+  padding: 0.625rem 0.875rem;
+  background: rgba(20, 184, 166, 0.15);
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.syllabus-overlay-title {
+.syllabus-panel-title {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-size: 0.8125rem;
+  font-size: 0.75rem;
   font-weight: 600;
   color: white;
   margin: 0;
 }
 
-.syllabus-overlay-title i {
-  color: #14b8a6;
-  font-size: 0.75rem;
+.syllabus-panel-title i {
+  color: #5eead4;
+  font-size: 0.6875rem;
 }
 
-.syllabus-overlay-count {
-  font-size: 0.6875rem;
-  color: #14b8a6;
+.syllabus-panel-count {
+  font-size: 0.625rem;
+  color: #5eead4;
   font-weight: 600;
-  background: rgba(20, 184, 166, 0.15);
-  padding: 0.25rem 0.5rem;
+  background: rgba(20, 184, 166, 0.2);
+  padding: 0.1875rem 0.5rem;
   border-radius: 9999px;
 }
 
-.syllabus-overlay-list {
-  max-height: 240px;
+.syllabus-panel-list {
+  max-height: 200px;
   overflow-y: auto;
-  padding: 0.5rem;
+  padding: 0.375rem;
 }
 
-.syllabus-overlay-list::-webkit-scrollbar {
-  width: 4px;
+.syllabus-panel-list::-webkit-scrollbar {
+  width: 3px;
 }
 
-.syllabus-overlay-list::-webkit-scrollbar-track {
+.syllabus-panel-list::-webkit-scrollbar-track {
   background: rgba(255, 255, 255, 0.05);
 }
 
-.syllabus-overlay-list::-webkit-scrollbar-thumb {
-  background: rgba(20, 184, 166, 0.5);
+.syllabus-panel-list::-webkit-scrollbar-thumb {
+  background: rgba(20, 184, 166, 0.4);
   border-radius: 2px;
 }
 
-.syllabus-overlay-item {
+.syllabus-panel-item {
   display: flex;
   align-items: center;
-  gap: 0.625rem;
-  padding: 0.5rem 0.625rem;
-  border-radius: 0.5rem;
+  gap: 0.5rem;
+  padding: 0.375rem 0.5rem;
+  border-radius: 0.375rem;
   transition: all 0.2s ease;
   cursor: pointer;
 }
 
-.syllabus-overlay-item:hover {
+.syllabus-panel-item:hover {
   background: rgba(255, 255, 255, 0.08);
 }
 
-.syllabus-overlay-item.completed {
-  opacity: 0.6;
-}
-
-.syllabus-overlay-item.current {
-  background: rgba(20, 184, 166, 0.2);
-  border: 1px solid rgba(20, 184, 166, 0.4);
-}
-
-.syllabus-overlay-number {
-  width: 1.5rem;
-  height: 1.5rem;
+.syllabus-panel-number {
+  width: 1.25rem;
+  height: 1.25rem;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  font-size: 0.625rem;
+  font-size: 0.5625rem;
   font-weight: 600;
-  background: rgba(255, 255, 255, 0.1);
-  color: rgba(255, 255, 255, 0.7);
+  background: rgba(20, 184, 166, 0.25);
+  color: #5eead4;
 }
 
-.syllabus-overlay-item.completed .syllabus-overlay-number {
-  background: rgba(20, 184, 166, 0.3);
-  color: #14b8a6;
-}
-
-.syllabus-overlay-item.current .syllabus-overlay-number {
-  background: #14b8a6;
-  color: white;
-}
-
-.syllabus-overlay-number i {
-  font-size: 0.5rem;
-}
-
-.syllabus-overlay-info {
+.syllabus-panel-info {
   flex: 1;
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.125rem;
+  gap: 0.0625rem;
 }
 
-.syllabus-overlay-lesson-title {
-  font-size: 0.6875rem;
+.syllabus-panel-lesson-title {
+  font-size: 0.625rem;
   font-weight: 500;
   color: rgba(255, 255, 255, 0.9);
   white-space: nowrap;
@@ -2409,18 +2393,16 @@ function resumeFeaturedAutoPlay() {
   text-overflow: ellipsis;
 }
 
-.syllabus-overlay-item.completed .syllabus-overlay-lesson-title {
-  text-decoration: line-through;
+.syllabus-panel-duration {
+  font-size: 0.5rem;
   color: rgba(255, 255, 255, 0.5);
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
 }
 
-.syllabus-overlay-item.current .syllabus-overlay-lesson-title {
-  color: #5eead4;
-}
-
-.syllabus-overlay-duration {
-  font-size: 0.5625rem;
-  color: rgba(255, 255, 255, 0.5);
+.syllabus-panel-duration i {
+  font-size: 0.4375rem;
 }
 
 /* Up Next Column */
@@ -2719,9 +2701,40 @@ function resumeFeaturedAutoPlay() {
   font-size: 0.5rem;
 }
 
+.up-next-view-btn {
+  padding: 0.3125rem 0.625rem;
+  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  color: white;
+  font-size: 0.5625rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  transition: all 0.2s ease;
+  opacity: 0;
+  transform: translateX(8px);
+}
+
+.up-next-course-card:hover .up-next-view-btn {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.up-next-view-btn:hover {
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.35);
+  transform: scale(1.05);
+}
+
+.up-next-view-btn i {
+  font-size: 0.5rem;
+}
+
 /* Responsive */
 @media (max-width: 767px) {
-  .syllabus-overlay {
+  .syllabus-panel {
     display: none;
   }
 
@@ -2746,7 +2759,8 @@ function resumeFeaturedAutoPlay() {
     height: 120px;
   }
 
-  .up-next-resume-btn {
+  .up-next-resume-btn,
+  .up-next-view-btn {
     opacity: 1;
     transform: translateX(0);
   }
