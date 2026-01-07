@@ -1279,11 +1279,11 @@ function resumeFeaturedAutoPlay() {
             <!-- Top Row - Title and Primary Actions -->
             <div class="px-4 py-3 flex items-center justify-between">
               <h2 class="text-lg font-bold text-gray-900 flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-indigo-200">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center shadow-lg shadow-teal-200">
                   <i class="fas fa-graduation-cap text-white text-sm"></i>
                 </div>
                 <div>
-                  <span class="block">All Courses</span>
+                  <span class="block">My Courses</span>
                   <span class="text-xs font-medium text-gray-500">{{ filteredAllCourses.length }} courses available</span>
                 </div>
               </h2>
