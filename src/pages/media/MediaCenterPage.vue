@@ -596,6 +596,21 @@ function selectFolder(folderId: string) {
   selectedFolder.value = selectedFolder.value === folderId ? null : folderId
 }
 
+function getFolderName(folderId: string): string {
+  // Search recursively through folder tree
+  function findFolder(folders: any[]): string | null {
+    for (const folder of folders) {
+      if (folder.id === folderId) return folder.name
+      if (folder.children?.length) {
+        const found = findFolder(folder.children)
+        if (found) return found
+      }
+    }
+    return null
+  }
+  return findFolder(folderTree.value) || folderId
+}
+
 // Selection mode functions
 function toggleSelectionMode() {
   isSelectionMode.value = !isSelectionMode.value
@@ -1670,6 +1685,32 @@ onUnmounted(() => {
 
           <!-- Main Content Area -->
           <div class="flex-1 p-4">
+            <!-- Breadcrumb -->
+            <div v-if="!isSelectionMode || selectedCount === 0" class="flex items-center justify-between mb-5">
+              <div class="flex items-center gap-2 text-sm bg-white px-4 py-2 rounded-xl border border-gray-100 shadow-sm">
+                <button @click="currentView = 'all'; selectedFolder = null" class="w-7 h-7 rounded-lg bg-gray-100 text-gray-500 hover:bg-teal-100 hover:text-teal-600 flex items-center justify-center transition-all">
+                  <i class="fas fa-home text-xs"></i>
+                </button>
+                <i class="fas fa-chevron-right text-gray-300 text-xs"></i>
+                <span class="text-gray-700 font-medium flex items-center gap-2 px-2 py-1 bg-gray-50 rounded-lg">
+                  <i :class="[viewNavItems.find(v => v.id === currentView)?.icon, viewNavItems.find(v => v.id === currentView)?.color, 'text-sm']"></i>
+                  {{ viewNavItems.find(v => v.id === currentView)?.name }}
+                </span>
+                <template v-if="selectedFolder">
+                  <i class="fas fa-chevron-right text-gray-300 text-xs"></i>
+                  <span class="text-gray-600 px-2 py-1 bg-gray-50 rounded-lg flex items-center gap-2">
+                    <i class="fas fa-folder text-amber-500 text-xs"></i>
+                    {{ getFolderName(selectedFolder) }}
+                  </span>
+                </template>
+              </div>
+              <div class="flex items-center gap-2 text-xs text-gray-500 bg-white px-3 py-2 rounded-lg border border-gray-100">
+                <i class="fas fa-photo-film text-teal-500"></i>
+                <span class="font-medium">{{ filteredMedia.length }}</span>
+                <span>items</span>
+              </div>
+            </div>
+
             <!-- Selection Toolbar (Bulk Actions) -->
             <div v-if="isSelectionMode && selectedCount > 0" class="flex items-center justify-between mb-5 p-3 bg-gradient-to-r from-teal-500 to-teal-600 rounded-xl shadow-lg shadow-teal-200/50">
               <div class="flex items-center gap-4">
