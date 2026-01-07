@@ -945,46 +945,6 @@ function resumeFeaturedAutoPlay() {
           </div>
         </div>
 
-        <!-- Quick Stats Row -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <div class="content-area p-3 md:p-4 flex items-center gap-3">
-            <div class="w-9 h-9 md:w-10 md:h-10 rounded-xl bg-blue-100 flex items-center justify-center flex-shrink-0">
-              <i class="fas fa-book-open text-blue-600 text-xs md:text-sm"></i>
-            </div>
-            <div>
-              <p class="text-base md:text-lg font-bold text-gray-900">{{ enrolledCourses.filter(c => c.progress > 0 && c.progress < 100).length }}</p>
-              <p class="text-[10px] md:text-[11px] text-gray-500">In Progress</p>
-            </div>
-          </div>
-          <div class="content-area p-3 md:p-4 flex items-center gap-3">
-            <div class="w-9 h-9 md:w-10 md:h-10 rounded-xl bg-teal-100 flex items-center justify-center flex-shrink-0">
-              <i class="fas fa-check-circle text-teal-600 text-xs md:text-sm"></i>
-            </div>
-            <div>
-              <p class="text-base md:text-lg font-bold text-gray-900">{{ enrolledCourses.filter(c => c.progress === 100).length }}</p>
-              <p class="text-[10px] md:text-[11px] text-gray-500">Completed</p>
-            </div>
-          </div>
-          <div class="content-area p-3 md:p-4 flex items-center gap-3">
-            <div class="w-9 h-9 md:w-10 md:h-10 rounded-xl bg-gray-100 flex items-center justify-center flex-shrink-0">
-              <i class="fas fa-clock text-gray-600 text-xs md:text-sm"></i>
-            </div>
-            <div>
-              <p class="text-base md:text-lg font-bold text-gray-900">{{ enrolledCourses.filter(c => c.progress === 0).length }}</p>
-              <p class="text-[10px] md:text-[11px] text-gray-500">Not Started</p>
-            </div>
-          </div>
-          <div class="content-area p-3 md:p-4 flex items-center gap-3">
-            <div class="w-9 h-9 md:w-10 md:h-10 rounded-xl bg-amber-100 flex items-center justify-center flex-shrink-0">
-              <i class="fas fa-graduation-cap text-amber-600 text-xs md:text-sm"></i>
-            </div>
-            <div>
-              <p class="text-base md:text-lg font-bold text-gray-900">{{ enrolledCourses.length }}</p>
-              <p class="text-[10px] md:text-[11px] text-gray-500">Total Enrolled</p>
-            </div>
-          </div>
-        </div>
-
         <!-- Section Header -->
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-3">
