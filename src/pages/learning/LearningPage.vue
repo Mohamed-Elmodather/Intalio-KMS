@@ -350,18 +350,24 @@ const allCoursesSortOrder = ref<'asc' | 'desc'>('desc')
 const showAllCoursesSortDropdown = ref(false)
 const allCoursesEnrollmentFilter = ref<string[]>([])
 const showEnrollmentFilter = ref(false)
+const selectedStatusFilters = ref<string[]>([])
+const showStatusFilter = ref(false)
 
 const courseEnrollmentOptions = [
   { id: 'enrolled', label: 'My Enrolled', color: 'text-teal-500' },
-  { id: 'not-enrolled', label: 'Not Enrolled', color: 'text-gray-500' },
-  { id: 'saved', label: 'My Saved', color: 'text-amber-500' },
-  { id: 'shared', label: 'Shared with me', color: 'text-purple-500' }
+  { id: 'not-enrolled', label: 'Not Enrolled', color: 'text-gray-500' }
 ]
 
 const courseProgressOptions = [
   { id: 'in-progress', label: 'In Progress', color: 'text-blue-500' },
   { id: 'completed', label: 'Completed', color: 'text-green-500' },
   { id: 'not-started', label: 'Not Started', color: 'text-gray-500' }
+]
+
+// Status filter options (like Documents page)
+const statusFilterOptions = [
+  { id: 'saved', label: 'My Saved', icon: 'fas fa-bookmark', color: 'text-amber-500' },
+  { id: 'shared', label: 'Shared with me', icon: 'fas fa-share-alt', color: 'text-purple-500' }
 ]
 
 const courseLevelOptions = [
@@ -402,16 +408,23 @@ const filteredAllCourses = computed(() => {
     courses = courses.filter(c => allCoursesCategoryFilter.value.includes(c.category))
   }
 
-  // Enrollment filter
+  // Progress filter (enrollment + progress status)
   if (allCoursesEnrollmentFilter.value.length > 0) {
     courses = courses.filter(c => {
       if (allCoursesEnrollmentFilter.value.includes('enrolled') && c.enrolled) return true
       if (allCoursesEnrollmentFilter.value.includes('not-enrolled') && !c.enrolled) return true
-      if (allCoursesEnrollmentFilter.value.includes('in-progress') && c.enrolled && c.progress > 0 && c.progress < 100) return true
-      if (allCoursesEnrollmentFilter.value.includes('completed') && c.enrolled && c.progress === 100) return true
-      if (allCoursesEnrollmentFilter.value.includes('not-started') && c.enrolled && c.progress === 0) return true
-      if (allCoursesEnrollmentFilter.value.includes('saved') && c.saved) return true
-      if (allCoursesEnrollmentFilter.value.includes('shared') && c.sharedWithMe) return true
+      if (allCoursesEnrollmentFilter.value.includes('in-progress') && c.enrolled && (c.progress ?? 0) > 0 && (c.progress ?? 0) < 100) return true
+      if (allCoursesEnrollmentFilter.value.includes('completed') && c.enrolled && (c.progress ?? 0) === 100) return true
+      if (allCoursesEnrollmentFilter.value.includes('not-started') && c.enrolled && (c.progress ?? 0) === 0) return true
+      return false
+    })
+  }
+
+  // Status filter (saved/shared)
+  if (selectedStatusFilters.value.length > 0) {
+    courses = courses.filter(c => {
+      if (selectedStatusFilters.value.includes('saved') && c.saved) return true
+      if (selectedStatusFilters.value.includes('shared') && c.sharedWithMe) return true
       return false
     })
   }
@@ -461,6 +474,19 @@ function toggleEnrollmentFilterOption(option: string) {
   } else {
     allCoursesEnrollmentFilter.value.splice(index, 1)
   }
+}
+
+function toggleStatusFilter(status: string) {
+  const index = selectedStatusFilters.value.indexOf(status)
+  if (index > -1) {
+    selectedStatusFilters.value.splice(index, 1)
+  } else {
+    selectedStatusFilters.value.push(status)
+  }
+}
+
+function isStatusSelected(status: string): boolean {
+  return selectedStatusFilters.value.includes(status)
 }
 
 function toggleSaveAllCourse(courseId: number) {
@@ -1202,7 +1228,7 @@ function resumeFeaturedAutoPlay() {
                 <div v-if="showCategoryFilterDropdown" @click="showCategoryFilterDropdown = false" class="fixed inset-0 z-40"></div>
               </div>
 
-              <!-- Enrollment Filter Dropdown -->
+              <!-- Progress Filter Dropdown -->
               <div class="relative">
                 <button
                   @click="showEnrollmentFilter = !showEnrollmentFilter"
@@ -1211,8 +1237,8 @@ function resumeFeaturedAutoPlay() {
                     allCoursesEnrollmentFilter.length > 0 ? 'bg-teal-50 border-teal-200 text-teal-700' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
                   ]"
                 >
-                  <i class="fas fa-user-graduate text-sm"></i>
-                  <span>{{ allCoursesEnrollmentFilter.length > 0 ? `${allCoursesEnrollmentFilter.length} Status` : 'Status' }}</span>
+                  <i class="fas fa-tasks text-sm"></i>
+                  <span>{{ allCoursesEnrollmentFilter.length > 0 ? `${allCoursesEnrollmentFilter.length} Progress` : 'Progress' }}</span>
                   <i :class="showEnrollmentFilter ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ml-1"></i>
                 </button>
 
@@ -1278,6 +1304,69 @@ function resumeFeaturedAutoPlay() {
                   </div>
                 </div>
                 <div v-if="showEnrollmentFilter" @click="showEnrollmentFilter = false" class="fixed inset-0 z-40"></div>
+              </div>
+
+              <!-- Status Filter Dropdown -->
+              <div class="relative">
+                <button
+                  @click="showStatusFilter = !showStatusFilter"
+                  :class="[
+                    'flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border',
+                    selectedStatusFilters.length > 0 ? 'bg-teal-50 border-teal-200 text-teal-700' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+                  ]"
+                >
+                  <i class="fas fa-filter text-sm"></i>
+                  <span>{{ selectedStatusFilters.length > 0 ? `${selectedStatusFilters.length} Status` : 'Status' }}</span>
+                  <i :class="showStatusFilter ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ml-1"></i>
+                </button>
+
+                <!-- Dropdown Menu -->
+                <div
+                  v-if="showStatusFilter"
+                  class="absolute left-0 top-full mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
+                >
+                  <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Filter by Status</div>
+                  <div class="max-h-48 overflow-y-auto">
+                    <button
+                      v-for="option in statusFilterOptions"
+                      :key="option.id"
+                      @click="toggleStatusFilter(option.id)"
+                      :class="[
+                        'w-full px-3 py-2 text-left text-sm flex items-center gap-3 transition-colors',
+                        isStatusSelected(option.id) ? 'bg-teal-50 text-teal-700' : 'text-gray-700 hover:bg-gray-50'
+                      ]"
+                    >
+                      <div :class="[
+                        'w-4 h-4 rounded border-2 flex items-center justify-center transition-all',
+                        isStatusSelected(option.id) ? 'bg-teal-500 border-teal-500' : 'border-gray-300'
+                      ]">
+                        <i v-if="isStatusSelected(option.id)" class="fas fa-check text-white text-[8px]"></i>
+                      </div>
+                      <i :class="[option.icon, option.color]"></i>
+                      <span class="flex-1">{{ option.label }}</span>
+                    </button>
+                  </div>
+
+                  <div class="my-2 border-t border-gray-100"></div>
+
+                  <div class="px-3 flex gap-2">
+                    <button
+                      @click="selectedStatusFilters = []; showStatusFilter = false"
+                      class="flex-1 px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                    >
+                      Clear All
+                    </button>
+                    <button
+                      @click="showStatusFilter = false"
+                      class="flex-1 px-3 py-1.5 text-xs font-medium text-white bg-teal-500 rounded-lg hover:bg-teal-600 transition-colors"
+                    >
+                      Apply
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Click outside to close -->
+                <div v-if="showStatusFilter" @click="showStatusFilter = false" class="fixed inset-0 z-40"></div>
               </div>
 
               <!-- Sort Options with Order Toggle -->
@@ -1532,7 +1621,7 @@ function resumeFeaturedAutoPlay() {
               </div>
               <h3 class="all-courses-empty-title">No courses found</h3>
               <p class="all-courses-empty-text">Try adjusting your filters or search query</p>
-              <button @click="allCoursesSearch = ''; allCoursesLevelFilter = []; allCoursesCategoryFilter = []; allCoursesEnrollmentFilter = []" class="all-courses-clear-btn">
+              <button @click="allCoursesSearch = ''; allCoursesLevelFilter = []; allCoursesCategoryFilter = []; allCoursesEnrollmentFilter = []; selectedStatusFilters = []" class="all-courses-clear-btn">
                 <i class="fas fa-undo mr-2"></i> Clear Filters
               </button>
             </div>
