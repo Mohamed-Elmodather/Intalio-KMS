@@ -3546,10 +3546,11 @@ onUnmounted(() => {
 
 .trending-badges {
   position: absolute;
-  top: 0.5rem;
+  bottom: 0.5rem;
   left: 0.5rem;
   display: flex;
   gap: 0.375rem;
+  z-index: 10;
 }
 
 .trending-new-badge {
@@ -3594,18 +3595,20 @@ onUnmounted(() => {
 
 .trending-actions {
   position: absolute;
-  bottom: 0.5rem;
-  left: 0.5rem;
+  top: 0.5rem;
+  right: 0.5rem;
   display: flex;
+  flex-direction: column;
   gap: 0.375rem;
   opacity: 0;
-  transform: translateY(8px);
+  transform: translateX(8px);
   transition: all 0.3s ease;
+  z-index: 10;
 }
 
 .trending-card-inner:hover .trending-actions {
   opacity: 1;
-  transform: translateY(0);
+  transform: translateX(0);
 }
 
 .trending-action-btn {
