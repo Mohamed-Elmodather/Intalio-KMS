@@ -86,6 +86,7 @@ const enrolledCourses = ref([
     students: 1250,
     image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&h=300&fit=crop',
     tags: ['Data Science', 'Analytics'],
+    description: 'Master advanced data analytics techniques including statistical modeling, predictive analytics, and business intelligence. Learn to transform raw data into actionable insights.',
     syllabus: [
       { id: 1, title: 'Introduction to Data Analytics', duration: '30 min', completed: true },
       { id: 2, title: 'Data Collection Methods', duration: '45 min', completed: true },
@@ -120,6 +121,7 @@ const enrolledCourses = ref([
     students: 2340,
     image: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=400&h=300&fit=crop',
     tags: ['Leadership', 'Management'],
+    description: 'Develop essential leadership skills to inspire and guide teams effectively. Learn communication strategies, conflict resolution, and how to drive organizational success.',
     syllabus: [
       { id: 1, title: 'What Makes a Great Leader', duration: '25 min', completed: true },
       { id: 2, title: 'Communication Strategies', duration: '35 min', completed: true },
@@ -153,6 +155,7 @@ const enrolledCourses = ref([
     students: 3450,
     image: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=400&h=300&fit=crop',
     tags: ['Security', 'IT'],
+    description: 'Build a solid foundation in cybersecurity principles. Understand common threats, learn protective measures, and develop skills to safeguard digital assets and information.',
     syllabus: [
       { id: 1, title: 'Introduction to Cybersecurity', duration: '30 min', completed: true },
       { id: 2, title: 'Common Threats & Vulnerabilities', duration: '35 min', completed: true },
@@ -183,6 +186,7 @@ const enrolledCourses = ref([
     students: 1890,
     image: 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=400&h=300&fit=crop',
     tags: ['Soft Skills', 'Communication'],
+    description: 'Enhance your communication abilities for professional success. Master verbal and written communication, presentations, and interpersonal skills for effective workplace interactions.',
     syllabus: [
       { id: 1, title: 'The Art of Communication', duration: '30 min', completed: false },
       { id: 2, title: 'Active Listening Skills', duration: '25 min', completed: false },
@@ -215,6 +219,7 @@ const enrolledCourses = ref([
     students: 2780,
     image: 'https://images.unsplash.com/photo-1507925921958-8a62f3d1a50d?w=400&h=300&fit=crop',
     tags: ['Project Management', 'Agile'],
+    description: 'Become a proficient project manager with comprehensive training in Agile, Scrum, and traditional methodologies. Learn to plan, execute, and deliver successful projects on time and budget.',
     syllabus: [
       { id: 1, title: 'Project Management Overview', duration: '30 min', completed: true },
       { id: 2, title: 'Project Lifecycle Phases', duration: '40 min', completed: true },
@@ -672,38 +677,48 @@ function resumeFeaturedAutoPlay() {
 
                 <!-- Content -->
                 <div class="featured-course-content">
-                  <div class="featured-course-meta">
-                    <span><i class="fas fa-clock"></i> {{ featuredCourse.duration }}</span>
-                    <span><i class="fas fa-play-circle"></i> {{ featuredCourse.totalLessons }} lessons</span>
-                    <span><i class="fas fa-star text-amber-400"></i> {{ featuredCourse.rating }}</span>
+                  <!-- Tags -->
+                  <div class="featured-course-tags">
+                    <span v-for="tag in featuredCourse.tags" :key="tag" class="featured-tag">{{ tag }}</span>
                   </div>
-                  <h3 class="featured-course-title">{{ featuredCourse.title }}</h3>
-                  <div class="featured-course-author">
-                    <div class="author-avatar">{{ featuredCourse.instructorInitials }}</div>
-                    <span>{{ featuredCourse.instructor }}</span>
-                    <span class="dot">•</span>
-                    <span class="students-label"><i class="fas fa-users"></i> {{ featuredCourse.students?.toLocaleString() }} students</span>
-                  </div>
-                </div>
 
-                <!-- Syllabus Panel - Always Visible -->
-                <div class="syllabus-panel" @click.stop>
-                  <div class="syllabus-panel-header">
-                    <h3 class="syllabus-panel-title"><i class="fas fa-list-ol"></i> Course Syllabus</h3>
-                    <span class="syllabus-panel-count">{{ featuredCourse.syllabus?.length }} lessons</span>
+                  <h3 class="featured-course-title">{{ featuredCourse.title }}</h3>
+
+                  <!-- Description -->
+                  <p class="featured-course-description">{{ featuredCourse.description }}</p>
+
+                  <!-- Stats Row -->
+                  <div class="featured-course-stats">
+                    <div class="featured-stat">
+                      <i class="fas fa-clock"></i>
+                      <span>{{ featuredCourse.duration }}</span>
+                    </div>
+                    <div class="featured-stat">
+                      <i class="fas fa-play-circle"></i>
+                      <span>{{ featuredCourse.totalLessons }} lessons</span>
+                    </div>
+                    <div class="featured-stat">
+                      <i class="fas fa-star text-amber-400"></i>
+                      <span>{{ featuredCourse.rating }} rating</span>
+                    </div>
+                    <div class="featured-stat">
+                      <i class="fas fa-users"></i>
+                      <span>{{ featuredCourse.students?.toLocaleString() }} students</span>
+                    </div>
                   </div>
-                  <div class="syllabus-panel-list">
-                    <div
-                      v-for="(lesson, index) in featuredCourse.syllabus"
-                      :key="lesson.id"
-                      class="syllabus-panel-item"
-                    >
-                      <div class="syllabus-panel-number">{{ index + 1 }}</div>
-                      <div class="syllabus-panel-info">
-                        <span class="syllabus-panel-lesson-title">{{ lesson.title }}</span>
-                        <span class="syllabus-panel-duration"><i class="fas fa-clock"></i> {{ lesson.duration }}</span>
+
+                  <!-- Instructor & Action -->
+                  <div class="featured-course-footer">
+                    <div class="featured-course-author">
+                      <div class="author-avatar">{{ featuredCourse.instructorInitials }}</div>
+                      <div class="author-info">
+                        <span class="author-name">{{ featuredCourse.instructor }}</span>
+                        <span class="author-role">Instructor</span>
                       </div>
                     </div>
+                    <button class="featured-enroll-btn" @click.stop="navigateToCourse(featuredCourse.id)">
+                      <i class="fas fa-play"></i> Start Learning
+                    </button>
                   </div>
                 </div>
 
@@ -2128,24 +2143,31 @@ function resumeFeaturedAutoPlay() {
   bottom: 0;
   left: 0;
   right: 0;
-  padding: 1rem;
+  padding: 1.25rem;
   z-index: 5;
+  background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.7) 60%, transparent 100%);
 }
 
-.featured-course-meta {
+/* Tags */
+.featured-course-tags {
   display: flex;
-  gap: 1rem;
-  margin-bottom: 0.5rem;
-  font-size: 0.6875rem;
-  color: rgba(255,255,255,0.8);
+  gap: 0.5rem;
+  margin-bottom: 0.625rem;
+  flex-wrap: wrap;
 }
 
-.featured-course-meta i {
-  margin-right: 0.25rem;
+.featured-tag {
+  padding: 0.25rem 0.625rem;
+  background: rgba(20, 184, 166, 0.2);
+  color: #5eead4;
+  font-size: 0.625rem;
+  font-weight: 600;
+  border-radius: 9999px;
+  border: 1px solid rgba(20, 184, 166, 0.3);
 }
 
 .featured-course-title {
-  font-size: 1.125rem;
+  font-size: 1.25rem;
   font-weight: 700;
   color: white;
   margin: 0 0 0.5rem 0;
@@ -2156,46 +2178,107 @@ function resumeFeaturedAutoPlay() {
   overflow: hidden;
 }
 
+/* Description */
+.featured-course-description {
+  font-size: 0.8125rem;
+  color: rgba(255, 255, 255, 0.8);
+  margin: 0 0 0.75rem 0;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Stats Row */
+.featured-course-stats {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 0.875rem;
+  flex-wrap: wrap;
+}
+
+.featured-stat {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.featured-stat i {
+  font-size: 0.6875rem;
+  color: #5eead4;
+}
+
+/* Footer */
+.featured-course-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
 .featured-course-author {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  font-size: 0.75rem;
-  color: rgba(255,255,255,0.7);
+  gap: 0.625rem;
 }
 
 .featured-course-author .author-avatar {
-  width: 1.75rem;
-  height: 1.75rem;
+  width: 2.25rem;
+  height: 2.25rem;
   border-radius: 50%;
   background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
-  font-size: 0.625rem;
+  font-size: 0.75rem;
   font-weight: 600;
+  border: 2px solid rgba(255, 255, 255, 0.2);
 }
 
-.featured-course-author .dot {
-  color: rgba(255,255,255,0.4);
+.featured-course-author .author-info {
+  display: flex;
+  flex-direction: column;
 }
 
-.featured-course-author .progress-label {
-  color: #14b8a6;
+.featured-course-author .author-name {
+  font-size: 0.8125rem;
   font-weight: 600;
+  color: white;
 }
 
-.featured-course-author .students-label {
-  color: rgba(255, 255, 255, 0.8);
+.featured-course-author .author-role {
+  font-size: 0.6875rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* Enroll Button */
+.featured-enroll-btn {
+  padding: 0.625rem 1.25rem;
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+  color: white;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 0.25rem;
+  gap: 0.5rem;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(20, 184, 166, 0.3);
 }
 
-.featured-course-author .students-label i {
-  font-size: 0.5rem;
-  color: #5eead4;
+.featured-enroll-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(20, 184, 166, 0.4);
+}
+
+.featured-enroll-btn i {
+  font-size: 0.6875rem;
 }
 
 /* Carousel Arrows */
@@ -2279,130 +2362,6 @@ function resumeFeaturedAutoPlay() {
 .carousel-fade-enter-from,
 .carousel-fade-leave-to {
   opacity: 0;
-}
-
-/* Syllabus Panel - Always Visible */
-.syllabus-panel {
-  position: absolute;
-  top: 0.75rem;
-  right: 0.75rem;
-  width: 260px;
-  max-height: calc(100% - 1.5rem);
-  background: rgba(15, 23, 42, 0.88);
-  backdrop-filter: blur(12px);
-  border-radius: 0.75rem;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  overflow: hidden;
-  z-index: 10;
-}
-
-.syllabus-panel-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.625rem 0.875rem;
-  background: rgba(20, 184, 166, 0.15);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.syllabus-panel-title {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: white;
-  margin: 0;
-}
-
-.syllabus-panel-title i {
-  color: #5eead4;
-  font-size: 0.6875rem;
-}
-
-.syllabus-panel-count {
-  font-size: 0.625rem;
-  color: #5eead4;
-  font-weight: 600;
-  background: rgba(20, 184, 166, 0.2);
-  padding: 0.1875rem 0.5rem;
-  border-radius: 9999px;
-}
-
-.syllabus-panel-list {
-  max-height: 200px;
-  overflow-y: auto;
-  padding: 0.375rem;
-}
-
-.syllabus-panel-list::-webkit-scrollbar {
-  width: 3px;
-}
-
-.syllabus-panel-list::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.05);
-}
-
-.syllabus-panel-list::-webkit-scrollbar-thumb {
-  background: rgba(20, 184, 166, 0.4);
-  border-radius: 2px;
-}
-
-.syllabus-panel-item {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.375rem 0.5rem;
-  border-radius: 0.375rem;
-  transition: all 0.2s ease;
-  cursor: pointer;
-}
-
-.syllabus-panel-item:hover {
-  background: rgba(255, 255, 255, 0.08);
-}
-
-.syllabus-panel-number {
-  width: 1.25rem;
-  height: 1.25rem;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  font-size: 0.5625rem;
-  font-weight: 600;
-  background: rgba(20, 184, 166, 0.25);
-  color: #5eead4;
-}
-
-.syllabus-panel-info {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.0625rem;
-}
-
-.syllabus-panel-lesson-title {
-  font-size: 0.625rem;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.9);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.syllabus-panel-duration {
-  font-size: 0.5rem;
-  color: rgba(255, 255, 255, 0.5);
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-}
-
-.syllabus-panel-duration i {
-  font-size: 0.4375rem;
 }
 
 /* Up Next Column */
@@ -2734,8 +2693,29 @@ function resumeFeaturedAutoPlay() {
 
 /* Responsive */
 @media (max-width: 767px) {
-  .syllabus-panel {
+  .featured-course-content {
+    padding: 1rem;
+  }
+
+  .featured-course-title {
+    font-size: 1rem;
+  }
+
+  .featured-course-description {
     display: none;
+  }
+
+  .featured-course-stats {
+    gap: 0.625rem;
+  }
+
+  .featured-stat {
+    font-size: 0.6875rem;
+  }
+
+  .featured-enroll-btn {
+    padding: 0.5rem 0.875rem;
+    font-size: 0.75rem;
   }
 
   .up-next-courses {
