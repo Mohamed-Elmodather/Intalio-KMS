@@ -988,7 +988,7 @@ onUnmounted(() => {
           <div class="featured-carousel" @mouseenter="pauseCarousel" @mouseleave="resumeCarousel">
             <!-- Carousel Items -->
             <div class="carousel-container">
-              <Transition name="carousel-slide" mode="out-in">
+              <Transition name="carousel-fade">
                 <div class="featured-spotlight" :key="activeFeaturedIndex" v-if="currentFeaturedArticle">
                   <div class="featured-spotlight-main">
                     <div class="featured-spotlight-content">
@@ -1610,16 +1610,8 @@ onUnmounted(() => {
                 <div class="absolute top-3 left-3 right-3 flex items-start justify-between">
                   <div class="flex flex-wrap gap-1.5">
                     <!-- Featured Badge -->
-                    <span v-if="article.featured" class="px-2 py-1 bg-amber-500 text-white text-[10px] font-semibold rounded-full flex items-center gap-1 shadow-sm">
+                    <span v-if="article.featured" class="article-category-tag featured">
                       <i class="fas fa-star text-[8px]"></i> Featured
-                    </span>
-                    <!-- Article Type Badge -->
-                    <span
-                      v-if="article.type"
-                      class="px-2 py-1 bg-white/90 backdrop-blur-sm text-teal-700 text-[10px] font-semibold rounded-full flex items-center gap-1 shadow-sm"
-                    >
-                      <i :class="[articleTypes.find(t => t.id === article.type)?.icon || 'fas fa-file', 'text-[8px]']"></i>
-                      {{ getTypeName(article.type) }}
                     </span>
                   </div>
                   <!-- Bookmark Button -->
@@ -1636,7 +1628,7 @@ onUnmounted(() => {
 
                 <!-- Category Badge (Bottom) -->
                 <div class="absolute bottom-3 left-3">
-                  <span class="px-2.5 py-1 bg-teal-500 text-white text-[10px] font-semibold rounded-full shadow-sm">
+                  <span :class="['article-category-tag', article.categoryId]">
                     {{ article.category }}
                   </span>
                 </div>
@@ -1747,7 +1739,7 @@ onUnmounted(() => {
               <div class="flex-1 min-w-0">
                 <!-- Header Badges -->
                 <div class="flex flex-wrap items-center gap-2 mb-1.5">
-                  <span class="px-2 py-0.5 bg-teal-500 text-white text-[10px] font-semibold rounded-full">
+                  <span :class="['article-category-tag', article.categoryId]">
                     {{ article.category }}
                   </span>
                   <span
@@ -3394,9 +3386,11 @@ onUnmounted(() => {
 .carousel-container {
   position: relative;
   overflow: hidden;
+  min-height: 320px;
 }
 
 .featured-spotlight {
+  position: relative;
   background: white;
   border-radius: 1.5rem;
   overflow: hidden;
@@ -3743,19 +3737,21 @@ onUnmounted(() => {
 }
 
 /* Carousel Transition */
-.carousel-slide-enter-active,
-.carousel-slide-leave-active {
-  transition: all 0.4s ease;
+.carousel-fade-enter-active,
+.carousel-fade-leave-active {
+  transition: opacity 0.3s ease;
 }
 
-.carousel-slide-enter-from {
+.carousel-fade-enter-from,
+.carousel-fade-leave-to {
   opacity: 0;
-  transform: translateX(20px);
 }
 
-.carousel-slide-leave-to {
-  opacity: 0;
-  transform: translateX(-20px);
+.carousel-fade-leave-active {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
 }
 
 /* Contributors Card */
@@ -3996,5 +3992,58 @@ onUnmounted(() => {
     flex-direction: column;
     align-items: center;
   }
+}
+
+/* Article Category Tag */
+.article-category-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.625rem;
+  font-weight: 600;
+  border-radius: 0.1875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.article-category-tag.getting-started {
+  background: #ccfbf1;
+  color: #0d9488;
+}
+
+.article-category-tag.tutorials {
+  background: #ede9fe;
+  color: #7c3aed;
+}
+
+.article-category-tag.best-practices {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+.article-category-tag.policies {
+  background: #e0e7ff;
+  color: #4f46e5;
+}
+
+.article-category-tag.tech {
+  background: #dbeafe;
+  color: #2563eb;
+}
+
+.article-category-tag.hr {
+  background: #fce7f3;
+  color: #db2777;
+}
+
+.article-category-tag.security {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.article-category-tag.featured {
+  background: #fef3c7;
+  color: #d97706;
+  gap: 0.25rem;
 }
 </style>
