@@ -29,8 +29,8 @@ const inProgressCourses = computed(() =>
   enrolledCourses.value.filter(c => c.progress > 0 && c.progress < 100)
 )
 
-// Tab state
-const activeTab = ref('my-courses')
+// View state
+const currentView = ref<'all' | 'my-courses' | 'in-progress' | 'completed' | 'saved'>('all')
 const viewMode = ref<'grid' | 'list'>('grid')
 
 // Stats
@@ -42,12 +42,40 @@ const certificates = ref(5)
 const streak = ref(12)
 const totalEnrolled = ref(156)
 
-// Tabs
-const tabs = ref([
-  { id: 'my-courses', label: 'My Courses', icon: 'fas fa-book-reader', count: 5 },
-  { id: 'paths', label: 'Learning Paths', icon: 'fas fa-route', count: null },
-  { id: 'certificates', label: 'Certificates', icon: 'fas fa-certificate', count: 5 },
+// View options (Collections style)
+const viewOptions = ref([
+  { id: 'all', name: 'All Courses', icon: 'fas fa-graduation-cap', color: 'text-teal-500' },
+  { id: 'my-courses', name: 'My Courses', icon: 'fas fa-book-reader', color: 'text-blue-500' },
+  { id: 'in-progress', name: 'In Progress', icon: 'fas fa-spinner', color: 'text-amber-500' },
+  { id: 'completed', name: 'Completed', icon: 'fas fa-check-circle', color: 'text-green-500' },
+  { id: 'saved', name: 'Saved', icon: 'fas fa-bookmark', color: 'text-purple-500' },
 ])
+
+// Filtered courses based on current view
+const filteredCourses = computed(() => {
+  let result = [...enrolledCourses.value]
+
+  switch (currentView.value) {
+    case 'my-courses':
+      // All enrolled courses
+      break
+    case 'in-progress':
+      result = result.filter(c => c.progress > 0 && c.progress < 100)
+      break
+    case 'completed':
+      result = result.filter(c => c.progress === 100)
+      break
+    case 'saved':
+      result = result.filter(c => c.saved)
+      break
+    case 'all':
+    default:
+      // Show all available courses (enrolled + browse)
+      break
+  }
+
+  return result
+})
 
 // Current course in progress
 const currentCourse = ref({
@@ -871,32 +899,27 @@ function resumeFeaturedAutoPlay() {
       </div>
     </div>
 
+    <!-- View Navigation -->
+    <div class="view-nav">
+      <button
+        v-for="view in viewOptions"
+        :key="view.id"
+        @click="currentView = view.id as any"
+        :class="[
+          'view-nav-btn',
+          currentView === view.id ? 'active' : ''
+        ]"
+      >
+        <i :class="[view.icon, view.color]"></i>
+        <span>{{ view.name }}</span>
+      </button>
+    </div>
+
     <!-- Main Content -->
     <div class="px-8 py-6">
-      <!-- Tab Navigation -->
-      <div class="flex items-center gap-2 mb-8 overflow-x-auto pb-2 scrollbar-hide">
-        <button v-for="tab in tabs" :key="tab.id"
-                @click="activeTab = tab.id"
-                :class="[
-                  'px-4 py-2.5 rounded-xl font-medium text-sm transition-all whitespace-nowrap flex items-center gap-2',
-                  activeTab === tab.id
-                    ? 'bg-gradient-to-r from-teal-500 to-teal-600 text-white shadow-lg shadow-teal-500/30'
-                    : 'bg-white text-gray-600 hover:bg-gray-50 border border-gray-200'
-                ]">
-          <i :class="tab.icon"></i>
-          {{ tab.label }}
-          <span v-if="tab.count"
-                :class="[
-                  'px-1.5 py-0.5 text-[10px] rounded-full font-semibold',
-                  activeTab === tab.id ? 'bg-white/20 text-white' : 'bg-teal-100 text-teal-600'
-                ]">
-            {{ tab.count }}
-          </span>
-        </button>
-      </div>
 
-      <!-- My Courses Tab -->
-      <div v-if="activeTab === 'my-courses'" class="space-y-6">
+      <!-- Courses Content -->
+      <div class="space-y-6">
         <!-- Featured Courses Section -->
         <div v-if="enrolledCourses.length > 0" class="featured-courses-section">
           <div class="featured-courses-header">
@@ -1737,8 +1760,8 @@ function resumeFeaturedAutoPlay() {
         </div>
       </div>
 
-      <!-- Learning Paths Tab -->
-      <div v-if="activeTab === 'paths'" class="space-y-6">
+      <!-- Learning Paths Section -->
+      <div v-if="currentView === 'all'" class="space-y-6 mt-8">
         <!-- My Enrolled Paths -->
         <div v-if="myEnrolledPaths.length > 0" class="content-area p-6 border-l-4 border-teal-500">
           <div class="flex items-center justify-between mb-5">
@@ -1929,7 +1952,7 @@ function resumeFeaturedAutoPlay() {
       </div>
 
       <!-- Certificates Tab -->
-      <div v-if="activeTab === 'certificates'" class="space-y-6">
+      <div v-if="currentView === 'all' || currentView === 'completed'" class="space-y-6 mt-8">
         <!-- Certificate Stats -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div class="content-area p-4 text-center">
@@ -2077,7 +2100,7 @@ function resumeFeaturedAutoPlay() {
             </div>
             <h3 class="font-semibold text-gray-900 mb-2">No certificates yet</h3>
             <p class="text-gray-500 text-sm mb-6 max-w-md mx-auto">Complete courses to earn certificates and showcase your achievements to employers</p>
-            <button @click="activeTab = 'my-courses'" class="px-6 py-2.5 bg-gradient-to-r from-teal-500 to-teal-600 text-white rounded-xl font-semibold text-sm hover:from-teal-600 hover:to-teal-700 transition-all shadow-lg shadow-teal-200 flex items-center gap-2 mx-auto">
+            <button @click="currentView = 'all'" class="px-6 py-2.5 bg-gradient-to-r from-teal-500 to-teal-600 text-white rounded-xl font-semibold text-sm hover:from-teal-600 hover:to-teal-700 transition-all shadow-lg shadow-teal-200 flex items-center gap-2 mx-auto">
               <i class="fas fa-book-reader"></i>
               View Courses
             </button>
@@ -2200,6 +2223,42 @@ function resumeFeaturedAutoPlay() {
   50% {
     transform: translate(10%, -45%);
   }
+}
+
+/* View Navigation */
+.view-nav {
+  display: flex;
+  gap: 0.5rem;
+  padding: 1rem 2rem;
+  background: white;
+  border-bottom: 1px solid #e5e7eb;
+  margin: 0;
+}
+
+.view-nav-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #64748b;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.view-nav-btn:hover {
+  background: #f1f5f9;
+  color: #334155;
+}
+
+.view-nav-btn.active {
+  background: #f0fdfa;
+  color: #0f766e;
+  border-color: #99f6e4;
 }
 
 /* Content Area */
