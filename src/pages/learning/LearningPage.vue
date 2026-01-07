@@ -1561,8 +1561,8 @@ function resumeFeaturedAutoPlay() {
                 <div v-if="showEnrollmentFilter" @click="showEnrollmentFilter = false" class="fixed inset-0 z-40"></div>
               </div>
 
-              <!-- Saved & Shared Filter Dropdown -->
-              <div class="relative">
+              <!-- Saved & Shared Filter Dropdown (My Courses only) -->
+              <div v-if="currentView === 'my-courses'" class="relative">
                 <button
                   @click="showStatusFilter = !showStatusFilter"
                   :class="[
