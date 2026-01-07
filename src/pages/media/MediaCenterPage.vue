@@ -1851,20 +1851,23 @@ onUnmounted(() => {
         </div>
 
             <!-- Pagination -->
-            <div v-if="filteredMedia.length > 0" class="mt-6 px-4 py-3 bg-white rounded-xl border border-gray-100">
+            <div v-if="filteredMedia.length > 0" class="mt-4 px-4 py-3 bg-white rounded-2xl border border-gray-100 shadow-sm">
               <div class="flex items-center justify-between flex-wrap gap-3">
+                <!-- Left: Stats & Items Per Page -->
                 <div class="flex items-center gap-4 flex-wrap">
                   <span class="text-xs text-gray-500">
                     Showing <span class="font-semibold text-gray-700">{{ Math.min((currentPage - 1) * itemsPerPage + 1, filteredMedia.length) }}</span>
                     to <span class="font-semibold text-gray-700">{{ Math.min(currentPage * itemsPerPage, filteredMedia.length) }}</span>
                     of <span class="font-semibold text-gray-700">{{ filteredMedia.length }}</span> items
                   </span>
+
+                  <!-- Items Per Page Selector -->
                   <div class="flex items-center gap-2">
                     <span class="text-xs text-gray-500">Show:</span>
                     <select
                       v-model="itemsPerPage"
                       @change="handlePerPageChange(itemsPerPage)"
-                      class="text-xs px-2 py-1.5 rounded-lg border border-gray-200 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-teal-500 cursor-pointer"
+                      class="text-xs px-2 py-1.5 rounded-lg border border-gray-200 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 cursor-pointer"
                     >
                       <option :value="6">6</option>
                       <option :value="9">9</option>
@@ -1874,28 +1877,57 @@ onUnmounted(() => {
                     <span class="text-xs text-gray-500">per page</span>
                   </div>
                 </div>
-                <div class="flex items-center gap-1">
+
+                <!-- Right: Pagination Controls -->
+                <div class="flex items-center gap-2">
                   <button
                     @click="handlePageChange(currentPage - 1)"
                     :disabled="currentPage === 1"
-                    :class="['w-8 h-8 rounded-lg flex items-center justify-center transition-all', currentPage === 1 ? 'text-gray-300 cursor-not-allowed' : 'text-gray-600 hover:bg-gray-100']"
+                    :class="[
+                      'px-3 py-1.5 text-xs rounded-lg transition-colors flex items-center gap-1.5 border',
+                      currentPage === 1
+                        ? 'text-gray-300 border-gray-100 cursor-not-allowed'
+                        : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100 border-gray-200'
+                    ]"
                   >
-                    <i class="fas fa-chevron-left text-xs"></i>
+                    <i class="fas fa-chevron-left text-[10px]"></i>
+                    Previous
                   </button>
-                  <template v-for="page in totalPages" :key="page">
-                    <button
-                      @click="handlePageChange(page)"
-                      :class="['w-8 h-8 rounded-lg text-xs font-medium transition-all', currentPage === page ? 'bg-teal-500 text-white' : 'text-gray-600 hover:bg-gray-100']"
-                    >
-                      {{ page }}
-                    </button>
-                  </template>
+
+                  <!-- Page Numbers -->
+                  <div class="flex items-center gap-1">
+                    <template v-for="page in totalPages" :key="page">
+                      <button
+                        v-if="page === 1 || page === totalPages || (page >= currentPage - 1 && page <= currentPage + 1)"
+                        @click="handlePageChange(page)"
+                        :class="[
+                          'w-8 h-8 text-xs rounded-lg transition-colors flex items-center justify-center',
+                          page === currentPage
+                            ? 'font-medium text-teal-600 bg-teal-50'
+                            : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
+                        ]"
+                      >
+                        {{ page }}
+                      </button>
+                      <span
+                        v-else-if="page === currentPage - 2 || page === currentPage + 2"
+                        class="text-xs text-gray-400 px-1"
+                      >...</span>
+                    </template>
+                  </div>
+
                   <button
                     @click="handlePageChange(currentPage + 1)"
                     :disabled="currentPage === totalPages"
-                    :class="['w-8 h-8 rounded-lg flex items-center justify-center transition-all', currentPage === totalPages ? 'text-gray-300 cursor-not-allowed' : 'text-gray-600 hover:bg-gray-100']"
+                    :class="[
+                      'px-3 py-1.5 text-xs rounded-lg transition-colors flex items-center gap-1.5 border',
+                      currentPage === totalPages
+                        ? 'text-gray-300 border-gray-100 cursor-not-allowed'
+                        : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100 border-gray-200'
+                    ]"
                   >
-                    <i class="fas fa-chevron-right text-xs"></i>
+                    Next
+                    <i class="fas fa-chevron-right text-[10px]"></i>
                   </button>
                 </div>
               </div>
