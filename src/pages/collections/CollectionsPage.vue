@@ -391,66 +391,64 @@ function saveNewCollection() {
 </script>
 
 <template>
-  <div class="collections-page">
+  <div class="min-h-screen bg-gray-50">
     <!-- Hero Section -->
-    <div class="hero-section">
-      <div class="hero-content">
-        <div class="hero-icon">
-          <i class="fas fa-layer-group"></i>
+    <div class="hero-gradient relative overflow-hidden">
+      <!-- Decorative elements with animations -->
+      <div class="circle-drift-1 absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full"></div>
+      <div class="circle-drift-2 absolute bottom-0 left-0 w-64 h-64 bg-white/5 rounded-full"></div>
+      <div class="circle-drift-3 absolute top-1/2 right-1/4 w-32 h-32 bg-white/10 rounded-full"></div>
+
+      <!-- Stats - Absolute Top Right -->
+      <div class="stats-top-right">
+        <div class="stat-card-square">
+          <div class="stat-icon-box">
+            <i class="fas fa-layer-group"></i>
+          </div>
+          <p class="stat-value-mini">{{ stats.total }}</p>
+          <p class="stat-label-mini">Collections</p>
         </div>
-        <div class="hero-text">
-          <h1 class="hero-title">
-            <span class="text-teal-400">Collections</span>
-          </h1>
-          <p class="hero-subtitle">
-            Organize and curate content from articles, documents, and media into custom collections
-          </p>
+        <div class="stat-card-square">
+          <div class="stat-icon-box">
+            <i class="fas fa-user"></i>
+          </div>
+          <p class="stat-value-mini">{{ stats.myCollections }}</p>
+          <p class="stat-label-mini">My Collections</p>
         </div>
-        <div class="hero-actions">
-          <button @click="createNewCollection" class="btn-create">
-            <i class="fas fa-plus mr-2"></i>
-            New Collection
-          </button>
+        <div class="stat-card-square">
+          <div class="stat-icon-box">
+            <i class="fas fa-share-alt"></i>
+          </div>
+          <p class="stat-value-mini">{{ stats.sharedWithMe }}</p>
+          <p class="stat-label-mini">Shared</p>
+        </div>
+        <div class="stat-card-square">
+          <div class="stat-icon-box">
+            <i class="fas fa-file-alt"></i>
+          </div>
+          <p class="stat-value-mini">{{ stats.totalItems }}</p>
+          <p class="stat-label-mini">Total Items</p>
         </div>
       </div>
 
-      <!-- Stats -->
-      <div class="stats-bar">
-        <div class="stat-item">
-          <div class="stat-icon bg-teal-100 text-teal-600">
-            <i class="fas fa-layer-group"></i>
-          </div>
-          <div class="stat-info">
-            <span class="stat-value">{{ stats.total }}</span>
-            <span class="stat-label">Total Collections</span>
-          </div>
+      <div class="relative px-8 py-8">
+        <div class="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-white text-xs font-semibold inline-flex items-center gap-2 mb-4">
+          <i class="fas fa-layer-group"></i>
+          AFC Asian Cup 2027
         </div>
-        <div class="stat-item">
-          <div class="stat-icon bg-blue-100 text-blue-600">
-            <i class="fas fa-user"></i>
-          </div>
-          <div class="stat-info">
-            <span class="stat-value">{{ stats.myCollections }}</span>
-            <span class="stat-label">My Collections</span>
-          </div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-icon bg-purple-100 text-purple-600">
-            <i class="fas fa-share-alt"></i>
-          </div>
-          <div class="stat-info">
-            <span class="stat-value">{{ stats.sharedWithMe }}</span>
-            <span class="stat-label">Shared with Me</span>
-          </div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-icon bg-amber-100 text-amber-600">
-            <i class="fas fa-file-alt"></i>
-          </div>
-          <div class="stat-info">
-            <span class="stat-value">{{ stats.totalItems }}</span>
-            <span class="stat-label">Total Items</span>
-          </div>
+
+        <h1 class="text-3xl font-bold text-white mb-2">Collections</h1>
+        <p class="text-teal-100 max-w-lg">Organize and curate content from articles, documents, and media into custom collections.</p>
+
+        <div class="flex flex-wrap gap-3 mt-6">
+          <button @click="createNewCollection" class="px-5 py-2.5 bg-white text-teal-600 rounded-xl font-semibold text-sm flex items-center gap-2 hover:bg-teal-50 transition-all shadow-lg">
+            <i class="fas fa-plus"></i>
+            New Collection
+          </button>
+          <button class="px-5 py-2.5 bg-white/20 backdrop-blur-sm border border-white/30 text-white rounded-xl font-semibold text-sm hover:bg-white/30 transition-all flex items-center gap-2">
+            <i class="fas fa-bookmark"></i>
+            My Saved
+          </button>
         </div>
       </div>
     </div>
@@ -764,134 +762,121 @@ function saveNewCollection() {
 </template>
 
 <style scoped>
-.collections-page {
-  min-height: 100vh;
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+/* Hero Gradient */
+.hero-gradient {
+  background: linear-gradient(135deg, #0d9488 0%, #14b8a6 50%, #10b981 100%);
 }
 
-/* Hero Section */
-.hero-section {
-  background: linear-gradient(135deg, #0f766e 0%, #115e59 50%, #134e4a 100%);
-  padding: 2rem 2rem 3rem;
-  position: relative;
-  overflow: hidden;
-}
-
-.hero-section::before {
-  content: '';
+.stats-top-right {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-  opacity: 0.5;
-}
-
-.hero-content {
-  position: relative;
+  top: 24px;
+  right: 32px;
   display: flex;
-  align-items: center;
-  gap: 1.5rem;
-  max-width: 1400px;
-  margin: 0 auto;
+  gap: 12px;
+  flex-wrap: wrap;
+  z-index: 10;
 }
 
-.hero-icon {
-  width: 64px;
-  height: 64px;
+.stat-card-square {
   background: rgba(255, 255, 255, 0.15);
-  border-radius: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.75rem;
-  color: white;
-}
-
-.hero-text {
-  flex: 1;
-}
-
-.hero-title {
-  font-size: 1.75rem;
-  font-weight: 700;
-  color: white;
-  margin-bottom: 0.25rem;
-}
-
-.hero-subtitle {
-  color: rgba(255, 255, 255, 0.8);
-  font-size: 0.9375rem;
-}
-
-.hero-actions {
-  display: flex;
-  gap: 0.75rem;
-}
-
-.btn-create {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1.25rem;
-  background: white;
-  color: #0f766e;
-  font-weight: 600;
-  font-size: 0.875rem;
-  border-radius: 10px;
-  border: none;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.btn-create:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-/* Stats Bar */
-.stats-bar {
-  display: flex;
-  gap: 1.5rem;
-  margin-top: 1.5rem;
-  position: relative;
-}
-
-.stat-item {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.75rem 1rem;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
   backdrop-filter: blur(8px);
-}
-
-.stat-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1rem;
-}
-
-.stat-info {
+  border-radius: 16px;
+  padding: 16px;
+  width: 100px;
+  height: 100px;
   display: flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  cursor: pointer;
 }
 
-.stat-value {
-  font-size: 1.25rem;
+.stat-card-square:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+.stat-card-square:hover .stat-icon-box {
+  transform: scale(1.1);
+}
+
+.stat-icon-box {
+  width: 32px;
+  height: 32px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 14px;
+  transition: transform 0.3s ease;
+}
+
+.stat-value-mini {
+  font-size: 18px;
   font-weight: 700;
   color: white;
+  margin: 0;
 }
 
-.stat-label {
-  font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.7);
+.stat-label-mini {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.8);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0;
+}
+
+/* Circle Drift Animations */
+.circle-drift-1 {
+  animation: drift-1 20s ease-in-out infinite;
+}
+
+.circle-drift-2 {
+  animation: drift-2 25s ease-in-out infinite;
+}
+
+.circle-drift-3 {
+  animation: drift-3 18s ease-in-out infinite;
+}
+
+@keyframes drift-1 {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  25% { transform: translate(-30px, 20px) rotate(5deg); }
+  50% { transform: translate(-20px, -30px) rotate(-5deg); }
+  75% { transform: translate(20px, -10px) rotate(3deg); }
+}
+
+@keyframes drift-2 {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  33% { transform: translate(40px, -20px) rotate(-8deg); }
+  66% { transform: translate(-30px, 30px) rotate(8deg); }
+}
+
+@keyframes drift-3 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(30px, -40px) scale(1.1); }
+}
+
+@media (max-width: 1023px) {
+  .stats-top-right {
+    position: relative;
+    top: auto;
+    right: auto;
+    margin: 1rem 2rem;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .stat-card-square {
+    width: 100%;
+    height: 80px;
+  }
 }
 
 /* View Navigation */
@@ -901,6 +886,7 @@ function saveNewCollection() {
   padding: 1rem 2rem;
   background: white;
   border-bottom: 1px solid #e5e7eb;
+  margin: 0;
 }
 
 .view-nav-btn {
