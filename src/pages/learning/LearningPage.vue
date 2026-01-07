@@ -30,7 +30,7 @@ const inProgressCourses = computed(() =>
 )
 
 // View state
-const currentView = ref<'all' | 'my-courses' | 'in-progress' | 'completed' | 'saved' | 'paths' | 'certificates'>('all')
+const currentView = ref<'all' | 'my-courses' | 'paths' | 'certificates'>('all')
 const viewMode = ref<'grid' | 'list'>('grid')
 
 // Stats
@@ -46,9 +46,6 @@ const totalEnrolled = ref(156)
 const viewOptions = ref([
   { id: 'all', name: 'All Courses', icon: 'fas fa-graduation-cap', color: 'text-teal-500' },
   { id: 'my-courses', name: 'My Courses', icon: 'fas fa-book-reader', color: 'text-blue-500' },
-  { id: 'in-progress', name: 'In Progress', icon: 'fas fa-spinner', color: 'text-amber-500' },
-  { id: 'completed', name: 'Completed', icon: 'fas fa-check-circle', color: 'text-green-500' },
-  { id: 'saved', name: 'Saved', icon: 'fas fa-bookmark', color: 'text-purple-500' },
   { id: 'paths', name: 'Learning Paths', icon: 'fas fa-route', color: 'text-indigo-500' },
   { id: 'certificates', name: 'Certificates', icon: 'fas fa-certificate', color: 'text-amber-500' },
 ])
@@ -60,15 +57,6 @@ const filteredCourses = computed(() => {
   switch (currentView.value) {
     case 'my-courses':
       // All enrolled courses
-      break
-    case 'in-progress':
-      result = result.filter(c => c.progress > 0 && c.progress < 100)
-      break
-    case 'completed':
-      result = result.filter(c => c.progress === 100)
-      break
-    case 'saved':
-      result = result.filter(c => c.saved)
       break
     case 'all':
     default:
