@@ -31,10 +31,6 @@ const inProgressCourses = computed(() =>
 
 // Tab state
 const activeTab = ref('my-courses')
-const searchQuery = ref('')
-const categoryFilter = ref('')
-const levelFilter = ref('')
-const courseFilter = ref('all')
 const viewMode = ref<'grid' | 'list'>('grid')
 
 // Stats
@@ -49,7 +45,6 @@ const totalEnrolled = ref(156)
 // Tabs
 const tabs = ref([
   { id: 'my-courses', label: 'My Courses', icon: 'fas fa-book-reader', count: 5 },
-  { id: 'catalog', label: 'Browse Catalog', icon: 'fas fa-compass', count: null },
   { id: 'paths', label: 'Learning Paths', icon: 'fas fa-route', count: null },
   { id: 'certificates', label: 'Certificates', icon: 'fas fa-certificate', count: 5 },
 ])
@@ -471,16 +466,6 @@ function toggleSaveAllCourse(courseId: number) {
   }
 }
 
-// Catalog courses (keep for backward compatibility)
-const catalogCourses = ref([
-  { id: 10, title: 'Machine Learning Basics', instructor: 'Dr. Sarah Mitchell', instructorInitials: 'SM', level: 'Intermediate', levelClass: 'intermediate', duration: '4 hours', lessons: 12, icon: 'fas fa-robot', gradientClass: 'from-violet-500 to-purple-600', rating: 4.8, students: 3200, image: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=400&h=300&fit=crop', tags: ['AI', 'ML'] },
-  { id: 11, title: 'Strategic Planning', instructor: 'Michael Brown', instructorInitials: 'MB', level: 'Advanced', levelClass: 'advanced', duration: '3 hours', lessons: 8, icon: 'fas fa-chess', gradientClass: 'from-slate-600 to-gray-800', rating: 4.6, students: 1890, image: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=400&h=300&fit=crop', tags: ['Strategy', 'Planning'] },
-  { id: 12, title: 'Public Speaking', instructor: 'Emma Wilson', instructorInitials: 'EW', level: 'Beginner', levelClass: 'beginner', duration: '2 hours', lessons: 6, icon: 'fas fa-microphone', gradientClass: 'from-rose-500 to-pink-600', rating: 4.7, students: 4500, image: 'https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=400&h=300&fit=crop', tags: ['Speaking', 'Presentation'] },
-  { id: 13, title: 'Cloud Architecture', instructor: 'David Kim', instructorInitials: 'DK', level: 'Advanced', levelClass: 'advanced', duration: '8 hours', lessons: 20, icon: 'fas fa-cloud', gradientClass: 'from-sky-500 to-blue-600', rating: 4.9, students: 2100, image: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=400&h=300&fit=crop', tags: ['Cloud', 'AWS'] },
-  { id: 14, title: 'UX Design Principles', instructor: 'Lisa Park', instructorInitials: 'LP', level: 'Intermediate', levelClass: 'intermediate', duration: '5 hours', lessons: 14, icon: 'fas fa-pencil-ruler', gradientClass: 'from-fuchsia-500 to-purple-600', rating: 4.8, students: 2890, image: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=400&h=300&fit=crop', tags: ['Design', 'UX'] },
-  { id: 15, title: 'Financial Analysis', instructor: 'Robert Chen', instructorInitials: 'RC', level: 'Intermediate', levelClass: 'intermediate', duration: '6 hours', lessons: 16, icon: 'fas fa-chart-pie', gradientClass: 'from-green-500 to-emerald-600', rating: 4.5, students: 1670, image: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=400&h=300&fit=crop', tags: ['Finance', 'Analysis'] },
-])
-
 // Learning paths
 const learningPaths = ref([
   {
@@ -675,31 +660,6 @@ const certificateStats = computed(() => ({
   avgScore: Math.round(earnedCertificates.value.reduce((sum, c) => sum + c.score, 0) / earnedCertificates.value.length)
 }))
 
-// Computed
-const filteredCatalog = computed(() => {
-  let result = [...catalogCourses.value]
-  if (searchQuery.value) {
-    const q = searchQuery.value.toLowerCase()
-    result = result.filter(c => c.title.toLowerCase().includes(q) || c.instructor.toLowerCase().includes(q))
-  }
-  if (levelFilter.value) {
-    result = result.filter(c => c.level.toLowerCase() === levelFilter.value)
-  }
-  if (categoryFilter.value) {
-    // In a real app, courses would have category IDs
-    result = result.filter(c => c.tags.some(t => t.toLowerCase().includes(categoryFilter.value)))
-  }
-  return result
-})
-
-const filteredEnrolledCourses = computed(() => {
-  if (courseFilter.value === 'all') return enrolledCourses.value
-  if (courseFilter.value === 'in-progress') return enrolledCourses.value.filter(c => c.progress > 0 && c.progress < 100)
-  if (courseFilter.value === 'completed') return enrolledCourses.value.filter(c => c.progress === 100)
-  if (courseFilter.value === 'not-started') return enrolledCourses.value.filter(c => c.progress === 0)
-  return enrolledCourses.value
-})
-
 // Navigate to course
 function navigateToCourse(courseId: number) {
   router.push({ name: 'CourseView', params: { id: courseId } })
@@ -825,11 +785,7 @@ function resumeFeaturedAutoPlay() {
         <p class="text-teal-100 max-w-lg">Expand your skills with curated courses, learning paths, and professional certifications.</p>
 
         <div class="flex flex-wrap gap-3 mt-6">
-          <button @click="activeTab = 'catalog'" class="px-5 py-2.5 bg-white text-teal-600 rounded-xl font-semibold text-sm flex items-center gap-2 hover:bg-teal-50 transition-all shadow-lg">
-            <i class="fas fa-compass"></i>
-            Browse Courses
-          </button>
-          <button v-if="currentCourse" @click="navigateToCourse(currentCourse.id)" class="px-5 py-2.5 bg-white/20 backdrop-blur-sm border border-white/30 text-white rounded-xl font-semibold text-sm hover:bg-white/30 transition-all flex items-center gap-2">
+          <button v-if="currentCourse" @click="navigateToCourse(currentCourse.id)" class="px-5 py-2.5 bg-white text-teal-600 rounded-xl font-semibold text-sm flex items-center gap-2 hover:bg-teal-50 transition-all shadow-lg">
             <i class="fas fa-play"></i>
             Continue Learning
           </button>
@@ -1580,335 +1536,6 @@ function resumeFeaturedAutoPlay() {
         </div>
       </div>
 
-      <!-- Browse Catalog Tab -->
-      <div v-if="activeTab === 'catalog'" class="space-y-6">
-        <!-- Search & Filters Bar -->
-        <div class="content-area p-4">
-          <div class="flex flex-wrap gap-3 items-center">
-            <div class="flex-1 min-w-[280px] relative">
-              <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
-              <input type="text" v-model="searchQuery" placeholder="Search courses, topics, or instructors..."
-                     class="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent focus:bg-white transition-all">
-            </div>
-            <select v-model="categoryFilter" class="text-xs px-4 py-3 rounded-xl border border-gray-200 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-teal-500 cursor-pointer">
-              <option value="">All Categories</option>
-              <option v-for="cat in categories" :key="cat.id" :value="cat.id">{{ cat.name }}</option>
-            </select>
-            <select v-model="levelFilter" class="text-xs px-4 py-3 rounded-xl border border-gray-200 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-teal-500 cursor-pointer">
-              <option value="">All Levels</option>
-              <option value="beginner">Beginner</option>
-              <option value="intermediate">Intermediate</option>
-              <option value="advanced">Advanced</option>
-            </select>
-            <div class="flex items-center gap-2 ml-auto">
-              <span class="text-xs text-gray-500">{{ filteredCatalog.length }} courses</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Featured Course Banner -->
-        <div class="content-area overflow-hidden">
-          <div class="flex flex-col lg:flex-row">
-            <!-- Featured Image -->
-            <div class="relative w-full lg:w-2/5 h-56 lg:h-auto">
-              <img src="https://images.unsplash.com/photo-1677442136019-21780ecad995?w=600&h=400&fit=crop" alt="Featured Course" class="w-full h-full object-cover">
-              <div class="absolute inset-0 bg-gradient-to-r from-violet-600/90 to-purple-600/70 lg:bg-gradient-to-t"></div>
-              <div class="absolute top-4 left-4 flex items-center gap-2">
-                <span class="px-3 py-1 bg-amber-400 text-amber-900 text-[10px] font-bold rounded-full uppercase">
-                  <i class="fas fa-star mr-1"></i>Featured
-                </span>
-                <span class="px-3 py-1 bg-white/20 backdrop-blur-sm text-white text-[10px] font-semibold rounded-full">
-                  <i class="fas fa-fire mr-1"></i>Trending
-                </span>
-              </div>
-            </div>
-            <!-- Featured Content -->
-            <div class="flex-1 p-6 bg-gradient-to-br from-violet-600 to-purple-700">
-              <div class="flex items-center gap-2 mb-3">
-                <span class="course-level-badge intermediate">Intermediate</span>
-                <span class="px-2 py-0.5 bg-white/20 text-white text-[10px] font-medium rounded">NEW</span>
-              </div>
-              <h2 class="text-2xl font-bold text-white mb-3">Machine Learning Basics</h2>
-              <p class="text-purple-100 text-sm mb-4 max-w-lg">Master the fundamentals of machine learning with hands-on projects. Learn neural networks, deep learning, and AI concepts from industry experts.</p>
-
-              <div class="flex flex-wrap items-center gap-4 mb-5 text-white/80 text-xs">
-                <span class="flex items-center gap-1.5"><i class="fas fa-clock"></i>4 hours</span>
-                <span class="flex items-center gap-1.5"><i class="fas fa-play-circle"></i>12 lessons</span>
-                <span class="flex items-center gap-1.5"><i class="fas fa-star text-amber-300"></i>4.8 (3,200 reviews)</span>
-                <span class="flex items-center gap-1.5"><i class="fas fa-users"></i>3.2k enrolled</span>
-              </div>
-
-              <div class="flex items-center gap-4 mb-5">
-                <div class="flex items-center gap-2">
-                  <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-white font-semibold text-sm">SM</div>
-                  <div>
-                    <p class="text-white text-sm font-medium">Dr. Sarah Mitchell</p>
-                    <p class="text-purple-200 text-[11px]">AI Research Lead</p>
-                  </div>
-                </div>
-              </div>
-
-              <div class="flex items-center gap-3">
-                <button class="px-6 py-3 bg-white text-purple-600 rounded-xl font-semibold text-sm hover:bg-purple-50 transition-all shadow-lg flex items-center gap-2">
-                  <i class="fas fa-play"></i>
-                  Start Learning
-                </button>
-                <button class="px-4 py-3 bg-white/20 backdrop-blur-sm border border-white/30 text-white rounded-xl font-semibold text-sm hover:bg-white/30 transition-all flex items-center gap-2">
-                  <i class="fas fa-bookmark"></i>
-                  Save
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- AI Recommendations -->
-        <div class="content-area p-5 border-l-4 border-teal-500">
-          <div class="flex items-center justify-between mb-4">
-            <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center shadow-lg shadow-teal-200">
-                <i class="fas fa-robot text-white text-sm"></i>
-              </div>
-              <div>
-                <h3 class="font-semibold text-gray-900 text-sm">Recommended for You</h3>
-                <p class="text-[11px] text-gray-500">Based on your interests and learning history</p>
-              </div>
-            </div>
-            <button class="text-teal-600 text-xs font-medium hover:text-teal-700 flex items-center gap-1">
-              View All <i class="fas fa-arrow-right text-[10px]"></i>
-            </button>
-          </div>
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-            <div v-for="course in recommendedCourses" :key="course.id"
-                 class="group flex items-center gap-3 p-3 bg-gradient-to-br from-teal-50 to-cyan-50/50 rounded-xl cursor-pointer hover:from-teal-100 hover:to-cyan-100/50 transition-all border border-teal-100 hover:border-teal-200 hover:shadow-md">
-              <div class="w-12 h-12 rounded-xl bg-white flex items-center justify-center flex-shrink-0 shadow-sm group-hover:shadow-md transition-all">
-                <i :class="[course.icon, 'text-teal-600 text-lg']"></i>
-              </div>
-              <div class="flex-1 min-w-0">
-                <h4 class="font-semibold text-gray-900 text-xs truncate group-hover:text-teal-700">{{ course.title }}</h4>
-                <p class="text-[10px] text-gray-500">{{ course.duration }} · {{ course.level }}</p>
-                <p class="text-[10px] text-gray-400 truncate">{{ course.instructor }}</p>
-              </div>
-              <div class="flex flex-col items-end gap-1">
-                <span class="px-2 py-0.5 bg-green-100 text-green-600 text-[10px] font-bold rounded-full">{{ course.matchScore }}% match</span>
-                <i class="fas fa-arrow-right text-teal-400 text-[10px] opacity-0 group-hover:opacity-100 transition-all"></i>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Categories Grid -->
-        <div>
-          <div class="flex items-center justify-between mb-4">
-            <h3 class="font-semibold text-gray-900 text-sm">Browse by Category</h3>
-            <button class="text-teal-600 text-xs font-medium hover:text-teal-700 flex items-center gap-1">
-              All Categories <i class="fas fa-arrow-right text-[10px]"></i>
-            </button>
-          </div>
-          <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-            <div v-for="cat in categories" :key="cat.id"
-                 @click="categoryFilter = categoryFilter === cat.id ? '' : cat.id"
-                 :class="[
-                   'group p-4 rounded-xl cursor-pointer transition-all text-center border hover:scale-105',
-                   categoryFilter === cat.id
-                     ? 'bg-teal-50 border-teal-300 shadow-lg shadow-teal-100'
-                     : 'bg-white border-gray-100 hover:border-teal-200 hover:shadow-lg'
-                 ]">
-              <div class="w-12 h-12 rounded-xl mx-auto mb-2 flex items-center justify-center transition-transform group-hover:scale-110" :style="{ backgroundColor: cat.color + '15' }">
-                <i :class="[cat.icon, 'text-xl']" :style="{ color: cat.color }"></i>
-              </div>
-              <h3 class="font-semibold text-gray-900 text-xs mb-0.5">{{ cat.name }}</h3>
-              <p class="text-[10px] text-gray-500">{{ cat.courseCount }} courses</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- New & Trending Section -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <!-- New Courses -->
-          <div class="content-area p-5">
-            <div class="flex items-center gap-3 mb-4">
-              <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center shadow-lg shadow-emerald-200">
-                <i class="fas fa-sparkles text-white text-sm"></i>
-              </div>
-              <div>
-                <h3 class="font-semibold text-gray-900 text-sm">New Courses</h3>
-                <p class="text-[11px] text-gray-500">Just added this week</p>
-              </div>
-            </div>
-            <div class="space-y-3">
-              <div v-for="course in catalogCourses.slice(0, 3)" :key="'new-' + course.id"
-                   class="group flex gap-3 p-3 bg-gray-50 rounded-xl cursor-pointer hover:bg-teal-50 transition-all">
-                <div class="relative w-20 h-14 flex-shrink-0 rounded-lg overflow-hidden">
-                  <img :src="course.image" :alt="course.title" class="w-full h-full object-cover">
-                  <div class="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-all"></div>
-                </div>
-                <div class="flex-1 min-w-0">
-                  <div class="flex items-center gap-2 mb-1">
-                    <span :class="['course-level-badge', course.levelClass]" style="padding: 2px 6px; font-size: 9px;">{{ course.level }}</span>
-                    <span class="px-1.5 py-0.5 bg-emerald-100 text-emerald-600 text-[9px] font-semibold rounded">NEW</span>
-                  </div>
-                  <h4 class="font-medium text-gray-900 text-xs truncate group-hover:text-teal-600">{{ course.title }}</h4>
-                  <p class="text-[10px] text-gray-500">{{ course.instructor }} · {{ course.duration }}</p>
-                </div>
-                <div class="flex items-center">
-                  <i class="fas fa-chevron-right text-gray-300 group-hover:text-teal-500 text-xs"></i>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Trending Courses -->
-          <div class="content-area p-5">
-            <div class="flex items-center gap-3 mb-4">
-              <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-400 to-red-500 flex items-center justify-center shadow-lg shadow-orange-200">
-                <i class="fas fa-fire text-white text-sm"></i>
-              </div>
-              <div>
-                <h3 class="font-semibold text-gray-900 text-sm">Trending Now</h3>
-                <p class="text-[11px] text-gray-500">Most popular this month</p>
-              </div>
-            </div>
-            <div class="space-y-3">
-              <div v-for="(course, idx) in catalogCourses.slice(3, 6)" :key="'trending-' + course.id"
-                   class="group flex gap-3 p-3 bg-gray-50 rounded-xl cursor-pointer hover:bg-orange-50 transition-all">
-                <div class="w-8 h-8 rounded-lg bg-orange-100 flex items-center justify-center flex-shrink-0">
-                  <span class="text-orange-600 font-bold text-sm">{{ idx + 1 }}</span>
-                </div>
-                <div class="relative w-16 h-12 flex-shrink-0 rounded-lg overflow-hidden">
-                  <img :src="course.image" :alt="course.title" class="w-full h-full object-cover">
-                </div>
-                <div class="flex-1 min-w-0">
-                  <h4 class="font-medium text-gray-900 text-xs truncate group-hover:text-orange-600">{{ course.title }}</h4>
-                  <div class="flex items-center gap-2 text-[10px] text-gray-500">
-                    <span><i class="fas fa-star text-amber-400"></i> {{ course.rating }}</span>
-                    <span>{{ course.students >= 1000 ? (course.students / 1000).toFixed(1) + 'k' : course.students }} enrolled</span>
-                  </div>
-                </div>
-                <div class="flex items-center">
-                  <i class="fas fa-arrow-trend-up text-orange-400 text-sm"></i>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- All Courses Section -->
-        <div class="content-area p-6">
-          <div class="flex items-center justify-between mb-5">
-            <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center shadow-lg shadow-teal-200">
-                <i class="fas fa-compass text-white text-sm"></i>
-              </div>
-              <div>
-                <h2 class="text-lg font-bold text-gray-900">All Courses</h2>
-                <p class="text-xs text-gray-500">{{ filteredCatalog.length }} courses available</p>
-              </div>
-            </div>
-            <div class="flex items-center gap-2">
-              <select class="text-xs px-3 py-2 rounded-lg border border-gray-200 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-teal-500 cursor-pointer">
-                <option>Most Popular</option>
-                <option>Highest Rated</option>
-                <option>Newest</option>
-                <option>Duration: Short to Long</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-5">
-            <div v-for="course in filteredCatalog" :key="course.id"
-                 class="course-card group bg-white rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 hover:-translate-y-1.5 border border-gray-100 shadow-sm hover:shadow-xl hover:border-teal-200">
-              <!-- Card Image -->
-              <div class="relative h-40 overflow-hidden">
-                <img :src="course.image" :alt="course.title" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
-                <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent"></div>
-
-                <!-- Badges -->
-                <div class="absolute top-3 left-3 flex items-center gap-2">
-                  <span :class="['course-level-badge', course.levelClass]">
-                    {{ course.level }}
-                  </span>
-                </div>
-
-                <!-- Wishlist Button -->
-                <button class="absolute top-3 right-3 w-8 h-8 bg-white/80 hover:bg-white rounded-full flex items-center justify-center shadow-lg opacity-0 group-hover:opacity-100 transition-all">
-                  <i class="far fa-heart text-gray-600 hover:text-red-500 text-sm"></i>
-                </button>
-
-                <!-- Play Button on Hover -->
-                <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all">
-                  <div class="w-14 h-14 rounded-full bg-white/90 flex items-center justify-center shadow-xl">
-                    <i class="fas fa-play text-teal-600 text-lg ml-1"></i>
-                  </div>
-                </div>
-
-                <!-- Bottom Info Overlay -->
-                <div class="absolute bottom-3 left-3 right-3 flex items-center justify-between">
-                  <div class="flex items-center gap-2">
-                    <span class="px-2 py-1 bg-black/50 backdrop-blur-sm text-white text-[10px] font-medium rounded-lg">
-                      <i class="fas fa-clock mr-1"></i>{{ course.duration }}
-                    </span>
-                    <span class="px-2 py-1 bg-black/50 backdrop-blur-sm text-white text-[10px] font-medium rounded-lg">
-                      <i class="fas fa-play-circle mr-1"></i>{{ course.lessons }} lessons
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Card Content -->
-              <div class="p-4">
-                <!-- Title -->
-                <h3 class="text-sm font-semibold text-gray-800 mb-2 line-clamp-2 group-hover:text-teal-600 transition-colors leading-snug h-10">
-                  {{ course.title }}
-                </h3>
-
-                <!-- Tags -->
-                <div class="flex flex-wrap gap-1.5 mb-3">
-                  <span v-for="tag in course.tags" :key="tag"
-                        class="px-2 py-0.5 bg-gray-100 text-gray-600 text-[10px] font-medium rounded-full hover:bg-teal-50 hover:text-teal-600 transition-colors">
-                    {{ tag }}
-                  </span>
-                </div>
-
-                <!-- Rating & Students -->
-                <div class="flex items-center gap-3 text-[11px] mb-3">
-                  <span class="flex items-center gap-1 text-amber-500 font-semibold">
-                    <i class="fas fa-star text-[10px]"></i>
-                    {{ course.rating }}
-                  </span>
-                  <span class="text-gray-400">({{ course.students >= 1000 ? (course.students / 1000).toFixed(1) + 'k' : course.students }} students)</span>
-                </div>
-
-                <!-- Footer -->
-                <div class="flex items-center justify-between pt-3 border-t border-gray-100">
-                  <!-- Instructor -->
-                  <div class="flex items-center gap-2">
-                    <div class="w-7 h-7 rounded-full bg-gradient-to-br from-teal-400 to-cyan-500 flex items-center justify-center text-white text-[10px] font-semibold shadow-sm">
-                      {{ course.instructorInitials }}
-                    </div>
-                    <span class="text-xs text-gray-600 font-medium">{{ course.instructor }}</span>
-                  </div>
-
-                  <!-- Enroll Button -->
-                  <button class="px-3 py-1.5 bg-gradient-to-r from-teal-500 to-teal-600 text-white text-xs font-semibold rounded-lg hover:from-teal-600 hover:to-teal-700 transition-all shadow-md flex items-center gap-1.5">
-                    <i class="fas fa-plus text-[10px]"></i>
-                    Enroll
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Load More Button -->
-          <div class="text-center mt-8">
-            <button class="px-8 py-3 bg-white border-2 border-teal-500 text-teal-600 rounded-xl font-semibold text-sm hover:bg-teal-50 transition-all flex items-center gap-2 mx-auto">
-              <i class="fas fa-plus"></i>
-              Load More Courses
-            </button>
-          </div>
-        </div>
-      </div>
-
       <!-- Learning Paths Tab -->
       <div v-if="activeTab === 'paths'" class="space-y-6">
         <!-- My Enrolled Paths -->
@@ -2249,9 +1876,9 @@ function resumeFeaturedAutoPlay() {
             </div>
             <h3 class="font-semibold text-gray-900 mb-2">No certificates yet</h3>
             <p class="text-gray-500 text-sm mb-6 max-w-md mx-auto">Complete courses to earn certificates and showcase your achievements to employers</p>
-            <button @click="activeTab = 'catalog'" class="px-6 py-2.5 bg-gradient-to-r from-teal-500 to-teal-600 text-white rounded-xl font-semibold text-sm hover:from-teal-600 hover:to-teal-700 transition-all shadow-lg shadow-teal-200 flex items-center gap-2 mx-auto">
-              <i class="fas fa-compass"></i>
-              Browse Courses
+            <button @click="activeTab = 'my-courses'" class="px-6 py-2.5 bg-gradient-to-r from-teal-500 to-teal-600 text-white rounded-xl font-semibold text-sm hover:from-teal-600 hover:to-teal-700 transition-all shadow-lg shadow-teal-200 flex items-center gap-2 mx-auto">
+              <i class="fas fa-book-reader"></i>
+              View Courses
             </button>
           </div>
         </div>
