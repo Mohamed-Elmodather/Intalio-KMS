@@ -1065,12 +1065,6 @@ function resumeFeaturedAutoPlay() {
                   <span class="text-xs font-medium text-gray-500">{{ filteredAllCourses.length }} courses available</span>
                 </div>
               </h2>
-              <div class="flex items-center gap-2">
-                <button class="px-4 py-2 bg-gradient-to-r from-teal-500 to-teal-600 text-white rounded-lg text-sm font-medium hover:from-teal-600 hover:to-teal-700 transition-all flex items-center gap-2 shadow-sm shadow-teal-200">
-                  <i class="fas fa-filter"></i>
-                  Browse Categories
-                </button>
-              </div>
             </div>
 
             <!-- Bottom Row - Search, Filters, View Options -->
