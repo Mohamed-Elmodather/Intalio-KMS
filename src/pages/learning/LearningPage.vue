@@ -501,18 +501,18 @@ function getLevelColor(level: string) {
         <div v-if="currentCourse" class="content-area overflow-hidden">
           <div class="flex items-stretch">
             <!-- Left: Course Image with Play Button -->
-            <div class="hidden md:block relative w-48 flex-shrink-0 overflow-hidden">
+            <div class="relative w-32 md:w-48 flex-shrink-0 overflow-hidden">
               <img :src="enrolledCourses[0]?.image" :alt="currentCourse.title" class="w-full h-full object-cover">
               <div class="absolute inset-0 bg-gradient-to-r from-transparent to-black/30"></div>
               <div class="absolute inset-0 flex items-center justify-center">
-                <button @click="navigateToCourse(currentCourse.id)" class="w-12 h-12 rounded-full bg-white/95 hover:bg-white flex items-center justify-center shadow-xl transition-all hover:scale-110 group">
-                  <i class="fas fa-play text-teal-600 ml-0.5 group-hover:text-teal-700"></i>
+                <button @click="navigateToCourse(currentCourse.id)" class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/95 hover:bg-white flex items-center justify-center shadow-xl transition-all hover:scale-110 group">
+                  <i class="fas fa-play text-teal-600 text-sm md:text-base ml-0.5 group-hover:text-teal-700"></i>
                 </button>
               </div>
             </div>
 
             <!-- Right: Content -->
-            <div class="flex-1 p-4 md:p-5 bg-gradient-to-br from-teal-500 to-teal-600">
+            <div class="flex-1 p-3 md:p-5 bg-gradient-to-br from-teal-500 to-teal-600">
               <div class="flex flex-wrap items-center gap-2 mb-2">
                 <span class="px-2 py-0.5 bg-white/20 text-white text-[10px] font-semibold rounded-full backdrop-blur-sm flex items-center gap-1">
                   <i class="fas fa-bolt text-[9px]"></i>Continue Learning
