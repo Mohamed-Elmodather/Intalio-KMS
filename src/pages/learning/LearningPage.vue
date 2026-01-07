@@ -779,15 +779,15 @@ function resumeFeaturedAutoPlay() {
                     <div class="up-next-overlay"></div>
                     <div class="up-next-play"><i class="fas fa-play"></i></div>
                     <span class="up-next-duration">{{ course.duration }}</span>
-                    <!-- Save Button -->
-                    <button
-                      class="up-next-save-btn"
-                      :class="{ 'saved': course.saved }"
-                      @click.stop="toggleSaveCourse(course.id)"
-                    >
-                      <i :class="course.saved ? 'fas fa-bookmark' : 'far fa-bookmark'"></i>
-                    </button>
                   </div>
+                  <!-- Save Button on Card Edge -->
+                  <button
+                    class="up-next-save-btn"
+                    :class="{ 'saved': course.saved }"
+                    @click.stop="toggleSaveCourse(course.id)"
+                  >
+                    <i :class="course.saved ? 'fas fa-bookmark' : 'far fa-bookmark'"></i>
+                  </button>
 
                   <!-- Info -->
                   <div class="up-next-info">
@@ -2510,11 +2510,11 @@ function resumeFeaturedAutoPlay() {
 .up-next-thumb {
   position: relative;
   width: 100px;
-  height: 65px;
   border-radius: 0.5rem;
   overflow: hidden;
   flex-shrink: 0;
   background: #1e293b;
+  align-self: stretch;
 }
 
 .up-next-img {
@@ -2582,13 +2582,13 @@ function resumeFeaturedAutoPlay() {
 
 .up-next-save-btn {
   position: absolute;
-  top: 4px;
-  right: 4px;
-  width: 1.5rem;
-  height: 1.5rem;
+  top: 0.5rem;
+  right: 0.5rem;
+  width: 1.75rem;
+  height: 1.75rem;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.95);
-  border: none;
+  border: 1px solid #e2e8f0;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -2597,7 +2597,7 @@ function resumeFeaturedAutoPlay() {
   z-index: 5;
   opacity: 0;
   transform: scale(0.8);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
 .up-next-course-card:hover .up-next-save-btn {
@@ -2611,7 +2611,7 @@ function resumeFeaturedAutoPlay() {
 }
 
 .up-next-save-btn i {
-  font-size: 0.625rem;
+  font-size: 0.75rem;
   color: #64748b;
   transition: all 0.2s ease;
 }
@@ -2622,6 +2622,7 @@ function resumeFeaturedAutoPlay() {
 
 .up-next-save-btn.saved {
   background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+  border-color: transparent;
   opacity: 1;
   transform: scale(1);
 }
