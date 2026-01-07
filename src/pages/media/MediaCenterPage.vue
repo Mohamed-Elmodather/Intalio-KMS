@@ -2338,21 +2338,21 @@ onUnmounted(() => {
 .section-title-sm {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  font-size: 1rem;
-  font-weight: 600;
+  gap: 0.75rem;
+  font-size: 1.125rem;
+  font-weight: 700;
   color: #1e293b;
 }
 
 .section-title-sm i {
-  width: 1.75rem;
-  height: 1.75rem;
+  width: 2.5rem;
+  height: 2.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
   background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 100%);
-  border-radius: 0.5rem;
-  font-size: 0.75rem;
+  border-radius: 0.75rem;
+  font-size: 0.875rem;
   box-shadow: 0 2px 8px rgba(20, 184, 166, 0.2);
 }
 
@@ -3353,8 +3353,8 @@ onUnmounted(() => {
 }
 
 .trending-icon-wrapper {
-  width: 2.75rem;
-  height: 2.75rem;
+  width: 2.5rem;
+  height: 2.5rem;
   border-radius: 0.75rem;
   background: linear-gradient(135deg, #ef4444 0%, #f97316 100%);
   display: flex;
@@ -3365,7 +3365,7 @@ onUnmounted(() => {
 
 .trending-icon-wrapper i {
   color: white;
-  font-size: 1rem;
+  font-size: 0.875rem;
   animation: flicker 1.5s ease-in-out infinite;
 }
 
