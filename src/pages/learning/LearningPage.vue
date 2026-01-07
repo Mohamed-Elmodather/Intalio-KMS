@@ -287,12 +287,10 @@ function getLevelColor(level: string) {
   <div class="page-view">
     <!-- Hero Section -->
     <div class="hero-gradient relative overflow-hidden">
-      <!-- Background Pattern -->
-      <div class="absolute inset-0 opacity-10">
-        <div class="absolute top-10 left-10 w-32 h-32 border border-white/30 rounded-full"></div>
-        <div class="absolute top-20 right-20 w-48 h-48 border border-white/20 rounded-full"></div>
-        <div class="absolute bottom-10 left-1/4 w-24 h-24 border border-white/25 rounded-full"></div>
-      </div>
+      <!-- Decorative elements with animations -->
+      <div class="circle-drift-1 absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full"></div>
+      <div class="circle-drift-2 absolute bottom-0 left-0 w-64 h-64 bg-white/5 rounded-full"></div>
+      <div class="circle-drift-3 absolute top-1/2 right-1/4 w-32 h-32 bg-white/10 rounded-full"></div>
 
       <!-- Stats - Absolute Top Right -->
       <div class="stats-top-right">
@@ -300,87 +298,56 @@ function getLevelColor(level: string) {
           <div class="stat-icon-box">
             <i class="fas fa-graduation-cap"></i>
           </div>
-          <div class="stat-value-mini">{{ completedCourses }}/{{ totalCourses }}</div>
-          <div class="stat-label-mini">Completed</div>
+          <p class="stat-value-mini">{{ completedCourses }}/{{ totalCourses }}</p>
+          <p class="stat-label-mini">Completed</p>
         </div>
         <div class="stat-card-square">
           <div class="stat-icon-box">
             <i class="fas fa-clock"></i>
           </div>
-          <div class="stat-value-mini">{{ learningHours }}h</div>
-          <div class="stat-label-mini">Learning</div>
+          <p class="stat-value-mini">{{ learningHours }}h</p>
+          <p class="stat-label-mini">Learning</p>
+        </div>
+        <div class="stat-card-square">
+          <div class="stat-icon-box">
+            <i class="fas fa-certificate"></i>
+          </div>
+          <p class="stat-value-mini">{{ certificates }}</p>
+          <p class="stat-label-mini">Certificates</p>
         </div>
         <div class="stat-card-square">
           <div class="stat-icon-box">
             <i class="fas fa-fire"></i>
           </div>
-          <div class="stat-value-mini">{{ streak }}</div>
-          <div class="stat-label-mini">Day Streak</div>
+          <p class="stat-value-mini">{{ streak }}</p>
+          <p class="stat-label-mini">Day Streak</p>
         </div>
       </div>
 
-      <div class="max-w-7xl mx-auto px-6 py-10 relative z-10">
-        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-          <!-- Left: Title & Description -->
-          <div class="flex-1 max-w-2xl">
-            <div class="flex items-center gap-3 mb-4">
-              <div class="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                <i class="fas fa-graduation-cap text-white text-xl"></i>
-              </div>
-              <div>
-                <h1 class="text-2xl md:text-3xl font-bold text-white">Learning & Development</h1>
-                <p class="text-teal-100 text-sm">Expand your skills with curated courses</p>
-              </div>
-            </div>
+      <div class="relative px-8 py-8">
+        <div class="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-white text-xs font-semibold inline-flex items-center gap-2 mb-4">
+          <i class="fas fa-graduation-cap"></i>
+          AFC Asian Cup 2027
+        </div>
 
-            <!-- Continue Learning Card -->
-            <div v-if="currentCourse" class="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
-              <div class="flex items-center gap-4">
-                <div class="w-14 h-14 rounded-xl bg-white/20 flex items-center justify-center flex-shrink-0">
-                  <i :class="[currentCourse.icon, 'text-white text-xl']"></i>
-                </div>
-                <div class="flex-1 min-w-0">
-                  <p class="text-teal-200 text-xs mb-0.5">Continue where you left off</p>
-                  <h3 class="font-semibold text-white text-sm truncate">{{ currentCourse.title }}</h3>
-                  <p class="text-teal-200 text-xs truncate">{{ currentCourse.nextLesson }}</p>
-                  <div class="flex items-center gap-2 mt-2">
-                    <div class="flex-1 h-1.5 bg-white/20 rounded-full overflow-hidden">
-                      <div class="h-full bg-white rounded-full transition-all" :style="{ width: currentCourse.progress + '%' }"></div>
-                    </div>
-                    <span class="text-white text-xs font-medium">{{ currentCourse.progress }}%</span>
-                  </div>
-                </div>
-                <button @click="navigateToCourse(currentCourse.id)" class="px-4 py-2 bg-white text-teal-600 rounded-xl font-semibold text-sm hover:bg-teal-50 transition-all shadow-lg flex items-center gap-2">
-                  <i class="fas fa-play text-xs"></i>
-                  Resume
-                </button>
-              </div>
-            </div>
-          </div>
+        <h1 class="text-3xl font-bold text-white mb-2">Learning & Development</h1>
+        <p class="text-teal-100 max-w-lg">Expand your skills with curated courses, learning paths, and professional certifications.</p>
 
-          <!-- Right: Progress Ring -->
-          <div class="flex-shrink-0 hidden lg:block">
-            <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20 text-center">
-              <div class="relative mb-3">
-                <svg class="progress-ring w-28 h-28">
-                  <circle class="text-white/20" stroke="currentColor" stroke-width="8" fill="transparent" r="45" cx="56" cy="56"/>
-                  <circle class="progress-ring__circle text-white" stroke="currentColor" stroke-width="8" fill="transparent" r="45" cx="56" cy="56"
-                          :style="{ strokeDashoffset: 283 - (283 * overallProgress / 100) }"/>
-                </svg>
-                <div class="absolute inset-0 flex items-center justify-center">
-                  <span class="text-2xl font-bold text-white">{{ overallProgress }}%</span>
-                </div>
-              </div>
-              <p class="text-white font-medium text-sm">Overall Progress</p>
-              <p class="text-teal-200 text-xs">{{ certificates }} certificates earned</p>
-            </div>
-          </div>
+        <div class="flex flex-wrap gap-3 mt-6">
+          <button @click="activeTab = 'catalog'" class="px-5 py-2.5 bg-white text-teal-600 rounded-xl font-semibold text-sm flex items-center gap-2 hover:bg-teal-50 transition-all shadow-lg">
+            <i class="fas fa-compass"></i>
+            Browse Courses
+          </button>
+          <button v-if="currentCourse" @click="navigateToCourse(currentCourse.id)" class="px-5 py-2.5 bg-white/20 backdrop-blur-sm border border-white/30 text-white rounded-xl font-semibold text-sm hover:bg-white/30 transition-all flex items-center gap-2">
+            <i class="fas fa-play"></i>
+            Continue Learning
+          </button>
         </div>
       </div>
     </div>
 
     <!-- Main Content -->
-    <div class="max-w-7xl mx-auto px-6 py-8">
+    <div class="px-8 py-6">
       <!-- Tab Navigation -->
       <div class="flex items-center gap-2 mb-8 overflow-x-auto pb-2 scrollbar-hide">
         <button v-for="tab in tabs" :key="tab.id"
@@ -885,50 +852,93 @@ function getLevelColor(level: string) {
   background: rgba(255, 255, 255, 0.15);
   backdrop-filter: blur(8px);
   border-radius: 16px;
-  width: 100px;
-  height: 100px;
+  width: 115px;
+  height: 115px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+  gap: 8px;
   text-align: center;
   transition: all 0.3s ease;
 }
 
 .stat-card-square:hover {
   background: rgba(255, 255, 255, 0.25);
-  transform: translateY(-4px);
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+.stat-card-square:hover .stat-icon-box {
+  transform: scale(1.1);
 }
 
 .stat-icon-box {
   color: white;
-  font-size: 18px;
+  font-size: 20px;
+  transition: transform 0.3s ease;
 }
 
 .stat-value-mini {
-  font-size: 20px;
+  font-size: 24px;
   font-weight: 700;
   color: white;
+  line-height: 1;
 }
 
 .stat-label-mini {
-  font-size: 10px;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.8);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1;
 }
 
-/* Progress Ring */
-.progress-ring {
-  transform: rotate(-90deg);
+/* Animated Circles */
+.circle-drift-1 {
+  animation: drift-1 20s ease-in-out infinite;
 }
 
-.progress-ring__circle {
-  stroke-dasharray: 283;
-  stroke-dashoffset: 283;
-  transition: stroke-dashoffset 0.5s ease;
+.circle-drift-2 {
+  animation: drift-2 25s ease-in-out infinite;
+}
+
+.circle-drift-3 {
+  animation: drift-3 18s ease-in-out infinite;
+}
+
+@keyframes drift-1 {
+  0%, 100% {
+    transform: translate(33%, -50%);
+  }
+  25% {
+    transform: translate(28%, -45%);
+  }
+  50% {
+    transform: translate(35%, -55%);
+  }
+  75% {
+    transform: translate(30%, -48%);
+  }
+}
+
+@keyframes drift-2 {
+  0%, 100% {
+    transform: translate(-30%, 50%);
+  }
+  33% {
+    transform: translate(-25%, 45%);
+  }
+  66% {
+    transform: translate(-35%, 55%);
+  }
+}
+
+@keyframes drift-3 {
+  0%, 100% {
+    transform: translate(0, -50%);
+  }
+  50% {
+    transform: translate(10%, -45%);
+  }
 }
 
 /* Content Area */
@@ -1014,19 +1024,33 @@ function getLevelColor(level: string) {
     position: relative;
     top: auto;
     right: auto;
-    justify-content: center;
-    margin-top: 1rem;
+    margin: 24px 32px 0;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
   }
-}
 
-@media (max-width: 640px) {
   .stat-card-square {
-    width: 80px;
+    width: 100%;
     height: 80px;
+  }
+
+  .stat-icon-box {
+    font-size: 14px;
   }
 
   .stat-value-mini {
     font-size: 16px;
+  }
+
+  .stat-label-mini {
+    font-size: 8px;
+  }
+}
+
+@media (max-width: 640px) {
+  .stats-top-right {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 </style>
