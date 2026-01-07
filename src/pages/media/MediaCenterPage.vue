@@ -402,13 +402,14 @@ const allTags = computed(() => {
   return Array.from(tags).sort()
 })
 
-// Computed: Active Filters Count
+/// Computed: Active Filters Count
 const activeFiltersCount = computed(() => {
   let count = 0
-  if (categoryFilter.value) count++
-  if (activeTab.value !== 'all') count++
   if (searchQuery.value) count++
+  count += selectedMediaTypes.value.length
+  count += selectedCategories.value.length
   count += selectedTags.value.length
+  count += selectedStatusFilters.value.length
   return count
 })
 
@@ -719,6 +720,25 @@ function toggleStatusFilter(status: string) {
 
 function isStatusSelected(status: string): boolean {
   return selectedStatusFilters.value.includes(status)
+}
+
+function toggleMediaTypeFilter(typeId: string) {
+  const index = selectedMediaTypes.value.indexOf(typeId)
+  if (index > -1) {
+    selectedMediaTypes.value.splice(index, 1)
+  } else {
+    selectedMediaTypes.value.push(typeId)
+  }
+}
+
+function clearAllFilters() {
+  searchQuery.value = ''
+  selectedMediaTypes.value = []
+  selectedCategories.value = []
+  selectedTags.value = []
+  selectedStatusFilters.value = []
+  categoryFilter.value = ''
+  activeTab.value = 'all'
 }
 
 // Get current sort option
@@ -1438,6 +1458,66 @@ onUnmounted(() => {
                 </button>
               </div>
           </div>
+        </div>
+
+        <!-- Active Filters Bar -->
+        <div v-if="activeFiltersCount > 0" class="flex items-center gap-3 mb-4 p-3 bg-white rounded-xl border border-gray-100 shadow-sm">
+          <div class="flex items-center gap-2 px-2 py-1 bg-gray-100 rounded-lg">
+            <i class="fas fa-filter text-gray-400 text-xs"></i>
+            <span class="text-xs font-medium text-gray-600">Active Filters</span>
+          </div>
+          <div class="flex flex-wrap gap-2 flex-1">
+            <!-- Search Filter -->
+            <span v-if="searchQuery" class="px-2.5 py-1 bg-gray-100 text-gray-700 rounded-lg text-xs font-medium flex items-center gap-1.5 border border-gray-200">
+              <i class="fas fa-search text-[10px]"></i>
+              "{{ searchQuery }}"
+              <button @click="searchQuery = ''" class="ml-1 hover:text-gray-900 hover:bg-gray-200 rounded-full w-4 h-4 flex items-center justify-center"><i class="fas fa-times text-[10px]"></i></button>
+            </span>
+            <!-- Media Type Filters -->
+            <span
+              v-for="typeId in selectedMediaTypes"
+              :key="'type-' + typeId"
+              class="px-2.5 py-1 bg-teal-50 text-teal-700 rounded-lg text-xs font-medium flex items-center gap-1.5 border border-teal-100"
+            >
+              <i class="fas fa-photo-film text-[10px]"></i>
+              {{ mediaTypeOptions.find(t => t.id === typeId)?.label || typeId }}
+              <button @click="toggleMediaTypeFilter(typeId)" class="ml-1 hover:text-teal-900 hover:bg-teal-100 rounded-full w-4 h-4 flex items-center justify-center"><i class="fas fa-times text-[10px]"></i></button>
+            </span>
+            <!-- Category Filters -->
+            <span
+              v-for="cat in selectedCategories"
+              :key="'cat-' + cat"
+              class="px-2.5 py-1 bg-teal-50 text-teal-700 rounded-lg text-xs font-medium flex items-center gap-1.5 border border-teal-100"
+            >
+              <i class="fas fa-layer-group text-[10px]"></i>
+              {{ cat }}
+              <button @click="toggleCategorySelection(cat)" class="ml-1 hover:text-teal-900 hover:bg-teal-100 rounded-full w-4 h-4 flex items-center justify-center"><i class="fas fa-times text-[10px]"></i></button>
+            </span>
+            <!-- Tag Filters -->
+            <span
+              v-for="tag in selectedTags"
+              :key="'tag-' + tag"
+              class="px-2.5 py-1 bg-teal-50 text-teal-700 rounded-lg text-xs font-medium flex items-center gap-1.5 border border-teal-100"
+            >
+              <i class="fas fa-tag text-[10px]"></i>
+              {{ tag }}
+              <button @click="toggleTagFilter(tag)" class="ml-1 hover:text-teal-900 hover:bg-teal-100 rounded-full w-4 h-4 flex items-center justify-center"><i class="fas fa-times text-[10px]"></i></button>
+            </span>
+            <!-- Status Filters (Saved & Shared) -->
+            <span
+              v-for="status in selectedStatusFilters"
+              :key="'status-' + status"
+              class="px-2.5 py-1 bg-amber-50 text-amber-700 rounded-lg text-xs font-medium flex items-center gap-1.5 border border-amber-100"
+            >
+              <i :class="[status === 'saved' ? 'fas fa-bookmark' : 'fas fa-share-alt', 'text-[10px]']"></i>
+              {{ status === 'saved' ? 'My Saved' : 'Shared with me' }}
+              <button @click="toggleStatusFilter(status)" class="ml-1 hover:text-amber-900 hover:bg-amber-100 rounded-full w-4 h-4 flex items-center justify-center"><i class="fas fa-times text-[10px]"></i></button>
+            </span>
+          </div>
+          <button @click="clearAllFilters" class="px-3 py-1.5 text-xs font-medium text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors flex items-center gap-1.5">
+            <i class="fas fa-times-circle"></i>
+            Clear all
+          </button>
         </div>
 
         <div class="flex min-h-[500px]">

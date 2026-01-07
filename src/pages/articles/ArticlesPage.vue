@@ -511,6 +511,7 @@ const activeFiltersCount = computed(() => {
   count += selectedCategories.value.length
   count += selectedTypes.value.length
   count += selectedTags.value.length
+  count += selectedStatusFilters.value.length
   return count
 })
 
@@ -698,6 +699,7 @@ function clearFilters() {
   selectedCategories.value = []
   selectedTypes.value = []
   selectedTags.value = []
+  selectedStatusFilters.value = []
   sortBy.value = 'recent'
   sortOrder.value = 'desc'
   filterArticles()
@@ -1664,6 +1666,16 @@ onUnmounted(() => {
             <i class="fas fa-tag text-[10px]"></i>
             {{ tag }}
             <button @click="toggleTagFilter(tag)" class="ml-1 hover:text-teal-900 hover:bg-teal-100 rounded-full w-4 h-4 flex items-center justify-center"><i class="fas fa-times text-[10px]"></i></button>
+          </span>
+          <!-- Status Filters (Saved & Shared) -->
+          <span
+            v-for="status in selectedStatusFilters"
+            :key="'status-' + status"
+            class="px-2.5 py-1 bg-amber-50 text-amber-700 rounded-lg text-xs font-medium flex items-center gap-1.5 border border-amber-100"
+          >
+            <i :class="[status === 'saved' ? 'fas fa-bookmark' : 'fas fa-share-alt', 'text-[10px]']"></i>
+            {{ status === 'saved' ? 'My Saved' : 'Shared with me' }}
+            <button @click="toggleStatusFilter(status)" class="ml-1 hover:text-amber-900 hover:bg-amber-100 rounded-full w-4 h-4 flex items-center justify-center"><i class="fas fa-times text-[10px]"></i></button>
           </span>
         </div>
         <button @click="clearFilters" class="px-3 py-1.5 text-xs font-medium text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors flex items-center gap-1.5">
