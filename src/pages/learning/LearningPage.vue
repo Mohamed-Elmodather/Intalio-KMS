@@ -944,6 +944,7 @@ const pathsViewMode = ref<'grid' | 'list'>('grid')
 
 // Paths filter dropdown states
 const showPathsLevelFilter = ref(false)
+const showPathsEnrollmentFilter = ref(false)
 const showPathsSortDropdown = ref(false)
 
 // Paths pagination state
@@ -2559,11 +2560,77 @@ function resumeFeaturedAutoPlay() {
               </div>
 
               <!-- Enrollment Filter Dropdown -->
-              <select v-model="pathFilter" class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border bg-white border-gray-200 text-gray-600 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-teal-500 cursor-pointer">
-                <option value="all">All Paths</option>
-                <option value="enrolled">My Enrolled</option>
-                <option value="available">Available</option>
-              </select>
+              <div class="relative">
+                <button
+                  @click="showPathsEnrollmentFilter = !showPathsEnrollmentFilter"
+                  :class="[
+                    'flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border',
+                    pathFilter !== 'all' ? 'bg-blue-50 border-blue-200 text-blue-700' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+                  ]"
+                >
+                  <i class="fas fa-route text-sm"></i>
+                  <span>{{ pathFilter === 'all' ? 'All Paths' : pathFilter === 'enrolled' ? 'My Enrolled' : 'Available' }}</span>
+                  <i :class="showPathsEnrollmentFilter ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ml-1"></i>
+                </button>
+                <!-- Dropdown Panel -->
+                <div
+                  v-if="showPathsEnrollmentFilter"
+                  class="absolute left-0 top-full mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
+                >
+                  <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Filter by Status</div>
+                  <div class="max-h-64 overflow-y-auto">
+                    <button
+                      @click="pathFilter = 'all'; showPathsEnrollmentFilter = false"
+                      :class="[
+                        'w-full px-3 py-2 text-left text-sm flex items-center gap-3 transition-colors',
+                        pathFilter === 'all' ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50'
+                      ]"
+                    >
+                      <div :class="[
+                        'w-4 h-4 rounded-full border-2 flex items-center justify-center transition-all',
+                        pathFilter === 'all' ? 'bg-blue-500 border-blue-500' : 'border-gray-300'
+                      ]">
+                        <i v-if="pathFilter === 'all'" class="fas fa-circle text-white text-[6px]"></i>
+                      </div>
+                      <i class="fas fa-layer-group text-sm w-4" :class="pathFilter === 'all' ? 'text-blue-500' : 'text-gray-400'"></i>
+                      <span class="flex-1">All Paths</span>
+                    </button>
+                    <button
+                      @click="pathFilter = 'enrolled'; showPathsEnrollmentFilter = false"
+                      :class="[
+                        'w-full px-3 py-2 text-left text-sm flex items-center gap-3 transition-colors',
+                        pathFilter === 'enrolled' ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50'
+                      ]"
+                    >
+                      <div :class="[
+                        'w-4 h-4 rounded-full border-2 flex items-center justify-center transition-all',
+                        pathFilter === 'enrolled' ? 'bg-blue-500 border-blue-500' : 'border-gray-300'
+                      ]">
+                        <i v-if="pathFilter === 'enrolled'" class="fas fa-circle text-white text-[6px]"></i>
+                      </div>
+                      <i class="fas fa-user-check text-sm w-4" :class="pathFilter === 'enrolled' ? 'text-blue-500' : 'text-gray-400'"></i>
+                      <span class="flex-1">My Enrolled</span>
+                    </button>
+                    <button
+                      @click="pathFilter = 'available'; showPathsEnrollmentFilter = false"
+                      :class="[
+                        'w-full px-3 py-2 text-left text-sm flex items-center gap-3 transition-colors',
+                        pathFilter === 'available' ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50'
+                      ]"
+                    >
+                      <div :class="[
+                        'w-4 h-4 rounded-full border-2 flex items-center justify-center transition-all',
+                        pathFilter === 'available' ? 'bg-blue-500 border-blue-500' : 'border-gray-300'
+                      ]">
+                        <i v-if="pathFilter === 'available'" class="fas fa-circle text-white text-[6px]"></i>
+                      </div>
+                      <i class="fas fa-unlock text-sm w-4" :class="pathFilter === 'available' ? 'text-blue-500' : 'text-gray-400'"></i>
+                      <span class="flex-1">Available</span>
+                    </button>
+                  </div>
+                </div>
+                <div v-if="showPathsEnrollmentFilter" @click="showPathsEnrollmentFilter = false" class="fixed inset-0 z-40"></div>
+              </div>
 
               <!-- Sort Options with Order Toggle -->
               <div class="relative ml-auto flex items-center">
