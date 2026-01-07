@@ -268,8 +268,8 @@ const categories = ref([
   { id: 'security', name: 'Security', icon: 'fas fa-shield-alt', color: '#ef4444', courseCount: 8 },
 ])
 
-// Recommended courses
-const recommendedCourses = ref([
+// Trending courses
+const trendingCourses = ref([
   {
     id: 10,
     title: 'Machine Learning Basics',
@@ -279,27 +279,12 @@ const recommendedCourses = ref([
     totalLessons: 12,
     level: 'Intermediate',
     levelClass: 'intermediate',
-    matchScore: 95,
+    trendingRank: 1,
+    viewsThisWeek: 12500,
     rating: 4.8,
     students: 3200,
     image: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=400&h=300&fit=crop',
     tags: ['AI', 'Machine Learning'],
-    saved: false
-  },
-  {
-    id: 11,
-    title: 'Strategic Planning',
-    instructor: 'Michael Brown',
-    instructorInitials: 'MB',
-    duration: '3 hours',
-    totalLessons: 8,
-    level: 'Advanced',
-    levelClass: 'advanced',
-    matchScore: 88,
-    rating: 4.6,
-    students: 1890,
-    image: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=400&h=300&fit=crop',
-    tags: ['Strategy', 'Business'],
     saved: false
   },
   {
@@ -311,12 +296,30 @@ const recommendedCourses = ref([
     totalLessons: 6,
     level: 'Beginner',
     levelClass: 'beginner',
-    matchScore: 82,
+    trendingRank: 2,
+    viewsThisWeek: 9800,
     rating: 4.7,
     students: 4500,
     image: 'https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=400&h=300&fit=crop',
     tags: ['Speaking', 'Communication'],
     saved: true
+  },
+  {
+    id: 17,
+    title: 'Python for Data Science',
+    instructor: 'Dr. James Wilson',
+    instructorInitials: 'JW',
+    duration: '6 hours',
+    totalLessons: 18,
+    level: 'Beginner',
+    levelClass: 'beginner',
+    trendingRank: 3,
+    viewsThisWeek: 8200,
+    rating: 4.9,
+    students: 5200,
+    image: 'https://images.unsplash.com/photo-1526379095098-d400fd0bf935?w=400&h=300&fit=crop',
+    tags: ['Python', 'Data Science'],
+    saved: false
   },
   {
     id: 13,
@@ -327,7 +330,8 @@ const recommendedCourses = ref([
     totalLessons: 20,
     level: 'Advanced',
     levelClass: 'advanced',
-    matchScore: 78,
+    trendingRank: 4,
+    viewsThisWeek: 6500,
     rating: 4.9,
     students: 2100,
     image: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=400&h=300&fit=crop',
@@ -894,8 +898,8 @@ function toggleSaveCourse(courseId: number) {
   }
 }
 
-function toggleSaveRecommended(courseId: number) {
-  const course = recommendedCourses.value.find(c => c.id === courseId)
+function toggleSaveTrending(courseId: number) {
+  const course = trendingCourses.value.find(c => c.id === courseId)
   if (course) {
     course.saved = !course.saved
   }
@@ -1324,60 +1328,60 @@ function resumeFeaturedAutoPlay() {
           </div>
         </div>
 
-        <!-- Recommended For You Section -->
-        <div class="recommended-section">
-          <div class="recommended-header">
-            <div class="recommended-title-wrap">
-              <div class="recommended-icon">
-                <i class="fas fa-sparkles"></i>
+        <!-- Trending Section -->
+        <div class="trending-section">
+          <div class="trending-header">
+            <div class="trending-title-wrap">
+              <div class="trending-icon">
+                <i class="fas fa-fire-flame-curved"></i>
               </div>
               <div>
-                <h2 class="recommended-title">Recommended for You</h2>
-                <p class="recommended-subtitle">Based on your learning history and interests</p>
+                <h2 class="trending-title">Trending Now</h2>
+                <p class="trending-subtitle">Popular courses this week</p>
               </div>
             </div>
-            <button class="recommended-see-all">
+            <button class="trending-see-all">
               See All <i class="fas fa-arrow-right"></i>
             </button>
           </div>
-          <div class="recommended-grid">
-            <div v-for="course in recommendedCourses" :key="course.id" class="recommended-card">
+          <div class="trending-grid">
+            <div v-for="course in trendingCourses" :key="course.id" class="trending-card">
               <!-- Save Button -->
               <button
-                class="recommended-save-btn"
+                class="trending-save-btn"
                 :class="{ 'saved': course.saved }"
-                @click.stop="toggleSaveRecommended(course.id)"
+                @click.stop="toggleSaveTrending(course.id)"
               >
                 <i :class="course.saved ? 'fas fa-bookmark' : 'far fa-bookmark'"></i>
               </button>
-              <!-- Match Badge -->
-              <div class="recommended-match">
-                <i class="fas fa-bullseye"></i> {{ course.matchScore }}% Match
+              <!-- Trending Rank Badge -->
+              <div class="trending-rank">
+                <i class="fas fa-fire"></i> #{{ course.trendingRank }} Trending
               </div>
               <!-- Image -->
-              <div class="recommended-image">
+              <div class="trending-image">
                 <img :src="course.image" :alt="course.title" />
-                <div class="recommended-overlay"></div>
-                <span class="recommended-duration">{{ course.duration }}</span>
+                <div class="trending-overlay"></div>
+                <span class="trending-duration">{{ course.duration }}</span>
               </div>
               <!-- Content -->
-              <div class="recommended-content">
-                <div class="recommended-tags">
-                  <span v-for="tag in course.tags" :key="tag" class="recommended-tag">{{ tag }}</span>
-                  <span :class="['recommended-level', course.levelClass]">{{ course.level }}</span>
+              <div class="trending-content">
+                <div class="trending-tags">
+                  <span v-for="tag in course.tags" :key="tag" class="trending-tag">{{ tag }}</span>
+                  <span :class="['trending-level', course.levelClass]">{{ course.level }}</span>
                 </div>
-                <h3 class="recommended-course-title">{{ course.title }}</h3>
-                <div class="recommended-instructor">
-                  <div class="recommended-avatar">{{ course.instructorInitials }}</div>
+                <h3 class="trending-course-title">{{ course.title }}</h3>
+                <div class="trending-instructor">
+                  <div class="trending-avatar">{{ course.instructorInitials }}</div>
                   <span>{{ course.instructor }}</span>
                 </div>
-                <div class="recommended-footer">
-                  <div class="recommended-stats">
-                    <span><i class="fas fa-play-circle"></i> {{ course.totalLessons }}</span>
+                <div class="trending-footer">
+                  <div class="trending-stats">
+                    <span><i class="fas fa-eye"></i> {{ (course.viewsThisWeek / 1000).toFixed(1) }}k views</span>
                     <span><i class="fas fa-star text-amber-400"></i> {{ course.rating }}</span>
                     <span><i class="fas fa-users"></i> {{ (course.students / 1000).toFixed(1) }}k</span>
                   </div>
-                  <button class="recommended-enroll-btn">
+                  <button class="trending-enroll-btn">
                     <i class="fas fa-plus"></i> Enroll
                   </button>
                 </div>
@@ -3985,57 +3989,63 @@ function resumeFeaturedAutoPlay() {
   font-size: 0.5rem;
 }
 
-/* Recommended Section */
-.recommended-section {
-  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
-  border: 1px solid #e2e8f0;
+/* Trending Section */
+.trending-section {
+  background: linear-gradient(135deg, #fef3c7 0%, #fff7ed 50%, #ffffff 100%);
+  border: 1px solid #fcd34d;
   border-radius: 1rem;
   padding: 1.25rem;
 }
 
-.recommended-header {
+.trending-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 1rem;
 }
 
-.recommended-title-wrap {
+.trending-title-wrap {
   display: flex;
   align-items: center;
   gap: 0.75rem;
 }
 
-.recommended-icon {
+.trending-icon {
   width: 2.5rem;
   height: 2.5rem;
   border-radius: 0.75rem;
-  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+  box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
+  animation: pulse-fire 2s ease-in-out infinite;
 }
 
-.recommended-icon i {
+@keyframes pulse-fire {
+  0%, 100% { box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3); }
+  50% { box-shadow: 0 4px 20px rgba(249, 115, 22, 0.5); }
+}
+
+.trending-icon i {
   color: white;
   font-size: 0.875rem;
 }
 
-.recommended-title {
+.trending-title {
   font-size: 1.125rem;
   font-weight: 700;
   color: #1e293b;
   margin: 0;
 }
 
-.recommended-subtitle {
+.trending-subtitle {
   font-size: 0.75rem;
   color: #64748b;
   margin: 0;
 }
 
-.recommended-see-all {
+.trending-see-all {
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -4050,28 +4060,28 @@ function resumeFeaturedAutoPlay() {
   transition: all 0.2s ease;
 }
 
-.recommended-see-all:hover {
-  background: #f1f5f9;
-  color: #0d9488;
-  border-color: #0d9488;
+.trending-see-all:hover {
+  background: #fff7ed;
+  color: #ea580c;
+  border-color: #ea580c;
 }
 
-.recommended-see-all i {
+.trending-see-all i {
   font-size: 0.625rem;
   transition: transform 0.2s ease;
 }
 
-.recommended-see-all:hover i {
+.trending-see-all:hover i {
   transform: translateX(3px);
 }
 
-.recommended-grid {
+.trending-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 1rem;
 }
 
-.recommended-card {
+.trending-card {
   position: relative;
   background: white;
   border: 1px solid #e2e8f0;
@@ -4081,13 +4091,13 @@ function resumeFeaturedAutoPlay() {
   cursor: pointer;
 }
 
-.recommended-card:hover {
-  border-color: #14b8a6;
-  box-shadow: 0 8px 24px rgba(20, 184, 166, 0.15);
+.trending-card:hover {
+  border-color: #f97316;
+  box-shadow: 0 8px 24px rgba(249, 115, 22, 0.15);
   transform: translateY(-4px);
 }
 
-.recommended-save-btn {
+.trending-save-btn {
   position: absolute;
   top: 0.5rem;
   right: 0.5rem;
@@ -4107,43 +4117,43 @@ function resumeFeaturedAutoPlay() {
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
-.recommended-card:hover .recommended-save-btn {
+.trending-card:hover .trending-save-btn {
   opacity: 1;
   transform: scale(1);
 }
 
-.recommended-save-btn:hover {
+.trending-save-btn:hover {
   transform: scale(1.1);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-.recommended-save-btn i {
+.trending-save-btn i {
   font-size: 0.75rem;
   color: #64748b;
   transition: all 0.2s ease;
 }
 
-.recommended-save-btn:hover i {
-  color: #14b8a6;
+.trending-save-btn:hover i {
+  color: #f97316;
 }
 
-.recommended-save-btn.saved {
-  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+.trending-save-btn.saved {
+  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
   border-color: transparent;
   opacity: 1;
   transform: scale(1);
 }
 
-.recommended-save-btn.saved i {
+.trending-save-btn.saved i {
   color: white;
 }
 
-.recommended-match {
+.trending-rank {
   position: absolute;
   top: 0.5rem;
   left: 0.5rem;
   padding: 0.25rem 0.5rem;
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
   color: white;
   font-size: 0.625rem;
   font-weight: 600;
@@ -4154,34 +4164,34 @@ function resumeFeaturedAutoPlay() {
   gap: 0.25rem;
 }
 
-.recommended-match i {
+.trending-rank i {
   font-size: 0.5rem;
 }
 
-.recommended-image {
+.trending-image {
   position: relative;
   height: 120px;
   overflow: hidden;
 }
 
-.recommended-image img {
+.trending-image img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   transition: transform 0.4s ease;
 }
 
-.recommended-card:hover .recommended-image img {
+.trending-card:hover .trending-image img {
   transform: scale(1.08);
 }
 
-.recommended-overlay {
+.trending-overlay {
   position: absolute;
   inset: 0;
   background: linear-gradient(to top, rgba(0,0,0,0.5) 0%, transparent 60%);
 }
 
-.recommended-duration {
+.trending-duration {
   position: absolute;
   bottom: 0.5rem;
   right: 0.5rem;
@@ -4193,18 +4203,18 @@ function resumeFeaturedAutoPlay() {
   border-radius: 0.25rem;
 }
 
-.recommended-content {
+.trending-content {
   padding: 0.875rem;
 }
 
-.recommended-tags {
+.trending-tags {
   display: flex;
   flex-wrap: wrap;
   gap: 0.375rem;
   margin-bottom: 0.5rem;
 }
 
-.recommended-tag {
+.trending-tag {
   padding: 0.125rem 0.375rem;
   background: #f1f5f9;
   color: #64748b;
@@ -4213,7 +4223,7 @@ function resumeFeaturedAutoPlay() {
   border-radius: 0.25rem;
 }
 
-.recommended-level {
+.trending-level {
   padding: 0.125rem 0.375rem;
   font-size: 0.5625rem;
   font-weight: 600;
@@ -4221,22 +4231,22 @@ function resumeFeaturedAutoPlay() {
   text-transform: uppercase;
 }
 
-.recommended-level.beginner {
+.trending-level.beginner {
   background: #dcfce7;
   color: #16a34a;
 }
 
-.recommended-level.intermediate {
+.trending-level.intermediate {
   background: #dbeafe;
   color: #2563eb;
 }
 
-.recommended-level.advanced {
+.trending-level.advanced {
   background: #ede9fe;
   color: #7c3aed;
 }
 
-.recommended-course-title {
+.trending-course-title {
   font-size: 0.875rem;
   font-weight: 700;
   color: #1e293b;
@@ -4248,18 +4258,18 @@ function resumeFeaturedAutoPlay() {
   overflow: hidden;
 }
 
-.recommended-instructor {
+.trending-instructor {
   display: flex;
   align-items: center;
   gap: 0.5rem;
   margin-bottom: 0.75rem;
 }
 
-.recommended-avatar {
+.trending-avatar {
   width: 1.5rem;
   height: 1.5rem;
   border-radius: 50%;
-  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
   color: white;
   font-size: 0.5rem;
   font-weight: 600;
@@ -4268,12 +4278,12 @@ function resumeFeaturedAutoPlay() {
   justify-content: center;
 }
 
-.recommended-instructor span {
+.trending-instructor span {
   font-size: 0.6875rem;
   color: #64748b;
 }
 
-.recommended-footer {
+.trending-footer {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -4281,13 +4291,13 @@ function resumeFeaturedAutoPlay() {
   border-top: 1px solid #f1f5f9;
 }
 
-.recommended-stats {
+.trending-stats {
   display: flex;
   align-items: center;
   gap: 0.625rem;
 }
 
-.recommended-stats span {
+.trending-stats span {
   display: flex;
   align-items: center;
   gap: 0.25rem;
@@ -4295,13 +4305,13 @@ function resumeFeaturedAutoPlay() {
   color: #64748b;
 }
 
-.recommended-stats i {
+.trending-stats i {
   font-size: 0.5rem;
 }
 
-.recommended-enroll-btn {
+.trending-enroll-btn {
   padding: 0.375rem 0.75rem;
-  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
   color: white;
   border: none;
   border-radius: 0.375rem;
@@ -4314,12 +4324,12 @@ function resumeFeaturedAutoPlay() {
   transition: all 0.2s ease;
 }
 
-.recommended-enroll-btn:hover {
-  box-shadow: 0 4px 12px rgba(20, 184, 166, 0.35);
+.trending-enroll-btn:hover {
+  box-shadow: 0 4px 12px rgba(249, 115, 22, 0.35);
   transform: scale(1.05);
 }
 
-.recommended-enroll-btn i {
+.trending-enroll-btn i {
   font-size: 0.5rem;
 }
 
@@ -4735,52 +4745,52 @@ function resumeFeaturedAutoPlay() {
     transform: scale(1);
   }
 
-  .recommended-section {
+  .trending-section {
     padding: 1rem;
   }
 
-  .recommended-header {
+  .trending-header {
     flex-direction: column;
     align-items: flex-start;
     gap: 0.75rem;
   }
 
-  .recommended-see-all {
+  .trending-see-all {
     width: 100%;
     justify-content: center;
   }
 
-  .recommended-grid {
+  .trending-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 0.75rem;
   }
 
-  .recommended-image {
+  .trending-image {
     height: 100px;
   }
 
-  .recommended-content {
+  .trending-content {
     padding: 0.75rem;
   }
 
-  .recommended-course-title {
+  .trending-course-title {
     font-size: 0.75rem;
   }
 
-  .recommended-instructor {
+  .trending-instructor {
     display: none;
   }
 
-  .recommended-stats {
+  .trending-stats {
     gap: 0.5rem;
   }
 
-  .recommended-enroll-btn {
+  .trending-enroll-btn {
     padding: 0.25rem 0.5rem;
     font-size: 0.5625rem;
   }
 
-  .recommended-save-btn {
+  .trending-save-btn {
     opacity: 1;
     transform: scale(1);
   }
