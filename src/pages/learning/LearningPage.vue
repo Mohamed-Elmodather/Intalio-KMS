@@ -499,37 +499,37 @@ function getLevelColor(level: string) {
       <div v-if="activeTab === 'my-courses'" class="space-y-6">
         <!-- Continue Learning Hero Card -->
         <div v-if="currentCourse" class="content-area overflow-hidden">
-          <div class="flex flex-col md:flex-row">
-            <!-- Left: Course Image with Gradient -->
-            <div class="relative w-full md:w-80 h-48 md:h-auto flex-shrink-0">
-              <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&h=300&fit=crop" alt="Current Course" class="w-full h-full object-cover">
-              <div class="absolute inset-0 bg-gradient-to-r from-teal-600/90 to-teal-500/70 md:bg-gradient-to-t"></div>
+          <div class="flex flex-col lg:flex-row">
+            <!-- Left: Course Image with Play Button -->
+            <div class="relative w-full lg:w-72 h-44 lg:h-auto flex-shrink-0 overflow-hidden">
+              <img :src="enrolledCourses[0]?.image" :alt="currentCourse.title" class="w-full h-full object-cover">
+              <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent lg:bg-gradient-to-r lg:from-black/50 lg:to-transparent"></div>
               <div class="absolute inset-0 flex items-center justify-center">
-                <button @click="navigateToCourse(currentCourse.id)" class="w-16 h-16 rounded-full bg-white/90 hover:bg-white flex items-center justify-center shadow-xl transition-all hover:scale-110 group">
-                  <i class="fas fa-play text-teal-600 text-xl ml-1 group-hover:text-teal-700"></i>
+                <button @click="navigateToCourse(currentCourse.id)" class="w-14 h-14 rounded-full bg-white/95 hover:bg-white flex items-center justify-center shadow-xl transition-all hover:scale-110 group">
+                  <i class="fas fa-play text-teal-600 text-lg ml-0.5 group-hover:text-teal-700"></i>
                 </button>
               </div>
             </div>
 
             <!-- Right: Content -->
-            <div class="flex-1 p-6 bg-gradient-to-br from-teal-500 to-teal-600">
-              <div class="flex items-center gap-2 mb-3">
-                <span class="px-2 py-0.5 bg-white/20 text-white text-[10px] font-semibold rounded-full backdrop-blur-sm">
-                  <i class="fas fa-bolt mr-1"></i>Continue Learning
+            <div class="flex-1 p-5 lg:p-6 bg-gradient-to-br from-teal-500 to-teal-600">
+              <div class="flex flex-wrap items-center gap-2 mb-3">
+                <span class="px-2.5 py-1 bg-white/20 text-white text-[10px] font-semibold rounded-full backdrop-blur-sm flex items-center gap-1">
+                  <i class="fas fa-bolt"></i>Continue Learning
                 </span>
-                <span class="px-2 py-0.5 bg-amber-400 text-amber-900 text-[10px] font-semibold rounded-full">
-                  <i class="fas fa-fire mr-1"></i>{{ streak }} Day Streak
+                <span class="px-2.5 py-1 bg-amber-400 text-amber-900 text-[10px] font-semibold rounded-full flex items-center gap-1">
+                  <i class="fas fa-fire"></i>{{ streak }} Day Streak
                 </span>
               </div>
 
-              <h2 class="text-xl font-bold text-white mb-2">{{ currentCourse.title }}</h2>
-              <p class="text-teal-100 text-sm mb-4">{{ currentCourse.nextLesson }}</p>
+              <h2 class="text-lg lg:text-xl font-bold text-white mb-1">{{ currentCourse.title }}</h2>
+              <p class="text-teal-100 text-sm mb-3">{{ currentCourse.nextLesson }}</p>
 
               <!-- Progress Bar -->
-              <div class="mb-4">
-                <div class="flex items-center justify-between text-xs text-white/80 mb-2">
+              <div class="mb-4 max-w-md">
+                <div class="flex items-center justify-between text-xs text-white/80 mb-1.5">
                   <span>Progress</span>
-                  <span class="font-semibold text-white">{{ currentCourse.progress }}% Complete</span>
+                  <span class="font-semibold text-white">{{ currentCourse.progress }}%</span>
                 </div>
                 <div class="h-2 bg-white/20 rounded-full overflow-hidden">
                   <div class="h-full bg-white rounded-full transition-all duration-500" :style="{ width: currentCourse.progress + '%' }"></div>
@@ -537,24 +537,15 @@ function getLevelColor(level: string) {
               </div>
 
               <!-- Quick Stats -->
-              <div class="flex items-center gap-4 mb-4">
-                <div class="flex items-center gap-2 text-white/80 text-xs">
-                  <i class="fas fa-clock"></i>
-                  <span>8 hours</span>
-                </div>
-                <div class="flex items-center gap-2 text-white/80 text-xs">
-                  <i class="fas fa-play-circle"></i>
-                  <span>9/12 lessons</span>
-                </div>
-                <div class="flex items-center gap-2 text-white/80 text-xs">
-                  <i class="fas fa-star text-amber-300"></i>
-                  <span>4.8</span>
-                </div>
+              <div class="flex flex-wrap items-center gap-4 mb-4 text-white/80 text-xs">
+                <span class="flex items-center gap-1.5"><i class="fas fa-clock"></i>8 hours</span>
+                <span class="flex items-center gap-1.5"><i class="fas fa-play-circle"></i>9/12 lessons</span>
+                <span class="flex items-center gap-1.5"><i class="fas fa-star text-amber-300"></i>4.8</span>
               </div>
 
               <!-- Action Button -->
-              <button @click="navigateToCourse(currentCourse.id)" class="px-6 py-3 bg-white text-teal-600 rounded-xl font-semibold text-sm hover:bg-teal-50 transition-all shadow-lg flex items-center gap-2">
-                <i class="fas fa-play"></i>
+              <button @click="navigateToCourse(currentCourse.id)" class="px-5 py-2.5 bg-white text-teal-600 rounded-xl font-semibold text-sm hover:bg-teal-50 transition-all shadow-lg flex items-center gap-2">
+                <i class="fas fa-play text-xs"></i>
                 Resume Course
               </button>
             </div>
@@ -562,41 +553,41 @@ function getLevelColor(level: string) {
         </div>
 
         <!-- Quick Stats Row -->
-        <div class="grid grid-cols-4 gap-4">
-          <div class="content-area p-4 flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center">
-              <i class="fas fa-book-open text-blue-600 text-sm"></i>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <div class="content-area p-3 md:p-4 flex items-center gap-3">
+            <div class="w-9 h-9 md:w-10 md:h-10 rounded-xl bg-blue-100 flex items-center justify-center flex-shrink-0">
+              <i class="fas fa-book-open text-blue-600 text-xs md:text-sm"></i>
             </div>
             <div>
-              <p class="text-lg font-bold text-gray-900">{{ enrolledCourses.filter(c => c.progress > 0 && c.progress < 100).length }}</p>
-              <p class="text-[11px] text-gray-500">In Progress</p>
+              <p class="text-base md:text-lg font-bold text-gray-900">{{ enrolledCourses.filter(c => c.progress > 0 && c.progress < 100).length }}</p>
+              <p class="text-[10px] md:text-[11px] text-gray-500">In Progress</p>
             </div>
           </div>
-          <div class="content-area p-4 flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-teal-100 flex items-center justify-center">
-              <i class="fas fa-check-circle text-teal-600 text-sm"></i>
+          <div class="content-area p-3 md:p-4 flex items-center gap-3">
+            <div class="w-9 h-9 md:w-10 md:h-10 rounded-xl bg-teal-100 flex items-center justify-center flex-shrink-0">
+              <i class="fas fa-check-circle text-teal-600 text-xs md:text-sm"></i>
             </div>
             <div>
-              <p class="text-lg font-bold text-gray-900">{{ enrolledCourses.filter(c => c.progress === 100).length }}</p>
-              <p class="text-[11px] text-gray-500">Completed</p>
+              <p class="text-base md:text-lg font-bold text-gray-900">{{ enrolledCourses.filter(c => c.progress === 100).length }}</p>
+              <p class="text-[10px] md:text-[11px] text-gray-500">Completed</p>
             </div>
           </div>
-          <div class="content-area p-4 flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center">
-              <i class="fas fa-clock text-gray-600 text-sm"></i>
+          <div class="content-area p-3 md:p-4 flex items-center gap-3">
+            <div class="w-9 h-9 md:w-10 md:h-10 rounded-xl bg-gray-100 flex items-center justify-center flex-shrink-0">
+              <i class="fas fa-clock text-gray-600 text-xs md:text-sm"></i>
             </div>
             <div>
-              <p class="text-lg font-bold text-gray-900">{{ enrolledCourses.filter(c => c.progress === 0).length }}</p>
-              <p class="text-[11px] text-gray-500">Not Started</p>
+              <p class="text-base md:text-lg font-bold text-gray-900">{{ enrolledCourses.filter(c => c.progress === 0).length }}</p>
+              <p class="text-[10px] md:text-[11px] text-gray-500">Not Started</p>
             </div>
           </div>
-          <div class="content-area p-4 flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center">
-              <i class="fas fa-graduation-cap text-amber-600 text-sm"></i>
+          <div class="content-area p-3 md:p-4 flex items-center gap-3">
+            <div class="w-9 h-9 md:w-10 md:h-10 rounded-xl bg-amber-100 flex items-center justify-center flex-shrink-0">
+              <i class="fas fa-graduation-cap text-amber-600 text-xs md:text-sm"></i>
             </div>
             <div>
-              <p class="text-lg font-bold text-gray-900">{{ enrolledCourses.length }}</p>
-              <p class="text-[11px] text-gray-500">Total Enrolled</p>
+              <p class="text-base md:text-lg font-bold text-gray-900">{{ enrolledCourses.length }}</p>
+              <p class="text-[10px] md:text-[11px] text-gray-500">Total Enrolled</p>
             </div>
           </div>
         </div>
