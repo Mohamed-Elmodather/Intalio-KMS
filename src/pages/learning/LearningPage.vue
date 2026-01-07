@@ -653,9 +653,6 @@ function resumeFeaturedAutoPlay() {
                 <div v-for="(course, index) in upNextCourses" :key="course.id"
                      @click="navigateToCourse(course.id)"
                      class="up-next-course-card group">
-                  <!-- Queue Number -->
-                  <div class="up-next-queue">{{ index + 1 }}</div>
-
                   <!-- Thumbnail -->
                   <div class="up-next-thumb">
                     <img :src="course.image" :alt="course.title" class="up-next-img" />
@@ -2244,25 +2241,6 @@ function resumeFeaturedAutoPlay() {
   background: linear-gradient(135deg, #f0fdfa 0%, #ffffff 100%);
 }
 
-/* Queue Number */
-.up-next-queue {
-  position: absolute;
-  top: -6px;
-  left: -6px;
-  width: 1.25rem;
-  height: 1.25rem;
-  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
-  color: white;
-  font-size: 0.625rem;
-  font-weight: 700;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 2px 6px rgba(20, 184, 166, 0.4);
-  z-index: 5;
-}
-
 .up-next-thumb {
   position: relative;
   width: 100px;
@@ -2512,11 +2490,6 @@ function resumeFeaturedAutoPlay() {
   .up-next-thumb {
     width: 100%;
     height: 120px;
-  }
-
-  .up-next-queue {
-    top: 0.5rem;
-    left: 0.5rem;
   }
 
   .up-next-resume-btn {
