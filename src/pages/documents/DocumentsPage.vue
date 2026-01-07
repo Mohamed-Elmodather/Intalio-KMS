@@ -1299,15 +1299,22 @@ function getFileIconBg(type: string): string {
               <div v-if="showTagFilter" @click="showTagFilter = false" class="fixed inset-0 z-40"></div>
             </div>
 
-            <!-- Sort Options -->
-            <div class="relative">
+            <!-- Sort Options with Order Toggle -->
+            <div class="relative ml-auto flex items-center">
               <button
                 @click="showSortDropdown = !showSortDropdown"
-                class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border bg-white border-gray-200 text-gray-600 hover:bg-gray-50"
+                class="flex items-center gap-2 px-3 py-1.5 rounded-l-lg text-xs font-medium transition-all border border-r-0 bg-white border-gray-200 text-gray-600 hover:bg-gray-50"
               >
                 <i :class="[currentSortOption.icon, 'text-sm text-teal-500']"></i>
                 <span>{{ currentSortOption.label }}</span>
                 <i :class="showSortDropdown ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ml-1"></i>
+              </button>
+              <button
+                @click="sortOrder = sortOrder === 'asc' ? 'desc' : 'asc'"
+                class="flex items-center justify-center w-8 h-8 rounded-r-lg text-xs font-medium transition-all border bg-white border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-teal-600"
+                :title="sortOrder === 'asc' ? 'Ascending order - Click for descending' : 'Descending order - Click for ascending'"
+              >
+                <i :class="sortOrder === 'asc' ? 'fas fa-arrow-up' : 'fas fa-arrow-down'" class="text-sm text-teal-500"></i>
               </button>
 
               <!-- Dropdown Menu -->
@@ -1334,15 +1341,6 @@ function getFileIconBg(type: string): string {
               </div>
               <div v-if="showSortDropdown" @click="showSortDropdown = false" class="fixed inset-0 z-40"></div>
             </div>
-
-            <!-- Sort Order Toggle Button -->
-            <button
-              @click="sortOrder = sortOrder === 'asc' ? 'desc' : 'asc'"
-              class="flex items-center justify-center w-8 h-8 rounded-lg text-xs font-medium transition-all border bg-white border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-teal-600 hover:border-teal-300"
-              :title="sortOrder === 'asc' ? 'Ascending order - Click for descending' : 'Descending order - Click for ascending'"
-            >
-              <i :class="sortOrder === 'asc' ? 'fas fa-arrow-up' : 'fas fa-arrow-down'" class="text-sm text-teal-500"></i>
-            </button>
 
             <!-- View Toggle -->
             <div class="flex items-center gap-0.5 bg-white border border-gray-200 rounded-lg p-1">

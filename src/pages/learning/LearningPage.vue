@@ -344,6 +344,7 @@ const allCoursesViewMode = ref<'grid' | 'list'>('grid')
 const showLevelFilter = ref(false)
 const showCategoryFilterDropdown = ref(false)
 const allCoursesSortBy = ref('popular')
+const allCoursesSortOrder = ref<'asc' | 'desc'>('desc')
 const showAllCoursesSortDropdown = ref(false)
 
 const courseLevelOptions = [
@@ -385,18 +386,19 @@ const filteredAllCourses = computed(() => {
   }
 
   // Sort
+  const multiplier = allCoursesSortOrder.value === 'asc' ? 1 : -1
   switch (allCoursesSortBy.value) {
     case 'popular':
-      courses.sort((a, b) => b.students - a.students)
+      courses.sort((a, b) => (b.students - a.students) * multiplier)
       break
     case 'rating':
-      courses.sort((a, b) => b.rating - a.rating)
+      courses.sort((a, b) => (b.rating - a.rating) * multiplier)
       break
     case 'newest':
-      courses.sort((a, b) => (b.isNew ? 1 : 0) - (a.isNew ? 1 : 0))
+      courses.sort((a, b) => ((b.isNew ? 1 : 0) - (a.isNew ? 1 : 0)) * multiplier)
       break
     case 'title':
-      courses.sort((a, b) => a.title.localeCompare(b.title))
+      courses.sort((a, b) => a.title.localeCompare(b.title) * multiplier)
       break
   }
 
@@ -1199,15 +1201,22 @@ function resumeFeaturedAutoPlay() {
                 <div v-if="showCategoryFilterDropdown" @click="showCategoryFilterDropdown = false" class="fixed inset-0 z-40"></div>
               </div>
 
-              <!-- Sort Options -->
-              <div class="relative">
+              <!-- Sort Options with Order Toggle -->
+              <div class="relative ml-auto flex items-center">
                 <button
                   @click="showAllCoursesSortDropdown = !showAllCoursesSortDropdown"
-                  class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border bg-white border-gray-200 text-gray-600 hover:bg-gray-50"
+                  class="flex items-center gap-2 px-3 py-1.5 rounded-l-lg text-xs font-medium transition-all border border-r-0 bg-white border-gray-200 text-gray-600 hover:bg-gray-50"
                 >
                   <i :class="[allCoursesSortOptions.find(o => o.value === allCoursesSortBy)?.icon, 'text-sm text-teal-500']"></i>
                   <span>{{ allCoursesSortOptions.find(o => o.value === allCoursesSortBy)?.label }}</span>
                   <i :class="showAllCoursesSortDropdown ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ml-1"></i>
+                </button>
+                <button
+                  @click="allCoursesSortOrder = allCoursesSortOrder === 'asc' ? 'desc' : 'asc'"
+                  class="flex items-center justify-center w-8 h-8 rounded-r-lg text-xs font-medium transition-all border bg-white border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-teal-600"
+                  :title="allCoursesSortOrder === 'asc' ? 'Ascending order - Click for descending' : 'Descending order - Click for ascending'"
+                >
+                  <i :class="allCoursesSortOrder === 'asc' ? 'fas fa-arrow-up' : 'fas fa-arrow-down'" class="text-sm text-teal-500"></i>
                 </button>
 
                 <!-- Dropdown Menu -->
@@ -1236,7 +1245,7 @@ function resumeFeaturedAutoPlay() {
               </div>
 
               <!-- View Toggle -->
-              <div class="flex items-center gap-0.5 bg-white border border-gray-200 rounded-lg p-1 ml-auto">
+              <div class="flex items-center gap-0.5 bg-white border border-gray-200 rounded-lg p-1">
                 <button
                   @click="allCoursesViewMode = 'grid'"
                   :class="['px-2.5 py-1 rounded-md transition-all', allCoursesViewMode === 'grid' ? 'bg-teal-500 text-white' : 'text-gray-500 hover:bg-gray-100']"
