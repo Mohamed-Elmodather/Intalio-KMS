@@ -2326,19 +2326,25 @@ function resumeFeaturedAutoPlay() {
 
         <!-- Explore Learning Paths Section (Using All Courses Card Style) -->
         <div class="all-courses-wrapper bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-          <!-- Section Header -->
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
-            <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-200">
-                <i class="fas fa-route text-white text-sm"></i>
-              </div>
-              <div>
-                <span class="block text-lg font-bold text-gray-900">Explore Learning Paths</span>
-                <span class="text-xs text-gray-500">{{ filteredPaths.length }} structured learning journeys</span>
-              </div>
+          <!-- Section Header / Toolbar -->
+          <div class="border-b border-gray-100">
+            <!-- Top Row - Title -->
+            <div class="px-4 py-3 flex items-center justify-between">
+              <h2 class="text-lg font-bold text-gray-900 flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center shadow-lg shadow-teal-200">
+                  <i class="fas fa-route text-white text-sm"></i>
+                </div>
+                <div>
+                  <span class="block">Explore Learning Paths</span>
+                  <span class="text-xs font-medium text-gray-500">{{ filteredPaths.length }} learning paths available</span>
+                </div>
+              </h2>
             </div>
-            <div class="flex items-center gap-2">
-              <select v-model="pathFilter" class="text-xs px-3 py-2 rounded-lg border border-gray-200 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-teal-500 cursor-pointer">
+
+            <!-- Bottom Row - Filter -->
+            <div class="px-4 py-2 bg-gray-50/50 flex flex-wrap items-center gap-3">
+              <!-- Filter Dropdown -->
+              <select v-model="pathFilter" class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border bg-white border-gray-200 text-gray-600 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-teal-500 cursor-pointer">
                 <option value="all">All Paths</option>
                 <option value="enrolled">My Enrolled</option>
                 <option value="available">Available</option>
