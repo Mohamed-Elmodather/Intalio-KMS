@@ -5583,7 +5583,7 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   gap: 0.875rem;
-  font-size: 0.75rem;
+  font-size: 0.6875rem;
   color: #94a3b8;
 }
 
@@ -5594,7 +5594,7 @@ onUnmounted(() => {
 }
 
 .list-stats i {
-  font-size: 0.625rem;
+  font-size: 0.5625rem;
 }
 
 .list-item-actions {

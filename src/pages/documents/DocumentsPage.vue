@@ -1829,10 +1829,10 @@ function getFileIconBg(type: string): string {
 
                 <!-- Tags -->
                 <div v-if="doc.tags && doc.tags.length > 0" class="flex flex-wrap gap-1 mb-2">
-                  <span v-for="tag in doc.tags.slice(0, 2)" :key="tag" class="px-1.5 py-0.5 bg-gray-100 text-gray-500 text-[9px] rounded-md font-medium">
+                  <span v-for="tag in doc.tags.slice(0, 2)" :key="tag" class="px-1.5 py-0.5 bg-gray-100 text-gray-500 text-[10px] rounded-md font-medium">
                     {{ tag }}
                   </span>
-                  <span v-if="doc.tags.length > 2" class="px-1.5 py-0.5 bg-gray-100 text-gray-400 text-[9px] rounded-md font-medium">
+                  <span v-if="doc.tags.length > 2" class="px-1.5 py-0.5 bg-gray-100 text-gray-400 text-[10px] rounded-md font-medium">
                     +{{ doc.tags.length - 2 }}
                   </span>
                 </div>
@@ -1840,17 +1840,17 @@ function getFileIconBg(type: string): string {
                 <!-- Meta Row -->
                 <div class="flex items-center justify-between pt-2 border-t border-gray-100">
                   <!-- Author -->
-                  <div class="flex items-center gap-1.5">
+                  <div class="flex items-center gap-2">
                     <div
-                      class="w-5 h-5 rounded-full flex items-center justify-center text-white text-[8px] font-bold"
+                      class="w-7 h-7 rounded-full flex items-center justify-center text-white text-[10px] font-bold shadow-sm"
                       :style="{ backgroundColor: doc.author.color }"
                     >
                       {{ doc.author.initials }}
                     </div>
-                    <span class="text-[10px] text-gray-500 truncate max-w-[60px]">{{ doc.author.name }}</span>
+                    <span class="text-xs text-gray-500 truncate max-w-[70px]">{{ doc.author.name }}</span>
                   </div>
                   <!-- Size & Date -->
-                  <div class="flex items-center gap-2 text-[10px] text-gray-400">
+                  <div class="flex items-center gap-2 text-[11px] text-gray-400">
                     <span>{{ formatFileSize(doc.size) }}</span>
                     <span class="w-1 h-1 bg-gray-300 rounded-full"></span>
                     <span>{{ getRelativeTime(doc.updatedAt) }}</span>
@@ -2067,7 +2067,7 @@ function getFileIconBg(type: string): string {
                         {{ doc.author.initials }}
                       </div>
                       <span class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-green-400 border-2 border-white rounded-full flex items-center justify-center">
-                        <i class="fas fa-check text-white text-[6px]"></i>
+                        <i class="fas fa-check text-white text-[8px]"></i>
                       </span>
                     </div>
                     <div class="min-w-0 space-y-0.5">

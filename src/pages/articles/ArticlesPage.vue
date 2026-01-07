@@ -1769,7 +1769,7 @@ onUnmounted(() => {
                 <div class="flex items-center justify-between">
                   <!-- Author & Date -->
                   <div class="flex items-center gap-2">
-                    <div class="w-5 h-5 rounded-full bg-gradient-to-br from-teal-400 to-cyan-500 flex items-center justify-center text-white text-[8px] font-semibold">
+                    <div class="w-6 h-6 rounded-full bg-gradient-to-br from-teal-400 to-cyan-500 flex items-center justify-center text-white text-[9px] font-semibold">
                       {{ article.author?.initials || 'U' }}
                     </div>
                     <span class="text-[11px] text-gray-500">
@@ -1783,18 +1783,18 @@ onUnmounted(() => {
                       <span
                         v-for="tag in article.tags?.slice(0, 2)"
                         :key="tag"
-                        class="px-1.5 py-0.5 bg-gray-100 text-gray-500 text-[9px] rounded-full"
+                        class="px-1.5 py-0.5 bg-gray-100 text-gray-500 text-[10px] rounded-full"
                       >
                         {{ tag }}
                       </span>
                     </div>
-                    <div class="flex items-center gap-2 text-[10px] text-gray-400">
+                    <div class="flex items-center gap-2 text-[11px] text-gray-400">
                       <span class="flex items-center gap-1">
-                        <i class="fas fa-eye text-[8px]"></i>
+                        <i class="fas fa-eye text-[9px]"></i>
                         {{ formatNumber(article.views) }}
                       </span>
                       <span class="flex items-center gap-1">
-                        <i class="fas fa-heart text-[8px]"></i>
+                        <i class="fas fa-heart text-[9px]"></i>
                         {{ article.likes || 0 }}
                       </span>
                     </div>

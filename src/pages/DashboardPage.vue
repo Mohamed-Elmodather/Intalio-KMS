@@ -1276,7 +1276,7 @@ onUnmounted(() => {
                 </div>
               </div>
               <div v-if="index === 0" class="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center">
-                <span class="text-white text-[6px] font-bold">NEW</span>
+                <span class="text-white text-[8px] font-bold">NEW</span>
               </div>
             </div>
             <!-- Article Content -->
@@ -1530,7 +1530,7 @@ onUnmounted(() => {
                   <div class="flex items-center gap-2">
                     <div class="flex -space-x-1.5">
                       <div v-for="(attendee, idx) in event.attendees.slice(0, 3)" :key="idx"
-                           class="w-5 h-5 rounded-full border-2 border-white flex items-center justify-center text-[7px] font-bold text-white transition-transform hover:scale-110 hover:z-10"
+                           class="w-5 h-5 rounded-full border-2 border-white flex items-center justify-center text-[8px] font-bold text-white transition-transform hover:scale-110 hover:z-10"
                            :style="{ backgroundColor: attendee.color }"
                            :title="attendee.name">
                         {{ attendee.initials }}
