@@ -779,6 +779,14 @@ function resumeFeaturedAutoPlay() {
                     <div class="up-next-overlay"></div>
                     <div class="up-next-play"><i class="fas fa-play"></i></div>
                     <span class="up-next-duration">{{ course.duration }}</span>
+                    <!-- Save Button -->
+                    <button
+                      class="up-next-save-btn"
+                      :class="{ 'saved': course.saved }"
+                      @click.stop="toggleSaveCourse(course.id)"
+                    >
+                      <i :class="course.saved ? 'fas fa-bookmark' : 'far fa-bookmark'"></i>
+                    </button>
                   </div>
 
                   <!-- Info -->
@@ -2572,6 +2580,60 @@ function resumeFeaturedAutoPlay() {
   border-radius: 0.25rem;
 }
 
+.up-next-save-btn {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.95);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  z-index: 5;
+  opacity: 0;
+  transform: scale(0.8);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+}
+
+.up-next-course-card:hover .up-next-save-btn {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.up-next-save-btn:hover {
+  transform: scale(1.15);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.up-next-save-btn i {
+  font-size: 0.625rem;
+  color: #64748b;
+  transition: all 0.2s ease;
+}
+
+.up-next-save-btn:hover i {
+  color: #14b8a6;
+}
+
+.up-next-save-btn.saved {
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+  opacity: 1;
+  transform: scale(1);
+}
+
+.up-next-save-btn.saved i {
+  color: white;
+}
+
+.up-next-save-btn.saved:hover {
+  background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%);
+}
+
 .up-next-progress {
   position: absolute;
   bottom: 0;
@@ -2810,6 +2872,11 @@ function resumeFeaturedAutoPlay() {
   .up-next-view-btn {
     opacity: 1;
     transform: translateX(0);
+  }
+
+  .up-next-save-btn {
+    opacity: 1;
+    transform: scale(1);
   }
 }
 </style>
