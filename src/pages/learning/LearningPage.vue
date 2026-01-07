@@ -30,7 +30,7 @@ const inProgressCourses = computed(() =>
 )
 
 // View state
-const currentView = ref<'all' | 'my-courses' | 'in-progress' | 'completed' | 'saved'>('all')
+const currentView = ref<'all' | 'my-courses' | 'in-progress' | 'completed' | 'saved' | 'paths' | 'certificates'>('all')
 const viewMode = ref<'grid' | 'list'>('grid')
 
 // Stats
@@ -49,6 +49,8 @@ const viewOptions = ref([
   { id: 'in-progress', name: 'In Progress', icon: 'fas fa-spinner', color: 'text-amber-500' },
   { id: 'completed', name: 'Completed', icon: 'fas fa-check-circle', color: 'text-green-500' },
   { id: 'saved', name: 'Saved', icon: 'fas fa-bookmark', color: 'text-purple-500' },
+  { id: 'paths', name: 'Learning Paths', icon: 'fas fa-route', color: 'text-indigo-500' },
+  { id: 'certificates', name: 'Certificates', icon: 'fas fa-certificate', color: 'text-amber-500' },
 ])
 
 // Filtered courses based on current view
@@ -919,7 +921,7 @@ function resumeFeaturedAutoPlay() {
     <div class="px-8 py-6">
 
       <!-- Courses Content -->
-      <div class="space-y-6">
+      <div v-if="currentView !== 'paths' && currentView !== 'certificates'" class="space-y-6">
         <!-- Featured Courses Section -->
         <div v-if="enrolledCourses.length > 0" class="featured-courses-section">
           <div class="featured-courses-header">
@@ -1761,7 +1763,7 @@ function resumeFeaturedAutoPlay() {
       </div>
 
       <!-- Learning Paths Section -->
-      <div v-if="currentView === 'all'" class="space-y-6 mt-8">
+      <div v-if="currentView === 'paths'" class="space-y-6">
         <!-- My Enrolled Paths -->
         <div v-if="myEnrolledPaths.length > 0" class="content-area p-6 border-l-4 border-teal-500">
           <div class="flex items-center justify-between mb-5">
@@ -1951,8 +1953,8 @@ function resumeFeaturedAutoPlay() {
         </div>
       </div>
 
-      <!-- Certificates Tab -->
-      <div v-if="currentView === 'all' || currentView === 'completed'" class="space-y-6 mt-8">
+      <!-- Certificates Section -->
+      <div v-if="currentView === 'certificates'" class="space-y-6">
         <!-- Certificate Stats -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div class="content-area p-4 text-center">
