@@ -663,7 +663,7 @@ function isCategorySelected(cat: string): boolean {
 
 // Get current sort option
 const currentSortOption = computed(() => {
-  return sortOptionsList.value.find(opt => opt.value === sortBy.value) || sortOptionsList.value[0]
+  return sortOptionsList.value.find(opt => opt.value === sortBy.value) ?? sortOptionsList.value[0]!
 })
 
 function selectSortOption(value: string) {

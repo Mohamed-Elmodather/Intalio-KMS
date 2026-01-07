@@ -18,6 +18,23 @@ const isSidebarCollapsed = ref(false)
 const showFileTypeFilter = ref(false)
 const showCategoryFilter = ref(false)
 const showTagFilter = ref(false)
+const showSortDropdown = ref(false)
+
+// Sort options with icons
+const sortOptionsList = ref([
+  { value: 'date', label: 'Date Modified', icon: 'fas fa-clock' },
+  { value: 'name', label: 'Name', icon: 'fas fa-font' },
+  { value: 'size', label: 'Size', icon: 'fas fa-weight-hanging' }
+])
+
+const currentSortOption = computed(() => {
+  return sortOptionsList.value.find(opt => opt.value === sortBy.value) ?? sortOptionsList.value[0]!
+})
+
+function selectSortOption(value: string) {
+  sortBy.value = value as 'name' | 'date' | 'size'
+  showSortDropdown.value = false
+}
 const selectedCategories = ref<string[]>([])
 const selectedTags = ref<string[]>([])
 const currentView = ref<'all' | 'shared' | 'team' | 'starred' | 'trash'>('all')
@@ -1283,23 +1300,49 @@ function getFileIconBg(type: string): string {
             </div>
 
             <!-- Sort Options -->
-            <div class="flex items-center gap-1 bg-white border border-gray-200 rounded-lg p-1">
-              <select
-                v-model="sortBy"
-                class="px-2 py-1 text-xs text-gray-700 bg-transparent border-0 focus:outline-none focus:ring-0 cursor-pointer"
-              >
-                <option value="date">Modified</option>
-                <option value="name">Name</option>
-                <option value="size">Size</option>
-              </select>
+            <div class="relative">
               <button
-                @click="sortOrder = sortOrder === 'asc' ? 'desc' : 'asc'"
-                class="px-2 py-1 rounded-md text-gray-500 hover:bg-gray-100 transition-all"
-                :title="sortOrder === 'asc' ? 'Ascending' : 'Descending'"
+                @click="showSortDropdown = !showSortDropdown"
+                class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border bg-white border-gray-200 text-gray-600 hover:bg-gray-50"
               >
-                <i :class="sortOrder === 'asc' ? 'fas fa-arrow-up' : 'fas fa-arrow-down'" class="text-xs"></i>
+                <i :class="[currentSortOption.icon, 'text-sm text-teal-500']"></i>
+                <span>{{ currentSortOption.label }}</span>
+                <i :class="showSortDropdown ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ml-1"></i>
               </button>
+
+              <!-- Dropdown Menu -->
+              <div
+                v-if="showSortDropdown"
+                class="absolute left-0 top-full mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
+              >
+                <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Sort By</div>
+                <div class="max-h-64 overflow-y-auto">
+                  <button
+                    v-for="option in sortOptionsList"
+                    :key="option.value"
+                    @click="selectSortOption(option.value)"
+                    :class="[
+                      'w-full px-3 py-2 text-left text-sm flex items-center gap-3 transition-colors',
+                      sortBy === option.value ? 'bg-teal-50 text-teal-700' : 'text-gray-700 hover:bg-gray-50'
+                    ]"
+                  >
+                    <i :class="[option.icon, 'text-sm w-4', sortBy === option.value ? 'text-teal-500' : 'text-gray-400']"></i>
+                    <span class="flex-1">{{ option.label }}</span>
+                    <i v-if="sortBy === option.value" class="fas fa-check text-teal-500 text-xs"></i>
+                  </button>
+                </div>
+              </div>
+              <div v-if="showSortDropdown" @click="showSortDropdown = false" class="fixed inset-0 z-40"></div>
             </div>
+
+            <!-- Sort Order Toggle Button -->
+            <button
+              @click="sortOrder = sortOrder === 'asc' ? 'desc' : 'asc'"
+              class="flex items-center justify-center w-8 h-8 rounded-lg text-xs font-medium transition-all border bg-white border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-teal-600 hover:border-teal-300"
+              :title="sortOrder === 'asc' ? 'Ascending order - Click for descending' : 'Descending order - Click for ascending'"
+            >
+              <i :class="sortOrder === 'asc' ? 'fas fa-arrow-up' : 'fas fa-arrow-down'" class="text-sm text-teal-500"></i>
+            </button>
 
             <!-- View Toggle -->
             <div class="flex items-center gap-0.5 bg-white border border-gray-200 rounded-lg p-1">
