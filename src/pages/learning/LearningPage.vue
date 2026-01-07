@@ -1536,7 +1536,7 @@ function resumeFeaturedAutoPlay() {
               <h2 class="text-lg font-bold text-gray-900 flex items-center gap-3">
                 <div :class="[
                   'w-10 h-10 rounded-xl flex items-center justify-center shadow-lg',
-                  currentView === 'my-courses' ? 'bg-gradient-to-br from-blue-500 to-blue-600 shadow-blue-200' : 'bg-gradient-to-br from-teal-500 to-teal-600 shadow-teal-200'
+                  currentView === 'my-courses' ? 'bg-gradient-to-br from-teal-500 to-teal-600 shadow-teal-200' : 'bg-gradient-to-br from-teal-500 to-teal-600 shadow-teal-200'
                 ]">
                   <i :class="currentView === 'my-courses' ? 'fas fa-book-reader text-white text-sm' : 'fas fa-graduation-cap text-white text-sm'"></i>
                 </div>
