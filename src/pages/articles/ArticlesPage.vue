@@ -15,7 +15,6 @@ const sortBy = ref('recent')
 const sortOrder = ref<'asc' | 'desc'>('desc')
 const viewMode = ref<'grid' | 'list'>('grid')
 const showFilters = ref(false)
-const showFeaturedOnly = ref(false)
 const showCategoryFilter = ref(false)
 const showTypeFilter = ref(false)
 const showTagFilter = ref(false)
@@ -52,6 +51,7 @@ const currentUser = ref({
 // DATA
 // ============================================
 const categories = ref([
+  { id: 'featured', name: 'Featured', count: 8, icon: 'fas fa-star', color: '#f59e0b', isSpecial: true },
   { id: 'getting-started', name: 'Getting Started', count: 15, icon: 'fas fa-rocket', color: '#14b8a6' },
   { id: 'tutorials', name: 'Tutorials', count: 28, icon: 'fas fa-graduation-cap', color: '#8b5cf6' },
   { id: 'best-practices', name: 'Best Practices', count: 22, icon: 'fas fa-lightbulb', color: '#f59e0b' },
@@ -497,7 +497,6 @@ const activeFiltersCount = computed(() => {
   count += selectedCategories.value.length
   count += selectedTypes.value.length
   count += selectedTags.value.length
-  if (showFeaturedOnly.value) count++
   return count
 })
 
@@ -588,8 +587,8 @@ function filterArticles() {
     result = result.filter(a => a.tags?.some(tag => selectedTags.value.includes(tag)))
   }
 
-  // Featured filter
-  if (showFeaturedOnly.value) {
+  // Featured filter (when selected as a category)
+  if (selectedCategories.value.includes('featured')) {
     result = result.filter(a => a.featured)
   }
 
@@ -664,7 +663,6 @@ function clearFilters() {
   selectedTags.value = []
   sortBy.value = 'recent'
   sortOrder.value = 'desc'
-  showFeaturedOnly.value = false
   filterArticles()
 }
 
@@ -1270,10 +1268,33 @@ onUnmounted(() => {
               v-if="showCategoryFilter"
               class="absolute left-0 top-full mt-2 w-64 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
             >
-              <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Select Categories</div>
+              <!-- Featured Option (Special) -->
+              <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Special Filter</div>
+              <button
+                @click="toggleCategoryFilter('featured')"
+                :class="[
+                  'w-full px-3 py-2 text-left text-sm flex items-center gap-3 transition-colors',
+                  isCategorySelected('featured') ? 'bg-amber-50 text-amber-700' : 'text-gray-700 hover:bg-gray-50'
+                ]"
+              >
+                <div :class="[
+                  'w-4 h-4 rounded border-2 flex items-center justify-center transition-all',
+                  isCategorySelected('featured') ? 'bg-amber-500 border-amber-500' : 'border-gray-300'
+                ]">
+                  <i v-if="isCategorySelected('featured')" class="fas fa-check text-white text-[8px]"></i>
+                </div>
+                <i class="fas fa-star text-amber-500 text-sm"></i>
+                <span class="flex-1">Featured</span>
+                <span class="text-xs text-gray-400">{{ categories.find(c => c.id === 'featured')?.count }}</span>
+              </button>
+
+              <div class="my-2 border-t border-gray-100"></div>
+
+              <!-- Regular Categories -->
+              <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Categories</div>
               <div class="max-h-48 overflow-y-auto">
                 <button
-                  v-for="cat in categories"
+                  v-for="cat in categories.filter(c => c.id !== 'featured')"
                   :key="cat.id"
                   @click="toggleCategoryFilter(cat.id)"
                   :class="[
@@ -1438,18 +1459,6 @@ onUnmounted(() => {
             </div>
           </div>
 
-          <!-- Featured Toggle -->
-          <button
-            @click="showFeaturedOnly = !showFeaturedOnly; filterArticles()"
-            :class="[
-              'flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border',
-              showFeaturedOnly ? 'bg-amber-50 border-amber-200 text-amber-700' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
-            ]"
-          >
-            <i class="fas fa-star text-sm"></i>
-            <span>Featured</span>
-          </button>
-
           <!-- Sort Options -->
           <div class="relative">
             <button
@@ -1557,12 +1566,6 @@ onUnmounted(() => {
             <i class="fas fa-tag text-[10px]"></i>
             {{ tag }}
             <button @click="toggleTagFilter(tag)" class="ml-1 hover:text-teal-900 hover:bg-teal-100 rounded-full w-4 h-4 flex items-center justify-center"><i class="fas fa-times text-[10px]"></i></button>
-          </span>
-          <!-- Featured Filter -->
-          <span v-if="showFeaturedOnly" class="px-2.5 py-1 bg-amber-50 text-amber-700 rounded-lg text-xs font-medium flex items-center gap-1.5 border border-amber-100">
-            <i class="fas fa-star text-[10px]"></i>
-            Featured Only
-            <button @click="showFeaturedOnly = false; filterArticles()" class="ml-1 hover:text-amber-900 hover:bg-amber-100 rounded-full w-4 h-4 flex items-center justify-center"><i class="fas fa-times text-[10px]"></i></button>
           </span>
         </div>
         <button @click="clearFilters" class="px-3 py-1.5 text-xs font-medium text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors flex items-center gap-1.5">
