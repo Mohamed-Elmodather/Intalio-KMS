@@ -33,9 +33,11 @@ const selectedMedia = ref(new Set<number>())
 // Dropdown filter states
 const showMediaTypeFilter = ref(false)
 const showCategoryFilter = ref(false)
+const showTagFilter = ref(false)
 const showSortDropdown = ref(false)
 const selectedMediaTypes = ref<string[]>([])
 const selectedCategories = ref<string[]>([])
+const selectedTags = ref<string[]>([])
 
 // Sort options with icons
 const sortOptionsList = ref([
@@ -361,27 +363,36 @@ const upNextVideos = ref([
 
 // Media Items
 const mediaItems = ref([
-  { id: 5, title: 'Saudi Arabia vs Japan: Opening Match Preview', type: 'video', category: 'Highlights', duration: '12:45', views: '45.2K', date: '2 days ago', thumbnail: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=400&h=225&fit=crop', isNew: true, hasTranscript: true, author: 'AFC Media' },
-  { id: 6, title: 'King Fahd Stadium: Behind the Scenes Tour', type: 'video', category: 'Behind the Scenes', duration: '18:30', views: '32.1K', date: '3 days ago', thumbnail: 'https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=400&h=225&fit=crop', isNew: true, hasTranscript: true, author: 'Venue Team' },
-  { id: 13, title: 'AFC Asian Cup 2027 Official Draw Ceremony', type: 'gallery', category: 'Highlights', photoCount: 48, views: '28.5K', date: '1 day ago', thumbnail: 'https://images.unsplash.com/photo-1459865264687-595d652de67e?w=400&h=225&fit=crop', isNew: true, author: 'AFC Media' },
-  { id: 18, title: 'AFC Asian Cup Official Podcast: Episode 1', type: 'audio', category: 'Interviews', duration: '45:30', views: '12.3K', date: '2 days ago', thumbnail: 'https://images.unsplash.com/photo-1478737270239-2f02b77fc618?w=400&h=225&fit=crop', isNew: true, hasTranscript: true, author: 'AFC Media' },
-  { id: 19, title: 'King Fahd Stadium Aerial View', type: 'image', category: 'Venues', views: '18.5K', date: '1 day ago', thumbnail: 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?w=400&h=225&fit=crop', isNew: true, author: 'AFC Media' },
-  { id: 7, title: 'Coach Interview: Saudi Arabia Tactics Analysis', type: 'video', category: 'Interviews', duration: '25:15', views: '18.7K', date: '1 week ago', thumbnail: 'https://images.unsplash.com/photo-1551958219-acbc608c6377?w=400&h=225&fit=crop', isNew: false, hasTranscript: true, author: 'Sports Desk' },
-  { id: 20, title: 'Match Day Commentary: Live Analysis', type: 'audio', category: 'Matches', duration: '90:00', views: '8.7K', date: '4 days ago', thumbnail: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=400&h=225&fit=crop', isNew: true, author: 'AFC Radio' },
-  { id: 21, title: 'Saudi Arabia Team Photo 2027', type: 'image', category: 'Teams', views: '35.2K', date: '3 days ago', thumbnail: 'https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=400&h=225&fit=crop', isNew: true, author: 'AFC Media' },
-  { id: 14, title: 'Fan Zone Setup: Riyadh Boulevard', type: 'gallery', category: 'Fans', photoCount: 32, views: '15.3K', date: '3 days ago', thumbnail: 'https://images.unsplash.com/photo-1560272564-c83b66b1ad12?w=400&h=225&fit=crop', isNew: true, author: 'Events Team' },
-  { id: 8, title: 'Top 10 Goals: AFC Asian Cup History', type: 'video', category: 'Highlights', duration: '15:20', views: '89.4K', date: '1 week ago', thumbnail: 'https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?w=400&h=225&fit=crop', isNew: false, hasTranscript: true, author: 'AFC Media' },
-  { id: 22, title: 'Trophy Unveiling Ceremony', type: 'image', category: 'Highlights', views: '42.1K', date: '1 week ago', thumbnail: 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=400&h=225&fit=crop', isNew: false, author: 'AFC Media' },
-  { id: 9, title: 'Team Japan: Road to Saudi Arabia 2027', type: 'video', category: 'Teams', duration: '22:10', views: '41.2K', date: '2 weeks ago', thumbnail: 'https://images.unsplash.com/photo-1606925797300-0b35e9d1794e?w=400&h=225&fit=crop', isNew: false, hasTranscript: true, author: 'AFC Media' },
-  { id: 23, title: 'Pre-Match Analysis Podcast: Group A', type: 'audio', category: 'Matches', duration: '32:15', views: '6.4K', date: '1 week ago', thumbnail: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=400&h=225&fit=crop', isNew: false, author: 'AFC Analysts' },
-  { id: 15, title: 'Volunteer Training Program Launch', type: 'gallery', category: 'Behind the Scenes', photoCount: 65, views: '12.8K', date: '1 week ago', thumbnail: 'https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=400&h=225&fit=crop', isNew: false, author: 'LOC Team' },
-  { id: 10, title: 'Salem Al-Dawsari: Exclusive Interview', type: 'video', category: 'Interviews', duration: '18:30', views: '67.3K', date: '2 weeks ago', thumbnail: 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=400&h=225&fit=crop', isNew: false, hasTranscript: false, author: 'Sports Desk' },
-  { id: 24, title: 'Fans Celebrating at Boulevard', type: 'image', category: 'Fans', views: '28.9K', date: '2 weeks ago', thumbnail: 'https://images.unsplash.com/photo-1459865264687-595d652de67e?w=400&h=225&fit=crop', isNew: false, author: 'Events Team' },
-  { id: 16, title: 'Stadium Infrastructure Progress Photos', type: 'gallery', category: 'Venues', photoCount: 28, views: '9.5K', date: '2 weeks ago', thumbnail: 'https://images.unsplash.com/photo-1489944440615-453fc2b6a9a9?w=400&h=225&fit=crop', isNew: false, author: 'Venue Operations' },
-  { id: 11, title: 'Group Stage Draw Analysis', type: 'video', category: 'Highlights', duration: '35:00', views: '52.1K', date: '3 weeks ago', thumbnail: 'https://images.unsplash.com/photo-1518091043644-c1d4457512c6?w=400&h=225&fit=crop', isNew: false, hasTranscript: true, author: 'AFC Analysts' },
-  { id: 12, title: 'AFC Podcast: Tournament Predictions', type: 'audio', category: 'Interviews', duration: '48:20', views: '8.9K', date: '3 weeks ago', thumbnail: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=400&h=225&fit=crop', isNew: false, hasTranscript: false, author: 'AFC Media' },
-  { id: 17, title: 'Media Accreditation Workshop', type: 'gallery', category: 'Behind the Scenes', photoCount: 42, views: '6.2K', date: '3 weeks ago', thumbnail: 'https://images.unsplash.com/photo-1504450758481-7338eba7524a?w=400&h=225&fit=crop', isNew: false, author: 'Media Team' },
+  { id: 5, title: 'Saudi Arabia vs Japan: Opening Match Preview', type: 'video', category: 'Highlights', duration: '12:45', views: '45.2K', date: '2 days ago', thumbnail: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=400&h=225&fit=crop', isNew: true, hasTranscript: true, author: 'AFC Media', tags: ['Saudi Arabia', 'Japan', 'Group A', 'Preview'] },
+  { id: 6, title: 'King Fahd Stadium: Behind the Scenes Tour', type: 'video', category: 'Behind the Scenes', duration: '18:30', views: '32.1K', date: '3 days ago', thumbnail: 'https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=400&h=225&fit=crop', isNew: true, hasTranscript: true, author: 'Venue Team', tags: ['Stadium', 'Riyadh', 'Exclusive'] },
+  { id: 13, title: 'AFC Asian Cup 2027 Official Draw Ceremony', type: 'gallery', category: 'Highlights', photoCount: 48, views: '28.5K', date: '1 day ago', thumbnail: 'https://images.unsplash.com/photo-1459865264687-595d652de67e?w=400&h=225&fit=crop', isNew: true, author: 'AFC Media', tags: ['Draw', 'Official', 'Ceremony'] },
+  { id: 18, title: 'AFC Asian Cup Official Podcast: Episode 1', type: 'audio', category: 'Interviews', duration: '45:30', views: '12.3K', date: '2 days ago', thumbnail: 'https://images.unsplash.com/photo-1478737270239-2f02b77fc618?w=400&h=225&fit=crop', isNew: true, hasTranscript: true, author: 'AFC Media', tags: ['Podcast', 'Official', 'Analysis'] },
+  { id: 19, title: 'King Fahd Stadium Aerial View', type: 'image', category: 'Venues', views: '18.5K', date: '1 day ago', thumbnail: 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?w=400&h=225&fit=crop', isNew: true, author: 'AFC Media', tags: ['Stadium', 'Riyadh', 'Aerial'] },
+  { id: 7, title: 'Coach Interview: Saudi Arabia Tactics Analysis', type: 'video', category: 'Interviews', duration: '25:15', views: '18.7K', date: '1 week ago', thumbnail: 'https://images.unsplash.com/photo-1551958219-acbc608c6377?w=400&h=225&fit=crop', isNew: false, hasTranscript: true, author: 'Sports Desk', tags: ['Saudi Arabia', 'Coach', 'Tactics'] },
+  { id: 20, title: 'Match Day Commentary: Live Analysis', type: 'audio', category: 'Matches', duration: '90:00', views: '8.7K', date: '4 days ago', thumbnail: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=400&h=225&fit=crop', isNew: true, author: 'AFC Radio', tags: ['Commentary', 'Live', 'Analysis'] },
+  { id: 21, title: 'Saudi Arabia Team Photo 2027', type: 'image', category: 'Teams', views: '35.2K', date: '3 days ago', thumbnail: 'https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=400&h=225&fit=crop', isNew: true, author: 'AFC Media', tags: ['Saudi Arabia', 'Team', 'Official'] },
+  { id: 14, title: 'Fan Zone Setup: Riyadh Boulevard', type: 'gallery', category: 'Fans', photoCount: 32, views: '15.3K', date: '3 days ago', thumbnail: 'https://images.unsplash.com/photo-1560272564-c83b66b1ad12?w=400&h=225&fit=crop', isNew: true, author: 'Events Team', tags: ['Fans', 'Riyadh', 'Fan Zone'] },
+  { id: 8, title: 'Top 10 Goals: AFC Asian Cup History', type: 'video', category: 'Highlights', duration: '15:20', views: '89.4K', date: '1 week ago', thumbnail: 'https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?w=400&h=225&fit=crop', isNew: false, hasTranscript: true, author: 'AFC Media', tags: ['Goals', 'History', 'Top 10'] },
+  { id: 22, title: 'Trophy Unveiling Ceremony', type: 'image', category: 'Highlights', views: '42.1K', date: '1 week ago', thumbnail: 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=400&h=225&fit=crop', isNew: false, author: 'AFC Media', tags: ['Trophy', 'Ceremony', 'Official'] },
+  { id: 9, title: 'Team Japan: Road to Saudi Arabia 2027', type: 'video', category: 'Teams', duration: '22:10', views: '41.2K', date: '2 weeks ago', thumbnail: 'https://images.unsplash.com/photo-1606925797300-0b35e9d1794e?w=400&h=225&fit=crop', isNew: false, hasTranscript: true, author: 'AFC Media', tags: ['Japan', 'Team', 'Documentary'] },
+  { id: 23, title: 'Pre-Match Analysis Podcast: Group A', type: 'audio', category: 'Matches', duration: '32:15', views: '6.4K', date: '1 week ago', thumbnail: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=400&h=225&fit=crop', isNew: false, author: 'AFC Analysts', tags: ['Podcast', 'Group A', 'Analysis'] },
+  { id: 15, title: 'Volunteer Training Program Launch', type: 'gallery', category: 'Behind the Scenes', photoCount: 65, views: '12.8K', date: '1 week ago', thumbnail: 'https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=400&h=225&fit=crop', isNew: false, author: 'LOC Team', tags: ['Volunteers', 'Training', 'Behind the Scenes'] },
+  { id: 10, title: 'Salem Al-Dawsari: Exclusive Interview', type: 'video', category: 'Interviews', duration: '18:30', views: '67.3K', date: '2 weeks ago', thumbnail: 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=400&h=225&fit=crop', isNew: false, hasTranscript: false, author: 'Sports Desk', tags: ['Saudi Arabia', 'Player', 'Exclusive'] },
+  { id: 24, title: 'Fans Celebrating at Boulevard', type: 'image', category: 'Fans', views: '28.9K', date: '2 weeks ago', thumbnail: 'https://images.unsplash.com/photo-1459865264687-595d652de67e?w=400&h=225&fit=crop', isNew: false, author: 'Events Team', tags: ['Fans', 'Celebration', 'Riyadh'] },
+  { id: 16, title: 'Stadium Infrastructure Progress Photos', type: 'gallery', category: 'Venues', photoCount: 28, views: '9.5K', date: '2 weeks ago', thumbnail: 'https://images.unsplash.com/photo-1489944440615-453fc2b6a9a9?w=400&h=225&fit=crop', isNew: false, author: 'Venue Operations', tags: ['Stadium', 'Infrastructure', 'Progress'] },
+  { id: 11, title: 'Group Stage Draw Analysis', type: 'video', category: 'Highlights', duration: '35:00', views: '52.1K', date: '3 weeks ago', thumbnail: 'https://images.unsplash.com/photo-1518091043644-c1d4457512c6?w=400&h=225&fit=crop', isNew: false, hasTranscript: true, author: 'AFC Analysts', tags: ['Draw', 'Analysis', 'Groups'] },
+  { id: 12, title: 'AFC Podcast: Tournament Predictions', type: 'audio', category: 'Interviews', duration: '48:20', views: '8.9K', date: '3 weeks ago', thumbnail: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=400&h=225&fit=crop', isNew: false, hasTranscript: false, author: 'AFC Media', tags: ['Podcast', 'Predictions', 'Analysis'] },
+  { id: 17, title: 'Media Accreditation Workshop', type: 'gallery', category: 'Behind the Scenes', photoCount: 42, views: '6.2K', date: '3 weeks ago', thumbnail: 'https://images.unsplash.com/photo-1504450758481-7338eba7524a?w=400&h=225&fit=crop', isNew: false, author: 'Media Team', tags: ['Media', 'Workshop', 'Behind the Scenes'] },
 ])
+
+// Computed: All available tags from media items
+const allTags = computed(() => {
+  const tags = new Set<string>()
+  mediaItems.value.forEach(item => {
+    item.tags?.forEach(tag => tags.add(tag))
+  })
+  return Array.from(tags).sort()
+})
 
 // Computed: Active Filters Count
 const activeFiltersCount = computed(() => {
@@ -389,6 +400,7 @@ const activeFiltersCount = computed(() => {
   if (categoryFilter.value) count++
   if (activeTab.value !== 'all') count++
   if (searchQuery.value) count++
+  count += selectedTags.value.length
   return count
 })
 
@@ -420,6 +432,11 @@ const filteredMedia = computed(() => {
   // Filter by dropdown categories (if any selected)
   if (selectedCategories.value.length > 0) {
     result = result.filter(m => selectedCategories.value.includes(m.category))
+  }
+
+  // Filter by tags (if any selected)
+  if (selectedTags.value.length > 0) {
+    result = result.filter(m => m.tags?.some(tag => selectedTags.value.includes(tag)))
   }
 
   return result
@@ -659,6 +676,19 @@ function toggleCategorySelection(cat: string) {
 
 function isCategorySelected(cat: string): boolean {
   return selectedCategories.value.includes(cat)
+}
+
+function toggleTagFilter(tag: string) {
+  const index = selectedTags.value.indexOf(tag)
+  if (index > -1) {
+    selectedTags.value.splice(index, 1)
+  } else {
+    selectedTags.value.push(tag)
+  }
+}
+
+function isTagSelected(tag: string): boolean {
+  return selectedTags.value.includes(tag)
 }
 
 // Get current sort option
@@ -1192,23 +1222,67 @@ onUnmounted(() => {
               <div v-if="showCategoryFilter" @click="showCategoryFilter = false" class="fixed inset-0 z-40"></div>
             </div>
 
-              <!-- View Toggle -->
-              <div class="flex items-center gap-0.5 bg-white border border-gray-200 rounded-lg p-1">
-                <button
-                  @click="viewMode = 'grid'"
-                  :class="['px-2.5 py-1 rounded-md transition-all', viewMode === 'grid' ? 'bg-teal-500 text-white' : 'text-gray-500 hover:bg-gray-100']"
-                  title="Grid view"
-                >
-                  <i class="fas fa-th-large text-xs"></i>
-                </button>
-                <button
-                  @click="viewMode = 'list'"
-                  :class="['px-2.5 py-1 rounded-md transition-all', viewMode === 'list' ? 'bg-teal-500 text-white' : 'text-gray-500 hover:bg-gray-100']"
-                  title="List view"
-                >
-                  <i class="fas fa-list text-xs"></i>
-                </button>
+            <!-- Tags Filter -->
+            <div class="relative">
+              <button
+                @click="showTagFilter = !showTagFilter"
+                :class="[
+                  'flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border',
+                  selectedTags.length > 0 ? 'bg-teal-50 border-teal-200 text-teal-700' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+                ]"
+              >
+                <i class="fas fa-tags text-sm"></i>
+                <span>{{ selectedTags.length > 0 ? `${selectedTags.length} Tags` : 'Tags' }}</span>
+                <i :class="showTagFilter ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ml-1"></i>
+              </button>
+
+              <!-- Dropdown Menu -->
+              <div
+                v-if="showTagFilter"
+                class="absolute left-0 top-full mt-2 w-64 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
+              >
+                <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Select Tags</div>
+                <div class="max-h-48 overflow-y-auto">
+                  <button
+                    v-for="tag in allTags"
+                    :key="tag"
+                    @click="toggleTagFilter(tag)"
+                    :class="[
+                      'w-full px-3 py-2 text-left text-sm flex items-center gap-3 transition-colors',
+                      isTagSelected(tag) ? 'bg-teal-50 text-teal-700' : 'text-gray-700 hover:bg-gray-50'
+                    ]"
+                  >
+                    <div :class="[
+                      'w-4 h-4 rounded border-2 flex items-center justify-center transition-all',
+                      isTagSelected(tag) ? 'bg-teal-500 border-teal-500' : 'border-gray-300'
+                    ]">
+                      <i v-if="isTagSelected(tag)" class="fas fa-check text-white text-[8px]"></i>
+                    </div>
+                    <span class="flex-1">{{ tag }}</span>
+                  </button>
+                </div>
+
+                <div class="my-2 border-t border-gray-100"></div>
+
+                <div class="px-3 flex gap-2">
+                  <button
+                    @click="selectedTags = []; showTagFilter = false"
+                    class="flex-1 px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                  >
+                    Clear All
+                  </button>
+                  <button
+                    @click="showTagFilter = false"
+                    class="flex-1 px-3 py-1.5 text-xs font-medium text-white bg-teal-500 rounded-lg hover:bg-teal-600 transition-colors"
+                  >
+                    Apply
+                  </button>
+                </div>
               </div>
+
+              <!-- Click outside to close -->
+              <div v-if="showTagFilter" @click="showTagFilter = false" class="fixed inset-0 z-40"></div>
+            </div>
 
               <!-- Sort Options -->
               <div class="relative">
@@ -1254,6 +1328,24 @@ onUnmounted(() => {
               >
                 <i :class="sortOrder === 'asc' ? 'fas fa-arrow-up' : 'fas fa-arrow-down'" class="text-sm text-teal-500"></i>
               </button>
+
+              <!-- View Toggle -->
+              <div class="flex items-center gap-0.5 bg-white border border-gray-200 rounded-lg p-1">
+                <button
+                  @click="viewMode = 'grid'"
+                  :class="['px-2.5 py-1 rounded-md transition-all', viewMode === 'grid' ? 'bg-teal-500 text-white' : 'text-gray-500 hover:bg-gray-100']"
+                  title="Grid view"
+                >
+                  <i class="fas fa-th-large text-xs"></i>
+                </button>
+                <button
+                  @click="viewMode = 'list'"
+                  :class="['px-2.5 py-1 rounded-md transition-all', viewMode === 'list' ? 'bg-teal-500 text-white' : 'text-gray-500 hover:bg-gray-100']"
+                  title="List view"
+                >
+                  <i class="fas fa-list text-xs"></i>
+                </button>
+              </div>
           </div>
         </div>
 
