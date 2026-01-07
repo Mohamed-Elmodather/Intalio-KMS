@@ -1246,6 +1246,69 @@ onUnmounted(() => {
             </button>
           </div>
 
+          <!-- Type Filter -->
+          <div class="relative">
+            <button
+              @click="showTypeFilter = !showTypeFilter"
+              :class="[
+                'flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border',
+                selectedTypes.length > 0 ? 'bg-teal-50 border-teal-200 text-teal-700' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+              ]"
+            >
+              <i class="fas fa-file-alt text-sm"></i>
+              <span>{{ selectedTypes.length > 0 ? `Type (${selectedTypes.length})` : 'Type' }}</span>
+              <i :class="showTypeFilter ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ml-1"></i>
+            </button>
+
+            <!-- Click outside to close (must be before dropdown) -->
+            <div v-if="showTypeFilter" @click="showTypeFilter = false" class="fixed inset-0 z-40"></div>
+
+            <!-- Dropdown Menu -->
+            <div
+              v-if="showTypeFilter"
+              class="absolute left-0 top-full mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
+            >
+              <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Select Types</div>
+              <div class="max-h-48 overflow-y-auto">
+                <button
+                  v-for="type in articleTypes"
+                  :key="type.id"
+                  @click="toggleTypeFilter(type.id)"
+                  :class="[
+                    'w-full px-3 py-2 text-left text-sm flex items-center gap-3 transition-colors',
+                    isTypeSelected(type.id) ? 'bg-teal-50 text-teal-700' : 'text-gray-700 hover:bg-gray-50'
+                  ]"
+                >
+                  <div :class="[
+                    'w-4 h-4 rounded border-2 flex items-center justify-center transition-all',
+                    isTypeSelected(type.id) ? 'bg-teal-500 border-teal-500' : 'border-gray-300'
+                  ]">
+                    <i v-if="isTypeSelected(type.id)" class="fas fa-check text-white text-[8px]"></i>
+                  </div>
+                  <i :class="[type.icon, 'text-teal-500 text-sm']"></i>
+                  <span class="flex-1">{{ type.name }}</span>
+                </button>
+              </div>
+
+              <div class="my-2 border-t border-gray-100"></div>
+
+              <div class="px-3 flex gap-2">
+                <button
+                  @click="selectedTypes = []; filterArticles(); showTypeFilter = false"
+                  class="flex-1 px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                >
+                  Clear
+                </button>
+                <button
+                  @click="showTypeFilter = false"
+                  class="flex-1 px-3 py-1.5 text-xs font-medium text-white bg-teal-500 rounded-lg hover:bg-teal-600 transition-colors"
+                >
+                  Apply
+                </button>
+              </div>
+            </div>
+          </div>
+
           <!-- Category Filter -->
           <div class="relative">
             <button
@@ -1325,69 +1388,6 @@ onUnmounted(() => {
                 </button>
                 <button
                   @click="showCategoryFilter = false"
-                  class="flex-1 px-3 py-1.5 text-xs font-medium text-white bg-teal-500 rounded-lg hover:bg-teal-600 transition-colors"
-                >
-                  Apply
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Type Filter -->
-          <div class="relative">
-            <button
-              @click="showTypeFilter = !showTypeFilter"
-              :class="[
-                'flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border',
-                selectedTypes.length > 0 ? 'bg-teal-50 border-teal-200 text-teal-700' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
-              ]"
-            >
-              <i class="fas fa-file-alt text-sm"></i>
-              <span>{{ selectedTypes.length > 0 ? `Type (${selectedTypes.length})` : 'Type' }}</span>
-              <i :class="showTypeFilter ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ml-1"></i>
-            </button>
-
-            <!-- Click outside to close (must be before dropdown) -->
-            <div v-if="showTypeFilter" @click="showTypeFilter = false" class="fixed inset-0 z-40"></div>
-
-            <!-- Dropdown Menu -->
-            <div
-              v-if="showTypeFilter"
-              class="absolute left-0 top-full mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
-            >
-              <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Select Types</div>
-              <div class="max-h-48 overflow-y-auto">
-                <button
-                  v-for="type in articleTypes"
-                  :key="type.id"
-                  @click="toggleTypeFilter(type.id)"
-                  :class="[
-                    'w-full px-3 py-2 text-left text-sm flex items-center gap-3 transition-colors',
-                    isTypeSelected(type.id) ? 'bg-teal-50 text-teal-700' : 'text-gray-700 hover:bg-gray-50'
-                  ]"
-                >
-                  <div :class="[
-                    'w-4 h-4 rounded border-2 flex items-center justify-center transition-all',
-                    isTypeSelected(type.id) ? 'bg-teal-500 border-teal-500' : 'border-gray-300'
-                  ]">
-                    <i v-if="isTypeSelected(type.id)" class="fas fa-check text-white text-[8px]"></i>
-                  </div>
-                  <i :class="[type.icon, 'text-teal-500 text-sm']"></i>
-                  <span class="flex-1">{{ type.name }}</span>
-                </button>
-              </div>
-
-              <div class="my-2 border-t border-gray-100"></div>
-
-              <div class="px-3 flex gap-2">
-                <button
-                  @click="selectedTypes = []; filterArticles(); showTypeFilter = false"
-                  class="flex-1 px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
-                >
-                  Clear
-                </button>
-                <button
-                  @click="showTypeFilter = false"
                   class="flex-1 px-3 py-1.5 text-xs font-medium text-white bg-teal-500 rounded-lg hover:bg-teal-600 transition-colors"
                 >
                   Apply
