@@ -257,9 +257,70 @@ const categories = ref([
 
 // Recommended courses
 const recommendedCourses = ref([
-  { id: 10, title: 'Machine Learning Basics', duration: '4 hours', level: 'Intermediate', matchScore: 95, icon: 'fas fa-robot', instructor: 'Dr. Sarah Mitchell' },
-  { id: 11, title: 'Strategic Planning', duration: '3 hours', level: 'Advanced', matchScore: 88, icon: 'fas fa-chess', instructor: 'Michael Brown' },
-  { id: 12, title: 'Public Speaking', duration: '2 hours', level: 'Beginner', matchScore: 82, icon: 'fas fa-microphone', instructor: 'Emma Wilson' },
+  {
+    id: 10,
+    title: 'Machine Learning Basics',
+    instructor: 'Dr. Sarah Mitchell',
+    instructorInitials: 'SM',
+    duration: '4 hours',
+    totalLessons: 12,
+    level: 'Intermediate',
+    levelClass: 'intermediate',
+    matchScore: 95,
+    rating: 4.8,
+    students: 3200,
+    image: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=400&h=300&fit=crop',
+    tags: ['AI', 'Machine Learning'],
+    saved: false
+  },
+  {
+    id: 11,
+    title: 'Strategic Planning',
+    instructor: 'Michael Brown',
+    instructorInitials: 'MB',
+    duration: '3 hours',
+    totalLessons: 8,
+    level: 'Advanced',
+    levelClass: 'advanced',
+    matchScore: 88,
+    rating: 4.6,
+    students: 1890,
+    image: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=400&h=300&fit=crop',
+    tags: ['Strategy', 'Business'],
+    saved: false
+  },
+  {
+    id: 12,
+    title: 'Public Speaking Mastery',
+    instructor: 'Emma Wilson',
+    instructorInitials: 'EW',
+    duration: '2 hours',
+    totalLessons: 6,
+    level: 'Beginner',
+    levelClass: 'beginner',
+    matchScore: 82,
+    rating: 4.7,
+    students: 4500,
+    image: 'https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=400&h=300&fit=crop',
+    tags: ['Speaking', 'Communication'],
+    saved: true
+  },
+  {
+    id: 13,
+    title: 'Cloud Architecture Fundamentals',
+    instructor: 'David Kim',
+    instructorInitials: 'DK',
+    duration: '8 hours',
+    totalLessons: 20,
+    level: 'Advanced',
+    levelClass: 'advanced',
+    matchScore: 78,
+    rating: 4.9,
+    students: 2100,
+    image: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=400&h=300&fit=crop',
+    tags: ['Cloud', 'AWS'],
+    saved: false
+  }
 ])
 
 // Catalog courses
@@ -498,6 +559,13 @@ function navigateToCourse(courseId: number) {
 
 function toggleSaveCourse(courseId: number) {
   const course = enrolledCourses.value.find(c => c.id === courseId)
+  if (course) {
+    course.saved = !course.saved
+  }
+}
+
+function toggleSaveRecommended(courseId: number) {
+  const course = recommendedCourses.value.find(c => c.id === courseId)
   if (course) {
     course.saved = !course.saved
   }
@@ -809,6 +877,68 @@ function resumeFeaturedAutoPlay() {
                       </button>
                     </div>
                   </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recommended For You Section -->
+        <div class="recommended-section">
+          <div class="recommended-header">
+            <div class="recommended-title-wrap">
+              <div class="recommended-icon">
+                <i class="fas fa-sparkles"></i>
+              </div>
+              <div>
+                <h2 class="recommended-title">Recommended for You</h2>
+                <p class="recommended-subtitle">Based on your learning history and interests</p>
+              </div>
+            </div>
+            <button class="recommended-see-all">
+              See All <i class="fas fa-arrow-right"></i>
+            </button>
+          </div>
+          <div class="recommended-grid">
+            <div v-for="course in recommendedCourses" :key="course.id" class="recommended-card">
+              <!-- Save Button -->
+              <button
+                class="recommended-save-btn"
+                :class="{ 'saved': course.saved }"
+                @click.stop="toggleSaveRecommended(course.id)"
+              >
+                <i :class="course.saved ? 'fas fa-bookmark' : 'far fa-bookmark'"></i>
+              </button>
+              <!-- Match Badge -->
+              <div class="recommended-match">
+                <i class="fas fa-bullseye"></i> {{ course.matchScore }}% Match
+              </div>
+              <!-- Image -->
+              <div class="recommended-image">
+                <img :src="course.image" :alt="course.title" />
+                <div class="recommended-overlay"></div>
+                <span class="recommended-duration">{{ course.duration }}</span>
+              </div>
+              <!-- Content -->
+              <div class="recommended-content">
+                <div class="recommended-tags">
+                  <span v-for="tag in course.tags" :key="tag" class="recommended-tag">{{ tag }}</span>
+                  <span :class="['recommended-level', course.levelClass]">{{ course.level }}</span>
+                </div>
+                <h3 class="recommended-course-title">{{ course.title }}</h3>
+                <div class="recommended-instructor">
+                  <div class="recommended-avatar">{{ course.instructorInitials }}</div>
+                  <span>{{ course.instructor }}</span>
+                </div>
+                <div class="recommended-footer">
+                  <div class="recommended-stats">
+                    <span><i class="fas fa-play-circle"></i> {{ course.totalLessons }}</span>
+                    <span><i class="fas fa-star text-amber-400"></i> {{ course.rating }}</span>
+                    <span><i class="fas fa-users"></i> {{ (course.students / 1000).toFixed(1) }}k</span>
+                  </div>
+                  <button class="recommended-enroll-btn">
+                    <i class="fas fa-plus"></i> Enroll
+                  </button>
                 </div>
               </div>
             </div>
@@ -2821,6 +2951,344 @@ function resumeFeaturedAutoPlay() {
   font-size: 0.5rem;
 }
 
+/* Recommended Section */
+.recommended-section {
+  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+  border: 1px solid #e2e8f0;
+  border-radius: 1rem;
+  padding: 1.25rem;
+}
+
+.recommended-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.recommended-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.recommended-icon {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.75rem;
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+}
+
+.recommended-icon i {
+  color: white;
+  font-size: 0.875rem;
+}
+
+.recommended-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0;
+}
+
+.recommended-subtitle {
+  font-size: 0.75rem;
+  color: #64748b;
+  margin: 0;
+}
+
+.recommended-see-all {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: transparent;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.recommended-see-all:hover {
+  background: #f1f5f9;
+  color: #0d9488;
+  border-color: #0d9488;
+}
+
+.recommended-see-all i {
+  font-size: 0.625rem;
+  transition: transform 0.2s ease;
+}
+
+.recommended-see-all:hover i {
+  transform: translateX(3px);
+}
+
+.recommended-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+}
+
+.recommended-card {
+  position: relative;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.recommended-card:hover {
+  border-color: #14b8a6;
+  box-shadow: 0 8px 24px rgba(20, 184, 166, 0.15);
+  transform: translateY(-4px);
+}
+
+.recommended-save-btn {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid #e2e8f0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  z-index: 10;
+  opacity: 0;
+  transform: scale(0.8);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.recommended-card:hover .recommended-save-btn {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.recommended-save-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.recommended-save-btn i {
+  font-size: 0.75rem;
+  color: #64748b;
+  transition: all 0.2s ease;
+}
+
+.recommended-save-btn:hover i {
+  color: #14b8a6;
+}
+
+.recommended-save-btn.saved {
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+  border-color: transparent;
+  opacity: 1;
+  transform: scale(1);
+}
+
+.recommended-save-btn.saved i {
+  color: white;
+}
+
+.recommended-match {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  padding: 0.25rem 0.5rem;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  font-size: 0.625rem;
+  font-weight: 600;
+  border-radius: 0.375rem;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.recommended-match i {
+  font-size: 0.5rem;
+}
+
+.recommended-image {
+  position: relative;
+  height: 120px;
+  overflow: hidden;
+}
+
+.recommended-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.recommended-card:hover .recommended-image img {
+  transform: scale(1.08);
+}
+
+.recommended-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.5) 0%, transparent 60%);
+}
+
+.recommended-duration {
+  position: absolute;
+  bottom: 0.5rem;
+  right: 0.5rem;
+  padding: 0.25rem 0.5rem;
+  background: rgba(0,0,0,0.85);
+  color: white;
+  font-size: 0.625rem;
+  font-weight: 600;
+  border-radius: 0.25rem;
+}
+
+.recommended-content {
+  padding: 0.875rem;
+}
+
+.recommended-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+  margin-bottom: 0.5rem;
+}
+
+.recommended-tag {
+  padding: 0.125rem 0.375rem;
+  background: #f1f5f9;
+  color: #64748b;
+  font-size: 0.5625rem;
+  font-weight: 500;
+  border-radius: 0.25rem;
+}
+
+.recommended-level {
+  padding: 0.125rem 0.375rem;
+  font-size: 0.5625rem;
+  font-weight: 600;
+  border-radius: 0.25rem;
+  text-transform: uppercase;
+}
+
+.recommended-level.beginner {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.recommended-level.intermediate {
+  background: #dbeafe;
+  color: #2563eb;
+}
+
+.recommended-level.advanced {
+  background: #ede9fe;
+  color: #7c3aed;
+}
+
+.recommended-course-title {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 0.5rem 0;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.recommended-instructor {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.recommended-avatar {
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+  color: white;
+  font-size: 0.5rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.recommended-instructor span {
+  font-size: 0.6875rem;
+  color: #64748b;
+}
+
+.recommended-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 0.625rem;
+  border-top: 1px solid #f1f5f9;
+}
+
+.recommended-stats {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+}
+
+.recommended-stats span {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.625rem;
+  color: #64748b;
+}
+
+.recommended-stats i {
+  font-size: 0.5rem;
+}
+
+.recommended-enroll-btn {
+  padding: 0.375rem 0.75rem;
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+  color: white;
+  border: none;
+  border-radius: 0.375rem;
+  font-size: 0.625rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  transition: all 0.2s ease;
+}
+
+.recommended-enroll-btn:hover {
+  box-shadow: 0 4px 12px rgba(20, 184, 166, 0.35);
+  transform: scale(1.05);
+}
+
+.recommended-enroll-btn i {
+  font-size: 0.5rem;
+}
+
 /* Responsive */
 @media (max-width: 767px) {
   .featured-course-content {
@@ -2876,6 +3344,56 @@ function resumeFeaturedAutoPlay() {
   }
 
   .up-next-save-btn {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  .recommended-section {
+    padding: 1rem;
+  }
+
+  .recommended-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .recommended-see-all {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .recommended-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+
+  .recommended-image {
+    height: 100px;
+  }
+
+  .recommended-content {
+    padding: 0.75rem;
+  }
+
+  .recommended-course-title {
+    font-size: 0.75rem;
+  }
+
+  .recommended-instructor {
+    display: none;
+  }
+
+  .recommended-stats {
+    gap: 0.5rem;
+  }
+
+  .recommended-enroll-btn {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.5625rem;
+  }
+
+  .recommended-save-btn {
     opacity: 1;
     transform: scale(1);
   }
