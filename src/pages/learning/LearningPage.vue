@@ -478,6 +478,77 @@ const filteredAllCourses = computed(() => {
   return courses
 })
 
+// My Courses filtered (enrolled, recommended/new, saved, or shared with me)
+const myCoursesFiltered = computed(() => {
+  // First filter to only courses that are enrolled, saved, shared, or new (recommended)
+  let courses = allCourses.value.filter(c => c.enrolled || c.saved || c.sharedWithMe || c.isNew)
+
+  // Search filter
+  if (allCoursesSearch.value) {
+    const search = allCoursesSearch.value.toLowerCase()
+    courses = courses.filter(c =>
+      c.title.toLowerCase().includes(search) ||
+      c.instructor.toLowerCase().includes(search) ||
+      c.tags.some(t => t.toLowerCase().includes(search))
+    )
+  }
+
+  // Level filter
+  if (allCoursesLevelFilter.value.length > 0) {
+    courses = courses.filter(c => allCoursesLevelFilter.value.includes(c.levelClass))
+  }
+
+  // Category filter
+  if (allCoursesCategoryFilter.value.length > 0) {
+    courses = courses.filter(c => allCoursesCategoryFilter.value.includes(c.category))
+  }
+
+  // Progress filter (enrollment + progress status)
+  if (allCoursesEnrollmentFilter.value.length > 0) {
+    courses = courses.filter(c => {
+      if (allCoursesEnrollmentFilter.value.includes('enrolled') && c.enrolled) return true
+      if (allCoursesEnrollmentFilter.value.includes('not-enrolled') && !c.enrolled) return true
+      if (allCoursesEnrollmentFilter.value.includes('in-progress') && c.enrolled && (c.progress ?? 0) > 0 && (c.progress ?? 0) < 100) return true
+      if (allCoursesEnrollmentFilter.value.includes('completed') && c.enrolled && (c.progress ?? 0) === 100) return true
+      if (allCoursesEnrollmentFilter.value.includes('not-started') && c.enrolled && (c.progress ?? 0) === 0) return true
+      return false
+    })
+  }
+
+  // Status filter (saved/shared)
+  if (selectedStatusFilters.value.length > 0) {
+    courses = courses.filter(c => {
+      if (selectedStatusFilters.value.includes('saved') && c.saved) return true
+      if (selectedStatusFilters.value.includes('shared') && c.sharedWithMe) return true
+      return false
+    })
+  }
+
+  // Sort
+  const multiplier = allCoursesSortOrder.value === 'asc' ? 1 : -1
+  switch (allCoursesSortBy.value) {
+    case 'popular':
+      courses.sort((a, b) => (b.students - a.students) * multiplier)
+      break
+    case 'rating':
+      courses.sort((a, b) => (b.rating - a.rating) * multiplier)
+      break
+    case 'newest':
+      courses.sort((a, b) => ((b.isNew ? 1 : 0) - (a.isNew ? 1 : 0)) * multiplier)
+      break
+    case 'title':
+      courses.sort((a, b) => a.title.localeCompare(b.title) * multiplier)
+      break
+  }
+
+  return courses
+})
+
+// Get the appropriate courses based on current view
+const displayedCourses = computed(() => {
+  return currentView.value === 'my-courses' ? myCoursesFiltered.value : filteredAllCourses.value
+})
+
 function toggleLevelFilterOption(level: string) {
   const index = allCoursesLevelFilter.value.indexOf(level)
   if (index === -1) {
@@ -1267,12 +1338,15 @@ function resumeFeaturedAutoPlay() {
             <!-- Top Row - Title and Primary Actions -->
             <div class="px-4 py-3 flex items-center justify-between">
               <h2 class="text-lg font-bold text-gray-900 flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center shadow-lg shadow-teal-200">
-                  <i class="fas fa-graduation-cap text-white text-sm"></i>
+                <div :class="[
+                  'w-10 h-10 rounded-xl flex items-center justify-center shadow-lg',
+                  currentView === 'my-courses' ? 'bg-gradient-to-br from-blue-500 to-blue-600 shadow-blue-200' : 'bg-gradient-to-br from-teal-500 to-teal-600 shadow-teal-200'
+                ]">
+                  <i :class="currentView === 'my-courses' ? 'fas fa-book-reader text-white text-sm' : 'fas fa-graduation-cap text-white text-sm'"></i>
                 </div>
                 <div>
-                  <span class="block">My Courses</span>
-                  <span class="text-xs font-medium text-gray-500">{{ filteredAllCourses.length }} courses available</span>
+                  <span class="block">{{ currentView === 'my-courses' ? 'My Courses' : 'All Courses' }}</span>
+                  <span class="text-xs font-medium text-gray-500">{{ displayedCourses.length }} courses available</span>
                 </div>
               </h2>
             </div>
@@ -1677,7 +1751,7 @@ function resumeFeaturedAutoPlay() {
           <div class="p-4">
             <!-- Grid View -->
             <div v-if="allCoursesViewMode === 'grid'" class="all-courses-grid">
-              <div v-for="course in filteredAllCourses" :key="course.id"
+              <div v-for="course in displayedCourses" :key="course.id"
                    class="all-course-card group bg-white rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 hover:-translate-y-1.5 border border-gray-100 shadow-sm hover:shadow-lg hover:border-teal-200">
                 <!-- Card Thumbnail -->
                 <div class="relative aspect-video">
@@ -1791,7 +1865,7 @@ function resumeFeaturedAutoPlay() {
 
             <!-- List View -->
             <div v-else class="all-courses-list">
-              <div v-for="course in filteredAllCourses" :key="course.id"
+              <div v-for="course in displayedCourses" :key="course.id"
                    class="all-course-list-item cursor-pointer group">
                 <!-- Thumbnail -->
                 <div class="all-course-list-thumbnail">
@@ -1856,12 +1930,12 @@ function resumeFeaturedAutoPlay() {
             </div>
 
             <!-- Empty State -->
-            <div v-if="filteredAllCourses.length === 0" class="all-courses-empty">
+            <div v-if="displayedCourses.length === 0" class="all-courses-empty">
               <div class="all-courses-empty-icon">
                 <i class="fas fa-search"></i>
               </div>
               <h3 class="all-courses-empty-title">No courses found</h3>
-              <p class="all-courses-empty-text">Try adjusting your filters or search query</p>
+              <p class="all-courses-empty-text">{{ currentView === 'my-courses' ? 'You haven\'t enrolled, saved, or been shared any courses yet' : 'Try adjusting your filters or search query' }}</p>
               <button @click="allCoursesSearch = ''; allCoursesLevelFilter = []; allCoursesCategoryFilter = []; allCoursesEnrollmentFilter = []; selectedStatusFilters = []" class="all-courses-clear-btn">
                 <i class="fas fa-undo mr-2"></i> Clear Filters
               </button>
