@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
@@ -547,6 +547,61 @@ const myCoursesFiltered = computed(() => {
 // Get the appropriate courses based on current view
 const displayedCourses = computed(() => {
   return currentView.value === 'my-courses' ? myCoursesFiltered.value : filteredAllCourses.value
+})
+
+// ============================================
+// PAGINATION STATE
+// ============================================
+const coursesCurrentPage = ref(1)
+const coursesItemsPerPage = ref(10)
+const coursesItemsPerPageOptions = [5, 10, 20, 50, 100]
+
+// ============================================
+// PAGINATION COMPUTED PROPERTIES
+// ============================================
+const coursesTotalPages = computed(() => Math.ceil(displayedCourses.value.length / coursesItemsPerPage.value))
+
+const paginatedCourses = computed(() => {
+  const start = (coursesCurrentPage.value - 1) * coursesItemsPerPage.value
+  return displayedCourses.value.slice(start, start + coursesItemsPerPage.value)
+})
+
+const coursesPaginationStart = computed(() => {
+  if (displayedCourses.value.length === 0) return 0
+  return (coursesCurrentPage.value - 1) * coursesItemsPerPage.value + 1
+})
+
+const coursesPaginationEnd = computed(() => Math.min(coursesCurrentPage.value * coursesItemsPerPage.value, displayedCourses.value.length))
+
+// ============================================
+// PAGINATION FUNCTIONS
+// ============================================
+function goToCoursesPage(page: number) {
+  if (page >= 1 && page <= coursesTotalPages.value) {
+    coursesCurrentPage.value = page
+  }
+}
+
+function nextCoursesPage() {
+  if (coursesCurrentPage.value < coursesTotalPages.value) {
+    coursesCurrentPage.value++
+  }
+}
+
+function prevCoursesPage() {
+  if (coursesCurrentPage.value > 1) {
+    coursesCurrentPage.value--
+  }
+}
+
+function changeCoursesItemsPerPage(count: number) {
+  coursesItemsPerPage.value = count
+  coursesCurrentPage.value = 1
+}
+
+// Reset pagination when view or filters change
+watch([currentView, allCoursesSearch, allCoursesLevelFilter, allCoursesCategoryFilter, allCoursesEnrollmentFilter, selectedStatusFilters], () => {
+  coursesCurrentPage.value = 1
 })
 
 function toggleLevelFilterOption(level: string) {
@@ -1751,7 +1806,7 @@ function resumeFeaturedAutoPlay() {
           <div class="p-4">
             <!-- Grid View -->
             <div v-if="allCoursesViewMode === 'grid'" class="all-courses-grid">
-              <div v-for="course in displayedCourses" :key="course.id"
+              <div v-for="course in paginatedCourses" :key="course.id"
                    class="all-course-card group bg-white rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 hover:-translate-y-1.5 border border-gray-100 shadow-sm hover:shadow-lg hover:border-teal-200">
                 <!-- Card Thumbnail -->
                 <div class="relative aspect-video">
@@ -1865,7 +1920,7 @@ function resumeFeaturedAutoPlay() {
 
             <!-- List View -->
             <div v-else class="all-courses-list">
-              <div v-for="course in displayedCourses" :key="course.id"
+              <div v-for="course in paginatedCourses" :key="course.id"
                    class="all-course-list-item cursor-pointer group">
                 <!-- Thumbnail -->
                 <div class="all-course-list-thumbnail">
@@ -1939,6 +1994,88 @@ function resumeFeaturedAutoPlay() {
               <button @click="allCoursesSearch = ''; allCoursesLevelFilter = []; allCoursesCategoryFilter = []; allCoursesEnrollmentFilter = []; selectedStatusFilters = []" class="all-courses-clear-btn">
                 <i class="fas fa-undo mr-2"></i> Clear Filters
               </button>
+            </div>
+
+            <!-- Pagination Footer -->
+            <div v-if="displayedCourses.length > 0" class="mt-4 px-4 py-3 bg-white rounded-2xl border border-gray-100 shadow-sm">
+              <div class="flex items-center justify-between flex-wrap gap-3">
+                <!-- Left: Stats & Items Per Page -->
+                <div class="flex items-center gap-4 flex-wrap">
+                  <span class="text-xs text-gray-500">
+                    Showing <span class="font-semibold text-gray-700">{{ coursesPaginationStart }}</span>
+                    to <span class="font-semibold text-gray-700">{{ coursesPaginationEnd }}</span>
+                    of <span class="font-semibold text-gray-700">{{ displayedCourses.length }}</span> courses
+                  </span>
+
+                  <!-- Items Per Page Selector -->
+                  <div class="flex items-center gap-2">
+                    <span class="text-xs text-gray-500">Show:</span>
+                    <select
+                      v-model="coursesItemsPerPage"
+                      @change="changeCoursesItemsPerPage(Number(($event.target as HTMLSelectElement).value))"
+                      class="text-xs px-2 py-1.5 rounded-lg border border-gray-200 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 cursor-pointer"
+                    >
+                      <option v-for="option in coursesItemsPerPageOptions" :key="option" :value="option">
+                        {{ option }}
+                      </option>
+                    </select>
+                    <span class="text-xs text-gray-500">per page</span>
+                  </div>
+                </div>
+
+                <!-- Right: Pagination Controls -->
+                <div class="flex items-center gap-2">
+                  <button
+                    @click="prevCoursesPage"
+                    :disabled="coursesCurrentPage === 1"
+                    :class="[
+                      'px-3 py-1.5 text-xs rounded-lg transition-colors flex items-center gap-1.5 border',
+                      coursesCurrentPage === 1
+                        ? 'text-gray-300 border-gray-100 cursor-not-allowed'
+                        : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100 border-gray-200'
+                    ]"
+                  >
+                    <i class="fas fa-chevron-left text-[10px]"></i>
+                    Previous
+                  </button>
+
+                  <!-- Page Numbers -->
+                  <div class="flex items-center gap-1">
+                    <template v-for="page in coursesTotalPages" :key="page">
+                      <button
+                        v-if="page === 1 || page === coursesTotalPages || (page >= coursesCurrentPage - 1 && page <= coursesCurrentPage + 1)"
+                        @click="goToCoursesPage(page)"
+                        :class="[
+                          'w-8 h-8 text-xs rounded-lg transition-colors flex items-center justify-center',
+                          page === coursesCurrentPage
+                            ? 'font-medium text-teal-600 bg-teal-50'
+                            : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
+                        ]"
+                      >
+                        {{ page }}
+                      </button>
+                      <span
+                        v-else-if="page === coursesCurrentPage - 2 || page === coursesCurrentPage + 2"
+                        class="text-xs text-gray-400 px-1"
+                      >...</span>
+                    </template>
+                  </div>
+
+                  <button
+                    @click="nextCoursesPage"
+                    :disabled="coursesCurrentPage === coursesTotalPages"
+                    :class="[
+                      'px-3 py-1.5 text-xs rounded-lg transition-colors flex items-center gap-1.5 border',
+                      coursesCurrentPage === coursesTotalPages
+                        ? 'text-gray-300 border-gray-100 cursor-not-allowed'
+                        : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100 border-gray-200'
+                    ]"
+                  >
+                    Next
+                    <i class="fas fa-chevron-right text-[10px]"></i>
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
