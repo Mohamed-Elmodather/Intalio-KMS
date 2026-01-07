@@ -323,7 +323,112 @@ const recommendedCourses = ref([
   }
 ])
 
-// Catalog courses
+// Catalog courses (All Courses)
+const allCourses = ref([
+  { id: 10, title: 'Machine Learning Basics', instructor: 'Dr. Sarah Mitchell', instructorInitials: 'SM', level: 'Intermediate', levelClass: 'intermediate', duration: '4 hours', lessons: 12, category: 'Technology', rating: 4.8, students: 3200, image: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=400&h=300&fit=crop', tags: ['AI', 'ML'], saved: false, isNew: true },
+  { id: 11, title: 'Strategic Planning', instructor: 'Michael Brown', instructorInitials: 'MB', level: 'Advanced', levelClass: 'advanced', duration: '3 hours', lessons: 8, category: 'Business', rating: 4.6, students: 1890, image: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=400&h=300&fit=crop', tags: ['Strategy', 'Planning'], saved: false, isNew: false },
+  { id: 12, title: 'Public Speaking Mastery', instructor: 'Emma Wilson', instructorInitials: 'EW', level: 'Beginner', levelClass: 'beginner', duration: '2 hours', lessons: 6, category: 'Soft Skills', rating: 4.7, students: 4500, image: 'https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=400&h=300&fit=crop', tags: ['Speaking', 'Communication'], saved: true, isNew: false },
+  { id: 13, title: 'Cloud Architecture Fundamentals', instructor: 'David Kim', instructorInitials: 'DK', level: 'Advanced', levelClass: 'advanced', duration: '8 hours', lessons: 20, category: 'Technology', rating: 4.9, students: 2100, image: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=400&h=300&fit=crop', tags: ['Cloud', 'AWS'], saved: false, isNew: true },
+  { id: 14, title: 'UX Design Principles', instructor: 'Lisa Park', instructorInitials: 'LP', level: 'Intermediate', levelClass: 'intermediate', duration: '5 hours', lessons: 14, category: 'Design', rating: 4.8, students: 2890, image: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=400&h=300&fit=crop', tags: ['Design', 'UX'], saved: false, isNew: false },
+  { id: 15, title: 'Financial Analysis', instructor: 'Robert Chen', instructorInitials: 'RC', level: 'Intermediate', levelClass: 'intermediate', duration: '6 hours', lessons: 16, category: 'Finance', rating: 4.5, students: 1670, image: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=400&h=300&fit=crop', tags: ['Finance', 'Analysis'], saved: false, isNew: false },
+  { id: 16, title: 'Agile Project Management', instructor: 'Jennifer Adams', instructorInitials: 'JA', level: 'Intermediate', levelClass: 'intermediate', duration: '4 hours', lessons: 10, category: 'Business', rating: 4.7, students: 3450, image: 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=400&h=300&fit=crop', tags: ['Agile', 'Scrum'], saved: false, isNew: true },
+  { id: 17, title: 'Python for Data Science', instructor: 'Dr. James Wilson', instructorInitials: 'JW', level: 'Beginner', levelClass: 'beginner', duration: '6 hours', lessons: 18, category: 'Technology', rating: 4.9, students: 5200, image: 'https://images.unsplash.com/photo-1526379095098-d400fd0bf935?w=400&h=300&fit=crop', tags: ['Python', 'Data Science'], saved: true, isNew: false },
+  { id: 18, title: 'Digital Marketing Essentials', instructor: 'Sophia Martinez', instructorInitials: 'SM', level: 'Beginner', levelClass: 'beginner', duration: '3 hours', lessons: 8, category: 'Marketing', rating: 4.6, students: 2780, image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&h=300&fit=crop', tags: ['Marketing', 'Digital'], saved: false, isNew: false },
+])
+
+// All Courses section state
+const allCoursesSearch = ref('')
+const allCoursesLevelFilter = ref<string[]>([])
+const allCoursesCategoryFilter = ref<string[]>([])
+const allCoursesViewMode = ref<'grid' | 'list'>('grid')
+const showLevelFilter = ref(false)
+const showCategoryFilterDropdown = ref(false)
+const allCoursesSortBy = ref('popular')
+const showAllCoursesSortDropdown = ref(false)
+
+const courseLevelOptions = [
+  { id: 'beginner', label: 'Beginner', color: 'text-green-500' },
+  { id: 'intermediate', label: 'Intermediate', color: 'text-blue-500' },
+  { id: 'advanced', label: 'Advanced', color: 'text-purple-500' }
+]
+
+const courseCategoryOptions = ['Technology', 'Business', 'Soft Skills', 'Design', 'Finance', 'Marketing']
+
+const allCoursesSortOptions = [
+  { value: 'popular', label: 'Most Popular', icon: 'fas fa-fire' },
+  { value: 'rating', label: 'Highest Rated', icon: 'fas fa-star' },
+  { value: 'newest', label: 'Newest', icon: 'fas fa-clock' },
+  { value: 'title', label: 'Title A-Z', icon: 'fas fa-sort-alpha-down' }
+]
+
+const filteredAllCourses = computed(() => {
+  let courses = [...allCourses.value]
+
+  // Search filter
+  if (allCoursesSearch.value) {
+    const search = allCoursesSearch.value.toLowerCase()
+    courses = courses.filter(c =>
+      c.title.toLowerCase().includes(search) ||
+      c.instructor.toLowerCase().includes(search) ||
+      c.tags.some(t => t.toLowerCase().includes(search))
+    )
+  }
+
+  // Level filter
+  if (allCoursesLevelFilter.value.length > 0) {
+    courses = courses.filter(c => allCoursesLevelFilter.value.includes(c.levelClass))
+  }
+
+  // Category filter
+  if (allCoursesCategoryFilter.value.length > 0) {
+    courses = courses.filter(c => allCoursesCategoryFilter.value.includes(c.category))
+  }
+
+  // Sort
+  switch (allCoursesSortBy.value) {
+    case 'popular':
+      courses.sort((a, b) => b.students - a.students)
+      break
+    case 'rating':
+      courses.sort((a, b) => b.rating - a.rating)
+      break
+    case 'newest':
+      courses.sort((a, b) => (b.isNew ? 1 : 0) - (a.isNew ? 1 : 0))
+      break
+    case 'title':
+      courses.sort((a, b) => a.title.localeCompare(b.title))
+      break
+  }
+
+  return courses
+})
+
+function toggleLevelFilterOption(level: string) {
+  const index = allCoursesLevelFilter.value.indexOf(level)
+  if (index === -1) {
+    allCoursesLevelFilter.value.push(level)
+  } else {
+    allCoursesLevelFilter.value.splice(index, 1)
+  }
+}
+
+function toggleCategoryFilterOption(category: string) {
+  const index = allCoursesCategoryFilter.value.indexOf(category)
+  if (index === -1) {
+    allCoursesCategoryFilter.value.push(category)
+  } else {
+    allCoursesCategoryFilter.value.splice(index, 1)
+  }
+}
+
+function toggleSaveAllCourse(courseId: number) {
+  const course = allCourses.value.find(c => c.id === courseId)
+  if (course) {
+    course.saved = !course.saved
+  }
+}
+
+// Catalog courses (keep for backward compatibility)
 const catalogCourses = ref([
   { id: 10, title: 'Machine Learning Basics', instructor: 'Dr. Sarah Mitchell', instructorInitials: 'SM', level: 'Intermediate', levelClass: 'intermediate', duration: '4 hours', lessons: 12, icon: 'fas fa-robot', gradientClass: 'from-violet-500 to-purple-600', rating: 4.8, students: 3200, image: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=400&h=300&fit=crop', tags: ['AI', 'ML'] },
   { id: 11, title: 'Strategic Planning', instructor: 'Michael Brown', instructorInitials: 'MB', level: 'Advanced', levelClass: 'advanced', duration: '3 hours', lessons: 8, icon: 'fas fa-chess', gradientClass: 'from-slate-600 to-gray-800', rating: 4.6, students: 1890, image: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=400&h=300&fit=crop', tags: ['Strategy', 'Planning'] },
@@ -941,6 +1046,391 @@ function resumeFeaturedAutoPlay() {
                   </button>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- All Courses Section -->
+        <div class="all-courses-wrapper bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+          <!-- Section Header / Toolbar -->
+          <div class="border-b border-gray-100">
+            <!-- Top Row - Title and Primary Actions -->
+            <div class="px-4 py-3 flex items-center justify-between">
+              <h2 class="text-lg font-bold text-gray-900 flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-indigo-200">
+                  <i class="fas fa-graduation-cap text-white text-sm"></i>
+                </div>
+                <div>
+                  <span class="block">All Courses</span>
+                  <span class="text-xs font-medium text-gray-500">{{ filteredAllCourses.length }} courses available</span>
+                </div>
+              </h2>
+              <div class="flex items-center gap-2">
+                <button class="px-4 py-2 bg-gradient-to-r from-teal-500 to-teal-600 text-white rounded-lg text-sm font-medium hover:from-teal-600 hover:to-teal-700 transition-all flex items-center gap-2 shadow-sm shadow-teal-200">
+                  <i class="fas fa-filter"></i>
+                  Browse Categories
+                </button>
+              </div>
+            </div>
+
+            <!-- Bottom Row - Search, Filters, View Options -->
+            <div class="px-4 py-2 bg-gray-50/50 flex flex-wrap items-center gap-3">
+              <!-- Search -->
+              <div class="min-w-[200px] max-w-md relative">
+                <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+                <input
+                  v-model="allCoursesSearch"
+                  type="text"
+                  placeholder="Search courses..."
+                  class="w-full pl-9 pr-4 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all"
+                >
+                <button v-if="allCoursesSearch" @click="allCoursesSearch = ''" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                  <i class="fas fa-times text-xs"></i>
+                </button>
+              </div>
+
+              <!-- Level Filter Dropdown -->
+              <div class="relative">
+                <button
+                  @click="showLevelFilter = !showLevelFilter"
+                  :class="[
+                    'flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border',
+                    allCoursesLevelFilter.length > 0 ? 'bg-teal-50 border-teal-200 text-teal-700' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+                  ]"
+                >
+                  <i class="fas fa-layer-group text-sm"></i>
+                  <span>{{ allCoursesLevelFilter.length > 0 ? `${allCoursesLevelFilter.length} Levels` : 'Level' }}</span>
+                  <i :class="showLevelFilter ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ml-1"></i>
+                </button>
+
+                <!-- Dropdown Menu -->
+                <div
+                  v-if="showLevelFilter"
+                  class="absolute left-0 top-full mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
+                >
+                  <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Select Levels</div>
+                  <div class="max-h-48 overflow-y-auto">
+                    <button
+                      v-for="level in courseLevelOptions"
+                      :key="level.id"
+                      @click="toggleLevelFilterOption(level.id)"
+                      :class="[
+                        'w-full px-3 py-2 text-left text-sm flex items-center gap-3 transition-colors',
+                        allCoursesLevelFilter.includes(level.id) ? 'bg-teal-50 text-teal-700' : 'text-gray-700 hover:bg-gray-50'
+                      ]"
+                    >
+                      <div :class="[
+                        'w-4 h-4 rounded border-2 flex items-center justify-center transition-all',
+                        allCoursesLevelFilter.includes(level.id) ? 'bg-teal-500 border-teal-500' : 'border-gray-300'
+                      ]">
+                        <i v-if="allCoursesLevelFilter.includes(level.id)" class="fas fa-check text-white text-[8px]"></i>
+                      </div>
+                      <span class="flex-1">{{ level.label }}</span>
+                    </button>
+                  </div>
+                  <div class="my-2 border-t border-gray-100"></div>
+                  <div class="px-3 flex gap-2">
+                    <button
+                      @click="allCoursesLevelFilter = []; showLevelFilter = false"
+                      class="flex-1 px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                    >
+                      Clear All
+                    </button>
+                    <button
+                      @click="showLevelFilter = false"
+                      class="flex-1 px-3 py-1.5 text-xs font-medium text-white bg-teal-500 rounded-lg hover:bg-teal-600 transition-colors"
+                    >
+                      Apply
+                    </button>
+                  </div>
+                </div>
+                <div v-if="showLevelFilter" @click="showLevelFilter = false" class="fixed inset-0 z-40"></div>
+              </div>
+
+              <!-- Category Filter Dropdown -->
+              <div class="relative">
+                <button
+                  @click="showCategoryFilterDropdown = !showCategoryFilterDropdown"
+                  :class="[
+                    'flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border',
+                    allCoursesCategoryFilter.length > 0 ? 'bg-teal-50 border-teal-200 text-teal-700' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+                  ]"
+                >
+                  <i class="fas fa-folder text-sm"></i>
+                  <span>{{ allCoursesCategoryFilter.length > 0 ? `${allCoursesCategoryFilter.length} Categories` : 'Category' }}</span>
+                  <i :class="showCategoryFilterDropdown ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ml-1"></i>
+                </button>
+
+                <!-- Dropdown Menu -->
+                <div
+                  v-if="showCategoryFilterDropdown"
+                  class="absolute left-0 top-full mt-2 w-64 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
+                >
+                  <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Select Categories</div>
+                  <div class="max-h-48 overflow-y-auto">
+                    <button
+                      v-for="cat in courseCategoryOptions"
+                      :key="cat"
+                      @click="toggleCategoryFilterOption(cat)"
+                      :class="[
+                        'w-full px-3 py-2 text-left text-sm flex items-center gap-3 transition-colors',
+                        allCoursesCategoryFilter.includes(cat) ? 'bg-teal-50 text-teal-700' : 'text-gray-700 hover:bg-gray-50'
+                      ]"
+                    >
+                      <div :class="[
+                        'w-4 h-4 rounded border-2 flex items-center justify-center transition-all',
+                        allCoursesCategoryFilter.includes(cat) ? 'bg-teal-500 border-teal-500' : 'border-gray-300'
+                      ]">
+                        <i v-if="allCoursesCategoryFilter.includes(cat)" class="fas fa-check text-white text-[8px]"></i>
+                      </div>
+                      <span class="flex-1">{{ cat }}</span>
+                    </button>
+                  </div>
+                  <div class="my-2 border-t border-gray-100"></div>
+                  <div class="px-3 flex gap-2">
+                    <button
+                      @click="allCoursesCategoryFilter = []; showCategoryFilterDropdown = false"
+                      class="flex-1 px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                    >
+                      Clear All
+                    </button>
+                    <button
+                      @click="showCategoryFilterDropdown = false"
+                      class="flex-1 px-3 py-1.5 text-xs font-medium text-white bg-teal-500 rounded-lg hover:bg-teal-600 transition-colors"
+                    >
+                      Apply
+                    </button>
+                  </div>
+                </div>
+                <div v-if="showCategoryFilterDropdown" @click="showCategoryFilterDropdown = false" class="fixed inset-0 z-40"></div>
+              </div>
+
+              <!-- Sort Options -->
+              <div class="relative">
+                <button
+                  @click="showAllCoursesSortDropdown = !showAllCoursesSortDropdown"
+                  class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border bg-white border-gray-200 text-gray-600 hover:bg-gray-50"
+                >
+                  <i :class="[allCoursesSortOptions.find(o => o.value === allCoursesSortBy)?.icon, 'text-sm text-teal-500']"></i>
+                  <span>{{ allCoursesSortOptions.find(o => o.value === allCoursesSortBy)?.label }}</span>
+                  <i :class="showAllCoursesSortDropdown ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ml-1"></i>
+                </button>
+
+                <!-- Dropdown Menu -->
+                <div
+                  v-if="showAllCoursesSortDropdown"
+                  class="absolute left-0 top-full mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
+                >
+                  <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Sort By</div>
+                  <div class="max-h-64 overflow-y-auto">
+                    <button
+                      v-for="option in allCoursesSortOptions"
+                      :key="option.value"
+                      @click="allCoursesSortBy = option.value; showAllCoursesSortDropdown = false"
+                      :class="[
+                        'w-full px-3 py-2 text-left text-sm flex items-center gap-3 transition-colors',
+                        allCoursesSortBy === option.value ? 'bg-teal-50 text-teal-700' : 'text-gray-700 hover:bg-gray-50'
+                      ]"
+                    >
+                      <i :class="[option.icon, 'text-sm w-4', allCoursesSortBy === option.value ? 'text-teal-500' : 'text-gray-400']"></i>
+                      <span class="flex-1">{{ option.label }}</span>
+                      <i v-if="allCoursesSortBy === option.value" class="fas fa-check text-teal-500 text-xs"></i>
+                    </button>
+                  </div>
+                </div>
+                <div v-if="showAllCoursesSortDropdown" @click="showAllCoursesSortDropdown = false" class="fixed inset-0 z-40"></div>
+              </div>
+
+              <!-- View Toggle -->
+              <div class="flex items-center gap-0.5 bg-white border border-gray-200 rounded-lg p-1 ml-auto">
+                <button
+                  @click="allCoursesViewMode = 'grid'"
+                  :class="['px-2.5 py-1 rounded-md transition-all', allCoursesViewMode === 'grid' ? 'bg-teal-500 text-white' : 'text-gray-500 hover:bg-gray-100']"
+                  title="Grid view"
+                >
+                  <i class="fas fa-th-large text-xs"></i>
+                </button>
+                <button
+                  @click="allCoursesViewMode = 'list'"
+                  :class="['px-2.5 py-1 rounded-md transition-all', allCoursesViewMode === 'list' ? 'bg-teal-500 text-white' : 'text-gray-500 hover:bg-gray-100']"
+                  title="List view"
+                >
+                  <i class="fas fa-list text-xs"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Main Content Area -->
+          <div class="p-4">
+            <!-- Grid View -->
+            <div v-if="allCoursesViewMode === 'grid'" class="all-courses-grid">
+              <div v-for="course in filteredAllCourses" :key="course.id"
+                   class="all-course-card group bg-white rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 hover:-translate-y-1.5 border border-gray-100 shadow-sm hover:shadow-lg hover:border-teal-200">
+                <!-- Card Thumbnail -->
+                <div class="relative aspect-video">
+                  <img :src="course.image" :alt="course.title" class="absolute inset-0 w-full h-full object-cover" />
+                  <div class="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent"></div>
+
+                  <!-- Save Button -->
+                  <button
+                    @click.stop="toggleSaveAllCourse(course.id)"
+                    :class="[
+                      'absolute top-2 right-2 w-8 h-8 rounded-full flex items-center justify-center transition-all z-10',
+                      course.saved
+                        ? 'bg-teal-500 text-white'
+                        : 'bg-white/90 text-gray-600 opacity-0 group-hover:opacity-100 hover:bg-teal-500 hover:text-white'
+                    ]"
+                  >
+                    <i :class="course.saved ? 'fas fa-bookmark' : 'far fa-bookmark'" class="text-sm"></i>
+                  </button>
+
+                  <!-- Badges -->
+                  <div class="absolute bottom-3 left-3 flex gap-1.5 z-10">
+                    <span v-if="course.isNew" class="all-course-new-badge">
+                      <i class="fas fa-sparkles"></i> New
+                    </span>
+                  </div>
+
+                  <!-- Duration Badge -->
+                  <div class="absolute bottom-3 right-3 all-course-duration-badge z-10">
+                    <i class="fas fa-clock"></i> {{ course.duration }}
+                  </div>
+
+                  <!-- Play Button -->
+                  <div class="all-course-play-btn">
+                    <i class="fas fa-play"></i>
+                  </div>
+                </div>
+
+                <!-- Card Body -->
+                <div class="p-4">
+                  <!-- Meta Info -->
+                  <div class="flex items-center gap-3 text-[11px] text-gray-400 mb-2">
+                    <span class="flex items-center gap-1">
+                      <i class="fas fa-play-circle text-[9px]"></i>
+                      {{ course.lessons }} lessons
+                    </span>
+                    <span class="flex items-center gap-1">
+                      <i class="fas fa-signal text-[9px]"></i>
+                      {{ course.level }}
+                    </span>
+                  </div>
+
+                  <!-- Title -->
+                  <h3 class="text-sm font-semibold text-gray-800 mb-2 line-clamp-2 group-hover:text-teal-600 transition-colors leading-snug">
+                    {{ course.title }}
+                  </h3>
+
+                  <!-- Category -->
+                  <p class="text-xs text-gray-500 mb-3">
+                    <span class="px-2 py-0.5 bg-teal-50 text-teal-600 text-[10px] font-medium rounded-full">
+                      {{ course.category }}
+                    </span>
+                  </p>
+
+                  <!-- Tags -->
+                  <div class="flex flex-wrap gap-1.5 mb-3">
+                    <span
+                      v-for="tag in course.tags.slice(0, 3)"
+                      :key="tag"
+                      class="px-2 py-0.5 bg-gray-100 text-gray-600 text-[10px] font-medium rounded-full hover:bg-teal-50 hover:text-teal-600 transition-colors"
+                    >
+                      {{ tag }}
+                    </span>
+                  </div>
+
+                  <!-- Footer -->
+                  <div class="flex items-center justify-between pt-3 border-t border-gray-100">
+                    <!-- Instructor -->
+                    <div class="flex items-center gap-2">
+                      <div class="w-7 h-7 rounded-full bg-gradient-to-br from-teal-400 to-cyan-500 flex items-center justify-center text-white text-[10px] font-semibold shadow-sm">
+                        {{ course.instructorInitials }}
+                      </div>
+                      <span class="text-xs text-gray-600 font-medium">{{ course.instructor }}</span>
+                    </div>
+
+                    <!-- Stats -->
+                    <div class="flex items-center gap-3 text-[11px] text-gray-400">
+                      <span class="flex items-center gap-1 hover:text-amber-500 transition-colors">
+                        <i class="fas fa-star text-[9px] text-amber-400"></i>
+                        {{ course.rating }}
+                      </span>
+                      <span class="flex items-center gap-1 hover:text-teal-500 transition-colors">
+                        <i class="fas fa-users text-[9px]"></i>
+                        {{ (course.students / 1000).toFixed(1) }}k
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- List View -->
+            <div v-else class="all-courses-list">
+              <div v-for="course in filteredAllCourses" :key="course.id"
+                   class="all-course-list-item cursor-pointer group">
+                <!-- Thumbnail -->
+                <div class="all-course-list-thumbnail">
+                  <img :src="course.image" :alt="course.title" class="absolute inset-0 w-full h-full object-cover rounded-lg" />
+                  <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent rounded-lg"></div>
+                  <div class="all-course-list-play-overlay">
+                    <i class="fas fa-play"></i>
+                  </div>
+                  <div class="all-course-list-duration">{{ course.duration }}</div>
+                </div>
+
+                <!-- Content -->
+                <div class="all-course-list-content">
+                  <div class="all-course-list-header">
+                    <div class="all-course-list-badges">
+                      <span :class="['all-course-level-badge', course.levelClass]">{{ course.level }}</span>
+                      <span class="all-course-category-badge">{{ course.category }}</span>
+                      <span v-if="course.isNew" class="all-course-list-new-badge">
+                        <i class="fas fa-sparkles"></i> New
+                      </span>
+                    </div>
+                    <h3 class="all-course-list-title">{{ course.title }}</h3>
+                  </div>
+                  <div class="all-course-list-footer">
+                    <div class="all-course-list-instructor">
+                      <div class="all-course-list-avatar">{{ course.instructorInitials }}</div>
+                      <span>{{ course.instructor }}</span>
+                    </div>
+                    <div class="all-course-list-stats">
+                      <span><i class="fas fa-play-circle"></i> {{ course.lessons }} lessons</span>
+                      <span><i class="fas fa-star text-amber-400"></i> {{ course.rating }}</span>
+                      <span><i class="fas fa-users"></i> {{ (course.students / 1000).toFixed(1) }}k</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="all-course-list-actions">
+                  <button
+                    :class="['all-course-list-action-btn', { saved: course.saved }]"
+                    @click.stop="toggleSaveAllCourse(course.id)"
+                    title="Save"
+                  >
+                    <i :class="course.saved ? 'fas fa-bookmark' : 'far fa-bookmark'"></i>
+                  </button>
+                  <button class="all-course-list-action-btn" title="Enroll">
+                    <i class="fas fa-plus"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Empty State -->
+            <div v-if="filteredAllCourses.length === 0" class="all-courses-empty">
+              <div class="all-courses-empty-icon">
+                <i class="fas fa-search"></i>
+              </div>
+              <h3 class="all-courses-empty-title">No courses found</h3>
+              <p class="all-courses-empty-text">Try adjusting your filters or search query</p>
+              <button @click="allCoursesSearch = ''; allCoursesLevelFilter = []; allCoursesCategoryFilter = []" class="all-courses-clear-btn">
+                <i class="fas fa-undo mr-2"></i> Clear Filters
+              </button>
             </div>
           </div>
         </div>
@@ -3249,6 +3739,359 @@ function resumeFeaturedAutoPlay() {
   font-size: 0.5rem;
 }
 
+/* All Courses Section */
+.all-courses-wrapper {
+  margin-bottom: 1.5rem;
+}
+
+.all-courses-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.25rem;
+}
+
+.all-course-card {
+  position: relative;
+}
+
+.all-course-new-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+  color: white;
+  font-size: 0.625rem;
+  font-weight: 700;
+  border-radius: 0.375rem;
+  text-transform: uppercase;
+  box-shadow: 0 2px 8px rgba(20, 184, 166, 0.4);
+}
+
+.all-course-duration-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(4px);
+  color: white;
+  font-size: 0.625rem;
+  font-weight: 600;
+  border-radius: 0.375rem;
+}
+
+.all-course-play-btn {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.8);
+  width: 3rem;
+  height: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 50%;
+  opacity: 0;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.all-course-card:hover .all-course-play-btn {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.all-course-play-btn i {
+  color: #0d9488;
+  font-size: 1rem;
+  margin-left: 2px;
+}
+
+/* All Courses List View */
+.all-courses-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.all-course-list-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.75rem;
+  transition: all 0.2s ease;
+}
+
+.all-course-list-item:hover {
+  border-color: #14b8a6;
+  box-shadow: 0 4px 12px rgba(20, 184, 166, 0.1);
+}
+
+.all-course-list-thumbnail {
+  position: relative;
+  width: 160px;
+  height: 90px;
+  flex-shrink: 0;
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.all-course-list-play-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.8);
+  width: 2.5rem;
+  height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 50%;
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+.all-course-list-item:hover .all-course-list-play-overlay {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.all-course-list-play-overlay i {
+  color: #0d9488;
+  font-size: 0.75rem;
+  margin-left: 2px;
+}
+
+.all-course-list-duration {
+  position: absolute;
+  bottom: 0.375rem;
+  right: 0.375rem;
+  padding: 0.125rem 0.375rem;
+  background: rgba(0, 0, 0, 0.75);
+  color: white;
+  font-size: 0.5625rem;
+  font-weight: 600;
+  border-radius: 0.25rem;
+}
+
+.all-course-list-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.all-course-list-header {
+  margin-bottom: 0.5rem;
+}
+
+.all-course-list-badges {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.375rem;
+}
+
+.all-course-level-badge {
+  padding: 0.125rem 0.375rem;
+  font-size: 0.5625rem;
+  font-weight: 600;
+  border-radius: 0.25rem;
+  text-transform: uppercase;
+}
+
+.all-course-level-badge.beginner {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.all-course-level-badge.intermediate {
+  background: #dbeafe;
+  color: #2563eb;
+}
+
+.all-course-level-badge.advanced {
+  background: #ede9fe;
+  color: #7c3aed;
+}
+
+.all-course-category-badge {
+  padding: 0.125rem 0.375rem;
+  background: #f0fdfa;
+  color: #0d9488;
+  font-size: 0.5625rem;
+  font-weight: 600;
+  border-radius: 0.25rem;
+}
+
+.all-course-list-new-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.125rem 0.375rem;
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+  color: white;
+  font-size: 0.5625rem;
+  font-weight: 700;
+  border-radius: 0.25rem;
+  text-transform: uppercase;
+}
+
+.all-course-list-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0;
+  transition: color 0.2s ease;
+}
+
+.all-course-list-item:hover .all-course-list-title {
+  color: #0d9488;
+}
+
+.all-course-list-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.all-course-list-instructor {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.all-course-list-avatar {
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+  color: white;
+  font-size: 0.5rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.all-course-list-instructor span {
+  font-size: 0.6875rem;
+  color: #64748b;
+}
+
+.all-course-list-stats {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.all-course-list-stats span {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.6875rem;
+  color: #64748b;
+}
+
+.all-course-list-stats i {
+  font-size: 0.5rem;
+}
+
+.all-course-list-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.all-course-list-action-btn {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.5rem;
+  background: #f1f5f9;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  color: #64748b;
+}
+
+.all-course-list-action-btn:hover {
+  background: #e2e8f0;
+  color: #0d9488;
+}
+
+.all-course-list-action-btn.saved {
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+  color: white;
+}
+
+.all-course-list-action-btn i {
+  font-size: 0.75rem;
+}
+
+/* All Courses Empty State */
+.all-courses-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1rem;
+  text-align: center;
+}
+
+.all-courses-empty-icon {
+  width: 4rem;
+  height: 4rem;
+  border-radius: 50%;
+  background: #f1f5f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.all-courses-empty-icon i {
+  font-size: 1.5rem;
+  color: #94a3b8;
+}
+
+.all-courses-empty-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0 0 0.5rem 0;
+}
+
+.all-courses-empty-text {
+  font-size: 0.875rem;
+  color: #64748b;
+  margin: 0 0 1rem 0;
+}
+
+.all-courses-clear-btn {
+  padding: 0.5rem 1rem;
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  transition: all 0.2s ease;
+}
+
+.all-courses-clear-btn:hover {
+  box-shadow: 0 4px 12px rgba(20, 184, 166, 0.35);
+}
+
 /* Responsive */
 @media (max-width: 767px) {
   .featured-course-content {
@@ -3356,6 +4199,32 @@ function resumeFeaturedAutoPlay() {
   .recommended-save-btn {
     opacity: 1;
     transform: scale(1);
+  }
+
+  /* All Courses Responsive */
+  .all-courses-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .all-course-list-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .all-course-list-thumbnail {
+    width: 100%;
+    height: 140px;
+  }
+
+  .all-course-list-footer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .all-course-list-actions {
+    width: 100%;
+    justify-content: flex-end;
   }
 }
 </style>
