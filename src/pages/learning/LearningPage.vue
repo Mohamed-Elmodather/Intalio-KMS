@@ -4497,11 +4497,11 @@ function resumeFeaturedAutoPlay() {
   width: 2.5rem;
   height: 2.5rem;
   border-radius: 0.75rem;
-  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+  box-shadow: 0 4px 12px rgba(20, 184, 166, 0.3);
 }
 
 .recommended-icon i {
@@ -4538,9 +4538,9 @@ function resumeFeaturedAutoPlay() {
 }
 
 .recommended-see-all:hover {
-  background: #f5f3ff;
-  color: #7c3aed;
-  border-color: #7c3aed;
+  background: #f0fdfa;
+  color: #0d9488;
+  border-color: #0d9488;
 }
 
 .recommended-see-all i {
@@ -4569,8 +4569,8 @@ function resumeFeaturedAutoPlay() {
 }
 
 .recommended-card:hover {
-  border-color: #8b5cf6;
-  box-shadow: 0 8px 24px rgba(139, 92, 246, 0.15);
+  border-color: #14b8a6;
+  box-shadow: 0 8px 24px rgba(20, 184, 166, 0.15);
   transform: translateY(-4px);
 }
 
@@ -4611,11 +4611,11 @@ function resumeFeaturedAutoPlay() {
 }
 
 .recommended-save-btn:hover i {
-  color: #8b5cf6;
+  color: #14b8a6;
 }
 
 .recommended-save-btn.saved {
-  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
   border-color: transparent;
   opacity: 1;
   transform: scale(1);
@@ -4746,7 +4746,7 @@ function resumeFeaturedAutoPlay() {
   width: 1.5rem;
   height: 1.5rem;
   border-radius: 50%;
-  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
   color: white;
   font-size: 0.5rem;
   font-weight: 600;
@@ -4788,7 +4788,7 @@ function resumeFeaturedAutoPlay() {
 
 .recommended-enroll-btn {
   padding: 0.375rem 0.75rem;
-  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
   color: white;
   border: none;
   border-radius: 0.375rem;
@@ -4802,7 +4802,7 @@ function resumeFeaturedAutoPlay() {
 }
 
 .recommended-enroll-btn:hover {
-  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.35);
+  box-shadow: 0 4px 12px rgba(20, 184, 166, 0.35);
   transform: scale(1.05);
 }
 
