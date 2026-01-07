@@ -1329,7 +1329,7 @@ function getFileIconBg(type: string): string {
               <div v-if="showTagFilter" @click="showTagFilter = false" class="fixed inset-0 z-40"></div>
             </div>
 
-            <!-- Status Filter Dropdown -->
+            <!-- Saved & Shared Filter Dropdown -->
             <div class="relative">
               <button
                 @click="showStatusFilter = !showStatusFilter"
@@ -1338,8 +1338,8 @@ function getFileIconBg(type: string): string {
                   selectedStatusFilters.length > 0 ? 'bg-teal-50 border-teal-200 text-teal-700' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
                 ]"
               >
-                <i class="fas fa-filter text-sm"></i>
-                <span>{{ selectedStatusFilters.length > 0 ? `${selectedStatusFilters.length} Status` : 'Status' }}</span>
+                <i class="fas fa-bookmark text-sm"></i>
+                <span>{{ selectedStatusFilters.length > 0 ? `${selectedStatusFilters.length} Saved & Shared` : 'Saved & Shared' }}</span>
                 <i :class="showStatusFilter ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ml-1"></i>
               </button>
 
