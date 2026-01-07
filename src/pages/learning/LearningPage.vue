@@ -1470,7 +1470,7 @@ function resumeFeaturedAutoPlay() {
           <div class="recommended-header">
             <div class="recommended-title-wrap">
               <div class="recommended-icon">
-                <i class="fas fa-sparkles"></i>
+                <i class="fas fa-lightbulb"></i>
               </div>
               <div>
                 <h2 class="recommended-title">Recommended for You</h2>
