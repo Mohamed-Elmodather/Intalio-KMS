@@ -10,6 +10,23 @@ const isLoading = ref(false)
 // Continue Learning carousel ref
 const continueLearningRef = ref<HTMLElement | null>(null)
 
+// Featured course carousel
+const currentFeaturedCourseIndex = ref(0)
+const featuredCourseInterval = ref<number | null>(null)
+
+// Get in-progress courses for carousel
+const inProgressCourses = computed(() =>
+  enrolledCourses.value.filter(c => c.progress > 0 && c.progress < 100)
+)
+
+const featuredCourse = computed(() =>
+  inProgressCourses.value[currentFeaturedCourseIndex.value] || inProgressCourses.value[0]
+)
+
+const upNextCourses = computed(() =>
+  inProgressCourses.value.filter((_, idx) => idx !== currentFeaturedCourseIndex.value).slice(0, 3)
+)
+
 // Tab state
 const activeTab = ref('my-courses')
 const searchQuery = ref('')
@@ -421,6 +438,39 @@ function scrollContinueLearning(direction: 'left' | 'right') {
     })
   }
 }
+
+// Featured course carousel functions
+function nextFeaturedCourse() {
+  currentFeaturedCourseIndex.value = (currentFeaturedCourseIndex.value + 1) % inProgressCourses.value.length
+}
+
+function prevFeaturedCourse() {
+  currentFeaturedCourseIndex.value = currentFeaturedCourseIndex.value === 0
+    ? inProgressCourses.value.length - 1
+    : currentFeaturedCourseIndex.value - 1
+}
+
+function goToFeaturedCourse(index: number) {
+  currentFeaturedCourseIndex.value = index
+}
+
+function startFeaturedAutoPlay() {
+  if (featuredCourseInterval.value) return
+  featuredCourseInterval.value = window.setInterval(() => {
+    nextFeaturedCourse()
+  }, 5000)
+}
+
+function pauseFeaturedAutoPlay() {
+  if (featuredCourseInterval.value) {
+    clearInterval(featuredCourseInterval.value)
+    featuredCourseInterval.value = null
+  }
+}
+
+function resumeFeaturedAutoPlay() {
+  startFeaturedAutoPlay()
+}
 </script>
 
 <template>
@@ -512,8 +562,8 @@ function scrollContinueLearning(direction: 'left' | 'right') {
 
       <!-- My Courses Tab -->
       <div v-if="activeTab === 'my-courses'" class="space-y-6">
-        <!-- Continue Learning Carousel Section -->
-        <div class="continue-learning-section">
+        <!-- Continue Learning Featured Section -->
+        <div v-if="inProgressCourses.length > 0" class="continue-learning-section">
           <div class="continue-learning-header">
             <div class="flex items-center gap-3">
               <div class="continue-learning-icon">
@@ -525,41 +575,97 @@ function scrollContinueLearning(direction: 'left' | 'right') {
               </div>
             </div>
             <div class="continue-learning-nav">
-              <button class="continue-nav-btn" @click="scrollContinueLearning('left')">
-                <i class="fas fa-chevron-left"></i>
-              </button>
-              <button class="continue-nav-btn" @click="scrollContinueLearning('right')">
-                <i class="fas fa-chevron-right"></i>
-              </button>
               <span class="continue-streak-badge">
                 <i class="fas fa-fire"></i>{{ streak }} Day Streak
               </span>
             </div>
           </div>
-          <div class="continue-learning-scroll" ref="continueLearningRef">
-            <div v-for="course in enrolledCourses.filter(c => c.progress > 0 && c.progress < 100)" :key="course.id"
-                 class="continue-card group" @click="navigateToCourse(course.id)">
-              <div class="continue-card-thumb">
-                <img :src="course.image" :alt="course.title" class="continue-card-img" />
-                <div class="continue-card-overlay"></div>
-                <div class="continue-card-play">
+
+          <!-- Featured Grid: Main + Up Next -->
+          <div class="featured-course-grid">
+            <!-- Main Featured Card with Carousel -->
+            <div class="featured-course-wrapper" @mouseenter="pauseFeaturedAutoPlay" @mouseleave="resumeFeaturedAutoPlay">
+              <div class="featured-course-card group" @click="navigateToCourse(featuredCourse.id)">
+                <transition name="carousel-fade" mode="out-in">
+                  <img :key="featuredCourse.id" :src="featuredCourse.image" :alt="featuredCourse.title" class="featured-course-img" />
+                </transition>
+                <div class="featured-course-overlay"></div>
+
+                <!-- Badges -->
+                <div class="featured-course-badges">
+                  <span class="badge-continue"><i class="fas fa-redo"></i> Resume</span>
+                  <span :class="['badge-level', featuredCourse.levelClass]">{{ featuredCourse.level }}</span>
+                </div>
+
+                <!-- Play Button -->
+                <div class="featured-course-play">
                   <i class="fas fa-play"></i>
                 </div>
-                <span class="continue-card-duration">{{ course.duration }}</span>
-                <div class="continue-card-progress">
-                  <div class="continue-card-progress-fill" :style="{ width: course.progress + '%' }"></div>
+
+                <!-- Progress Bar -->
+                <div class="featured-course-progress-bar">
+                  <div class="featured-course-progress-fill" :style="{ width: featuredCourse.progress + '%' }"></div>
+                </div>
+
+                <!-- Content -->
+                <div class="featured-course-content">
+                  <div class="featured-course-meta">
+                    <span><i class="fas fa-clock"></i> {{ featuredCourse.duration }}</span>
+                    <span><i class="fas fa-play-circle"></i> {{ featuredCourse.completedLessons }}/{{ featuredCourse.totalLessons }} lessons</span>
+                    <span><i class="fas fa-star text-amber-400"></i> {{ featuredCourse.rating }}</span>
+                  </div>
+                  <h3 class="featured-course-title">{{ featuredCourse.title }}</h3>
+                  <div class="featured-course-author">
+                    <div class="author-avatar">{{ featuredCourse.instructorInitials }}</div>
+                    <span>{{ featuredCourse.instructor }}</span>
+                    <span class="dot">•</span>
+                    <span class="progress-label">{{ featuredCourse.progress }}% complete</span>
+                  </div>
+                </div>
+
+                <!-- Carousel Navigation -->
+                <button v-if="inProgressCourses.length > 1" class="course-carousel-arrow course-carousel-prev" @click.stop="prevFeaturedCourse">
+                  <i class="fas fa-chevron-left"></i>
+                </button>
+                <button v-if="inProgressCourses.length > 1" class="course-carousel-arrow course-carousel-next" @click.stop="nextFeaturedCourse">
+                  <i class="fas fa-chevron-right"></i>
+                </button>
+
+                <!-- Carousel Dots -->
+                <div v-if="inProgressCourses.length > 1" class="course-carousel-dots">
+                  <button
+                    v-for="(course, index) in inProgressCourses"
+                    :key="course.id"
+                    :class="['course-carousel-dot', { active: index === currentFeaturedCourseIndex }]"
+                    @click.stop="goToFeaturedCourse(index)"
+                  ></button>
                 </div>
               </div>
-              <div class="continue-card-info">
-                <div class="continue-card-badges">
-                  <span :class="['continue-level-badge', course.levelClass]">{{ course.level }}</span>
-                  <span class="continue-progress-text">{{ course.progress }}%</span>
-                </div>
-                <h4 class="continue-card-title">{{ course.title }}</h4>
-                <p class="continue-card-lesson">{{ course.completedLessons }}/{{ course.totalLessons }} lessons completed</p>
-                <div class="continue-card-meta">
-                  <span><i class="fas fa-user"></i>{{ course.instructor }}</span>
-                  <span><i class="fas fa-star text-amber-400"></i>{{ course.rating }}</span>
+            </div>
+
+            <!-- Up Next Column -->
+            <div class="up-next-courses">
+              <h3 class="up-next-title"><i class="fas fa-list"></i> Up Next</h3>
+              <div class="up-next-list">
+                <div v-for="course in upNextCourses" :key="course.id"
+                     @click="navigateToCourse(course.id)"
+                     class="up-next-course-card group">
+                  <div class="up-next-thumb">
+                    <img :src="course.image" :alt="course.title" class="up-next-img" />
+                    <div class="up-next-play"><i class="fas fa-play"></i></div>
+                    <span class="up-next-duration">{{ course.duration }}</span>
+                    <div class="up-next-progress">
+                      <div class="up-next-progress-fill" :style="{ width: course.progress + '%' }"></div>
+                    </div>
+                  </div>
+                  <div class="up-next-info">
+                    <span :class="['up-next-level', course.levelClass]">{{ course.level }}</span>
+                    <h4 class="up-next-course-title">{{ course.title }}</h4>
+                    <div class="up-next-meta">
+                      <span><i class="fas fa-redo"></i> {{ course.progress }}%</span>
+                      <span><i class="fas fa-play-circle"></i> {{ course.completedLessons }}/{{ course.totalLessons }}</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1702,7 +1808,7 @@ function scrollContinueLearning(direction: 'left' | 'right') {
   }
 }
 
-/* Continue Learning Carousel */
+/* Continue Learning Section */
 .continue-learning-section {
   background: linear-gradient(135deg, #f0fdfa 0%, #f8fafc 100%);
   border-radius: 1rem;
@@ -1752,34 +1858,6 @@ function scrollContinueLearning(direction: 'left' | 'right') {
   gap: 0.5rem;
 }
 
-.continue-nav-btn {
-  width: 2rem;
-  height: 2rem;
-  border-radius: 0.5rem;
-  background: white;
-  border: 1px solid #e2e8f0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.continue-nav-btn:hover {
-  background: #f1f5f9;
-  border-color: #14b8a6;
-  color: #14b8a6;
-}
-
-.continue-nav-btn i {
-  font-size: 0.75rem;
-  color: #64748b;
-}
-
-.continue-nav-btn:hover i {
-  color: #14b8a6;
-}
-
 .continue-streak-badge {
   display: flex;
   align-items: center;
@@ -1796,79 +1874,101 @@ function scrollContinueLearning(direction: 'left' | 'right') {
   font-size: 0.625rem;
 }
 
-.continue-learning-scroll {
-  display: flex;
+/* Featured Course Grid */
+.featured-course-grid {
+  display: grid;
+  grid-template-columns: 1fr;
   gap: 1rem;
-  overflow-x: auto;
-  padding-bottom: 0.5rem;
-  scroll-snap-type: x mandatory;
 }
 
-.continue-learning-scroll::-webkit-scrollbar {
-  height: 4px;
+@media (min-width: 768px) {
+  .featured-course-grid {
+    grid-template-columns: 1.8fr 1fr;
+  }
 }
 
-.continue-learning-scroll::-webkit-scrollbar-track {
-  background: #f1f5f9;
-  border-radius: 4px;
+.featured-course-wrapper {
+  position: relative;
 }
 
-.continue-learning-scroll::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 4px;
-}
-
-.continue-learning-scroll::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
-}
-
-.continue-card {
-  flex: 0 0 280px;
-  background: white;
+/* Main Featured Card */
+.featured-course-card {
+  position: relative;
   border-radius: 0.875rem;
   overflow: hidden;
-  border: 1px solid #e2e8f0;
   cursor: pointer;
-  transition: all 0.3s ease;
-  scroll-snap-align: start;
+  aspect-ratio: 16/9;
+  background: #1e293b;
 }
 
-.continue-card:hover {
-  border-color: #14b8a6;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.1);
-  transform: translateY(-4px);
-}
-
-.continue-card-thumb {
-  position: relative;
-  height: 140px;
-  overflow: hidden;
-}
-
-.continue-card-img {
+.featured-course-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.4s ease;
+  transition: transform 0.5s ease;
 }
 
-.continue-card:hover .continue-card-img {
-  transform: scale(1.08);
+.featured-course-card:hover .featured-course-img {
+  transform: scale(1.05);
 }
 
-.continue-card-overlay {
+.featured-course-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 60%);
+  background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.3) 50%, transparent 100%);
 }
 
-.continue-card-play {
+.featured-course-badges {
+  position: absolute;
+  top: 0.75rem;
+  left: 0.75rem;
+  display: flex;
+  gap: 0.5rem;
+  z-index: 5;
+}
+
+.badge-continue {
+  padding: 0.25rem 0.625rem;
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+  color: white;
+  font-size: 0.625rem;
+  font-weight: 600;
+  border-radius: 0.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.badge-level {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.5625rem;
+  font-weight: 600;
+  border-radius: 0.25rem;
+  text-transform: uppercase;
+}
+
+.badge-level.beginner {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.badge-level.intermediate {
+  background: #dbeafe;
+  color: #2563eb;
+}
+
+.badge-level.advanced {
+  background: #ede9fe;
+  color: #7c3aed;
+}
+
+.featured-course-play {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 3rem;
-  height: 3rem;
+  width: 4rem;
+  height: 4rem;
   border-radius: 50%;
   background: rgba(255,255,255,0.95);
   display: flex;
@@ -1876,91 +1976,336 @@ function scrollContinueLearning(direction: 'left' | 'right') {
   justify-content: center;
   opacity: 0;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+  z-index: 5;
 }
 
-.continue-card:hover .continue-card-play {
+.featured-course-card:hover .featured-course-play {
   opacity: 1;
+  transform: translate(-50%, -50%) scale(1.1);
 }
 
-.continue-card-play i {
+.featured-course-play i {
   color: #0d9488;
-  font-size: 1rem;
-  margin-left: 2px;
+  font-size: 1.25rem;
+  margin-left: 3px;
 }
 
-.continue-card-duration {
-  position: absolute;
-  bottom: 0.5rem;
-  right: 0.5rem;
-  padding: 0.25rem 0.5rem;
-  background: rgba(0,0,0,0.8);
-  color: white;
-  font-size: 0.625rem;
-  font-weight: 500;
-  border-radius: 0.25rem;
-}
-
-.continue-card-progress {
+.featured-course-progress-bar {
   position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
   height: 4px;
+  background: rgba(255,255,255,0.2);
+  z-index: 5;
+}
+
+.featured-course-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #14b8a6, #0d9488);
+  transition: width 0.5s ease;
+}
+
+.featured-course-content {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 1rem;
+  z-index: 5;
+}
+
+.featured-course-meta {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.6875rem;
+  color: rgba(255,255,255,0.8);
+}
+
+.featured-course-meta i {
+  margin-right: 0.25rem;
+}
+
+.featured-course-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: white;
+  margin: 0 0 0.5rem 0;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.featured-course-author {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.7);
+}
+
+.featured-course-author .author-avatar {
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 0.625rem;
+  font-weight: 600;
+}
+
+.featured-course-author .dot {
+  color: rgba(255,255,255,0.4);
+}
+
+.featured-course-author .progress-label {
+  color: #14b8a6;
+  font-weight: 600;
+}
+
+/* Carousel Arrows */
+.course-carousel-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 2.25rem;
+  height: 2.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  border-radius: 50%;
+  color: #0f172a;
+  font-size: 0.75rem;
+  cursor: pointer;
+  opacity: 0;
+  transition: all 0.3s ease;
+  z-index: 10;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.featured-course-card:hover .course-carousel-arrow {
+  opacity: 1;
+}
+
+.course-carousel-arrow:hover {
+  background: white;
+  transform: translateY(-50%) scale(1.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.course-carousel-prev {
+  left: 0.75rem;
+}
+
+.course-carousel-next {
+  right: 0.75rem;
+}
+
+/* Carousel Dots */
+.course-carousel-dots {
+  position: absolute;
+  bottom: 0.75rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 0.5rem;
+  z-index: 10;
+}
+
+.course-carousel-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 0;
+}
+
+.course-carousel-dot:hover {
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.course-carousel-dot.active {
+  background: white;
+  width: 1.5rem;
+  border-radius: 0.25rem;
+}
+
+/* Carousel Fade Transition */
+.carousel-fade-enter-active,
+.carousel-fade-leave-active {
+  transition: opacity 0.4s ease;
+}
+
+.carousel-fade-enter-from,
+.carousel-fade-leave-to {
+  opacity: 0;
+}
+
+/* Up Next Column */
+.up-next-courses {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.up-next-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #334155;
+  margin: 0 0 0.625rem 0;
+}
+
+.up-next-title i {
+  color: #14b8a6;
+}
+
+.up-next-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex: 1;
+}
+
+/* Up Next Card */
+.up-next-course-card {
+  display: flex;
+  gap: 0.625rem;
+  padding: 0.5rem;
+  background: white;
+  border: 1px solid #f1f5f9;
+  border-radius: 0.625rem;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.up-next-course-card:hover {
+  border-color: #14b8a6;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+  transform: translateX(4px);
+}
+
+.up-next-thumb {
+  position: relative;
+  width: 90px;
+  height: 56px;
+  border-radius: 0.375rem;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: #1e293b;
+}
+
+.up-next-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.up-next-course-card:hover .up-next-img {
+  transform: scale(1.1);
+}
+
+.up-next-play {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.3);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.up-next-course-card:hover .up-next-play {
+  opacity: 1;
+}
+
+.up-next-play i {
+  color: white;
+  font-size: 0.75rem;
+}
+
+.up-next-duration {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  padding: 0.125rem 0.25rem;
+  background: rgba(0,0,0,0.8);
+  color: white;
+  font-size: 0.5rem;
+  font-weight: 500;
+  border-radius: 0.1875rem;
+}
+
+.up-next-progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
   background: rgba(255,255,255,0.3);
 }
 
-.continue-card-progress-fill {
+.up-next-progress-fill {
   height: 100%;
   background: linear-gradient(90deg, #14b8a6, #0d9488);
 }
 
-.continue-card-info {
-  padding: 0.875rem;
-}
-
-.continue-card-badges {
+.up-next-info {
+  flex: 1;
+  min-width: 0;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 0.5rem;
+  flex-direction: column;
+  justify-content: center;
 }
 
-.continue-level-badge {
-  padding: 0.125rem 0.375rem;
-  font-size: 0.5625rem;
+.up-next-level {
+  display: inline-block;
+  padding: 0.0625rem 0.25rem;
+  font-size: 0.5rem;
   font-weight: 600;
-  border-radius: 0.1875rem;
+  border-radius: 0.125rem;
   text-transform: uppercase;
+  margin-bottom: 0.25rem;
+  width: fit-content;
 }
 
-.continue-level-badge.beginner {
+.up-next-level.beginner {
   background: #dcfce7;
   color: #16a34a;
 }
 
-.continue-level-badge.intermediate {
+.up-next-level.intermediate {
   background: #dbeafe;
   color: #2563eb;
 }
 
-.continue-level-badge.advanced {
+.up-next-level.advanced {
   background: #ede9fe;
   color: #7c3aed;
 }
 
-.continue-progress-text {
+.up-next-course-title {
   font-size: 0.75rem;
-  font-weight: 700;
-  color: #0d9488;
-}
-
-.continue-card-title {
-  font-size: 0.8125rem;
   font-weight: 600;
   color: #0f172a;
-  margin: 0 0 0.375rem 0;
-  line-height: 1.3;
+  margin: 0 0 0.25rem 0;
+  line-height: 1.25;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -1968,29 +2313,39 @@ function scrollContinueLearning(direction: 'left' | 'right') {
   transition: color 0.2s ease;
 }
 
-.continue-card:hover .continue-card-title {
+.up-next-course-card:hover .up-next-course-title {
   color: #0d9488;
 }
 
-.continue-card-lesson {
-  font-size: 0.6875rem;
-  color: #64748b;
-  margin: 0 0 0.5rem 0;
-}
-
-.continue-card-meta {
+.up-next-meta {
   display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  font-size: 0.625rem;
+  gap: 0.625rem;
+  font-size: 0.5625rem;
   color: #94a3b8;
 }
 
-.continue-card-meta i {
-  margin-right: 0.25rem;
+.up-next-meta i {
+  margin-right: 0.1875rem;
+  color: #14b8a6;
 }
 
-.continue-card-meta span:first-child i {
-  color: #64748b;
+/* Responsive - Stack on mobile */
+@media (max-width: 767px) {
+  .up-next-list {
+    flex-direction: row;
+    overflow-x: auto;
+    gap: 0.75rem;
+    padding-bottom: 0.5rem;
+  }
+
+  .up-next-course-card {
+    flex: 0 0 220px;
+    flex-direction: column;
+  }
+
+  .up-next-thumb {
+    width: 100%;
+    height: 100px;
+  }
 }
 </style>
