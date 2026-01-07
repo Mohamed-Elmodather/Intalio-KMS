@@ -11,6 +11,7 @@ const activeTab = ref('all')
 const searchQuery = ref('')
 const categoryFilter = ref('')
 const sortBy = ref('recent')
+const sortOrder = ref<'asc' | 'desc'>('desc')
 const currentPage = ref(1)
 const itemsPerPage = ref(6)
 const showFilters = ref(false)
@@ -18,6 +19,101 @@ const trendingScrollRef = ref<HTMLElement | null>(null)
 const likedMedia = ref(new Set<number>())
 const savedMedia = ref(new Set<number>())
 const viewMode = ref('grid')
+
+// Sidebar state
+const isSidebarCollapsed = ref(false)
+const expandedFolders = ref(new Set<string>(['root', 'tournament', 'media-assets']))
+const selectedFolder = ref<string | null>(null)
+const currentView = ref<'all' | 'recent' | 'popular' | 'saved' | 'trash'>('all')
+
+// Selection mode
+const isSelectionMode = ref(false)
+const selectedMedia = ref(new Set<number>())
+
+// Dropdown filter states
+const showMediaTypeFilter = ref(false)
+const showCategoryFilter = ref(false)
+const showSortDropdown = ref(false)
+const selectedMediaTypes = ref<string[]>([])
+const selectedCategories = ref<string[]>([])
+
+// Sort options with icons
+const sortOptionsList = ref([
+  { value: 'recent', label: 'Date Modified', icon: 'fas fa-clock' },
+  { value: 'name', label: 'Name', icon: 'fas fa-font' },
+  { value: 'popular', label: 'Most Popular', icon: 'fas fa-fire' },
+  { value: 'views', label: 'Most Viewed', icon: 'fas fa-eye' },
+  { value: 'duration', label: 'Duration', icon: 'fas fa-hourglass-half' }
+])
+
+// View navigation items
+const viewNavItems = ref([
+  { id: 'all', name: 'All Media', icon: 'fas fa-photo-film', color: 'text-teal-500' },
+  { id: 'recent', name: 'Recently Viewed', icon: 'fas fa-clock', color: 'text-blue-500' },
+  { id: 'popular', name: 'Most Popular', icon: 'fas fa-fire', color: 'text-orange-500' },
+  { id: 'saved', name: 'Saved', icon: 'fas fa-bookmark', color: 'text-amber-500' },
+  { id: 'trash', name: 'Trash', icon: 'fas fa-trash-alt', color: 'text-red-500' }
+])
+
+// Folder tree structure
+const folderTree = ref([
+  {
+    id: 'root',
+    name: 'AFC Asian Cup 2027',
+    icon: 'fas fa-trophy',
+    children: [
+      {
+        id: 'tournament',
+        name: 'Tournament Coverage',
+        icon: 'fas fa-folder',
+        children: [
+          { id: 'highlights', name: 'Match Highlights', icon: 'fas fa-folder', children: [] },
+          { id: 'ceremonies', name: 'Ceremonies', icon: 'fas fa-folder', children: [] },
+          { id: 'interviews', name: 'Interviews', icon: 'fas fa-folder', children: [] }
+        ]
+      },
+      {
+        id: 'media-assets',
+        name: 'Media Assets',
+        icon: 'fas fa-folder',
+        children: [
+          { id: 'photos', name: 'Photos', icon: 'fas fa-folder', children: [] },
+          { id: 'videos', name: 'Videos', icon: 'fas fa-folder', children: [] },
+          { id: 'audio', name: 'Audio & Podcasts', icon: 'fas fa-folder', children: [] }
+        ]
+      },
+      {
+        id: 'teams',
+        name: 'Teams',
+        icon: 'fas fa-folder',
+        children: [
+          { id: 'team-profiles', name: 'Team Profiles', icon: 'fas fa-folder', children: [] },
+          { id: 'player-content', name: 'Player Content', icon: 'fas fa-folder', children: [] }
+        ]
+      },
+      {
+        id: 'venues',
+        name: 'Venues & Stadiums',
+        icon: 'fas fa-folder',
+        children: []
+      },
+      {
+        id: 'fan-zone',
+        name: 'Fan Zone',
+        icon: 'fas fa-folder',
+        children: []
+      }
+    ]
+  }
+])
+
+// Media type filter options
+const mediaTypeOptions = ref([
+  { id: 'video', label: 'Videos', icon: 'fas fa-video', color: 'text-blue-500' },
+  { id: 'audio', label: 'Audio', icon: 'fas fa-headphones', color: 'text-purple-500' },
+  { id: 'image', label: 'Images', icon: 'fas fa-image', color: 'text-green-500' },
+  { id: 'gallery', label: 'Galleries', icon: 'fas fa-images', color: 'text-amber-500' }
+])
 
 // Sort Options
 const sortOptions = ref([
@@ -299,16 +395,33 @@ const activeFiltersCount = computed(() => {
 // Computed: Filtered Media
 const filteredMedia = computed(() => {
   let result = [...mediaItems.value]
+
+  // Filter by active tab (quick filter)
   if (activeTab.value !== 'all') {
     result = result.filter(m => m.type === activeTab.value)
   }
+
+  // Filter by dropdown media types (if any selected)
+  if (selectedMediaTypes.value.length > 0) {
+    result = result.filter(m => selectedMediaTypes.value.includes(m.type))
+  }
+
+  // Filter by search query
   if (searchQuery.value) {
     const q = searchQuery.value.toLowerCase()
     result = result.filter(m => m.title.toLowerCase().includes(q))
   }
+
+  // Filter by single category (old filter)
   if (categoryFilter.value) {
     result = result.filter(m => m.category === categoryFilter.value)
   }
+
+  // Filter by dropdown categories (if any selected)
+  if (selectedCategories.value.length > 0) {
+    result = result.filter(m => selectedCategories.value.includes(m.category))
+  }
+
   return result
 })
 
@@ -426,7 +539,146 @@ function clearFilters() {
   categoryFilter.value = ''
   activeTab.value = 'all'
   searchQuery.value = ''
+  selectedMediaTypes.value = []
+  selectedCategories.value = []
+  selectedFolder.value = null
 }
+
+// Sidebar functions
+function toggleFolder(folderId: string) {
+  if (expandedFolders.value.has(folderId)) {
+    expandedFolders.value.delete(folderId)
+  } else {
+    expandedFolders.value.add(folderId)
+  }
+}
+
+function isFolderExpanded(folderId: string): boolean {
+  return expandedFolders.value.has(folderId)
+}
+
+function selectFolder(folderId: string) {
+  selectedFolder.value = selectedFolder.value === folderId ? null : folderId
+}
+
+// Selection mode functions
+function toggleSelectionMode() {
+  isSelectionMode.value = !isSelectionMode.value
+  if (!isSelectionMode.value) {
+    selectedMedia.value.clear()
+  }
+}
+
+function toggleMediaSelection(id: number) {
+  if (selectedMedia.value.has(id)) {
+    selectedMedia.value.delete(id)
+  } else {
+    selectedMedia.value.add(id)
+  }
+}
+
+function isMediaSelected(id: number): boolean {
+  return selectedMedia.value.has(id)
+}
+
+function selectAllMedia() {
+  filteredMedia.value.forEach(media => {
+    selectedMedia.value.add(media.id)
+  })
+}
+
+function clearMediaSelection() {
+  selectedMedia.value.clear()
+}
+
+const selectedCount = computed(() => selectedMedia.value.size)
+const isAllSelected = computed(() => selectedMedia.value.size === filteredMedia.value.length && filteredMedia.value.length > 0)
+const isSomeSelected = computed(() => selectedMedia.value.size > 0 && selectedMedia.value.size < filteredMedia.value.length)
+
+// Bulk actions
+function bulkDownload() {
+  const selected = Array.from(selectedMedia.value)
+  alert(`Downloading ${selected.length} items...`)
+}
+
+function bulkShare() {
+  const selected = Array.from(selectedMedia.value)
+  alert(`Sharing ${selected.length} items...`)
+}
+
+function bulkAddToPlaylist() {
+  const selected = Array.from(selectedMedia.value)
+  alert(`Adding ${selected.length} items to playlist...`)
+}
+
+function bulkMoveToTrash() {
+  const selected = Array.from(selectedMedia.value)
+  alert(`Moving ${selected.length} items to trash...`)
+  selectedMedia.value.clear()
+  isSelectionMode.value = false
+}
+
+function bulkRestore() {
+  const selected = Array.from(selectedMedia.value)
+  alert(`Restoring ${selected.length} items...`)
+  selectedMedia.value.clear()
+  isSelectionMode.value = false
+}
+
+function bulkPermanentDelete() {
+  const selected = Array.from(selectedMedia.value)
+  if (confirm(`Permanently delete ${selected.length} items? This cannot be undone.`)) {
+    alert(`Deleted ${selected.length} items permanently`)
+    selectedMedia.value.clear()
+    isSelectionMode.value = false
+  }
+}
+
+// Dropdown filter functions
+function toggleMediaType(type: string) {
+  const index = selectedMediaTypes.value.indexOf(type)
+  if (index > -1) {
+    selectedMediaTypes.value.splice(index, 1)
+  } else {
+    selectedMediaTypes.value.push(type)
+  }
+}
+
+function isMediaTypeSelected(type: string): boolean {
+  return selectedMediaTypes.value.includes(type)
+}
+
+function toggleCategorySelection(cat: string) {
+  const index = selectedCategories.value.indexOf(cat)
+  if (index > -1) {
+    selectedCategories.value.splice(index, 1)
+  } else {
+    selectedCategories.value.push(cat)
+  }
+}
+
+function isCategorySelected(cat: string): boolean {
+  return selectedCategories.value.includes(cat)
+}
+
+// Get current sort option
+const currentSortOption = computed(() => {
+  return sortOptionsList.value.find(opt => opt.value === sortBy.value) || sortOptionsList.value[0]
+})
+
+function selectSortOption(value: string) {
+  sortBy.value = value
+  showSortDropdown.value = false
+}
+
+// View counts
+const viewCounts = computed(() => ({
+  all: mediaItems.value.length,
+  recent: Math.floor(mediaItems.value.length * 0.4),
+  popular: Math.floor(mediaItems.value.length * 0.3),
+  saved: savedMedia.value.size,
+  trash: 0
+}))
 
 function handlePageChange(page: number) {
   currentPage.value = page
@@ -769,154 +1021,491 @@ onUnmounted(() => {
       </section>
 
       <!-- All Media Section -->
-      <section class="all-media-section mb-10 animate-in delay-3">
-        <!-- Section Header with Stats -->
-        <div class="all-media-header">
-          <div class="all-media-title-row">
-            <h2 class="all-media-title">
-              <div class="all-media-icon">
-                <i class="fas fa-photo-film"></i>
+      <div class="all-media-wrapper bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-10 animate-in delay-3">
+        <!-- Section Header / Toolbar -->
+        <div class="border-b border-gray-100">
+          <!-- Top Row - Title and Primary Actions -->
+          <div class="px-4 py-3 flex items-center justify-between">
+            <h2 class="text-lg font-bold text-gray-900 flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center shadow-lg shadow-teal-200">
+                <i class="fas fa-photo-film text-white text-sm"></i>
               </div>
               <div>
-                <span class="all-media-heading">Media Library</span>
-                <span class="all-media-subtitle">Browse and discover all content</span>
+                <span class="block">Media Library</span>
+                <span class="text-xs font-medium text-gray-500">{{ filteredMedia.length }} items</span>
               </div>
             </h2>
-            <div class="all-media-stats">
-              <div class="media-stat-item">
-                <i class="fas fa-video"></i>
-                <span class="stat-count">{{ mediaStats.totalVideos }}</span>
-                <span class="stat-label">Videos</span>
-              </div>
-              <div class="media-stat-item">
-                <i class="fas fa-headphones"></i>
-                <span class="stat-count">{{ mediaStats.audio }}</span>
-                <span class="stat-label">Audio</span>
-              </div>
-              <div class="media-stat-item">
-                <i class="fas fa-image"></i>
-                <span class="stat-count">{{ mediaStats.images }}</span>
-                <span class="stat-label">Images</span>
-              </div>
-              <div class="media-stat-item">
-                <i class="fas fa-images"></i>
-                <span class="stat-count">{{ mediaStats.galleries }}</span>
-                <span class="stat-label">Galleries</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Media Type Tabs -->
-          <div class="media-type-tabs">
-            <button
-              v-for="tab in mediaTabs"
-              :key="tab.id"
-              @click="activeTab = tab.id"
-              :class="['media-type-tab', { active: activeTab === tab.id }]">
-              <i :class="tab.icon"></i>
-              <span>{{ tab.label }}</span>
-              <span v-if="tab.id !== 'all'" class="tab-count">{{ getMediaTypeCount(tab.id) }}</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- Toolbar -->
-        <div class="toolbar">
-          <div class="toolbar-left">
-            <!-- Search Box -->
-            <div class="search-box">
-              <i class="fas fa-search"></i>
-              <input type="text" v-model="searchQuery" placeholder="Search media..." class="search-input">
-              <button v-if="searchQuery" @click="searchQuery = ''" class="search-clear">
-                <i class="fas fa-times"></i>
+            <div class="flex items-center gap-2">
+              <!-- Primary Actions -->
+              <button @click="showUploadModal = true" class="px-4 py-2 bg-gradient-to-r from-teal-500 to-teal-600 text-white rounded-lg text-sm font-medium hover:from-teal-600 hover:to-teal-700 transition-all flex items-center gap-2 shadow-sm shadow-teal-200">
+                <i class="fas fa-cloud-arrow-up"></i>
+                Upload Media
               </button>
-            </div>
-
-            <!-- Filter Button -->
-            <button
-              @click="showFilters = !showFilters"
-              :class="['filter-btn', { active: showFilters || activeFiltersCount > 0 }]">
-              <i class="fas fa-sliders-h"></i>
-              <span>Filters</span>
-              <span v-if="activeFiltersCount > 0" class="filter-badge">{{ activeFiltersCount }}</span>
-            </button>
-          </div>
-
-          <div class="toolbar-right">
-            <!-- Results Count -->
-            <span class="results-count">{{ filteredMedia.length }} results</span>
-
-            <!-- Sort -->
-            <div class="sort-wrapper">
-              <i class="fas fa-sort-amount-down"></i>
-              <select v-model="sortBy" class="sort-select">
-                <option v-for="option in sortOptions" :key="option.value" :value="option.value">
-                  {{ option.label }}
-                </option>
-              </select>
-            </div>
-
-            <!-- View Toggle -->
-            <div class="view-toggle">
-              <button @click="viewMode = 'grid'" :class="{ active: viewMode === 'grid' }" title="Grid view">
-                <i class="fas fa-th-large"></i>
+              <button class="px-3 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 hover:border-gray-300 transition-all flex items-center gap-2">
+                <i class="fas fa-folder-plus text-amber-500"></i>
+                New Folder
               </button>
-              <button @click="viewMode = 'list'" :class="{ active: viewMode === 'list' }" title="List view">
-                <i class="fas fa-list"></i>
+
+              <!-- Divider -->
+              <div class="w-px h-8 bg-gray-200 mx-1"></div>
+
+              <!-- Refresh Button -->
+              <button
+                class="w-9 h-9 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-800 flex items-center justify-center transition-all"
+                title="Refresh"
+              >
+                <i class="fas fa-sync-alt text-sm"></i>
               </button>
             </div>
           </div>
-        </div>
 
-        <!-- Filters Panel -->
-        <div v-if="showFilters" class="filters-panel">
-          <div class="filters-header">
-            <div class="filters-title">
-              <i class="fas fa-sliders"></i>
-              <span>Filters</span>
+          <!-- Bottom Row - Search, Filters, View Options -->
+          <div class="px-4 py-2 bg-gray-50/50 flex flex-wrap items-center gap-3">
+              <!-- Search -->
+              <div class="min-w-[200px] max-w-md relative">
+              <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+              <input
+                v-model="searchQuery"
+                type="text"
+                placeholder="Search media..."
+                class="w-full pl-9 pr-4 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all"
+              >
+              <button v-if="searchQuery" @click="searchQuery = ''" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                <i class="fas fa-times text-xs"></i>
+              </button>
             </div>
-            <button v-if="activeFiltersCount > 0" @click="clearFilters" class="clear-filters-btn">
-              Clear All
-            </button>
-          </div>
 
-          <div class="filter-groups">
-            <div class="filter-group">
-              <div class="filter-group-label">Category</div>
-              <div class="filter-chips">
+            <!-- Media Type Filter Dropdown -->
+            <div class="relative">
+              <button
+                @click="showMediaTypeFilter = !showMediaTypeFilter"
+                :class="[
+                  'flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border',
+                  selectedMediaTypes.length > 0 ? 'bg-teal-50 border-teal-200 text-teal-700' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+                ]"
+              >
+                <i class="fas fa-video text-sm"></i>
+                <span>{{ selectedMediaTypes.length > 0 ? `${selectedMediaTypes.length} Types` : 'Media Type' }}</span>
+                <i :class="showMediaTypeFilter ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ml-1"></i>
+              </button>
+
+              <!-- Dropdown Menu -->
+              <div
+                v-if="showMediaTypeFilter"
+                class="absolute left-0 top-full mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
+              >
+                <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Select Media Types</div>
+                <div class="max-h-48 overflow-y-auto">
+                  <button
+                    v-for="type in mediaTypeOptions"
+                    :key="type.id"
+                    @click="toggleMediaType(type.id)"
+                    :class="[
+                      'w-full px-3 py-2 text-left text-sm flex items-center gap-3 transition-colors',
+                      isMediaTypeSelected(type.id) ? 'bg-teal-50 text-teal-700' : 'text-gray-700 hover:bg-gray-50'
+                    ]"
+                  >
+                    <div :class="[
+                      'w-4 h-4 rounded border-2 flex items-center justify-center transition-all',
+                      isMediaTypeSelected(type.id) ? 'bg-teal-500 border-teal-500' : 'border-gray-300'
+                    ]">
+                      <i v-if="isMediaTypeSelected(type.id)" class="fas fa-check text-white text-[8px]"></i>
+                    </div>
+                    <i :class="[type.icon, type.color, 'text-sm']"></i>
+                    <span class="flex-1">{{ type.label }}</span>
+                  </button>
+                </div>
+                <div class="my-2 border-t border-gray-100"></div>
+                <div class="px-3 flex gap-2">
+                  <button
+                    @click="selectedMediaTypes = []; showMediaTypeFilter = false"
+                    class="flex-1 px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                  >
+                    Clear All
+                  </button>
+                  <button
+                    @click="showMediaTypeFilter = false"
+                    class="flex-1 px-3 py-1.5 text-xs font-medium text-white bg-teal-500 rounded-lg hover:bg-teal-600 transition-colors"
+                  >
+                    Apply
+                  </button>
+                </div>
+              </div>
+              <div v-if="showMediaTypeFilter" @click="showMediaTypeFilter = false" class="fixed inset-0 z-40"></div>
+            </div>
+
+            <!-- Category Filter Dropdown -->
+            <div class="relative">
+              <button
+                @click="showCategoryFilter = !showCategoryFilter"
+                :class="[
+                  'flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border',
+                  selectedCategories.length > 0 ? 'bg-teal-50 border-teal-200 text-teal-700' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+                ]"
+              >
+                <i class="fas fa-layer-group text-sm"></i>
+                <span>{{ selectedCategories.length > 0 ? `${selectedCategories.length} Categories` : 'Category' }}</span>
+                <i :class="showCategoryFilter ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ml-1"></i>
+              </button>
+
+              <!-- Dropdown Menu -->
+              <div
+                v-if="showCategoryFilter"
+                class="absolute left-0 top-full mt-2 w-64 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
+              >
+                <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Select Categories</div>
+                <div class="max-h-48 overflow-y-auto">
+                  <button
+                    v-for="cat in categories"
+                    :key="cat"
+                    @click="toggleCategorySelection(cat)"
+                    :class="[
+                      'w-full px-3 py-2 text-left text-sm flex items-center gap-3 transition-colors',
+                      isCategorySelected(cat) ? 'bg-teal-50 text-teal-700' : 'text-gray-700 hover:bg-gray-50'
+                    ]"
+                  >
+                    <div :class="[
+                      'w-4 h-4 rounded border-2 flex items-center justify-center transition-all',
+                      isCategorySelected(cat) ? 'bg-teal-500 border-teal-500' : 'border-gray-300'
+                    ]">
+                      <i v-if="isCategorySelected(cat)" class="fas fa-check text-white text-[8px]"></i>
+                    </div>
+                    <span class="flex-1">{{ cat }}</span>
+                  </button>
+                </div>
+                <div class="my-2 border-t border-gray-100"></div>
+                <div class="px-3 flex gap-2">
+                  <button
+                    @click="selectedCategories = []; showCategoryFilter = false"
+                    class="flex-1 px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                  >
+                    Clear All
+                  </button>
+                  <button
+                    @click="showCategoryFilter = false"
+                    class="flex-1 px-3 py-1.5 text-xs font-medium text-white bg-teal-500 rounded-lg hover:bg-teal-600 transition-colors"
+                  >
+                    Apply
+                  </button>
+                </div>
+              </div>
+              <div v-if="showCategoryFilter" @click="showCategoryFilter = false" class="fixed inset-0 z-40"></div>
+            </div>
+
+              <!-- View Toggle -->
+              <div class="flex items-center gap-0.5 bg-white border border-gray-200 rounded-lg p-1">
                 <button
-                  v-for="cat in categories"
-                  :key="cat"
-                  @click="toggleCategoryFilter(cat)"
-                  :class="['filter-chip', { active: categoryFilter === cat }]">
-                  {{ cat }}
+                  @click="viewMode = 'grid'"
+                  :class="['px-2.5 py-1 rounded-md transition-all', viewMode === 'grid' ? 'bg-teal-500 text-white' : 'text-gray-500 hover:bg-gray-100']"
+                  title="Grid view"
+                >
+                  <i class="fas fa-th-large text-xs"></i>
+                </button>
+                <button
+                  @click="viewMode = 'list'"
+                  :class="['px-2.5 py-1 rounded-md transition-all', viewMode === 'list' ? 'bg-teal-500 text-white' : 'text-gray-500 hover:bg-gray-100']"
+                  title="List view"
+                >
+                  <i class="fas fa-list text-xs"></i>
+                </button>
+              </div>
+
+              <!-- Sort Options -->
+              <div class="relative">
+                <button
+                  @click="showSortDropdown = !showSortDropdown"
+                  class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border bg-white border-gray-200 text-gray-600 hover:bg-gray-50"
+                >
+                  <i :class="[currentSortOption.icon, 'text-sm text-teal-500']"></i>
+                  <span>{{ currentSortOption.label }}</span>
+                  <i :class="showSortDropdown ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ml-1"></i>
+                </button>
+
+                <!-- Dropdown Menu -->
+                <div
+                  v-if="showSortDropdown"
+                  class="absolute left-0 top-full mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
+                >
+                  <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Sort By</div>
+                  <div class="max-h-64 overflow-y-auto">
+                    <button
+                      v-for="option in sortOptionsList"
+                      :key="option.value"
+                      @click="selectSortOption(option.value)"
+                      :class="[
+                        'w-full px-3 py-2 text-left text-sm flex items-center gap-3 transition-colors',
+                        sortBy === option.value ? 'bg-teal-50 text-teal-700' : 'text-gray-700 hover:bg-gray-50'
+                      ]"
+                    >
+                      <i :class="[option.icon, 'text-sm w-4', sortBy === option.value ? 'text-teal-500' : 'text-gray-400']"></i>
+                      <span class="flex-1">{{ option.label }}</span>
+                      <i v-if="sortBy === option.value" class="fas fa-check text-teal-500 text-xs"></i>
+                    </button>
+                  </div>
+                </div>
+                <div v-if="showSortDropdown" @click="showSortDropdown = false" class="fixed inset-0 z-40"></div>
+              </div>
+
+              <!-- Sort Order Toggle Button -->
+              <button
+                @click="sortOrder = sortOrder === 'asc' ? 'desc' : 'asc'"
+                class="flex items-center justify-center w-8 h-8 rounded-lg text-xs font-medium transition-all border bg-white border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-teal-600 hover:border-teal-300"
+                :title="sortOrder === 'asc' ? 'Ascending order - Click for descending' : 'Descending order - Click for ascending'"
+              >
+                <i :class="sortOrder === 'asc' ? 'fas fa-arrow-up' : 'fas fa-arrow-down'" class="text-sm text-teal-500"></i>
+              </button>
+          </div>
+        </div>
+
+        <div class="flex min-h-[500px]">
+          <!-- Folder Tree Sidebar -->
+          <div
+            :class="[
+              'border-r border-gray-100 bg-gray-50/50 transition-all duration-300 relative',
+              isSidebarCollapsed ? 'w-12 min-w-[48px]' : 'w-64 min-w-[256px]'
+            ]"
+          >
+            <!-- Collapse/Expand Button -->
+            <button
+              @click="isSidebarCollapsed = !isSidebarCollapsed"
+              class="absolute -right-3 top-4 w-6 h-6 bg-white border border-gray-200 rounded-full shadow-sm flex items-center justify-center text-gray-500 hover:text-teal-600 hover:border-teal-300 transition-all z-10"
+              :title="isSidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'"
+            >
+              <i :class="isSidebarCollapsed ? 'fas fa-chevron-right' : 'fas fa-chevron-left'" class="text-[10px]"></i>
+            </button>
+
+            <!-- Collapsed State - Icons Only -->
+            <div v-if="isSidebarCollapsed" class="p-2 pt-4 space-y-2">
+              <button
+                v-for="view in viewNavItems"
+                :key="'collapsed-' + view.id"
+                @click="currentView = view.id as any; isSidebarCollapsed = false"
+                :class="[
+                  'w-8 h-8 rounded-lg flex items-center justify-center transition-all',
+                  currentView === view.id ? 'bg-teal-100 text-teal-600' : 'hover:bg-gray-100 ' + view.color
+                ]"
+                :title="view.name"
+              >
+                <i :class="[view.icon, 'text-sm']"></i>
+              </button>
+              <div class="border-t border-gray-200 my-2"></div>
+              <button
+                v-for="folder in folderTree[0]?.children || []"
+                :key="folder.id"
+                @click="selectFolder(folder.id); isSidebarCollapsed = false"
+                :class="[
+                  'w-8 h-8 rounded-lg flex items-center justify-center transition-all',
+                  selectedFolder === folder.id ? 'bg-teal-100 text-teal-600' : 'hover:bg-gray-100 text-amber-500'
+                ]"
+                :title="folder.name"
+              >
+                <i class="fas fa-folder text-sm"></i>
+              </button>
+            </div>
+
+            <!-- Expanded State - Full Tree -->
+            <div v-else class="p-4">
+              <!-- View Navigation -->
+              <div class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Views</div>
+              <div class="space-y-1 mb-4">
+                <button
+                  v-for="view in viewNavItems"
+                  :key="view.id"
+                  @click="currentView = view.id as any"
+                  :class="[
+                    'w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-all text-left',
+                    currentView === view.id
+                      ? 'bg-teal-100 text-teal-700'
+                      : 'hover:bg-gray-100 text-gray-600'
+                  ]"
+                >
+                  <i :class="[view.icon, 'text-sm w-4', currentView === view.id ? 'text-teal-600' : view.color]"></i>
+                  <span class="text-sm font-medium flex-1">{{ view.name }}</span>
+                  <span :class="[
+                    'text-xs px-1.5 py-0.5 rounded-full min-w-[20px] text-center',
+                    currentView === view.id ? 'bg-teal-200 text-teal-700' : 'bg-gray-100 text-gray-500'
+                  ]">
+                    {{ viewCounts[view.id as keyof typeof viewCounts] }}
+                  </span>
+                </button>
+              </div>
+
+              <div class="border-t border-gray-200 my-4"></div>
+
+              <div class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Folders</div>
+
+              <!-- Folder Tree -->
+              <div class="space-y-1">
+                <template v-for="folder in folderTree" :key="folder.id">
+                  <div>
+                    <div
+                      @click="selectFolder(folder.id)"
+                      :class="[
+                        'flex items-center gap-2 px-2 py-1.5 rounded-lg cursor-pointer transition-all group',
+                        selectedFolder === folder.id ? 'bg-teal-100 text-teal-700' : 'hover:bg-gray-100 text-gray-700'
+                      ]"
+                    >
+                      <button
+                        v-if="folder.children && folder.children.length > 0"
+                        @click.stop="toggleFolder(folder.id)"
+                        class="w-4 h-4 flex items-center justify-center text-gray-400 hover:text-gray-600"
+                      >
+                        <i :class="isFolderExpanded(folder.id) ? 'fas fa-chevron-down' : 'fas fa-chevron-right'" class="text-[10px]"></i>
+                      </button>
+                      <span v-else class="w-4"></span>
+                      <i :class="[folder.icon, selectedFolder === folder.id ? 'text-teal-600' : 'text-amber-500']" class="text-sm"></i>
+                      <span class="text-sm font-medium truncate">{{ folder.name }}</span>
+                    </div>
+
+                    <!-- Level 1 Children -->
+                    <div v-if="isFolderExpanded(folder.id) && folder.children" class="ml-4 mt-1 space-y-1">
+                      <template v-for="child in folder.children" :key="child.id">
+                        <div>
+                          <div
+                            @click="selectFolder(child.id)"
+                            :class="[
+                              'flex items-center gap-2 px-2 py-1.5 rounded-lg cursor-pointer transition-all',
+                              selectedFolder === child.id ? 'bg-teal-100 text-teal-700' : 'hover:bg-gray-100 text-gray-700'
+                            ]"
+                          >
+                            <button
+                              v-if="child.children && child.children.length > 0"
+                              @click.stop="toggleFolder(child.id)"
+                              class="w-4 h-4 flex items-center justify-center text-gray-400 hover:text-gray-600"
+                            >
+                              <i :class="isFolderExpanded(child.id) ? 'fas fa-chevron-down' : 'fas fa-chevron-right'" class="text-[10px]"></i>
+                            </button>
+                            <span v-else class="w-4"></span>
+                            <i :class="[child.icon, selectedFolder === child.id ? 'text-teal-600' : 'text-amber-500']" class="text-sm"></i>
+                            <span class="text-sm truncate">{{ child.name }}</span>
+                          </div>
+
+                          <!-- Level 2 Children -->
+                          <div v-if="isFolderExpanded(child.id) && child.children" class="ml-4 mt-1 space-y-1">
+                            <div
+                              v-for="grandchild in child.children"
+                              :key="grandchild.id"
+                              @click="selectFolder(grandchild.id)"
+                              :class="[
+                                'flex items-center gap-2 px-2 py-1.5 rounded-lg cursor-pointer transition-all',
+                                selectedFolder === grandchild.id ? 'bg-teal-100 text-teal-700' : 'hover:bg-gray-100 text-gray-700'
+                              ]"
+                            >
+                              <span class="w-4"></span>
+                              <i class="fas fa-folder text-amber-500 text-sm"></i>
+                              <span class="text-sm truncate">{{ grandchild.name }}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </template>
+                    </div>
+                  </div>
+                </template>
+              </div>
+            </div>
+          </div>
+
+          <!-- Main Content Area -->
+          <div class="flex-1 p-4">
+            <!-- Selection Toolbar (Bulk Actions) -->
+            <div v-if="isSelectionMode && selectedCount > 0" class="flex items-center justify-between mb-5 p-3 bg-gradient-to-r from-teal-500 to-teal-600 rounded-xl shadow-lg shadow-teal-200/50">
+              <div class="flex items-center gap-4">
+                <!-- Select All Checkbox -->
+                <button
+                  @click="isAllSelected ? clearMediaSelection() : selectAllMedia()"
+                  class="flex items-center gap-2 text-white hover:bg-white/10 px-3 py-1.5 rounded-lg transition-all"
+                >
+                  <div :class="[
+                    'w-5 h-5 rounded border-2 flex items-center justify-center transition-all',
+                    isAllSelected ? 'bg-white border-white' : isSomeSelected ? 'bg-white/50 border-white' : 'border-white/70'
+                  ]">
+                    <i v-if="isAllSelected" class="fas fa-check text-teal-600 text-[10px]"></i>
+                    <i v-else-if="isSomeSelected" class="fas fa-minus text-teal-600 text-[10px]"></i>
+                  </div>
+                  <span class="text-sm font-medium">{{ isAllSelected ? 'Deselect all' : 'Select all' }}</span>
+                </button>
+
+                <!-- Selected Count -->
+                <div class="flex items-center gap-2 px-3 py-1.5 bg-white/20 rounded-lg">
+                  <i class="fas fa-check-circle text-white/80"></i>
+                  <span class="text-white text-sm font-semibold">{{ selectedCount }} selected</span>
+                </div>
+              </div>
+
+              <!-- Bulk Actions -->
+              <div class="flex items-center gap-2">
+                <template v-if="currentView !== 'trash'">
+                  <button
+                    @click="bulkDownload"
+                    class="flex items-center gap-2 px-3 py-2 bg-white/20 hover:bg-white/30 text-white rounded-lg transition-all text-sm font-medium"
+                    title="Download selected"
+                  >
+                    <i class="fas fa-download"></i>
+                    <span class="hidden sm:inline">Download</span>
+                  </button>
+                  <button
+                    @click="bulkShare"
+                    class="flex items-center gap-2 px-3 py-2 bg-white/20 hover:bg-white/30 text-white rounded-lg transition-all text-sm font-medium"
+                    title="Share selected"
+                  >
+                    <i class="fas fa-share-alt"></i>
+                    <span class="hidden sm:inline">Share</span>
+                  </button>
+                  <button
+                    @click="bulkAddToPlaylist"
+                    class="flex items-center gap-2 px-3 py-2 bg-white/20 hover:bg-white/30 text-white rounded-lg transition-all text-sm font-medium"
+                    title="Add to playlist"
+                  >
+                    <i class="fas fa-list-ul"></i>
+                    <span class="hidden sm:inline">Playlist</span>
+                  </button>
+                  <div class="w-px h-6 bg-white/30 mx-1"></div>
+                  <button
+                    @click="bulkMoveToTrash"
+                    class="flex items-center gap-2 px-3 py-2 bg-red-500/80 hover:bg-red-500 text-white rounded-lg transition-all text-sm font-medium"
+                    title="Move to trash"
+                  >
+                    <i class="fas fa-trash-alt"></i>
+                    <span class="hidden sm:inline">Delete</span>
+                  </button>
+                </template>
+                <template v-else>
+                  <button
+                    @click="bulkRestore"
+                    class="flex items-center gap-2 px-3 py-2 bg-white/20 hover:bg-white/30 text-white rounded-lg transition-all text-sm font-medium"
+                    title="Restore selected"
+                  >
+                    <i class="fas fa-undo"></i>
+                    <span class="hidden sm:inline">Restore</span>
+                  </button>
+                  <button
+                    @click="bulkPermanentDelete"
+                    class="flex items-center gap-2 px-3 py-2 bg-red-500/80 hover:bg-red-500 text-white rounded-lg transition-all text-sm font-medium"
+                    title="Delete permanently"
+                  >
+                    <i class="fas fa-trash"></i>
+                    <span class="hidden sm:inline">Delete Forever</span>
+                  </button>
+                </template>
+
+                <!-- Cancel -->
+                <button
+                  @click="toggleSelectionMode"
+                  class="flex items-center gap-2 px-3 py-2 bg-white text-teal-600 hover:bg-gray-100 rounded-lg transition-all text-sm font-medium ml-2"
+                >
+                  <i class="fas fa-times"></i>
+                  <span class="hidden sm:inline">Cancel</span>
                 </button>
               </div>
             </div>
 
-            <div class="filter-group">
-              <div class="filter-group-label">Type</div>
-              <div class="filter-chips">
-                <button
-                  v-for="tab in mediaTabs"
-                  :key="tab.id"
-                  @click="activeTab = tab.id"
-                  :class="['filter-chip', { active: activeTab === tab.id }]">
-                  <i :class="tab.icon"></i>
-                  {{ tab.label }}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Content Area with Media Grid/List -->
+            <!-- Content Area with Media Grid/List -->
         <div class="content-area">
           <div class="content-area-inner">
             <!-- Grid View -->
             <div v-if="viewMode === 'grid'" class="media-grid">
               <div v-for="media in paginatedMedia" :key="media.id"
-                   @click="goToMedia(media)"
+                   @click="isSelectionMode ? toggleMediaSelection(media.id) : goToMedia(media)"
                    class="media-card-enhanced rounded-2xl overflow-hidden cursor-pointer group bg-white">
                 <!-- Card Media/Thumbnail -->
                 <div class="card-thumbnail relative aspect-video">
@@ -924,8 +1513,23 @@ onUnmounted(() => {
                   <img :src="media.thumbnail" :alt="media.title" class="absolute inset-0 w-full h-full object-cover" />
                   <div class="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent"></div>
 
+                  <!-- Selection Checkbox -->
+                  <div
+                    @click.stop="toggleMediaSelection(media.id); if (!isSelectionMode) isSelectionMode = true"
+                    :class="[
+                      'absolute top-2 left-2 w-6 h-6 rounded-lg border-2 flex items-center justify-center cursor-pointer transition-all z-30',
+                      isMediaSelected(media.id)
+                        ? 'bg-teal-500 border-teal-500 text-white'
+                        : isSelectionMode
+                          ? 'bg-white/90 border-gray-300 hover:border-teal-400'
+                          : 'bg-white/90 border-gray-300 hover:border-teal-400 opacity-0 group-hover:opacity-100'
+                    ]"
+                  >
+                    <i v-if="isMediaSelected(media.id)" class="fas fa-check text-xs"></i>
+                  </div>
+
                   <!-- Card Badges -->
-                  <div class="absolute top-3 left-3 flex gap-1.5 z-20">
+                  <div class="absolute top-3 left-10 flex gap-1.5 z-20">
                     <span v-if="media.isNew" class="new-badge">
                       <i class="fas fa-sparkles"></i> New
                     </span>
@@ -1013,8 +1617,23 @@ onUnmounted(() => {
             <!-- List View -->
             <div v-else class="media-list">
               <div v-for="media in paginatedMedia" :key="media.id"
-                   @click="goToMedia(media)"
+                   @click="isSelectionMode ? toggleMediaSelection(media.id) : goToMedia(media)"
                    class="media-list-item cursor-pointer group">
+                <!-- Selection Checkbox -->
+                <div
+                  @click.stop="toggleMediaSelection(media.id); if (!isSelectionMode) isSelectionMode = true"
+                  :class="[
+                    'list-selection-checkbox w-6 h-6 rounded-lg border-2 flex items-center justify-center cursor-pointer transition-all flex-shrink-0',
+                    isMediaSelected(media.id)
+                      ? 'bg-teal-500 border-teal-500 text-white'
+                      : isSelectionMode
+                        ? 'bg-white border-gray-300 hover:border-teal-400'
+                        : 'bg-white border-gray-300 hover:border-teal-400 opacity-0 group-hover:opacity-100'
+                  ]"
+                >
+                  <i v-if="isMediaSelected(media.id)" class="fas fa-check text-xs"></i>
+                </div>
+
                 <!-- Thumbnail -->
                 <div class="list-item-thumbnail">
                   <img :src="media.thumbnail" :alt="media.title" class="absolute inset-0 w-full h-full object-cover rounded-lg" />
@@ -1104,49 +1723,59 @@ onUnmounted(() => {
           </div>
         </div>
 
-        <!-- Pagination (Documents Style) -->
-        <div v-if="filteredMedia.length > 0" class="mt-8">
-          <div class="pagination-container">
-            <div class="pagination-left">
-              <div class="pagination-info">
-                Showing {{ (currentPage - 1) * itemsPerPage + 1 }} - {{ Math.min(currentPage * itemsPerPage, filteredMedia.length) }} of {{ filteredMedia.length }} media
+            <!-- Pagination -->
+            <div v-if="filteredMedia.length > 0" class="mt-6 px-4 py-3 bg-white rounded-xl border border-gray-100">
+              <div class="flex items-center justify-between flex-wrap gap-3">
+                <div class="flex items-center gap-4 flex-wrap">
+                  <span class="text-xs text-gray-500">
+                    Showing <span class="font-semibold text-gray-700">{{ Math.min((currentPage - 1) * itemsPerPage + 1, filteredMedia.length) }}</span>
+                    to <span class="font-semibold text-gray-700">{{ Math.min(currentPage * itemsPerPage, filteredMedia.length) }}</span>
+                    of <span class="font-semibold text-gray-700">{{ filteredMedia.length }}</span> items
+                  </span>
+                  <div class="flex items-center gap-2">
+                    <span class="text-xs text-gray-500">Show:</span>
+                    <select
+                      v-model="itemsPerPage"
+                      @change="handlePerPageChange(itemsPerPage)"
+                      class="text-xs px-2 py-1.5 rounded-lg border border-gray-200 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-teal-500 cursor-pointer"
+                    >
+                      <option :value="6">6</option>
+                      <option :value="9">9</option>
+                      <option :value="12">12</option>
+                      <option :value="24">24</option>
+                    </select>
+                    <span class="text-xs text-gray-500">per page</span>
+                  </div>
+                </div>
+                <div class="flex items-center gap-1">
+                  <button
+                    @click="handlePageChange(currentPage - 1)"
+                    :disabled="currentPage === 1"
+                    :class="['w-8 h-8 rounded-lg flex items-center justify-center transition-all', currentPage === 1 ? 'text-gray-300 cursor-not-allowed' : 'text-gray-600 hover:bg-gray-100']"
+                  >
+                    <i class="fas fa-chevron-left text-xs"></i>
+                  </button>
+                  <template v-for="page in totalPages" :key="page">
+                    <button
+                      @click="handlePageChange(page)"
+                      :class="['w-8 h-8 rounded-lg text-xs font-medium transition-all', currentPage === page ? 'bg-teal-500 text-white' : 'text-gray-600 hover:bg-gray-100']"
+                    >
+                      {{ page }}
+                    </button>
+                  </template>
+                  <button
+                    @click="handlePageChange(currentPage + 1)"
+                    :disabled="currentPage === totalPages"
+                    :class="['w-8 h-8 rounded-lg flex items-center justify-center transition-all', currentPage === totalPages ? 'text-gray-300 cursor-not-allowed' : 'text-gray-600 hover:bg-gray-100']"
+                  >
+                    <i class="fas fa-chevron-right text-xs"></i>
+                  </button>
+                </div>
               </div>
             </div>
-            <div class="pagination-center">
-              <button
-                @click="handlePageChange(currentPage - 1)"
-                :disabled="currentPage === 1"
-                class="pagination-btn">
-                <i class="fas fa-chevron-left"></i>
-              </button>
-              <template v-for="page in totalPages" :key="page">
-                <button
-                  @click="handlePageChange(page)"
-                  :class="['pagination-btn', { active: currentPage === page }]">
-                  {{ page }}
-                </button>
-              </template>
-              <button
-                @click="handlePageChange(currentPage + 1)"
-                :disabled="currentPage === totalPages"
-                class="pagination-btn">
-                <i class="fas fa-chevron-right"></i>
-              </button>
-            </div>
-            <div class="pagination-right">
-              <span class="per-page-label">Items per page:</span>
-              <div class="per-page-select-wrapper">
-                <select v-model="itemsPerPage" @change="handlePerPageChange(itemsPerPage)" class="per-page-select">
-                  <option :value="6">6</option>
-                  <option :value="9">9</option>
-                  <option :value="12">12</option>
-                  <option :value="24">24</option>
-                </select>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+          </div><!-- End flex-1 main content -->
+        </div><!-- End flex container -->
+      </div><!-- End all-media-wrapper -->
 
     </div><!-- End Content Area -->
 
