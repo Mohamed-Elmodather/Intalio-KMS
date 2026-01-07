@@ -689,6 +689,34 @@ function resumeFeaturedAutoPlay() {
                   </div>
                 </div>
 
+                <!-- Syllabus Overlay -->
+                <div class="syllabus-overlay" @click.stop>
+                  <div class="syllabus-overlay-header">
+                    <h3 class="syllabus-overlay-title"><i class="fas fa-list-ol"></i> Syllabus</h3>
+                    <span class="syllabus-overlay-count">{{ featuredCourse.completedLessons }}/{{ featuredCourse.totalLessons }}</span>
+                  </div>
+                  <div class="syllabus-overlay-list">
+                    <div
+                      v-for="(lesson, index) in featuredCourse.syllabus"
+                      :key="lesson.id"
+                      :class="['syllabus-overlay-item', {
+                        'completed': lesson.completed,
+                        'current': lesson.current
+                      }]"
+                    >
+                      <div class="syllabus-overlay-number">
+                        <i v-if="lesson.completed" class="fas fa-check"></i>
+                        <i v-else-if="lesson.current" class="fas fa-play"></i>
+                        <span v-else>{{ index + 1 }}</span>
+                      </div>
+                      <div class="syllabus-overlay-info">
+                        <span class="syllabus-overlay-lesson-title">{{ lesson.title }}</span>
+                        <span class="syllabus-overlay-duration">{{ lesson.duration }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
                 <!-- Carousel Navigation -->
                 <button v-if="inProgressCourses.length > 1" class="course-carousel-arrow course-carousel-prev" @click.stop="prevFeaturedCourse">
                   <i class="fas fa-chevron-left"></i>
@@ -709,50 +737,49 @@ function resumeFeaturedAutoPlay() {
               </div>
             </div>
 
-            <!-- Course Syllabus Column -->
-            <div class="course-syllabus-panel">
-              <div class="syllabus-header">
-                <h3 class="syllabus-title"><i class="fas fa-list-ol"></i> Course Syllabus</h3>
-                <span class="syllabus-count">{{ featuredCourse.syllabus?.length || 0 }} lessons</span>
+            <!-- Up Next Column -->
+            <div class="up-next-courses">
+              <div class="up-next-header">
+                <h3 class="up-next-title"><i class="fas fa-list"></i> Up Next</h3>
+                <span class="up-next-count">{{ upNextCourses.length }} courses</span>
               </div>
-              <div class="syllabus-list">
-                <div
-                  v-for="(lesson, index) in featuredCourse.syllabus"
-                  :key="lesson.id"
-                  :class="['syllabus-item', {
-                    'completed': lesson.completed,
-                    'current': lesson.current,
-                    'locked': !lesson.completed && !lesson.current && index > 0 && !featuredCourse.syllabus[index - 1]?.completed
-                  }]"
-                >
-                  <div class="syllabus-item-number">
-                    <span v-if="lesson.completed" class="check-icon"><i class="fas fa-check"></i></span>
-                    <span v-else-if="lesson.current" class="play-icon"><i class="fas fa-play"></i></span>
-                    <span v-else class="lesson-number">{{ index + 1 }}</span>
-                  </div>
-                  <div class="syllabus-item-content">
-                    <h4 class="syllabus-item-title">{{ lesson.title }}</h4>
-                    <div class="syllabus-item-meta">
-                      <span class="syllabus-duration"><i class="fas fa-clock"></i> {{ lesson.duration }}</span>
-                      <span v-if="lesson.current" class="current-badge">Continue</span>
+              <div class="up-next-list">
+                <div v-for="(course, index) in upNextCourses" :key="course.id"
+                     @click="navigateToCourse(course.id)"
+                     class="up-next-course-card group">
+                  <!-- Thumbnail -->
+                  <div class="up-next-thumb">
+                    <img :src="course.image" :alt="course.title" class="up-next-img" />
+                    <div class="up-next-overlay"></div>
+                    <div class="up-next-play"><i class="fas fa-play"></i></div>
+                    <span class="up-next-duration">{{ course.duration }}</span>
+                    <!-- Progress Bar -->
+                    <div class="up-next-progress">
+                      <div class="up-next-progress-fill" :style="{ width: course.progress + '%' }"></div>
                     </div>
                   </div>
-                  <div class="syllabus-item-action">
-                    <button v-if="lesson.current" class="syllabus-play-btn">
-                      <i class="fas fa-play"></i>
-                    </button>
-                    <i v-else-if="lesson.completed" class="fas fa-check-circle text-teal-500"></i>
-                    <i v-else class="fas fa-lock text-gray-300"></i>
+
+                  <!-- Info -->
+                  <div class="up-next-info">
+                    <div class="up-next-badges">
+                      <span :class="['up-next-level', course.levelClass]">{{ course.level }}</span>
+                      <span class="up-next-progress-badge">{{ course.progress }}%</span>
+                    </div>
+                    <h4 class="up-next-course-title">{{ course.title }}</h4>
+                    <div class="up-next-instructor">
+                      <div class="up-next-avatar">{{ course.instructorInitials }}</div>
+                      <span>{{ course.instructor }}</span>
+                    </div>
+                    <div class="up-next-footer">
+                      <div class="up-next-meta">
+                        <span><i class="fas fa-play-circle"></i> {{ course.completedLessons }}/{{ course.totalLessons }}</span>
+                        <span><i class="fas fa-star text-amber-400"></i> {{ course.rating }}</span>
+                      </div>
+                      <button class="up-next-resume-btn" @click.stop="navigateToCourse(course.id)">
+                        <i class="fas fa-play"></i> Resume
+                      </button>
+                    </div>
                   </div>
-                </div>
-              </div>
-              <div class="syllabus-footer">
-                <div class="syllabus-progress-info">
-                  <span class="completed-count">{{ featuredCourse.completedLessons }} of {{ featuredCourse.totalLessons }} completed</span>
-                  <span class="progress-percent">{{ featuredCourse.progress }}%</span>
-                </div>
-                <div class="syllabus-progress-bar">
-                  <div class="syllabus-progress-fill" :style="{ width: featuredCourse.progress + '%' }"></div>
                 </div>
               </div>
             </div>
@@ -2240,275 +2267,488 @@ function resumeFeaturedAutoPlay() {
   opacity: 0;
 }
 
-/* Course Syllabus Panel */
-.course-syllabus-panel {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-  background: white;
+/* Syllabus Overlay on Featured Course */
+.syllabus-overlay {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  width: 280px;
+  max-height: calc(100% - 1.5rem);
+  background: rgba(15, 23, 42, 0.92);
+  backdrop-filter: blur(12px);
   border-radius: 0.75rem;
-  border: 1px solid #e2e8f0;
+  border: 1px solid rgba(255, 255, 255, 0.1);
   overflow: hidden;
+  z-index: 10;
+  opacity: 0;
+  transform: translateX(10px);
+  transition: all 0.3s ease;
 }
 
-.syllabus-header {
+.featured-course-card:hover .syllabus-overlay {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.syllabus-overlay-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.875rem 1rem;
-  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
-  border-bottom: 1px solid #e2e8f0;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.syllabus-title {
+.syllabus-overlay-title {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-size: 0.9375rem;
-  font-weight: 700;
-  color: #0f172a;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: white;
   margin: 0;
 }
 
-.syllabus-title i {
+.syllabus-overlay-title i {
   color: #14b8a6;
-  font-size: 0.875rem;
+  font-size: 0.75rem;
 }
 
-.syllabus-count {
+.syllabus-overlay-count {
   font-size: 0.6875rem;
-  color: #64748b;
-  background: #f1f5f9;
-  padding: 0.25rem 0.625rem;
+  color: #14b8a6;
+  font-weight: 600;
+  background: rgba(20, 184, 166, 0.15);
+  padding: 0.25rem 0.5rem;
   border-radius: 9999px;
-  font-weight: 500;
 }
 
-.syllabus-list {
-  flex: 1;
+.syllabus-overlay-list {
+  max-height: 240px;
   overflow-y: auto;
-  max-height: 320px;
   padding: 0.5rem;
 }
 
-/* Syllabus Item */
-.syllabus-item {
+.syllabus-overlay-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.syllabus-overlay-list::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.syllabus-overlay-list::-webkit-scrollbar-thumb {
+  background: rgba(20, 184, 166, 0.5);
+  border-radius: 2px;
+}
+
+.syllabus-overlay-item {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0.625rem 0.75rem;
+  gap: 0.625rem;
+  padding: 0.5rem 0.625rem;
   border-radius: 0.5rem;
   transition: all 0.2s ease;
   cursor: pointer;
-  border: 1px solid transparent;
 }
 
-.syllabus-item:hover {
-  background: #f8fafc;
+.syllabus-overlay-item:hover {
+  background: rgba(255, 255, 255, 0.08);
 }
 
-.syllabus-item.completed {
-  opacity: 0.7;
+.syllabus-overlay-item.completed {
+  opacity: 0.6;
 }
 
-.syllabus-item.completed:hover {
-  opacity: 1;
+.syllabus-overlay-item.current {
+  background: rgba(20, 184, 166, 0.2);
+  border: 1px solid rgba(20, 184, 166, 0.4);
 }
 
-.syllabus-item.current {
-  background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 100%);
-  border-color: #14b8a6;
-}
-
-.syllabus-item.locked {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.syllabus-item-number {
-  width: 1.75rem;
-  height: 1.75rem;
+.syllabus-overlay-number {
+  width: 1.5rem;
+  height: 1.5rem;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  font-size: 0.75rem;
+  font-size: 0.625rem;
   font-weight: 600;
-  background: #f1f5f9;
-  color: #64748b;
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.7);
 }
 
-.syllabus-item.completed .syllabus-item-number {
-  background: #dcfce7;
-  color: #16a34a;
+.syllabus-overlay-item.completed .syllabus-overlay-number {
+  background: rgba(20, 184, 166, 0.3);
+  color: #14b8a6;
 }
 
-.syllabus-item.current .syllabus-item-number {
-  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+.syllabus-overlay-item.current .syllabus-overlay-number {
+  background: #14b8a6;
   color: white;
 }
 
-.check-icon, .play-icon, .lesson-number {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.check-icon i {
-  font-size: 0.625rem;
-}
-
-.play-icon i {
+.syllabus-overlay-number i {
   font-size: 0.5rem;
-  margin-left: 1px;
 }
 
-.syllabus-item-content {
+.syllabus-overlay-info {
   flex: 1;
   min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
 }
 
-.syllabus-item-title {
-  font-size: 0.8125rem;
-  font-weight: 600;
-  color: #0f172a;
-  margin: 0 0 0.25rem 0;
-  line-height: 1.3;
+.syllabus-overlay-lesson-title {
+  font-size: 0.6875rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.9);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.syllabus-item.completed .syllabus-item-title {
+.syllabus-overlay-item.completed .syllabus-overlay-lesson-title {
   text-decoration: line-through;
-  color: #64748b;
+  color: rgba(255, 255, 255, 0.5);
 }
 
-.syllabus-item.current .syllabus-item-title {
-  color: #0d9488;
+.syllabus-overlay-item.current .syllabus-overlay-lesson-title {
+  color: #5eead4;
 }
 
-.syllabus-item-meta {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.syllabus-duration {
-  font-size: 0.6875rem;
-  color: #94a3b8;
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-}
-
-.syllabus-duration i {
-  font-size: 0.625rem;
-}
-
-.current-badge {
+.syllabus-overlay-duration {
   font-size: 0.5625rem;
-  font-weight: 600;
-  color: white;
-  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
-  padding: 0.125rem 0.375rem;
-  border-radius: 0.25rem;
-  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.5);
 }
 
-.syllabus-item-action {
-  flex-shrink: 0;
-  width: 1.5rem;
+/* Up Next Column */
+.up-next-courses {
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
+  min-width: 0;
+  background: white;
+  border-radius: 0.75rem;
+  padding: 0.875rem;
+  border: 1px solid #e2e8f0;
 }
 
-.syllabus-play-btn {
-  width: 1.5rem;
-  height: 1.5rem;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-  box-shadow: 0 2px 6px rgba(20, 184, 166, 0.3);
-}
-
-.syllabus-play-btn:hover {
-  transform: scale(1.1);
-  box-shadow: 0 4px 12px rgba(20, 184, 166, 0.4);
-}
-
-.syllabus-play-btn i {
-  color: white;
-  font-size: 0.5rem;
-  margin-left: 1px;
-}
-
-.syllabus-item-action i.fa-check-circle {
-  font-size: 0.875rem;
-}
-
-.syllabus-item-action i.fa-lock {
-  font-size: 0.75rem;
-}
-
-/* Syllabus Footer */
-.syllabus-footer {
-  padding: 0.75rem 1rem;
-  background: #f8fafc;
-  border-top: 1px solid #e2e8f0;
-}
-
-.syllabus-progress-info {
+.up-next-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.75rem;
 }
 
-.completed-count {
+.up-next-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+}
+
+.up-next-title i {
+  color: #14b8a6;
   font-size: 0.75rem;
-  color: #64748b;
 }
 
-.progress-percent {
-  font-size: 0.8125rem;
+.up-next-count {
+  font-size: 0.625rem;
+  color: #64748b;
+  background: #f1f5f9;
+  padding: 0.25rem 0.5rem;
+  border-radius: 9999px;
+}
+
+.up-next-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  flex: 1;
+}
+
+/* Up Next Card */
+.up-next-course-card {
+  display: flex;
+  gap: 0.75rem;
+  padding: 0.625rem;
+  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+  border: 1px solid #e2e8f0;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.up-next-course-card:hover {
+  border-color: #14b8a6;
+  box-shadow: 0 8px 20px rgba(20, 184, 166, 0.12);
+  transform: translateY(-2px);
+  background: linear-gradient(135deg, #f0fdfa 0%, #ffffff 100%);
+}
+
+.up-next-thumb {
+  position: relative;
+  width: 100px;
+  height: 65px;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: #1e293b;
+}
+
+.up-next-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.up-next-course-card:hover .up-next-img {
+  transform: scale(1.1);
+}
+
+.up-next-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.4) 0%, transparent 60%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.up-next-course-card:hover .up-next-overlay {
+  opacity: 1;
+}
+
+.up-next-play {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.8);
+  width: 1.75rem;
+  height: 1.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255,255,255,0.95);
+  border-radius: 50%;
+  opacity: 0;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.up-next-course-card:hover .up-next-play {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.up-next-play i {
+  color: #0d9488;
+  font-size: 0.625rem;
+  margin-left: 1px;
+}
+
+.up-next-duration {
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+  padding: 0.1875rem 0.375rem;
+  background: rgba(0,0,0,0.85);
+  color: white;
+  font-size: 0.5625rem;
+  font-weight: 600;
+  border-radius: 0.25rem;
+}
+
+.up-next-progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: rgba(255,255,255,0.3);
+}
+
+.up-next-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #14b8a6, #0d9488);
+  border-radius: 0 0 0.5rem 0.5rem;
+}
+
+.up-next-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.up-next-badges {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.up-next-level {
+  display: inline-block;
+  padding: 0.125rem 0.375rem;
+  font-size: 0.5625rem;
+  font-weight: 600;
+  border-radius: 0.1875rem;
+  text-transform: uppercase;
+}
+
+.up-next-level.beginner {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.up-next-level.intermediate {
+  background: #dbeafe;
+  color: #2563eb;
+}
+
+.up-next-level.advanced {
+  background: #ede9fe;
+  color: #7c3aed;
+}
+
+.up-next-progress-badge {
+  font-size: 0.625rem;
   font-weight: 700;
   color: #0d9488;
 }
 
-.syllabus-progress-bar {
-  height: 6px;
-  background: #e2e8f0;
-  border-radius: 3px;
+.up-next-course-title {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #0f172a;
+  margin: 0 0 0.375rem 0;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
   overflow: hidden;
+  transition: color 0.2s ease;
 }
 
-.syllabus-progress-fill {
-  height: 100%;
-  background: linear-gradient(90deg, #14b8a6, #0d9488);
-  border-radius: 3px;
-  transition: width 0.3s ease;
+.up-next-course-card:hover .up-next-course-title {
+  color: #0d9488;
 }
 
-/* Responsive - Syllabus */
+.up-next-instructor {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  margin-bottom: 0.5rem;
+}
+
+.up-next-avatar {
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 0.5rem;
+  font-weight: 600;
+}
+
+.up-next-instructor span {
+  font-size: 0.625rem;
+  color: #64748b;
+}
+
+.up-next-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.up-next-meta {
+  display: flex;
+  gap: 0.625rem;
+  font-size: 0.5625rem;
+  color: #94a3b8;
+}
+
+.up-next-meta i {
+  margin-right: 0.125rem;
+}
+
+.up-next-meta span:first-child i {
+  color: #14b8a6;
+}
+
+.up-next-resume-btn {
+  padding: 0.3125rem 0.625rem;
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+  color: white;
+  font-size: 0.5625rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  transition: all 0.2s ease;
+  opacity: 0;
+  transform: translateX(8px);
+}
+
+.up-next-course-card:hover .up-next-resume-btn {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.up-next-resume-btn:hover {
+  box-shadow: 0 4px 12px rgba(20, 184, 166, 0.35);
+  transform: scale(1.05);
+}
+
+.up-next-resume-btn i {
+  font-size: 0.5rem;
+}
+
+/* Responsive */
 @media (max-width: 767px) {
-  .course-syllabus-panel {
-    max-height: 400px;
+  .syllabus-overlay {
+    display: none;
   }
 
-  .syllabus-list {
-    max-height: 280px;
+  .up-next-courses {
+    padding: 0.75rem;
   }
 
-  .syllabus-item-title {
-    font-size: 0.75rem;
+  .up-next-list {
+    flex-direction: row;
+    overflow-x: auto;
+    gap: 0.75rem;
+    padding-bottom: 0.5rem;
+  }
+
+  .up-next-course-card {
+    flex: 0 0 260px;
+    flex-direction: column;
+  }
+
+  .up-next-thumb {
+    width: 100%;
+    height: 120px;
+  }
+
+  .up-next-resume-btn {
+    opacity: 1;
+    transform: translateX(0);
   }
 }
 </style>
