@@ -934,14 +934,157 @@ const earnedCertificates = ref([
   { id: 5, title: 'Time Management Mastery', course: 'Time Management', date: 'Sep 15, 2024', credentialId: 'AFC-TM-2024-005', icon: 'fas fa-clock', color: '#f59e0b', instructor: 'Emma Wilson', hours: 3, score: 87, skills: ['Productivity', 'Planning'] },
 ])
 
-// Path filter
+// Path filter & search state
 const pathFilter = ref('all')
+const pathsSearch = ref('')
+const pathsLevelFilter = ref<string[]>([])
+const pathsSortBy = ref('popular')
+const pathsSortOrder = ref<'asc' | 'desc'>('desc')
+const pathsViewMode = ref<'grid' | 'list'>('grid')
 
-// Computed for paths
+// Paths filter dropdown states
+const showPathsLevelFilter = ref(false)
+const showPathsSortDropdown = ref(false)
+
+// Paths pagination state
+const pathsCurrentPage = ref(1)
+const pathsItemsPerPage = ref(10)
+const pathsItemsPerPageOptions = [5, 10, 20, 50]
+
+// Paths sort options
+const pathsSortOptions = [
+  { value: 'popular', label: 'Most Popular', icon: 'fas fa-fire' },
+  { value: 'rating', label: 'Highest Rated', icon: 'fas fa-star' },
+  { value: 'newest', label: 'Newest', icon: 'fas fa-clock' },
+  { value: 'title', label: 'Title A-Z', icon: 'fas fa-sort-alpha-down' },
+  { value: 'courses', label: 'Most Courses', icon: 'fas fa-book' },
+]
+
+// Path level options (derived from learningPaths)
+const pathLevelOptions = computed(() => {
+  const levels = [...new Set(learningPaths.value.map(p => p.level))]
+  return levels.map(l => ({ id: l.toLowerCase(), label: l }))
+})
+
+// Computed for filtered paths
 const filteredPaths = computed(() => {
-  if (pathFilter.value === 'enrolled') return learningPaths.value.filter(p => p.isEnrolled)
-  if (pathFilter.value === 'available') return learningPaths.value.filter(p => !p.isEnrolled)
-  return learningPaths.value
+  let paths = learningPaths.value
+
+  // Filter by enrollment status
+  if (pathFilter.value === 'enrolled') {
+    paths = paths.filter(p => p.isEnrolled)
+  } else if (pathFilter.value === 'available') {
+    paths = paths.filter(p => !p.isEnrolled)
+  }
+
+  // Filter by search
+  if (pathsSearch.value) {
+    const search = pathsSearch.value.toLowerCase()
+    paths = paths.filter(p =>
+      p.title.toLowerCase().includes(search) ||
+      p.description.toLowerCase().includes(search) ||
+      p.skills.some((s: string) => s.toLowerCase().includes(search))
+    )
+  }
+
+  // Filter by level
+  if (pathsLevelFilter.value.length > 0) {
+    paths = paths.filter(p => pathsLevelFilter.value.includes(p.level.toLowerCase()))
+  }
+
+  // Sort
+  paths = [...paths].sort((a, b) => {
+    let comparison = 0
+    switch (pathsSortBy.value) {
+      case 'popular':
+        comparison = b.enrolled - a.enrolled
+        break
+      case 'rating':
+        comparison = b.rating - a.rating
+        break
+      case 'newest':
+        comparison = 0 // Keep original order for now
+        break
+      case 'title':
+        comparison = a.title.localeCompare(b.title)
+        break
+      case 'courses':
+        comparison = b.totalCourses - a.totalCourses
+        break
+    }
+    return pathsSortOrder.value === 'asc' ? -comparison : comparison
+  })
+
+  return paths
+})
+
+// Paginated paths
+const pathsTotalPages = computed(() => Math.ceil(filteredPaths.value.length / pathsItemsPerPage.value))
+
+const paginatedPaths = computed(() => {
+  const start = (pathsCurrentPage.value - 1) * pathsItemsPerPage.value
+  return filteredPaths.value.slice(start, start + pathsItemsPerPage.value)
+})
+
+const pathsPaginationStart = computed(() => {
+  return (pathsCurrentPage.value - 1) * pathsItemsPerPage.value + 1
+})
+const pathsPaginationEnd = computed(() => Math.min(pathsCurrentPage.value * pathsItemsPerPage.value, filteredPaths.value.length))
+
+// Paths pagination functions
+function goToPathsPage(page: number) {
+  if (page >= 1 && page <= pathsTotalPages.value) {
+    pathsCurrentPage.value = page
+  }
+}
+
+function nextPathsPage() {
+  if (pathsCurrentPage.value < pathsTotalPages.value) {
+    pathsCurrentPage.value++
+  }
+}
+
+function prevPathsPage() {
+  if (pathsCurrentPage.value > 1) {
+    pathsCurrentPage.value--
+  }
+}
+
+function changePathsItemsPerPage(value: number) {
+  pathsItemsPerPage.value = value
+  pathsCurrentPage.value = 1
+}
+
+// Paths filter functions
+function togglePathsLevelFilter(levelId: string) {
+  const index = pathsLevelFilter.value.indexOf(levelId)
+  if (index > -1) {
+    pathsLevelFilter.value.splice(index, 1)
+  } else {
+    pathsLevelFilter.value.push(levelId)
+  }
+}
+
+// Active paths filters count
+const activePathsFiltersCount = computed(() => {
+  let count = 0
+  if (pathsSearch.value) count++
+  count += pathsLevelFilter.value.length
+  if (pathFilter.value !== 'all') count++
+  return count
+})
+
+// Clear all paths filters
+function clearAllPathsFilters() {
+  pathsSearch.value = ''
+  pathsLevelFilter.value = []
+  pathFilter.value = 'all'
+  pathsCurrentPage.value = 1
+}
+
+// Watch for filter changes to reset pagination
+watch([pathFilter, pathsSearch, pathsLevelFilter], () => {
+  pathsCurrentPage.value = 1
 })
 
 const myEnrolledPaths = computed(() => learningPaths.value.filter(p => p.isEnrolled))
@@ -2341,21 +2484,190 @@ function resumeFeaturedAutoPlay() {
               </h2>
             </div>
 
-            <!-- Bottom Row - Filter -->
+            <!-- Bottom Row - Search, Filters, View Options -->
             <div class="px-4 py-2 bg-gray-50/50 flex flex-wrap items-center gap-3">
-              <!-- Filter Dropdown -->
+              <!-- Search -->
+              <div class="min-w-[200px] max-w-md relative">
+                <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+                <input
+                  v-model="pathsSearch"
+                  type="text"
+                  placeholder="Search learning paths..."
+                  class="w-full pl-9 pr-4 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all"
+                >
+                <button v-if="pathsSearch" @click="pathsSearch = ''" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                  <i class="fas fa-times text-xs"></i>
+                </button>
+              </div>
+
+              <!-- Level Filter Dropdown -->
+              <div class="relative">
+                <button
+                  @click="showPathsLevelFilter = !showPathsLevelFilter"
+                  :class="[
+                    'flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border',
+                    pathsLevelFilter.length > 0 ? 'bg-teal-50 border-teal-200 text-teal-700' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+                  ]"
+                >
+                  <i class="fas fa-layer-group text-sm"></i>
+                  <span>{{ pathsLevelFilter.length > 0 ? `${pathsLevelFilter.length} Levels` : 'Level' }}</span>
+                  <i :class="showPathsLevelFilter ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ml-1"></i>
+                </button>
+
+                <!-- Dropdown Menu -->
+                <div
+                  v-if="showPathsLevelFilter"
+                  class="absolute left-0 top-full mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
+                >
+                  <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Select Levels</div>
+                  <div class="max-h-48 overflow-y-auto">
+                    <button
+                      v-for="level in pathLevelOptions"
+                      :key="level.id"
+                      @click="togglePathsLevelFilter(level.id)"
+                      :class="[
+                        'w-full px-3 py-2 text-left text-sm flex items-center gap-3 transition-colors',
+                        pathsLevelFilter.includes(level.id) ? 'bg-teal-50 text-teal-700' : 'text-gray-700 hover:bg-gray-50'
+                      ]"
+                    >
+                      <div :class="[
+                        'w-4 h-4 rounded border-2 flex items-center justify-center transition-all',
+                        pathsLevelFilter.includes(level.id) ? 'bg-teal-500 border-teal-500' : 'border-gray-300'
+                      ]">
+                        <i v-if="pathsLevelFilter.includes(level.id)" class="fas fa-check text-white text-[8px]"></i>
+                      </div>
+                      <span class="flex-1">{{ level.label }}</span>
+                    </button>
+                  </div>
+                  <div class="my-2 border-t border-gray-100"></div>
+                  <div class="px-3 flex gap-2">
+                    <button
+                      @click="pathsLevelFilter = []; showPathsLevelFilter = false"
+                      class="flex-1 px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                    >
+                      Clear All
+                    </button>
+                    <button
+                      @click="showPathsLevelFilter = false"
+                      class="flex-1 px-3 py-1.5 text-xs font-medium text-white bg-teal-500 rounded-lg hover:bg-teal-600 transition-colors"
+                    >
+                      Apply
+                    </button>
+                  </div>
+                </div>
+                <div v-if="showPathsLevelFilter" @click="showPathsLevelFilter = false" class="fixed inset-0 z-40"></div>
+              </div>
+
+              <!-- Enrollment Filter Dropdown -->
               <select v-model="pathFilter" class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border bg-white border-gray-200 text-gray-600 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-teal-500 cursor-pointer">
                 <option value="all">All Paths</option>
                 <option value="enrolled">My Enrolled</option>
                 <option value="available">Available</option>
               </select>
+
+              <!-- Sort Options with Order Toggle -->
+              <div class="relative ml-auto flex items-center">
+                <button
+                  @click="showPathsSortDropdown = !showPathsSortDropdown"
+                  class="flex items-center gap-2 px-3 py-1.5 rounded-l-lg text-xs font-medium transition-all border border-r-0 bg-white border-gray-200 text-gray-600 hover:bg-gray-50"
+                >
+                  <i :class="[pathsSortOptions.find(o => o.value === pathsSortBy)?.icon, 'text-sm text-teal-500']"></i>
+                  <span>{{ pathsSortOptions.find(o => o.value === pathsSortBy)?.label }}</span>
+                  <i :class="showPathsSortDropdown ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ml-1"></i>
+                </button>
+                <button
+                  @click="pathsSortOrder = pathsSortOrder === 'asc' ? 'desc' : 'asc'"
+                  class="flex items-center justify-center w-8 h-8 rounded-r-lg text-xs font-medium transition-all border bg-white border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-teal-600"
+                  :title="pathsSortOrder === 'asc' ? 'Ascending order - Click for descending' : 'Descending order - Click for ascending'"
+                >
+                  <i :class="pathsSortOrder === 'asc' ? 'fas fa-arrow-up' : 'fas fa-arrow-down'" class="text-sm text-teal-500"></i>
+                </button>
+
+                <!-- Dropdown Menu -->
+                <div
+                  v-if="showPathsSortDropdown"
+                  class="absolute left-0 top-full mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
+                >
+                  <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Sort By</div>
+                  <div class="max-h-64 overflow-y-auto">
+                    <button
+                      v-for="option in pathsSortOptions"
+                      :key="option.value"
+                      @click="pathsSortBy = option.value; showPathsSortDropdown = false"
+                      :class="[
+                        'w-full px-3 py-2 text-left text-sm flex items-center gap-3 transition-colors',
+                        pathsSortBy === option.value ? 'bg-teal-50 text-teal-700' : 'text-gray-700 hover:bg-gray-50'
+                      ]"
+                    >
+                      <i :class="[option.icon, 'text-sm w-4', pathsSortBy === option.value ? 'text-teal-500' : 'text-gray-400']"></i>
+                      <span class="flex-1">{{ option.label }}</span>
+                      <i v-if="pathsSortBy === option.value" class="fas fa-check text-teal-500 text-xs"></i>
+                    </button>
+                  </div>
+                </div>
+                <div v-if="showPathsSortDropdown" @click="showPathsSortDropdown = false" class="fixed inset-0 z-40"></div>
+              </div>
+
+              <!-- View Toggle -->
+              <div class="flex items-center gap-0.5 bg-white border border-gray-200 rounded-lg p-1">
+                <button
+                  @click="pathsViewMode = 'grid'"
+                  :class="['px-2.5 py-1 rounded-md transition-all', pathsViewMode === 'grid' ? 'bg-teal-500 text-white' : 'text-gray-500 hover:bg-gray-100']"
+                  title="Grid view"
+                >
+                  <i class="fas fa-th-large text-xs"></i>
+                </button>
+                <button
+                  @click="pathsViewMode = 'list'"
+                  :class="['px-2.5 py-1 rounded-md transition-all', pathsViewMode === 'list' ? 'bg-teal-500 text-white' : 'text-gray-500 hover:bg-gray-100']"
+                  title="List view"
+                >
+                  <i class="fas fa-list text-xs"></i>
+                </button>
+              </div>
             </div>
+          </div>
+
+          <!-- Active Filters Bar -->
+          <div v-if="activePathsFiltersCount > 0" class="flex items-center gap-3 mb-4 p-3 bg-white rounded-xl border border-gray-100 shadow-sm mx-4 mt-4">
+            <div class="flex items-center gap-2 px-2 py-1 bg-gray-100 rounded-lg">
+              <i class="fas fa-filter text-gray-400 text-xs"></i>
+              <span class="text-xs font-medium text-gray-600">Active Filters</span>
+            </div>
+            <div class="flex flex-wrap gap-2 flex-1">
+              <!-- Search Filter -->
+              <span v-if="pathsSearch" class="px-2.5 py-1 bg-gray-100 text-gray-700 rounded-lg text-xs font-medium flex items-center gap-1.5 border border-gray-200">
+                <i class="fas fa-search text-[10px]"></i>
+                "{{ pathsSearch }}"
+                <button @click="pathsSearch = ''" class="ml-1 hover:text-gray-900 hover:bg-gray-200 rounded-full w-4 h-4 flex items-center justify-center"><i class="fas fa-times text-[10px]"></i></button>
+              </span>
+              <!-- Level Filters -->
+              <span
+                v-for="level in pathsLevelFilter"
+                :key="'path-level-' + level"
+                class="px-2.5 py-1 bg-teal-50 text-teal-700 rounded-lg text-xs font-medium flex items-center gap-1.5 border border-teal-100"
+              >
+                <i class="fas fa-signal text-[10px]"></i>
+                {{ level.charAt(0).toUpperCase() + level.slice(1) }}
+                <button @click="togglePathsLevelFilter(level)" class="ml-1 hover:text-teal-900 hover:bg-teal-100 rounded-full w-4 h-4 flex items-center justify-center"><i class="fas fa-times text-[10px]"></i></button>
+              </span>
+              <!-- Enrollment Filter -->
+              <span v-if="pathFilter !== 'all'" class="px-2.5 py-1 bg-blue-50 text-blue-700 rounded-lg text-xs font-medium flex items-center gap-1.5 border border-blue-100">
+                <i class="fas fa-user-graduate text-[10px]"></i>
+                {{ pathFilter === 'enrolled' ? 'My Enrolled' : 'Available' }}
+                <button @click="pathFilter = 'all'" class="ml-1 hover:text-blue-900 hover:bg-blue-100 rounded-full w-4 h-4 flex items-center justify-center"><i class="fas fa-times text-[10px]"></i></button>
+              </span>
+            </div>
+            <button @click="clearAllPathsFilters" class="px-3 py-1.5 text-xs font-medium text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors flex items-center gap-1.5">
+              <i class="fas fa-times-circle"></i>
+              Clear all
+            </button>
           </div>
 
           <!-- Paths Grid -->
           <div class="p-4">
             <div class="all-courses-grid">
-              <div v-for="path in filteredPaths" :key="path.id"
+              <div v-for="path in paginatedPaths" :key="path.id"
                    class="all-course-card group bg-white rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 hover:-translate-y-1.5 border border-gray-100 shadow-sm hover:shadow-lg hover:border-teal-200">
                 <!-- Card Thumbnail -->
                 <div class="relative aspect-video">
@@ -2461,15 +2773,97 @@ function resumeFeaturedAutoPlay() {
             </div>
 
             <!-- Empty State -->
-            <div v-if="filteredPaths.length === 0" class="all-courses-empty">
+            <div v-if="paginatedPaths.length === 0" class="all-courses-empty">
               <div class="all-courses-empty-icon">
                 <i class="fas fa-route"></i>
               </div>
               <h3 class="all-courses-empty-title">No learning paths found</h3>
               <p class="all-courses-empty-text">Try adjusting your filter selection</p>
-              <button @click="pathFilter = 'all'" class="all-courses-clear-btn">
+              <button @click="clearAllPathsFilters" class="all-courses-clear-btn">
                 <i class="fas fa-redo"></i> Reset Filters
               </button>
+            </div>
+
+            <!-- Pagination Footer -->
+            <div v-if="filteredPaths.length > 0" class="mt-4 px-4 py-3 bg-white rounded-2xl border border-gray-100 shadow-sm">
+              <div class="flex items-center justify-between flex-wrap gap-3">
+                <!-- Left: Stats & Items Per Page -->
+                <div class="flex items-center gap-4 flex-wrap">
+                  <span class="text-xs text-gray-500">
+                    Showing <span class="font-semibold text-gray-700">{{ pathsPaginationStart }}</span>
+                    to <span class="font-semibold text-gray-700">{{ pathsPaginationEnd }}</span>
+                    of <span class="font-semibold text-gray-700">{{ filteredPaths.length }}</span> paths
+                  </span>
+
+                  <!-- Items Per Page Selector -->
+                  <div class="flex items-center gap-2">
+                    <span class="text-xs text-gray-500">Show:</span>
+                    <select
+                      v-model="pathsItemsPerPage"
+                      @change="changePathsItemsPerPage(Number(($event.target as HTMLSelectElement).value))"
+                      class="text-xs px-2 py-1.5 rounded-lg border border-gray-200 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 cursor-pointer"
+                    >
+                      <option v-for="option in pathsItemsPerPageOptions" :key="option" :value="option">
+                        {{ option }}
+                      </option>
+                    </select>
+                    <span class="text-xs text-gray-500">per page</span>
+                  </div>
+                </div>
+
+                <!-- Right: Pagination Controls -->
+                <div class="flex items-center gap-2">
+                  <button
+                    @click="prevPathsPage"
+                    :disabled="pathsCurrentPage === 1"
+                    :class="[
+                      'px-3 py-1.5 text-xs rounded-lg transition-colors flex items-center gap-1.5 border',
+                      pathsCurrentPage === 1
+                        ? 'text-gray-300 border-gray-100 cursor-not-allowed'
+                        : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100 border-gray-200'
+                    ]"
+                  >
+                    <i class="fas fa-chevron-left text-[10px]"></i>
+                    Previous
+                  </button>
+
+                  <!-- Page Numbers -->
+                  <div class="flex items-center gap-1">
+                    <template v-for="page in pathsTotalPages" :key="page">
+                      <button
+                        v-if="page === 1 || page === pathsTotalPages || (page >= pathsCurrentPage - 1 && page <= pathsCurrentPage + 1)"
+                        @click="goToPathsPage(page)"
+                        :class="[
+                          'w-8 h-8 text-xs rounded-lg transition-colors flex items-center justify-center',
+                          page === pathsCurrentPage
+                            ? 'font-medium text-teal-600 bg-teal-50'
+                            : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
+                        ]"
+                      >
+                        {{ page }}
+                      </button>
+                      <span
+                        v-else-if="page === pathsCurrentPage - 2 || page === pathsCurrentPage + 2"
+                        class="text-xs text-gray-400 px-1"
+                      >...</span>
+                    </template>
+                  </div>
+
+                  <button
+                    @click="nextPathsPage"
+                    :disabled="pathsCurrentPage === pathsTotalPages"
+                    :class="[
+                      'px-3 py-1.5 text-xs rounded-lg transition-colors flex items-center gap-1.5 border',
+                      pathsCurrentPage === pathsTotalPages
+                        ? 'text-gray-300 border-gray-100 cursor-not-allowed'
+                        : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100 border-gray-200'
+                    ]"
+                  >
+                    Next
+                    <i class="fas fa-chevron-right text-[10px]"></i>
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
