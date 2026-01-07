@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
+import ContentActionsDropdown from '@/components/common/ContentActionsDropdown.vue'
+import AddToCollectionModal from '@/components/common/AddToCollectionModal.vue'
 
 const router = useRouter()
 
@@ -31,6 +33,14 @@ const currentPage = ref(1)
 const itemsPerPage = ref(10)
 const itemsPerPageOptions = [5, 10, 20, 50, 100]
 const toasts = ref<Array<{ id: number; type: string; message: string }>>([])
+
+// Add to Collection modal
+const showAddToCollectionModal = ref(false)
+const selectedItemForCollection = ref<{
+  id: number
+  title: string
+  thumbnail?: string
+} | null>(null)
 
 const sortOptions = ref([
   { value: 'recent', label: 'Recent', icon: 'fas fa-clock' },
@@ -779,6 +789,24 @@ function shareViaEmail(article: typeof articles.value[0]) {
   const subject = encodeURIComponent(article.title)
   const body = encodeURIComponent(`Check out this article: ${article.title}\n\n${window.location.origin}/articles/${article.id}`)
   window.open(`mailto:?subject=${subject}&body=${body}`)
+}
+
+function openAddToCollection(article: any) {
+  selectedItemForCollection.value = {
+    id: article.id,
+    title: article.title,
+    thumbnail: article.coverImage || undefined
+  }
+  showAddToCollectionModal.value = true
+}
+
+function handleAddedToCollection(collectionIds: string[]) {
+  if (collectionIds.length > 0) {
+    toasts.value.push({ id: Date.now(), type: 'success', message: `Added to ${collectionIds.length} collection(s)!` })
+    setTimeout(() => toasts.value.shift(), 3000)
+  }
+  showAddToCollectionModal.value = false
+  selectedItemForCollection.value = null
 }
 
 function rateArticle(articleId: number, rating: number) {
@@ -1724,16 +1752,24 @@ onUnmounted(() => {
                       <i class="fas fa-star text-[8px]"></i> Featured
                     </span>
                   </div>
-                  <!-- Bookmark Button -->
-                  <button
-                    @click.stop="toggleBookmark(article.id)"
-                    :class="[
-                      'w-7 h-7 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center transition-all shadow-sm opacity-0 group-hover:opacity-100',
-                      bookmarks.includes(article.id) ? 'text-teal-600' : 'text-gray-400 hover:text-teal-600 hover:bg-white'
-                    ]"
-                  >
-                    <i :class="bookmarks.includes(article.id) ? 'fas fa-bookmark' : 'far fa-bookmark'" class="text-xs"></i>
-                  </button>
+                  <!-- Action Buttons -->
+                  <div class="flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button
+                      @click.stop="toggleBookmark(article.id)"
+                      :class="[
+                        'w-7 h-7 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center transition-all shadow-sm',
+                        bookmarks.includes(article.id) ? 'text-teal-600' : 'text-gray-400 hover:text-teal-600 hover:bg-white'
+                      ]"
+                    >
+                      <i :class="bookmarks.includes(article.id) ? 'fas fa-bookmark' : 'far fa-bookmark'" class="text-xs"></i>
+                    </button>
+                    <ContentActionsDropdown
+                      :show-download="false"
+                      @add-to-collection="openAddToCollection(article)"
+                      @share="openShareModal(article)"
+                      @copy-link="copyArticleLink(article.id)"
+                    />
+                  </div>
                 </div>
 
                 <!-- Category Badge (Bottom) -->
@@ -1931,6 +1967,12 @@ onUnmounted(() => {
                 >
                   <i class="fas fa-share-alt text-xs"></i>
                 </button>
+                <ContentActionsDropdown
+                  :show-download="false"
+                  @add-to-collection="openAddToCollection(article)"
+                  @share="openShareModal(article)"
+                  @copy-link="copyArticleLink(article.id)"
+                />
               </div>
             </article>
           </div>
@@ -2032,6 +2074,17 @@ onUnmounted(() => {
         </div>
       </div>
     </div>
+
+    <!-- Add to Collection Modal -->
+    <AddToCollectionModal
+      :show="showAddToCollectionModal"
+      content-type="article"
+      :content-id="selectedItemForCollection?.id || 0"
+      :content-title="selectedItemForCollection?.title || ''"
+      :content-thumbnail="selectedItemForCollection?.thumbnail"
+      @close="showAddToCollectionModal = false"
+      @added="handleAddedToCollection"
+    />
   </div>
 </template>
 

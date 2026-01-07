@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
+import ContentActionsDropdown from '@/components/common/ContentActionsDropdown.vue'
+import AddToCollectionModal from '@/components/common/AddToCollectionModal.vue'
 
 const router = useRouter()
 
@@ -48,6 +50,14 @@ const selectedTags = ref<string[]>([])
 const currentView = ref<'all' | 'shared' | 'team' | 'starred' | 'trash'>('all')
 const isSelectionMode = ref(false)
 const selectedDocuments = ref(new Set<string>())
+
+// Add to Collection modal
+const showAddToCollectionModal = ref(false)
+const selectedItemForCollection = ref<{
+  id: string
+  title: string
+  thumbnail?: string
+} | null>(null)
 
 // Pagination state
 const currentPage = ref(1)
@@ -616,6 +626,23 @@ function shareDocument(doc: any) {
   alert(`Share link copied for: ${doc.name}`)
 }
 
+function openAddToCollection(doc: any) {
+  selectedItemForCollection.value = {
+    id: doc.id,
+    title: doc.name,
+    thumbnail: doc.thumbnail || undefined
+  }
+  showAddToCollectionModal.value = true
+}
+
+function handleAddedToCollection(collectionIds: string[]) {
+  if (collectionIds.length > 0) {
+    alert(`Added to ${collectionIds.length} collection(s)!`)
+  }
+  showAddToCollectionModal.value = false
+  selectedItemForCollection.value = null
+}
+
 function toggleStar(doc: any) {
   doc.isStarred = !doc.isStarred
   console.log(doc.isStarred ? 'Starred:' : 'Unstarred:', doc.name)
@@ -1008,6 +1035,13 @@ function getFileIconBg(type: string): string {
                 >
                   <i class="fas fa-download text-xs"></i>
                 </button>
+                <ContentActionsDropdown
+                  :show-download="true"
+                  @add-to-collection="openAddToCollection(doc)"
+                  @share="shareDocument(doc)"
+                  @download="downloadDocument(doc)"
+                  @copy-link="() => navigator.clipboard.writeText(window.location.origin + '/documents/' + doc.id)"
+                />
               </div>
             </div>
           </div>
@@ -1077,6 +1111,13 @@ function getFileIconBg(type: string): string {
                 >
                   <i class="fas fa-download text-xs"></i>
                 </button>
+                <ContentActionsDropdown
+                  :show-download="true"
+                  @add-to-collection="openAddToCollection(doc)"
+                  @share="shareDocument(doc)"
+                  @download="downloadDocument(doc)"
+                  @copy-link="() => navigator.clipboard.writeText(window.location.origin + '/documents/' + doc.id)"
+                />
               </div>
             </div>
           </div>
@@ -1911,6 +1952,14 @@ function getFileIconBg(type: string): string {
                     >
                       <i class="fas fa-share-alt text-xs"></i>
                     </button>
+                    <ContentActionsDropdown
+                      v-if="currentView !== 'trash'"
+                      :show-download="true"
+                      @add-to-collection="openAddToCollection(doc)"
+                      @share="shareDocument(doc)"
+                      @download="downloadDocument(doc)"
+                      @copy-link="() => navigator.clipboard.writeText(window.location.origin + '/documents/' + doc.id)"
+                    />
                   </div>
 
                 </div>
@@ -2263,6 +2312,13 @@ function getFileIconBg(type: string): string {
                         >
                           <i class="fas fa-share-alt text-sm"></i>
                         </button>
+                        <ContentActionsDropdown
+                          :show-download="true"
+                          @add-to-collection="openAddToCollection(doc)"
+                          @share="shareDocument(doc)"
+                          @download="downloadDocument(doc)"
+                          @copy-link="() => navigator.clipboard.writeText(window.location.origin + '/documents/' + doc.id)"
+                        />
                       </template>
                       <template v-else>
                         <button
@@ -2390,6 +2446,17 @@ function getFileIconBg(type: string): string {
         </div>
       </div>
     </div>
+
+    <!-- Add to Collection Modal -->
+    <AddToCollectionModal
+      :show="showAddToCollectionModal"
+      content-type="document"
+      :content-id="selectedItemForCollection?.id ?? ''"
+      :content-title="selectedItemForCollection?.title ?? ''"
+      :content-thumbnail="selectedItemForCollection?.thumbnail"
+      @close="showAddToCollectionModal = false; selectedItemForCollection = null"
+      @added="handleAddedToCollection"
+    />
   </div>
 </template>
 
