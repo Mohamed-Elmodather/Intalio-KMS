@@ -645,25 +645,48 @@ function resumeFeaturedAutoPlay() {
 
             <!-- Up Next Column -->
             <div class="up-next-courses">
-              <h3 class="up-next-title"><i class="fas fa-list"></i> Up Next</h3>
+              <div class="up-next-header">
+                <h3 class="up-next-title"><i class="fas fa-list"></i> Up Next</h3>
+                <span class="up-next-count">{{ upNextCourses.length }} courses</span>
+              </div>
               <div class="up-next-list">
-                <div v-for="course in upNextCourses" :key="course.id"
+                <div v-for="(course, index) in upNextCourses" :key="course.id"
                      @click="navigateToCourse(course.id)"
                      class="up-next-course-card group">
+                  <!-- Queue Number -->
+                  <div class="up-next-queue">{{ index + 1 }}</div>
+
+                  <!-- Thumbnail -->
                   <div class="up-next-thumb">
                     <img :src="course.image" :alt="course.title" class="up-next-img" />
+                    <div class="up-next-overlay"></div>
                     <div class="up-next-play"><i class="fas fa-play"></i></div>
                     <span class="up-next-duration">{{ course.duration }}</span>
+                    <!-- Progress Bar -->
                     <div class="up-next-progress">
                       <div class="up-next-progress-fill" :style="{ width: course.progress + '%' }"></div>
                     </div>
                   </div>
+
+                  <!-- Info -->
                   <div class="up-next-info">
-                    <span :class="['up-next-level', course.levelClass]">{{ course.level }}</span>
+                    <div class="up-next-badges">
+                      <span :class="['up-next-level', course.levelClass]">{{ course.level }}</span>
+                      <span class="up-next-progress-badge">{{ course.progress }}%</span>
+                    </div>
                     <h4 class="up-next-course-title">{{ course.title }}</h4>
-                    <div class="up-next-meta">
-                      <span><i class="fas fa-redo"></i> {{ course.progress }}%</span>
-                      <span><i class="fas fa-play-circle"></i> {{ course.completedLessons }}/{{ course.totalLessons }}</span>
+                    <div class="up-next-instructor">
+                      <div class="up-next-avatar">{{ course.instructorInitials }}</div>
+                      <span>{{ course.instructor }}</span>
+                    </div>
+                    <div class="up-next-footer">
+                      <div class="up-next-meta">
+                        <span><i class="fas fa-play-circle"></i> {{ course.completedLessons }}/{{ course.totalLessons }}</span>
+                        <span><i class="fas fa-star text-amber-400"></i> {{ course.rating }}</span>
+                      </div>
+                      <button class="up-next-resume-btn" @click.stop="navigateToCourse(course.id)">
+                        <i class="fas fa-play"></i> Resume
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -2158,52 +2181,93 @@ function resumeFeaturedAutoPlay() {
   display: flex;
   flex-direction: column;
   min-width: 0;
+  background: white;
+  border-radius: 0.75rem;
+  padding: 0.875rem;
+  border: 1px solid #e2e8f0;
+}
+
+.up-next-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
 }
 
 .up-next-title {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-size: 0.8125rem;
-  font-weight: 600;
-  color: #334155;
-  margin: 0 0 0.625rem 0;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
 }
 
 .up-next-title i {
   color: #14b8a6;
+  font-size: 0.75rem;
+}
+
+.up-next-count {
+  font-size: 0.625rem;
+  color: #64748b;
+  background: #f1f5f9;
+  padding: 0.25rem 0.5rem;
+  border-radius: 9999px;
 }
 
 .up-next-list {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.625rem;
   flex: 1;
 }
 
 /* Up Next Card */
 .up-next-course-card {
   display: flex;
-  gap: 0.625rem;
-  padding: 0.5rem;
-  background: white;
-  border: 1px solid #f1f5f9;
-  border-radius: 0.625rem;
+  gap: 0.75rem;
+  padding: 0.625rem;
+  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+  border: 1px solid #e2e8f0;
+  border-radius: 0.75rem;
   cursor: pointer;
-  transition: all 0.25s ease;
+  transition: all 0.3s ease;
+  position: relative;
 }
 
 .up-next-course-card:hover {
   border-color: #14b8a6;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
-  transform: translateX(4px);
+  box-shadow: 0 8px 20px rgba(20, 184, 166, 0.12);
+  transform: translateY(-2px);
+  background: linear-gradient(135deg, #f0fdfa 0%, #ffffff 100%);
+}
+
+/* Queue Number */
+.up-next-queue {
+  position: absolute;
+  top: -6px;
+  left: -6px;
+  width: 1.25rem;
+  height: 1.25rem;
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+  color: white;
+  font-size: 0.625rem;
+  font-weight: 700;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(20, 184, 166, 0.4);
+  z-index: 5;
 }
 
 .up-next-thumb {
   position: relative;
-  width: 90px;
-  height: 56px;
-  border-radius: 0.375rem;
+  width: 100px;
+  height: 65px;
+  border-radius: 0.5rem;
   overflow: hidden;
   flex-shrink: 0;
   background: #1e293b;
@@ -2213,43 +2277,63 @@ function resumeFeaturedAutoPlay() {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.3s ease;
+  transition: transform 0.4s ease;
 }
 
 .up-next-course-card:hover .up-next-img {
   transform: scale(1.1);
 }
 
-.up-next-play {
+.up-next-overlay {
   position: absolute;
   inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(0,0,0,0.3);
+  background: linear-gradient(to top, rgba(0,0,0,0.4) 0%, transparent 60%);
   opacity: 0;
   transition: opacity 0.3s ease;
 }
 
-.up-next-course-card:hover .up-next-play {
+.up-next-course-card:hover .up-next-overlay {
   opacity: 1;
 }
 
+.up-next-play {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.8);
+  width: 1.75rem;
+  height: 1.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255,255,255,0.95);
+  border-radius: 50%;
+  opacity: 0;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.up-next-course-card:hover .up-next-play {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
 .up-next-play i {
-  color: white;
-  font-size: 0.75rem;
+  color: #0d9488;
+  font-size: 0.625rem;
+  margin-left: 1px;
 }
 
 .up-next-duration {
   position: absolute;
-  bottom: 2px;
-  right: 2px;
-  padding: 0.125rem 0.25rem;
-  background: rgba(0,0,0,0.8);
+  bottom: 4px;
+  right: 4px;
+  padding: 0.1875rem 0.375rem;
+  background: rgba(0,0,0,0.85);
   color: white;
-  font-size: 0.5rem;
-  font-weight: 500;
-  border-radius: 0.1875rem;
+  font-size: 0.5625rem;
+  font-weight: 600;
+  border-radius: 0.25rem;
 }
 
 .up-next-progress {
@@ -2257,13 +2341,14 @@ function resumeFeaturedAutoPlay() {
   bottom: 0;
   left: 0;
   right: 0;
-  height: 2px;
+  height: 3px;
   background: rgba(255,255,255,0.3);
 }
 
 .up-next-progress-fill {
   height: 100%;
   background: linear-gradient(90deg, #14b8a6, #0d9488);
+  border-radius: 0 0 0.5rem 0.5rem;
 }
 
 .up-next-info {
@@ -2271,18 +2356,23 @@ function resumeFeaturedAutoPlay() {
   min-width: 0;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: space-between;
+}
+
+.up-next-badges {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
 }
 
 .up-next-level {
   display: inline-block;
-  padding: 0.0625rem 0.25rem;
-  font-size: 0.5rem;
+  padding: 0.125rem 0.375rem;
+  font-size: 0.5625rem;
   font-weight: 600;
-  border-radius: 0.125rem;
+  border-radius: 0.1875rem;
   text-transform: uppercase;
-  margin-bottom: 0.25rem;
-  width: fit-content;
 }
 
 .up-next-level.beginner {
@@ -2300,12 +2390,18 @@ function resumeFeaturedAutoPlay() {
   color: #7c3aed;
 }
 
+.up-next-progress-badge {
+  font-size: 0.625rem;
+  font-weight: 700;
+  color: #0d9488;
+}
+
 .up-next-course-title {
-  font-size: 0.75rem;
+  font-size: 0.8125rem;
   font-weight: 600;
   color: #0f172a;
-  margin: 0 0 0.25rem 0;
-  line-height: 1.25;
+  margin: 0 0 0.375rem 0;
+  line-height: 1.3;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -2317,6 +2413,38 @@ function resumeFeaturedAutoPlay() {
   color: #0d9488;
 }
 
+.up-next-instructor {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  margin-bottom: 0.5rem;
+}
+
+.up-next-avatar {
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 0.5rem;
+  font-weight: 600;
+}
+
+.up-next-instructor span {
+  font-size: 0.625rem;
+  color: #64748b;
+}
+
+.up-next-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
 .up-next-meta {
   display: flex;
   gap: 0.625rem;
@@ -2325,12 +2453,50 @@ function resumeFeaturedAutoPlay() {
 }
 
 .up-next-meta i {
-  margin-right: 0.1875rem;
+  margin-right: 0.125rem;
+}
+
+.up-next-meta span:first-child i {
   color: #14b8a6;
+}
+
+.up-next-resume-btn {
+  padding: 0.3125rem 0.625rem;
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+  color: white;
+  font-size: 0.5625rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  transition: all 0.2s ease;
+  opacity: 0;
+  transform: translateX(8px);
+}
+
+.up-next-course-card:hover .up-next-resume-btn {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.up-next-resume-btn:hover {
+  box-shadow: 0 4px 12px rgba(20, 184, 166, 0.35);
+  transform: scale(1.05);
+}
+
+.up-next-resume-btn i {
+  font-size: 0.5rem;
 }
 
 /* Responsive - Stack on mobile */
 @media (max-width: 767px) {
+  .up-next-courses {
+    padding: 0.75rem;
+  }
+
   .up-next-list {
     flex-direction: row;
     overflow-x: auto;
@@ -2339,13 +2505,23 @@ function resumeFeaturedAutoPlay() {
   }
 
   .up-next-course-card {
-    flex: 0 0 220px;
+    flex: 0 0 260px;
     flex-direction: column;
   }
 
   .up-next-thumb {
     width: 100%;
-    height: 100px;
+    height: 120px;
+  }
+
+  .up-next-queue {
+    top: 0.5rem;
+    left: 0.5rem;
+  }
+
+  .up-next-resume-btn {
+    opacity: 1;
+    transform: translateX(0);
   }
 }
 </style>
