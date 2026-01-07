@@ -3991,10 +3991,11 @@ function resumeFeaturedAutoPlay() {
 
 /* Trending Section */
 .trending-section {
-  background: linear-gradient(135deg, #fef3c7 0%, #fff7ed 50%, #ffffff 100%);
-  border: 1px solid #fcd34d;
+  background: white;
+  border: 1px solid #e5e7eb;
   border-radius: 1rem;
   padding: 1.25rem;
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
 }
 
 .trending-header {
