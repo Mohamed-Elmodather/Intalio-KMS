@@ -87,6 +87,7 @@ const enrolledCourses = ref([
     image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&h=300&fit=crop',
     tags: ['Data Science', 'Analytics'],
     description: 'Master advanced data analytics techniques including statistical modeling, predictive analytics, and business intelligence. Learn to transform raw data into actionable insights.',
+    saved: false,
     syllabus: [
       { id: 1, title: 'Introduction to Data Analytics', duration: '30 min', completed: true },
       { id: 2, title: 'Data Collection Methods', duration: '45 min', completed: true },
@@ -122,6 +123,7 @@ const enrolledCourses = ref([
     image: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=400&h=300&fit=crop',
     tags: ['Leadership', 'Management'],
     description: 'Develop essential leadership skills to inspire and guide teams effectively. Learn communication strategies, conflict resolution, and how to drive organizational success.',
+    saved: true,
     syllabus: [
       { id: 1, title: 'What Makes a Great Leader', duration: '25 min', completed: true },
       { id: 2, title: 'Communication Strategies', duration: '35 min', completed: true },
@@ -156,6 +158,7 @@ const enrolledCourses = ref([
     image: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=400&h=300&fit=crop',
     tags: ['Security', 'IT'],
     description: 'Build a solid foundation in cybersecurity principles. Understand common threats, learn protective measures, and develop skills to safeguard digital assets and information.',
+    saved: false,
     syllabus: [
       { id: 1, title: 'Introduction to Cybersecurity', duration: '30 min', completed: true },
       { id: 2, title: 'Common Threats & Vulnerabilities', duration: '35 min', completed: true },
@@ -187,6 +190,7 @@ const enrolledCourses = ref([
     image: 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=400&h=300&fit=crop',
     tags: ['Soft Skills', 'Communication'],
     description: 'Enhance your communication abilities for professional success. Master verbal and written communication, presentations, and interpersonal skills for effective workplace interactions.',
+    saved: false,
     syllabus: [
       { id: 1, title: 'The Art of Communication', duration: '30 min', completed: false },
       { id: 2, title: 'Active Listening Skills', duration: '25 min', completed: false },
@@ -220,6 +224,7 @@ const enrolledCourses = ref([
     image: 'https://images.unsplash.com/photo-1507925921958-8a62f3d1a50d?w=400&h=300&fit=crop',
     tags: ['Project Management', 'Agile'],
     description: 'Become a proficient project manager with comprehensive training in Agile, Scrum, and traditional methodologies. Learn to plan, execute, and deliver successful projects on time and budget.',
+    saved: false,
     syllabus: [
       { id: 1, title: 'Project Management Overview', duration: '30 min', completed: true },
       { id: 2, title: 'Project Lifecycle Phases', duration: '40 min', completed: true },
@@ -491,6 +496,13 @@ function navigateToCourse(courseId: number) {
   router.push({ name: 'CourseView', params: { id: courseId } })
 }
 
+function toggleSaveCourse(courseId: number) {
+  const course = enrolledCourses.value.find(c => c.id === courseId)
+  if (course) {
+    course.saved = !course.saved
+  }
+}
+
 function getLevelColor(level: string) {
   switch (level.toLowerCase()) {
     case 'beginner': return '#10b981'
@@ -669,6 +681,15 @@ function resumeFeaturedAutoPlay() {
                   <span class="badge-featured"><i class="fas fa-star"></i> Featured</span>
                   <span :class="['badge-level', featuredCourse.levelClass]">{{ featuredCourse.level }}</span>
                 </div>
+
+                <!-- Save Button -->
+                <button
+                  class="featured-save-btn"
+                  :class="{ 'saved': featuredCourse.saved }"
+                  @click.stop="toggleSaveCourse(featuredCourse.id)"
+                >
+                  <i :class="featuredCourse.saved ? 'fas fa-bookmark' : 'far fa-bookmark'"></i>
+                </button>
 
                 <!-- Play Button -->
                 <div class="featured-course-play">
@@ -2068,6 +2089,52 @@ function resumeFeaturedAutoPlay() {
 
 .badge-featured i {
   font-size: 0.5rem;
+}
+
+/* Save Button */
+.featured-save-btn {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.95);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  z-index: 10;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.featured-save-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.featured-save-btn i {
+  font-size: 0.9375rem;
+  color: #64748b;
+  transition: all 0.2s ease;
+}
+
+.featured-save-btn:hover i {
+  color: #14b8a6;
+}
+
+.featured-save-btn.saved {
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+}
+
+.featured-save-btn.saved i {
+  color: white;
+}
+
+.featured-save-btn.saved:hover {
+  background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%);
 }
 
 .badge-level {
