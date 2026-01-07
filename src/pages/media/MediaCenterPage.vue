@@ -1598,7 +1598,7 @@ onUnmounted(() => {
             <div v-if="viewMode === 'grid'" class="media-grid">
               <div v-for="media in paginatedMedia" :key="media.id"
                    @click="isSelectionMode ? toggleMediaSelection(media.id) : goToMedia(media)"
-                   class="media-card-enhanced rounded-2xl overflow-hidden cursor-pointer group bg-white">
+                   class="group bg-white rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 hover:-translate-y-1.5 border border-gray-100 shadow-sm hover:shadow-lg hover:border-teal-200">
                 <!-- Card Media/Thumbnail -->
                 <div class="card-thumbnail relative aspect-video">
                   <!-- Actual Thumbnail Image -->
@@ -1621,7 +1621,7 @@ onUnmounted(() => {
                   </div>
 
                   <!-- Card Badges -->
-                  <div class="absolute top-3 left-10 flex gap-1.5 z-20">
+                  <div class="absolute bottom-3 left-3 flex gap-1.5 z-20">
                     <span v-if="media.isNew" class="new-badge">
                       <i class="fas fa-sparkles"></i> New
                     </span>
@@ -1678,28 +1678,63 @@ onUnmounted(() => {
                   </div>
                 </div>
 
-                <!-- Card Body -->
-                <div class="card-body-enhanced">
-                  <div class="card-meta-row">
-                    <span :class="['media-type-badge', media.type]">
-                      <i :class="media.type === 'video' ? 'fas fa-video' : media.type === 'audio' ? 'fas fa-headphones' : media.type === 'image' ? 'fas fa-image' : 'fas fa-images'"></i>
+                <!-- Card Body (Articles Style) -->
+                <div class="p-4">
+                  <!-- Meta Info -->
+                  <div class="flex items-center gap-3 text-[11px] text-gray-400 mb-2">
+                    <span class="flex items-center gap-1">
+                      <i :class="media.type === 'video' ? 'fas fa-video' : media.type === 'audio' ? 'fas fa-headphones' : media.type === 'image' ? 'fas fa-image' : 'fas fa-images'" class="text-[9px]"></i>
                       {{ media.type === 'video' ? 'Video' : media.type === 'audio' ? 'Audio' : media.type === 'image' ? 'Image' : 'Gallery' }}
                     </span>
-                    <span :class="['media-category-tag', media.category.toLowerCase().split(' ')[0]]">{{ media.category }}</span>
+                    <span class="flex items-center gap-1">
+                      <i class="fas fa-clock text-[9px]"></i>
+                      {{ media.date }}
+                    </span>
                   </div>
 
-                  <h3 class="card-title-enhanced">{{ media.title }}</h3>
+                  <!-- Title -->
+                  <h3 class="text-sm font-semibold text-gray-800 mb-2 line-clamp-2 group-hover:text-teal-600 transition-colors leading-snug">
+                    {{ media.title }}
+                  </h3>
 
-                  <div class="card-footer-enhanced">
-                    <div class="author-info">
-                      <div class="author-avatar">
-                        <span class="avatar-text">{{ getInitials(media.author) }}</span>
+                  <!-- Category -->
+                  <p class="text-xs text-gray-500 mb-3">
+                    <span class="px-2 py-0.5 bg-teal-50 text-teal-600 text-[10px] font-medium rounded-full">
+                      {{ media.category }}
+                    </span>
+                  </p>
+
+                  <!-- Tags -->
+                  <div class="flex flex-wrap gap-1.5 mb-3">
+                    <span
+                      v-for="tag in media.tags?.slice(0, 3)"
+                      :key="tag"
+                      class="px-2 py-0.5 bg-gray-100 text-gray-600 text-[10px] font-medium rounded-full hover:bg-teal-50 hover:text-teal-600 transition-colors"
+                    >
+                      {{ tag }}
+                    </span>
+                  </div>
+
+                  <!-- Footer -->
+                  <div class="flex items-center justify-between pt-3 border-t border-gray-100">
+                    <!-- Author -->
+                    <div class="flex items-center gap-2">
+                      <div class="w-7 h-7 rounded-full bg-gradient-to-br from-teal-400 to-cyan-500 flex items-center justify-center text-white text-[10px] font-semibold shadow-sm">
+                        {{ getInitials(media.author) }}
                       </div>
-                      <span class="author-name">{{ media.author || 'AFC Media' }}</span>
+                      <span class="text-xs text-gray-600 font-medium">{{ media.author || 'AFC Media' }}</span>
                     </div>
-                    <div class="card-stats">
-                      <span><i class="fas fa-eye"></i> {{ media.views }}</span>
-                      <span><i class="fas fa-clock"></i> {{ media.date }}</span>
+
+                    <!-- Stats -->
+                    <div class="flex items-center gap-3 text-[11px] text-gray-400">
+                      <span class="flex items-center gap-1 hover:text-teal-500 transition-colors">
+                        <i class="fas fa-eye text-[9px]"></i>
+                        {{ media.views }}
+                      </span>
+                      <span class="flex items-center gap-1 hover:text-red-400 transition-colors">
+                        <i class="fas fa-heart text-[9px]"></i>
+                        {{ likedMedia.has(media.id) ? '1' : '0' }}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -4749,9 +4784,10 @@ onUnmounted(() => {
 
 /* Content Area Wrapper */
 .content-area {
-  background: #f8fafc;
+  background: white;
   border-radius: 1rem;
-  border: 1px solid #e2e8f0;
+  border: 1px solid #f3f4f6;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
   overflow: hidden;
   animation: fadeInUp 0.5s ease-out;
 }
@@ -4767,7 +4803,7 @@ onUnmounted(() => {
 /* Media Grid */
 .media-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: 1.25rem;
 }
 
@@ -5601,7 +5637,7 @@ onUnmounted(() => {
   }
 
   .media-grid {
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   }
 }
 

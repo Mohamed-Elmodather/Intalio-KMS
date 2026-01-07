@@ -1730,7 +1730,7 @@ function getFileIconBg(type: string): string {
 
             <!-- Documents Grid View -->
             <div v-else-if="viewMode === 'grid'">
-              <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
+              <div class="grid grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-4">
                 <div
                   v-for="doc in paginatedDocuments"
                 :key="doc.id"

@@ -1578,7 +1578,7 @@ onUnmounted(() => {
       <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
         <div v-if="filteredArticles.length > 0">
           <!-- Grid View -->
-          <div v-if="viewMode === 'grid'" class="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-5">
+          <div v-if="viewMode === 'grid'" class="grid grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-5">
             <article
               v-for="article in paginatedArticles"
               :key="article.id"
@@ -2472,7 +2472,7 @@ onUnmounted(() => {
 /* Article Cards Grid */
 .articles-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: 1.25rem;
   padding: 1.25rem;
 }
