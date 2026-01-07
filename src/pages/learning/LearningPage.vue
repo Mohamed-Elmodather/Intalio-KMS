@@ -7,6 +7,9 @@ const router = useRouter()
 // Loading state
 const isLoading = ref(false)
 
+// Continue Learning carousel ref
+const continueLearningRef = ref<HTMLElement | null>(null)
+
 // Tab state
 const activeTab = ref('my-courses')
 const searchQuery = ref('')
@@ -406,6 +409,18 @@ function getLevelColor(level: string) {
     default: return '#6b7280'
   }
 }
+
+// Scroll Continue Learning carousel
+function scrollContinueLearning(direction: 'left' | 'right') {
+  if (continueLearningRef.value) {
+    const scrollAmount = 320
+    const currentScroll = continueLearningRef.value.scrollLeft
+    continueLearningRef.value.scrollTo({
+      left: direction === 'left' ? currentScroll - scrollAmount : currentScroll + scrollAmount,
+      behavior: 'smooth'
+    })
+  }
+}
 </script>
 
 <template>
@@ -497,56 +512,55 @@ function getLevelColor(level: string) {
 
       <!-- My Courses Tab -->
       <div v-if="activeTab === 'my-courses'" class="space-y-6">
-        <!-- Continue Learning Hero Card -->
-        <div v-if="currentCourse" class="content-area overflow-hidden">
-          <div class="flex items-stretch">
-            <!-- Left: Course Image with Play Button -->
-            <div class="relative w-32 md:w-48 flex-shrink-0 overflow-hidden">
-              <img :src="enrolledCourses[0]?.image" :alt="currentCourse.title" class="w-full h-full object-cover">
-              <div class="absolute inset-0 bg-gradient-to-r from-transparent to-black/30"></div>
-              <div class="absolute inset-0 flex items-center justify-center">
-                <button @click="navigateToCourse(currentCourse.id)" class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/95 hover:bg-white flex items-center justify-center shadow-xl transition-all hover:scale-110 group">
-                  <i class="fas fa-play text-teal-600 text-sm md:text-base ml-0.5 group-hover:text-teal-700"></i>
-                </button>
+        <!-- Continue Learning Carousel Section -->
+        <div class="continue-learning-section">
+          <div class="continue-learning-header">
+            <div class="flex items-center gap-3">
+              <div class="continue-learning-icon">
+                <i class="fas fa-play"></i>
+              </div>
+              <div>
+                <h2 class="continue-learning-title">Continue Learning</h2>
+                <p class="continue-learning-subtitle">Pick up where you left off</p>
               </div>
             </div>
-
-            <!-- Right: Content -->
-            <div class="flex-1 p-3 md:p-5 bg-gradient-to-br from-teal-500 to-teal-600">
-              <div class="flex flex-wrap items-center gap-2 mb-2">
-                <span class="px-2 py-0.5 bg-white/20 text-white text-[10px] font-semibold rounded-full backdrop-blur-sm flex items-center gap-1">
-                  <i class="fas fa-bolt text-[9px]"></i>Continue Learning
-                </span>
-                <span class="px-2 py-0.5 bg-amber-400 text-amber-900 text-[10px] font-semibold rounded-full flex items-center gap-1">
-                  <i class="fas fa-fire text-[9px]"></i>{{ streak }} Day Streak
-                </span>
+            <div class="continue-learning-nav">
+              <button class="continue-nav-btn" @click="scrollContinueLearning('left')">
+                <i class="fas fa-chevron-left"></i>
+              </button>
+              <button class="continue-nav-btn" @click="scrollContinueLearning('right')">
+                <i class="fas fa-chevron-right"></i>
+              </button>
+              <span class="continue-streak-badge">
+                <i class="fas fa-fire"></i>{{ streak }} Day Streak
+              </span>
+            </div>
+          </div>
+          <div class="continue-learning-scroll" ref="continueLearningRef">
+            <div v-for="course in enrolledCourses.filter(c => c.progress > 0 && c.progress < 100)" :key="course.id"
+                 class="continue-card group" @click="navigateToCourse(course.id)">
+              <div class="continue-card-thumb">
+                <img :src="course.image" :alt="course.title" class="continue-card-img" />
+                <div class="continue-card-overlay"></div>
+                <div class="continue-card-play">
+                  <i class="fas fa-play"></i>
+                </div>
+                <span class="continue-card-duration">{{ course.duration }}</span>
+                <div class="continue-card-progress">
+                  <div class="continue-card-progress-fill" :style="{ width: course.progress + '%' }"></div>
+                </div>
               </div>
-
-              <h2 class="text-base md:text-lg font-bold text-white mb-1">{{ currentCourse.title }}</h2>
-              <p class="text-teal-100 text-xs mb-3">{{ currentCourse.nextLesson }}</p>
-
-              <!-- Progress Bar -->
-              <div class="mb-3 max-w-sm">
-                <div class="flex items-center justify-between text-[11px] text-white/80 mb-1">
-                  <span>Progress</span>
-                  <span class="font-semibold text-white">{{ currentCourse.progress }}%</span>
+              <div class="continue-card-info">
+                <div class="continue-card-badges">
+                  <span :class="['continue-level-badge', course.levelClass]">{{ course.level }}</span>
+                  <span class="continue-progress-text">{{ course.progress }}%</span>
                 </div>
-                <div class="h-1.5 bg-white/20 rounded-full overflow-hidden">
-                  <div class="h-full bg-white rounded-full transition-all duration-500" :style="{ width: currentCourse.progress + '%' }"></div>
+                <h4 class="continue-card-title">{{ course.title }}</h4>
+                <p class="continue-card-lesson">{{ course.completedLessons }}/{{ course.totalLessons }} lessons completed</p>
+                <div class="continue-card-meta">
+                  <span><i class="fas fa-user"></i>{{ course.instructor }}</span>
+                  <span><i class="fas fa-star text-amber-400"></i>{{ course.rating }}</span>
                 </div>
-              </div>
-
-              <!-- Quick Stats & Action -->
-              <div class="flex flex-wrap items-center justify-between gap-3">
-                <div class="flex items-center gap-3 text-white/80 text-[11px]">
-                  <span class="flex items-center gap-1"><i class="fas fa-clock text-[9px]"></i>8h</span>
-                  <span class="flex items-center gap-1"><i class="fas fa-play-circle text-[9px]"></i>9/12</span>
-                  <span class="flex items-center gap-1"><i class="fas fa-star text-amber-300 text-[9px]"></i>4.8</span>
-                </div>
-                <button @click="navigateToCourse(currentCourse.id)" class="px-4 py-2 bg-white text-teal-600 rounded-lg font-semibold text-xs hover:bg-teal-50 transition-all shadow-md flex items-center gap-1.5">
-                  <i class="fas fa-play text-[10px]"></i>
-                  Resume
-                </button>
               </div>
             </div>
           </div>
@@ -1686,5 +1700,297 @@ function getLevelColor(level: string) {
   .stats-top-right {
     grid-template-columns: repeat(2, 1fr);
   }
+}
+
+/* Continue Learning Carousel */
+.continue-learning-section {
+  background: linear-gradient(135deg, #f0fdfa 0%, #f8fafc 100%);
+  border-radius: 1rem;
+  padding: 1.25rem;
+  border: 1px solid #e2e8f0;
+}
+
+.continue-learning-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.continue-learning-icon {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.75rem;
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(20, 184, 166, 0.3);
+}
+
+.continue-learning-icon i {
+  color: white;
+  font-size: 0.875rem;
+}
+
+.continue-learning-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+}
+
+.continue-learning-subtitle {
+  font-size: 0.6875rem;
+  color: #64748b;
+  margin: 0;
+}
+
+.continue-learning-nav {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.continue-nav-btn {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.5rem;
+  background: white;
+  border: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.continue-nav-btn:hover {
+  background: #f1f5f9;
+  border-color: #14b8a6;
+  color: #14b8a6;
+}
+
+.continue-nav-btn i {
+  font-size: 0.75rem;
+  color: #64748b;
+}
+
+.continue-nav-btn:hover i {
+  color: #14b8a6;
+}
+
+.continue-streak-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.375rem 0.75rem;
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  color: #78350f;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  border-radius: 9999px;
+}
+
+.continue-streak-badge i {
+  font-size: 0.625rem;
+}
+
+.continue-learning-scroll {
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+  scroll-snap-type: x mandatory;
+}
+
+.continue-learning-scroll::-webkit-scrollbar {
+  height: 4px;
+}
+
+.continue-learning-scroll::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 4px;
+}
+
+.continue-learning-scroll::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+.continue-learning-scroll::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+.continue-card {
+  flex: 0 0 280px;
+  background: white;
+  border-radius: 0.875rem;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  scroll-snap-align: start;
+}
+
+.continue-card:hover {
+  border-color: #14b8a6;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+  transform: translateY(-4px);
+}
+
+.continue-card-thumb {
+  position: relative;
+  height: 140px;
+  overflow: hidden;
+}
+
+.continue-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.continue-card:hover .continue-card-img {
+  transform: scale(1.08);
+}
+
+.continue-card-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 60%);
+}
+
+.continue-card-play {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.95);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.continue-card:hover .continue-card-play {
+  opacity: 1;
+}
+
+.continue-card-play i {
+  color: #0d9488;
+  font-size: 1rem;
+  margin-left: 2px;
+}
+
+.continue-card-duration {
+  position: absolute;
+  bottom: 0.5rem;
+  right: 0.5rem;
+  padding: 0.25rem 0.5rem;
+  background: rgba(0,0,0,0.8);
+  color: white;
+  font-size: 0.625rem;
+  font-weight: 500;
+  border-radius: 0.25rem;
+}
+
+.continue-card-progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: rgba(255,255,255,0.3);
+}
+
+.continue-card-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #14b8a6, #0d9488);
+}
+
+.continue-card-info {
+  padding: 0.875rem;
+}
+
+.continue-card-badges {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.continue-level-badge {
+  padding: 0.125rem 0.375rem;
+  font-size: 0.5625rem;
+  font-weight: 600;
+  border-radius: 0.1875rem;
+  text-transform: uppercase;
+}
+
+.continue-level-badge.beginner {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.continue-level-badge.intermediate {
+  background: #dbeafe;
+  color: #2563eb;
+}
+
+.continue-level-badge.advanced {
+  background: #ede9fe;
+  color: #7c3aed;
+}
+
+.continue-progress-text {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #0d9488;
+}
+
+.continue-card-title {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #0f172a;
+  margin: 0 0 0.375rem 0;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  transition: color 0.2s ease;
+}
+
+.continue-card:hover .continue-card-title {
+  color: #0d9488;
+}
+
+.continue-card-lesson {
+  font-size: 0.6875rem;
+  color: #64748b;
+  margin: 0 0 0.5rem 0;
+}
+
+.continue-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.625rem;
+  color: #94a3b8;
+}
+
+.continue-card-meta i {
+  margin-right: 0.25rem;
+}
+
+.continue-card-meta span:first-child i {
+  color: #64748b;
 }
 </style>
