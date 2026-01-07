@@ -1598,7 +1598,7 @@ onUnmounted(() => {
             <div v-if="viewMode === 'grid'" class="media-grid">
               <div v-for="media in paginatedMedia" :key="media.id"
                    @click="isSelectionMode ? toggleMediaSelection(media.id) : goToMedia(media)"
-                   class="group bg-white rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 hover:-translate-y-1.5 border border-gray-100 shadow-sm hover:shadow-lg hover:border-teal-200">
+                   class="media-card-enhanced group bg-white rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 hover:-translate-y-1.5 border border-gray-100 shadow-sm hover:shadow-lg hover:border-teal-200">
                 <!-- Card Media/Thumbnail -->
                 <div class="card-thumbnail relative aspect-video">
                   <!-- Actual Thumbnail Image -->
