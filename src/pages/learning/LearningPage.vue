@@ -325,15 +325,22 @@ const recommendedCourses = ref([
 
 // Catalog courses (All Courses)
 const allCourses = ref([
-  { id: 10, title: 'Machine Learning Basics', instructor: 'Dr. Sarah Mitchell', instructorInitials: 'SM', level: 'Intermediate', levelClass: 'intermediate', duration: '4 hours', lessons: 12, category: 'Technology', rating: 4.8, students: 3200, image: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=400&h=300&fit=crop', tags: ['AI', 'ML'], saved: false, isNew: true },
-  { id: 11, title: 'Strategic Planning', instructor: 'Michael Brown', instructorInitials: 'MB', level: 'Advanced', levelClass: 'advanced', duration: '3 hours', lessons: 8, category: 'Business', rating: 4.6, students: 1890, image: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=400&h=300&fit=crop', tags: ['Strategy', 'Planning'], saved: false, isNew: false },
-  { id: 12, title: 'Public Speaking Mastery', instructor: 'Emma Wilson', instructorInitials: 'EW', level: 'Beginner', levelClass: 'beginner', duration: '2 hours', lessons: 6, category: 'Soft Skills', rating: 4.7, students: 4500, image: 'https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=400&h=300&fit=crop', tags: ['Speaking', 'Communication'], saved: true, isNew: false },
-  { id: 13, title: 'Cloud Architecture Fundamentals', instructor: 'David Kim', instructorInitials: 'DK', level: 'Advanced', levelClass: 'advanced', duration: '8 hours', lessons: 20, category: 'Technology', rating: 4.9, students: 2100, image: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=400&h=300&fit=crop', tags: ['Cloud', 'AWS'], saved: false, isNew: true },
-  { id: 14, title: 'UX Design Principles', instructor: 'Lisa Park', instructorInitials: 'LP', level: 'Intermediate', levelClass: 'intermediate', duration: '5 hours', lessons: 14, category: 'Design', rating: 4.8, students: 2890, image: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=400&h=300&fit=crop', tags: ['Design', 'UX'], saved: false, isNew: false },
-  { id: 15, title: 'Financial Analysis', instructor: 'Robert Chen', instructorInitials: 'RC', level: 'Intermediate', levelClass: 'intermediate', duration: '6 hours', lessons: 16, category: 'Finance', rating: 4.5, students: 1670, image: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=400&h=300&fit=crop', tags: ['Finance', 'Analysis'], saved: false, isNew: false },
-  { id: 16, title: 'Agile Project Management', instructor: 'Jennifer Adams', instructorInitials: 'JA', level: 'Intermediate', levelClass: 'intermediate', duration: '4 hours', lessons: 10, category: 'Business', rating: 4.7, students: 3450, image: 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=400&h=300&fit=crop', tags: ['Agile', 'Scrum'], saved: false, isNew: true },
-  { id: 17, title: 'Python for Data Science', instructor: 'Dr. James Wilson', instructorInitials: 'JW', level: 'Beginner', levelClass: 'beginner', duration: '6 hours', lessons: 18, category: 'Technology', rating: 4.9, students: 5200, image: 'https://images.unsplash.com/photo-1526379095098-d400fd0bf935?w=400&h=300&fit=crop', tags: ['Python', 'Data Science'], saved: true, isNew: false },
-  { id: 18, title: 'Digital Marketing Essentials', instructor: 'Sophia Martinez', instructorInitials: 'SM', level: 'Beginner', levelClass: 'beginner', duration: '3 hours', lessons: 8, category: 'Marketing', rating: 4.6, students: 2780, image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&h=300&fit=crop', tags: ['Marketing', 'Digital'], saved: false, isNew: false },
+  // Enrolled courses
+  { id: 1, title: 'Advanced Data Analytics', instructor: 'Dr. James Wilson', instructorInitials: 'JW', level: 'Advanced', levelClass: 'advanced', duration: '8 hours', lessons: 12, completedLessons: 9, category: 'Technology', rating: 4.8, students: 1250, image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&h=300&fit=crop', tags: ['Data Science', 'Analytics'], saved: false, isNew: false, enrolled: true, progress: 75, status: 'In Progress', statusClass: 'in-progress' },
+  { id: 2, title: 'Leadership Essentials', instructor: 'Maria Garcia', instructorInitials: 'MG', level: 'Intermediate', levelClass: 'intermediate', duration: '6 hours', lessons: 11, completedLessons: 5, category: 'Business', rating: 4.6, students: 2340, image: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=400&h=300&fit=crop', tags: ['Leadership', 'Management'], saved: true, isNew: false, enrolled: true, progress: 45, status: 'In Progress', statusClass: 'in-progress' },
+  { id: 3, title: 'Cybersecurity Fundamentals', instructor: 'Alex Thompson', instructorInitials: 'AT', level: 'Beginner', levelClass: 'beginner', duration: '4 hours', lessons: 8, completedLessons: 8, category: 'Technology', rating: 4.9, students: 3450, image: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=400&h=300&fit=crop', tags: ['Security', 'IT'], saved: false, isNew: false, enrolled: true, progress: 100, status: 'Completed', statusClass: 'completed' },
+  { id: 4, title: 'Effective Communication', instructor: 'Sarah Chen', instructorInitials: 'SC', level: 'Beginner', levelClass: 'beginner', duration: '5 hours', lessons: 10, completedLessons: 0, category: 'Soft Skills', rating: 4.7, students: 1890, image: 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=400&h=300&fit=crop', tags: ['Soft Skills', 'Communication'], saved: false, isNew: false, enrolled: true, progress: 0, status: 'Not Started', statusClass: 'not-started' },
+  { id: 5, title: 'Project Management Pro', instructor: 'David Lee', instructorInitials: 'DL', level: 'Intermediate', levelClass: 'intermediate', duration: '10 hours', lessons: 15, completedLessons: 4, category: 'Business', rating: 4.5, students: 2780, image: 'https://images.unsplash.com/photo-1507925921958-8a62f3d1a50d?w=400&h=300&fit=crop', tags: ['Project Management', 'Agile'], saved: false, isNew: false, enrolled: true, progress: 30, status: 'In Progress', statusClass: 'in-progress' },
+  // Non-enrolled courses
+  { id: 10, title: 'Machine Learning Basics', instructor: 'Dr. Sarah Mitchell', instructorInitials: 'SM', level: 'Intermediate', levelClass: 'intermediate', duration: '4 hours', lessons: 12, category: 'Technology', rating: 4.8, students: 3200, image: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=400&h=300&fit=crop', tags: ['AI', 'ML'], saved: false, isNew: true, enrolled: false },
+  { id: 11, title: 'Strategic Planning', instructor: 'Michael Brown', instructorInitials: 'MB', level: 'Advanced', levelClass: 'advanced', duration: '3 hours', lessons: 8, category: 'Business', rating: 4.6, students: 1890, image: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=400&h=300&fit=crop', tags: ['Strategy', 'Planning'], saved: false, isNew: false, enrolled: false },
+  { id: 12, title: 'Public Speaking Mastery', instructor: 'Emma Wilson', instructorInitials: 'EW', level: 'Beginner', levelClass: 'beginner', duration: '2 hours', lessons: 6, category: 'Soft Skills', rating: 4.7, students: 4500, image: 'https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=400&h=300&fit=crop', tags: ['Speaking', 'Communication'], saved: true, isNew: false, enrolled: false },
+  { id: 13, title: 'Cloud Architecture Fundamentals', instructor: 'David Kim', instructorInitials: 'DK', level: 'Advanced', levelClass: 'advanced', duration: '8 hours', lessons: 20, category: 'Technology', rating: 4.9, students: 2100, image: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=400&h=300&fit=crop', tags: ['Cloud', 'AWS'], saved: false, isNew: true, enrolled: false },
+  { id: 14, title: 'UX Design Principles', instructor: 'Lisa Park', instructorInitials: 'LP', level: 'Intermediate', levelClass: 'intermediate', duration: '5 hours', lessons: 14, category: 'Design', rating: 4.8, students: 2890, image: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=400&h=300&fit=crop', tags: ['Design', 'UX'], saved: false, isNew: false, enrolled: false },
+  { id: 15, title: 'Financial Analysis', instructor: 'Robert Chen', instructorInitials: 'RC', level: 'Intermediate', levelClass: 'intermediate', duration: '6 hours', lessons: 16, category: 'Finance', rating: 4.5, students: 1670, image: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=400&h=300&fit=crop', tags: ['Finance', 'Analysis'], saved: false, isNew: false, enrolled: false },
+  { id: 16, title: 'Agile Project Management', instructor: 'Jennifer Adams', instructorInitials: 'JA', level: 'Intermediate', levelClass: 'intermediate', duration: '4 hours', lessons: 10, category: 'Business', rating: 4.7, students: 3450, image: 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=400&h=300&fit=crop', tags: ['Agile', 'Scrum'], saved: false, isNew: true, enrolled: false },
+  { id: 17, title: 'Python for Data Science', instructor: 'Dr. James Wilson', instructorInitials: 'JW', level: 'Beginner', levelClass: 'beginner', duration: '6 hours', lessons: 18, category: 'Technology', rating: 4.9, students: 5200, image: 'https://images.unsplash.com/photo-1526379095098-d400fd0bf935?w=400&h=300&fit=crop', tags: ['Python', 'Data Science'], saved: true, isNew: false, enrolled: false },
+  { id: 18, title: 'Digital Marketing Essentials', instructor: 'Sophia Martinez', instructorInitials: 'SM', level: 'Beginner', levelClass: 'beginner', duration: '3 hours', lessons: 8, category: 'Marketing', rating: 4.6, students: 2780, image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&h=300&fit=crop', tags: ['Marketing', 'Digital'], saved: false, isNew: false, enrolled: false },
 ])
 
 // All Courses section state
@@ -346,6 +353,19 @@ const showCategoryFilterDropdown = ref(false)
 const allCoursesSortBy = ref('popular')
 const allCoursesSortOrder = ref<'asc' | 'desc'>('desc')
 const showAllCoursesSortDropdown = ref(false)
+const allCoursesEnrollmentFilter = ref<string[]>([])
+const showEnrollmentFilter = ref(false)
+
+const courseEnrollmentOptions = [
+  { id: 'enrolled', label: 'My Enrolled', color: 'text-teal-500' },
+  { id: 'not-enrolled', label: 'Not Enrolled', color: 'text-gray-500' }
+]
+
+const courseProgressOptions = [
+  { id: 'in-progress', label: 'In Progress', color: 'text-blue-500' },
+  { id: 'completed', label: 'Completed', color: 'text-green-500' },
+  { id: 'not-started', label: 'Not Started', color: 'text-gray-500' }
+]
 
 const courseLevelOptions = [
   { id: 'beginner', label: 'Beginner', color: 'text-green-500' },
@@ -385,6 +405,18 @@ const filteredAllCourses = computed(() => {
     courses = courses.filter(c => allCoursesCategoryFilter.value.includes(c.category))
   }
 
+  // Enrollment filter
+  if (allCoursesEnrollmentFilter.value.length > 0) {
+    courses = courses.filter(c => {
+      if (allCoursesEnrollmentFilter.value.includes('enrolled') && c.enrolled) return true
+      if (allCoursesEnrollmentFilter.value.includes('not-enrolled') && !c.enrolled) return true
+      if (allCoursesEnrollmentFilter.value.includes('in-progress') && c.enrolled && c.progress > 0 && c.progress < 100) return true
+      if (allCoursesEnrollmentFilter.value.includes('completed') && c.enrolled && c.progress === 100) return true
+      if (allCoursesEnrollmentFilter.value.includes('not-started') && c.enrolled && c.progress === 0) return true
+      return false
+    })
+  }
+
   // Sort
   const multiplier = allCoursesSortOrder.value === 'asc' ? 1 : -1
   switch (allCoursesSortBy.value) {
@@ -420,6 +452,15 @@ function toggleCategoryFilterOption(category: string) {
     allCoursesCategoryFilter.value.push(category)
   } else {
     allCoursesCategoryFilter.value.splice(index, 1)
+  }
+}
+
+function toggleEnrollmentFilterOption(option: string) {
+  const index = allCoursesEnrollmentFilter.value.indexOf(option)
+  if (index === -1) {
+    allCoursesEnrollmentFilter.value.push(option)
+  } else {
+    allCoursesEnrollmentFilter.value.splice(index, 1)
   }
 }
 
@@ -1201,6 +1242,84 @@ function resumeFeaturedAutoPlay() {
                 <div v-if="showCategoryFilterDropdown" @click="showCategoryFilterDropdown = false" class="fixed inset-0 z-40"></div>
               </div>
 
+              <!-- Enrollment Filter Dropdown -->
+              <div class="relative">
+                <button
+                  @click="showEnrollmentFilter = !showEnrollmentFilter"
+                  :class="[
+                    'flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border',
+                    allCoursesEnrollmentFilter.length > 0 ? 'bg-teal-50 border-teal-200 text-teal-700' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+                  ]"
+                >
+                  <i class="fas fa-user-graduate text-sm"></i>
+                  <span>{{ allCoursesEnrollmentFilter.length > 0 ? `${allCoursesEnrollmentFilter.length} Status` : 'Status' }}</span>
+                  <i :class="showEnrollmentFilter ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ml-1"></i>
+                </button>
+
+                <!-- Dropdown Menu -->
+                <div
+                  v-if="showEnrollmentFilter"
+                  class="absolute left-0 top-full mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
+                >
+                  <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Enrollment</div>
+                  <div class="max-h-48 overflow-y-auto">
+                    <button
+                      v-for="option in courseEnrollmentOptions"
+                      :key="option.id"
+                      @click="toggleEnrollmentFilterOption(option.id)"
+                      :class="[
+                        'w-full px-3 py-2 text-left text-sm flex items-center gap-3 transition-colors',
+                        allCoursesEnrollmentFilter.includes(option.id) ? 'bg-teal-50 text-teal-700' : 'text-gray-700 hover:bg-gray-50'
+                      ]"
+                    >
+                      <div :class="[
+                        'w-4 h-4 rounded border-2 flex items-center justify-center transition-all',
+                        allCoursesEnrollmentFilter.includes(option.id) ? 'bg-teal-500 border-teal-500' : 'border-gray-300'
+                      ]">
+                        <i v-if="allCoursesEnrollmentFilter.includes(option.id)" class="fas fa-check text-white text-[8px]"></i>
+                      </div>
+                      <span class="flex-1">{{ option.label }}</span>
+                    </button>
+                  </div>
+                  <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider border-t border-gray-100 mt-2 pt-2">Progress</div>
+                  <div class="max-h-48 overflow-y-auto">
+                    <button
+                      v-for="option in courseProgressOptions"
+                      :key="option.id"
+                      @click="toggleEnrollmentFilterOption(option.id)"
+                      :class="[
+                        'w-full px-3 py-2 text-left text-sm flex items-center gap-3 transition-colors',
+                        allCoursesEnrollmentFilter.includes(option.id) ? 'bg-teal-50 text-teal-700' : 'text-gray-700 hover:bg-gray-50'
+                      ]"
+                    >
+                      <div :class="[
+                        'w-4 h-4 rounded border-2 flex items-center justify-center transition-all',
+                        allCoursesEnrollmentFilter.includes(option.id) ? 'bg-teal-500 border-teal-500' : 'border-gray-300'
+                      ]">
+                        <i v-if="allCoursesEnrollmentFilter.includes(option.id)" class="fas fa-check text-white text-[8px]"></i>
+                      </div>
+                      <span class="flex-1">{{ option.label }}</span>
+                    </button>
+                  </div>
+                  <div class="my-2 border-t border-gray-100"></div>
+                  <div class="px-3 flex gap-2">
+                    <button
+                      @click="allCoursesEnrollmentFilter = []; showEnrollmentFilter = false"
+                      class="flex-1 px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                    >
+                      Clear All
+                    </button>
+                    <button
+                      @click="showEnrollmentFilter = false"
+                      class="flex-1 px-3 py-1.5 text-xs font-medium text-white bg-teal-500 rounded-lg hover:bg-teal-600 transition-colors"
+                    >
+                      Apply
+                    </button>
+                  </div>
+                </div>
+                <div v-if="showEnrollmentFilter" @click="showEnrollmentFilter = false" class="fixed inset-0 z-40"></div>
+              </div>
+
               <!-- Sort Options with Order Toggle -->
               <div class="relative ml-auto flex items-center">
                 <button
@@ -1289,7 +1408,10 @@ function resumeFeaturedAutoPlay() {
                   </button>
 
                   <!-- Badges -->
-                  <div class="absolute bottom-3 left-3 flex gap-1.5 z-10">
+                  <div class="absolute top-2 left-2 flex gap-1.5 z-10">
+                    <span v-if="course.enrolled" :class="['px-2 py-0.5 text-[10px] font-semibold rounded-full', course.statusClass === 'completed' ? 'bg-green-500 text-white' : course.statusClass === 'in-progress' ? 'bg-blue-500 text-white' : 'bg-gray-500 text-white']">
+                      {{ course.status }}
+                    </span>
                     <span v-if="course.isNew" class="all-course-new-badge">
                       <i class="fas fa-sparkles"></i> New
                     </span>
@@ -1304,6 +1426,11 @@ function resumeFeaturedAutoPlay() {
                   <div class="all-course-play-btn">
                     <i class="fas fa-play"></i>
                   </div>
+
+                  <!-- Progress Bar for Enrolled Courses -->
+                  <div v-if="course.enrolled" class="absolute bottom-0 left-0 right-0 h-1.5 bg-black/30 z-10">
+                    <div class="h-full bg-gradient-to-r from-teal-400 to-teal-500 transition-all" :style="{ width: course.progress + '%' }"></div>
+                  </div>
                 </div>
 
                 <!-- Card Body -->
@@ -1312,7 +1439,7 @@ function resumeFeaturedAutoPlay() {
                   <div class="flex items-center gap-3 text-[11px] text-gray-400 mb-2">
                     <span class="flex items-center gap-1">
                       <i class="fas fa-play-circle text-[9px]"></i>
-                      {{ course.lessons }} lessons
+                      {{ course.enrolled ? `${course.completedLessons}/${course.lessons}` : course.lessons }} lessons
                     </span>
                     <span class="flex items-center gap-1">
                       <i class="fas fa-signal text-[9px]"></i>
@@ -1359,7 +1486,10 @@ function resumeFeaturedAutoPlay() {
                         <i class="fas fa-star text-[9px] text-amber-400"></i>
                         {{ course.rating }}
                       </span>
-                      <span class="flex items-center gap-1 hover:text-teal-500 transition-colors">
+                      <span v-if="course.enrolled" class="font-bold text-teal-600 text-sm">
+                        {{ course.progress }}%
+                      </span>
+                      <span v-else class="flex items-center gap-1 hover:text-teal-500 transition-colors">
                         <i class="fas fa-users text-[9px]"></i>
                         {{ (course.students / 1000).toFixed(1) }}k
                       </span>
@@ -1381,6 +1511,10 @@ function resumeFeaturedAutoPlay() {
                     <i class="fas fa-play"></i>
                   </div>
                   <div class="all-course-list-duration">{{ course.duration }}</div>
+                  <!-- Progress Bar for Enrolled Courses -->
+                  <div v-if="course.enrolled" class="absolute bottom-0 left-0 right-0 h-1 bg-black/30 rounded-b-lg">
+                    <div class="h-full bg-gradient-to-r from-teal-400 to-teal-500 transition-all rounded-bl-lg" :style="{ width: course.progress + '%' }"></div>
+                  </div>
                 </div>
 
                 <!-- Content -->
@@ -1389,6 +1523,9 @@ function resumeFeaturedAutoPlay() {
                     <div class="all-course-list-badges">
                       <span :class="['all-course-level-badge', course.levelClass]">{{ course.level }}</span>
                       <span class="all-course-category-badge">{{ course.category }}</span>
+                      <span v-if="course.enrolled" :class="['px-2 py-0.5 text-[10px] font-semibold rounded-full', course.statusClass === 'completed' ? 'bg-green-100 text-green-700' : course.statusClass === 'in-progress' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-700']">
+                        {{ course.status }}
+                      </span>
                       <span v-if="course.isNew" class="all-course-list-new-badge">
                         <i class="fas fa-sparkles"></i> New
                       </span>
@@ -1401,9 +1538,10 @@ function resumeFeaturedAutoPlay() {
                       <span>{{ course.instructor }}</span>
                     </div>
                     <div class="all-course-list-stats">
-                      <span><i class="fas fa-play-circle"></i> {{ course.lessons }} lessons</span>
+                      <span><i class="fas fa-play-circle"></i> {{ course.enrolled ? `${course.completedLessons}/${course.lessons}` : course.lessons }} lessons</span>
                       <span><i class="fas fa-star text-amber-400"></i> {{ course.rating }}</span>
-                      <span><i class="fas fa-users"></i> {{ (course.students / 1000).toFixed(1) }}k</span>
+                      <span v-if="course.enrolled" class="font-semibold text-teal-600">{{ course.progress }}%</span>
+                      <span v-else><i class="fas fa-users"></i> {{ (course.students / 1000).toFixed(1) }}k</span>
                     </div>
                   </div>
                 </div>
@@ -1417,8 +1555,11 @@ function resumeFeaturedAutoPlay() {
                   >
                     <i :class="course.saved ? 'fas fa-bookmark' : 'far fa-bookmark'"></i>
                   </button>
-                  <button class="all-course-list-action-btn" title="Enroll">
+                  <button v-if="!course.enrolled" class="all-course-list-action-btn" title="Enroll">
                     <i class="fas fa-plus"></i>
+                  </button>
+                  <button v-else class="all-course-list-action-btn text-teal-500" :title="(course.progress ?? 0) > 0 && (course.progress ?? 0) < 100 ? 'Continue' : (course.progress ?? 0) === 100 ? 'Review' : 'Start'">
+                    <i :class="(course.progress ?? 0) > 0 && (course.progress ?? 0) < 100 ? 'fas fa-play' : (course.progress ?? 0) === 100 ? 'fas fa-redo' : 'fas fa-play'"></i>
                   </button>
                 </div>
               </div>
@@ -1431,198 +1572,10 @@ function resumeFeaturedAutoPlay() {
               </div>
               <h3 class="all-courses-empty-title">No courses found</h3>
               <p class="all-courses-empty-text">Try adjusting your filters or search query</p>
-              <button @click="allCoursesSearch = ''; allCoursesLevelFilter = []; allCoursesCategoryFilter = []" class="all-courses-clear-btn">
+              <button @click="allCoursesSearch = ''; allCoursesLevelFilter = []; allCoursesCategoryFilter = []; allCoursesEnrollmentFilter = []" class="all-courses-clear-btn">
                 <i class="fas fa-undo mr-2"></i> Clear Filters
               </button>
             </div>
-          </div>
-        </div>
-
-        <!-- Section Header -->
-        <div class="flex items-center justify-between">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center shadow-lg shadow-teal-200">
-              <i class="fas fa-book-reader text-white text-sm"></i>
-            </div>
-            <div>
-              <h2 class="text-lg font-bold text-gray-900">My Enrolled Courses</h2>
-              <p class="text-xs text-gray-500">{{ filteredEnrolledCourses.length }} courses</p>
-            </div>
-          </div>
-          <div class="flex items-center gap-3">
-            <select v-model="courseFilter" class="text-xs px-3 py-2 rounded-lg border border-gray-200 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-teal-500 cursor-pointer">
-              <option value="all">All Courses</option>
-              <option value="in-progress">In Progress</option>
-              <option value="completed">Completed</option>
-              <option value="not-started">Not Started</option>
-            </select>
-            <div class="flex items-center bg-white rounded-lg border border-gray-200 p-1">
-              <button @click="viewMode = 'grid'" :class="['px-3 py-1.5 rounded-md text-xs font-medium transition-all', viewMode === 'grid' ? 'bg-teal-500 text-white' : 'text-gray-500 hover:bg-gray-100']">
-                <i class="fas fa-th-large"></i>
-              </button>
-              <button @click="viewMode = 'list'" :class="['px-3 py-1.5 rounded-md text-xs font-medium transition-all', viewMode === 'list' ? 'bg-teal-500 text-white' : 'text-gray-500 hover:bg-gray-100']">
-                <i class="fas fa-list"></i>
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Course Grid -->
-        <div class="content-area p-6">
-          <div v-if="viewMode === 'grid'" class="grid grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-5">
-            <div v-for="course in filteredEnrolledCourses" :key="course.id"
-                 @click="navigateToCourse(course.id)"
-                 class="course-card group bg-white rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 hover:-translate-y-1.5 border border-gray-100 shadow-sm hover:shadow-xl hover:border-teal-200">
-              <!-- Card Image -->
-              <div class="relative h-40 overflow-hidden">
-                <img :src="course.image" :alt="course.title" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
-                <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
-
-                <!-- Status Badge -->
-                <div class="absolute top-3 left-3 flex items-center gap-2">
-                  <span :class="['course-status-badge', course.statusClass]">
-                    {{ course.status }}
-                  </span>
-                </div>
-
-                <!-- Play Button on Hover -->
-                <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all">
-                  <div class="w-12 h-12 rounded-full bg-white/90 flex items-center justify-center shadow-lg">
-                    <i class="fas fa-play text-teal-600 ml-0.5"></i>
-                  </div>
-                </div>
-
-                <!-- Progress Overlay -->
-                <div class="absolute bottom-0 left-0 right-0 h-1.5 bg-black/30">
-                  <div class="h-full bg-gradient-to-r from-teal-400 to-teal-500 transition-all" :style="{ width: course.progress + '%' }"></div>
-                </div>
-              </div>
-
-              <!-- Card Content -->
-              <div class="p-4">
-                <!-- Meta Info -->
-                <div class="flex items-center gap-3 text-[11px] text-gray-400 mb-2">
-                  <span class="flex items-center gap-1">
-                    <i class="fas fa-clock text-[9px]"></i>
-                    {{ course.duration }}
-                  </span>
-                  <span class="flex items-center gap-1">
-                    <i class="fas fa-play-circle text-[9px]"></i>
-                    {{ course.completedLessons }}/{{ course.totalLessons }} lessons
-                  </span>
-                </div>
-
-                <!-- Title -->
-                <h3 class="text-sm font-semibold text-gray-800 mb-2 line-clamp-2 group-hover:text-teal-600 transition-colors leading-snug">
-                  {{ course.title }}
-                </h3>
-
-                <!-- Level Badge -->
-                <div class="mb-3">
-                  <span :class="['course-level-badge', course.levelClass]">
-                    {{ course.level }}
-                  </span>
-                </div>
-
-                <!-- Tags -->
-                <div class="flex flex-wrap gap-1.5 mb-3">
-                  <span v-for="tag in course.tags" :key="tag"
-                        class="px-2 py-0.5 bg-gray-100 text-gray-600 text-[10px] font-medium rounded-full hover:bg-teal-50 hover:text-teal-600 transition-colors">
-                    {{ tag }}
-                  </span>
-                </div>
-
-                <!-- Footer -->
-                <div class="flex items-center justify-between pt-3 border-t border-gray-100">
-                  <!-- Instructor -->
-                  <div class="flex items-center gap-2">
-                    <div class="w-7 h-7 rounded-full bg-gradient-to-br from-teal-400 to-cyan-500 flex items-center justify-center text-white text-[10px] font-semibold shadow-sm">
-                      {{ course.instructorInitials }}
-                    </div>
-                    <span class="text-xs text-gray-600 font-medium">{{ course.instructor }}</span>
-                  </div>
-
-                  <!-- Stats -->
-                  <div class="flex items-center gap-3 text-[11px] text-gray-400">
-                    <span class="flex items-center gap-1">
-                      <i class="fas fa-star text-amber-400 text-[9px]"></i>
-                      {{ course.rating }}
-                    </span>
-                    <span class="font-bold text-teal-600 text-sm">{{ course.progress }}%</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- List View -->
-          <div v-else class="space-y-3">
-            <div v-for="course in filteredEnrolledCourses" :key="course.id"
-                 @click="navigateToCourse(course.id)"
-                 class="group flex gap-4 p-4 bg-white rounded-2xl cursor-pointer transition-all duration-300 border border-gray-100 shadow-sm hover:shadow-lg hover:border-teal-200">
-              <!-- Thumbnail -->
-              <div class="relative w-44 h-28 flex-shrink-0 rounded-xl overflow-hidden">
-                <img :src="course.image" :alt="course.title" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110">
-                <div class="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-all"></div>
-                <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all">
-                  <div class="w-10 h-10 rounded-full bg-white/90 flex items-center justify-center shadow-lg">
-                    <i class="fas fa-play text-teal-600 text-sm ml-0.5"></i>
-                  </div>
-                </div>
-                <div class="absolute bottom-0 left-0 right-0 h-1.5 bg-black/30">
-                  <div class="h-full bg-gradient-to-r from-teal-400 to-teal-500" :style="{ width: course.progress + '%' }"></div>
-                </div>
-              </div>
-
-              <!-- Content -->
-              <div class="flex-1 min-w-0">
-                <div class="flex flex-wrap items-center gap-2 mb-1.5">
-                  <span :class="['course-level-badge', course.levelClass]">{{ course.level }}</span>
-                  <span :class="['course-status-badge', course.statusClass]">{{ course.status }}</span>
-                </div>
-                <h3 class="text-sm font-semibold text-gray-800 mb-1 truncate group-hover:text-teal-600 transition-colors">
-                  {{ course.title }}
-                </h3>
-                <p class="text-xs text-gray-500 mb-2">{{ course.instructor }}</p>
-                <div class="flex items-center gap-4 text-[11px] text-gray-400 mb-2">
-                  <span><i class="fas fa-clock text-[9px] mr-1"></i>{{ course.duration }}</span>
-                  <span><i class="fas fa-play-circle text-[9px] mr-1"></i>{{ course.completedLessons }}/{{ course.totalLessons }} lessons</span>
-                  <span><i class="fas fa-star text-amber-400 text-[9px] mr-1"></i>{{ course.rating }}</span>
-                </div>
-                <!-- Tags -->
-                <div class="flex flex-wrap gap-1.5">
-                  <span v-for="tag in course.tags" :key="tag"
-                        class="px-2 py-0.5 bg-gray-100 text-gray-500 text-[10px] font-medium rounded-full">
-                    {{ tag }}
-                  </span>
-                </div>
-              </div>
-
-              <!-- Progress & Action -->
-              <div class="flex flex-col items-end justify-between">
-                <div class="text-right">
-                  <span class="text-xl font-bold text-teal-600">{{ course.progress }}%</span>
-                  <p class="text-[10px] text-gray-400">complete</p>
-                </div>
-                <button class="px-5 py-2.5 bg-gradient-to-r from-teal-500 to-teal-600 text-white rounded-xl text-xs font-semibold hover:from-teal-600 hover:to-teal-700 transition-all shadow-lg shadow-teal-200 flex items-center gap-2">
-                  <i :class="course.progress > 0 && course.progress < 100 ? 'fas fa-play' : course.progress === 100 ? 'fas fa-redo' : 'fas fa-play'" class="text-[10px]"></i>
-                  {{ course.progress > 0 && course.progress < 100 ? 'Continue' : course.progress === 100 ? 'Review' : 'Start' }}
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Empty State -->
-          <div v-if="filteredEnrolledCourses.length === 0" class="text-center py-16">
-            <div class="w-20 h-20 rounded-full bg-gradient-to-br from-teal-100 to-cyan-100 flex items-center justify-center mx-auto mb-4">
-              <i class="fas fa-book-open text-teal-400 text-3xl"></i>
-            </div>
-            <h3 class="font-semibold text-gray-900 mb-2">No courses found</h3>
-            <p class="text-gray-500 text-sm mb-6 max-w-md mx-auto">Try changing your filter or browse our catalog to find new courses</p>
-            <button @click="activeTab = 'catalog'" class="px-6 py-2.5 bg-gradient-to-r from-teal-500 to-teal-600 text-white rounded-xl font-semibold text-sm hover:from-teal-600 hover:to-teal-700 transition-all shadow-lg shadow-teal-200 flex items-center gap-2 mx-auto">
-              <i class="fas fa-compass"></i>
-              Browse Catalog
-            </button>
           </div>
         </div>
       </div>
