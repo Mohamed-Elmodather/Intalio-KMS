@@ -932,7 +932,40 @@ const earnedCertificates = ref([
   { id: 3, title: 'Effective Communication', course: 'Effective Communication', date: 'Nov 10, 2024', credentialId: 'AFC-EC-2024-003', icon: 'fas fa-comments', color: '#8b5cf6', instructor: 'Sarah Chen', hours: 5, score: 95, skills: ['Presentation', 'Writing'] },
   { id: 4, title: 'Data Privacy Compliance', course: 'Data Privacy & GDPR', date: 'Oct 22, 2024', credentialId: 'AFC-DP-2024-004', icon: 'fas fa-user-shield', color: '#ef4444', instructor: 'Michael Brown', hours: 6, score: 90, skills: ['GDPR', 'Compliance'] },
   { id: 5, title: 'Time Management Mastery', course: 'Time Management', date: 'Sep 15, 2024', credentialId: 'AFC-TM-2024-005', icon: 'fas fa-clock', color: '#f59e0b', instructor: 'Emma Wilson', hours: 3, score: 87, skills: ['Productivity', 'Planning'] },
+  { id: 6, title: 'Leadership Excellence', course: 'Leadership Development', date: 'Aug 20, 2024', credentialId: 'AFC-LD-2024-006', icon: 'fas fa-crown', color: '#6366f1', instructor: 'James Rodriguez', hours: 8, score: 94, skills: ['Leadership', 'Team Building', 'Coaching'] },
+  { id: 7, title: 'Cloud Computing Basics', course: 'AWS Cloud Fundamentals', date: 'Jul 12, 2024', credentialId: 'AFC-CC-2024-007', icon: 'fas fa-cloud', color: '#06b6d4', instructor: 'Lisa Park', hours: 12, score: 91, skills: ['AWS', 'Cloud', 'DevOps'] },
+  { id: 8, title: 'Excel Advanced Analytics', course: 'Excel Mastery', date: 'Jun 05, 2024', credentialId: 'AFC-EA-2024-008', icon: 'fas fa-file-excel', color: '#22c55e', instructor: 'Tom Anderson', hours: 6, score: 89, skills: ['Excel', 'Data Analysis', 'Macros'] },
 ])
+
+// Certificate filter & search state
+const certSearch = ref('')
+const certSortBy = ref('date')
+const certSortOrder = ref<'asc' | 'desc'>('desc')
+const certViewMode = ref<'grid' | 'list'>('grid')
+const certScoreFilter = ref('all')
+const showCertSortDropdown = ref(false)
+const showCertScoreFilter = ref(false)
+
+// Certificate pagination state
+const certCurrentPage = ref(1)
+const certItemsPerPage = ref(6)
+const certItemsPerPageOptions = [6, 12, 24]
+
+// Certificate sort options
+const certSortOptions = [
+  { value: 'date', label: 'Date Earned', icon: 'fas fa-calendar' },
+  { value: 'score', label: 'Highest Score', icon: 'fas fa-star' },
+  { value: 'title', label: 'Title A-Z', icon: 'fas fa-sort-alpha-down' },
+  { value: 'hours', label: 'Most Hours', icon: 'fas fa-clock' },
+]
+
+// Certificate score filter options
+const certScoreOptions = [
+  { value: 'all', label: 'All Scores', min: 0, max: 100 },
+  { value: '90+', label: '90% and above', min: 90, max: 100 },
+  { value: '80-89', label: '80% - 89%', min: 80, max: 89 },
+  { value: 'below80', label: 'Below 80%', min: 0, max: 79 },
+]
 
 // Path filter & search state
 const pathFilter = ref('all')
@@ -1097,6 +1130,112 @@ const certificateStats = computed(() => ({
   totalHours: earnedCertificates.value.reduce((sum, c) => sum + c.hours, 0),
   avgScore: Math.round(earnedCertificates.value.reduce((sum, c) => sum + c.score, 0) / earnedCertificates.value.length)
 }))
+
+// Filtered certificates
+const filteredCertificates = computed(() => {
+  let certs = [...earnedCertificates.value]
+
+  // Filter by search
+  if (certSearch.value.trim()) {
+    const search = certSearch.value.toLowerCase()
+    certs = certs.filter(c =>
+      c.title.toLowerCase().includes(search) ||
+      c.course.toLowerCase().includes(search) ||
+      c.instructor.toLowerCase().includes(search) ||
+      c.skills.some((s: string) => s.toLowerCase().includes(search))
+    )
+  }
+
+  // Filter by score
+  if (certScoreFilter.value !== 'all') {
+    const option = certScoreOptions.find(o => o.value === certScoreFilter.value)
+    if (option) {
+      certs = certs.filter(c => c.score >= option.min && c.score <= option.max)
+    }
+  }
+
+  // Sort
+  certs.sort((a, b) => {
+    let comparison = 0
+    switch (certSortBy.value) {
+      case 'date':
+        comparison = new Date(b.date).getTime() - new Date(a.date).getTime()
+        break
+      case 'score':
+        comparison = b.score - a.score
+        break
+      case 'title':
+        comparison = a.title.localeCompare(b.title)
+        break
+      case 'hours':
+        comparison = b.hours - a.hours
+        break
+    }
+    return certSortOrder.value === 'asc' ? -comparison : comparison
+  })
+
+  return certs
+})
+
+// Certificate pagination
+const certTotalPages = computed(() => Math.ceil(filteredCertificates.value.length / certItemsPerPage.value))
+
+const paginatedCertificates = computed(() => {
+  const start = (certCurrentPage.value - 1) * certItemsPerPage.value
+  return filteredCertificates.value.slice(start, start + certItemsPerPage.value)
+})
+
+const certPaginationStart = computed(() => {
+  if (filteredCertificates.value.length === 0) return 0
+  return (certCurrentPage.value - 1) * certItemsPerPage.value + 1
+})
+
+const certPaginationEnd = computed(() => {
+  return Math.min(certCurrentPage.value * certItemsPerPage.value, filteredCertificates.value.length)
+})
+
+// Active certificate filters count
+const activeCertFiltersCount = computed(() => {
+  let count = 0
+  if (certSearch.value.trim()) count++
+  if (certScoreFilter.value !== 'all') count++
+  return count
+})
+
+// Certificate pagination functions
+function goToCertPage(page: number) {
+  certCurrentPage.value = page
+}
+
+function nextCertPage() {
+  if (certCurrentPage.value < certTotalPages.value) {
+    certCurrentPage.value++
+  }
+}
+
+function prevCertPage() {
+  if (certCurrentPage.value > 1) {
+    certCurrentPage.value--
+  }
+}
+
+function changeCertItemsPerPage(value: number) {
+  certItemsPerPage.value = value
+  certCurrentPage.value = 1
+}
+
+function clearAllCertFilters() {
+  certSearch.value = ''
+  certScoreFilter.value = 'all'
+  certSortBy.value = 'date'
+  certSortOrder.value = 'desc'
+  certCurrentPage.value = 1
+}
+
+// Reset cert pagination when filters change
+watch([certSearch, certScoreFilter], () => {
+  certCurrentPage.value = 1
+})
 
 // Navigate to course
 function navigateToCourse(courseId: number) {
@@ -2936,159 +3075,395 @@ function resumeFeaturedAutoPlay() {
         </div>
       </div>
 
-      <!-- Certificates Section -->
+      <!-- Certificates Section - Premium Enhanced -->
       <div v-if="currentView === 'certificates'" class="space-y-6">
-        <!-- Certificate Stats -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div class="content-area p-4 text-center">
-            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center mx-auto mb-2 shadow-lg shadow-amber-200">
-              <i class="fas fa-award text-white text-sm"></i>
+        <!-- Premium Stats Cards -->
+        <div class="cert-stats-section">
+          <div class="cert-stats-grid">
+            <div class="cert-stat-card cert-stat-total">
+              <div class="cert-stat-glow"></div>
+              <div class="cert-stat-icon">
+                <i class="fas fa-award"></i>
+              </div>
+              <div class="cert-stat-content">
+                <p class="cert-stat-value">{{ certificateStats.total }}</p>
+                <p class="cert-stat-label">Total Certificates</p>
+              </div>
+              <div class="cert-stat-badge">
+                <i class="fas fa-trophy"></i>
+              </div>
             </div>
-            <p class="text-2xl font-bold text-gray-900">{{ certificateStats.total }}</p>
-            <p class="text-xs text-gray-500">Total Certificates</p>
-          </div>
-          <div class="content-area p-4 text-center">
-            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center mx-auto mb-2 shadow-lg shadow-teal-200">
-              <i class="fas fa-calendar-check text-white text-sm"></i>
+            <div class="cert-stat-card cert-stat-year">
+              <div class="cert-stat-glow"></div>
+              <div class="cert-stat-icon">
+                <i class="fas fa-calendar-check"></i>
+              </div>
+              <div class="cert-stat-content">
+                <p class="cert-stat-value">{{ certificateStats.thisYear }}</p>
+                <p class="cert-stat-label">Earned This Year</p>
+              </div>
+              <div class="cert-stat-badge">
+                <i class="fas fa-fire"></i>
+              </div>
             </div>
-            <p class="text-2xl font-bold text-gray-900">{{ certificateStats.thisYear }}</p>
-            <p class="text-xs text-gray-500">Earned This Year</p>
-          </div>
-          <div class="content-area p-4 text-center">
-            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-400 to-indigo-600 flex items-center justify-center mx-auto mb-2 shadow-lg shadow-blue-200">
-              <i class="fas fa-clock text-white text-sm"></i>
+            <div class="cert-stat-card cert-stat-hours">
+              <div class="cert-stat-glow"></div>
+              <div class="cert-stat-icon">
+                <i class="fas fa-clock"></i>
+              </div>
+              <div class="cert-stat-content">
+                <p class="cert-stat-value">{{ certificateStats.totalHours }}<span class="cert-stat-unit">h</span></p>
+                <p class="cert-stat-label">Learning Hours</p>
+              </div>
+              <div class="cert-stat-badge">
+                <i class="fas fa-hourglass-half"></i>
+              </div>
             </div>
-            <p class="text-2xl font-bold text-gray-900">{{ certificateStats.totalHours }}h</p>
-            <p class="text-xs text-gray-500">Learning Hours</p>
-          </div>
-          <div class="content-area p-4 text-center">
-            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-400 to-pink-600 flex items-center justify-center mx-auto mb-2 shadow-lg shadow-purple-200">
-              <i class="fas fa-chart-line text-white text-sm"></i>
+            <div class="cert-stat-card cert-stat-score">
+              <div class="cert-stat-glow"></div>
+              <div class="cert-stat-icon">
+                <i class="fas fa-chart-line"></i>
+              </div>
+              <div class="cert-stat-content">
+                <p class="cert-stat-value">{{ certificateStats.avgScore }}<span class="cert-stat-unit">%</span></p>
+                <p class="cert-stat-label">Average Score</p>
+              </div>
+              <div class="cert-stat-badge">
+                <i class="fas fa-star"></i>
+              </div>
             </div>
-            <p class="text-2xl font-bold text-gray-900">{{ certificateStats.avgScore }}%</p>
-            <p class="text-xs text-gray-500">Average Score</p>
           </div>
         </div>
 
-        <!-- Certificates Grid -->
-        <div class="content-area p-6">
-          <div class="flex items-center justify-between mb-6">
-            <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-lg shadow-amber-200">
-                <i class="fas fa-certificate text-white text-sm"></i>
+        <!-- Certificates Main Section -->
+        <div class="cert-main-section">
+          <!-- Header Row -->
+          <div class="cert-header">
+            <div class="cert-header-left">
+              <div class="cert-header-icon">
+                <i class="fas fa-certificate"></i>
+                <div class="cert-header-icon-ring"></div>
               </div>
               <div>
-                <h2 class="text-lg font-bold text-gray-900">My Certificates</h2>
-                <p class="text-xs text-gray-500">Showcase your achievements</p>
+                <h2 class="cert-header-title">My Certificates</h2>
+                <p class="cert-header-subtitle">{{ filteredCertificates.length }} achievements earned</p>
               </div>
             </div>
-            <button class="px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg text-xs font-medium hover:bg-gray-50 transition-all flex items-center gap-2">
-              <i class="fas fa-download text-[10px]"></i>
-              Download All
-            </button>
-          </div>
-
-          <div v-if="earnedCertificates.length > 0" class="grid grid-cols-[repeat(auto-fill,minmax(340px,1fr))] gap-5">
-            <div v-for="cert in earnedCertificates" :key="cert.id"
-                 class="group bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-xl hover:border-amber-200 transition-all">
-              <!-- Certificate Visual -->
-              <div class="relative h-40 overflow-hidden">
-                <!-- Decorative Background -->
-                <div class="absolute inset-0 bg-gradient-to-br from-amber-400 via-orange-400 to-amber-500"></div>
-                <div class="absolute inset-0">
-                  <div class="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
-                  <div class="absolute bottom-0 left-0 w-32 h-32 bg-white/10 rounded-full translate-y-1/2 -translate-x-1/2"></div>
-                  <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 border border-white/10 rounded-full"></div>
-                </div>
-
-                <!-- Certificate Content -->
-                <div class="absolute inset-0 flex flex-col items-center justify-center p-4">
-                  <div class="w-14 h-14 rounded-full bg-white shadow-xl flex items-center justify-center mb-2">
-                    <i :class="[cert.icon, 'text-xl']" :style="{ color: cert.color }"></i>
-                  </div>
-                  <p class="text-white/70 text-[9px] font-semibold uppercase tracking-widest mb-1">Certificate of Completion</p>
-                  <h3 class="font-bold text-white text-center text-sm px-4">{{ cert.title }}</h3>
-                </div>
-
-                <!-- Score Badge -->
-                <div class="absolute top-3 right-3 px-2 py-1 bg-white/90 rounded-lg shadow-lg">
-                  <div class="flex items-center gap-1">
-                    <i class="fas fa-star text-amber-500 text-[10px]"></i>
-                    <span class="text-xs font-bold text-gray-800">{{ cert.score }}%</span>
-                  </div>
-                </div>
-
-                <!-- Verified Badge -->
-                <div class="absolute top-3 left-3 px-2 py-1 bg-teal-500 rounded-lg shadow-lg flex items-center gap-1">
-                  <i class="fas fa-check-circle text-white text-[10px]"></i>
-                  <span class="text-[10px] font-semibold text-white">Verified</span>
-                </div>
-              </div>
-
-              <!-- Certificate Info -->
-              <div class="p-4">
-                <!-- Course & Instructor -->
-                <div class="flex items-start justify-between mb-3">
-                  <div>
-                    <p class="text-xs text-gray-600 mb-0.5">{{ cert.course }}</p>
-                    <p class="text-[11px] text-gray-400">Instructor: {{ cert.instructor }}</p>
-                  </div>
-                  <span class="px-2 py-0.5 bg-gray-100 text-gray-500 text-[10px] font-medium rounded">
-                    {{ cert.hours }}h
-                  </span>
-                </div>
-
-                <!-- Skills Earned -->
-                <div class="flex flex-wrap gap-1.5 mb-3">
-                  <span v-for="skill in cert.skills" :key="skill"
-                        class="px-2 py-0.5 text-[10px] font-medium rounded-full"
-                        :style="{ backgroundColor: cert.color + '15', color: cert.color }">
-                    {{ skill }}
-                  </span>
-                </div>
-
-                <!-- Metadata -->
-                <div class="flex items-center gap-4 text-[11px] text-gray-400 mb-4 pt-3 border-t border-gray-100">
-                  <span class="flex items-center gap-1">
-                    <i class="fas fa-calendar text-[9px]"></i>
-                    {{ cert.date }}
-                  </span>
-                  <span class="flex items-center gap-1">
-                    <i class="fas fa-fingerprint text-[9px]"></i>
-                    {{ cert.credentialId }}
-                  </span>
-                </div>
-
-                <!-- Actions -->
-                <div class="flex items-center gap-2">
-                  <button class="flex-1 px-3 py-2.5 bg-gradient-to-r from-teal-500 to-teal-600 text-white rounded-xl text-xs font-semibold hover:from-teal-600 hover:to-teal-700 transition-all flex items-center justify-center gap-1.5 shadow-lg shadow-teal-200">
-                    <i class="fas fa-eye text-[10px]"></i> View
-                  </button>
-                  <button class="flex-1 px-3 py-2.5 bg-white border border-gray-200 text-gray-700 rounded-xl text-xs font-semibold hover:bg-gray-50 transition-all flex items-center justify-center gap-1.5">
-                    <i class="fas fa-download text-[10px]"></i> PDF
-                  </button>
-                  <button class="px-3 py-2.5 bg-[#0077b5] text-white rounded-xl text-xs font-semibold hover:bg-[#006699] transition-all flex items-center justify-center gap-1.5" title="Share on LinkedIn">
-                    <i class="fab fa-linkedin text-sm"></i>
-                  </button>
-                  <button class="px-3 py-2.5 bg-white border border-gray-200 text-gray-700 rounded-xl text-xs font-semibold hover:bg-gray-50 transition-all" title="Copy Link">
-                    <i class="fas fa-link text-[10px]"></i>
-                  </button>
-                </div>
-              </div>
+            <div class="cert-header-actions">
+              <button class="cert-download-all-btn">
+                <i class="fas fa-download"></i>
+                Download All
+              </button>
+              <button class="cert-share-all-btn">
+                <i class="fab fa-linkedin"></i>
+                Share Profile
+              </button>
             </div>
           </div>
 
-          <!-- Empty State -->
-          <div v-else class="text-center py-16">
-            <div class="w-20 h-20 rounded-full bg-gradient-to-br from-amber-100 to-orange-100 flex items-center justify-center mx-auto mb-4">
-              <i class="fas fa-certificate text-amber-400 text-3xl"></i>
+          <!-- Toolbar Row -->
+          <div class="cert-toolbar">
+            <!-- Search -->
+            <div class="cert-search-wrap">
+              <i class="fas fa-search cert-search-icon"></i>
+              <input
+                v-model="certSearch"
+                type="text"
+                placeholder="Search certificates..."
+                class="cert-search-input"
+              />
+              <button v-if="certSearch" @click="certSearch = ''" class="cert-search-clear">
+                <i class="fas fa-times"></i>
+              </button>
             </div>
-            <h3 class="font-semibold text-gray-900 mb-2">No certificates yet</h3>
-            <p class="text-gray-500 text-sm mb-6 max-w-md mx-auto">Complete courses to earn certificates and showcase your achievements to employers</p>
-            <button @click="currentView = 'all'" class="px-6 py-2.5 bg-gradient-to-r from-teal-500 to-teal-600 text-white rounded-xl font-semibold text-sm hover:from-teal-600 hover:to-teal-700 transition-all shadow-lg shadow-teal-200 flex items-center gap-2 mx-auto">
-              <i class="fas fa-book-reader"></i>
-              View Courses
+
+            <!-- Score Filter Dropdown -->
+            <div class="relative">
+              <button
+                @click="showCertScoreFilter = !showCertScoreFilter"
+                :class="[
+                  'cert-filter-btn',
+                  certScoreFilter !== 'all' ? 'active' : ''
+                ]"
+              >
+                <i class="fas fa-star"></i>
+                <span>{{ certScoreOptions.find(o => o.value === certScoreFilter)?.label }}</span>
+                <i :class="showCertScoreFilter ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="chevron"></i>
+              </button>
+              <!-- Dropdown Panel -->
+              <div v-if="showCertScoreFilter" class="cert-dropdown-panel">
+                <div class="cert-dropdown-header">Filter by Score</div>
+                <div class="cert-dropdown-options">
+                  <button
+                    v-for="option in certScoreOptions"
+                    :key="option.value"
+                    @click="certScoreFilter = option.value; showCertScoreFilter = false"
+                    :class="['cert-dropdown-option', { active: certScoreFilter === option.value }]"
+                  >
+                    <div :class="['cert-radio', { checked: certScoreFilter === option.value }]">
+                      <i v-if="certScoreFilter === option.value" class="fas fa-circle"></i>
+                    </div>
+                    <span>{{ option.label }}</span>
+                  </button>
+                </div>
+              </div>
+              <div v-if="showCertScoreFilter" @click="showCertScoreFilter = false" class="fixed inset-0 z-40"></div>
+            </div>
+
+            <!-- Sort Dropdown -->
+            <div class="relative ml-auto flex items-center">
+              <button
+                @click="showCertSortDropdown = !showCertSortDropdown"
+                class="cert-sort-btn"
+              >
+                <i :class="[certSortOptions.find(o => o.value === certSortBy)?.icon]"></i>
+                <span>{{ certSortOptions.find(o => o.value === certSortBy)?.label }}</span>
+                <i :class="showCertSortDropdown ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="chevron"></i>
+              </button>
+              <button
+                @click="certSortOrder = certSortOrder === 'asc' ? 'desc' : 'asc'"
+                class="cert-sort-order-btn"
+                :title="certSortOrder === 'asc' ? 'Ascending' : 'Descending'"
+              >
+                <i :class="certSortOrder === 'asc' ? 'fas fa-arrow-up' : 'fas fa-arrow-down'"></i>
+              </button>
+
+              <!-- Sort Dropdown Panel -->
+              <div v-if="showCertSortDropdown" class="cert-dropdown-panel sort-panel">
+                <div class="cert-dropdown-header">Sort By</div>
+                <div class="cert-dropdown-options">
+                  <button
+                    v-for="option in certSortOptions"
+                    :key="option.value"
+                    @click="certSortBy = option.value; showCertSortDropdown = false"
+                    :class="['cert-dropdown-option', { active: certSortBy === option.value }]"
+                  >
+                    <i :class="[option.icon, 'option-icon']"></i>
+                    <span>{{ option.label }}</span>
+                    <i v-if="certSortBy === option.value" class="fas fa-check check-icon"></i>
+                  </button>
+                </div>
+              </div>
+              <div v-if="showCertSortDropdown" @click="showCertSortDropdown = false" class="fixed inset-0 z-40"></div>
+            </div>
+
+            <!-- View Toggle -->
+            <div class="cert-view-toggle">
+              <button
+                @click="certViewMode = 'grid'"
+                :class="['cert-view-btn', { active: certViewMode === 'grid' }]"
+                title="Grid view"
+              >
+                <i class="fas fa-th-large"></i>
+              </button>
+              <button
+                @click="certViewMode = 'list'"
+                :class="['cert-view-btn', { active: certViewMode === 'list' }]"
+                title="List view"
+              >
+                <i class="fas fa-list"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Active Filters Bar -->
+          <div v-if="activeCertFiltersCount > 0" class="cert-active-filters">
+            <div class="cert-filter-label">
+              <i class="fas fa-filter"></i>
+              <span>Active Filters</span>
+            </div>
+            <div class="cert-filter-tags">
+              <span v-if="certSearch" class="cert-filter-tag search">
+                <i class="fas fa-search"></i>
+                "{{ certSearch }}"
+                <button @click="certSearch = ''"><i class="fas fa-times"></i></button>
+              </span>
+              <span v-if="certScoreFilter !== 'all'" class="cert-filter-tag score">
+                <i class="fas fa-star"></i>
+                {{ certScoreOptions.find(o => o.value === certScoreFilter)?.label }}
+                <button @click="certScoreFilter = 'all'"><i class="fas fa-times"></i></button>
+              </span>
+            </div>
+            <button @click="clearAllCertFilters" class="cert-clear-all-btn">
+              <i class="fas fa-times-circle"></i>
+              Clear all
             </button>
+          </div>
+
+          <!-- Certificates Grid -->
+          <div class="cert-grid-container">
+            <div v-if="paginatedCertificates.length > 0" :class="['cert-grid', certViewMode]">
+              <div v-for="cert in paginatedCertificates" :key="cert.id"
+                   :class="['cert-card', certViewMode]">
+                <!-- Certificate Visual Header -->
+                <div class="cert-card-visual" :style="{ '--cert-color': cert.color }">
+                  <!-- Decorative Elements -->
+                  <div class="cert-visual-bg"></div>
+                  <div class="cert-visual-pattern">
+                    <div class="pattern-circle c1"></div>
+                    <div class="pattern-circle c2"></div>
+                    <div class="pattern-ring"></div>
+                  </div>
+
+                  <!-- Content -->
+                  <div class="cert-visual-content">
+                    <div class="cert-icon-wrap">
+                      <i :class="cert.icon"></i>
+                    </div>
+                    <p class="cert-visual-label">Certificate of Completion</p>
+                    <h3 class="cert-visual-title">{{ cert.title }}</h3>
+                  </div>
+
+                  <!-- Badges -->
+                  <div class="cert-score-badge">
+                    <i class="fas fa-star"></i>
+                    <span>{{ cert.score }}%</span>
+                  </div>
+                  <div class="cert-verified-badge">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Verified</span>
+                  </div>
+                </div>
+
+                <!-- Certificate Body -->
+                <div class="cert-card-body">
+                  <!-- Course Info -->
+                  <div class="cert-course-info">
+                    <div>
+                      <p class="cert-course-name">{{ cert.course }}</p>
+                      <p class="cert-instructor">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                        {{ cert.instructor }}
+                      </p>
+                    </div>
+                    <span class="cert-hours-badge">
+                      <i class="fas fa-clock"></i>
+                      {{ cert.hours }}h
+                    </span>
+                  </div>
+
+                  <!-- Skills -->
+                  <div class="cert-skills">
+                    <span
+                      v-for="skill in cert.skills"
+                      :key="skill"
+                      class="cert-skill-tag"
+                      :style="{ '--skill-color': cert.color }"
+                    >
+                      {{ skill }}
+                    </span>
+                  </div>
+
+                  <!-- Metadata -->
+                  <div class="cert-metadata">
+                    <span>
+                      <i class="fas fa-calendar-alt"></i>
+                      {{ cert.date }}
+                    </span>
+                    <span>
+                      <i class="fas fa-fingerprint"></i>
+                      {{ cert.credentialId }}
+                    </span>
+                  </div>
+
+                  <!-- Actions -->
+                  <div class="cert-actions">
+                    <button class="cert-action-btn primary">
+                      <i class="fas fa-eye"></i>
+                      <span>View</span>
+                    </button>
+                    <button class="cert-action-btn secondary">
+                      <i class="fas fa-download"></i>
+                      <span>PDF</span>
+                    </button>
+                    <button class="cert-action-btn linkedin">
+                      <i class="fab fa-linkedin"></i>
+                    </button>
+                    <button class="cert-action-btn link">
+                      <i class="fas fa-link"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Empty State -->
+            <div v-else class="cert-empty-state">
+              <div class="cert-empty-icon">
+                <i class="fas fa-certificate"></i>
+              </div>
+              <h3 class="cert-empty-title">No certificates found</h3>
+              <p class="cert-empty-text">
+                {{ activeCertFiltersCount > 0 ? 'Try adjusting your filter selection' : 'Complete courses to earn certificates and showcase your achievements' }}
+              </p>
+              <button v-if="activeCertFiltersCount > 0" @click="clearAllCertFilters" class="cert-empty-btn">
+                <i class="fas fa-redo"></i>
+                Reset Filters
+              </button>
+              <button v-else @click="currentView = 'all'" class="cert-empty-btn">
+                <i class="fas fa-book-reader"></i>
+                Browse Courses
+              </button>
+            </div>
+
+            <!-- Pagination Footer -->
+            <div v-if="filteredCertificates.length > 0" class="cert-pagination">
+              <div class="cert-pagination-info">
+                <span>
+                  Showing <strong>{{ certPaginationStart }}</strong>
+                  to <strong>{{ certPaginationEnd }}</strong>
+                  of <strong>{{ filteredCertificates.length }}</strong> certificates
+                </span>
+                <div class="cert-per-page">
+                  <span>Show:</span>
+                  <select
+                    v-model="certItemsPerPage"
+                    @change="changeCertItemsPerPage(Number(($event.target as HTMLSelectElement).value))"
+                  >
+                    <option v-for="option in certItemsPerPageOptions" :key="option" :value="option">
+                      {{ option }}
+                    </option>
+                  </select>
+                  <span>per page</span>
+                </div>
+              </div>
+
+              <div class="cert-pagination-controls">
+                <button
+                  @click="prevCertPage"
+                  :disabled="certCurrentPage === 1"
+                  class="cert-page-btn"
+                >
+                  <i class="fas fa-chevron-left"></i>
+                  Previous
+                </button>
+
+                <div class="cert-page-numbers">
+                  <template v-for="page in certTotalPages" :key="page">
+                    <button
+                      v-if="page === 1 || page === certTotalPages || (page >= certCurrentPage - 1 && page <= certCurrentPage + 1)"
+                      @click="goToCertPage(page)"
+                      :class="['cert-page-num', { active: page === certCurrentPage }]"
+                    >
+                      {{ page }}
+                    </button>
+                    <span
+                      v-else-if="page === certCurrentPage - 2 || page === certCurrentPage + 2"
+                      class="cert-page-dots"
+                    >...</span>
+                  </template>
+                </div>
+
+                <button
+                  @click="nextCertPage"
+                  :disabled="certCurrentPage === certTotalPages"
+                  class="cert-page-btn"
+                >
+                  Next
+                  <i class="fas fa-chevron-right"></i>
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -6416,6 +6791,1199 @@ function resumeFeaturedAutoPlay() {
 
   .my-path-skills {
     display: none;
+  }
+}
+
+/* ========================================
+   CERTIFICATES SECTION - PREMIUM STYLES
+   ======================================== */
+
+/* Stats Section */
+.cert-stats-section {
+  padding: 0;
+}
+
+.cert-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+}
+
+.cert-stat-card {
+  position: relative;
+  background: white;
+  border-radius: 1.25rem;
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.cert-stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+}
+
+.cert-stat-card:hover .cert-stat-glow {
+  opacity: 0.15;
+}
+
+.cert-stat-card:hover .cert-stat-icon {
+  transform: scale(1.1);
+}
+
+.cert-stat-glow {
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 150%;
+  height: 150%;
+  border-radius: 50%;
+  opacity: 0.08;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.cert-stat-total .cert-stat-glow { background: radial-gradient(circle, #f59e0b 0%, transparent 70%); }
+.cert-stat-year .cert-stat-glow { background: radial-gradient(circle, #14b8a6 0%, transparent 70%); }
+.cert-stat-hours .cert-stat-glow { background: radial-gradient(circle, #3b82f6 0%, transparent 70%); }
+.cert-stat-score .cert-stat-glow { background: radial-gradient(circle, #8b5cf6 0%, transparent 70%); }
+
+.cert-stat-icon {
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  color: white;
+  transition: transform 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.cert-stat-total .cert-stat-icon { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
+.cert-stat-year .cert-stat-icon { background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%); }
+.cert-stat-hours .cert-stat-icon { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); }
+.cert-stat-score .cert-stat-icon { background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); }
+
+.cert-stat-content {
+  flex: 1;
+}
+
+.cert-stat-value {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #1f2937;
+  line-height: 1;
+  margin-bottom: 0.25rem;
+}
+
+.cert-stat-unit {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #6b7280;
+}
+
+.cert-stat-label {
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.cert-stat-badge {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.625rem;
+}
+
+.cert-stat-total .cert-stat-badge { background: #fef3c7; color: #d97706; }
+.cert-stat-year .cert-stat-badge { background: #ccfbf1; color: #0d9488; }
+.cert-stat-hours .cert-stat-badge { background: #dbeafe; color: #2563eb; }
+.cert-stat-score .cert-stat-badge { background: #ede9fe; color: #7c3aed; }
+
+/* Main Section */
+.cert-main-section {
+  background: white;
+  border-radius: 1.5rem;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+}
+
+/* Header */
+.cert-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem;
+  border-bottom: 1px solid #f3f4f6;
+  background: linear-gradient(180deg, #fffbeb 0%, white 100%);
+}
+
+.cert-header-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.cert-header-icon {
+  position: relative;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 1rem;
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.125rem;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+}
+
+.cert-header-icon-ring {
+  position: absolute;
+  inset: -4px;
+  border-radius: 1.25rem;
+  border: 2px solid rgba(245, 158, 11, 0.2);
+  animation: pulse-ring 2s ease-in-out infinite;
+}
+
+@keyframes pulse-ring {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.1); opacity: 0.5; }
+}
+
+.cert-header-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.cert-header-subtitle {
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.cert-header-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.cert-download-all-btn,
+.cert-share-all-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.cert-download-all-btn {
+  background: white;
+  border: 1px solid #e5e7eb;
+  color: #374151;
+}
+
+.cert-download-all-btn:hover {
+  background: #f9fafb;
+  border-color: #d1d5db;
+}
+
+.cert-share-all-btn {
+  background: #0077b5;
+  border: none;
+  color: white;
+}
+
+.cert-share-all-btn:hover {
+  background: #006699;
+}
+
+/* Toolbar */
+.cert-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #f3f4f6;
+  background: #fafafa;
+}
+
+.cert-search-wrap {
+  position: relative;
+  flex: 0 0 280px;
+}
+
+.cert-search-icon {
+  position: absolute;
+  left: 0.875rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #9ca3af;
+  font-size: 0.75rem;
+}
+
+.cert-search-input {
+  width: 100%;
+  padding: 0.5rem 2rem 0.5rem 2.25rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.75rem;
+  font-size: 0.75rem;
+  background: white;
+  transition: all 0.2s ease;
+}
+
+.cert-search-input:focus {
+  outline: none;
+  border-color: #f59e0b;
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+}
+
+.cert-search-clear {
+  position: absolute;
+  right: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #e5e7eb;
+  color: #6b7280;
+  font-size: 0.625rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cert-search-clear:hover {
+  background: #d1d5db;
+  color: #374151;
+}
+
+.cert-filter-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.875rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.75rem;
+  background: white;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #374151;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cert-filter-btn:hover {
+  background: #f9fafb;
+}
+
+.cert-filter-btn.active {
+  background: #fef3c7;
+  border-color: #fcd34d;
+  color: #92400e;
+}
+
+.cert-filter-btn .chevron {
+  font-size: 0.625rem;
+  margin-left: 0.25rem;
+}
+
+.cert-dropdown-panel {
+  position: absolute;
+  left: 0;
+  top: 100%;
+  margin-top: 0.5rem;
+  width: 200px;
+  background: white;
+  border-radius: 0.875rem;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  border: 1px solid #e5e7eb;
+  z-index: 50;
+  overflow: hidden;
+}
+
+.cert-dropdown-panel.sort-panel {
+  left: auto;
+  right: 0;
+}
+
+.cert-dropdown-header {
+  padding: 0.75rem 1rem;
+  font-size: 0.625rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #9ca3af;
+}
+
+.cert-dropdown-options {
+  max-height: 240px;
+  overflow-y: auto;
+}
+
+.cert-dropdown-option {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.625rem 1rem;
+  font-size: 0.8125rem;
+  color: #374151;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-align: left;
+}
+
+.cert-dropdown-option:hover {
+  background: #f9fafb;
+}
+
+.cert-dropdown-option.active {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.cert-radio {
+  width: 1rem;
+  height: 1rem;
+  border-radius: 50%;
+  border: 2px solid #d1d5db;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.cert-radio.checked {
+  background: #f59e0b;
+  border-color: #f59e0b;
+}
+
+.cert-radio i {
+  font-size: 0.375rem;
+  color: white;
+}
+
+.cert-dropdown-option .option-icon {
+  width: 1rem;
+  color: #9ca3af;
+}
+
+.cert-dropdown-option.active .option-icon {
+  color: #f59e0b;
+}
+
+.cert-dropdown-option .check-icon {
+  margin-left: auto;
+  font-size: 0.75rem;
+  color: #f59e0b;
+}
+
+.cert-sort-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.875rem;
+  border: 1px solid #e5e7eb;
+  border-right: none;
+  border-radius: 0.75rem 0 0 0.75rem;
+  background: white;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #374151;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cert-sort-btn:hover {
+  background: #f9fafb;
+}
+
+.cert-sort-btn i:first-child {
+  color: #f59e0b;
+}
+
+.cert-sort-btn .chevron {
+  font-size: 0.625rem;
+  margin-left: 0.25rem;
+}
+
+.cert-sort-order-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 0 0.75rem 0.75rem 0;
+  background: white;
+  color: #f59e0b;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cert-sort-order-btn:hover {
+  background: #fef3c7;
+}
+
+.cert-view-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.125rem;
+  padding: 0.25rem;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.75rem;
+}
+
+.cert-view-btn {
+  padding: 0.375rem 0.625rem;
+  border-radius: 0.5rem;
+  background: none;
+  border: none;
+  color: #9ca3af;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cert-view-btn:hover {
+  color: #6b7280;
+  background: #f3f4f6;
+}
+
+.cert-view-btn.active {
+  background: #f59e0b;
+  color: white;
+}
+
+/* Active Filters */
+.cert-active-filters {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.875rem 1.5rem;
+  background: #fffbeb;
+  border-bottom: 1px solid #fef3c7;
+}
+
+.cert-filter-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.375rem 0.75rem;
+  background: white;
+  border-radius: 0.5rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: #6b7280;
+  border: 1px solid #e5e7eb;
+}
+
+.cert-filter-label i {
+  color: #9ca3af;
+}
+
+.cert-filter-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  flex: 1;
+}
+
+.cert-filter-tag {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.375rem 0.625rem;
+  border-radius: 0.5rem;
+  font-size: 0.6875rem;
+  font-weight: 500;
+}
+
+.cert-filter-tag.search {
+  background: #f3f4f6;
+  color: #374151;
+  border: 1px solid #e5e7eb;
+}
+
+.cert-filter-tag.score {
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fcd34d;
+}
+
+.cert-filter-tag button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1rem;
+  height: 1rem;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.1);
+  border: none;
+  cursor: pointer;
+  margin-left: 0.25rem;
+  transition: all 0.2s ease;
+}
+
+.cert-filter-tag button:hover {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.cert-filter-tag button i {
+  font-size: 0.5rem;
+}
+
+.cert-clear-all-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.375rem 0.75rem;
+  background: none;
+  border: none;
+  color: #dc2626;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.cert-clear-all-btn:hover {
+  background: #fef2f2;
+}
+
+/* Grid Container */
+.cert-grid-container {
+  padding: 1.5rem;
+}
+
+.cert-grid {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.cert-grid.grid {
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+}
+
+.cert-grid.list {
+  grid-template-columns: 1fr;
+}
+
+/* Certificate Card */
+.cert-card {
+  background: white;
+  border-radius: 1.25rem;
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.cert-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.1);
+  border-color: #fcd34d;
+}
+
+.cert-card.list {
+  display: flex;
+  flex-direction: row;
+}
+
+.cert-card.list .cert-card-visual {
+  width: 280px;
+  min-width: 280px;
+  height: auto;
+}
+
+.cert-card.list .cert-card-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Card Visual */
+.cert-card-visual {
+  position: relative;
+  height: 160px;
+  overflow: hidden;
+}
+
+.cert-visual-bg {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, var(--cert-color) 0%, color-mix(in srgb, var(--cert-color) 80%, #000) 100%);
+}
+
+.cert-visual-pattern {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.pattern-circle {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.pattern-circle.c1 {
+  width: 120px;
+  height: 120px;
+  top: -30%;
+  right: -10%;
+}
+
+.pattern-circle.c2 {
+  width: 80px;
+  height: 80px;
+  bottom: -20%;
+  left: -5%;
+}
+
+.pattern-ring {
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+}
+
+.cert-visual-content {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  z-index: 2;
+}
+
+.cert-icon-wrap {
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 50%;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.75rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+.cert-icon-wrap i {
+  font-size: 1.25rem;
+  color: var(--cert-color);
+}
+
+.cert-visual-label {
+  font-size: 0.5625rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 0.25rem;
+}
+
+.cert-visual-title {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: white;
+  text-align: center;
+  line-height: 1.3;
+  max-width: 90%;
+}
+
+.cert-score-badge {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  z-index: 3;
+}
+
+.cert-score-badge i {
+  font-size: 0.625rem;
+  color: #f59e0b;
+}
+
+.cert-score-badge span {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.cert-verified-badge {
+  position: absolute;
+  top: 0.75rem;
+  left: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  background: #10b981;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+  z-index: 3;
+}
+
+.cert-verified-badge i {
+  font-size: 0.625rem;
+  color: white;
+}
+
+.cert-verified-badge span {
+  font-size: 0.625rem;
+  font-weight: 600;
+  color: white;
+}
+
+/* Card Body */
+.cert-card-body {
+  padding: 1rem;
+}
+
+.cert-course-info {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.cert-course-name {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 0.25rem;
+}
+
+.cert-instructor {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.6875rem;
+  color: #6b7280;
+}
+
+.cert-instructor i {
+  font-size: 0.625rem;
+  color: #9ca3af;
+}
+
+.cert-hours-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  background: #f3f4f6;
+  border-radius: 0.375rem;
+  font-size: 0.625rem;
+  font-weight: 500;
+  color: #6b7280;
+}
+
+.cert-hours-badge i {
+  font-size: 0.5625rem;
+}
+
+.cert-skills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+  margin-bottom: 0.75rem;
+}
+
+.cert-skill-tag {
+  padding: 0.25rem 0.5rem;
+  background: color-mix(in srgb, var(--skill-color) 10%, white);
+  color: var(--skill-color);
+  border-radius: 0.375rem;
+  font-size: 0.625rem;
+  font-weight: 500;
+}
+
+.cert-metadata {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 0;
+  border-top: 1px solid #f3f4f6;
+  margin-bottom: 0.75rem;
+}
+
+.cert-metadata span {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.6875rem;
+  color: #6b7280;
+}
+
+.cert-metadata i {
+  font-size: 0.625rem;
+  color: #9ca3af;
+}
+
+.cert-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.cert-action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  padding: 0.625rem 0.875rem;
+  border-radius: 0.75rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.cert-action-btn.primary {
+  flex: 1;
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(20, 184, 166, 0.25);
+}
+
+.cert-action-btn.primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(20, 184, 166, 0.35);
+}
+
+.cert-action-btn.secondary {
+  flex: 1;
+  background: white;
+  border: 1px solid #e5e7eb;
+  color: #374151;
+}
+
+.cert-action-btn.secondary:hover {
+  background: #f9fafb;
+}
+
+.cert-action-btn.linkedin {
+  background: #0077b5;
+  color: white;
+  padding: 0.625rem;
+}
+
+.cert-action-btn.linkedin:hover {
+  background: #006699;
+}
+
+.cert-action-btn.link {
+  background: white;
+  border: 1px solid #e5e7eb;
+  color: #6b7280;
+  padding: 0.625rem;
+}
+
+.cert-action-btn.link:hover {
+  background: #f9fafb;
+  color: #374151;
+}
+
+/* Empty State */
+.cert-empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+}
+
+.cert-empty-icon {
+  width: 5rem;
+  height: 5rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.5rem;
+}
+
+.cert-empty-icon i {
+  font-size: 2rem;
+  color: #f59e0b;
+}
+
+.cert-empty-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 0.5rem;
+}
+
+.cert-empty-text {
+  font-size: 0.875rem;
+  color: #6b7280;
+  max-width: 24rem;
+  margin: 0 auto 1.5rem;
+}
+
+.cert-empty-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+  color: white;
+  border: none;
+  border-radius: 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(20, 184, 166, 0.25);
+}
+
+.cert-empty-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(20, 184, 166, 0.35);
+}
+
+/* Pagination */
+.cert-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background: #fafafa;
+  border-radius: 1rem;
+  border: 1px solid #f3f4f6;
+}
+
+.cert-pagination-info {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.cert-pagination-info > span {
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.cert-pagination-info strong {
+  font-weight: 600;
+  color: #374151;
+}
+
+.cert-per-page {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.cert-per-page select {
+  padding: 0.375rem 0.625rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  background: white;
+  font-size: 0.75rem;
+  color: #374151;
+  cursor: pointer;
+}
+
+.cert-per-page select:focus {
+  outline: none;
+  border-color: #f59e0b;
+}
+
+.cert-pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.cert-page-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem 0.875rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  background: white;
+  font-size: 0.75rem;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cert-page-btn:hover:not(:disabled) {
+  background: #f9fafb;
+  color: #374151;
+}
+
+.cert-page-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.cert-page-btn i {
+  font-size: 0.625rem;
+}
+
+.cert-page-numbers {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.cert-page-num {
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 0.5rem;
+  background: none;
+  font-size: 0.75rem;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cert-page-num:hover {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.cert-page-num.active {
+  background: #fef3c7;
+  color: #92400e;
+  font-weight: 600;
+}
+
+.cert-page-dots {
+  font-size: 0.75rem;
+  color: #9ca3af;
+  padding: 0 0.25rem;
+}
+
+/* Responsive - Tablet */
+@media (max-width: 1024px) {
+  .cert-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .cert-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .cert-header-actions {
+    width: 100%;
+  }
+
+  .cert-download-all-btn,
+  .cert-share-all-btn {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .cert-toolbar {
+    flex-wrap: wrap;
+  }
+
+  .cert-search-wrap {
+    flex: 1 1 100%;
+    order: -1;
+    margin-bottom: 0.5rem;
+  }
+
+  .cert-card.list {
+    flex-direction: column;
+  }
+
+  .cert-card.list .cert-card-visual {
+    width: 100%;
+    height: 160px;
+  }
+}
+
+/* Responsive - Mobile */
+@media (max-width: 640px) {
+  .cert-stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .cert-stat-card {
+    padding: 1rem;
+  }
+
+  .cert-stat-icon {
+    width: 2.5rem;
+    height: 2.5rem;
+    font-size: 1rem;
+  }
+
+  .cert-stat-value {
+    font-size: 1.5rem;
+  }
+
+  .cert-grid.grid {
+    grid-template-columns: 1fr;
+  }
+
+  .cert-pagination {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .cert-pagination-info {
+    justify-content: center;
+  }
+
+  .cert-pagination-controls {
+    justify-content: center;
   }
 }
 </style>
