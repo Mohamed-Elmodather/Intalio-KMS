@@ -83,7 +83,21 @@ const enrolledCourses = ref([
     rating: 4.8,
     students: 1250,
     image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&h=300&fit=crop',
-    tags: ['Data Science', 'Analytics']
+    tags: ['Data Science', 'Analytics'],
+    syllabus: [
+      { id: 1, title: 'Introduction to Data Analytics', duration: '30 min', completed: true },
+      { id: 2, title: 'Data Collection Methods', duration: '45 min', completed: true },
+      { id: 3, title: 'Statistical Analysis Basics', duration: '50 min', completed: true },
+      { id: 4, title: 'Data Visualization Techniques', duration: '40 min', completed: true },
+      { id: 5, title: 'Advanced Statistical Models', duration: '55 min', completed: true },
+      { id: 6, title: 'Predictive Analytics', duration: '45 min', completed: true },
+      { id: 7, title: 'Machine Learning Integration', duration: '50 min', completed: true },
+      { id: 8, title: 'Real-time Data Processing', duration: '40 min', completed: true },
+      { id: 9, title: 'Data Pipeline Architecture', duration: '45 min', completed: true },
+      { id: 10, title: 'Business Intelligence Tools', duration: '35 min', completed: false, current: true },
+      { id: 11, title: 'Dashboard Development', duration: '40 min', completed: false },
+      { id: 12, title: 'Final Project & Assessment', duration: '60 min', completed: false }
+    ]
   },
   {
     id: 2,
@@ -103,7 +117,20 @@ const enrolledCourses = ref([
     rating: 4.6,
     students: 2340,
     image: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=400&h=300&fit=crop',
-    tags: ['Leadership', 'Management']
+    tags: ['Leadership', 'Management'],
+    syllabus: [
+      { id: 1, title: 'What Makes a Great Leader', duration: '25 min', completed: true },
+      { id: 2, title: 'Communication Strategies', duration: '35 min', completed: true },
+      { id: 3, title: 'Building Trust & Credibility', duration: '30 min', completed: true },
+      { id: 4, title: 'Delegation & Empowerment', duration: '40 min', completed: true },
+      { id: 5, title: 'Conflict Resolution', duration: '35 min', completed: true },
+      { id: 6, title: 'Motivating Your Team', duration: '30 min', completed: false, current: true },
+      { id: 7, title: 'Decision Making Under Pressure', duration: '40 min', completed: false },
+      { id: 8, title: 'Leading Remote Teams', duration: '35 min', completed: false },
+      { id: 9, title: 'Change Management', duration: '45 min', completed: false },
+      { id: 10, title: 'Coaching & Mentoring', duration: '30 min', completed: false },
+      { id: 11, title: 'Leadership Assessment', duration: '40 min', completed: false }
+    ]
   },
   {
     id: 3,
@@ -123,7 +150,17 @@ const enrolledCourses = ref([
     rating: 4.9,
     students: 3450,
     image: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=400&h=300&fit=crop',
-    tags: ['Security', 'IT']
+    tags: ['Security', 'IT'],
+    syllabus: [
+      { id: 1, title: 'Introduction to Cybersecurity', duration: '30 min', completed: true },
+      { id: 2, title: 'Common Threats & Vulnerabilities', duration: '35 min', completed: true },
+      { id: 3, title: 'Network Security Basics', duration: '40 min', completed: true },
+      { id: 4, title: 'Password & Authentication', duration: '25 min', completed: true },
+      { id: 5, title: 'Data Encryption', duration: '35 min', completed: true },
+      { id: 6, title: 'Phishing & Social Engineering', duration: '30 min', completed: true },
+      { id: 7, title: 'Security Best Practices', duration: '25 min', completed: true },
+      { id: 8, title: 'Final Assessment', duration: '40 min', completed: true }
+    ]
   },
   {
     id: 4,
@@ -143,7 +180,19 @@ const enrolledCourses = ref([
     rating: 4.7,
     students: 1890,
     image: 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=400&h=300&fit=crop',
-    tags: ['Soft Skills', 'Communication']
+    tags: ['Soft Skills', 'Communication'],
+    syllabus: [
+      { id: 1, title: 'The Art of Communication', duration: '30 min', completed: false },
+      { id: 2, title: 'Active Listening Skills', duration: '25 min', completed: false },
+      { id: 3, title: 'Non-Verbal Communication', duration: '35 min', completed: false },
+      { id: 4, title: 'Written Communication', duration: '40 min', completed: false },
+      { id: 5, title: 'Presentation Skills', duration: '45 min', completed: false },
+      { id: 6, title: 'Handling Difficult Conversations', duration: '30 min', completed: false },
+      { id: 7, title: 'Cross-Cultural Communication', duration: '35 min', completed: false },
+      { id: 8, title: 'Persuasion Techniques', duration: '30 min', completed: false },
+      { id: 9, title: 'Feedback & Criticism', duration: '25 min', completed: false },
+      { id: 10, title: 'Final Project', duration: '40 min', completed: false }
+    ]
   },
   {
     id: 5,
@@ -163,7 +212,24 @@ const enrolledCourses = ref([
     rating: 4.5,
     students: 2780,
     image: 'https://images.unsplash.com/photo-1507925921958-8a62f3d1a50d?w=400&h=300&fit=crop',
-    tags: ['Project Management', 'Agile']
+    tags: ['Project Management', 'Agile'],
+    syllabus: [
+      { id: 1, title: 'Project Management Overview', duration: '30 min', completed: true },
+      { id: 2, title: 'Project Lifecycle Phases', duration: '40 min', completed: true },
+      { id: 3, title: 'Stakeholder Management', duration: '35 min', completed: true },
+      { id: 4, title: 'Scope Definition', duration: '45 min', completed: true },
+      { id: 5, title: 'Work Breakdown Structure', duration: '40 min', completed: false, current: true },
+      { id: 6, title: 'Schedule Development', duration: '50 min', completed: false },
+      { id: 7, title: 'Resource Planning', duration: '35 min', completed: false },
+      { id: 8, title: 'Budget Management', duration: '45 min', completed: false },
+      { id: 9, title: 'Risk Assessment', duration: '40 min', completed: false },
+      { id: 10, title: 'Quality Management', duration: '35 min', completed: false },
+      { id: 11, title: 'Agile Methodologies', duration: '50 min', completed: false },
+      { id: 12, title: 'Scrum Framework', duration: '45 min', completed: false },
+      { id: 13, title: 'Kanban Principles', duration: '30 min', completed: false },
+      { id: 14, title: 'Team Collaboration Tools', duration: '35 min', completed: false },
+      { id: 15, title: 'Capstone Project', duration: '60 min', completed: false }
+    ]
   },
 ])
 
@@ -643,49 +709,50 @@ function resumeFeaturedAutoPlay() {
               </div>
             </div>
 
-            <!-- Up Next Column -->
-            <div class="up-next-courses">
-              <div class="up-next-header">
-                <h3 class="up-next-title"><i class="fas fa-list"></i> Up Next</h3>
-                <span class="up-next-count">{{ upNextCourses.length }} courses</span>
+            <!-- Course Syllabus Column -->
+            <div class="course-syllabus-panel">
+              <div class="syllabus-header">
+                <h3 class="syllabus-title"><i class="fas fa-list-ol"></i> Course Syllabus</h3>
+                <span class="syllabus-count">{{ featuredCourse.syllabus?.length || 0 }} lessons</span>
               </div>
-              <div class="up-next-list">
-                <div v-for="(course, index) in upNextCourses" :key="course.id"
-                     @click="navigateToCourse(course.id)"
-                     class="up-next-course-card group">
-                  <!-- Thumbnail -->
-                  <div class="up-next-thumb">
-                    <img :src="course.image" :alt="course.title" class="up-next-img" />
-                    <div class="up-next-overlay"></div>
-                    <div class="up-next-play"><i class="fas fa-play"></i></div>
-                    <span class="up-next-duration">{{ course.duration }}</span>
-                    <!-- Progress Bar -->
-                    <div class="up-next-progress">
-                      <div class="up-next-progress-fill" :style="{ width: course.progress + '%' }"></div>
+              <div class="syllabus-list">
+                <div
+                  v-for="(lesson, index) in featuredCourse.syllabus"
+                  :key="lesson.id"
+                  :class="['syllabus-item', {
+                    'completed': lesson.completed,
+                    'current': lesson.current,
+                    'locked': !lesson.completed && !lesson.current && index > 0 && !featuredCourse.syllabus[index - 1]?.completed
+                  }]"
+                >
+                  <div class="syllabus-item-number">
+                    <span v-if="lesson.completed" class="check-icon"><i class="fas fa-check"></i></span>
+                    <span v-else-if="lesson.current" class="play-icon"><i class="fas fa-play"></i></span>
+                    <span v-else class="lesson-number">{{ index + 1 }}</span>
+                  </div>
+                  <div class="syllabus-item-content">
+                    <h4 class="syllabus-item-title">{{ lesson.title }}</h4>
+                    <div class="syllabus-item-meta">
+                      <span class="syllabus-duration"><i class="fas fa-clock"></i> {{ lesson.duration }}</span>
+                      <span v-if="lesson.current" class="current-badge">Continue</span>
                     </div>
                   </div>
-
-                  <!-- Info -->
-                  <div class="up-next-info">
-                    <div class="up-next-badges">
-                      <span :class="['up-next-level', course.levelClass]">{{ course.level }}</span>
-                      <span class="up-next-progress-badge">{{ course.progress }}%</span>
-                    </div>
-                    <h4 class="up-next-course-title">{{ course.title }}</h4>
-                    <div class="up-next-instructor">
-                      <div class="up-next-avatar">{{ course.instructorInitials }}</div>
-                      <span>{{ course.instructor }}</span>
-                    </div>
-                    <div class="up-next-footer">
-                      <div class="up-next-meta">
-                        <span><i class="fas fa-play-circle"></i> {{ course.completedLessons }}/{{ course.totalLessons }}</span>
-                        <span><i class="fas fa-star text-amber-400"></i> {{ course.rating }}</span>
-                      </div>
-                      <button class="up-next-resume-btn" @click.stop="navigateToCourse(course.id)">
-                        <i class="fas fa-play"></i> Resume
-                      </button>
-                    </div>
+                  <div class="syllabus-item-action">
+                    <button v-if="lesson.current" class="syllabus-play-btn">
+                      <i class="fas fa-play"></i>
+                    </button>
+                    <i v-else-if="lesson.completed" class="fas fa-check-circle text-teal-500"></i>
+                    <i v-else class="fas fa-lock text-gray-300"></i>
                   </div>
+                </div>
+              </div>
+              <div class="syllabus-footer">
+                <div class="syllabus-progress-info">
+                  <span class="completed-count">{{ featuredCourse.completedLessons }} of {{ featuredCourse.totalLessons }} completed</span>
+                  <span class="progress-percent">{{ featuredCourse.progress }}%</span>
+                </div>
+                <div class="syllabus-progress-bar">
+                  <div class="syllabus-progress-fill" :style="{ width: featuredCourse.progress + '%' }"></div>
                 </div>
               </div>
             </div>
@@ -2173,328 +2240,275 @@ function resumeFeaturedAutoPlay() {
   opacity: 0;
 }
 
-/* Up Next Column */
-.up-next-courses {
+/* Course Syllabus Panel */
+.course-syllabus-panel {
   display: flex;
   flex-direction: column;
   min-width: 0;
   background: white;
   border-radius: 0.75rem;
-  padding: 0.875rem;
   border: 1px solid #e2e8f0;
+  overflow: hidden;
 }
 
-.up-next-header {
+.syllabus-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 0.75rem;
+  padding: 0.875rem 1rem;
+  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+  border-bottom: 1px solid #e2e8f0;
 }
 
-.up-next-title {
+.syllabus-title {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-size: 0.875rem;
+  font-size: 0.9375rem;
   font-weight: 700;
   color: #0f172a;
   margin: 0;
 }
 
-.up-next-title i {
+.syllabus-title i {
   color: #14b8a6;
-  font-size: 0.75rem;
+  font-size: 0.875rem;
 }
 
-.up-next-count {
-  font-size: 0.625rem;
+.syllabus-count {
+  font-size: 0.6875rem;
   color: #64748b;
   background: #f1f5f9;
-  padding: 0.25rem 0.5rem;
+  padding: 0.25rem 0.625rem;
   border-radius: 9999px;
+  font-weight: 500;
 }
 
-.up-next-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.625rem;
+.syllabus-list {
   flex: 1;
+  overflow-y: auto;
+  max-height: 320px;
+  padding: 0.5rem;
 }
 
-/* Up Next Card */
-.up-next-course-card {
+/* Syllabus Item */
+.syllabus-item {
   display: flex;
+  align-items: center;
   gap: 0.75rem;
-  padding: 0.625rem;
-  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
-  border: 1px solid #e2e8f0;
-  border-radius: 0.75rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  position: relative;
-}
-
-.up-next-course-card:hover {
-  border-color: #14b8a6;
-  box-shadow: 0 8px 20px rgba(20, 184, 166, 0.12);
-  transform: translateY(-2px);
-  background: linear-gradient(135deg, #f0fdfa 0%, #ffffff 100%);
-}
-
-.up-next-thumb {
-  position: relative;
-  width: 100px;
-  height: 65px;
+  padding: 0.625rem 0.75rem;
   border-radius: 0.5rem;
-  overflow: hidden;
-  flex-shrink: 0;
-  background: #1e293b;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  border: 1px solid transparent;
 }
 
-.up-next-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.4s ease;
+.syllabus-item:hover {
+  background: #f8fafc;
 }
 
-.up-next-course-card:hover .up-next-img {
-  transform: scale(1.1);
+.syllabus-item.completed {
+  opacity: 0.7;
 }
 
-.up-next-overlay {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(to top, rgba(0,0,0,0.4) 0%, transparent 60%);
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.up-next-course-card:hover .up-next-overlay {
+.syllabus-item.completed:hover {
   opacity: 1;
 }
 
-.up-next-play {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%) scale(0.8);
+.syllabus-item.current {
+  background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 100%);
+  border-color: #14b8a6;
+}
+
+.syllabus-item.locked {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.syllabus-item-number {
   width: 1.75rem;
   height: 1.75rem;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255,255,255,0.95);
-  border-radius: 50%;
-  opacity: 0;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-}
-
-.up-next-course-card:hover .up-next-play {
-  opacity: 1;
-  transform: translate(-50%, -50%) scale(1);
-}
-
-.up-next-play i {
-  color: #0d9488;
-  font-size: 0.625rem;
-  margin-left: 1px;
-}
-
-.up-next-duration {
-  position: absolute;
-  bottom: 4px;
-  right: 4px;
-  padding: 0.1875rem 0.375rem;
-  background: rgba(0,0,0,0.85);
-  color: white;
-  font-size: 0.5625rem;
+  flex-shrink: 0;
+  font-size: 0.75rem;
   font-weight: 600;
-  border-radius: 0.25rem;
+  background: #f1f5f9;
+  color: #64748b;
 }
 
-.up-next-progress {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: rgba(255,255,255,0.3);
-}
-
-.up-next-progress-fill {
-  height: 100%;
-  background: linear-gradient(90deg, #14b8a6, #0d9488);
-  border-radius: 0 0 0.5rem 0.5rem;
-}
-
-.up-next-info {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-
-.up-next-badges {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 0.25rem;
-}
-
-.up-next-level {
-  display: inline-block;
-  padding: 0.125rem 0.375rem;
-  font-size: 0.5625rem;
-  font-weight: 600;
-  border-radius: 0.1875rem;
-  text-transform: uppercase;
-}
-
-.up-next-level.beginner {
+.syllabus-item.completed .syllabus-item-number {
   background: #dcfce7;
   color: #16a34a;
 }
 
-.up-next-level.intermediate {
-  background: #dbeafe;
-  color: #2563eb;
+.syllabus-item.current .syllabus-item-number {
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+  color: white;
 }
 
-.up-next-level.advanced {
-  background: #ede9fe;
-  color: #7c3aed;
+.check-icon, .play-icon, .lesson-number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.up-next-progress-badge {
+.check-icon i {
   font-size: 0.625rem;
+}
+
+.play-icon i {
+  font-size: 0.5rem;
+  margin-left: 1px;
+}
+
+.syllabus-item-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.syllabus-item-title {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #0f172a;
+  margin: 0 0 0.25rem 0;
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.syllabus-item.completed .syllabus-item-title {
+  text-decoration: line-through;
+  color: #64748b;
+}
+
+.syllabus-item.current .syllabus-item-title {
+  color: #0d9488;
+}
+
+.syllabus-item-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.syllabus-duration {
+  font-size: 0.6875rem;
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.syllabus-duration i {
+  font-size: 0.625rem;
+}
+
+.current-badge {
+  font-size: 0.5625rem;
+  font-weight: 600;
+  color: white;
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+  padding: 0.125rem 0.375rem;
+  border-radius: 0.25rem;
+  text-transform: uppercase;
+}
+
+.syllabus-item-action {
+  flex-shrink: 0;
+  width: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.syllabus-play-btn {
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 6px rgba(20, 184, 166, 0.3);
+}
+
+.syllabus-play-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(20, 184, 166, 0.4);
+}
+
+.syllabus-play-btn i {
+  color: white;
+  font-size: 0.5rem;
+  margin-left: 1px;
+}
+
+.syllabus-item-action i.fa-check-circle {
+  font-size: 0.875rem;
+}
+
+.syllabus-item-action i.fa-lock {
+  font-size: 0.75rem;
+}
+
+/* Syllabus Footer */
+.syllabus-footer {
+  padding: 0.75rem 1rem;
+  background: #f8fafc;
+  border-top: 1px solid #e2e8f0;
+}
+
+.syllabus-progress-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.completed-count {
+  font-size: 0.75rem;
+  color: #64748b;
+}
+
+.progress-percent {
+  font-size: 0.8125rem;
   font-weight: 700;
   color: #0d9488;
 }
 
-.up-next-course-title {
-  font-size: 0.8125rem;
-  font-weight: 600;
-  color: #0f172a;
-  margin: 0 0 0.375rem 0;
-  line-height: 1.3;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
+.syllabus-progress-bar {
+  height: 6px;
+  background: #e2e8f0;
+  border-radius: 3px;
   overflow: hidden;
-  transition: color 0.2s ease;
 }
 
-.up-next-course-card:hover .up-next-course-title {
-  color: #0d9488;
+.syllabus-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #14b8a6, #0d9488);
+  border-radius: 3px;
+  transition: width 0.3s ease;
 }
 
-.up-next-instructor {
-  display: flex;
-  align-items: center;
-  gap: 0.375rem;
-  margin-bottom: 0.5rem;
-}
-
-.up-next-avatar {
-  width: 1.25rem;
-  height: 1.25rem;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-size: 0.5rem;
-  font-weight: 600;
-}
-
-.up-next-instructor span {
-  font-size: 0.625rem;
-  color: #64748b;
-}
-
-.up-next-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
-}
-
-.up-next-meta {
-  display: flex;
-  gap: 0.625rem;
-  font-size: 0.5625rem;
-  color: #94a3b8;
-}
-
-.up-next-meta i {
-  margin-right: 0.125rem;
-}
-
-.up-next-meta span:first-child i {
-  color: #14b8a6;
-}
-
-.up-next-resume-btn {
-  padding: 0.3125rem 0.625rem;
-  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
-  color: white;
-  font-size: 0.5625rem;
-  font-weight: 600;
-  border: none;
-  border-radius: 0.375rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-  transition: all 0.2s ease;
-  opacity: 0;
-  transform: translateX(8px);
-}
-
-.up-next-course-card:hover .up-next-resume-btn {
-  opacity: 1;
-  transform: translateX(0);
-}
-
-.up-next-resume-btn:hover {
-  box-shadow: 0 4px 12px rgba(20, 184, 166, 0.35);
-  transform: scale(1.05);
-}
-
-.up-next-resume-btn i {
-  font-size: 0.5rem;
-}
-
-/* Responsive - Stack on mobile */
+/* Responsive - Syllabus */
 @media (max-width: 767px) {
-  .up-next-courses {
-    padding: 0.75rem;
+  .course-syllabus-panel {
+    max-height: 400px;
   }
 
-  .up-next-list {
-    flex-direction: row;
-    overflow-x: auto;
-    gap: 0.75rem;
-    padding-bottom: 0.5rem;
+  .syllabus-list {
+    max-height: 280px;
   }
 
-  .up-next-course-card {
-    flex: 0 0 260px;
-    flex-direction: column;
-  }
-
-  .up-next-thumb {
-    width: 100%;
-    height: 120px;
-  }
-
-  .up-next-resume-btn {
-    opacity: 1;
-    transform: translateX(0);
+  .syllabus-item-title {
+    font-size: 0.75rem;
   }
 }
 </style>
