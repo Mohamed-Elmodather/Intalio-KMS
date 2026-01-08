@@ -47,7 +47,7 @@ const viewOptions = ref([
   { id: 'all', name: 'All Courses', icon: 'fas fa-graduation-cap', color: 'text-teal-500' },
   { id: 'my-courses', name: 'My Courses', icon: 'fas fa-book-reader', color: 'text-blue-500' },
   { id: 'paths', name: 'Learning Paths', icon: 'fas fa-route', color: 'text-indigo-500' },
-  { id: 'certificates', name: 'Certificates', icon: 'fas fa-certificate', color: 'text-amber-500' },
+  { id: 'certificates', name: 'Certificates', icon: 'fas fa-certificate', color: 'text-teal-500' },
 ])
 
 // Filtered courses based on current view
@@ -6848,7 +6848,7 @@ function resumeFeaturedAutoPlay() {
   pointer-events: none;
 }
 
-.cert-stat-total .cert-stat-glow { background: radial-gradient(circle, #f59e0b 0%, transparent 70%); }
+.cert-stat-total .cert-stat-glow { background: radial-gradient(circle, #14b8a6 0%, transparent 70%); }
 .cert-stat-year .cert-stat-glow { background: radial-gradient(circle, #14b8a6 0%, transparent 70%); }
 .cert-stat-hours .cert-stat-glow { background: radial-gradient(circle, #3b82f6 0%, transparent 70%); }
 .cert-stat-score .cert-stat-glow { background: radial-gradient(circle, #8b5cf6 0%, transparent 70%); }
@@ -6866,7 +6866,7 @@ function resumeFeaturedAutoPlay() {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-.cert-stat-total .cert-stat-icon { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
+.cert-stat-total .cert-stat-icon { background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%); }
 .cert-stat-year .cert-stat-icon { background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%); }
 .cert-stat-hours .cert-stat-icon { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); }
 .cert-stat-score .cert-stat-icon { background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); }
@@ -6907,7 +6907,7 @@ function resumeFeaturedAutoPlay() {
   font-size: 0.625rem;
 }
 
-.cert-stat-total .cert-stat-badge { background: #fef3c7; color: #d97706; }
+.cert-stat-total .cert-stat-badge { background: #ccfbf1; color: #0d9488; }
 .cert-stat-year .cert-stat-badge { background: #ccfbf1; color: #0d9488; }
 .cert-stat-hours .cert-stat-badge { background: #dbeafe; color: #2563eb; }
 .cert-stat-score .cert-stat-badge { background: #ede9fe; color: #7c3aed; }
@@ -6928,7 +6928,7 @@ function resumeFeaturedAutoPlay() {
   justify-content: space-between;
   padding: 1.5rem;
   border-bottom: 1px solid #f3f4f6;
-  background: linear-gradient(180deg, #fffbeb 0%, white 100%);
+  background: linear-gradient(180deg, #f0fdfa 0%, white 100%);
 }
 
 .cert-header-left {
@@ -6942,20 +6942,20 @@ function resumeFeaturedAutoPlay() {
   width: 3rem;
   height: 3rem;
   border-radius: 1rem;
-  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
   font-size: 1.125rem;
-  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+  box-shadow: 0 4px 12px rgba(20, 184, 166, 0.3);
 }
 
 .cert-header-icon-ring {
   position: absolute;
   inset: -4px;
   border-radius: 1.25rem;
-  border: 2px solid rgba(245, 158, 11, 0.2);
+  border: 2px solid rgba(20, 184, 166, 0.2);
   animation: pulse-ring 2s ease-in-out infinite;
 }
 
@@ -7050,8 +7050,8 @@ function resumeFeaturedAutoPlay() {
 
 .cert-search-input:focus {
   outline: none;
-  border-color: #f59e0b;
-  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+  border-color: #14b8a6;
+  box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.1);
 }
 
 .cert-search-clear {
@@ -7098,9 +7098,9 @@ function resumeFeaturedAutoPlay() {
 }
 
 .cert-filter-btn.active {
-  background: #fef3c7;
-  border-color: #fcd34d;
-  color: #92400e;
+  background: #ccfbf1;
+  border-color: #5eead4;
+  color: #115e59;
 }
 
 .cert-filter-btn .chevron {
@@ -7161,8 +7161,8 @@ function resumeFeaturedAutoPlay() {
 }
 
 .cert-dropdown-option.active {
-  background: #fef3c7;
-  color: #92400e;
+  background: #ccfbf1;
+  color: #115e59;
 }
 
 .cert-radio {
@@ -7177,8 +7177,8 @@ function resumeFeaturedAutoPlay() {
 }
 
 .cert-radio.checked {
-  background: #f59e0b;
-  border-color: #f59e0b;
+  background: #14b8a6;
+  border-color: #14b8a6;
 }
 
 .cert-radio i {
@@ -7192,13 +7192,13 @@ function resumeFeaturedAutoPlay() {
 }
 
 .cert-dropdown-option.active .option-icon {
-  color: #f59e0b;
+  color: #14b8a6;
 }
 
 .cert-dropdown-option .check-icon {
   margin-left: auto;
   font-size: 0.75rem;
-  color: #f59e0b;
+  color: #14b8a6;
 }
 
 .cert-sort-btn {
@@ -7222,7 +7222,7 @@ function resumeFeaturedAutoPlay() {
 }
 
 .cert-sort-btn i:first-child {
-  color: #f59e0b;
+  color: #14b8a6;
 }
 
 .cert-sort-btn .chevron {
@@ -7239,14 +7239,14 @@ function resumeFeaturedAutoPlay() {
   border: 1px solid #e5e7eb;
   border-radius: 0 0.75rem 0.75rem 0;
   background: white;
-  color: #f59e0b;
+  color: #14b8a6;
   font-size: 0.75rem;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .cert-sort-order-btn:hover {
-  background: #fef3c7;
+  background: #ccfbf1;
 }
 
 .cert-view-toggle {
@@ -7276,7 +7276,7 @@ function resumeFeaturedAutoPlay() {
 }
 
 .cert-view-btn.active {
-  background: #f59e0b;
+  background: #14b8a6;
   color: white;
 }
 
@@ -7286,8 +7286,8 @@ function resumeFeaturedAutoPlay() {
   align-items: center;
   gap: 0.75rem;
   padding: 0.875rem 1.5rem;
-  background: #fffbeb;
-  border-bottom: 1px solid #fef3c7;
+  background: #f0fdfa;
+  border-bottom: 1px solid #ccfbf1;
 }
 
 .cert-filter-label {
@@ -7331,9 +7331,9 @@ function resumeFeaturedAutoPlay() {
 }
 
 .cert-filter-tag.score {
-  background: #fef3c7;
-  color: #92400e;
-  border: 1px solid #fcd34d;
+  background: #ccfbf1;
+  color: #115e59;
+  border: 1px solid #5eead4;
 }
 
 .cert-filter-tag button {
@@ -7408,7 +7408,7 @@ function resumeFeaturedAutoPlay() {
 .cert-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 16px 32px rgba(0, 0, 0, 0.1);
-  border-color: #fcd34d;
+  border-color: #5eead4;
 }
 
 .cert-card.list {
@@ -7540,7 +7540,7 @@ function resumeFeaturedAutoPlay() {
 
 .cert-score-badge i {
   font-size: 0.625rem;
-  color: #f59e0b;
+  color: #14b8a6;
 }
 
 .cert-score-badge span {
@@ -7734,7 +7734,7 @@ function resumeFeaturedAutoPlay() {
   width: 5rem;
   height: 5rem;
   border-radius: 50%;
-  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  background: linear-gradient(135deg, #ccfbf1 0%, #99f6e4 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -7743,7 +7743,7 @@ function resumeFeaturedAutoPlay() {
 
 .cert-empty-icon i {
   font-size: 2rem;
-  color: #f59e0b;
+  color: #14b8a6;
 }
 
 .cert-empty-title {
@@ -7832,7 +7832,7 @@ function resumeFeaturedAutoPlay() {
 
 .cert-per-page select:focus {
   outline: none;
-  border-color: #f59e0b;
+  border-color: #14b8a6;
 }
 
 .cert-pagination-controls {
@@ -7896,8 +7896,8 @@ function resumeFeaturedAutoPlay() {
 }
 
 .cert-page-num.active {
-  background: #fef3c7;
-  color: #92400e;
+  background: #ccfbf1;
+  color: #115e59;
   font-weight: 600;
 }
 
