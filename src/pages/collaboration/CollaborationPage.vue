@@ -104,6 +104,8 @@ const selectedDMId = ref<string | null>(null)
 const messageInput = ref('')
 const searchQuery = ref('')
 const showRightPanel = ref(true)
+const leftPanelCollapsed = ref(false)
+const rightPanelCollapsed = ref(false)
 const showCreateChannelModal = ref(false)
 const showContentPicker = ref(false)
 const showEmojiPicker = ref(false)
@@ -1098,16 +1100,26 @@ watch(isViewingDM, (isDM) => {
 
 <template>
   <div class="collaboration-hub flex h-[calc(100vh-64px)] overflow-hidden">
-    <!-- Left Sidebar - Premium Light Theme -->
-    <aside class="w-72 bg-gradient-to-b from-white via-gray-50/50 to-white border-r border-gray-100 flex flex-col flex-shrink-0 shadow-sm">
+    <!-- Left Sidebar - Premium Light Theme (Collapsible) -->
+    <aside
+      :class="[
+        'bg-gradient-to-b from-white via-gray-50/50 to-white border-r border-gray-100 flex flex-col flex-shrink-0 shadow-sm transition-all duration-300 ease-in-out',
+        leftPanelCollapsed ? 'w-20' : 'w-72'
+      ]"
+    >
       <!-- Workspace Header with Gradient -->
-      <div class="p-4 bg-gradient-to-r from-teal-600 via-teal-500 to-emerald-500 text-white">
-        <div class="flex items-center justify-between">
+      <div class="p-3 bg-gradient-to-r from-teal-600 via-teal-500 to-emerald-500 text-white">
+        <div class="flex items-center" :class="leftPanelCollapsed ? 'justify-center' : 'justify-between'">
           <div class="flex items-center gap-3">
-            <div class="w-11 h-11 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center font-bold text-sm shadow-lg border border-white/30">
+            <div
+              class="bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center font-bold text-sm shadow-lg border border-white/30 cursor-pointer hover:bg-white/30 transition-all duration-200"
+              :class="leftPanelCollapsed ? 'w-12 h-12' : 'w-11 h-11'"
+              @click="leftPanelCollapsed = !leftPanelCollapsed"
+              :title="leftPanelCollapsed ? 'Expand sidebar' : 'Collapse sidebar'"
+            >
               AFC
             </div>
-            <div>
+            <div v-if="!leftPanelCollapsed" class="transition-opacity duration-200">
               <h2 class="font-bold text-base tracking-tight">AFC 2027</h2>
               <span class="text-xs text-teal-100 flex items-center gap-1.5">
                 <span class="w-2 h-2 bg-emerald-300 rounded-full animate-pulse"></span>
@@ -1115,15 +1127,20 @@ watch(isViewingDM, (isDM) => {
               </span>
             </div>
           </div>
-          <button class="p-2 hover:bg-white/10 rounded-xl transition-all duration-200 group">
-            <i class="fas fa-ellipsis-v text-white/70 group-hover:text-white"></i>
+          <button
+            v-if="!leftPanelCollapsed"
+            @click="leftPanelCollapsed = true"
+            class="p-2 hover:bg-white/10 rounded-xl transition-all duration-200 group"
+            title="Collapse sidebar"
+          >
+            <i class="fas fa-chevron-left text-white/70 group-hover:text-white"></i>
           </button>
         </div>
       </div>
 
       <!-- Search with Premium Styling -->
       <div class="p-3 border-b border-gray-100">
-        <div class="relative group">
+        <div v-if="!leftPanelCollapsed" class="relative group">
           <i class="fas fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-sm group-focus-within:text-teal-500 transition-colors"></i>
           <input
             v-model="searchQuery"
@@ -1132,13 +1149,20 @@ watch(isViewingDM, (isDM) => {
             class="w-full bg-gray-50 text-sm text-gray-700 placeholder-gray-400 rounded-xl pl-10 pr-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:bg-white border border-gray-200 focus:border-teal-400 transition-all duration-200"
           />
         </div>
+        <button
+          v-else
+          class="w-full flex items-center justify-center p-2.5 bg-gray-50 rounded-xl border border-gray-200 hover:bg-teal-50 hover:border-teal-200 transition-all duration-200 group"
+          title="Search"
+        >
+          <i class="fas fa-search text-gray-400 group-hover:text-teal-600"></i>
+        </button>
       </div>
 
       <!-- Channels & DMs with Modern Cards -->
-      <div class="flex-1 overflow-y-auto custom-scrollbar px-3 py-2">
+      <div class="flex-1 overflow-y-auto custom-scrollbar px-2 py-2">
         <!-- Channels Section -->
         <div class="mb-4">
-          <div class="flex items-center justify-between mb-2 px-1">
+          <div v-if="!leftPanelCollapsed" class="flex items-center justify-between mb-2 px-1">
             <button class="flex items-center gap-2 text-xs font-semibold text-gray-500 hover:text-gray-700 transition-colors uppercase tracking-wider">
               <i class="fas fa-chevron-down text-[10px]"></i>
               <span>Channels</span>
@@ -1151,77 +1175,115 @@ watch(isViewingDM, (isDM) => {
               <i class="fas fa-plus text-gray-400 group-hover:text-teal-600 text-xs"></i>
             </button>
           </div>
+          <div v-else class="flex justify-center mb-2">
+            <span class="text-[10px] font-semibold text-gray-400 uppercase">CH</span>
+          </div>
 
-          <div class="space-y-1">
+          <div :class="leftPanelCollapsed ? 'space-y-2' : 'space-y-1'">
             <button
               v-for="channel in filteredChannels"
               :key="channel.id"
               @click="selectChannel(channel.id)"
+              :title="leftPanelCollapsed ? channel.name : ''"
               :class="[
-                'w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all duration-200 group',
+                'w-full flex items-center rounded-xl transition-all duration-200 group',
+                leftPanelCollapsed ? 'justify-center p-2' : 'gap-3 px-3 py-2.5',
                 selectedChannelId === channel.id && !selectedDMId
                   ? 'bg-gradient-to-r from-teal-50 to-emerald-50 text-teal-700 shadow-sm border border-teal-100'
                   : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
               ]"
             >
-              <div :class="[
-                'w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-200',
-                selectedChannelId === channel.id && !selectedDMId
-                  ? 'bg-teal-500 text-white shadow-sm'
-                  : 'bg-gray-100 text-gray-500 group-hover:bg-teal-100 group-hover:text-teal-600'
-              ]">
-                <i :class="channel.type === 'private' ? 'fas fa-lock' : 'fas fa-hashtag'" class="text-xs"></i>
+              <div class="relative">
+                <div :class="[
+                  'rounded-lg flex items-center justify-center transition-all duration-200',
+                  leftPanelCollapsed ? 'w-10 h-10' : 'w-8 h-8',
+                  selectedChannelId === channel.id && !selectedDMId
+                    ? 'bg-teal-500 text-white shadow-sm'
+                    : 'bg-gray-100 text-gray-500 group-hover:bg-teal-100 group-hover:text-teal-600'
+                ]">
+                  <i :class="channel.type === 'private' ? 'fas fa-lock' : 'fas fa-hashtag'" class="text-xs"></i>
+                </div>
+                <span
+                  v-if="channel.unreadCount > 0 && leftPanelCollapsed"
+                  class="absolute -top-1 -right-1 bg-teal-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center"
+                >
+                  {{ channel.unreadCount > 9 ? '9+' : channel.unreadCount }}
+                </span>
               </div>
-              <span class="flex-1 text-left truncate font-medium">{{ channel.name }}</span>
-              <span
-                v-if="channel.unreadCount > 0"
-                class="bg-gradient-to-r from-teal-500 to-emerald-500 text-white text-xs font-bold px-2 py-0.5 rounded-full min-w-[22px] text-center shadow-sm"
-              >
-                {{ channel.unreadCount }}
-              </span>
-              <i v-if="channel.isMuted" class="fas fa-bell-slash text-gray-300 text-xs"></i>
+              <template v-if="!leftPanelCollapsed">
+                <span class="flex-1 text-left truncate font-medium text-sm">{{ channel.name }}</span>
+                <span
+                  v-if="channel.unreadCount > 0"
+                  class="bg-gradient-to-r from-teal-500 to-emerald-500 text-white text-xs font-bold px-2 py-0.5 rounded-full min-w-[22px] text-center shadow-sm"
+                >
+                  {{ channel.unreadCount }}
+                </span>
+                <i v-if="channel.isMuted" class="fas fa-bell-slash text-gray-300 text-xs"></i>
+              </template>
             </button>
           </div>
         </div>
 
         <!-- Teams Section -->
         <div class="mb-4">
-          <button class="flex items-center gap-2 text-xs font-semibold text-gray-500 hover:text-gray-700 transition-colors mb-2 px-1 uppercase tracking-wider">
+          <div v-if="!leftPanelCollapsed" class="flex items-center gap-2 text-xs font-semibold text-gray-500 hover:text-gray-700 transition-colors mb-2 px-1 uppercase tracking-wider">
             <i class="fas fa-chevron-down text-[10px]"></i>
             <span>Teams</span>
-          </button>
+          </div>
+          <div v-else class="flex justify-center mb-2">
+            <span class="text-[10px] font-semibold text-gray-400 uppercase">TM</span>
+          </div>
 
-          <div class="space-y-2">
-            <div v-for="team in teams" :key="team.id" class="bg-white rounded-xl border border-gray-100 overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-200">
+          <div :class="leftPanelCollapsed ? 'space-y-2' : 'space-y-2'">
+            <div v-for="team in teams" :key="team.id" :class="leftPanelCollapsed ? '' : 'bg-white rounded-xl border border-gray-100 overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-200'">
               <!-- Team Header -->
               <button
                 @click="toggleTeam(team.id)"
-                class="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-all duration-200"
+                :title="leftPanelCollapsed ? team.name : ''"
+                :class="[
+                  'w-full flex items-center transition-all duration-200',
+                  leftPanelCollapsed
+                    ? 'justify-center p-2 rounded-xl hover:bg-gray-50'
+                    : 'gap-3 px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-50'
+                ]"
               >
-                <i :class="[
+                <i v-if="!leftPanelCollapsed" :class="[
                   'fas text-[10px] w-3 text-gray-400 transition-transform duration-200',
                   isTeamExpanded(team.id) ? 'fa-chevron-down' : 'fa-chevron-right'
                 ]"></i>
-                <div
-                  class="w-8 h-8 rounded-lg flex items-center justify-center text-white text-xs font-bold shadow-sm"
-                  :style="{ background: `linear-gradient(135deg, ${team.color}, ${team.color}dd)` }"
-                >
-                  {{ team.name.substring(0, 2).toUpperCase() }}
+                <div class="relative">
+                  <div
+                    :class="[
+                      'rounded-lg flex items-center justify-center text-white font-bold shadow-sm',
+                      leftPanelCollapsed ? 'w-10 h-10 text-xs' : 'w-8 h-8 text-xs'
+                    ]"
+                    :style="{ background: `linear-gradient(135deg, ${team.color}, ${team.color}dd)` }"
+                  >
+                    {{ team.name.substring(0, 2).toUpperCase() }}
+                  </div>
+                  <span
+                    v-if="getTeamUnreadCount(team) > 0 && leftPanelCollapsed"
+                    class="absolute -top-1 -right-1 bg-teal-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center"
+                  >
+                    {{ getTeamUnreadCount(team) > 9 ? '9+' : getTeamUnreadCount(team) }}
+                  </span>
                 </div>
-                <div class="flex-1 text-left">
-                  <span class="font-semibold truncate block">{{ team.name }}</span>
-                  <span class="text-xs text-gray-400">{{ team.memberCount }} members</span>
-                </div>
-                <span
-                  v-if="getTeamUnreadCount(team) > 0"
-                  class="bg-gradient-to-r from-teal-500 to-emerald-500 text-white text-xs font-bold px-2 py-0.5 rounded-full min-w-[22px] text-center shadow-sm"
-                >
-                  {{ getTeamUnreadCount(team) }}
-                </span>
+                <template v-if="!leftPanelCollapsed">
+                  <div class="flex-1 text-left">
+                    <span class="font-semibold truncate block">{{ team.name }}</span>
+                    <span class="text-xs text-gray-400">{{ team.memberCount }} members</span>
+                  </div>
+                  <span
+                    v-if="getTeamUnreadCount(team) > 0"
+                    class="bg-gradient-to-r from-teal-500 to-emerald-500 text-white text-xs font-bold px-2 py-0.5 rounded-full min-w-[22px] text-center shadow-sm"
+                  >
+                    {{ getTeamUnreadCount(team) }}
+                  </span>
+                </template>
               </button>
 
-              <!-- Team Channels (expanded) -->
-              <div v-if="isTeamExpanded(team.id)" class="bg-gray-50/50 border-t border-gray-100 py-1">
+              <!-- Team Channels (expanded) - only show when not collapsed -->
+              <div v-if="isTeamExpanded(team.id) && !leftPanelCollapsed" class="bg-gray-50/50 border-t border-gray-100 py-1">
                 <button
                   v-for="channel in team.channels"
                   :key="channel.id"
@@ -1252,7 +1314,7 @@ watch(isViewingDM, (isDM) => {
 
         <!-- Direct Messages Section -->
         <div>
-          <div class="flex items-center justify-between mb-2 px-1">
+          <div v-if="!leftPanelCollapsed" class="flex items-center justify-between mb-2 px-1">
             <button class="flex items-center gap-2 text-xs font-semibold text-gray-500 hover:text-gray-700 transition-colors uppercase tracking-wider">
               <i class="fas fa-chevron-down text-[10px]"></i>
               <span>Direct Messages</span>
@@ -1261,14 +1323,19 @@ watch(isViewingDM, (isDM) => {
               <i class="fas fa-edit text-gray-400 group-hover:text-teal-600 text-xs"></i>
             </button>
           </div>
+          <div v-else class="flex justify-center mb-2">
+            <span class="text-[10px] font-semibold text-gray-400 uppercase">DM</span>
+          </div>
 
-          <div class="space-y-1">
+          <div :class="leftPanelCollapsed ? 'space-y-2' : 'space-y-1'">
             <button
               v-for="dm in filteredDMs"
               :key="dm.id"
               @click="selectDM(dm.id)"
+              :title="leftPanelCollapsed ? dm.user.displayName : ''"
               :class="[
-                'w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all duration-200 group',
+                'w-full flex items-center rounded-xl transition-all duration-200 group',
+                leftPanelCollapsed ? 'justify-center p-2' : 'gap-3 px-3 py-2.5',
                 selectedDMId === dm.id
                   ? 'bg-gradient-to-r from-teal-50 to-emerald-50 text-teal-700 shadow-sm border border-teal-100'
                   : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
@@ -1276,7 +1343,8 @@ watch(isViewingDM, (isDM) => {
             >
               <div class="relative">
                 <div :class="[
-                  'w-9 h-9 rounded-xl flex items-center justify-center text-xs font-semibold transition-all duration-200',
+                  'rounded-xl flex items-center justify-center font-semibold transition-all duration-200',
+                  leftPanelCollapsed ? 'w-10 h-10 text-xs' : 'w-9 h-9 text-xs',
                   selectedDMId === dm.id
                     ? 'bg-gradient-to-br from-teal-400 to-teal-600 text-white shadow-sm'
                     : 'bg-gradient-to-br from-gray-100 to-gray-200 text-gray-600 group-hover:from-teal-100 group-hover:to-teal-200 group-hover:text-teal-700'
@@ -1284,54 +1352,77 @@ watch(isViewingDM, (isDM) => {
                   {{ dm.user.displayName.split(' ').map(n => n[0]).join('') }}
                 </div>
                 <span
-                  :class="['absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-white shadow-sm', getPresenceColor(dm.presence)]"
+                  :class="['absolute -bottom-0.5 -right-0.5 rounded-full border-2 border-white shadow-sm', leftPanelCollapsed ? 'w-3.5 h-3.5' : 'w-3 h-3', getPresenceColor(dm.presence)]"
                 ></span>
-              </div>
-              <div class="flex-1 min-w-0 text-left">
-                <p class="font-medium truncate">{{ dm.user.displayName }}</p>
-                <p :class="[
-                  'text-xs truncate',
-                  selectedDMId === dm.id ? 'text-teal-600/70' : 'text-gray-400'
-                ]">{{ dm.lastMessage }}</p>
-              </div>
-              <div class="flex flex-col items-end gap-1">
                 <span
-                  v-if="dm.unreadCount > 0"
-                  class="bg-gradient-to-r from-teal-500 to-emerald-500 text-white text-xs font-bold px-2 py-0.5 rounded-full min-w-[22px] text-center shadow-sm"
+                  v-if="dm.unreadCount > 0 && leftPanelCollapsed"
+                  class="absolute -top-1 -right-1 bg-teal-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center"
                 >
-                  {{ dm.unreadCount }}
+                  {{ dm.unreadCount > 9 ? '9+' : dm.unreadCount }}
                 </span>
-                <span v-else class="text-[10px] text-gray-400">{{ dm.lastMessageTime }}</span>
               </div>
+              <template v-if="!leftPanelCollapsed">
+                <div class="flex-1 min-w-0 text-left">
+                  <p class="font-medium truncate text-sm">{{ dm.user.displayName }}</p>
+                  <p :class="[
+                    'text-xs truncate',
+                    selectedDMId === dm.id ? 'text-teal-600/70' : 'text-gray-400'
+                  ]">{{ dm.lastMessage }}</p>
+                </div>
+                <div class="flex flex-col items-end gap-1">
+                  <span
+                    v-if="dm.unreadCount > 0"
+                    class="bg-gradient-to-r from-teal-500 to-emerald-500 text-white text-xs font-bold px-2 py-0.5 rounded-full min-w-[22px] text-center shadow-sm"
+                  >
+                    {{ dm.unreadCount }}
+                  </span>
+                  <span v-else class="text-[10px] text-gray-400">{{ dm.lastMessageTime }}</span>
+                </div>
+              </template>
             </button>
           </div>
         </div>
       </div>
 
       <!-- User Footer - Premium Card Style -->
-      <div class="p-3 border-t border-gray-100 bg-gradient-to-r from-gray-50 to-white">
-        <div class="flex items-center gap-3 p-2 bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-200">
+      <div class="p-2 border-t border-gray-100 bg-gradient-to-r from-gray-50 to-white">
+        <div
+          :class="[
+            'bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-200',
+            leftPanelCollapsed ? 'p-2 flex flex-col items-center gap-2' : 'p-2 flex items-center gap-3'
+          ]"
+        >
           <div class="relative">
-            <div class="w-10 h-10 bg-gradient-to-br from-teal-400 to-teal-600 rounded-xl flex items-center justify-center font-semibold text-white shadow-sm">
+            <div :class="[
+              'bg-gradient-to-br from-teal-400 to-teal-600 rounded-xl flex items-center justify-center font-semibold text-white shadow-sm',
+              leftPanelCollapsed ? 'w-11 h-11' : 'w-10 h-10'
+            ]">
               YO
             </div>
             <span class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-emerald-500 rounded-full border-2 border-white shadow-sm"></span>
           </div>
-          <div class="flex-1 min-w-0">
-            <p class="text-sm font-semibold text-gray-800 truncate">You</p>
-            <p class="text-xs text-emerald-600 flex items-center gap-1">
-              <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full"></span>
-              Online
-            </p>
-          </div>
-          <div class="flex items-center gap-1">
-            <button class="p-2 hover:bg-gray-100 rounded-lg transition-all duration-200 group">
-              <i class="fas fa-microphone text-gray-400 group-hover:text-teal-600 text-sm"></i>
-            </button>
-            <button class="p-2 hover:bg-gray-100 rounded-lg transition-all duration-200 group">
+          <template v-if="!leftPanelCollapsed">
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-semibold text-gray-800 truncate">You</p>
+              <p class="text-xs text-emerald-600 flex items-center gap-1">
+                <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full"></span>
+                Online
+              </p>
+            </div>
+            <div class="flex items-center gap-1">
+              <button class="p-2 hover:bg-gray-100 rounded-lg transition-all duration-200 group">
+                <i class="fas fa-microphone text-gray-400 group-hover:text-teal-600 text-sm"></i>
+              </button>
+              <button class="p-2 hover:bg-gray-100 rounded-lg transition-all duration-200 group">
+                <i class="fas fa-cog text-gray-400 group-hover:text-teal-600 text-sm"></i>
+              </button>
+            </div>
+          </template>
+          <template v-else>
+            <button class="p-1.5 hover:bg-gray-100 rounded-lg transition-all duration-200 group" title="Settings">
               <i class="fas fa-cog text-gray-400 group-hover:text-teal-600 text-sm"></i>
             </button>
-          </div>
+          </template>
         </div>
       </div>
     </aside>
@@ -1759,24 +1850,64 @@ watch(isViewingDM, (isDM) => {
       </div>
     </main>
 
-    <!-- Right Panel - Details -->
+    <!-- Right Panel - Details (Collapsible) -->
     <aside
       v-if="showRightPanel"
-      class="w-80 border-l border-gray-200 bg-gray-50 flex flex-col flex-shrink-0"
+      :class="[
+        'border-l border-gray-200 bg-gray-50 flex flex-col flex-shrink-0 transition-all duration-300 ease-in-out',
+        rightPanelCollapsed ? 'w-16' : 'w-80'
+      ]"
     >
       <!-- Panel Header (Context Aware) -->
-      <div class="h-14 px-4 border-b border-gray-200 flex items-center justify-between bg-white">
-        <h3 class="font-semibold text-gray-900">{{ isViewingDM ? 'Profile' : 'Details' }}</h3>
+      <div class="h-14 px-3 border-b border-gray-200 flex items-center bg-white" :class="rightPanelCollapsed ? 'justify-center' : 'justify-between'">
+        <h3 v-if="!rightPanelCollapsed" class="font-semibold text-gray-900">{{ isViewingDM ? 'Profile' : 'Details' }}</h3>
+        <div class="flex items-center gap-1">
+          <button
+            @click="rightPanelCollapsed = !rightPanelCollapsed"
+            class="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
+            :title="rightPanelCollapsed ? 'Expand panel' : 'Collapse panel'"
+          >
+            <i :class="['fas text-gray-500', rightPanelCollapsed ? 'fa-chevron-left' : 'fa-chevron-right']"></i>
+          </button>
+          <button
+            v-if="!rightPanelCollapsed"
+            @click="showRightPanel = false"
+            class="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
+            title="Close panel"
+          >
+            <i class="fas fa-times text-gray-500"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Collapsed View - Icons Only -->
+      <div v-if="rightPanelCollapsed" class="flex-1 flex flex-col items-center py-4 gap-2">
         <button
-          @click="showRightPanel = false"
-          class="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
+          v-for="tab in rightPanelTabs"
+          :key="tab"
+          @click="rightPanelTab = tab; rightPanelCollapsed = false"
+          :title="tab"
+          :class="[
+            'w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200',
+            rightPanelTab === tab
+              ? 'bg-teal-100 text-teal-600'
+              : 'text-gray-400 hover:bg-gray-100 hover:text-gray-600'
+          ]"
         >
-          <i class="fas fa-times text-gray-500"></i>
+          <i :class="[
+            'fas',
+            tab === 'details' ? 'fa-info-circle' :
+            tab === 'members' ? 'fa-users' :
+            tab === 'files' ? 'fa-folder' :
+            tab === 'pinned' ? 'fa-thumbtack' :
+            tab === 'profile' ? 'fa-user' :
+            tab === 'media' ? 'fa-photo-video' : 'fa-circle'
+          ]"></i>
         </button>
       </div>
 
-      <!-- Panel Tabs - Context Aware -->
-      <div class="px-4 py-2 border-b border-gray-200 bg-white">
+      <!-- Panel Tabs - Context Aware (Expanded) -->
+      <div v-if="!rightPanelCollapsed" class="px-4 py-2 border-b border-gray-200 bg-white">
         <div class="flex gap-1">
           <button
             v-for="tab in rightPanelTabs"
@@ -1794,8 +1925,8 @@ watch(isViewingDM, (isDM) => {
         </div>
       </div>
 
-      <!-- Panel Content -->
-      <div class="flex-1 overflow-y-auto custom-scrollbar p-4">
+      <!-- Panel Content (only show when expanded) -->
+      <div v-if="!rightPanelCollapsed" class="flex-1 overflow-y-auto custom-scrollbar p-4">
         <!-- Details Tab -->
         <div v-if="rightPanelTab === 'details' && selectedChannel">
           <div class="text-center mb-6">
