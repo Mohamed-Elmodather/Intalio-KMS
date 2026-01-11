@@ -381,7 +381,7 @@ function getCategoryCount(categoryId: string) {
     </div>
 
     <!-- Main Content Area -->
-    <div class="main-content">
+    <div class="events-content">
 
       <!-- Premium Quick Actions -->
       <div class="quick-actions-premium">
@@ -1140,9 +1140,16 @@ function getCategoryCount(categoryId: string) {
   }
 }
 
-/* Main Content */
-.main-content {
-  padding: 0;
+/* Events Page Container */
+.events-page {
+  min-height: 100vh;
+  background: #f9fafb;
+}
+
+/* Events Content Area */
+.events-content {
+  padding: 1.5rem 2rem;
+  width: 100%;
 }
 
 /* Toolbar */
@@ -1153,6 +1160,7 @@ function getCategoryCount(categoryId: string) {
   margin-bottom: 1.25rem;
   gap: 1rem;
   flex-wrap: wrap;
+  width: 100%;
 }
 
 .toolbar-left {
@@ -1284,6 +1292,7 @@ function getCategoryCount(categoryId: string) {
   border: 1px solid #f1f5f9;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
   animation: slideDown 0.25s ease-out;
+  width: 100%;
 }
 
 @keyframes slideDown {
@@ -2139,6 +2148,7 @@ function getCategoryCount(categoryId: string) {
   grid-template-columns: repeat(4, 1fr);
   gap: 1rem;
   margin-bottom: 1.5rem;
+  width: 100%;
 }
 
 .quick-action-premium {
@@ -2268,6 +2278,7 @@ function getCategoryCount(categoryId: string) {
   border: 1px solid rgba(20, 184, 166, 0.15);
   overflow: hidden;
   backdrop-filter: blur(10px);
+  width: 100%;
 }
 
 .featured-event-bg {
@@ -2485,6 +2496,7 @@ function getCategoryCount(categoryId: string) {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: 1.25rem;
+  width: 100%;
 }
 
 .event-card-premium {
@@ -2707,6 +2719,7 @@ function getCategoryCount(categoryId: string) {
   display: flex;
   flex-direction: column;
   gap: 0.875rem;
+  width: 100%;
 }
 
 .event-list-item-premium {
@@ -3014,6 +3027,7 @@ function getCategoryCount(categoryId: string) {
   overflow: hidden;
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
   border: 1px solid rgba(20, 184, 166, 0.1);
+  width: 100%;
 }
 
 .calendar-header-premium {
@@ -3355,6 +3369,7 @@ function getCategoryCount(categoryId: string) {
   margin-bottom: 1.5rem;
   overflow-x: auto;
   flex-wrap: wrap;
+  width: 100%;
 }
 
 .quick-filter-chip {
