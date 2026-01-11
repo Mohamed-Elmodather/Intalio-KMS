@@ -312,6 +312,169 @@ const messages = ref<Map<string, Message[]>>(new Map([
       isPinned: true,
       createdAt: '2027-01-10T09:00:00Z'
     }
+  ]],
+  // AFC 2027 Core Team Channels
+  ['t1-general', [
+    {
+      id: 't1g1',
+      channelId: 't1-general',
+      sender: { id: 'u1', displayName: 'Sarah Ahmed' },
+      content: 'Welcome to the AFC 2027 Core team! This is our main channel for team-wide discussions.',
+      type: 'text',
+      reactions: [{ emoji: '👋', count: 12, users: ['u2', 'u3', 'u4', 'u5', 'u6', 'u7', 'u8'], hasReacted: true }],
+      isEdited: false,
+      isPinned: true,
+      createdAt: '2027-01-08T09:00:00Z'
+    },
+    {
+      id: 't1g2',
+      channelId: 't1-general',
+      sender: { id: 'u2', displayName: 'Mohammed Hassan' },
+      content: 'Great to be part of this team! Looking forward to making this event a success.',
+      type: 'text',
+      reactions: [{ emoji: '🙌', count: 8, users: ['u1', 'u3', 'u5', 'u6'], hasReacted: false }],
+      isEdited: false,
+      isPinned: false,
+      createdAt: '2027-01-08T09:15:00Z'
+    }
+  ]],
+  ['t1-leadership', [
+    {
+      id: 't1l1',
+      channelId: 't1-leadership',
+      sender: { id: 'u1', displayName: 'Sarah Ahmed' },
+      content: 'Leadership sync: Let\'s discuss the budget allocation for Q1.',
+      type: 'text',
+      isEdited: false,
+      isPinned: false,
+      createdAt: '2027-01-10T10:00:00Z'
+    }
+  ]],
+  ['t1-updates', [
+    {
+      id: 't1u1',
+      channelId: 't1-updates',
+      sender: { id: 'u1', displayName: 'Sarah Ahmed' },
+      content: '📢 Weekly Update: All venue contracts have been finalized. Next milestone is equipment procurement.',
+      type: 'text',
+      reactions: [{ emoji: '🎉', count: 15, users: ['u2', 'u3', 'u4', 'u5', 'u6', 'u7', 'u8'], hasReacted: true }],
+      isEdited: false,
+      isPinned: true,
+      createdAt: '2027-01-10T08:00:00Z'
+    },
+    {
+      id: 't1u2',
+      channelId: 't1-updates',
+      sender: { id: 'u4', displayName: 'Ahmed Khalil' },
+      content: '🔧 Tech Update: Mobile app beta testing starts next week. Please sign up if you want to participate.',
+      type: 'text',
+      reactions: [{ emoji: '📱', count: 10, users: ['u1', 'u2', 'u3', 'u5', 'u6'], hasReacted: false }],
+      isEdited: false,
+      isPinned: false,
+      createdAt: '2027-01-11T09:00:00Z'
+    }
+  ]],
+  // Media & Press Team Channels
+  ['t2-general', [
+    {
+      id: 't2g1',
+      channelId: 't2-general',
+      sender: { id: 'u5', displayName: 'Layla Omar' },
+      content: 'Media team huddle at 3 PM today. We\'ll review the press release schedule.',
+      type: 'text',
+      reactions: [{ emoji: '👍', count: 6, users: ['u1', 'u2', 'u3'], hasReacted: true }],
+      isEdited: false,
+      isPinned: false,
+      createdAt: '2027-01-11T11:00:00Z'
+    }
+  ]],
+  ['t2-content', [
+    {
+      id: 't2c1',
+      channelId: 't2-content',
+      sender: { id: 'u3', displayName: 'Fatima Al-Rashid' },
+      content: 'New brand assets are ready for review. Check the shared folder for the updated logo pack.',
+      type: 'text',
+      attachments: [
+        { id: 't2a1', name: 'AFC2027-BrandAssets-v2.zip', type: 'file', url: '#', size: 25000000 }
+      ],
+      isEdited: false,
+      isPinned: false,
+      createdAt: '2027-01-11T14:00:00Z'
+    }
+  ]],
+  ['t2-social', [
+    {
+      id: 't2s1',
+      channelId: 't2-social',
+      sender: { id: 'u5', displayName: 'Layla Omar' },
+      content: 'Social media calendar for January is live! Please review your assigned posts.',
+      type: 'text',
+      linkedContent: {
+        type: 'document',
+        id: 'doc-social',
+        title: 'Social Media Calendar - January 2027',
+        description: 'Monthly posting schedule and content themes',
+        url: '/documents/social-calendar'
+      },
+      isEdited: false,
+      isPinned: true,
+      createdAt: '2027-01-09T10:00:00Z'
+    }
+  ]],
+  // Operations Team Channels
+  ['t3-general', [
+    {
+      id: 't3g1',
+      channelId: 't3-general',
+      sender: { id: 'u6', displayName: 'Omar Farid' },
+      content: 'Operations team standup every morning at 9 AM. Don\'t forget to update your tasks!',
+      type: 'text',
+      reactions: [{ emoji: '✅', count: 10, users: ['u1', 'u2', 'u3', 'u4', 'u5', 'u7', 'u8'], hasReacted: false }],
+      isEdited: false,
+      isPinned: true,
+      createdAt: '2027-01-08T08:00:00Z'
+    }
+  ]],
+  ['t3-logistics', [
+    {
+      id: 't3l1',
+      channelId: 't3-logistics',
+      sender: { id: 'u6', displayName: 'Omar Farid' },
+      content: 'Equipment delivery scheduled for next Monday. Please ensure warehouse access is arranged.',
+      type: 'text',
+      reactions: [{ emoji: '📦', count: 4, users: ['u1', 'u7', 'u8'], hasReacted: true }],
+      isEdited: false,
+      isPinned: false,
+      createdAt: '2027-01-11T15:00:00Z'
+    },
+    {
+      id: 't3l2',
+      channelId: 't3-logistics',
+      sender: { id: 'u7', displayName: 'Noor Salim' },
+      content: 'Warehouse access confirmed. I\'ll be there to receive the delivery.',
+      type: 'text',
+      reactions: [{ emoji: '👍', count: 2, users: ['u6'], hasReacted: false }],
+      isEdited: false,
+      isPinned: false,
+      createdAt: '2027-01-11T15:30:00Z'
+    }
+  ]],
+  ['t3-venues', [
+    {
+      id: 't3v1',
+      channelId: 't3-venues',
+      sender: { id: 'u8', displayName: 'Yusuf Ali' },
+      content: 'Site inspection at Stadium A completed. Full report attached.',
+      type: 'text',
+      attachments: [
+        { id: 't3a1', name: 'StadiumA-Inspection-Report.pdf', type: 'file', url: '#', size: 3500000 }
+      ],
+      reactions: [{ emoji: '📋', count: 5, users: ['u1', 'u6', 'u7'], hasReacted: false }],
+      isEdited: false,
+      isPinned: false,
+      createdAt: '2027-01-11T12:00:00Z'
+    }
   ]]
 ]))
 
