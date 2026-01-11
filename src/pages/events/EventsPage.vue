@@ -209,6 +209,48 @@ const featuredEventCountdown = computed(() => {
   return { days, hours, label: `${days} days` }
 })
 
+// Filtered events for calendar view (applies all filters EXCEPT date range)
+const calendarFilteredEvents = computed(() => {
+  let result = [...events.value]
+
+  // Apply My Events filter
+  if (showMyEventsOnly.value) {
+    result = result.filter(e => e.isGoing)
+  }
+
+  // Apply Featured filter
+  if (showFeaturedOnly.value) {
+    result = result.filter(e => e.featured)
+  }
+
+  // Apply Interested filter
+  if (showInterestedOnly.value) {
+    result = result.filter(e => e.interested)
+  }
+
+  // Apply search filter
+  if (searchQuery.value) {
+    const q = searchQuery.value.toLowerCase()
+    result = result.filter(e => e.title.toLowerCase().includes(q) || e.location.toLowerCase().includes(q))
+  }
+
+  // Apply type filter
+  if (selectedTypes.value.length > 0) {
+    result = result.filter(e => selectedTypes.value.includes(e.category))
+  }
+
+  // Apply format filter
+  if (selectedFormats.value.length > 0) {
+    result = result.filter(e => {
+      if (selectedFormats.value.includes('virtual') && e.virtual) return true
+      if (selectedFormats.value.includes('in-person') && !e.virtual) return true
+      return false
+    })
+  }
+
+  return result
+})
+
 const filteredEvents = computed(() => {
   const today = new Date().toISOString().split('T')[0]
   const weekFromNow = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
@@ -304,19 +346,20 @@ const calendarDays = computed<CalendarDay[]>(() => {
   const lastDay = new Date(year, month + 1, 0)
   const startPadding = firstDay.getDay()
   const today = new Date()
+  const filtered = calendarFilteredEvents.value
 
   const prevMonthLastDay = new Date(year, month, 0).getDate()
   for (let i = startPadding - 1; i >= 0; i--) {
     const prevMonth = month === 0 ? 11 : month - 1
     const prevYear = month === 0 ? year - 1 : year
     const dateStr = `${prevYear}-${String(prevMonth + 1).padStart(2, '0')}-${String(prevMonthLastDay - i).padStart(2, '0')}`
-    const dayEvents = events.value.filter(e => e.date === dateStr)
+    const dayEvents = filtered.filter(e => e.date === dateStr)
     days.push({ date: prevMonthLastDay - i, fullDate: dateStr, isCurrentMonth: false, isToday: false, events: dayEvents })
   }
 
   for (let d = 1; d <= lastDay.getDate(); d++) {
     const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`
-    const dayEvents = events.value.filter(e => e.date === dateStr)
+    const dayEvents = filtered.filter(e => e.date === dateStr)
     days.push({
       date: d,
       fullDate: dateStr,
@@ -331,7 +374,7 @@ const calendarDays = computed<CalendarDay[]>(() => {
   const nextYear = month === 11 ? year + 1 : year
   for (let d = 1; d <= remaining; d++) {
     const dateStr = `${nextYear}-${String(nextMonth + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`
-    const dayEvents = events.value.filter(e => e.date === dateStr)
+    const dayEvents = filtered.filter(e => e.date === dateStr)
     days.push({ date: d, fullDate: dateStr, isCurrentMonth: false, isToday: false, events: dayEvents })
   }
 
@@ -348,12 +391,13 @@ const weekViewDays = computed<CalendarDay[]>(() => {
   const dayOfWeek = curr.getDay()
   const startOfWeek = new Date(curr)
   startOfWeek.setDate(curr.getDate() - dayOfWeek)
+  const filtered = calendarFilteredEvents.value
 
   for (let i = 0; i < 7; i++) {
     const day = new Date(startOfWeek)
     day.setDate(startOfWeek.getDate() + i)
     const dateStr = `${day.getFullYear()}-${String(day.getMonth() + 1).padStart(2, '0')}-${String(day.getDate()).padStart(2, '0')}`
-    const dayEvents = events.value.filter(e => e.date === dateStr)
+    const dayEvents = filtered.filter(e => e.date === dateStr)
     days.push({
       date: day.getDate(),
       fullDate: dateStr,
@@ -365,11 +409,12 @@ const weekViewDays = computed<CalendarDay[]>(() => {
   return days
 })
 
-// Calendar month stats
+// Calendar month stats (uses filtered events)
 const calendarMonthStats = computed(() => {
   const year = currentDate.value.getFullYear()
   const month = currentDate.value.getMonth()
-  const monthEvents = events.value.filter(e => {
+  const filtered = calendarFilteredEvents.value
+  const monthEvents = filtered.filter(e => {
     const d = new Date(e.date)
     return d.getFullYear() === year && d.getMonth() === month
   })
