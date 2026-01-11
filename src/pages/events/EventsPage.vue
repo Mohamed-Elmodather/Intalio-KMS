@@ -13,6 +13,31 @@ const quickFilter = ref<'all' | 'today' | 'week' | 'myevents' | 'virtual' | 'inp
 const showShareModal = ref(false)
 const selectedEventForShare = ref<Event | null>(null)
 
+// Pagination state
+const currentPage = ref(1)
+const itemsPerPage = ref(6)
+
+// Filter dropdown states
+const showEventTypeFilter = ref(false)
+const showFormatFilter = ref(false)
+const showDateFilter = ref(false)
+const showSortDropdown = ref(false)
+const sortBy = ref('date')
+const sortOrder = ref<'asc' | 'desc'>('asc')
+
+// Sort options
+const sortOptions = [
+  { value: 'date', label: 'Date', icon: 'fas fa-calendar' },
+  { value: 'title', label: 'Title', icon: 'fas fa-font' },
+  { value: 'attendees', label: 'Attendees', icon: 'fas fa-users' }
+]
+
+// Format filter options
+const formatOptions = [
+  { id: 'virtual', label: 'Virtual', icon: 'fas fa-video', color: 'text-blue-500' },
+  { id: 'in-person', label: 'In-Person', icon: 'fas fa-building', color: 'text-amber-500' }
+]
+
 const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
 const eventTypes = ref([
@@ -193,7 +218,32 @@ const filteredEvents = computed(() => {
     })
   }
 
-  return result.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+  // Apply sorting
+  result.sort((a, b) => {
+    let comparison = 0
+    if (sortBy.value === 'date') {
+      comparison = new Date(a.date).getTime() - new Date(b.date).getTime()
+    } else if (sortBy.value === 'title') {
+      comparison = a.title.localeCompare(b.title)
+    } else if (sortBy.value === 'attendees') {
+      comparison = b.attendees.length - a.attendees.length
+    }
+    return sortOrder.value === 'asc' ? comparison : -comparison
+  })
+
+  return result
+})
+
+// Paginated events
+const paginatedEvents = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage.value
+  const end = start + itemsPerPage.value
+  return filteredEvents.value.slice(start, end)
+})
+
+// Total pages
+const totalPages = computed(() => {
+  return Math.ceil(filteredEvents.value.length / itemsPerPage.value)
 })
 
 interface CalendarDay {
@@ -297,6 +347,59 @@ function clearFilters() {
   selectedTypes.value = []
   selectedFormats.value = []
   searchQuery.value = ''
+  quickFilter.value = 'all'
+  currentPage.value = 1
+}
+
+// Filter toggle methods
+function toggleEventType(typeId: string) {
+  const idx = selectedTypes.value.indexOf(typeId)
+  if (idx > -1) {
+    selectedTypes.value.splice(idx, 1)
+  } else {
+    selectedTypes.value.push(typeId)
+  }
+  currentPage.value = 1
+}
+
+function isEventTypeSelected(typeId: string) {
+  return selectedTypes.value.includes(typeId)
+}
+
+function toggleFormat(formatId: string) {
+  const idx = selectedFormats.value.indexOf(formatId)
+  if (idx > -1) {
+    selectedFormats.value.splice(idx, 1)
+  } else {
+    selectedFormats.value.push(formatId)
+  }
+  currentPage.value = 1
+}
+
+function isFormatSelected(formatId: string) {
+  return selectedFormats.value.includes(formatId)
+}
+
+function setSort(value: string) {
+  if (sortBy.value === value) {
+    sortOrder.value = sortOrder.value === 'asc' ? 'desc' : 'asc'
+  } else {
+    sortBy.value = value
+    sortOrder.value = 'asc'
+  }
+  showSortDropdown.value = false
+}
+
+// Pagination methods
+function handlePageChange(page: number) {
+  if (page >= 1 && page <= totalPages.value) {
+    currentPage.value = page
+  }
+}
+
+function handlePerPageChange(perPage: number) {
+  itemsPerPage.value = perPage
+  currentPage.value = 1
 }
 
 function filterToday() {
@@ -572,69 +675,256 @@ function getCategoryCount(categoryId: string) {
         </div>
       </div>
 
-      <!-- Toolbar -->
-      <div class="toolbar">
-        <div class="toolbar-left">
-          <div class="search-box">
-            <i class="fas fa-search"></i>
-            <input type="text" v-model="searchQuery" placeholder="Search events..." class="search-input">
-          </div>
-          <button @click="showFilters = !showFilters"
-                  :class="['filter-btn', { active: showFilters || activeFiltersCount > 0 }]">
-            <i class="fas fa-filter"></i>
-            <span>Filters</span>
-            <span v-if="activeFiltersCount > 0" class="filter-badge">{{ activeFiltersCount }}</span>
-          </button>
-        </div>
+      <!-- Events Section Wrapper -->
+      <div class="events-wrapper bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-4">
+        <!-- Section Header / Toolbar -->
+        <div class="border-b border-gray-100">
+          <!-- Top Row - Title and Primary Actions -->
+          <div class="px-4 py-3 flex items-center justify-between">
+            <h2 class="text-lg font-bold text-gray-900 flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center shadow-lg shadow-teal-200">
+                <i class="fas fa-calendar-alt text-white text-sm"></i>
+              </div>
+              <div>
+                <span class="block">Events</span>
+                <span class="text-xs font-medium text-gray-500">{{ filteredEvents.length }} events</span>
+              </div>
+            </h2>
+            <div class="flex items-center gap-2">
+              <!-- Primary Actions -->
+              <button @click="showCreateModal = true" class="px-4 py-2 bg-gradient-to-r from-teal-500 to-teal-600 text-white rounded-lg text-sm font-medium hover:from-teal-600 hover:to-teal-700 transition-all flex items-center gap-2 shadow-sm shadow-teal-200">
+                <i class="fas fa-plus"></i>
+                Create Event
+              </button>
+              <button @click="goToToday" class="px-3 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 hover:border-gray-300 transition-all flex items-center gap-2">
+                <i class="fas fa-crosshairs text-teal-500"></i>
+                Today
+              </button>
 
-        <div class="toolbar-right">
-          <div class="view-toggle">
-            <button @click="calendarView = 'calendar'" :class="{ active: calendarView === 'calendar' }">
-              <i class="fas fa-calendar"></i> Calendar
-            </button>
-            <button @click="calendarView = 'grid'" :class="{ active: calendarView === 'grid' }">
-              <i class="fas fa-th-large"></i> Grid
-            </button>
-            <button @click="calendarView = 'list'" :class="{ active: calendarView === 'list' }">
-              <i class="fas fa-list"></i> List
-            </button>
-          </div>
-        </div>
-      </div>
+              <!-- Divider -->
+              <div class="w-px h-8 bg-gray-200 mx-1"></div>
 
-      <!-- Filters Panel -->
-      <div v-if="showFilters" class="filters-panel">
-        <div class="filter-groups">
-          <div class="filter-group">
-            <div class="filter-group-label">Event Type</div>
-            <div class="filter-chips">
-              <button v-for="type in eventTypes" :key="type.id"
-                      @click="toggleTypeFilter(type.id)"
-                      :class="['filter-chip', { active: selectedTypes.includes(type.id) }]">
-                <i :class="type.icon"></i>
-                {{ type.name }}
+              <!-- Refresh Button -->
+              <button
+                @click="currentPage = 1"
+                class="w-9 h-9 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-800 flex items-center justify-center transition-all"
+                title="Refresh"
+              >
+                <i class="fas fa-sync-alt text-sm"></i>
               </button>
             </div>
           </div>
-          <div class="filter-group">
-            <div class="filter-group-label">Format</div>
-            <div class="filter-chips">
-              <button @click="toggleFormatFilter('virtual')"
-                      :class="['filter-chip', { active: selectedFormats.includes('virtual') }]">
-                <i class="fas fa-video"></i> Virtual
+
+          <!-- Bottom Row - Search, Filters, View Options -->
+          <div class="px-4 py-2 bg-gray-50/50 flex flex-wrap items-center gap-3">
+            <!-- Search -->
+            <div class="min-w-[200px] max-w-md relative flex-1">
+              <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+              <input
+                v-model="searchQuery"
+                type="text"
+                placeholder="Search events..."
+                class="w-full pl-9 pr-4 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all"
+              >
+              <button v-if="searchQuery" @click="searchQuery = ''" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                <i class="fas fa-times text-xs"></i>
               </button>
-              <button @click="toggleFormatFilter('in-person')"
-                      :class="['filter-chip', { active: selectedFormats.includes('in-person') }]">
-                <i class="fas fa-building"></i> In-Person
+            </div>
+
+            <!-- Event Type Filter Dropdown -->
+            <div class="relative">
+              <button
+                @click="showEventTypeFilter = !showEventTypeFilter"
+                :class="[
+                  'flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border',
+                  selectedTypes.length > 0 ? 'bg-teal-50 border-teal-200 text-teal-700' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+                ]"
+              >
+                <i class="fas fa-calendar-check text-sm"></i>
+                <span>{{ selectedTypes.length > 0 ? `${selectedTypes.length} Types` : 'Event Type' }}</span>
+                <i :class="showEventTypeFilter ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ml-1"></i>
               </button>
-              <button @click="toggleFormatFilter('hybrid')"
-                      :class="['filter-chip', { active: selectedFormats.includes('hybrid') }]">
-                <i class="fas fa-laptop-house"></i> Hybrid
+
+              <!-- Dropdown Menu -->
+              <div
+                v-if="showEventTypeFilter"
+                class="absolute left-0 top-full mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
+              >
+                <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Select Event Types</div>
+                <div class="max-h-48 overflow-y-auto">
+                  <button
+                    v-for="type in eventTypes"
+                    :key="type.id"
+                    @click="toggleEventType(type.id)"
+                    :class="[
+                      'w-full px-3 py-2 text-left text-sm flex items-center gap-3 transition-colors',
+                      isEventTypeSelected(type.id) ? 'bg-teal-50 text-teal-700' : 'text-gray-700 hover:bg-gray-50'
+                    ]"
+                  >
+                    <div :class="[
+                      'w-4 h-4 rounded border-2 flex items-center justify-center transition-all',
+                      isEventTypeSelected(type.id) ? 'bg-teal-500 border-teal-500' : 'border-gray-300'
+                    ]">
+                      <i v-if="isEventTypeSelected(type.id)" class="fas fa-check text-white text-[8px]"></i>
+                    </div>
+                    <i :class="[type.icon, 'text-sm']" :style="{ color: type.color }"></i>
+                    <span class="flex-1">{{ type.name }}</span>
+                  </button>
+                </div>
+                <div class="my-2 border-t border-gray-100"></div>
+                <div class="px-3 flex gap-2">
+                  <button
+                    @click="selectedTypes = []; showEventTypeFilter = false"
+                    class="flex-1 px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                  >
+                    Clear All
+                  </button>
+                  <button
+                    @click="showEventTypeFilter = false"
+                    class="flex-1 px-3 py-1.5 text-xs font-medium text-white bg-teal-500 rounded-lg hover:bg-teal-600 transition-colors"
+                  >
+                    Apply
+                  </button>
+                </div>
+              </div>
+              <div v-if="showEventTypeFilter" @click="showEventTypeFilter = false" class="fixed inset-0 z-40"></div>
+            </div>
+
+            <!-- Format Filter Dropdown -->
+            <div class="relative">
+              <button
+                @click="showFormatFilter = !showFormatFilter"
+                :class="[
+                  'flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border',
+                  selectedFormats.length > 0 ? 'bg-teal-50 border-teal-200 text-teal-700' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+                ]"
+              >
+                <i class="fas fa-desktop text-sm"></i>
+                <span>{{ selectedFormats.length > 0 ? `${selectedFormats.length} Formats` : 'Format' }}</span>
+                <i :class="showFormatFilter ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ml-1"></i>
+              </button>
+
+              <!-- Dropdown Menu -->
+              <div
+                v-if="showFormatFilter"
+                class="absolute left-0 top-full mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
+              >
+                <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Select Format</div>
+                <div class="max-h-48 overflow-y-auto">
+                  <button
+                    v-for="format in formatOptions"
+                    :key="format.id"
+                    @click="toggleFormat(format.id)"
+                    :class="[
+                      'w-full px-3 py-2 text-left text-sm flex items-center gap-3 transition-colors',
+                      isFormatSelected(format.id) ? 'bg-teal-50 text-teal-700' : 'text-gray-700 hover:bg-gray-50'
+                    ]"
+                  >
+                    <div :class="[
+                      'w-4 h-4 rounded border-2 flex items-center justify-center transition-all',
+                      isFormatSelected(format.id) ? 'bg-teal-500 border-teal-500' : 'border-gray-300'
+                    ]">
+                      <i v-if="isFormatSelected(format.id)" class="fas fa-check text-white text-[8px]"></i>
+                    </div>
+                    <i :class="[format.icon, format.color, 'text-sm']"></i>
+                    <span class="flex-1">{{ format.label }}</span>
+                  </button>
+                </div>
+                <div class="my-2 border-t border-gray-100"></div>
+                <div class="px-3 flex gap-2">
+                  <button
+                    @click="selectedFormats = []; showFormatFilter = false"
+                    class="flex-1 px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                  >
+                    Clear All
+                  </button>
+                  <button
+                    @click="showFormatFilter = false"
+                    class="flex-1 px-3 py-1.5 text-xs font-medium text-white bg-teal-500 rounded-lg hover:bg-teal-600 transition-colors"
+                  >
+                    Apply
+                  </button>
+                </div>
+              </div>
+              <div v-if="showFormatFilter" @click="showFormatFilter = false" class="fixed inset-0 z-40"></div>
+            </div>
+
+            <!-- Sort Dropdown -->
+            <div class="relative">
+              <button
+                @click="showSortDropdown = !showSortDropdown"
+                class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border bg-white border-gray-200 text-gray-600 hover:bg-gray-50"
+              >
+                <i class="fas fa-sort text-sm"></i>
+                <span>{{ sortOptions.find(s => s.value === sortBy)?.label || 'Sort' }}</span>
+                <i :class="sortOrder === 'asc' ? 'fas fa-arrow-up' : 'fas fa-arrow-down'" class="text-[10px] ml-1"></i>
+              </button>
+
+              <!-- Dropdown Menu -->
+              <div
+                v-if="showSortDropdown"
+                class="absolute left-0 top-full mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
+              >
+                <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Sort By</div>
+                <button
+                  v-for="option in sortOptions"
+                  :key="option.value"
+                  @click="setSort(option.value)"
+                  :class="[
+                    'w-full px-3 py-2 text-left text-sm flex items-center gap-3 transition-colors',
+                    sortBy === option.value ? 'bg-teal-50 text-teal-700' : 'text-gray-700 hover:bg-gray-50'
+                  ]"
+                >
+                  <i :class="[option.icon, 'text-sm', sortBy === option.value ? 'text-teal-500' : 'text-gray-400']"></i>
+                  <span class="flex-1">{{ option.label }}</span>
+                  <i v-if="sortBy === option.value" :class="sortOrder === 'asc' ? 'fas fa-arrow-up' : 'fas fa-arrow-down'" class="text-xs text-teal-500"></i>
+                </button>
+              </div>
+              <div v-if="showSortDropdown" @click="showSortDropdown = false" class="fixed inset-0 z-40"></div>
+            </div>
+
+            <!-- Clear Filters -->
+            <button
+              v-if="selectedTypes.length > 0 || selectedFormats.length > 0 || searchQuery"
+              @click="clearFilters"
+              class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-red-600 bg-red-50 border border-red-200 hover:bg-red-100 transition-colors"
+            >
+              <i class="fas fa-times text-xs"></i>
+              <span>Clear</span>
+            </button>
+
+            <!-- Spacer -->
+            <div class="flex-1"></div>
+
+            <!-- View Toggle -->
+            <div class="view-toggle">
+              <button
+                @click="calendarView = 'calendar'"
+                :class="['px-2.5 py-1 rounded-md transition-all', calendarView === 'calendar' ? 'bg-teal-500 text-white' : 'text-gray-500 hover:bg-gray-100']"
+                title="Calendar view"
+              >
+                <i class="fas fa-calendar text-xs"></i>
+              </button>
+              <button
+                @click="calendarView = 'grid'"
+                :class="['px-2.5 py-1 rounded-md transition-all', calendarView === 'grid' ? 'bg-teal-500 text-white' : 'text-gray-500 hover:bg-gray-100']"
+                title="Grid view"
+              >
+                <i class="fas fa-th-large text-xs"></i>
+              </button>
+              <button
+                @click="calendarView = 'list'"
+                :class="['px-2.5 py-1 rounded-md transition-all', calendarView === 'list' ? 'bg-teal-500 text-white' : 'text-gray-500 hover:bg-gray-100']"
+                title="List view"
+              >
+                <i class="fas fa-list text-xs"></i>
               </button>
             </div>
           </div>
         </div>
-      </div>
+
+        <!-- Content Area Inside Wrapper -->
+        <div class="p-4">
 
       <!-- Content with Sidebar -->
       <div class="flex gap-6 content-with-sidebar">
@@ -691,7 +981,7 @@ function getCategoryCount(categoryId: string) {
 
           <!-- Premium Grid View -->
           <div v-if="calendarView === 'grid'" class="events-grid-premium">
-            <div v-for="event in filteredEvents" :key="event.id"
+            <div v-for="event in paginatedEvents" :key="event.id"
                  @click="openEvent(event)"
                  :class="['event-card-premium', event.category]">
               <div class="event-card-glow"></div>
@@ -751,7 +1041,7 @@ function getCategoryCount(categoryId: string) {
 
           <!-- Premium List View -->
           <div v-if="calendarView === 'list'" class="events-list-premium">
-            <div v-for="event in filteredEvents" :key="event.id"
+            <div v-for="event in paginatedEvents" :key="event.id"
                  @click="openEvent(event)"
                  :class="['event-list-item-premium', event.category]">
               <div class="event-list-date-premium">
@@ -814,6 +1104,89 @@ function getCategoryCount(categoryId: string) {
               <i class="fas fa-refresh"></i>
               Clear all filters
             </button>
+          </div>
+
+          <!-- Pagination -->
+          <div v-if="filteredEvents.length > 0 && calendarView !== 'calendar'" class="mt-4 px-4 py-3 bg-white rounded-2xl border border-gray-100 shadow-sm">
+            <div class="flex items-center justify-between flex-wrap gap-3">
+              <!-- Left: Stats & Items Per Page -->
+              <div class="flex items-center gap-4 flex-wrap">
+                <span class="text-xs text-gray-500">
+                  Showing <span class="font-semibold text-gray-700">{{ Math.min((currentPage - 1) * itemsPerPage + 1, filteredEvents.length) }}</span>
+                  to <span class="font-semibold text-gray-700">{{ Math.min(currentPage * itemsPerPage, filteredEvents.length) }}</span>
+                  of <span class="font-semibold text-gray-700">{{ filteredEvents.length }}</span> events
+                </span>
+
+                <!-- Items Per Page Selector -->
+                <div class="flex items-center gap-2">
+                  <span class="text-xs text-gray-500">Show:</span>
+                  <select
+                    v-model="itemsPerPage"
+                    @change="handlePerPageChange(itemsPerPage)"
+                    class="text-xs px-2 py-1.5 rounded-lg border border-gray-200 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 cursor-pointer"
+                  >
+                    <option :value="6">6</option>
+                    <option :value="9">9</option>
+                    <option :value="12">12</option>
+                    <option :value="24">24</option>
+                  </select>
+                  <span class="text-xs text-gray-500">per page</span>
+                </div>
+              </div>
+
+              <!-- Right: Pagination Controls -->
+              <div class="flex items-center gap-2">
+                <button
+                  @click="handlePageChange(currentPage - 1)"
+                  :disabled="currentPage === 1"
+                  :class="[
+                    'px-3 py-1.5 text-xs rounded-lg transition-colors flex items-center gap-1.5 border',
+                    currentPage === 1
+                      ? 'text-gray-300 border-gray-100 cursor-not-allowed'
+                      : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100 border-gray-200'
+                  ]"
+                >
+                  <i class="fas fa-chevron-left text-[10px]"></i>
+                  Previous
+                </button>
+
+                <!-- Page Numbers -->
+                <div class="flex items-center gap-1">
+                  <template v-for="page in totalPages" :key="page">
+                    <button
+                      v-if="page === 1 || page === totalPages || (page >= currentPage - 1 && page <= currentPage + 1)"
+                      @click="handlePageChange(page)"
+                      :class="[
+                        'w-8 h-8 text-xs rounded-lg transition-colors flex items-center justify-center',
+                        page === currentPage
+                          ? 'font-medium text-teal-600 bg-teal-50'
+                          : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
+                      ]"
+                    >
+                      {{ page }}
+                    </button>
+                    <span
+                      v-else-if="page === currentPage - 2 || page === currentPage + 2"
+                      class="text-xs text-gray-400 px-1"
+                    >...</span>
+                  </template>
+                </div>
+
+                <button
+                  @click="handlePageChange(currentPage + 1)"
+                  :disabled="currentPage === totalPages"
+                  :class="[
+                    'px-3 py-1.5 text-xs rounded-lg transition-colors flex items-center gap-1.5 border',
+                    currentPage === totalPages
+                      ? 'text-gray-300 border-gray-100 cursor-not-allowed'
+                      : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100 border-gray-200'
+                  ]"
+                >
+                  Next
+                  <i class="fas fa-chevron-right text-[10px]"></i>
+                </button>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -910,6 +1283,8 @@ function getCategoryCount(categoryId: string) {
             </div>
           </div>
         </aside>
+      </div>
+        </div>
       </div>
 
     </div>
