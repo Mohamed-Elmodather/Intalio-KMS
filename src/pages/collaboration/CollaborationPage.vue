@@ -116,6 +116,7 @@ const rightPanelTab = ref<'details' | 'members' | 'files' | 'pinned'>('details')
 const isTyping = ref(false)
 const typingUsers = ref<string[]>([])
 const messagesContainerRef = ref<HTMLElement | null>(null)
+const expandedTeamIds = ref<Set<string>>(new Set())
 
 // New channel form
 const newChannel = ref({
@@ -144,9 +145,42 @@ const directMessages = ref<DirectMessage[]>([
 ])
 
 const teams = ref<CollaborationTeam[]>([
-  { id: 't1', name: 'AFC 2027 Core', avatar: '', color: '#0d9488', channels: [], memberCount: 24 },
-  { id: 't2', name: 'Media & Press', avatar: '', color: '#8b5cf6', channels: [], memberCount: 12 },
-  { id: 't3', name: 'Operations', avatar: '', color: '#f59e0b', channels: [], memberCount: 18 },
+  {
+    id: 't1',
+    name: 'AFC 2027 Core',
+    avatar: '',
+    color: '#0d9488',
+    memberCount: 24,
+    channels: [
+      { id: 't1-general', name: 'general', type: 'public', memberCount: 24, unreadCount: 2, isMuted: false, isPinned: false },
+      { id: 't1-leadership', name: 'leadership', type: 'private', memberCount: 6, unreadCount: 0, isMuted: false, isPinned: false },
+      { id: 't1-updates', name: 'updates', type: 'public', memberCount: 24, unreadCount: 5, isMuted: false, isPinned: false },
+    ]
+  },
+  {
+    id: 't2',
+    name: 'Media & Press',
+    avatar: '',
+    color: '#8b5cf6',
+    memberCount: 12,
+    channels: [
+      { id: 't2-general', name: 'general', type: 'public', memberCount: 12, unreadCount: 0, isMuted: false, isPinned: false },
+      { id: 't2-content', name: 'content-review', type: 'private', memberCount: 8, unreadCount: 3, isMuted: false, isPinned: false },
+      { id: 't2-social', name: 'social-media', type: 'public', memberCount: 12, unreadCount: 1, isMuted: false, isPinned: false },
+    ]
+  },
+  {
+    id: 't3',
+    name: 'Operations',
+    avatar: '',
+    color: '#f59e0b',
+    memberCount: 18,
+    channels: [
+      { id: 't3-general', name: 'general', type: 'public', memberCount: 18, unreadCount: 0, isMuted: false, isPinned: false },
+      { id: 't3-logistics', name: 'logistics', type: 'private', memberCount: 10, unreadCount: 4, isMuted: false, isPinned: false },
+      { id: 't3-venues', name: 'venues', type: 'public', memberCount: 15, unreadCount: 0, isMuted: false, isPinned: false },
+    ]
+  },
 ])
 
 const channelMembers = ref<ChannelMember[]>([
@@ -371,6 +405,35 @@ function selectDM(dmId: string) {
   const dm = directMessages.value.find(d => d.id === dmId)
   if (dm) dm.unreadCount = 0
   scrollToBottom()
+}
+
+function toggleTeam(teamId: string) {
+  if (expandedTeamIds.value.has(teamId)) {
+    expandedTeamIds.value.delete(teamId)
+  } else {
+    expandedTeamIds.value.add(teamId)
+  }
+  // Force reactivity
+  expandedTeamIds.value = new Set(expandedTeamIds.value)
+}
+
+function selectTeamChannel(teamId: string, channelId: string) {
+  selectedChannelId.value = channelId
+  selectedDMId.value = null
+  expandedThreadId.value = null
+  // Mark as read
+  const team = teams.value.find(t => t.id === teamId)
+  const channel = team?.channels.find(c => c.id === channelId)
+  if (channel) channel.unreadCount = 0
+  scrollToBottom()
+}
+
+function isTeamExpanded(teamId: string): boolean {
+  return expandedTeamIds.value.has(teamId)
+}
+
+function getTeamUnreadCount(team: CollaborationTeam): number {
+  return team.channels.reduce((sum, c) => sum + c.unreadCount, 0)
 }
 
 function sendMessage() {
@@ -688,21 +751,60 @@ watch(messageInput, (val) => {
             <span>TEAMS</span>
           </button>
 
-          <div class="space-y-0.5">
-            <button
-              v-for="team in teams"
-              :key="team.id"
-              class="w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition-all"
-            >
-              <div
-                class="w-5 h-5 rounded flex items-center justify-center text-white text-[10px] font-bold"
-                :style="{ backgroundColor: team.color }"
+          <div class="space-y-1">
+            <div v-for="team in teams" :key="team.id">
+              <!-- Team Header -->
+              <button
+                @click="toggleTeam(team.id)"
+                class="w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition-all"
               >
-                {{ team.name.substring(0, 2).toUpperCase() }}
+                <i :class="[
+                  'fas text-[10px] w-3 transition-transform',
+                  isTeamExpanded(team.id) ? 'fa-chevron-down' : 'fa-chevron-right'
+                ]"></i>
+                <div
+                  class="w-5 h-5 rounded flex items-center justify-center text-white text-[10px] font-bold"
+                  :style="{ backgroundColor: team.color }"
+                >
+                  {{ team.name.substring(0, 2).toUpperCase() }}
+                </div>
+                <span class="flex-1 text-left truncate">{{ team.name }}</span>
+                <span
+                  v-if="getTeamUnreadCount(team) > 0"
+                  class="bg-teal-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full min-w-[20px] text-center"
+                >
+                  {{ getTeamUnreadCount(team) }}
+                </span>
+                <span v-else class="text-xs text-slate-500">{{ team.memberCount }}</span>
+              </button>
+
+              <!-- Team Channels (expanded) -->
+              <div v-if="isTeamExpanded(team.id)" class="ml-5 mt-0.5 space-y-0.5">
+                <button
+                  v-for="channel in team.channels"
+                  :key="channel.id"
+                  @click="selectTeamChannel(team.id, channel.id)"
+                  :class="[
+                    'w-full flex items-center gap-2 px-2 py-1 rounded-lg text-sm transition-all',
+                    selectedChannelId === channel.id
+                      ? 'bg-teal-500/20 text-teal-400'
+                      : 'text-slate-400 hover:bg-slate-800 hover:text-white'
+                  ]"
+                >
+                  <i :class="[
+                    channel.type === 'private' ? 'fas fa-lock' : 'fas fa-hashtag',
+                    'text-xs w-4'
+                  ]"></i>
+                  <span class="flex-1 text-left truncate">{{ channel.name }}</span>
+                  <span
+                    v-if="channel.unreadCount > 0"
+                    class="bg-teal-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full min-w-[20px] text-center"
+                  >
+                    {{ channel.unreadCount }}
+                  </span>
+                </button>
               </div>
-              <span class="flex-1 text-left truncate">{{ team.name }}</span>
-              <span class="text-xs text-slate-500">{{ team.memberCount }}</span>
-            </button>
+            </div>
           </div>
         </div>
 
