@@ -112,7 +112,7 @@ const showMentionAutocomplete = ref(false)
 const mentionQuery = ref('')
 const expandedThreadId = ref<string | null>(null)
 const threadReplyInput = ref('')
-const rightPanelTab = ref<'details' | 'members' | 'files' | 'pinned'>('details')
+const rightPanelTab = ref<'details' | 'members' | 'files' | 'pinned' | 'profile' | 'media'>('details')
 const isTyping = ref(false)
 const typingUsers = ref<string[]>([])
 const messagesContainerRef = ref<HTMLElement | null>(null)
@@ -748,6 +748,46 @@ const selectedChannel = computed(() => {
   return channels.value.find(c => c.id === selectedChannelId.value)
 })
 
+// Get full DM info for context-aware right panel
+const selectedDM = computed(() => {
+  if (!selectedDMId.value) return null
+  return directMessages.value.find(d => d.id === selectedDMId.value) || null
+})
+
+// Check if we're viewing a DM or a channel
+const isViewingDM = computed(() => !!selectedDMId.value)
+
+// Get files shared in the current DM conversation
+const dmSharedFiles = computed(() => {
+  if (!selectedDMId.value) return []
+  const dmMessages = messages.value.get(selectedDMId.value) || []
+  const files: Array<{ id: string; name: string; type: string; size: number; uploadedBy: string; uploadedAt: string }> = []
+
+  dmMessages.forEach(msg => {
+    if (msg.attachments) {
+      msg.attachments.forEach(att => {
+        files.push({
+          id: att.id,
+          name: att.name,
+          type: att.type,
+          size: att.size,
+          uploadedBy: msg.sender.displayName,
+          uploadedAt: formatTime(msg.createdAt)
+        })
+      })
+    }
+  })
+  return files
+})
+
+// Get right panel tabs based on context (DM vs Channel)
+const rightPanelTabs = computed(() => {
+  if (isViewingDM.value) {
+    return ['profile', 'files', 'media'] as const
+  }
+  return ['details', 'members', 'files', 'pinned'] as const
+})
+
 const currentMessages = computed(() => {
   const id = selectedDMId.value || selectedChannelId.value
   return messages.value.get(id) || []
@@ -1048,6 +1088,11 @@ watch(messageInput, (val) => {
   } else {
     isTyping.value = false
   }
+})
+
+// Reset right panel tab when switching between DM and channel
+watch(isViewingDM, (isDM) => {
+  rightPanelTab.value = isDM ? 'profile' : 'details'
 })
 </script>
 
@@ -1686,9 +1731,9 @@ watch(messageInput, (val) => {
       v-if="showRightPanel"
       class="w-80 border-l border-gray-200 bg-gray-50 flex flex-col flex-shrink-0"
     >
-      <!-- Panel Header -->
+      <!-- Panel Header (Context Aware) -->
       <div class="h-14 px-4 border-b border-gray-200 flex items-center justify-between bg-white">
-        <h3 class="font-semibold text-gray-900">Details</h3>
+        <h3 class="font-semibold text-gray-900">{{ isViewingDM ? 'Profile' : 'Details' }}</h3>
         <button
           @click="showRightPanel = false"
           class="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
@@ -1697,11 +1742,11 @@ watch(messageInput, (val) => {
         </button>
       </div>
 
-      <!-- Panel Tabs -->
+      <!-- Panel Tabs - Context Aware -->
       <div class="px-4 py-2 border-b border-gray-200 bg-white">
         <div class="flex gap-1">
           <button
-            v-for="tab in ['details', 'members', 'files', 'pinned'] as const"
+            v-for="tab in rightPanelTabs"
             :key="tab"
             @click="rightPanelTab = tab"
             :class="[
@@ -1767,6 +1812,121 @@ watch(messageInput, (val) => {
           </div>
         </div>
 
+        <!-- Profile Tab (DM Context) -->
+        <div v-if="rightPanelTab === 'profile' && selectedDM">
+          <!-- User Profile Header -->
+          <div class="text-center mb-6">
+            <div class="relative inline-block">
+              <div class="w-20 h-20 bg-gradient-to-br from-teal-400 to-teal-600 rounded-full flex items-center justify-center mx-auto mb-3 text-white text-2xl font-semibold">
+                {{ selectedDM.user.displayName.split(' ').map(n => n[0]).join('') }}
+              </div>
+              <span
+                :class="['absolute bottom-1 right-1 w-4 h-4 rounded-full border-3 border-white', getPresenceColor(selectedDM.presence)]"
+              ></span>
+            </div>
+            <h4 class="font-semibold text-gray-900 text-lg">{{ selectedDM.user.displayName }}</h4>
+            <p class="text-sm text-gray-500 mt-1">{{ selectedDM.user.role }}</p>
+            <div class="flex items-center justify-center gap-1 mt-2">
+              <span :class="['w-2 h-2 rounded-full', getPresenceColor(selectedDM.presence)]"></span>
+              <span class="text-xs text-gray-500 capitalize">{{ selectedDM.presence }}</span>
+            </div>
+          </div>
+
+          <!-- Quick Actions -->
+          <div class="grid grid-cols-3 gap-2 mb-6">
+            <button class="flex flex-col items-center gap-1 p-3 bg-white rounded-xl border border-gray-100 hover:border-teal-200 hover:bg-teal-50 transition-colors">
+              <i class="fas fa-video text-teal-600"></i>
+              <span class="text-xs text-gray-600">Video</span>
+            </button>
+            <button class="flex flex-col items-center gap-1 p-3 bg-white rounded-xl border border-gray-100 hover:border-teal-200 hover:bg-teal-50 transition-colors">
+              <i class="fas fa-phone text-teal-600"></i>
+              <span class="text-xs text-gray-600">Call</span>
+            </button>
+            <button class="flex flex-col items-center gap-1 p-3 bg-white rounded-xl border border-gray-100 hover:border-teal-200 hover:bg-teal-50 transition-colors">
+              <i class="fas fa-calendar-plus text-teal-600"></i>
+              <span class="text-xs text-gray-600">Schedule</span>
+            </button>
+          </div>
+
+          <!-- User Info -->
+          <div class="bg-white rounded-xl border border-gray-100 p-4 mb-4">
+            <h5 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Contact Information</h5>
+            <div class="space-y-3">
+              <div class="flex items-center gap-3">
+                <i class="fas fa-envelope text-gray-400 w-5"></i>
+                <div>
+                  <p class="text-xs text-gray-400">Email</p>
+                  <p class="text-sm text-gray-700">{{ selectedDM.user.displayName.toLowerCase().replace(' ', '.') }}@afc2027.org</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-3">
+                <i class="fas fa-building text-gray-400 w-5"></i>
+                <div>
+                  <p class="text-xs text-gray-400">Department</p>
+                  <p class="text-sm text-gray-700">{{ selectedDM.user.role }}</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-3">
+                <i class="fas fa-clock text-gray-400 w-5"></i>
+                <div>
+                  <p class="text-xs text-gray-400">Local Time</p>
+                  <p class="text-sm text-gray-700">{{ new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) }} (GST)</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Conversation Actions -->
+          <div class="space-y-2">
+            <button class="w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-700 hover:bg-white rounded-lg transition-colors">
+              <i class="fas fa-search w-5 text-gray-400"></i>
+              <span>Search in conversation</span>
+            </button>
+            <button class="w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-700 hover:bg-white rounded-lg transition-colors">
+              <i class="fas fa-bell-slash w-5 text-gray-400"></i>
+              <span>Mute notifications</span>
+            </button>
+            <button class="w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-700 hover:bg-white rounded-lg transition-colors">
+              <i class="fas fa-thumbtack w-5 text-gray-400"></i>
+              <span>Pin conversation</span>
+            </button>
+            <button class="w-full flex items-center gap-3 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+              <i class="fas fa-ban w-5"></i>
+              <span>Block user</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Media Tab (DM Context) -->
+        <div v-if="rightPanelTab === 'media' && selectedDM">
+          <div class="mb-4">
+            <h5 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Shared Photos & Videos</h5>
+            <div v-if="dmSharedFiles.filter(f => f.type === 'image' || f.type === 'video').length === 0" class="text-center py-8 text-gray-400">
+              <i class="fas fa-photo-video text-3xl mb-3 opacity-50"></i>
+              <p class="text-sm">No media shared yet</p>
+            </div>
+            <div v-else class="grid grid-cols-3 gap-2">
+              <div
+                v-for="file in dmSharedFiles.filter(f => f.type === 'image' || f.type === 'video')"
+                :key="file.id"
+                class="aspect-square bg-gray-200 rounded-lg overflow-hidden cursor-pointer hover:opacity-90 transition-opacity"
+              >
+                <div class="w-full h-full flex items-center justify-center bg-gray-100">
+                  <i :class="file.type === 'video' ? 'fas fa-play-circle text-gray-400 text-2xl' : 'fas fa-image text-gray-400 text-2xl'"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <h5 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Shared Links</h5>
+            <div class="text-center py-6 text-gray-400">
+              <i class="fas fa-link text-2xl mb-2 opacity-50"></i>
+              <p class="text-sm">No links shared yet</p>
+            </div>
+          </div>
+        </div>
+
         <!-- Members Tab -->
         <div v-if="rightPanelTab === 'members'" class="space-y-1">
           <div
@@ -1792,22 +1952,47 @@ watch(messageInput, (val) => {
           </div>
         </div>
 
-        <!-- Files Tab -->
+        <!-- Files Tab (Context Aware) -->
         <div v-if="rightPanelTab === 'files'" class="space-y-2">
-          <div
-            v-for="file in sharedFiles"
-            :key="file.id"
-            class="flex items-center gap-3 p-3 bg-white rounded-xl border border-gray-100 hover:shadow-sm transition-shadow"
-          >
-            <i :class="[getFileIcon(file.name), 'text-xl']"></i>
-            <div class="flex-1 min-w-0">
-              <p class="font-medium text-gray-900 text-sm truncate">{{ file.name }}</p>
-              <p class="text-xs text-gray-500">{{ formatFileSize(file.size) }} · {{ file.uploadedBy }}</p>
+          <!-- DM Context -->
+          <template v-if="isViewingDM">
+            <div v-if="dmSharedFiles.length === 0" class="text-center py-8 text-gray-400">
+              <i class="fas fa-file text-3xl mb-3 opacity-50"></i>
+              <p class="text-sm">No files shared yet</p>
+              <p class="text-xs mt-1">Files shared in this conversation will appear here</p>
             </div>
-            <button class="p-1.5 hover:bg-gray-100 rounded-lg transition-colors">
-              <i class="fas fa-download text-gray-400 text-sm"></i>
-            </button>
-          </div>
+            <div
+              v-for="file in dmSharedFiles"
+              :key="file.id"
+              class="flex items-center gap-3 p-3 bg-white rounded-xl border border-gray-100 hover:shadow-sm transition-shadow"
+            >
+              <i :class="[getFileIcon(file.name), 'text-xl']"></i>
+              <div class="flex-1 min-w-0">
+                <p class="font-medium text-gray-900 text-sm truncate">{{ file.name }}</p>
+                <p class="text-xs text-gray-500">{{ formatFileSize(file.size) }} · {{ file.uploadedBy }}</p>
+              </div>
+              <button class="p-1.5 hover:bg-gray-100 rounded-lg transition-colors">
+                <i class="fas fa-download text-gray-400 text-sm"></i>
+              </button>
+            </div>
+          </template>
+          <!-- Channel Context -->
+          <template v-else>
+            <div
+              v-for="file in sharedFiles"
+              :key="file.id"
+              class="flex items-center gap-3 p-3 bg-white rounded-xl border border-gray-100 hover:shadow-sm transition-shadow"
+            >
+              <i :class="[getFileIcon(file.name), 'text-xl']"></i>
+              <div class="flex-1 min-w-0">
+                <p class="font-medium text-gray-900 text-sm truncate">{{ file.name }}</p>
+                <p class="text-xs text-gray-500">{{ formatFileSize(file.size) }} · {{ file.uploadedBy }}</p>
+              </div>
+              <button class="p-1.5 hover:bg-gray-100 rounded-lg transition-colors">
+                <i class="fas fa-download text-gray-400 text-sm"></i>
+              </button>
+            </div>
+          </template>
         </div>
 
         <!-- Pinned Tab -->
