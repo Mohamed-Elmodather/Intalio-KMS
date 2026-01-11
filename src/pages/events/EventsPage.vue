@@ -44,8 +44,17 @@ const dateRangeOptions = [
   { id: 'today', label: 'Today', icon: 'fas fa-sun' },
   { id: 'week', label: 'This Week', icon: 'fas fa-calendar-week' },
   { id: 'month', label: 'This Month', icon: 'fas fa-calendar-alt' },
-  { id: 'myevents', label: 'My Events', icon: 'fas fa-user-check' }
+  { id: 'custom', label: 'Custom Range', icon: 'fas fa-calendar-days' }
 ]
+
+// My Events filter (separate from date range)
+const showMyEventsOnly = ref(false)
+const showFeaturedOnly = ref(false)
+
+// Custom date range state
+const customDateStart = ref('')
+const customDateEnd = ref('')
+const showCustomDatePicker = ref(false)
 
 const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
@@ -72,21 +81,22 @@ interface Event {
   categoryLabel: string
   virtual: boolean
   isGoing: boolean
+  featured: boolean
   description: string
   attendees: Attendee[]
 }
 
 const events = ref<Event[]>([
-  { id: 1, title: 'All-Hands Meeting Q4', date: '2025-12-24', time: '10:00 AM - 11:30 AM', location: 'Main Conference Room', category: 'meeting', categoryLabel: 'Meeting', virtual: true, isGoing: true, description: 'Quarterly all-hands meeting to discuss company progress and goals.', attendees: [{ color: '#14b8a6', initials: 'AI' }, { color: '#3b82f6', initials: 'SC' }, { color: '#ec4899', initials: 'LW' }] },
-  { id: 2, title: 'Product Demo - New Features', date: '2025-12-26', time: '2:00 PM - 3:00 PM', location: 'Virtual - Zoom', category: 'webinar', categoryLabel: 'Webinar', virtual: true, isGoing: false, description: 'Demo of the latest product features to the team.', attendees: [{ color: '#6366f1', initials: 'DK' }, { color: '#0d9488', initials: 'MJ' }] },
-  { id: 3, title: 'Year-End Performance Review', date: '2025-12-30', time: '9:00 AM - 12:00 PM', location: 'Board Room', category: 'review', categoryLabel: 'Review', virtual: false, isGoing: true, description: 'Annual performance review meeting.', attendees: [{ color: '#f59e0b', initials: 'HR' }] },
-  { id: 4, title: 'Holiday Team Lunch', date: '2025-12-24', time: '12:30 PM - 2:00 PM', location: 'Cafeteria', category: 'social', categoryLabel: 'Social', virtual: false, isGoing: true, description: 'Holiday celebration lunch with the team.', attendees: [{ color: '#ec4899', initials: 'TM' }, { color: '#14b8a6', initials: 'AI' }, { color: '#3b82f6', initials: 'SC' }, { color: '#10b981', initials: 'ED' }] },
-  { id: 5, title: 'Advanced Excel Training', date: '2025-12-27', time: '3:00 PM - 5:00 PM', location: 'Training Room A', category: 'training', categoryLabel: 'Training', virtual: false, isGoing: false, description: 'Advanced Excel techniques for productivity.', attendees: [{ color: '#10b981', initials: 'RG' }, { color: '#0d9488', initials: 'AT' }] },
-  { id: 6, title: 'Sprint Planning Meeting', date: '2025-12-25', time: '10:00 AM - 11:00 AM', location: 'Scrum Room', category: 'meeting', categoryLabel: 'Meeting', virtual: false, isGoing: true, description: 'Planning for the upcoming sprint.', attendees: [{ color: '#3b82f6', initials: 'PM' }, { color: '#14b8a6', initials: 'AI' }, { color: '#6366f1', initials: 'DK' }] },
-  { id: 7, title: 'Customer Success Webinar', date: '2025-12-28', time: '1:00 PM - 2:30 PM', location: 'Virtual - Teams', category: 'webinar', categoryLabel: 'Webinar', virtual: true, isGoing: false, description: 'Webinar on customer success strategies.', attendees: [{ color: '#6366f1', initials: 'CS' }, { color: '#ec4899', initials: 'LW' }] },
-  { id: 8, title: 'New Year Planning Session', date: '2025-12-31', time: '2:00 PM - 4:00 PM', location: 'Executive Suite', category: 'meeting', categoryLabel: 'Meeting', virtual: false, isGoing: true, description: 'Strategic planning for the new year.', attendees: [{ color: '#14b8a6', initials: 'AI' }, { color: '#0d9488', initials: 'CEO' }] },
-  { id: 9, title: 'Team Building Workshop', date: '2025-12-29', time: '9:00 AM - 12:00 PM', location: 'Innovation Lab', category: 'social', categoryLabel: 'Social', virtual: false, isGoing: false, description: 'Interactive team building exercises.', attendees: [{ color: '#ec4899', initials: 'HR' }, { color: '#10b981', initials: 'ED' }, { color: '#3b82f6', initials: 'SC' }] },
-  { id: 10, title: 'Security Awareness Training', date: '2025-12-26', time: '10:00 AM - 11:00 AM', location: 'Virtual - Webex', category: 'training', categoryLabel: 'Training', virtual: true, isGoing: true, description: 'Mandatory security training for all employees.', attendees: [{ color: '#10b981', initials: 'IT' }, { color: '#f59e0b', initials: 'SEC' }] },
+  { id: 1, title: 'All-Hands Meeting Q4', date: '2025-12-24', time: '10:00 AM - 11:30 AM', location: 'Main Conference Room', category: 'meeting', categoryLabel: 'Meeting', virtual: true, isGoing: true, featured: true, description: 'Quarterly all-hands meeting to discuss company progress and goals.', attendees: [{ color: '#14b8a6', initials: 'AI' }, { color: '#3b82f6', initials: 'SC' }, { color: '#ec4899', initials: 'LW' }] },
+  { id: 2, title: 'Product Demo - New Features', date: '2025-12-26', time: '2:00 PM - 3:00 PM', location: 'Virtual - Zoom', category: 'webinar', categoryLabel: 'Webinar', virtual: true, isGoing: false, featured: false, description: 'Demo of the latest product features to the team.', attendees: [{ color: '#6366f1', initials: 'DK' }, { color: '#0d9488', initials: 'MJ' }] },
+  { id: 3, title: 'Year-End Performance Review', date: '2025-12-30', time: '9:00 AM - 12:00 PM', location: 'Board Room', category: 'review', categoryLabel: 'Review', virtual: false, isGoing: true, featured: false, description: 'Annual performance review meeting.', attendees: [{ color: '#f59e0b', initials: 'HR' }] },
+  { id: 4, title: 'Holiday Team Lunch', date: '2025-12-24', time: '12:30 PM - 2:00 PM', location: 'Cafeteria', category: 'social', categoryLabel: 'Social', virtual: false, isGoing: true, featured: true, description: 'Holiday celebration lunch with the team.', attendees: [{ color: '#ec4899', initials: 'TM' }, { color: '#14b8a6', initials: 'AI' }, { color: '#3b82f6', initials: 'SC' }, { color: '#10b981', initials: 'ED' }] },
+  { id: 5, title: 'Advanced Excel Training', date: '2025-12-27', time: '3:00 PM - 5:00 PM', location: 'Training Room A', category: 'training', categoryLabel: 'Training', virtual: false, isGoing: false, featured: false, description: 'Advanced Excel techniques for productivity.', attendees: [{ color: '#10b981', initials: 'RG' }, { color: '#0d9488', initials: 'AT' }] },
+  { id: 6, title: 'Sprint Planning Meeting', date: '2025-12-25', time: '10:00 AM - 11:00 AM', location: 'Scrum Room', category: 'meeting', categoryLabel: 'Meeting', virtual: false, isGoing: true, featured: false, description: 'Planning for the upcoming sprint.', attendees: [{ color: '#3b82f6', initials: 'PM' }, { color: '#14b8a6', initials: 'AI' }, { color: '#6366f1', initials: 'DK' }] },
+  { id: 7, title: 'Customer Success Webinar', date: '2025-12-28', time: '1:00 PM - 2:30 PM', location: 'Virtual - Teams', category: 'webinar', categoryLabel: 'Webinar', virtual: true, isGoing: false, featured: true, description: 'Webinar on customer success strategies.', attendees: [{ color: '#6366f1', initials: 'CS' }, { color: '#ec4899', initials: 'LW' }] },
+  { id: 8, title: 'New Year Planning Session', date: '2025-12-31', time: '2:00 PM - 4:00 PM', location: 'Executive Suite', category: 'meeting', categoryLabel: 'Meeting', virtual: false, isGoing: true, featured: true, description: 'Strategic planning for the new year.', attendees: [{ color: '#14b8a6', initials: 'AI' }, { color: '#0d9488', initials: 'CEO' }] },
+  { id: 9, title: 'Team Building Workshop', date: '2025-12-29', time: '9:00 AM - 12:00 PM', location: 'Innovation Lab', category: 'social', categoryLabel: 'Social', virtual: false, isGoing: false, featured: false, description: 'Interactive team building exercises.', attendees: [{ color: '#ec4899', initials: 'HR' }, { color: '#10b981', initials: 'ED' }, { color: '#3b82f6', initials: 'SC' }] },
+  { id: 10, title: 'Security Awareness Training', date: '2025-12-26', time: '10:00 AM - 11:00 AM', location: 'Virtual - Webex', category: 'training', categoryLabel: 'Training', virtual: true, isGoing: true, featured: false, description: 'Mandatory security training for all employees.', attendees: [{ color: '#10b981', initials: 'IT' }, { color: '#f59e0b', initials: 'SEC' }] },
 ])
 
 const newEvent = ref({
@@ -197,17 +207,28 @@ const filteredEvents = computed(() => {
     }
   })
 
-  // Apply quick filter
+  // Apply date range filter
   if (quickFilter.value === 'today') {
     result = result.filter(e => e.date === today)
   } else if (quickFilter.value === 'week') {
     result = result.filter(e => e.date >= today && e.date <= weekFromNow)
-  } else if (quickFilter.value === 'myevents') {
+  } else if (quickFilter.value === 'month') {
+    const monthFromNow = new Date()
+    monthFromNow.setMonth(monthFromNow.getMonth() + 1)
+    const monthEnd = monthFromNow.toISOString().split('T')[0]
+    result = result.filter(e => e.date >= today && e.date <= monthEnd)
+  } else if (quickFilter.value === 'custom' && customDateStart.value && customDateEnd.value) {
+    result = result.filter(e => e.date >= customDateStart.value && e.date <= customDateEnd.value)
+  }
+
+  // Apply My Events filter (separate from date range)
+  if (showMyEventsOnly.value) {
     result = result.filter(e => e.isGoing)
-  } else if (quickFilter.value === 'virtual') {
-    result = result.filter(e => e.virtual)
-  } else if (quickFilter.value === 'inperson') {
-    result = result.filter(e => !e.virtual)
+  }
+
+  // Apply Featured filter
+  if (showFeaturedOnly.value) {
+    result = result.filter(e => e.featured)
   }
 
   if (searchQuery.value) {
@@ -363,6 +384,11 @@ function clearFilters() {
   selectedFormats.value = []
   searchQuery.value = ''
   quickFilter.value = 'all'
+  customDateStart.value = ''
+  customDateEnd.value = ''
+  showCustomDatePicker.value = false
+  showMyEventsOnly.value = false
+  showFeaturedOnly.value = false
   currentPage.value = 1
 }
 
@@ -406,10 +432,42 @@ function setSort(value: string) {
 }
 
 function setDateRange(rangeId: string) {
-  quickFilter.value = rangeId as typeof quickFilter.value
-  currentPage.value = 1
-  showDateFilter.value = false
+  if (rangeId === 'custom') {
+    showCustomDatePicker.value = true
+  } else {
+    quickFilter.value = rangeId as typeof quickFilter.value
+    currentPage.value = 1
+    showDateFilter.value = false
+    showCustomDatePicker.value = false
+  }
 }
+
+function applyCustomDateRange() {
+  if (customDateStart.value && customDateEnd.value) {
+    quickFilter.value = 'custom'
+    currentPage.value = 1
+    showDateFilter.value = false
+    showCustomDatePicker.value = false
+  }
+}
+
+function cancelCustomDateRange() {
+  showCustomDatePicker.value = false
+  if (quickFilter.value !== 'custom') {
+    customDateStart.value = ''
+    customDateEnd.value = ''
+  }
+}
+
+// Computed for custom date range label
+const customDateRangeLabel = computed(() => {
+  if (quickFilter.value === 'custom' && customDateStart.value && customDateEnd.value) {
+    const start = new Date(customDateStart.value).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+    const end = new Date(customDateEnd.value).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+    return `${start} - ${end}`
+  }
+  return null
+})
 
 // Pagination methods
 function handlePageChange(page: number) {
@@ -634,31 +692,87 @@ function getCategoryCount(categoryId: string) {
                 ]"
               >
                 <i class="fas fa-calendar text-sm"></i>
-                <span>{{ dateRangeOptions.find(d => d.id === quickFilter)?.label || 'All Dates' }}</span>
+                <span>{{ customDateRangeLabel || dateRangeOptions.find(d => d.id === quickFilter)?.label || 'All Dates' }}</span>
                 <i :class="showDateFilter ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ml-1"></i>
               </button>
 
               <!-- Dropdown Menu -->
               <div
                 v-if="showDateFilter"
-                class="absolute left-0 top-full mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
+                class="absolute left-0 top-full mt-2 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
+                :class="showCustomDatePicker ? 'w-72' : 'w-48'"
               >
-                <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Date Range</div>
-                <button
-                  v-for="option in dateRangeOptions"
-                  :key="option.id"
-                  @click="setDateRange(option.id)"
-                  :class="[
-                    'w-full px-3 py-2 text-left text-sm flex items-center gap-3 transition-colors',
-                    quickFilter === option.id ? 'bg-teal-50 text-teal-700' : 'text-gray-700 hover:bg-gray-50'
-                  ]"
-                >
-                  <i :class="[option.icon, 'text-sm', quickFilter === option.id ? 'text-teal-500' : 'text-gray-400']"></i>
-                  <span class="flex-1">{{ option.label }}</span>
-                  <i v-if="quickFilter === option.id" class="fas fa-check text-teal-500 text-xs"></i>
-                </button>
+                <!-- Preset Options -->
+                <div v-if="!showCustomDatePicker">
+                  <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Date Range</div>
+                  <button
+                    v-for="option in dateRangeOptions"
+                    :key="option.id"
+                    @click="setDateRange(option.id)"
+                    :class="[
+                      'w-full px-3 py-2 text-left text-sm flex items-center gap-3 transition-colors',
+                      quickFilter === option.id ? 'bg-teal-50 text-teal-700' : 'text-gray-700 hover:bg-gray-50'
+                    ]"
+                  >
+                    <i :class="[option.icon, 'text-sm', quickFilter === option.id ? 'text-teal-500' : 'text-gray-400']"></i>
+                    <span class="flex-1">{{ option.label }}</span>
+                    <i v-if="quickFilter === option.id && option.id !== 'custom'" class="fas fa-check text-teal-500 text-xs"></i>
+                    <i v-if="option.id === 'custom'" class="fas fa-chevron-right text-gray-400 text-xs"></i>
+                  </button>
+                </div>
+
+                <!-- Custom Date Picker -->
+                <div v-else class="px-3 py-2">
+                  <div class="flex items-center gap-2 mb-3">
+                    <button @click="showCustomDatePicker = false" class="text-gray-400 hover:text-gray-600">
+                      <i class="fas fa-arrow-left text-sm"></i>
+                    </button>
+                    <span class="text-sm font-semibold text-gray-700">Custom Date Range</span>
+                  </div>
+
+                  <div class="space-y-3">
+                    <div>
+                      <label class="block text-xs font-medium text-gray-500 mb-1">Start Date</label>
+                      <input
+                        type="date"
+                        v-model="customDateStart"
+                        class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                      >
+                    </div>
+                    <div>
+                      <label class="block text-xs font-medium text-gray-500 mb-1">End Date</label>
+                      <input
+                        type="date"
+                        v-model="customDateEnd"
+                        :min="customDateStart"
+                        class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                      >
+                    </div>
+                  </div>
+
+                  <div class="flex gap-2 mt-4">
+                    <button
+                      @click="cancelCustomDateRange"
+                      class="flex-1 px-3 py-2 text-xs font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      @click="applyCustomDateRange"
+                      :disabled="!customDateStart || !customDateEnd"
+                      :class="[
+                        'flex-1 px-3 py-2 text-xs font-medium rounded-lg transition-colors',
+                        customDateStart && customDateEnd
+                          ? 'text-white bg-teal-500 hover:bg-teal-600'
+                          : 'text-gray-400 bg-gray-100 cursor-not-allowed'
+                      ]"
+                    >
+                      Apply
+                    </button>
+                  </div>
+                </div>
               </div>
-              <div v-if="showDateFilter" @click="showDateFilter = false" class="fixed inset-0 z-40"></div>
+              <div v-if="showDateFilter && !showCustomDatePicker" @click="showDateFilter = false" class="fixed inset-0 z-40"></div>
             </div>
 
             <!-- Event Type Filter Dropdown -->
@@ -813,9 +927,39 @@ function getCategoryCount(categoryId: string) {
               <div v-if="showSortDropdown" @click="showSortDropdown = false" class="fixed inset-0 z-40"></div>
             </div>
 
+            <!-- Featured Toggle -->
+            <button
+              @click="showFeaturedOnly = !showFeaturedOnly; currentPage = 1"
+              :class="[
+                'flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border',
+                showFeaturedOnly ? 'bg-amber-50 border-amber-200 text-amber-700' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+              ]"
+            >
+              <i class="fas fa-star text-sm"></i>
+              <span>Featured</span>
+              <span v-if="showFeaturedOnly" class="w-4 h-4 rounded-full bg-amber-500 text-white text-[10px] flex items-center justify-center">
+                <i class="fas fa-check"></i>
+              </span>
+            </button>
+
+            <!-- My Events Toggle -->
+            <button
+              @click="showMyEventsOnly = !showMyEventsOnly; currentPage = 1"
+              :class="[
+                'flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border',
+                showMyEventsOnly ? 'bg-purple-50 border-purple-200 text-purple-700' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+              ]"
+            >
+              <i class="fas fa-user-check text-sm"></i>
+              <span>My Events</span>
+              <span v-if="showMyEventsOnly" class="w-4 h-4 rounded-full bg-purple-500 text-white text-[10px] flex items-center justify-center">
+                <i class="fas fa-check"></i>
+              </span>
+            </button>
+
             <!-- Clear Filters -->
             <button
-              v-if="selectedTypes.length > 0 || selectedFormats.length > 0 || searchQuery || quickFilter !== 'all'"
+              v-if="selectedTypes.length > 0 || selectedFormats.length > 0 || searchQuery || quickFilter !== 'all' || showMyEventsOnly || showFeaturedOnly"
               @click="clearFilters"
               class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-red-600 bg-red-50 border border-red-200 hover:bg-red-100 transition-colors"
             >
