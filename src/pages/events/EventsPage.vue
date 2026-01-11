@@ -38,6 +38,15 @@ const formatOptions = [
   { id: 'in-person', label: 'In-Person', icon: 'fas fa-building', color: 'text-amber-500' }
 ]
 
+// Date range options
+const dateRangeOptions = [
+  { id: 'all', label: 'All Dates', icon: 'fas fa-calendar' },
+  { id: 'today', label: 'Today', icon: 'fas fa-sun' },
+  { id: 'week', label: 'This Week', icon: 'fas fa-calendar-week' },
+  { id: 'month', label: 'This Month', icon: 'fas fa-calendar-alt' },
+  { id: 'myevents', label: 'My Events', icon: 'fas fa-user-check' }
+]
+
 const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
 const eventTypes = ref([
@@ -311,6 +320,12 @@ function nextMonth() {
 
 function goToToday() {
   currentDate.value = new Date()
+  quickFilter.value = 'today'
+  currentPage.value = 1
+  // Switch to list/grid view to see filtered results
+  if (calendarView.value === 'calendar') {
+    calendarView.value = 'grid'
+  }
 }
 
 function selectDate(day: CalendarDay) {
@@ -390,6 +405,12 @@ function setSort(value: string) {
   showSortDropdown.value = false
 }
 
+function setDateRange(rangeId: string) {
+  quickFilter.value = rangeId as typeof quickFilter.value
+  currentPage.value = 1
+  showDateFilter.value = false
+}
+
 // Pagination methods
 function handlePageChange(page: number) {
   if (page >= 1 && page <= totalPages.value) {
@@ -400,14 +421,6 @@ function handlePageChange(page: number) {
 function handlePerPageChange(perPage: number) {
   itemsPerPage.value = perPage
   currentPage.value = 1
-}
-
-function filterToday() {
-  calendarView.value = 'list'
-}
-
-function filterMyEvents() {
-  calendarView.value = 'list'
 }
 
 function getEventTypeIcon(category: string) {
@@ -475,125 +488,12 @@ function getCategoryCount(categoryId: string) {
             <i class="fas fa-plus"></i>
             Create Event
           </button>
-          <button @click="goToToday" class="px-5 py-2.5 bg-white/20 backdrop-blur-sm border border-white/30 text-white rounded-xl font-semibold text-sm hover:bg-white/30 transition-all flex items-center gap-2">
-            <i class="fas fa-crosshairs"></i>
-            Go to Today
-          </button>
         </div>
       </div>
     </div>
 
     <!-- Main Content Area -->
     <div class="events-content">
-
-      <!-- Premium Quick Actions -->
-      <div class="quick-actions-premium">
-        <div class="quick-action-premium today-action" @click="filterToday">
-          <div class="quick-action-glow"></div>
-          <div class="quick-action-icon-premium">
-            <i class="fas fa-sun"></i>
-          </div>
-          <div class="quick-action-content">
-            <h4>Today's Events</h4>
-            <p>{{ todayEventsCount }} events today</p>
-          </div>
-          <div class="quick-action-arrow">
-            <i class="fas fa-arrow-right"></i>
-          </div>
-        </div>
-        <div class="quick-action-premium upcoming-action" @click="calendarView = 'list'">
-          <div class="quick-action-glow"></div>
-          <div class="quick-action-icon-premium">
-            <i class="fas fa-clock"></i>
-          </div>
-          <div class="quick-action-content">
-            <h4>Upcoming</h4>
-            <p>Next 7 days</p>
-          </div>
-          <div class="quick-action-arrow">
-            <i class="fas fa-arrow-right"></i>
-          </div>
-        </div>
-        <div class="quick-action-premium myevents-action" @click="filterMyEvents">
-          <div class="quick-action-glow"></div>
-          <div class="quick-action-icon-premium">
-            <i class="fas fa-user-check"></i>
-          </div>
-          <div class="quick-action-content">
-            <h4>My Events</h4>
-            <p>RSVP'd events</p>
-          </div>
-          <div class="quick-action-arrow">
-            <i class="fas fa-arrow-right"></i>
-          </div>
-        </div>
-        <div class="quick-action-premium create-action" @click="showCreateModal = true">
-          <div class="quick-action-glow"></div>
-          <div class="quick-action-icon-premium">
-            <i class="fas fa-plus"></i>
-          </div>
-          <div class="quick-action-content">
-            <h4>Create Event</h4>
-            <p>Schedule new</p>
-          </div>
-          <div class="quick-action-arrow">
-            <i class="fas fa-arrow-right"></i>
-          </div>
-        </div>
-      </div>
-
-      <!-- Quick Filter Chips -->
-      <div class="quick-filter-bar">
-        <button
-          @click="quickFilter = 'all'"
-          :class="['quick-filter-chip', { active: quickFilter === 'all' }]"
-        >
-          <i class="fas fa-globe"></i>
-          <span>All Events</span>
-          <span class="chip-count">{{ quickFilterCounts.all }}</span>
-        </button>
-        <button
-          @click="quickFilter = 'today'"
-          :class="['quick-filter-chip', { active: quickFilter === 'today' }]"
-        >
-          <i class="fas fa-sun"></i>
-          <span>Today</span>
-          <span class="chip-count">{{ quickFilterCounts.today }}</span>
-        </button>
-        <button
-          @click="quickFilter = 'week'"
-          :class="['quick-filter-chip', { active: quickFilter === 'week' }]"
-        >
-          <i class="fas fa-calendar-week"></i>
-          <span>This Week</span>
-          <span class="chip-count">{{ quickFilterCounts.week }}</span>
-        </button>
-        <button
-          @click="quickFilter = 'myevents'"
-          :class="['quick-filter-chip my-events', { active: quickFilter === 'myevents' }]"
-        >
-          <i class="fas fa-user-check"></i>
-          <span>My Events</span>
-          <span class="chip-count">{{ quickFilterCounts.myevents }}</span>
-        </button>
-        <div class="filter-divider"></div>
-        <button
-          @click="quickFilter = 'virtual'"
-          :class="['quick-filter-chip virtual', { active: quickFilter === 'virtual' }]"
-        >
-          <i class="fas fa-video"></i>
-          <span>Virtual</span>
-          <span class="chip-count">{{ quickFilterCounts.virtual }}</span>
-        </button>
-        <button
-          @click="quickFilter = 'inperson'"
-          :class="['quick-filter-chip inperson', { active: quickFilter === 'inperson' }]"
-        >
-          <i class="fas fa-building"></i>
-          <span>In-Person</span>
-          <span class="chip-count">{{ quickFilterCounts.inperson }}</span>
-        </button>
-      </div>
 
       <!-- Premium Featured Event -->
       <div v-if="featuredEvent" class="featured-event-premium">
@@ -696,13 +596,6 @@ function getCategoryCount(categoryId: string) {
                 <i class="fas fa-plus"></i>
                 Create Event
               </button>
-              <button @click="goToToday" class="px-3 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 hover:border-gray-300 transition-all flex items-center gap-2">
-                <i class="fas fa-crosshairs text-teal-500"></i>
-                Today
-              </button>
-
-              <!-- Divider -->
-              <div class="w-px h-8 bg-gray-200 mx-1"></div>
 
               <!-- Refresh Button -->
               <button
@@ -729,6 +622,43 @@ function getCategoryCount(categoryId: string) {
               <button v-if="searchQuery" @click="searchQuery = ''" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
                 <i class="fas fa-times text-xs"></i>
               </button>
+            </div>
+
+            <!-- Date Range Filter Dropdown -->
+            <div class="relative">
+              <button
+                @click="showDateFilter = !showDateFilter"
+                :class="[
+                  'flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border',
+                  quickFilter !== 'all' ? 'bg-teal-50 border-teal-200 text-teal-700' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+                ]"
+              >
+                <i class="fas fa-calendar text-sm"></i>
+                <span>{{ dateRangeOptions.find(d => d.id === quickFilter)?.label || 'All Dates' }}</span>
+                <i :class="showDateFilter ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ml-1"></i>
+              </button>
+
+              <!-- Dropdown Menu -->
+              <div
+                v-if="showDateFilter"
+                class="absolute left-0 top-full mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
+              >
+                <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Date Range</div>
+                <button
+                  v-for="option in dateRangeOptions"
+                  :key="option.id"
+                  @click="setDateRange(option.id)"
+                  :class="[
+                    'w-full px-3 py-2 text-left text-sm flex items-center gap-3 transition-colors',
+                    quickFilter === option.id ? 'bg-teal-50 text-teal-700' : 'text-gray-700 hover:bg-gray-50'
+                  ]"
+                >
+                  <i :class="[option.icon, 'text-sm', quickFilter === option.id ? 'text-teal-500' : 'text-gray-400']"></i>
+                  <span class="flex-1">{{ option.label }}</span>
+                  <i v-if="quickFilter === option.id" class="fas fa-check text-teal-500 text-xs"></i>
+                </button>
+              </div>
+              <div v-if="showDateFilter" @click="showDateFilter = false" class="fixed inset-0 z-40"></div>
             </div>
 
             <!-- Event Type Filter Dropdown -->
@@ -885,7 +815,7 @@ function getCategoryCount(categoryId: string) {
 
             <!-- Clear Filters -->
             <button
-              v-if="selectedTypes.length > 0 || selectedFormats.length > 0 || searchQuery"
+              v-if="selectedTypes.length > 0 || selectedFormats.length > 0 || searchQuery || quickFilter !== 'all'"
               @click="clearFilters"
               class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-red-600 bg-red-50 border border-red-200 hover:bg-red-100 transition-colors"
             >
@@ -2517,132 +2447,6 @@ function getCategoryCount(categoryId: string) {
    PREMIUM EVENTS PAGE STYLES
    =============================================== */
 
-/* Premium Quick Actions */
-.quick-actions-premium {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 1rem;
-  margin-bottom: 1.5rem;
-  width: 100%;
-}
-
-.quick-action-premium {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 0.875rem;
-  padding: 1rem 1.25rem;
-  background: white;
-  border-radius: 1rem;
-  border: 1px solid #f1f5f9;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  overflow: hidden;
-}
-
-.quick-action-premium:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
-}
-
-.quick-action-glow {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 4px;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.quick-action-premium:hover .quick-action-glow {
-  opacity: 1;
-}
-
-.today-action .quick-action-glow { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
-.upcoming-action .quick-action-glow { background: linear-gradient(90deg, #10b981, #34d399); }
-.myevents-action .quick-action-glow { background: linear-gradient(90deg, #ec4899, #f472b6); }
-.create-action .quick-action-glow { background: linear-gradient(90deg, #14b8a6, #2dd4bf); }
-
-.today-action:hover { border-color: rgba(59, 130, 246, 0.3); }
-.upcoming-action:hover { border-color: rgba(16, 185, 129, 0.3); }
-.myevents-action:hover { border-color: rgba(236, 72, 153, 0.3); }
-.create-action:hover { border-color: rgba(20, 184, 166, 0.3); }
-
-.quick-action-icon-premium {
-  width: 48px;
-  height: 48px;
-  border-radius: 0.875rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.25rem;
-  flex-shrink: 0;
-  transition: transform 0.3s ease;
-}
-
-.quick-action-premium:hover .quick-action-icon-premium {
-  transform: scale(1.1);
-}
-
-.today-action .quick-action-icon-premium {
-  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
-  color: #1e40af;
-}
-
-.upcoming-action .quick-action-icon-premium {
-  background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
-  color: #065f46;
-}
-
-.myevents-action .quick-action-icon-premium {
-  background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%);
-  color: #9d174d;
-}
-
-.create-action .quick-action-icon-premium {
-  background: linear-gradient(135deg, #ccfbf1 0%, #99f6e4 100%);
-  color: #0d9488;
-}
-
-.quick-action-content {
-  flex: 1;
-  min-width: 0;
-}
-
-.quick-action-content h4 {
-  font-size: 0.9375rem;
-  font-weight: 700;
-  color: #0f172a;
-  margin: 0 0 0.125rem;
-}
-
-.quick-action-content p {
-  font-size: 0.75rem;
-  color: #64748b;
-  margin: 0;
-}
-
-.quick-action-arrow {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: #f8fafc;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #94a3b8;
-  font-size: 0.75rem;
-  transition: all 0.3s ease;
-  flex-shrink: 0;
-}
-
-.quick-action-premium:hover .quick-action-arrow {
-  background: #0d9488;
-  color: white;
-  transform: translateX(4px);
-}
-
 /* Premium Featured Event */
 .featured-event-premium {
   position: relative;
@@ -3341,17 +3145,7 @@ function getCategoryCount(categoryId: string) {
 }
 
 /* Responsive Updates for Premium Styles */
-@media (max-width: 1024px) {
-  .quick-actions-premium {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
 @media (max-width: 768px) {
-  .quick-actions-premium {
-    grid-template-columns: 1fr;
-  }
-
   .featured-event-premium {
     padding: 1.25rem;
   }
@@ -3731,94 +3525,6 @@ function getCategoryCount(categoryId: string) {
 }
 
 /* ===============================================
-   QUICK FILTER BAR
-   =============================================== */
-.quick-filter-bar {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 1rem 1.5rem;
-  background: white;
-  border-radius: 16px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-  margin-bottom: 1.5rem;
-  overflow-x: auto;
-  flex-wrap: wrap;
-  width: 100%;
-}
-
-.quick-filter-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 1rem;
-  background: #f3f4f6;
-  border: 2px solid transparent;
-  border-radius: 12px;
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: #6b7280;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  white-space: nowrap;
-}
-
-.quick-filter-chip:hover {
-  background: #e5e7eb;
-  color: #374151;
-}
-
-.quick-filter-chip.active {
-  background: linear-gradient(135deg, #0d9488 0%, #14b8a6 100%);
-  color: white;
-  border-color: transparent;
-  box-shadow: 0 4px 12px rgba(20, 184, 166, 0.3);
-}
-
-.quick-filter-chip.my-events.active {
-  background: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%);
-  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
-}
-
-.quick-filter-chip.virtual.active {
-  background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-}
-
-.quick-filter-chip.inperson.active {
-  background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
-  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
-}
-
-.quick-filter-chip i {
-  font-size: 0.8rem;
-}
-
-.chip-count {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 1.5rem;
-  height: 1.5rem;
-  padding: 0 0.375rem;
-  background: rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
-  font-size: 0.75rem;
-  font-weight: 600;
-}
-
-.quick-filter-chip.active .chip-count {
-  background: rgba(255, 255, 255, 0.25);
-}
-
-.filter-divider {
-  width: 1px;
-  height: 24px;
-  background: #e5e7eb;
-  margin: 0 0.5rem;
-}
-
-/* ===============================================
    FEATURED EVENT COUNTDOWN
    =============================================== */
 .featured-countdown {
@@ -4074,20 +3780,6 @@ function getCategoryCount(categoryId: string) {
 }
 
 @media (max-width: 768px) {
-  .quick-filter-bar {
-    padding: 0.75rem 1rem;
-    gap: 0.5rem;
-  }
-
-  .quick-filter-chip {
-    padding: 0.375rem 0.75rem;
-    font-size: 0.813rem;
-  }
-
-  .filter-divider {
-    display: none;
-  }
-
   .featured-actions {
     flex-wrap: wrap;
     gap: 0.5rem;
