@@ -57,6 +57,19 @@ const customDateStart = ref('')
 const customDateEnd = ref('')
 const showCustomDatePicker = ref(false)
 
+// Calendar enhancement state
+const selectedCalendarDay = ref<CalendarDay | null>(null)
+const showDayDetailPopup = ref(false)
+const calendarMode = ref<'month' | 'week'>('month')
+
+interface CalendarDay {
+  date: number
+  fullDate?: string
+  isCurrentMonth: boolean
+  isToday: boolean
+  events: Event[]
+}
+
 const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
 const eventTypes = ref([
@@ -283,13 +296,6 @@ const totalPages = computed(() => {
   return Math.ceil(filteredEvents.value.length / itemsPerPage.value)
 })
 
-interface CalendarDay {
-  date: number
-  isCurrentMonth: boolean
-  isToday: boolean
-  events: Event[]
-}
-
 const calendarDays = computed<CalendarDay[]>(() => {
   const days: CalendarDay[] = []
   const year = currentDate.value.getFullYear()
@@ -301,7 +307,11 @@ const calendarDays = computed<CalendarDay[]>(() => {
 
   const prevMonthLastDay = new Date(year, month, 0).getDate()
   for (let i = startPadding - 1; i >= 0; i--) {
-    days.push({ date: prevMonthLastDay - i, isCurrentMonth: false, isToday: false, events: [] })
+    const prevMonth = month === 0 ? 11 : month - 1
+    const prevYear = month === 0 ? year - 1 : year
+    const dateStr = `${prevYear}-${String(prevMonth + 1).padStart(2, '0')}-${String(prevMonthLastDay - i).padStart(2, '0')}`
+    const dayEvents = events.value.filter(e => e.date === dateStr)
+    days.push({ date: prevMonthLastDay - i, fullDate: dateStr, isCurrentMonth: false, isToday: false, events: dayEvents })
   }
 
   for (let d = 1; d <= lastDay.getDate(); d++) {
@@ -309,6 +319,7 @@ const calendarDays = computed<CalendarDay[]>(() => {
     const dayEvents = events.value.filter(e => e.date === dateStr)
     days.push({
       date: d,
+      fullDate: dateStr,
       isCurrentMonth: true,
       isToday: today.getDate() === d && today.getMonth() === month && today.getFullYear() === year,
       events: dayEvents
@@ -316,14 +327,66 @@ const calendarDays = computed<CalendarDay[]>(() => {
   }
 
   const remaining = 42 - days.length
+  const nextMonth = month === 11 ? 0 : month + 1
+  const nextYear = month === 11 ? year + 1 : year
   for (let d = 1; d <= remaining; d++) {
-    days.push({ date: d, isCurrentMonth: false, isToday: false, events: [] })
+    const dateStr = `${nextYear}-${String(nextMonth + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`
+    const dayEvents = events.value.filter(e => e.date === dateStr)
+    days.push({ date: d, fullDate: dateStr, isCurrentMonth: false, isToday: false, events: dayEvents })
   }
 
   return days
 })
 
 const miniCalendarDays = computed(() => calendarDays.value.map(d => ({ ...d, hasEvents: d.events.length > 0 })))
+
+// Week view days (current week based on currentDate)
+const weekViewDays = computed<CalendarDay[]>(() => {
+  const days: CalendarDay[] = []
+  const today = new Date()
+  const curr = new Date(currentDate.value)
+  const dayOfWeek = curr.getDay()
+  const startOfWeek = new Date(curr)
+  startOfWeek.setDate(curr.getDate() - dayOfWeek)
+
+  for (let i = 0; i < 7; i++) {
+    const day = new Date(startOfWeek)
+    day.setDate(startOfWeek.getDate() + i)
+    const dateStr = `${day.getFullYear()}-${String(day.getMonth() + 1).padStart(2, '0')}-${String(day.getDate()).padStart(2, '0')}`
+    const dayEvents = events.value.filter(e => e.date === dateStr)
+    days.push({
+      date: day.getDate(),
+      fullDate: dateStr,
+      isCurrentMonth: day.getMonth() === currentDate.value.getMonth(),
+      isToday: day.toDateString() === today.toDateString(),
+      events: dayEvents
+    })
+  }
+  return days
+})
+
+// Calendar month stats
+const calendarMonthStats = computed(() => {
+  const year = currentDate.value.getFullYear()
+  const month = currentDate.value.getMonth()
+  const monthEvents = events.value.filter(e => {
+    const d = new Date(e.date)
+    return d.getFullYear() === year && d.getMonth() === month
+  })
+  return {
+    total: monthEvents.length,
+    featured: monthEvents.filter(e => e.featured).length,
+    going: monthEvents.filter(e => e.isGoing).length,
+    virtual: monthEvents.filter(e => e.virtual).length
+  }
+})
+
+// Selected day formatted date
+const selectedDayFormatted = computed(() => {
+  if (!selectedCalendarDay.value?.fullDate) return ''
+  const d = new Date(selectedCalendarDay.value.fullDate)
+  return d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })
+})
 
 const upcomingEvents = computed(() => {
   const today = new Date()
@@ -357,11 +420,36 @@ function goToToday() {
 }
 
 function selectDate(day: CalendarDay) {
-  console.log('Selected date:', day)
+  selectedCalendarDay.value = day
+  showDayDetailPopup.value = true
+}
+
+function closeDayDetailPopup() {
+  showDayDetailPopup.value = false
+  selectedCalendarDay.value = null
 }
 
 function selectMiniCalendarDay(day: CalendarDay & { hasEvents: boolean }) {
-  console.log('Mini calendar day:', day)
+  selectedCalendarDay.value = day
+  showDayDetailPopup.value = true
+}
+
+// Week navigation
+function previousWeek() {
+  const curr = new Date(currentDate.value)
+  curr.setDate(curr.getDate() - 7)
+  currentDate.value = curr
+}
+
+function nextWeek() {
+  const curr = new Date(currentDate.value)
+  curr.setDate(curr.getDate() + 7)
+  currentDate.value = curr
+}
+
+// Get short time from event time
+function getShortTime(time: string) {
+  return time.split(' - ')[0]
 }
 
 function openEvent(event: Event & { month?: string; day?: number }) {
@@ -920,40 +1008,6 @@ function toggleReserve(eventId: number) {
               <div v-if="showFormatFilter" @click="showFormatFilter = false" class="fixed inset-0 z-40"></div>
             </div>
 
-            <!-- Sort Dropdown -->
-            <div class="relative">
-              <button
-                @click="showSortDropdown = !showSortDropdown"
-                class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border bg-white border-gray-200 text-gray-600 hover:bg-gray-50"
-              >
-                <i class="fas fa-sort text-sm"></i>
-                <span>{{ sortOptions.find(s => s.value === sortBy)?.label || 'Sort' }}</span>
-                <i :class="sortOrder === 'asc' ? 'fas fa-arrow-up' : 'fas fa-arrow-down'" class="text-[10px] ml-1"></i>
-              </button>
-
-              <!-- Dropdown Menu -->
-              <div
-                v-if="showSortDropdown"
-                class="absolute left-0 top-full mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
-              >
-                <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Sort By</div>
-                <button
-                  v-for="option in sortOptions"
-                  :key="option.value"
-                  @click="setSort(option.value)"
-                  :class="[
-                    'w-full px-3 py-2 text-left text-sm flex items-center gap-3 transition-colors',
-                    sortBy === option.value ? 'bg-teal-50 text-teal-700' : 'text-gray-700 hover:bg-gray-50'
-                  ]"
-                >
-                  <i :class="[option.icon, 'text-sm', sortBy === option.value ? 'text-teal-500' : 'text-gray-400']"></i>
-                  <span class="flex-1">{{ option.label }}</span>
-                  <i v-if="sortBy === option.value" :class="sortOrder === 'asc' ? 'fas fa-arrow-up' : 'fas fa-arrow-down'" class="text-xs text-teal-500"></i>
-                </button>
-              </div>
-              <div v-if="showSortDropdown" @click="showSortDropdown = false" class="fixed inset-0 z-40"></div>
-            </div>
-
             <!-- Featured Toggle -->
             <button
               @click="showFeaturedOnly = !showFeaturedOnly; currentPage = 1"
@@ -1012,6 +1066,52 @@ function toggleReserve(eventId: number) {
             <!-- Spacer -->
             <div class="flex-1"></div>
 
+            <!-- Sort Dropdown -->
+            <div class="relative">
+              <button
+                @click="showSortDropdown = !showSortDropdown"
+                class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border bg-white border-gray-200 text-gray-600 hover:bg-gray-50"
+              >
+                <i class="fas fa-sort text-sm"></i>
+                <span>{{ sortOptions.find(s => s.value === sortBy)?.label || 'Sort' }}</span>
+                <i :class="sortOrder === 'asc' ? 'fas fa-arrow-up' : 'fas fa-arrow-down'" class="text-[10px] ml-1"></i>
+              </button>
+              <!-- Dropdown Menu -->
+              <div v-if="showSortDropdown" class="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50">
+                <div class="px-3 py-1.5 text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Sort By</div>
+                <button
+                  v-for="option in sortOptions"
+                  :key="option.value"
+                  @click="sortBy = option.value; showSortDropdown = false"
+                  :class="['w-full px-3 py-2 text-left text-xs flex items-center gap-2 hover:bg-gray-50', sortBy === option.value ? 'text-teal-600 bg-teal-50' : 'text-gray-600']"
+                >
+                  <i :class="option.icon" class="w-4"></i>
+                  {{ option.label }}
+                  <i v-if="sortBy === option.value" class="fas fa-check ml-auto text-teal-500"></i>
+                </button>
+                <div class="border-t border-gray-100 mt-2 pt-2">
+                  <div class="px-3 py-1.5 text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Order</div>
+                  <button
+                    @click="sortOrder = 'asc'; showSortDropdown = false"
+                    :class="['w-full px-3 py-2 text-left text-xs flex items-center gap-2 hover:bg-gray-50', sortOrder === 'asc' ? 'text-teal-600 bg-teal-50' : 'text-gray-600']"
+                  >
+                    <i class="fas fa-arrow-up w-4"></i>
+                    Ascending
+                    <i v-if="sortOrder === 'asc'" class="fas fa-check ml-auto text-teal-500"></i>
+                  </button>
+                  <button
+                    @click="sortOrder = 'desc'; showSortDropdown = false"
+                    :class="['w-full px-3 py-2 text-left text-xs flex items-center gap-2 hover:bg-gray-50', sortOrder === 'desc' ? 'text-teal-600 bg-teal-50' : 'text-gray-600']"
+                  >
+                    <i class="fas fa-arrow-down w-4"></i>
+                    Descending
+                    <i v-if="sortOrder === 'desc'" class="fas fa-check ml-auto text-teal-500"></i>
+                  </button>
+                </div>
+              </div>
+              <div v-if="showSortDropdown" @click="showSortDropdown = false" class="fixed inset-0 z-40"></div>
+            </div>
+
             <!-- View Toggle -->
             <div class="view-toggle">
               <button
@@ -1049,50 +1149,160 @@ function toggleReserve(eventId: number) {
 
           <!-- Premium Calendar View -->
           <div v-if="calendarView === 'calendar'" class="calendar-premium">
+            <!-- Enhanced Calendar Header -->
             <div class="calendar-header-premium">
-              <div class="calendar-nav-premium">
-                <button @click="previousMonth" class="calendar-nav-btn-premium">
-                  <i class="fas fa-chevron-left"></i>
-                </button>
-                <div class="calendar-title-wrapper">
-                  <h2 class="calendar-title-premium">{{ currentMonthName }}</h2>
-                  <span class="calendar-year-premium">{{ currentYear }}</span>
+              <div class="calendar-header-left">
+                <div class="calendar-nav-premium">
+                  <button @click="calendarMode === 'month' ? previousMonth() : previousWeek()" class="calendar-nav-btn-premium">
+                    <i class="fas fa-chevron-left"></i>
+                  </button>
+                  <div class="calendar-title-wrapper">
+                    <h2 class="calendar-title-premium">{{ currentMonthName }}</h2>
+                    <span class="calendar-year-premium">{{ currentYear }}</span>
+                  </div>
+                  <button @click="calendarMode === 'month' ? nextMonth() : nextWeek()" class="calendar-nav-btn-premium">
+                    <i class="fas fa-chevron-right"></i>
+                  </button>
                 </div>
-                <button @click="nextMonth" class="calendar-nav-btn-premium">
-                  <i class="fas fa-chevron-right"></i>
-                </button>
-              </div>
-              <button @click="goToToday" class="calendar-today-btn-premium">
-                <i class="fas fa-crosshairs"></i>
-                Today
-              </button>
-            </div>
-
-            <div class="calendar-weekdays-premium">
-              <div v-for="day in weekDays" :key="day" class="calendar-weekday-premium">{{ day }}</div>
-            </div>
-
-            <div class="calendar-grid-premium">
-              <div v-for="(day, index) in calendarDays" :key="index"
-                   :class="['calendar-day-premium',
-                            day.isToday ? 'is-today' : '',
-                            !day.isCurrentMonth ? 'other-month' : '',
-                            day.events.length > 0 ? 'has-events' : '']"
-                   @click="selectDate(day)">
-                <span :class="['day-number-premium', day.isToday ? 'today-badge' : '']">{{ day.date }}</span>
-                <div class="day-events-premium">
-                  <div v-for="event in day.events.slice(0, 3)" :key="event.id"
-                       @click.stop="openEvent(event)"
-                       :class="['day-event-premium', event.category]">
-                    <span class="event-dot"></span>
-                    <span class="event-text">{{ event.title }}</span>
-                  </div>
-                  <div v-if="day.events.length > 3" class="day-more-premium">
-                    +{{ day.events.length - 3 }} more
-                  </div>
+                <!-- Month/Week Toggle -->
+                <div class="calendar-mode-toggle">
+                  <button
+                    @click="calendarMode = 'month'"
+                    :class="['mode-btn', calendarMode === 'month' ? 'active' : '']"
+                  >
+                    <i class="fas fa-calendar-alt"></i>
+                    Month
+                  </button>
+                  <button
+                    @click="calendarMode = 'week'"
+                    :class="['mode-btn', calendarMode === 'week' ? 'active' : '']"
+                  >
+                    <i class="fas fa-calendar-week"></i>
+                    Week
+                  </button>
                 </div>
               </div>
+              <div class="calendar-header-right">
+                <!-- Mini Stats -->
+                <div class="calendar-stats">
+                  <div class="stat-badge">
+                    <i class="fas fa-calendar-check"></i>
+                    <span>{{ calendarMonthStats.total }} events</span>
+                  </div>
+                  <div v-if="calendarMonthStats.featured > 0" class="stat-badge featured">
+                    <i class="fas fa-star"></i>
+                    <span>{{ calendarMonthStats.featured }} featured</span>
+                  </div>
+                  <div v-if="calendarMonthStats.going > 0" class="stat-badge going">
+                    <i class="fas fa-check-circle"></i>
+                    <span>{{ calendarMonthStats.going }} RSVP'd</span>
+                  </div>
+                </div>
+                <button @click="goToToday" class="calendar-today-btn-premium">
+                  <i class="fas fa-crosshairs"></i>
+                  Today
+                </button>
+              </div>
             </div>
+
+            <!-- Category Legend -->
+            <div class="calendar-legend">
+              <div v-for="type in eventTypes" :key="type.id" class="legend-item">
+                <span class="legend-dot" :style="{ background: type.color }"></span>
+                <span class="legend-label">{{ type.name }}</span>
+              </div>
+            </div>
+
+            <!-- Month View -->
+            <template v-if="calendarMode === 'month'">
+              <div class="calendar-weekdays-premium">
+                <div v-for="day in weekDays" :key="day" class="calendar-weekday-premium">{{ day }}</div>
+              </div>
+
+              <div class="calendar-grid-premium">
+                <div v-for="(day, index) in calendarDays" :key="index"
+                     :class="['calendar-day-premium',
+                              day.isToday ? 'is-today' : '',
+                              !day.isCurrentMonth ? 'other-month' : '',
+                              day.events.length > 0 ? 'has-events' : '']"
+                     @click="selectDate(day)">
+                  <span :class="['day-number-premium', day.isToday ? 'today-badge' : '']">{{ day.date }}</span>
+                  <div class="day-events-premium">
+                    <div v-for="event in day.events.slice(0, 3)" :key="event.id"
+                         @click.stop="openEvent(event)"
+                         :class="['day-event-premium', event.category]">
+                      <div class="event-indicators">
+                        <i v-if="event.featured" class="fas fa-star featured-indicator" title="Featured"></i>
+                        <i v-if="event.isGoing" class="fas fa-check-circle going-indicator" title="RSVP'd"></i>
+                      </div>
+                      <span class="event-time-mini">{{ getShortTime(event.time) }}</span>
+                      <span class="event-text">{{ event.title }}</span>
+                    </div>
+                    <div v-if="day.events.length > 3" class="day-more-premium">
+                      +{{ day.events.length - 3 }} more
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </template>
+
+            <!-- Week View -->
+            <template v-else>
+              <div class="calendar-weekdays-premium week-view">
+                <div v-for="(day, idx) in weekViewDays" :key="idx" class="calendar-weekday-premium week-day-header">
+                  <span class="weekday-name">{{ weekDays[idx] }}</span>
+                  <span :class="['weekday-date', day.isToday ? 'today-date' : '']">{{ day.date }}</span>
+                </div>
+              </div>
+
+              <div class="calendar-week-grid">
+                <div v-for="(day, index) in weekViewDays" :key="index"
+                     :class="['calendar-week-day',
+                              day.isToday ? 'is-today' : '',
+                              day.events.length > 0 ? 'has-events' : '']"
+                     @click="selectDate(day)">
+                  <div class="week-day-events">
+                    <div v-for="event in day.events" :key="event.id"
+                         @click.stop="openEvent(event)"
+                         :class="['week-event-card', event.category]">
+                      <div class="week-event-header">
+                        <span class="week-event-time">{{ event.time }}</span>
+                        <div class="week-event-badges">
+                          <i v-if="event.featured" class="fas fa-star featured-indicator" title="Featured"></i>
+                          <i v-if="event.isGoing" class="fas fa-check-circle going-indicator" title="RSVP'd"></i>
+                          <i v-if="event.virtual" class="fas fa-video virtual-indicator" title="Virtual"></i>
+                        </div>
+                      </div>
+                      <h4 class="week-event-title">{{ event.title }}</h4>
+                      <p class="week-event-location">
+                        <i :class="event.virtual ? 'fas fa-video' : 'fas fa-map-marker-alt'"></i>
+                        {{ event.location }}
+                      </p>
+                      <div class="week-event-footer">
+                        <div class="week-event-attendees">
+                          <div v-for="(attendee, i) in event.attendees.slice(0, 3)" :key="i"
+                               class="mini-avatar"
+                               :style="{ backgroundColor: attendee.color }">
+                            {{ attendee.initials }}
+                          </div>
+                          <span v-if="event.attendees.length > 3" class="more-attendees">+{{ event.attendees.length - 3 }}</span>
+                        </div>
+                        <button
+                          @click.stop="toggleReserve(event.id)"
+                          :class="['week-rsvp-btn', event.isGoing ? 'going' : '']"
+                        >
+                          <i :class="event.isGoing ? 'fas fa-check' : 'fas fa-plus'"></i>
+                        </button>
+                      </div>
+                    </div>
+                    <div v-if="day.events.length === 0" class="week-no-events">
+                      <i class="far fa-calendar"></i>
+                      <span>No events</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </template>
           </div>
 
           <!-- Premium Grid View -->
@@ -1491,6 +1701,105 @@ function toggleReserve(eventId: number) {
           </div>
         </div>
       </div>
+    </Teleport>
+
+    <!-- Day Detail Popup -->
+    <Teleport to="body">
+      <Transition name="popup-fade">
+        <div v-if="showDayDetailPopup" class="day-popup-overlay" @click.self="closeDayDetailPopup">
+          <div class="day-popup-content">
+            <!-- Popup Header -->
+            <div class="day-popup-header">
+              <div class="day-popup-date">
+                <div class="popup-date-badge" :class="{ 'is-today': selectedCalendarDay?.isToday }">
+                  <span class="popup-date-day">{{ selectedCalendarDay?.date }}</span>
+                  <span class="popup-date-month">{{ currentMonthName.slice(0, 3) }}</span>
+                </div>
+                <div class="popup-date-info">
+                  <h3 class="popup-title">{{ selectedDayFormatted }}</h3>
+                  <p class="popup-subtitle">
+                    {{ selectedCalendarDay?.events.length || 0 }} event{{ (selectedCalendarDay?.events.length || 0) !== 1 ? 's' : '' }}
+                  </p>
+                </div>
+              </div>
+              <button @click="closeDayDetailPopup" class="popup-close-btn">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+
+            <!-- Popup Body -->
+            <div class="day-popup-body">
+              <div v-if="selectedCalendarDay?.events.length === 0" class="popup-empty">
+                <div class="empty-icon">
+                  <i class="far fa-calendar-times"></i>
+                </div>
+                <p class="empty-text">No events scheduled</p>
+                <button @click="showCreateModal = true; closeDayDetailPopup()" class="popup-add-btn">
+                  <i class="fas fa-plus"></i>
+                  Add Event
+                </button>
+              </div>
+
+              <div v-else class="popup-events-list">
+                <div v-for="event in selectedCalendarDay?.events" :key="event.id"
+                     :class="['popup-event-card', event.category]"
+                     @click="openEvent(event); closeDayDetailPopup()">
+                  <div class="popup-event-time">
+                    <i class="fas fa-clock"></i>
+                    {{ event.time }}
+                  </div>
+                  <div class="popup-event-main">
+                    <div class="popup-event-badges">
+                      <span :class="['popup-type-badge', event.category]">{{ event.categoryLabel }}</span>
+                      <span v-if="event.featured" class="popup-featured-badge">
+                        <i class="fas fa-star"></i> Featured
+                      </span>
+                      <span v-if="event.virtual" class="popup-virtual-badge">
+                        <i class="fas fa-video"></i> Virtual
+                      </span>
+                    </div>
+                    <h4 class="popup-event-title">{{ event.title }}</h4>
+                    <p class="popup-event-location">
+                      <i :class="event.virtual ? 'fas fa-video' : 'fas fa-map-marker-alt'"></i>
+                      {{ event.location }}
+                    </p>
+                    <p class="popup-event-desc">{{ event.description }}</p>
+                  </div>
+                  <div class="popup-event-footer">
+                    <div class="popup-attendees">
+                      <div v-for="(attendee, i) in event.attendees.slice(0, 4)" :key="i"
+                           class="popup-attendee"
+                           :style="{ backgroundColor: attendee.color }">
+                        {{ attendee.initials }}
+                      </div>
+                      <span v-if="event.attendees.length > 4" class="popup-more-attendees">
+                        +{{ event.attendees.length - 4 }}
+                      </span>
+                      <span class="popup-attendee-count">{{ event.attendees.length }} going</span>
+                    </div>
+                    <div class="popup-actions">
+                      <button
+                        @click.stop="toggleInterested(event.id)"
+                        :class="['popup-action-btn', event.interested ? 'interested' : '']"
+                        :title="event.interested ? 'Remove Interest' : 'Mark as Interested'"
+                      >
+                        <i :class="event.interested ? 'fas fa-heart' : 'far fa-heart'"></i>
+                      </button>
+                      <button
+                        @click.stop="toggleReserve(event.id)"
+                        :class="['popup-rsvp-btn', event.isGoing ? 'going' : '']"
+                      >
+                        <i :class="event.isGoing ? 'fas fa-check-circle' : 'fas fa-plus-circle'"></i>
+                        {{ event.isGoing ? 'Going' : 'RSVP' }}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Transition>
     </Teleport>
   </div>
 </template>
@@ -3722,6 +4031,852 @@ function toggleReserve(eventId: number) {
     width: 6px;
     height: 6px;
   }
+}
+
+/* ===============================================
+   ENHANCED CALENDAR HEADER
+   =============================================== */
+
+.calendar-header-premium {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.25rem 1.5rem;
+  background: linear-gradient(135deg, #f8fafc 0%, #f0fdfa 100%);
+  border-bottom: 1px solid rgba(20, 184, 166, 0.08);
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.calendar-header-left {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.calendar-header-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+/* Month/Week Toggle */
+.calendar-mode-toggle {
+  display: flex;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.625rem;
+  overflow: hidden;
+}
+
+.mode-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem 0.875rem;
+  border: none;
+  background: transparent;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.mode-btn:hover {
+  background: #f8fafc;
+  color: #475569;
+}
+
+.mode-btn.active {
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+  color: white;
+}
+
+.mode-btn i {
+  font-size: 0.6875rem;
+}
+
+/* Calendar Stats */
+.calendar-stats {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.stat-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.375rem 0.75rem;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 999px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.stat-badge i {
+  font-size: 0.625rem;
+}
+
+.stat-badge.featured {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border-color: #fcd34d;
+  color: #92400e;
+}
+
+.stat-badge.going {
+  background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+  border-color: #6ee7b7;
+  color: #065f46;
+}
+
+/* Calendar Legend */
+.calendar-legend {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  padding: 0.75rem 1.5rem;
+  background: #fafafa;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.legend-label {
+  font-size: 0.6875rem;
+  font-weight: 500;
+  color: #64748b;
+}
+
+/* Event Indicators in Calendar */
+.event-indicators {
+  display: flex;
+  align-items: center;
+  gap: 0.125rem;
+  flex-shrink: 0;
+}
+
+.featured-indicator {
+  color: #f59e0b;
+  font-size: 0.5rem;
+}
+
+.going-indicator {
+  color: #10b981;
+  font-size: 0.5rem;
+}
+
+.virtual-indicator {
+  color: #6366f1;
+  font-size: 0.5rem;
+}
+
+.event-time-mini {
+  font-size: 0.5625rem;
+  font-weight: 600;
+  color: inherit;
+  opacity: 0.8;
+  flex-shrink: 0;
+}
+
+/* ===============================================
+   WEEK VIEW STYLES
+   =============================================== */
+
+.calendar-weekdays-premium.week-view {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+}
+
+.week-day-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.75rem 0.5rem;
+}
+
+.weekday-name {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.weekday-date {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #334155;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.5rem;
+}
+
+.weekday-date.today-date {
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+  color: white;
+  box-shadow: 0 4px 10px rgba(20, 184, 166, 0.35);
+}
+
+.calendar-week-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  min-height: 400px;
+}
+
+.calendar-week-day {
+  border-right: 1px solid #f1f5f9;
+  padding: 0.75rem 0.5rem;
+  min-height: 350px;
+  background: white;
+  transition: background 0.2s ease;
+}
+
+.calendar-week-day:last-child {
+  border-right: none;
+}
+
+.calendar-week-day:hover {
+  background: linear-gradient(135deg, rgba(20, 184, 166, 0.02) 0%, rgba(20, 184, 166, 0.04) 100%);
+}
+
+.calendar-week-day.is-today {
+  background: linear-gradient(135deg, rgba(20, 184, 166, 0.05) 0%, rgba(20, 184, 166, 0.02) 100%);
+}
+
+.week-day-events {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.week-event-card {
+  padding: 0.625rem;
+  border-radius: 0.625rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-left: 3px solid;
+}
+
+.week-event-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.week-event-card.meeting {
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+  border-left-color: #3b82f6;
+}
+
+.week-event-card.training {
+  background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+  border-left-color: #10b981;
+}
+
+.week-event-card.social {
+  background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%);
+  border-left-color: #ec4899;
+}
+
+.week-event-card.review {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border-left-color: #f59e0b;
+}
+
+.week-event-card.webinar {
+  background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+  border-left-color: #6366f1;
+}
+
+.week-event-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.375rem;
+}
+
+.week-event-time {
+  font-size: 0.625rem;
+  font-weight: 600;
+  color: #475569;
+}
+
+.week-event-badges {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.week-event-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 0.25rem 0;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.week-event-location {
+  font-size: 0.625rem;
+  color: #64748b;
+  margin: 0 0 0.5rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.week-event-location i {
+  font-size: 0.5rem;
+}
+
+.week-event-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.week-event-attendees {
+  display: flex;
+  align-items: center;
+  gap: -0.25rem;
+}
+
+.mini-avatar {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.5rem;
+  font-weight: 700;
+  color: white;
+  border: 1.5px solid white;
+  margin-right: -6px;
+}
+
+.more-attendees {
+  font-size: 0.5625rem;
+  font-weight: 600;
+  color: #64748b;
+  margin-left: 0.375rem;
+}
+
+.week-rsvp-btn {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: none;
+  background: white;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.625rem;
+}
+
+.week-rsvp-btn:hover {
+  background: #14b8a6;
+  color: white;
+}
+
+.week-rsvp-btn.going {
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+  color: white;
+}
+
+.week-no-events {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+  color: #cbd5e1;
+  text-align: center;
+}
+
+.week-no-events i {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.week-no-events span {
+  font-size: 0.6875rem;
+  font-weight: 500;
+}
+
+/* ===============================================
+   DAY DETAIL POPUP
+   =============================================== */
+
+.day-popup-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.day-popup-content {
+  background: white;
+  border-radius: 1.25rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  width: 100%;
+  max-width: 540px;
+  max-height: 85vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.day-popup-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 1.25rem 1.5rem;
+  background: linear-gradient(135deg, #f8fafc 0%, #f0fdfa 100%);
+  border-bottom: 1px solid rgba(20, 184, 166, 0.1);
+}
+
+.day-popup-date {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.popup-date-badge {
+  width: 60px;
+  height: 60px;
+  background: white;
+  border-radius: 0.875rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e2e8f0;
+}
+
+.popup-date-badge.is-today {
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+  border-color: transparent;
+  box-shadow: 0 4px 12px rgba(20, 184, 166, 0.35);
+}
+
+.popup-date-badge.is-today .popup-date-day,
+.popup-date-badge.is-today .popup-date-month {
+  color: white;
+}
+
+.popup-date-day {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #0f172a;
+  line-height: 1;
+}
+
+.popup-date-month {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: #14b8a6;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.popup-date-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.popup-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+}
+
+.popup-subtitle {
+  font-size: 0.8125rem;
+  color: #64748b;
+  margin: 0;
+}
+
+.popup-close-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 0.625rem;
+  border: none;
+  background: white;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.popup-close-btn:hover {
+  background: #fee2e2;
+  color: #ef4444;
+}
+
+.day-popup-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.25rem 1.5rem;
+}
+
+.popup-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1rem;
+  text-align: center;
+}
+
+.empty-icon {
+  width: 64px;
+  height: 64px;
+  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.empty-icon i {
+  font-size: 1.5rem;
+  color: #94a3b8;
+}
+
+.empty-text {
+  font-size: 0.9375rem;
+  color: #64748b;
+  margin: 0 0 1.25rem 0;
+}
+
+.popup-add-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+  border: none;
+  border-radius: 0.625rem;
+  color: white;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.popup-add-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(20, 184, 166, 0.35);
+}
+
+.popup-events-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.popup-event-card {
+  padding: 1rem;
+  border-radius: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-left: 4px solid;
+}
+
+.popup-event-card:hover {
+  transform: translateX(4px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.popup-event-card.meeting {
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+  border-left-color: #3b82f6;
+}
+
+.popup-event-card.training {
+  background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+  border-left-color: #10b981;
+}
+
+.popup-event-card.social {
+  background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%);
+  border-left-color: #ec4899;
+}
+
+.popup-event-card.review {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border-left-color: #f59e0b;
+}
+
+.popup-event-card.webinar {
+  background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+  border-left-color: #6366f1;
+}
+
+.popup-event-time {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #475569;
+  margin-bottom: 0.625rem;
+}
+
+.popup-event-time i {
+  font-size: 0.625rem;
+}
+
+.popup-event-main {
+  margin-bottom: 0.875rem;
+}
+
+.popup-event-badges {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.popup-type-badge {
+  padding: 0.25rem 0.625rem;
+  border-radius: 999px;
+  font-size: 0.625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.popup-type-badge.meeting {
+  background: #3b82f6;
+  color: white;
+}
+
+.popup-type-badge.training {
+  background: #10b981;
+  color: white;
+}
+
+.popup-type-badge.social {
+  background: #ec4899;
+  color: white;
+}
+
+.popup-type-badge.review {
+  background: #f59e0b;
+  color: white;
+}
+
+.popup-type-badge.webinar {
+  background: #6366f1;
+  color: white;
+}
+
+.popup-featured-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.625rem;
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border-radius: 999px;
+  font-size: 0.625rem;
+  font-weight: 700;
+  color: #92400e;
+}
+
+.popup-virtual-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.625rem;
+  background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+  border-radius: 999px;
+  font-size: 0.625rem;
+  font-weight: 700;
+  color: #3730a3;
+}
+
+.popup-event-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 0.375rem 0;
+  line-height: 1.3;
+}
+
+.popup-event-location {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.8125rem;
+  color: #475569;
+  margin: 0 0 0.5rem 0;
+}
+
+.popup-event-location i {
+  font-size: 0.6875rem;
+  color: #64748b;
+}
+
+.popup-event-desc {
+  font-size: 0.8125rem;
+  color: #64748b;
+  margin: 0;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.popup-event-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.popup-attendees {
+  display: flex;
+  align-items: center;
+}
+
+.popup-attendee {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.625rem;
+  font-weight: 700;
+  color: white;
+  border: 2px solid white;
+  margin-right: -8px;
+}
+
+.popup-more-attendees {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: #64748b;
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
+}
+
+.popup-attendee-count {
+  font-size: 0.75rem;
+  color: #64748b;
+}
+
+.popup-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.popup-action-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 0.625rem;
+  border: 1px solid #e2e8f0;
+  background: white;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.popup-action-btn:hover {
+  border-color: #fecaca;
+  color: #ef4444;
+  background: #fef2f2;
+}
+
+.popup-action-btn.interested {
+  background: #fef2f2;
+  border-color: #fecaca;
+  color: #ef4444;
+}
+
+.popup-rsvp-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem 1rem;
+  border-radius: 0.625rem;
+  border: none;
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.popup-rsvp-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(20, 184, 166, 0.35);
+}
+
+.popup-rsvp-btn.going {
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+}
+
+/* Popup Transition */
+.popup-fade-enter-active,
+.popup-fade-leave-active {
+  transition: all 0.3s ease;
+}
+
+.popup-fade-enter-from,
+.popup-fade-leave-to {
+  opacity: 0;
+}
+
+.popup-fade-enter-from .day-popup-content,
+.popup-fade-leave-to .day-popup-content {
+  transform: scale(0.95) translateY(20px);
 }
 
 /* ===============================================
