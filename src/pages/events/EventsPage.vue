@@ -254,59 +254,63 @@ function getCategoryCount(categoryId: string) {
 
 <template>
   <div class="events-page">
-    <!-- Premium Hero Section -->
-    <div class="events-hero">
-      <div class="events-hero-bg">
-        <div class="hero-gradient-orb hero-orb-1"></div>
-        <div class="hero-gradient-orb hero-orb-2"></div>
-        <div class="hero-gradient-orb hero-orb-3"></div>
-      </div>
-      <div class="events-hero-content">
-        <div class="events-hero-left">
-          <div class="events-hero-icon-wrapper">
-            <div class="events-hero-icon">
-              <i class="fas fa-calendar-alt"></i>
-            </div>
-            <div class="hero-icon-ring"></div>
+    <!-- Hero Section (Documents Style) -->
+    <div class="hero-gradient relative overflow-hidden">
+      <!-- Decorative elements with animations -->
+      <div class="circle-drift-1 absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full"></div>
+      <div class="circle-drift-2 absolute bottom-0 left-0 w-64 h-64 bg-white/5 rounded-full"></div>
+      <div class="circle-drift-3 absolute top-1/2 right-1/4 w-32 h-32 bg-white/10 rounded-full"></div>
+
+      <!-- Stats - Absolute Top Right -->
+      <div class="stats-top-right">
+        <div class="stat-card-square">
+          <div class="stat-icon-box">
+            <i class="fas fa-calendar-alt"></i>
           </div>
-          <div class="events-hero-text">
-            <h1 class="events-hero-title">
-              <span class="title-gradient">Events</span> & Calendar
-            </h1>
-            <p class="events-hero-subtitle">Stay connected with company events, meetings, and activities</p>
-          </div>
+          <p class="stat-value-mini">{{ eventStats.total }}</p>
+          <p class="stat-label-mini">Total Events</p>
         </div>
-        <div class="events-hero-stats">
-          <div class="events-stat-card events-stat-total">
-            <div class="events-stat-glow"></div>
-            <div class="events-stat-icon">
-              <i class="fas fa-calendar-alt"></i>
-            </div>
-            <div class="events-stat-content">
-              <p class="events-stat-value">{{ eventStats.total }}</p>
-              <p class="events-stat-label">Total Events</p>
-            </div>
+        <div class="stat-card-square">
+          <div class="stat-icon-box">
+            <i class="fas fa-calendar-week"></i>
           </div>
-          <div class="events-stat-card events-stat-week">
-            <div class="events-stat-glow"></div>
-            <div class="events-stat-icon">
-              <i class="fas fa-calendar-week"></i>
-            </div>
-            <div class="events-stat-content">
-              <p class="events-stat-value">{{ eventStats.thisWeek }}</p>
-              <p class="events-stat-label">This Week</p>
-            </div>
+          <p class="stat-value-mini">{{ eventStats.thisWeek }}</p>
+          <p class="stat-label-mini">This Week</p>
+        </div>
+        <div class="stat-card-square">
+          <div class="stat-icon-box">
+            <i class="fas fa-check-circle"></i>
           </div>
-          <div class="events-stat-card events-stat-rsvp">
-            <div class="events-stat-glow"></div>
-            <div class="events-stat-icon">
-              <i class="fas fa-check-circle"></i>
-            </div>
-            <div class="events-stat-content">
-              <p class="events-stat-value">{{ eventStats.yourRsvps }}</p>
-              <p class="events-stat-label">Your RSVPs</p>
-            </div>
+          <p class="stat-value-mini">{{ eventStats.yourRsvps }}</p>
+          <p class="stat-label-mini">Your RSVPs</p>
+        </div>
+        <div class="stat-card-square">
+          <div class="stat-icon-box">
+            <i class="fas fa-sun"></i>
           </div>
+          <p class="stat-value-mini">{{ todayEventsCount }}</p>
+          <p class="stat-label-mini">Today</p>
+        </div>
+      </div>
+
+      <div class="relative px-8 py-8">
+        <div class="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-white text-xs font-semibold inline-flex items-center gap-2 mb-4">
+          <i class="fas fa-calendar-alt"></i>
+          AFC Asian Cup 2027
+        </div>
+
+        <h1 class="text-3xl font-bold text-white mb-2">Events & Calendar</h1>
+        <p class="text-teal-100 max-w-lg">Stay connected with company events, meetings, and activities.</p>
+
+        <div class="flex flex-wrap gap-3 mt-6">
+          <button @click="showCreateModal = true" class="px-5 py-2.5 bg-white text-teal-600 rounded-xl font-semibold text-sm flex items-center gap-2 hover:bg-teal-50 transition-all shadow-lg">
+            <i class="fas fa-plus"></i>
+            Create Event
+          </button>
+          <button @click="goToToday" class="px-5 py-2.5 bg-white/20 backdrop-blur-sm border border-white/30 text-white rounded-xl font-semibold text-sm hover:bg-white/30 transition-all flex items-center gap-2">
+            <i class="fas fa-crosshairs"></i>
+            Go to Today
+          </button>
         </div>
       </div>
     </div>
@@ -799,6 +803,155 @@ function getCategoryCount(categoryId: string) {
 </template>
 
 <style scoped>
+/* ===============================================
+   HERO SECTION (Documents Style)
+   =============================================== */
+
+.hero-gradient {
+  background: linear-gradient(135deg, #0d9488 0%, #14b8a6 50%, #10b981 100%);
+}
+
+.stats-top-right {
+  position: absolute;
+  top: 24px;
+  right: 32px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  z-index: 10;
+}
+
+.stat-card-square {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(8px);
+  border-radius: 16px;
+  width: 115px;
+  height: 115px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-align: center;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.stat-card-square:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+.stat-card-square:hover .stat-icon-box {
+  transform: scale(1.1);
+}
+
+.stat-icon-box {
+  color: white;
+  font-size: 20px;
+  transition: transform 0.3s ease;
+}
+
+.stat-value-mini {
+  font-size: 24px;
+  font-weight: 700;
+  color: white;
+  line-height: 1;
+  margin: 0;
+}
+
+.stat-label-mini {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1;
+  margin: 0;
+}
+
+/* Circle Drift Animations */
+.circle-drift-1 {
+  animation: drift1 20s ease-in-out infinite;
+}
+
+.circle-drift-2 {
+  animation: drift2 25s ease-in-out infinite;
+}
+
+.circle-drift-3 {
+  animation: drift3 18s ease-in-out infinite;
+}
+
+@keyframes drift1 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  25% { transform: translate(-30px, 20px) scale(1.1); }
+  50% { transform: translate(-20px, -30px) scale(0.95); }
+  75% { transform: translate(20px, 10px) scale(1.05); }
+}
+
+@keyframes drift2 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(40px, -20px) scale(1.15); }
+  66% { transform: translate(-30px, 30px) scale(0.9); }
+}
+
+@keyframes drift3 {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  50% { transform: translate(30px, -40px) rotate(180deg); }
+}
+
+/* Responsive Hero */
+@media (max-width: 1280px) {
+  .stats-top-right {
+    position: relative;
+    top: auto;
+    right: auto;
+    margin: 24px 32px 0;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+  }
+
+  .stat-card-square {
+    width: 100%;
+    height: 90px;
+  }
+
+  .stat-icon-box {
+    font-size: 16px;
+  }
+
+  .stat-value-mini {
+    font-size: 20px;
+  }
+
+  .stat-label-mini {
+    font-size: 10px;
+  }
+}
+
+@media (max-width: 768px) {
+  .stats-top-right {
+    grid-template-columns: repeat(2, 1fr);
+    margin: 16px 24px 0;
+  }
+
+  .stat-card-square {
+    height: 80px;
+  }
+
+  .stat-icon-box {
+    font-size: 14px;
+  }
+
+  .stat-value-mini {
+    font-size: 18px;
+  }
+
+  .stat-label-mini {
+    font-size: 9px;
+  }
+}
+
 /* Main Content */
 .main-content {
   padding: 0;
@@ -1792,248 +1945,6 @@ function getCategoryCount(categoryId: string) {
    PREMIUM EVENTS PAGE STYLES
    =============================================== */
 
-/* Premium Hero Section */
-.events-hero {
-  position: relative;
-  padding: 2rem 1.5rem;
-  margin-bottom: 1.5rem;
-  background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 50%, #e0f2fe 100%);
-  border-radius: 1.5rem;
-  overflow: hidden;
-  border: 1px solid rgba(20, 184, 166, 0.15);
-}
-
-.events-hero-bg {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  overflow: hidden;
-}
-
-.hero-gradient-orb {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(60px);
-  opacity: 0.5;
-  animation: float 8s ease-in-out infinite;
-}
-
-.hero-orb-1 {
-  width: 200px;
-  height: 200px;
-  background: radial-gradient(circle, #14b8a6 0%, transparent 70%);
-  top: -50px;
-  right: 10%;
-  animation-delay: 0s;
-}
-
-.hero-orb-2 {
-  width: 150px;
-  height: 150px;
-  background: radial-gradient(circle, #3b82f6 0%, transparent 70%);
-  bottom: -30px;
-  left: 20%;
-  animation-delay: -3s;
-}
-
-.hero-orb-3 {
-  width: 100px;
-  height: 100px;
-  background: radial-gradient(circle, #6366f1 0%, transparent 70%);
-  top: 50%;
-  right: 30%;
-  animation-delay: -5s;
-}
-
-@keyframes float {
-  0%, 100% { transform: translateY(0) scale(1); }
-  50% { transform: translateY(-20px) scale(1.1); }
-}
-
-.events-hero-content {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 2rem;
-  flex-wrap: wrap;
-}
-
-.events-hero-left {
-  display: flex;
-  align-items: center;
-  gap: 1.25rem;
-}
-
-.events-hero-icon-wrapper {
-  position: relative;
-  width: 64px;
-  height: 64px;
-}
-
-.events-hero-icon {
-  width: 64px;
-  height: 64px;
-  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
-  border-radius: 1rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 8px 24px rgba(20, 184, 166, 0.35);
-  position: relative;
-  z-index: 2;
-}
-
-.events-hero-icon i {
-  font-size: 1.75rem;
-  color: white;
-}
-
-.hero-icon-ring {
-  position: absolute;
-  inset: -6px;
-  border: 2px solid rgba(20, 184, 166, 0.3);
-  border-radius: 1.25rem;
-  animation: pulse-ring 2s ease-out infinite;
-}
-
-@keyframes pulse-ring {
-  0% { transform: scale(1); opacity: 1; }
-  100% { transform: scale(1.3); opacity: 0; }
-}
-
-.events-hero-text {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
-.events-hero-title {
-  font-size: 1.75rem;
-  font-weight: 800;
-  color: #0f172a;
-  margin: 0;
-  line-height: 1.2;
-}
-
-.title-gradient {
-  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.events-hero-subtitle {
-  font-size: 0.9375rem;
-  color: #64748b;
-  margin: 0;
-}
-
-/* Premium Stats Cards */
-.events-hero-stats {
-  display: flex;
-  gap: 1rem;
-}
-
-.events-stat-card {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 0.875rem;
-  padding: 1rem 1.25rem;
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(10px);
-  border-radius: 1rem;
-  border: 1px solid rgba(255, 255, 255, 0.8);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
-  overflow: hidden;
-  transition: all 0.3s ease;
-  min-width: 150px;
-}
-
-.events-stat-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-}
-
-.events-stat-glow {
-  position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.events-stat-card:hover .events-stat-glow {
-  opacity: 1;
-}
-
-.events-stat-total .events-stat-glow {
-  background: radial-gradient(circle, #14b8a6 0%, transparent 70%);
-}
-
-.events-stat-week .events-stat-glow {
-  background: radial-gradient(circle, #3b82f6 0%, transparent 70%);
-}
-
-.events-stat-rsvp .events-stat-glow {
-  background: radial-gradient(circle, #10b981 0%, transparent 70%);
-}
-
-.events-stat-icon {
-  width: 44px;
-  height: 44px;
-  border-radius: 0.75rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.125rem;
-  flex-shrink: 0;
-}
-
-.events-stat-total .events-stat-icon {
-  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
-  color: white;
-  box-shadow: 0 4px 12px rgba(20, 184, 166, 0.3);
-}
-
-.events-stat-week .events-stat-icon {
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-  color: white;
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-}
-
-.events-stat-rsvp .events-stat-icon {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  color: white;
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-}
-
-.events-stat-content {
-  display: flex;
-  flex-direction: column;
-  gap: 0.125rem;
-}
-
-.events-stat-value {
-  font-size: 1.5rem;
-  font-weight: 800;
-  color: #0f172a;
-  margin: 0;
-  line-height: 1;
-}
-
-.events-stat-label {
-  font-size: 0.75rem;
-  color: #64748b;
-  margin: 0;
-  font-weight: 500;
-}
-
 /* Premium Quick Actions */
 .quick-actions-premium {
   display: grid;
@@ -2855,49 +2766,12 @@ function getCategoryCount(categoryId: string) {
 
 /* Responsive Updates for Premium Styles */
 @media (max-width: 1024px) {
-  .events-hero-content {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .events-hero-stats {
-    width: 100%;
-    flex-wrap: wrap;
-  }
-
-  .events-stat-card {
-    flex: 1;
-    min-width: 140px;
-  }
-
   .quick-actions-premium {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
 @media (max-width: 768px) {
-  .events-hero {
-    padding: 1.5rem 1rem;
-  }
-
-  .events-hero-left {
-    flex-direction: column;
-    align-items: flex-start;
-    text-align: left;
-  }
-
-  .events-hero-title {
-    font-size: 1.5rem;
-  }
-
-  .events-hero-stats {
-    flex-direction: column;
-  }
-
-  .events-stat-card {
-    width: 100%;
-  }
-
   .quick-actions-premium {
     grid-template-columns: 1fr;
   }
