@@ -1164,7 +1164,7 @@ function toggleReserve(eventId: number) {
                     <i class="fas fa-chevron-right"></i>
                   </button>
                 </div>
-                <!-- Month/Week Toggle -->
+                <!-- Month/Week/Today Toggle -->
                 <div class="calendar-mode-toggle">
                   <button
                     @click="calendarMode = 'month'"
@@ -1179,6 +1179,13 @@ function toggleReserve(eventId: number) {
                   >
                     <i class="fas fa-calendar-week"></i>
                     Week
+                  </button>
+                  <button
+                    @click="goToToday"
+                    class="mode-btn today-btn"
+                  >
+                    <i class="fas fa-crosshairs"></i>
+                    Today
                   </button>
                 </div>
               </div>
@@ -1198,10 +1205,6 @@ function toggleReserve(eventId: number) {
                     <span>{{ calendarMonthStats.going }} RSVP'd</span>
                   </div>
                 </div>
-                <button @click="goToToday" class="calendar-today-btn-premium">
-                  <i class="fas fa-crosshairs"></i>
-                  Today
-                </button>
               </div>
             </div>
 
@@ -4097,6 +4100,15 @@ function toggleReserve(eventId: number) {
 
 .mode-btn i {
   font-size: 0.6875rem;
+}
+
+.mode-btn.today-btn {
+  border-left: 1px solid #e2e8f0;
+}
+
+.mode-btn.today-btn:hover {
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+  color: white;
 }
 
 /* Calendar Stats */
