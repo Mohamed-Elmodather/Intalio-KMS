@@ -475,6 +475,234 @@ const messages = ref<Map<string, Message[]>>(new Map([
       isPinned: false,
       createdAt: '2027-01-11T12:00:00Z'
     }
+  ]],
+  // Direct Messages
+  ['dm1', [
+    {
+      id: 'dm1-1',
+      channelId: 'dm1',
+      sender: { id: 'u1', displayName: 'Sarah Ahmed' },
+      content: 'Hi! Do you have a minute to chat about the tournament schedule?',
+      type: 'text',
+      isEdited: false,
+      isPinned: false,
+      createdAt: '2027-01-11T10:00:00Z'
+    },
+    {
+      id: 'dm1-2',
+      channelId: 'dm1',
+      sender: { id: 'me', displayName: 'You' },
+      content: 'Sure, what do you need?',
+      type: 'text',
+      isEdited: false,
+      isPinned: false,
+      createdAt: '2027-01-11T10:05:00Z'
+    },
+    {
+      id: 'dm1-3',
+      channelId: 'dm1',
+      sender: { id: 'u1', displayName: 'Sarah Ahmed' },
+      content: 'I was thinking we should move the opening ceremony rehearsal to Thursday instead of Friday. What do you think?',
+      type: 'text',
+      isEdited: false,
+      isPinned: false,
+      createdAt: '2027-01-11T10:10:00Z'
+    },
+    {
+      id: 'dm1-4',
+      channelId: 'dm1',
+      sender: { id: 'me', displayName: 'You' },
+      content: 'That works for me. I\'ll update the calendar.',
+      type: 'text',
+      isEdited: false,
+      isPinned: false,
+      createdAt: '2027-01-11T10:15:00Z'
+    },
+    {
+      id: 'dm1-5',
+      channelId: 'dm1',
+      sender: { id: 'u1', displayName: 'Sarah Ahmed' },
+      content: 'Can we discuss the schedule?',
+      type: 'text',
+      isEdited: false,
+      isPinned: false,
+      createdAt: '2027-01-11T10:30:00Z'
+    }
+  ]],
+  ['dm2', [
+    {
+      id: 'dm2-1',
+      channelId: 'dm2',
+      sender: { id: 'u2', displayName: 'Mohammed Hassan' },
+      content: 'Hey, I\'ve finished preparing the content for the media kit.',
+      type: 'text',
+      isEdited: false,
+      isPinned: false,
+      createdAt: '2027-01-11T08:30:00Z'
+    },
+    {
+      id: 'dm2-2',
+      channelId: 'dm2',
+      sender: { id: 'me', displayName: 'You' },
+      content: 'Great! Can you upload them to the shared folder?',
+      type: 'text',
+      isEdited: false,
+      isPinned: false,
+      createdAt: '2027-01-11T08:45:00Z'
+    },
+    {
+      id: 'dm2-3',
+      channelId: 'dm2',
+      sender: { id: 'u2', displayName: 'Mohammed Hassan' },
+      content: 'Documents uploaded',
+      type: 'text',
+      attachments: [
+        { id: 'dm2a1', name: 'MediaKit-2027.pdf', type: 'file', url: '#', size: 8500000 },
+        { id: 'dm2a2', name: 'PressRelease-Draft.docx', type: 'file', url: '#', size: 245000 }
+      ],
+      isEdited: false,
+      isPinned: false,
+      createdAt: '2027-01-11T09:15:00Z'
+    }
+  ]],
+  ['dm3', [
+    {
+      id: 'dm3-1',
+      channelId: 'dm3',
+      sender: { id: 'me', displayName: 'You' },
+      content: 'Hi Fatima, how\'s the new logo design coming along?',
+      type: 'text',
+      isEdited: false,
+      isPinned: false,
+      createdAt: '2027-01-10T14:00:00Z'
+    },
+    {
+      id: 'dm3-2',
+      channelId: 'dm3',
+      sender: { id: 'u3', displayName: 'Fatima Al-Rashid' },
+      content: 'Almost done! Here\'s a preview:',
+      type: 'text',
+      attachments: [
+        { id: 'dm3a1', name: 'logo-preview.png', type: 'image', url: 'https://picsum.photos/400/300', thumbnailUrl: 'https://picsum.photos/100/75', size: 850000 }
+      ],
+      isEdited: false,
+      isPinned: false,
+      createdAt: '2027-01-10T14:30:00Z'
+    },
+    {
+      id: 'dm3-3',
+      channelId: 'dm3',
+      sender: { id: 'me', displayName: 'You' },
+      content: 'This looks amazing! I love the color scheme.',
+      type: 'text',
+      reactions: [{ emoji: '❤️', count: 1, users: ['u3'], hasReacted: false }],
+      isEdited: false,
+      isPinned: false,
+      createdAt: '2027-01-10T14:45:00Z'
+    },
+    {
+      id: 'dm3-4',
+      channelId: 'dm3',
+      sender: { id: 'u3', displayName: 'Fatima Al-Rashid' },
+      content: 'Design approved!',
+      type: 'text',
+      reactions: [{ emoji: '🎉', count: 1, users: ['me'], hasReacted: true }],
+      isEdited: false,
+      isPinned: false,
+      createdAt: '2027-01-10T15:00:00Z'
+    }
+  ]],
+  ['dm4', [
+    {
+      id: 'dm4-1',
+      channelId: 'dm4',
+      sender: { id: 'u4', displayName: 'Ahmed Khalil' },
+      content: 'Hey, quick update on the ticketing system integration.',
+      type: 'text',
+      isEdited: false,
+      isPinned: false,
+      createdAt: '2027-01-10T16:00:00Z'
+    },
+    {
+      id: 'dm4-2',
+      channelId: 'dm4',
+      sender: { id: 'me', displayName: 'You' },
+      content: 'What\'s the status?',
+      type: 'text',
+      isEdited: false,
+      isPinned: false,
+      createdAt: '2027-01-10T16:05:00Z'
+    },
+    {
+      id: 'dm4-3',
+      channelId: 'dm4',
+      sender: { id: 'u4', displayName: 'Ahmed Khalil' },
+      content: 'All tests passed! The API endpoints are working perfectly. I\'ve also added rate limiting and caching.',
+      type: 'text',
+      isEdited: false,
+      isPinned: false,
+      createdAt: '2027-01-10T16:15:00Z'
+    },
+    {
+      id: 'dm4-4',
+      channelId: 'dm4',
+      sender: { id: 'u4', displayName: 'Ahmed Khalil' },
+      content: 'API is ready',
+      type: 'text',
+      linkedContent: {
+        type: 'document',
+        id: 'api-docs',
+        title: 'Ticketing API Documentation',
+        description: 'Complete API reference with examples',
+        url: '/documents/api-docs'
+      },
+      isEdited: false,
+      isPinned: false,
+      createdAt: '2027-01-10T16:30:00Z'
+    }
+  ]],
+  ['dm5', [
+    {
+      id: 'dm5-1',
+      channelId: 'dm5',
+      sender: { id: 'u5', displayName: 'Layla Omar' },
+      content: 'Thanks for the feedback on the marketing campaign!',
+      type: 'text',
+      isEdited: false,
+      isPinned: false,
+      createdAt: '2027-01-06T17:00:00Z'
+    },
+    {
+      id: 'dm5-2',
+      channelId: 'dm5',
+      sender: { id: 'me', displayName: 'You' },
+      content: 'No problem! The social media strategy looks solid.',
+      type: 'text',
+      isEdited: false,
+      isPinned: false,
+      createdAt: '2027-01-06T17:15:00Z'
+    },
+    {
+      id: 'dm5-3',
+      channelId: 'dm5',
+      sender: { id: 'u5', displayName: 'Layla Omar' },
+      content: 'Great! I\'ll finalize it and share with the team. Have a good evening!',
+      type: 'text',
+      isEdited: false,
+      isPinned: false,
+      createdAt: '2027-01-06T17:30:00Z'
+    },
+    {
+      id: 'dm5-4',
+      channelId: 'dm5',
+      sender: { id: 'me', displayName: 'You' },
+      content: 'See you tomorrow!',
+      type: 'text',
+      reactions: [{ emoji: '👋', count: 1, users: ['u5'], hasReacted: false }],
+      isEdited: false,
+      isPinned: false,
+      createdAt: '2027-01-06T17:35:00Z'
+    }
   ]]
 ]))
 
