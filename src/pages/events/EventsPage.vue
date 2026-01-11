@@ -4,11 +4,14 @@ import { ref, computed } from 'vue'
 // State
 const showCreateModal = ref(false)
 const showFilters = ref(false)
-const calendarView = ref<'calendar' | 'grid' | 'list'>('calendar')
+const calendarView = ref<'calendar' | 'grid' | 'list'>('grid')
 const currentDate = ref(new Date())
 const searchQuery = ref('')
 const selectedTypes = ref<string[]>([])
 const selectedFormats = ref<string[]>([])
+const quickFilter = ref<'all' | 'today' | 'week' | 'myevents' | 'virtual' | 'inperson'>('all')
+const showShareModal = ref(false)
+const selectedEventForShare = ref<Event | null>(null)
 
 const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
@@ -101,7 +104,56 @@ const currentYear = computed(() => currentDate.value.getFullYear())
 
 const activeFiltersCount = computed(() => selectedTypes.value.length + selectedFormats.value.length)
 
+// Quick filter counts
+const quickFilterCounts = computed(() => {
+  const today = new Date().toISOString().split('T')[0]
+  const weekFromNow = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+  return {
+    all: events.value.length,
+    today: events.value.filter(e => e.date === today).length,
+    week: events.value.filter(e => e.date >= today && e.date <= weekFromNow).length,
+    myevents: events.value.filter(e => e.isGoing).length,
+    virtual: events.value.filter(e => e.virtual).length,
+    inperson: events.value.filter(e => !e.virtual).length
+  }
+})
+
+// My upcoming events (RSVP'd)
+const myUpcomingEvents = computed(() => {
+  const today = new Date()
+  return events.value
+    .filter(e => e.isGoing && new Date(e.date) >= today)
+    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+    .slice(0, 3)
+    .map(e => {
+      const d = new Date(e.date)
+      return {
+        ...e,
+        month: d.toLocaleString('default', { month: 'short' }).toUpperCase(),
+        day: d.getDate(),
+        dayName: d.toLocaleString('default', { weekday: 'short' })
+      }
+    })
+})
+
+// Countdown to featured event
+const featuredEventCountdown = computed(() => {
+  if (!featuredEvent.value) return null
+  const eventDate = new Date(featuredEvent.value.date)
+  const now = new Date()
+  const diff = eventDate.getTime() - now.getTime()
+  if (diff <= 0) return { days: 0, hours: 0, label: 'Today!' }
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24))
+  const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
+  if (days === 0) return { days: 0, hours, label: `${hours}h left` }
+  if (days === 1) return { days: 1, hours, label: 'Tomorrow' }
+  return { days, hours, label: `${days} days` }
+})
+
 const filteredEvents = computed(() => {
+  const today = new Date().toISOString().split('T')[0]
+  const weekFromNow = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+
   let result = events.value.map(e => {
     const d = new Date(e.date)
     return {
@@ -110,6 +162,19 @@ const filteredEvents = computed(() => {
       day: d.getDate()
     }
   })
+
+  // Apply quick filter
+  if (quickFilter.value === 'today') {
+    result = result.filter(e => e.date === today)
+  } else if (quickFilter.value === 'week') {
+    result = result.filter(e => e.date >= today && e.date <= weekFromNow)
+  } else if (quickFilter.value === 'myevents') {
+    result = result.filter(e => e.isGoing)
+  } else if (quickFilter.value === 'virtual') {
+    result = result.filter(e => e.virtual)
+  } else if (quickFilter.value === 'inperson') {
+    result = result.filter(e => !e.virtual)
+  }
 
   if (searchQuery.value) {
     const q = searchQuery.value.toLowerCase()
@@ -374,6 +439,59 @@ function getCategoryCount(categoryId: string) {
         </div>
       </div>
 
+      <!-- Quick Filter Chips -->
+      <div class="quick-filter-bar">
+        <button
+          @click="quickFilter = 'all'"
+          :class="['quick-filter-chip', { active: quickFilter === 'all' }]"
+        >
+          <i class="fas fa-globe"></i>
+          <span>All Events</span>
+          <span class="chip-count">{{ quickFilterCounts.all }}</span>
+        </button>
+        <button
+          @click="quickFilter = 'today'"
+          :class="['quick-filter-chip', { active: quickFilter === 'today' }]"
+        >
+          <i class="fas fa-sun"></i>
+          <span>Today</span>
+          <span class="chip-count">{{ quickFilterCounts.today }}</span>
+        </button>
+        <button
+          @click="quickFilter = 'week'"
+          :class="['quick-filter-chip', { active: quickFilter === 'week' }]"
+        >
+          <i class="fas fa-calendar-week"></i>
+          <span>This Week</span>
+          <span class="chip-count">{{ quickFilterCounts.week }}</span>
+        </button>
+        <button
+          @click="quickFilter = 'myevents'"
+          :class="['quick-filter-chip my-events', { active: quickFilter === 'myevents' }]"
+        >
+          <i class="fas fa-user-check"></i>
+          <span>My Events</span>
+          <span class="chip-count">{{ quickFilterCounts.myevents }}</span>
+        </button>
+        <div class="filter-divider"></div>
+        <button
+          @click="quickFilter = 'virtual'"
+          :class="['quick-filter-chip virtual', { active: quickFilter === 'virtual' }]"
+        >
+          <i class="fas fa-video"></i>
+          <span>Virtual</span>
+          <span class="chip-count">{{ quickFilterCounts.virtual }}</span>
+        </button>
+        <button
+          @click="quickFilter = 'inperson'"
+          :class="['quick-filter-chip inperson', { active: quickFilter === 'inperson' }]"
+        >
+          <i class="fas fa-building"></i>
+          <span>In-Person</span>
+          <span class="chip-count">{{ quickFilterCounts.inperson }}</span>
+        </button>
+      </div>
+
       <!-- Premium Featured Event -->
       <div v-if="featuredEvent" class="featured-event-premium">
         <div class="featured-event-bg">
@@ -383,7 +501,14 @@ function getCategoryCount(categoryId: string) {
         <div class="featured-event-header">
           <div class="featured-badge-premium">
             <i class="fas fa-star"></i>
-            <span>Featured Event</span>
+            <span>Next Up</span>
+          </div>
+          <!-- Countdown Badge -->
+          <div v-if="featuredEventCountdown" class="featured-countdown">
+            <div class="countdown-icon">
+              <i class="fas fa-hourglass-half"></i>
+            </div>
+            <span class="countdown-label">{{ featuredEventCountdown.label }}</span>
           </div>
           <div class="featured-date-badge">
             <span class="featured-date-month">{{ featuredEvent.month }}</span>
@@ -429,10 +554,21 @@ function getCategoryCount(categoryId: string) {
             </div>
             <span class="featured-attendee-text">+12 attending</span>
           </div>
-          <button class="featured-rsvp-btn">
-            <i class="fas fa-check"></i>
-            <span>RSVP Now</span>
-          </button>
+          <div class="featured-actions">
+            <button class="featured-action-btn secondary" title="Set Reminder">
+              <i class="fas fa-bell"></i>
+            </button>
+            <button class="featured-action-btn secondary" title="Share Event">
+              <i class="fas fa-share-alt"></i>
+            </button>
+            <button class="featured-action-btn secondary" title="Add to Calendar">
+              <i class="fas fa-calendar-plus"></i>
+            </button>
+            <button class="featured-rsvp-btn">
+              <i class="fas fa-check"></i>
+              <span>RSVP Now</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -597,10 +733,18 @@ function getCategoryCount(categoryId: string) {
                   </div>
                   <span class="attendee-count-premium">{{ event.attendees.length }} going</span>
                 </div>
-                <button :class="['rsvp-btn-premium', event.isGoing ? 'going' : 'pending']">
-                  <i :class="event.isGoing ? 'fas fa-check-circle' : 'fas fa-plus-circle'"></i>
-                  {{ event.isGoing ? 'Going' : 'RSVP' }}
-                </button>
+                <div class="card-action-buttons">
+                  <button class="card-action-btn" @click.stop title="Set Reminder">
+                    <i class="fas fa-bell"></i>
+                  </button>
+                  <button class="card-action-btn" @click.stop title="Share">
+                    <i class="fas fa-share-alt"></i>
+                  </button>
+                  <button :class="['rsvp-btn-premium', event.isGoing ? 'going' : 'pending']">
+                    <i :class="event.isGoing ? 'fas fa-check-circle' : 'fas fa-plus-circle'"></i>
+                    {{ event.isGoing ? 'Going' : 'RSVP' }}
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -639,10 +783,21 @@ function getCategoryCount(categoryId: string) {
                     {{ attendee.initials }}
                   </div>
                 </div>
-                <button :class="['list-rsvp-btn', event.isGoing ? 'going' : 'pending']">
-                  <i :class="event.isGoing ? 'fas fa-check' : 'fas fa-plus'"></i>
-                  {{ event.isGoing ? 'Going' : 'RSVP' }}
-                </button>
+                <div class="list-action-buttons">
+                  <button class="list-action-btn" @click.stop title="Set Reminder">
+                    <i class="fas fa-bell"></i>
+                  </button>
+                  <button class="list-action-btn" @click.stop title="Share">
+                    <i class="fas fa-share-alt"></i>
+                  </button>
+                  <button class="list-action-btn" @click.stop title="Add to Calendar">
+                    <i class="fas fa-calendar-plus"></i>
+                  </button>
+                  <button :class="['list-rsvp-btn', event.isGoing ? 'going' : 'pending']">
+                    <i :class="event.isGoing ? 'fas fa-check' : 'fas fa-plus'"></i>
+                    {{ event.isGoing ? 'Going' : 'RSVP' }}
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -664,6 +819,39 @@ function getCategoryCount(categoryId: string) {
 
         <!-- Sidebar -->
         <aside class="w-80 flex-shrink-0 content-sidebar hidden xl:block">
+          <!-- My Upcoming Events -->
+          <div v-if="myUpcomingEvents.length > 0" class="sidebar-section my-events-section">
+            <div class="sidebar-title">
+              <i class="fas fa-user-check"></i>
+              My Upcoming Events
+            </div>
+            <div class="my-events-list">
+              <div v-for="event in myUpcomingEvents" :key="event.id"
+                   @click="openEvent(event)"
+                   class="my-event-item">
+                <div class="my-event-date">
+                  <span class="my-event-day">{{ event.day }}</span>
+                  <span class="my-event-month">{{ event.month }}</span>
+                </div>
+                <div class="my-event-info">
+                  <h4 class="my-event-title">{{ event.title }}</h4>
+                  <div class="my-event-meta">
+                    <span><i class="fas fa-clock"></i> {{ event.time }}</span>
+                  </div>
+                </div>
+                <div class="my-event-actions">
+                  <button class="my-event-action-btn" title="View Details">
+                    <i class="fas fa-arrow-right"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <button class="view-all-my-events" @click="quickFilter = 'myevents'">
+              <span>View all my events</span>
+              <i class="fas fa-chevron-right"></i>
+            </button>
+          </div>
+
           <!-- Mini Calendar -->
           <div class="sidebar-section">
             <div class="sidebar-title">
@@ -3150,6 +3338,382 @@ function getCategoryCount(categoryId: string) {
     opacity: 1;
     width: 6px;
     height: 6px;
+  }
+}
+
+/* ===============================================
+   QUICK FILTER BAR
+   =============================================== */
+.quick-filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 1.5rem;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  margin-bottom: 1.5rem;
+  overflow-x: auto;
+  flex-wrap: wrap;
+}
+
+.quick-filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: #f3f4f6;
+  border: 2px solid transparent;
+  border-radius: 12px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.quick-filter-chip:hover {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+.quick-filter-chip.active {
+  background: linear-gradient(135deg, #0d9488 0%, #14b8a6 100%);
+  color: white;
+  border-color: transparent;
+  box-shadow: 0 4px 12px rgba(20, 184, 166, 0.3);
+}
+
+.quick-filter-chip.my-events.active {
+  background: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%);
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+}
+
+.quick-filter-chip.virtual.active {
+  background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.quick-filter-chip.inperson.active {
+  background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+}
+
+.quick-filter-chip i {
+  font-size: 0.8rem;
+}
+
+.chip-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.5rem;
+  height: 1.5rem;
+  padding: 0 0.375rem;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.quick-filter-chip.active .chip-count {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.filter-divider {
+  width: 1px;
+  height: 24px;
+  background: #e5e7eb;
+  margin: 0 0.5rem;
+}
+
+/* ===============================================
+   FEATURED EVENT COUNTDOWN
+   =============================================== */
+.featured-countdown {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 12px;
+  color: #dc2626;
+}
+
+.countdown-icon {
+  font-size: 0.875rem;
+  animation: pulse-countdown 2s ease-in-out infinite;
+}
+
+@keyframes pulse-countdown {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(1.1); }
+}
+
+.countdown-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+/* ===============================================
+   FEATURED EVENT ACTIONS
+   =============================================== */
+.featured-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.featured-action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.featured-action-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateY(-2px);
+}
+
+.featured-action-btn.secondary {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* ===============================================
+   MY UPCOMING EVENTS SIDEBAR
+   =============================================== */
+.my-events-section {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.05) 0%, rgba(168, 139, 250, 0.05) 100%);
+  border: 1px solid rgba(139, 92, 246, 0.15);
+}
+
+.my-events-section .sidebar-title {
+  color: #7c3aed;
+}
+
+.my-events-section .sidebar-title i {
+  color: #8b5cf6;
+}
+
+.my-events-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.my-event-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background: white;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid rgba(139, 92, 246, 0.1);
+}
+
+.my-event-item:hover {
+  transform: translateX(4px);
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.15);
+  border-color: rgba(139, 92, 246, 0.3);
+}
+
+.my-event-date {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 48px;
+  padding: 0.5rem;
+  background: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%);
+  border-radius: 10px;
+  color: white;
+}
+
+.my-event-day {
+  font-size: 1.125rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.my-event-month {
+  font-size: 0.625rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  opacity: 0.9;
+}
+
+.my-event-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.my-event-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 0.25rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.my-event-meta {
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.my-event-meta i {
+  margin-right: 0.25rem;
+  color: #8b5cf6;
+}
+
+.my-event-actions {
+  display: flex;
+  align-items: center;
+}
+
+.my-event-action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: rgba(139, 92, 246, 0.1);
+  border: none;
+  border-radius: 8px;
+  color: #8b5cf6;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.my-event-action-btn:hover {
+  background: #8b5cf6;
+  color: white;
+}
+
+.view-all-my-events {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.75rem;
+  margin-top: 0.75rem;
+  background: transparent;
+  border: 1px dashed rgba(139, 92, 246, 0.3);
+  border-radius: 10px;
+  color: #8b5cf6;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.view-all-my-events:hover {
+  background: rgba(139, 92, 246, 0.1);
+  border-style: solid;
+}
+
+/* ===============================================
+   CARD ACTION BUTTONS (Grid View)
+   =============================================== */
+.card-action-buttons {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.card-action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: #f3f4f6;
+  border: none;
+  border-radius: 10px;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.card-action-btn:hover {
+  background: #0d9488;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(13, 148, 136, 0.25);
+}
+
+/* ===============================================
+   LIST ACTION BUTTONS
+   =============================================== */
+.list-action-buttons {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.list-action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: #f3f4f6;
+  border: none;
+  border-radius: 8px;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.list-action-btn:hover {
+  background: #0d9488;
+  color: white;
+}
+
+@media (max-width: 768px) {
+  .quick-filter-bar {
+    padding: 0.75rem 1rem;
+    gap: 0.5rem;
+  }
+
+  .quick-filter-chip {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.813rem;
+  }
+
+  .filter-divider {
+    display: none;
+  }
+
+  .featured-actions {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .featured-action-btn {
+    width: 36px;
+    height: 36px;
+  }
+
+  .card-action-buttons {
+    flex-wrap: wrap;
+  }
+
+  .list-action-buttons {
+    flex-wrap: wrap;
   }
 }
 </style>
