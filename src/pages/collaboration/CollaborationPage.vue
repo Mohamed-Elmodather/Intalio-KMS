@@ -115,7 +115,7 @@ const threadReplyInput = ref('')
 const rightPanelTab = ref<'details' | 'members' | 'files' | 'pinned'>('details')
 const isTyping = ref(false)
 const typingUsers = ref<string[]>([])
-const messagesEndRef = ref<HTMLElement | null>(null)
+const messagesContainerRef = ref<HTMLElement | null>(null)
 
 // New channel form
 const newChannel = ref({
@@ -574,7 +574,9 @@ function getFileIcon(type: string): string {
 
 function scrollToBottom() {
   nextTick(() => {
-    messagesEndRef.value?.scrollIntoView({ behavior: 'smooth' })
+    if (messagesContainerRef.value) {
+      messagesContainerRef.value.scrollTop = messagesContainerRef.value.scrollHeight
+    }
   })
 }
 
@@ -824,7 +826,7 @@ watch(messageInput, (val) => {
       </header>
 
       <!-- Messages -->
-      <div class="flex-1 overflow-y-auto px-4 py-4 custom-scrollbar">
+      <div ref="messagesContainerRef" class="flex-1 overflow-y-auto px-4 py-4 custom-scrollbar">
         <div class="space-y-4">
           <template v-for="(message, idx) in currentMessages" :key="message.id">
             <!-- Date Separator -->
@@ -1087,8 +1089,6 @@ watch(messageInput, (val) => {
               </div>
             </div>
           </template>
-
-          <div ref="messagesEndRef"></div>
         </div>
 
         <!-- Typing Indicator -->
