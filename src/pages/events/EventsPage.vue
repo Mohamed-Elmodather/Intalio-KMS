@@ -254,46 +254,57 @@ function getCategoryCount(categoryId: string) {
 
 <template>
   <div class="events-page">
-    <!-- Page Hero Section -->
-    <div class="hero-section fade-in-up">
-      <div class="hero-content">
-        <div class="hero-left">
-          <div class="hero-header">
-            <div class="hero-icon">
+    <!-- Premium Hero Section -->
+    <div class="events-hero">
+      <div class="events-hero-bg">
+        <div class="hero-gradient-orb hero-orb-1"></div>
+        <div class="hero-gradient-orb hero-orb-2"></div>
+        <div class="hero-gradient-orb hero-orb-3"></div>
+      </div>
+      <div class="events-hero-content">
+        <div class="events-hero-left">
+          <div class="events-hero-icon-wrapper">
+            <div class="events-hero-icon">
               <i class="fas fa-calendar-alt"></i>
             </div>
-            <div>
-              <h1 class="hero-title"><span class="hero-title-highlight">Events</span> & Calendar</h1>
-              <p class="hero-subtitle">Stay connected with company events, meetings, and activities</p>
-            </div>
+            <div class="hero-icon-ring"></div>
+          </div>
+          <div class="events-hero-text">
+            <h1 class="events-hero-title">
+              <span class="title-gradient">Events</span> & Calendar
+            </h1>
+            <p class="events-hero-subtitle">Stay connected with company events, meetings, and activities</p>
           </div>
         </div>
-        <div class="hero-stats">
-          <div class="stat-card-hero">
-            <div class="stat-card-hero-icon teal">
+        <div class="events-hero-stats">
+          <div class="events-stat-card events-stat-total">
+            <div class="events-stat-glow"></div>
+            <div class="events-stat-icon">
               <i class="fas fa-calendar-alt"></i>
             </div>
-            <div class="stat-card-hero-content">
-              <p class="stat-card-hero-value">{{ eventStats.total }}</p>
-              <p class="stat-card-hero-label">Total Events</p>
+            <div class="events-stat-content">
+              <p class="events-stat-value">{{ eventStats.total }}</p>
+              <p class="events-stat-label">Total Events</p>
             </div>
           </div>
-          <div class="stat-card-hero">
-            <div class="stat-card-hero-icon blue">
+          <div class="events-stat-card events-stat-week">
+            <div class="events-stat-glow"></div>
+            <div class="events-stat-icon">
               <i class="fas fa-calendar-week"></i>
             </div>
-            <div class="stat-card-hero-content">
-              <p class="stat-card-hero-value">{{ eventStats.thisWeek }}</p>
-              <p class="stat-card-hero-label">This Week</p>
+            <div class="events-stat-content">
+              <p class="events-stat-value">{{ eventStats.thisWeek }}</p>
+              <p class="events-stat-label">This Week</p>
             </div>
           </div>
-          <div class="stat-card-hero">
-            <div class="stat-card-hero-icon teal">
+          <div class="events-stat-card events-stat-rsvp">
+            <div class="events-stat-glow"></div>
+            <div class="events-stat-icon">
               <i class="fas fa-check-circle"></i>
             </div>
-            <div class="stat-card-hero-content">
-              <p class="stat-card-hero-value">{{ eventStats.yourRsvps }}</p>
-              <p class="stat-card-hero-label">Your RSVPs</p>
+            <div class="events-stat-content">
+              <p class="events-stat-value">{{ eventStats.yourRsvps }}</p>
+              <p class="events-stat-label">Your RSVPs</p>
             </div>
           </div>
         </div>
@@ -303,84 +314,121 @@ function getCategoryCount(categoryId: string) {
     <!-- Main Content Area -->
     <div class="main-content">
 
-      <!-- Quick Actions -->
-      <div class="quick-actions">
-        <div class="quick-action-card" @click="filterToday">
-          <div class="quick-action-icon today">
+      <!-- Premium Quick Actions -->
+      <div class="quick-actions-premium">
+        <div class="quick-action-premium today-action" @click="filterToday">
+          <div class="quick-action-glow"></div>
+          <div class="quick-action-icon-premium">
             <i class="fas fa-sun"></i>
           </div>
-          <div class="quick-action-text">
+          <div class="quick-action-content">
             <h4>Today's Events</h4>
             <p>{{ todayEventsCount }} events today</p>
           </div>
+          <div class="quick-action-arrow">
+            <i class="fas fa-arrow-right"></i>
+          </div>
         </div>
-        <div class="quick-action-card" @click="calendarView = 'list'">
-          <div class="quick-action-icon upcoming">
+        <div class="quick-action-premium upcoming-action" @click="calendarView = 'list'">
+          <div class="quick-action-glow"></div>
+          <div class="quick-action-icon-premium">
             <i class="fas fa-clock"></i>
           </div>
-          <div class="quick-action-text">
+          <div class="quick-action-content">
             <h4>Upcoming</h4>
             <p>Next 7 days</p>
           </div>
+          <div class="quick-action-arrow">
+            <i class="fas fa-arrow-right"></i>
+          </div>
         </div>
-        <div class="quick-action-card" @click="filterMyEvents">
-          <div class="quick-action-icon my-events">
+        <div class="quick-action-premium myevents-action" @click="filterMyEvents">
+          <div class="quick-action-glow"></div>
+          <div class="quick-action-icon-premium">
             <i class="fas fa-user-check"></i>
           </div>
-          <div class="quick-action-text">
+          <div class="quick-action-content">
             <h4>My Events</h4>
             <p>RSVP'd events</p>
           </div>
+          <div class="quick-action-arrow">
+            <i class="fas fa-arrow-right"></i>
+          </div>
         </div>
-        <div class="quick-action-card" @click="showCreateModal = true">
-          <div class="quick-action-icon create">
+        <div class="quick-action-premium create-action" @click="showCreateModal = true">
+          <div class="quick-action-glow"></div>
+          <div class="quick-action-icon-premium">
             <i class="fas fa-plus"></i>
           </div>
-          <div class="quick-action-text">
+          <div class="quick-action-content">
             <h4>Create Event</h4>
             <p>Schedule new</p>
+          </div>
+          <div class="quick-action-arrow">
+            <i class="fas fa-arrow-right"></i>
           </div>
         </div>
       </div>
 
-      <!-- Featured Event -->
-      <div v-if="featuredEvent" class="featured-event">
-        <div class="featured-badge">
-          <i class="fas fa-star"></i>
-          Featured Event
+      <!-- Premium Featured Event -->
+      <div v-if="featuredEvent" class="featured-event-premium">
+        <div class="featured-event-bg">
+          <div class="featured-orb featured-orb-1"></div>
+          <div class="featured-orb featured-orb-2"></div>
         </div>
-        <div class="flex items-start gap-6">
-          <div class="flex-1">
-            <h2 class="text-xl font-bold text-gray-900 mb-2">{{ featuredEvent.title }}</h2>
-            <p class="text-gray-600 mb-4">{{ featuredEvent.description }}</p>
-            <div class="flex flex-wrap gap-4 text-sm text-gray-600">
-              <span class="flex items-center gap-2">
-                <i class="fas fa-calendar text-teal-500"></i>
-                {{ featuredEvent.dateFormatted }}
-              </span>
-              <span class="flex items-center gap-2">
-                <i class="fas fa-clock text-teal-500"></i>
-                {{ featuredEvent.time }}
-              </span>
-              <span class="flex items-center gap-2">
-                <i class="fas fa-map-marker-alt text-teal-500"></i>
-                {{ featuredEvent.location }}
-              </span>
-              <span v-if="featuredEvent.virtual" class="flex items-center gap-2">
-                <i class="fas fa-video text-teal-500"></i>
-                Virtual
-              </span>
+        <div class="featured-event-header">
+          <div class="featured-badge-premium">
+            <i class="fas fa-star"></i>
+            <span>Featured Event</span>
+          </div>
+          <div class="featured-date-badge">
+            <span class="featured-date-month">{{ featuredEvent.month }}</span>
+            <span class="featured-date-day">{{ featuredEvent.day }}</span>
+          </div>
+        </div>
+        <div class="featured-event-body">
+          <h2 class="featured-event-title">{{ featuredEvent.title }}</h2>
+          <p class="featured-event-description">{{ featuredEvent.description }}</p>
+          <div class="featured-event-meta">
+            <div class="featured-meta-item">
+              <div class="featured-meta-icon">
+                <i class="fas fa-calendar"></i>
+              </div>
+              <span>{{ featuredEvent.dateFormatted }}</span>
+            </div>
+            <div class="featured-meta-item">
+              <div class="featured-meta-icon">
+                <i class="fas fa-clock"></i>
+              </div>
+              <span>{{ featuredEvent.time }}</span>
+            </div>
+            <div class="featured-meta-item">
+              <div class="featured-meta-icon">
+                <i class="fas fa-map-marker-alt"></i>
+              </div>
+              <span>{{ featuredEvent.location }}</span>
+            </div>
+            <div v-if="featuredEvent.virtual" class="featured-meta-item virtual">
+              <div class="featured-meta-icon">
+                <i class="fas fa-video"></i>
+              </div>
+              <span>Virtual Event</span>
             </div>
           </div>
-          <div class="flex flex-col items-end gap-3">
-            <div class="event-date-badge">
-              <span class="event-date-month">{{ featuredEvent.month }}</span>
-              <span class="event-date-day">{{ featuredEvent.day }}</span>
+        </div>
+        <div class="featured-event-footer">
+          <div class="featured-attendees">
+            <div class="featured-avatar-stack">
+              <div class="featured-avatar" style="background: #14b8a6;">AI</div>
+              <div class="featured-avatar" style="background: #3b82f6;">SC</div>
+              <div class="featured-avatar" style="background: #ec4899;">LW</div>
             </div>
-            <button class="rsvp-btn pending">
-              <i class="fas fa-check mr-1"></i> RSVP Now
-            </button>
+            <span class="featured-attendee-text">+12 attending</span>
           </div>
+          <button class="featured-rsvp-btn">
+            <i class="fas fa-check"></i>
+            <span>RSVP Now</span>
+          </button>
         </div>
       </div>
 
@@ -453,39 +501,47 @@ function getCategoryCount(categoryId: string) {
         <!-- Main Content -->
         <div class="flex-1 min-w-0">
 
-          <!-- Calendar View -->
-          <div v-if="calendarView === 'calendar'" class="calendar-container">
-            <div class="calendar-header">
-              <div class="calendar-nav">
-                <button @click="previousMonth" class="calendar-nav-btn">
+          <!-- Premium Calendar View -->
+          <div v-if="calendarView === 'calendar'" class="calendar-premium">
+            <div class="calendar-header-premium">
+              <div class="calendar-nav-premium">
+                <button @click="previousMonth" class="calendar-nav-btn-premium">
                   <i class="fas fa-chevron-left"></i>
                 </button>
-                <h2 class="calendar-title">{{ currentMonthName }} {{ currentYear }}</h2>
-                <button @click="nextMonth" class="calendar-nav-btn">
+                <div class="calendar-title-wrapper">
+                  <h2 class="calendar-title-premium">{{ currentMonthName }}</h2>
+                  <span class="calendar-year-premium">{{ currentYear }}</span>
+                </div>
+                <button @click="nextMonth" class="calendar-nav-btn-premium">
                   <i class="fas fa-chevron-right"></i>
                 </button>
               </div>
-              <button @click="goToToday" class="calendar-today-btn">Today</button>
+              <button @click="goToToday" class="calendar-today-btn-premium">
+                <i class="fas fa-crosshairs"></i>
+                Today
+              </button>
             </div>
 
-            <div class="calendar-weekdays">
-              <div v-for="day in weekDays" :key="day" class="calendar-weekday">{{ day }}</div>
+            <div class="calendar-weekdays-premium">
+              <div v-for="day in weekDays" :key="day" class="calendar-weekday-premium">{{ day }}</div>
             </div>
 
-            <div class="calendar-grid">
+            <div class="calendar-grid-premium">
               <div v-for="(day, index) in calendarDays" :key="index"
-                   :class="['calendar-day',
-                            day.isToday ? 'today' : '',
-                            !day.isCurrentMonth ? 'other-month' : '']"
+                   :class="['calendar-day-premium',
+                            day.isToday ? 'is-today' : '',
+                            !day.isCurrentMonth ? 'other-month' : '',
+                            day.events.length > 0 ? 'has-events' : '']"
                    @click="selectDate(day)">
-                <span class="day-number">{{ day.date }}</span>
-                <div class="day-events">
+                <span :class="['day-number-premium', day.isToday ? 'today-badge' : '']">{{ day.date }}</span>
+                <div class="day-events-premium">
                   <div v-for="event in day.events.slice(0, 3)" :key="event.id"
                        @click.stop="openEvent(event)"
-                       :class="['day-event', event.category]">
-                    {{ event.title }}
+                       :class="['day-event-premium', event.category]">
+                    <span class="event-dot"></span>
+                    <span class="event-text">{{ event.title }}</span>
                   </div>
-                  <div v-if="day.events.length > 3" class="day-more">
+                  <div v-if="day.events.length > 3" class="day-more-premium">
                     +{{ day.events.length - 3 }} more
                   </div>
                 </div>
@@ -493,100 +549,110 @@ function getCategoryCount(categoryId: string) {
             </div>
           </div>
 
-          <!-- Grid View -->
-          <div v-if="calendarView === 'grid'" class="events-grid">
+          <!-- Premium Grid View -->
+          <div v-if="calendarView === 'grid'" class="events-grid-premium">
             <div v-for="event in filteredEvents" :key="event.id"
                  @click="openEvent(event)"
-                 class="event-card">
-              <div class="event-card-header">
-                <span :class="['event-type-badge', event.category]">
+                 :class="['event-card-premium', event.category]">
+              <div class="event-card-glow"></div>
+              <div class="event-card-header-premium">
+                <span :class="['event-type-badge-premium', event.category]">
                   <i :class="getEventTypeIcon(event.category)"></i>
                   {{ event.categoryLabel }}
                 </span>
-                <div class="event-date-badge">
-                  <span class="event-date-month">{{ event.month }}</span>
-                  <span class="event-date-day">{{ event.day }}</span>
+                <div class="event-date-badge-premium">
+                  <span class="event-date-month-premium">{{ event.month }}</span>
+                  <span class="event-date-day-premium">{{ event.day }}</span>
                 </div>
               </div>
-              <div class="event-card-body">
-                <h3 class="event-card-title">{{ event.title }}</h3>
-                <div class="event-card-meta">
-                  <div class="event-meta-item">
-                    <i class="fas fa-clock"></i>
+              <div class="event-card-body-premium">
+                <h3 class="event-card-title-premium">{{ event.title }}</h3>
+                <div class="event-card-meta-premium">
+                  <div class="event-meta-item-premium">
+                    <div class="meta-icon-wrapper">
+                      <i class="fas fa-clock"></i>
+                    </div>
                     <span>{{ event.time }}</span>
                   </div>
-                  <div class="event-meta-item">
-                    <i :class="event.virtual ? 'fas fa-video' : 'fas fa-map-marker-alt'"></i>
+                  <div class="event-meta-item-premium">
+                    <div class="meta-icon-wrapper">
+                      <i :class="event.virtual ? 'fas fa-video' : 'fas fa-map-marker-alt'"></i>
+                    </div>
                     <span>{{ event.location }}</span>
                   </div>
                 </div>
-                <div class="event-card-footer">
-                  <div class="event-attendees">
-                    <div class="attendee-avatars">
-                      <div v-for="(attendee, i) in event.attendees.slice(0, 3)" :key="i"
-                           class="attendee-avatar"
-                           :style="{ backgroundColor: attendee.color }">
-                        {{ attendee.initials }}
-                      </div>
+              </div>
+              <div class="event-card-footer-premium">
+                <div class="event-attendees-premium">
+                  <div class="attendee-avatars-premium">
+                    <div v-for="(attendee, i) in event.attendees.slice(0, 3)" :key="i"
+                         class="attendee-avatar-premium"
+                         :style="{ backgroundColor: attendee.color }">
+                      {{ attendee.initials }}
                     </div>
-                    <span class="attendee-count">{{ event.attendees.length }} going</span>
                   </div>
-                  <button :class="['rsvp-btn', event.isGoing ? 'going' : 'pending']">
-                    {{ event.isGoing ? 'Going' : 'RSVP' }}
-                  </button>
+                  <span class="attendee-count-premium">{{ event.attendees.length }} going</span>
                 </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- List View -->
-          <div v-if="calendarView === 'list'" class="events-list">
-            <div v-for="event in filteredEvents" :key="event.id"
-                 @click="openEvent(event)"
-                 class="event-list-item">
-              <div class="event-list-date">
-                <span class="text-[10px] font-bold text-teal-600 uppercase">{{ event.month }}</span>
-                <span class="text-xl font-extrabold text-gray-900">{{ event.day }}</span>
-              </div>
-              <div class="event-list-info">
-                <h4 class="event-list-title">{{ event.title }}</h4>
-                <div class="event-list-details">
-                  <span :class="['event-type-badge', event.category]">
-                    {{ event.categoryLabel }}
-                  </span>
-                  <span class="flex items-center gap-1">
-                    <i class="fas fa-clock text-teal-500"></i>
-                    {{ event.time }}
-                  </span>
-                  <span class="flex items-center gap-1">
-                    <i :class="[event.virtual ? 'fas fa-video' : 'fas fa-map-marker-alt', 'text-teal-500']"></i>
-                    {{ event.location }}
-                  </span>
-                </div>
-              </div>
-              <div class="event-list-actions">
-                <div class="attendee-avatars mr-3">
-                  <div v-for="(attendee, i) in event.attendees.slice(0, 3)" :key="i"
-                       class="attendee-avatar"
-                       :style="{ backgroundColor: attendee.color }">
-                    {{ attendee.initials }}
-                  </div>
-                </div>
-                <button :class="['rsvp-btn', event.isGoing ? 'going' : 'pending']">
+                <button :class="['rsvp-btn-premium', event.isGoing ? 'going' : 'pending']">
+                  <i :class="event.isGoing ? 'fas fa-check-circle' : 'fas fa-plus-circle'"></i>
                   {{ event.isGoing ? 'Going' : 'RSVP' }}
                 </button>
               </div>
             </div>
           </div>
 
-          <!-- Empty State -->
-          <div v-if="filteredEvents.length === 0 && calendarView !== 'calendar'" class="text-center py-12">
-            <div class="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-2xl flex items-center justify-center">
-              <i class="fas fa-calendar-xmark text-2xl text-gray-400"></i>
+          <!-- Premium List View -->
+          <div v-if="calendarView === 'list'" class="events-list-premium">
+            <div v-for="event in filteredEvents" :key="event.id"
+                 @click="openEvent(event)"
+                 :class="['event-list-item-premium', event.category]">
+              <div class="event-list-date-premium">
+                <span class="list-date-month">{{ event.month }}</span>
+                <span class="list-date-day">{{ event.day }}</span>
+              </div>
+              <div class="event-list-content-premium">
+                <h4 class="event-list-title-premium">{{ event.title }}</h4>
+                <div class="event-list-details-premium">
+                  <span :class="['event-list-badge', event.category]">
+                    <i :class="getEventTypeIcon(event.category)"></i>
+                    {{ event.categoryLabel }}
+                  </span>
+                  <span class="event-list-meta-item">
+                    <i class="fas fa-clock"></i>
+                    {{ event.time }}
+                  </span>
+                  <span class="event-list-meta-item">
+                    <i :class="event.virtual ? 'fas fa-video' : 'fas fa-map-marker-alt'"></i>
+                    {{ event.location }}
+                  </span>
+                </div>
+              </div>
+              <div class="event-list-actions-premium">
+                <div class="list-attendee-avatars">
+                  <div v-for="(attendee, i) in event.attendees.slice(0, 3)" :key="i"
+                       class="list-attendee-avatar"
+                       :style="{ backgroundColor: attendee.color }">
+                    {{ attendee.initials }}
+                  </div>
+                </div>
+                <button :class="['list-rsvp-btn', event.isGoing ? 'going' : 'pending']">
+                  <i :class="event.isGoing ? 'fas fa-check' : 'fas fa-plus'"></i>
+                  {{ event.isGoing ? 'Going' : 'RSVP' }}
+                </button>
+              </div>
             </div>
-            <h3 class="text-lg font-semibold text-gray-900 mb-2">No events found</h3>
-            <p class="text-gray-600 mb-4">Try adjusting your filters or search query</p>
-            <button @click="clearFilters" class="text-teal-600 font-medium hover:text-teal-700">
+          </div>
+
+          <!-- Premium Empty State -->
+          <div v-if="filteredEvents.length === 0 && calendarView !== 'calendar'" class="empty-state-premium">
+            <div class="empty-state-icon">
+              <div class="empty-state-icon-bg"></div>
+              <i class="fas fa-calendar-xmark"></i>
+            </div>
+            <h3 class="empty-state-title">No events found</h3>
+            <p class="empty-state-text">Try adjusting your filters or search query</p>
+            <button @click="clearFilters" class="empty-state-btn">
+              <i class="fas fa-refresh"></i>
               Clear all filters
             </button>
           </div>
@@ -1719,6 +1785,1497 @@ function getCategoryCount(categoryId: string) {
   .toolbar-left,
   .toolbar-right {
     width: 100%;
+  }
+}
+
+/* ===============================================
+   PREMIUM EVENTS PAGE STYLES
+   =============================================== */
+
+/* Premium Hero Section */
+.events-hero {
+  position: relative;
+  padding: 2rem 1.5rem;
+  margin-bottom: 1.5rem;
+  background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 50%, #e0f2fe 100%);
+  border-radius: 1.5rem;
+  overflow: hidden;
+  border: 1px solid rgba(20, 184, 166, 0.15);
+}
+
+.events-hero-bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.hero-gradient-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px);
+  opacity: 0.5;
+  animation: float 8s ease-in-out infinite;
+}
+
+.hero-orb-1 {
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, #14b8a6 0%, transparent 70%);
+  top: -50px;
+  right: 10%;
+  animation-delay: 0s;
+}
+
+.hero-orb-2 {
+  width: 150px;
+  height: 150px;
+  background: radial-gradient(circle, #3b82f6 0%, transparent 70%);
+  bottom: -30px;
+  left: 20%;
+  animation-delay: -3s;
+}
+
+.hero-orb-3 {
+  width: 100px;
+  height: 100px;
+  background: radial-gradient(circle, #6366f1 0%, transparent 70%);
+  top: 50%;
+  right: 30%;
+  animation-delay: -5s;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-20px) scale(1.1); }
+}
+
+.events-hero-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.events-hero-left {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.events-hero-icon-wrapper {
+  position: relative;
+  width: 64px;
+  height: 64px;
+}
+
+.events-hero-icon {
+  width: 64px;
+  height: 64px;
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+  border-radius: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 24px rgba(20, 184, 166, 0.35);
+  position: relative;
+  z-index: 2;
+}
+
+.events-hero-icon i {
+  font-size: 1.75rem;
+  color: white;
+}
+
+.hero-icon-ring {
+  position: absolute;
+  inset: -6px;
+  border: 2px solid rgba(20, 184, 166, 0.3);
+  border-radius: 1.25rem;
+  animation: pulse-ring 2s ease-out infinite;
+}
+
+@keyframes pulse-ring {
+  0% { transform: scale(1); opacity: 1; }
+  100% { transform: scale(1.3); opacity: 0; }
+}
+
+.events-hero-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.events-hero-title {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.title-gradient {
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.events-hero-subtitle {
+  font-size: 0.9375rem;
+  color: #64748b;
+  margin: 0;
+}
+
+/* Premium Stats Cards */
+.events-hero-stats {
+  display: flex;
+  gap: 1rem;
+}
+
+.events-stat-card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  padding: 1rem 1.25rem;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
+  border-radius: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+  transition: all 0.3s ease;
+  min-width: 150px;
+}
+
+.events-stat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+.events-stat-glow {
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.events-stat-card:hover .events-stat-glow {
+  opacity: 1;
+}
+
+.events-stat-total .events-stat-glow {
+  background: radial-gradient(circle, #14b8a6 0%, transparent 70%);
+}
+
+.events-stat-week .events-stat-glow {
+  background: radial-gradient(circle, #3b82f6 0%, transparent 70%);
+}
+
+.events-stat-rsvp .events-stat-glow {
+  background: radial-gradient(circle, #10b981 0%, transparent 70%);
+}
+
+.events-stat-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.125rem;
+  flex-shrink: 0;
+}
+
+.events-stat-total .events-stat-icon {
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(20, 184, 166, 0.3);
+}
+
+.events-stat-week .events-stat-icon {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.events-stat-rsvp .events-stat-icon {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.events-stat-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.events-stat-value {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0;
+  line-height: 1;
+}
+
+.events-stat-label {
+  font-size: 0.75rem;
+  color: #64748b;
+  margin: 0;
+  font-weight: 500;
+}
+
+/* Premium Quick Actions */
+.quick-actions-premium {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.quick-action-premium {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  padding: 1rem 1.25rem;
+  background: white;
+  border-radius: 1rem;
+  border: 1px solid #f1f5f9;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+
+.quick-action-premium:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+}
+
+.quick-action-glow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.quick-action-premium:hover .quick-action-glow {
+  opacity: 1;
+}
+
+.today-action .quick-action-glow { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
+.upcoming-action .quick-action-glow { background: linear-gradient(90deg, #10b981, #34d399); }
+.myevents-action .quick-action-glow { background: linear-gradient(90deg, #ec4899, #f472b6); }
+.create-action .quick-action-glow { background: linear-gradient(90deg, #14b8a6, #2dd4bf); }
+
+.today-action:hover { border-color: rgba(59, 130, 246, 0.3); }
+.upcoming-action:hover { border-color: rgba(16, 185, 129, 0.3); }
+.myevents-action:hover { border-color: rgba(236, 72, 153, 0.3); }
+.create-action:hover { border-color: rgba(20, 184, 166, 0.3); }
+
+.quick-action-icon-premium {
+  width: 48px;
+  height: 48px;
+  border-radius: 0.875rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  flex-shrink: 0;
+  transition: transform 0.3s ease;
+}
+
+.quick-action-premium:hover .quick-action-icon-premium {
+  transform: scale(1.1);
+}
+
+.today-action .quick-action-icon-premium {
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+  color: #1e40af;
+}
+
+.upcoming-action .quick-action-icon-premium {
+  background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+  color: #065f46;
+}
+
+.myevents-action .quick-action-icon-premium {
+  background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%);
+  color: #9d174d;
+}
+
+.create-action .quick-action-icon-premium {
+  background: linear-gradient(135deg, #ccfbf1 0%, #99f6e4 100%);
+  color: #0d9488;
+}
+
+.quick-action-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.quick-action-content h4 {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 0.125rem;
+}
+
+.quick-action-content p {
+  font-size: 0.75rem;
+  color: #64748b;
+  margin: 0;
+}
+
+.quick-action-arrow {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #f8fafc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #94a3b8;
+  font-size: 0.75rem;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.quick-action-premium:hover .quick-action-arrow {
+  background: #0d9488;
+  color: white;
+  transform: translateX(4px);
+}
+
+/* Premium Featured Event */
+.featured-event-premium {
+  position: relative;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(240, 253, 250, 0.95) 100%);
+  border-radius: 1.25rem;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid rgba(20, 184, 166, 0.15);
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+}
+
+.featured-event-bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.featured-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(50px);
+  opacity: 0.3;
+}
+
+.featured-orb-1 {
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, #14b8a6 0%, transparent 70%);
+  top: -80px;
+  right: -50px;
+}
+
+.featured-orb-2 {
+  width: 150px;
+  height: 150px;
+  background: radial-gradient(circle, #6366f1 0%, transparent 70%);
+  bottom: -60px;
+  left: 20%;
+}
+
+.featured-event-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+  position: relative;
+  z-index: 1;
+}
+
+.featured-badge-premium {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-radius: 9999px;
+  box-shadow: 0 4px 12px rgba(20, 184, 166, 0.3);
+}
+
+.featured-badge-premium i {
+  font-size: 0.6875rem;
+  animation: twinkle 1.5s ease-in-out infinite;
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(0.8); }
+}
+
+.featured-date-badge {
+  width: 64px;
+  height: 64px;
+  background: white;
+  border-radius: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  border: 2px solid rgba(20, 184, 166, 0.2);
+}
+
+.featured-date-month {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #14b8a6;
+  letter-spacing: 0.05em;
+}
+
+.featured-date-day {
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: #0f172a;
+  line-height: 1;
+}
+
+.featured-event-body {
+  position: relative;
+  z-index: 1;
+  margin-bottom: 1.25rem;
+}
+
+.featured-event-title {
+  font-size: 1.375rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0 0 0.5rem;
+  line-height: 1.3;
+}
+
+.featured-event-description {
+  font-size: 0.9375rem;
+  color: #64748b;
+  margin: 0 0 1rem;
+  line-height: 1.5;
+}
+
+.featured-event-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.featured-meta-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: #475569;
+}
+
+.featured-meta-item.virtual {
+  color: #6366f1;
+}
+
+.featured-meta-icon {
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 100%);
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #14b8a6;
+  font-size: 0.75rem;
+}
+
+.featured-meta-item.virtual .featured-meta-icon {
+  background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%);
+  color: #6366f1;
+}
+
+.featured-event-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(20, 184, 166, 0.1);
+  position: relative;
+  z-index: 1;
+}
+
+.featured-attendees {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.featured-avatar-stack {
+  display: flex;
+  margin-left: -8px;
+}
+
+.featured-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 3px solid white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: white;
+  margin-left: -8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.featured-attendee-text {
+  font-size: 0.8125rem;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.featured-rsvp-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+  color: white;
+  border: none;
+  border-radius: 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(20, 184, 166, 0.3);
+}
+
+.featured-rsvp-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(20, 184, 166, 0.4);
+}
+
+/* Premium Event Cards Grid */
+.events-grid-premium {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.25rem;
+}
+
+.event-card-premium {
+  position: relative;
+  background: white;
+  border-radius: 1.25rem;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  border: 1px solid #f1f5f9;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+}
+
+.event-card-premium:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+}
+
+.event-card-glow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.event-card-premium:hover .event-card-glow {
+  opacity: 1;
+}
+
+.event-card-premium.meeting .event-card-glow { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
+.event-card-premium.training .event-card-glow { background: linear-gradient(90deg, #10b981, #34d399); }
+.event-card-premium.social .event-card-glow { background: linear-gradient(90deg, #ec4899, #f472b6); }
+.event-card-premium.review .event-card-glow { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+.event-card-premium.webinar .event-card-glow { background: linear-gradient(90deg, #6366f1, #818cf8); }
+
+.event-card-premium.meeting:hover { border-color: rgba(59, 130, 246, 0.3); }
+.event-card-premium.training:hover { border-color: rgba(16, 185, 129, 0.3); }
+.event-card-premium.social:hover { border-color: rgba(236, 72, 153, 0.3); }
+.event-card-premium.review:hover { border-color: rgba(245, 158, 11, 0.3); }
+.event-card-premium.webinar:hover { border-color: rgba(99, 102, 241, 0.3); }
+
+.event-card-header-premium {
+  position: relative;
+  padding: 1.25rem;
+  background: linear-gradient(135deg, #f8fafc 0%, #f0fdfa 100%);
+  border-bottom: 1px solid rgba(20, 184, 166, 0.08);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.event-type-badge-premium {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.375rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.event-type-badge-premium.meeting { background: linear-gradient(135deg, #dbeafe, #bfdbfe); color: #1e40af; }
+.event-type-badge-premium.training { background: linear-gradient(135deg, #d1fae5, #a7f3d0); color: #065f46; }
+.event-type-badge-premium.social { background: linear-gradient(135deg, #fce7f3, #fbcfe8); color: #9d174d; }
+.event-type-badge-premium.review { background: linear-gradient(135deg, #fef3c7, #fde68a); color: #92400e; }
+.event-type-badge-premium.webinar { background: linear-gradient(135deg, #e0e7ff, #c7d2fe); color: #3730a3; }
+
+.event-date-badge-premium {
+  width: 56px;
+  height: 56px;
+  background: white;
+  border-radius: 0.875rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(20, 184, 166, 0.1);
+}
+
+.event-date-month-premium {
+  font-size: 0.5625rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: #14b8a6;
+  letter-spacing: 0.05em;
+}
+
+.event-date-day-premium {
+  font-size: 1.375rem;
+  font-weight: 900;
+  color: #0f172a;
+  line-height: 1;
+}
+
+.event-card-body-premium {
+  padding: 1.25rem;
+}
+
+.event-card-title-premium {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 0.75rem;
+  line-height: 1.4;
+  transition: color 0.3s ease;
+}
+
+.event-card-premium:hover .event-card-title-premium {
+  color: #0d9488;
+}
+
+.event-card-meta-premium {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.event-meta-item-premium {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  font-size: 0.8125rem;
+  color: #64748b;
+}
+
+.meta-icon-wrapper {
+  width: 28px;
+  height: 28px;
+  background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 100%);
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #14b8a6;
+  font-size: 0.6875rem;
+  flex-shrink: 0;
+}
+
+.event-card-footer-premium {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.25rem;
+  background: #fafafa;
+  border-top: 1px solid #f1f5f9;
+}
+
+.event-attendees-premium {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+}
+
+.attendee-avatars-premium {
+  display: flex;
+  margin-left: -6px;
+}
+
+.attendee-avatar-premium {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 2px solid white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.625rem;
+  font-weight: 700;
+  color: white;
+  margin-left: -6px;
+  transition: transform 0.3s ease;
+}
+
+.event-card-premium:hover .attendee-avatar-premium {
+  transform: translateY(-2px);
+}
+
+.attendee-count-premium {
+  font-size: 0.75rem;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.rsvp-btn-premium {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem 1rem;
+  border-radius: 0.625rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.rsvp-btn-premium.going {
+  background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+  color: #065f46;
+}
+
+.rsvp-btn-premium.pending {
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(20, 184, 166, 0.25);
+}
+
+.rsvp-btn-premium:hover {
+  transform: scale(1.05);
+}
+
+/* Premium List View */
+.events-list-premium {
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+}
+
+.event-list-item-premium {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 1.25rem;
+  background: white;
+  border-radius: 1rem;
+  border: 1px solid #f1f5f9;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.event-list-item-premium::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.event-list-item-premium:hover::before {
+  opacity: 1;
+}
+
+.event-list-item-premium.meeting::before { background: #3b82f6; }
+.event-list-item-premium.training::before { background: #10b981; }
+.event-list-item-premium.social::before { background: #ec4899; }
+.event-list-item-premium.review::before { background: #f59e0b; }
+.event-list-item-premium.webinar::before { background: #6366f1; }
+
+.event-list-item-premium:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  transform: translateX(4px);
+}
+
+.event-list-date-premium {
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 100%);
+  border-radius: 0.875rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 1px solid rgba(20, 184, 166, 0.1);
+}
+
+.list-date-month {
+  font-size: 0.625rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: #14b8a6;
+  letter-spacing: 0.05em;
+}
+
+.list-date-day {
+  font-size: 1.375rem;
+  font-weight: 900;
+  color: #0f172a;
+  line-height: 1;
+}
+
+.event-list-content-premium {
+  flex: 1;
+  min-width: 0;
+}
+
+.event-list-title-premium {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 0.375rem;
+  transition: color 0.3s ease;
+}
+
+.event-list-item-premium:hover .event-list-title-premium {
+  color: #0d9488;
+}
+
+.event-list-details-premium {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.event-list-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.625rem;
+  border-radius: 9999px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+}
+
+.event-list-badge.meeting { background: #dbeafe; color: #1e40af; }
+.event-list-badge.training { background: #d1fae5; color: #065f46; }
+.event-list-badge.social { background: #fce7f3; color: #9d174d; }
+.event-list-badge.review { background: #fef3c7; color: #92400e; }
+.event-list-badge.webinar { background: #e0e7ff; color: #3730a3; }
+
+.event-list-meta-item {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.8125rem;
+  color: #64748b;
+}
+
+.event-list-meta-item i {
+  color: #14b8a6;
+  font-size: 0.75rem;
+}
+
+.event-list-actions-premium {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.list-attendee-avatars {
+  display: flex;
+  margin-left: -6px;
+}
+
+.list-attendee-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.5625rem;
+  font-weight: 700;
+  color: white;
+  margin-left: -6px;
+}
+
+.list-rsvp-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.list-rsvp-btn.going {
+  background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+  color: #065f46;
+}
+
+.list-rsvp-btn.pending {
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+  color: white;
+}
+
+.list-rsvp-btn:hover {
+  transform: scale(1.05);
+}
+
+/* Premium Empty State */
+.empty-state-premium {
+  text-align: center;
+  padding: 4rem 2rem;
+}
+
+.empty-state-icon {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.empty-state-icon-bg {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 100%);
+  border-radius: 1.25rem;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.05); opacity: 0.8; }
+}
+
+.empty-state-icon i {
+  position: relative;
+  z-index: 1;
+  font-size: 2rem;
+  color: #14b8a6;
+}
+
+.empty-state-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 0.5rem;
+}
+
+.empty-state-text {
+  font-size: 0.9375rem;
+  color: #64748b;
+  margin: 0 0 1.5rem;
+}
+
+.empty-state-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+  color: white;
+  border: none;
+  border-radius: 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(20, 184, 166, 0.3);
+}
+
+.empty-state-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(20, 184, 166, 0.4);
+}
+
+/* Responsive Updates for Premium Styles */
+@media (max-width: 1024px) {
+  .events-hero-content {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .events-hero-stats {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .events-stat-card {
+    flex: 1;
+    min-width: 140px;
+  }
+
+  .quick-actions-premium {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .events-hero {
+    padding: 1.5rem 1rem;
+  }
+
+  .events-hero-left {
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .events-hero-title {
+    font-size: 1.5rem;
+  }
+
+  .events-hero-stats {
+    flex-direction: column;
+  }
+
+  .events-stat-card {
+    width: 100%;
+  }
+
+  .quick-actions-premium {
+    grid-template-columns: 1fr;
+  }
+
+  .featured-event-premium {
+    padding: 1.25rem;
+  }
+
+  .featured-event-header {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .featured-date-badge {
+    align-self: flex-start;
+  }
+
+  .featured-event-meta {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .featured-event-footer {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+
+  .events-grid-premium {
+    grid-template-columns: 1fr;
+  }
+
+  .event-list-item-premium {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .event-list-actions-premium {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+
+/* ===============================================
+   PREMIUM CALENDAR VIEW STYLES
+   =============================================== */
+
+.calendar-premium {
+  background: white;
+  border-radius: 1.25rem;
+  overflow: hidden;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(20, 184, 166, 0.1);
+}
+
+.calendar-header-premium {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.25rem 1.5rem;
+  background: linear-gradient(135deg, #f8fafc 0%, #f0fdfa 100%);
+  border-bottom: 1px solid rgba(20, 184, 166, 0.08);
+}
+
+.calendar-nav-premium {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.calendar-nav-btn-premium {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.75rem;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-size: 0.875rem;
+}
+
+.calendar-nav-btn-premium:hover {
+  background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 100%);
+  border-color: #14b8a6;
+  color: #0d9488;
+  transform: scale(1.05);
+}
+
+.calendar-title-wrapper {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  min-width: 200px;
+  justify-content: center;
+}
+
+.calendar-title-premium {
+  font-size: 1.375rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0;
+}
+
+.calendar-year-premium {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #14b8a6;
+}
+
+.calendar-today-btn-premium {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.25rem;
+  background: white;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.calendar-today-btn-premium:hover {
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+  border-color: transparent;
+  color: white;
+  box-shadow: 0 4px 12px rgba(20, 184, 166, 0.3);
+}
+
+.calendar-today-btn-premium i {
+  font-size: 0.75rem;
+}
+
+.calendar-weekdays-premium {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.calendar-weekday-premium {
+  padding: 1rem;
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.calendar-grid-premium {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+}
+
+.calendar-day-premium {
+  min-height: 110px;
+  padding: 0.625rem;
+  border-right: 1px solid #f1f5f9;
+  border-bottom: 1px solid #f1f5f9;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  position: relative;
+}
+
+.calendar-day-premium:nth-child(7n) {
+  border-right: none;
+}
+
+.calendar-day-premium:hover {
+  background: linear-gradient(135deg, rgba(20, 184, 166, 0.03) 0%, rgba(20, 184, 166, 0.06) 100%);
+}
+
+.calendar-day-premium.is-today {
+  background: linear-gradient(135deg, rgba(20, 184, 166, 0.08) 0%, rgba(20, 184, 166, 0.04) 100%);
+}
+
+.calendar-day-premium.other-month {
+  background: #fafafa;
+}
+
+.calendar-day-premium.other-month .day-number-premium {
+  color: #cbd5e1;
+}
+
+.calendar-day-premium.has-events::after {
+  content: '';
+  position: absolute;
+  bottom: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4px;
+  height: 4px;
+  background: #14b8a6;
+  border-radius: 50%;
+  opacity: 0.5;
+}
+
+.day-number-premium {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #334155;
+  border-radius: 0.625rem;
+  margin-bottom: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.day-number-premium.today-badge {
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+  color: white;
+  box-shadow: 0 4px 10px rgba(20, 184, 166, 0.35);
+  font-weight: 700;
+}
+
+.day-events-premium {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.day-event-premium {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.375rem;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  overflow: hidden;
+}
+
+.day-event-premium:hover {
+  transform: translateX(2px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.event-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.event-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.day-event-premium.meeting {
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+  color: #1e40af;
+}
+.day-event-premium.meeting .event-dot { background: #3b82f6; }
+
+.day-event-premium.training {
+  background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+  color: #065f46;
+}
+.day-event-premium.training .event-dot { background: #10b981; }
+
+.day-event-premium.social {
+  background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%);
+  color: #9d174d;
+}
+.day-event-premium.social .event-dot { background: #ec4899; }
+
+.day-event-premium.review {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  color: #92400e;
+}
+.day-event-premium.review .event-dot { background: #f59e0b; }
+
+.day-event-premium.webinar {
+  background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+  color: #3730a3;
+}
+.day-event-premium.webinar .event-dot { background: #6366f1; }
+
+.day-more-premium {
+  font-size: 0.625rem;
+  font-weight: 600;
+  color: #14b8a6;
+  padding: 0.25rem 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-radius: 0.25rem;
+}
+
+.day-more-premium:hover {
+  background: rgba(20, 184, 166, 0.1);
+  color: #0d9488;
+}
+
+/* Calendar Responsive */
+@media (max-width: 1024px) {
+  .calendar-day-premium {
+    min-height: 90px;
+    padding: 0.5rem;
+  }
+
+  .day-number-premium {
+    width: 28px;
+    height: 28px;
+    font-size: 0.8125rem;
+  }
+
+  .day-event-premium {
+    font-size: 0.625rem;
+    padding: 0.1875rem 0.375rem;
+  }
+
+  .event-dot {
+    width: 5px;
+    height: 5px;
+  }
+}
+
+@media (max-width: 768px) {
+  .calendar-header-premium {
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem;
+  }
+
+  .calendar-nav-premium {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .calendar-title-wrapper {
+    min-width: auto;
+  }
+
+  .calendar-today-btn-premium {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .calendar-weekday-premium {
+    padding: 0.75rem 0.25rem;
+    font-size: 0.6875rem;
+  }
+
+  .calendar-day-premium {
+    min-height: 70px;
+    padding: 0.25rem;
+  }
+
+  .day-number-premium {
+    width: 24px;
+    height: 24px;
+    font-size: 0.75rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .day-events-premium {
+    display: none;
+  }
+
+  .calendar-day-premium.has-events::after {
+    opacity: 1;
+    width: 6px;
+    height: 6px;
   }
 }
 </style>
