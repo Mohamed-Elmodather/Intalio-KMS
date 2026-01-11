@@ -1098,133 +1098,139 @@ watch(isViewingDM, (isDM) => {
 
 <template>
   <div class="collaboration-hub flex h-[calc(100vh-64px)] overflow-hidden">
-    <!-- Left Sidebar -->
-    <aside class="w-64 bg-slate-900 text-white flex flex-col flex-shrink-0">
-      <!-- Workspace Header -->
-      <div class="p-4 border-b border-slate-700">
+    <!-- Left Sidebar - Premium Light Theme -->
+    <aside class="w-72 bg-gradient-to-b from-white via-gray-50/50 to-white border-r border-gray-100 flex flex-col flex-shrink-0 shadow-sm">
+      <!-- Workspace Header with Gradient -->
+      <div class="p-4 bg-gradient-to-r from-teal-600 via-teal-500 to-emerald-500 text-white">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-3">
-            <div class="w-9 h-9 bg-teal-500 rounded-lg flex items-center justify-center font-bold text-sm">
+            <div class="w-11 h-11 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center font-bold text-sm shadow-lg border border-white/30">
               AFC
             </div>
             <div>
-              <h2 class="font-semibold text-sm">AFC 2027</h2>
-              <span class="text-xs text-slate-400 flex items-center gap-1">
-                <span class="w-2 h-2 bg-emerald-500 rounded-full"></span>
-                {{ channelMembers.length }} online
+              <h2 class="font-bold text-base tracking-tight">AFC 2027</h2>
+              <span class="text-xs text-teal-100 flex items-center gap-1.5">
+                <span class="w-2 h-2 bg-emerald-300 rounded-full animate-pulse"></span>
+                {{ channelMembers.length }} members online
               </span>
             </div>
           </div>
-          <button class="p-1.5 hover:bg-slate-700 rounded-lg transition-colors">
-            <i class="fas fa-ellipsis-v text-slate-400"></i>
+          <button class="p-2 hover:bg-white/10 rounded-xl transition-all duration-200 group">
+            <i class="fas fa-ellipsis-v text-white/70 group-hover:text-white"></i>
           </button>
         </div>
       </div>
 
-      <!-- Search -->
-      <div class="p-3">
-        <div class="relative">
-          <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-sm"></i>
+      <!-- Search with Premium Styling -->
+      <div class="p-3 border-b border-gray-100">
+        <div class="relative group">
+          <i class="fas fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-sm group-focus-within:text-teal-500 transition-colors"></i>
           <input
             v-model="searchQuery"
             type="text"
-            placeholder="Search..."
-            class="w-full bg-slate-800 text-sm text-white placeholder-slate-500 rounded-lg pl-9 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-teal-500 border border-slate-700"
+            placeholder="Search conversations..."
+            class="w-full bg-gray-50 text-sm text-gray-700 placeholder-gray-400 rounded-xl pl-10 pr-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:bg-white border border-gray-200 focus:border-teal-400 transition-all duration-200"
           />
         </div>
       </div>
 
-      <!-- Channels & DMs -->
-      <div class="flex-1 overflow-y-auto custom-scrollbar">
+      <!-- Channels & DMs with Modern Cards -->
+      <div class="flex-1 overflow-y-auto custom-scrollbar px-3 py-2">
         <!-- Channels Section -->
-        <div class="px-3 py-2">
-          <div class="flex items-center justify-between mb-2">
-            <button class="flex items-center gap-2 text-xs font-semibold text-slate-400 hover:text-white transition-colors">
+        <div class="mb-4">
+          <div class="flex items-center justify-between mb-2 px-1">
+            <button class="flex items-center gap-2 text-xs font-semibold text-gray-500 hover:text-gray-700 transition-colors uppercase tracking-wider">
               <i class="fas fa-chevron-down text-[10px]"></i>
-              <span>CHANNELS</span>
+              <span>Channels</span>
             </button>
             <button
               @click="showCreateChannelModal = true"
-              class="p-1 hover:bg-slate-700 rounded transition-colors"
+              class="p-1.5 hover:bg-teal-50 rounded-lg transition-all duration-200 group"
               title="Create Channel"
             >
-              <i class="fas fa-plus text-slate-400 hover:text-white text-xs"></i>
+              <i class="fas fa-plus text-gray-400 group-hover:text-teal-600 text-xs"></i>
             </button>
           </div>
 
-          <div class="space-y-0.5">
+          <div class="space-y-1">
             <button
               v-for="channel in filteredChannels"
               :key="channel.id"
               @click="selectChannel(channel.id)"
               :class="[
-                'w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-sm transition-all',
+                'w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all duration-200 group',
                 selectedChannelId === channel.id && !selectedDMId
-                  ? 'bg-teal-500/20 text-teal-400'
-                  : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+                  ? 'bg-gradient-to-r from-teal-50 to-emerald-50 text-teal-700 shadow-sm border border-teal-100'
+                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
               ]"
             >
-              <i :class="[
-                channel.type === 'private' ? 'fas fa-lock' : 'fas fa-hashtag',
-                'text-xs w-4'
-              ]"></i>
-              <span class="flex-1 text-left truncate">{{ channel.name }}</span>
+              <div :class="[
+                'w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-200',
+                selectedChannelId === channel.id && !selectedDMId
+                  ? 'bg-teal-500 text-white shadow-sm'
+                  : 'bg-gray-100 text-gray-500 group-hover:bg-teal-100 group-hover:text-teal-600'
+              ]">
+                <i :class="channel.type === 'private' ? 'fas fa-lock' : 'fas fa-hashtag'" class="text-xs"></i>
+              </div>
+              <span class="flex-1 text-left truncate font-medium">{{ channel.name }}</span>
               <span
                 v-if="channel.unreadCount > 0"
-                class="bg-teal-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full min-w-[20px] text-center"
+                class="bg-gradient-to-r from-teal-500 to-emerald-500 text-white text-xs font-bold px-2 py-0.5 rounded-full min-w-[22px] text-center shadow-sm"
               >
                 {{ channel.unreadCount }}
               </span>
-              <i v-if="channel.isMuted" class="fas fa-bell-slash text-slate-500 text-xs"></i>
+              <i v-if="channel.isMuted" class="fas fa-bell-slash text-gray-300 text-xs"></i>
             </button>
           </div>
         </div>
 
         <!-- Teams Section -->
-        <div class="px-3 py-2">
-          <button class="flex items-center gap-2 text-xs font-semibold text-slate-400 hover:text-white transition-colors mb-2">
+        <div class="mb-4">
+          <button class="flex items-center gap-2 text-xs font-semibold text-gray-500 hover:text-gray-700 transition-colors mb-2 px-1 uppercase tracking-wider">
             <i class="fas fa-chevron-down text-[10px]"></i>
-            <span>TEAMS</span>
+            <span>Teams</span>
           </button>
 
-          <div class="space-y-1">
-            <div v-for="team in teams" :key="team.id">
+          <div class="space-y-2">
+            <div v-for="team in teams" :key="team.id" class="bg-white rounded-xl border border-gray-100 overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-200">
               <!-- Team Header -->
               <button
                 @click="toggleTeam(team.id)"
-                class="w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition-all"
+                class="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-all duration-200"
               >
                 <i :class="[
-                  'fas text-[10px] w-3 transition-transform',
+                  'fas text-[10px] w-3 text-gray-400 transition-transform duration-200',
                   isTeamExpanded(team.id) ? 'fa-chevron-down' : 'fa-chevron-right'
                 ]"></i>
                 <div
-                  class="w-5 h-5 rounded flex items-center justify-center text-white text-[10px] font-bold"
-                  :style="{ backgroundColor: team.color }"
+                  class="w-8 h-8 rounded-lg flex items-center justify-center text-white text-xs font-bold shadow-sm"
+                  :style="{ background: `linear-gradient(135deg, ${team.color}, ${team.color}dd)` }"
                 >
                   {{ team.name.substring(0, 2).toUpperCase() }}
                 </div>
-                <span class="flex-1 text-left truncate">{{ team.name }}</span>
+                <div class="flex-1 text-left">
+                  <span class="font-semibold truncate block">{{ team.name }}</span>
+                  <span class="text-xs text-gray-400">{{ team.memberCount }} members</span>
+                </div>
                 <span
                   v-if="getTeamUnreadCount(team) > 0"
-                  class="bg-teal-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full min-w-[20px] text-center"
+                  class="bg-gradient-to-r from-teal-500 to-emerald-500 text-white text-xs font-bold px-2 py-0.5 rounded-full min-w-[22px] text-center shadow-sm"
                 >
                   {{ getTeamUnreadCount(team) }}
                 </span>
-                <span v-else class="text-xs text-slate-500">{{ team.memberCount }}</span>
               </button>
 
               <!-- Team Channels (expanded) -->
-              <div v-if="isTeamExpanded(team.id)" class="ml-5 mt-0.5 space-y-0.5">
+              <div v-if="isTeamExpanded(team.id)" class="bg-gray-50/50 border-t border-gray-100 py-1">
                 <button
                   v-for="channel in team.channels"
                   :key="channel.id"
                   @click="selectTeamChannel(team.id, channel.id)"
                   :class="[
-                    'w-full flex items-center gap-2 px-2 py-1 rounded-lg text-sm transition-all',
+                    'w-full flex items-center gap-2 px-4 py-2 text-sm transition-all duration-200 group',
                     selectedChannelId === channel.id
-                      ? 'bg-teal-500/20 text-teal-400'
-                      : 'text-slate-400 hover:bg-slate-800 hover:text-white'
+                      ? 'bg-teal-50 text-teal-700 border-l-2 border-teal-500'
+                      : 'text-gray-500 hover:bg-white hover:text-gray-700 border-l-2 border-transparent'
                   ]"
                 >
                   <i :class="[
@@ -1245,60 +1251,87 @@ watch(isViewingDM, (isDM) => {
         </div>
 
         <!-- Direct Messages Section -->
-        <div class="px-3 py-2">
-          <button class="flex items-center gap-2 text-xs font-semibold text-slate-400 hover:text-white transition-colors mb-2">
-            <i class="fas fa-chevron-down text-[10px]"></i>
-            <span>DIRECT MESSAGES</span>
-          </button>
+        <div>
+          <div class="flex items-center justify-between mb-2 px-1">
+            <button class="flex items-center gap-2 text-xs font-semibold text-gray-500 hover:text-gray-700 transition-colors uppercase tracking-wider">
+              <i class="fas fa-chevron-down text-[10px]"></i>
+              <span>Direct Messages</span>
+            </button>
+            <button class="p-1.5 hover:bg-teal-50 rounded-lg transition-all duration-200 group" title="New Message">
+              <i class="fas fa-edit text-gray-400 group-hover:text-teal-600 text-xs"></i>
+            </button>
+          </div>
 
-          <div class="space-y-0.5">
+          <div class="space-y-1">
             <button
               v-for="dm in filteredDMs"
               :key="dm.id"
               @click="selectDM(dm.id)"
               :class="[
-                'w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-sm transition-all',
+                'w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all duration-200 group',
                 selectedDMId === dm.id
-                  ? 'bg-teal-500/20 text-teal-400'
-                  : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+                  ? 'bg-gradient-to-r from-teal-50 to-emerald-50 text-teal-700 shadow-sm border border-teal-100'
+                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
               ]"
             >
               <div class="relative">
-                <div class="w-6 h-6 bg-slate-600 rounded-full flex items-center justify-center text-xs font-medium">
+                <div :class="[
+                  'w-9 h-9 rounded-xl flex items-center justify-center text-xs font-semibold transition-all duration-200',
+                  selectedDMId === dm.id
+                    ? 'bg-gradient-to-br from-teal-400 to-teal-600 text-white shadow-sm'
+                    : 'bg-gradient-to-br from-gray-100 to-gray-200 text-gray-600 group-hover:from-teal-100 group-hover:to-teal-200 group-hover:text-teal-700'
+                ]">
                   {{ dm.user.displayName.split(' ').map(n => n[0]).join('') }}
                 </div>
                 <span
-                  :class="['absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-slate-900', getPresenceColor(dm.presence)]"
+                  :class="['absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-white shadow-sm', getPresenceColor(dm.presence)]"
                 ></span>
               </div>
-              <span class="flex-1 text-left truncate">{{ dm.user.displayName }}</span>
-              <span
-                v-if="dm.unreadCount > 0"
-                class="bg-teal-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full min-w-[20px] text-center"
-              >
-                {{ dm.unreadCount }}
-              </span>
+              <div class="flex-1 min-w-0 text-left">
+                <p class="font-medium truncate">{{ dm.user.displayName }}</p>
+                <p :class="[
+                  'text-xs truncate',
+                  selectedDMId === dm.id ? 'text-teal-600/70' : 'text-gray-400'
+                ]">{{ dm.lastMessage }}</p>
+              </div>
+              <div class="flex flex-col items-end gap-1">
+                <span
+                  v-if="dm.unreadCount > 0"
+                  class="bg-gradient-to-r from-teal-500 to-emerald-500 text-white text-xs font-bold px-2 py-0.5 rounded-full min-w-[22px] text-center shadow-sm"
+                >
+                  {{ dm.unreadCount }}
+                </span>
+                <span v-else class="text-[10px] text-gray-400">{{ dm.lastMessageTime }}</span>
+              </div>
             </button>
           </div>
         </div>
       </div>
 
-      <!-- User Footer -->
-      <div class="p-3 border-t border-slate-700">
-        <div class="flex items-center gap-3">
+      <!-- User Footer - Premium Card Style -->
+      <div class="p-3 border-t border-gray-100 bg-gradient-to-r from-gray-50 to-white">
+        <div class="flex items-center gap-3 p-2 bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-200">
           <div class="relative">
-            <div class="w-9 h-9 bg-teal-600 rounded-full flex items-center justify-center font-medium">
+            <div class="w-10 h-10 bg-gradient-to-br from-teal-400 to-teal-600 rounded-xl flex items-center justify-center font-semibold text-white shadow-sm">
               YO
             </div>
-            <span class="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 rounded-full border-2 border-slate-900"></span>
+            <span class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-emerald-500 rounded-full border-2 border-white shadow-sm"></span>
           </div>
           <div class="flex-1 min-w-0">
-            <p class="text-sm font-medium truncate">You</p>
-            <p class="text-xs text-slate-400 truncate">Online</p>
+            <p class="text-sm font-semibold text-gray-800 truncate">You</p>
+            <p class="text-xs text-emerald-600 flex items-center gap-1">
+              <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full"></span>
+              Online
+            </p>
           </div>
-          <button class="p-1.5 hover:bg-slate-700 rounded-lg transition-colors">
-            <i class="fas fa-cog text-slate-400"></i>
-          </button>
+          <div class="flex items-center gap-1">
+            <button class="p-2 hover:bg-gray-100 rounded-lg transition-all duration-200 group">
+              <i class="fas fa-microphone text-gray-400 group-hover:text-teal-600 text-sm"></i>
+            </button>
+            <button class="p-2 hover:bg-gray-100 rounded-lg transition-all duration-200 group">
+              <i class="fas fa-cog text-gray-400 group-hover:text-teal-600 text-sm"></i>
+            </button>
+          </div>
         </div>
       </div>
     </aside>
