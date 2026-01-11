@@ -50,6 +50,7 @@ const dateRangeOptions = [
 // My Events filter (separate from date range)
 const showMyEventsOnly = ref(false)
 const showFeaturedOnly = ref(false)
+const showInterestedOnly = ref(false)
 
 // Custom date range state
 const customDateStart = ref('')
@@ -81,22 +82,23 @@ interface Event {
   categoryLabel: string
   virtual: boolean
   isGoing: boolean
+  interested: boolean
   featured: boolean
   description: string
   attendees: Attendee[]
 }
 
 const events = ref<Event[]>([
-  { id: 1, title: 'All-Hands Meeting Q4', date: '2025-12-24', time: '10:00 AM - 11:30 AM', location: 'Main Conference Room', category: 'meeting', categoryLabel: 'Meeting', virtual: true, isGoing: true, featured: true, description: 'Quarterly all-hands meeting to discuss company progress and goals.', attendees: [{ color: '#14b8a6', initials: 'AI' }, { color: '#3b82f6', initials: 'SC' }, { color: '#ec4899', initials: 'LW' }] },
-  { id: 2, title: 'Product Demo - New Features', date: '2025-12-26', time: '2:00 PM - 3:00 PM', location: 'Virtual - Zoom', category: 'webinar', categoryLabel: 'Webinar', virtual: true, isGoing: false, featured: false, description: 'Demo of the latest product features to the team.', attendees: [{ color: '#6366f1', initials: 'DK' }, { color: '#0d9488', initials: 'MJ' }] },
-  { id: 3, title: 'Year-End Performance Review', date: '2025-12-30', time: '9:00 AM - 12:00 PM', location: 'Board Room', category: 'review', categoryLabel: 'Review', virtual: false, isGoing: true, featured: false, description: 'Annual performance review meeting.', attendees: [{ color: '#f59e0b', initials: 'HR' }] },
-  { id: 4, title: 'Holiday Team Lunch', date: '2025-12-24', time: '12:30 PM - 2:00 PM', location: 'Cafeteria', category: 'social', categoryLabel: 'Social', virtual: false, isGoing: true, featured: true, description: 'Holiday celebration lunch with the team.', attendees: [{ color: '#ec4899', initials: 'TM' }, { color: '#14b8a6', initials: 'AI' }, { color: '#3b82f6', initials: 'SC' }, { color: '#10b981', initials: 'ED' }] },
-  { id: 5, title: 'Advanced Excel Training', date: '2025-12-27', time: '3:00 PM - 5:00 PM', location: 'Training Room A', category: 'training', categoryLabel: 'Training', virtual: false, isGoing: false, featured: false, description: 'Advanced Excel techniques for productivity.', attendees: [{ color: '#10b981', initials: 'RG' }, { color: '#0d9488', initials: 'AT' }] },
-  { id: 6, title: 'Sprint Planning Meeting', date: '2025-12-25', time: '10:00 AM - 11:00 AM', location: 'Scrum Room', category: 'meeting', categoryLabel: 'Meeting', virtual: false, isGoing: true, featured: false, description: 'Planning for the upcoming sprint.', attendees: [{ color: '#3b82f6', initials: 'PM' }, { color: '#14b8a6', initials: 'AI' }, { color: '#6366f1', initials: 'DK' }] },
-  { id: 7, title: 'Customer Success Webinar', date: '2025-12-28', time: '1:00 PM - 2:30 PM', location: 'Virtual - Teams', category: 'webinar', categoryLabel: 'Webinar', virtual: true, isGoing: false, featured: true, description: 'Webinar on customer success strategies.', attendees: [{ color: '#6366f1', initials: 'CS' }, { color: '#ec4899', initials: 'LW' }] },
-  { id: 8, title: 'New Year Planning Session', date: '2025-12-31', time: '2:00 PM - 4:00 PM', location: 'Executive Suite', category: 'meeting', categoryLabel: 'Meeting', virtual: false, isGoing: true, featured: true, description: 'Strategic planning for the new year.', attendees: [{ color: '#14b8a6', initials: 'AI' }, { color: '#0d9488', initials: 'CEO' }] },
-  { id: 9, title: 'Team Building Workshop', date: '2025-12-29', time: '9:00 AM - 12:00 PM', location: 'Innovation Lab', category: 'social', categoryLabel: 'Social', virtual: false, isGoing: false, featured: false, description: 'Interactive team building exercises.', attendees: [{ color: '#ec4899', initials: 'HR' }, { color: '#10b981', initials: 'ED' }, { color: '#3b82f6', initials: 'SC' }] },
-  { id: 10, title: 'Security Awareness Training', date: '2025-12-26', time: '10:00 AM - 11:00 AM', location: 'Virtual - Webex', category: 'training', categoryLabel: 'Training', virtual: true, isGoing: true, featured: false, description: 'Mandatory security training for all employees.', attendees: [{ color: '#10b981', initials: 'IT' }, { color: '#f59e0b', initials: 'SEC' }] },
+  { id: 1, title: 'All-Hands Meeting Q4', date: '2025-12-24', time: '10:00 AM - 11:30 AM', location: 'Main Conference Room', category: 'meeting', categoryLabel: 'Meeting', virtual: true, isGoing: true, interested: false, featured: true, description: 'Quarterly all-hands meeting to discuss company progress and goals.', attendees: [{ color: '#14b8a6', initials: 'AI' }, { color: '#3b82f6', initials: 'SC' }, { color: '#ec4899', initials: 'LW' }] },
+  { id: 2, title: 'Product Demo - New Features', date: '2025-12-26', time: '2:00 PM - 3:00 PM', location: 'Virtual - Zoom', category: 'webinar', categoryLabel: 'Webinar', virtual: true, isGoing: false, interested: true, featured: false, description: 'Demo of the latest product features to the team.', attendees: [{ color: '#6366f1', initials: 'DK' }, { color: '#0d9488', initials: 'MJ' }] },
+  { id: 3, title: 'Year-End Performance Review', date: '2025-12-30', time: '9:00 AM - 12:00 PM', location: 'Board Room', category: 'review', categoryLabel: 'Review', virtual: false, isGoing: true, interested: false, featured: false, description: 'Annual performance review meeting.', attendees: [{ color: '#f59e0b', initials: 'HR' }] },
+  { id: 4, title: 'Holiday Team Lunch', date: '2025-12-24', time: '12:30 PM - 2:00 PM', location: 'Cafeteria', category: 'social', categoryLabel: 'Social', virtual: false, isGoing: true, interested: false, featured: true, description: 'Holiday celebration lunch with the team.', attendees: [{ color: '#ec4899', initials: 'TM' }, { color: '#14b8a6', initials: 'AI' }, { color: '#3b82f6', initials: 'SC' }, { color: '#10b981', initials: 'ED' }] },
+  { id: 5, title: 'Advanced Excel Training', date: '2025-12-27', time: '3:00 PM - 5:00 PM', location: 'Training Room A', category: 'training', categoryLabel: 'Training', virtual: false, isGoing: false, interested: true, featured: false, description: 'Advanced Excel techniques for productivity.', attendees: [{ color: '#10b981', initials: 'RG' }, { color: '#0d9488', initials: 'AT' }] },
+  { id: 6, title: 'Sprint Planning Meeting', date: '2025-12-25', time: '10:00 AM - 11:00 AM', location: 'Scrum Room', category: 'meeting', categoryLabel: 'Meeting', virtual: false, isGoing: true, interested: false, featured: false, description: 'Planning for the upcoming sprint.', attendees: [{ color: '#3b82f6', initials: 'PM' }, { color: '#14b8a6', initials: 'AI' }, { color: '#6366f1', initials: 'DK' }] },
+  { id: 7, title: 'Customer Success Webinar', date: '2025-12-28', time: '1:00 PM - 2:30 PM', location: 'Virtual - Teams', category: 'webinar', categoryLabel: 'Webinar', virtual: true, isGoing: false, interested: false, featured: true, description: 'Webinar on customer success strategies.', attendees: [{ color: '#6366f1', initials: 'CS' }, { color: '#ec4899', initials: 'LW' }] },
+  { id: 8, title: 'New Year Planning Session', date: '2025-12-31', time: '2:00 PM - 4:00 PM', location: 'Executive Suite', category: 'meeting', categoryLabel: 'Meeting', virtual: false, isGoing: true, interested: false, featured: true, description: 'Strategic planning for the new year.', attendees: [{ color: '#14b8a6', initials: 'AI' }, { color: '#0d9488', initials: 'CEO' }] },
+  { id: 9, title: 'Team Building Workshop', date: '2025-12-29', time: '9:00 AM - 12:00 PM', location: 'Innovation Lab', category: 'social', categoryLabel: 'Social', virtual: false, isGoing: false, interested: true, featured: false, description: 'Interactive team building exercises.', attendees: [{ color: '#ec4899', initials: 'HR' }, { color: '#10b981', initials: 'ED' }, { color: '#3b82f6', initials: 'SC' }] },
+  { id: 10, title: 'Security Awareness Training', date: '2025-12-26', time: '10:00 AM - 11:00 AM', location: 'Virtual - Webex', category: 'training', categoryLabel: 'Training', virtual: true, isGoing: true, interested: false, featured: false, description: 'Mandatory security training for all employees.', attendees: [{ color: '#10b981', initials: 'IT' }, { color: '#f59e0b', initials: 'SEC' }] },
 ])
 
 const newEvent = ref({
@@ -229,6 +231,11 @@ const filteredEvents = computed(() => {
   // Apply Featured filter
   if (showFeaturedOnly.value) {
     result = result.filter(e => e.featured)
+  }
+
+  // Apply Interested filter
+  if (showInterestedOnly.value) {
+    result = result.filter(e => e.interested)
   }
 
   if (searchQuery.value) {
@@ -389,6 +396,7 @@ function clearFilters() {
   showCustomDatePicker.value = false
   showMyEventsOnly.value = false
   showFeaturedOnly.value = false
+  showInterestedOnly.value = false
   currentPage.value = 1
 }
 
@@ -488,6 +496,25 @@ function getEventTypeIcon(category: string) {
 
 function getCategoryCount(categoryId: string) {
   return events.value.filter(e => e.category === categoryId).length
+}
+
+function toggleInterested(eventId: number) {
+  const event = events.value.find(e => e.id === eventId)
+  if (event) {
+    event.interested = !event.interested
+    // If marking as interested and already going, keep going status
+  }
+}
+
+function toggleReserve(eventId: number) {
+  const event = events.value.find(e => e.id === eventId)
+  if (event) {
+    event.isGoing = !event.isGoing
+    // If reserving, remove interested status (upgraded to going)
+    if (event.isGoing) {
+      event.interested = false
+    }
+  }
 }
 </script>
 
@@ -942,6 +969,21 @@ function getCategoryCount(categoryId: string) {
               </span>
             </button>
 
+            <!-- Interested Toggle -->
+            <button
+              @click="showInterestedOnly = !showInterestedOnly; currentPage = 1"
+              :class="[
+                'flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border',
+                showInterestedOnly ? 'bg-red-50 border-red-200 text-red-600' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+              ]"
+            >
+              <i :class="showInterestedOnly ? 'fas fa-heart' : 'far fa-heart'" class="text-sm"></i>
+              <span>Interested</span>
+              <span v-if="showInterestedOnly" class="w-4 h-4 rounded-full bg-red-500 text-white text-[10px] flex items-center justify-center">
+                <i class="fas fa-check"></i>
+              </span>
+            </button>
+
             <!-- My Events Toggle -->
             <button
               @click="showMyEventsOnly = !showMyEventsOnly; currentPage = 1"
@@ -959,7 +1001,7 @@ function getCategoryCount(categoryId: string) {
 
             <!-- Clear Filters -->
             <button
-              v-if="selectedTypes.length > 0 || selectedFormats.length > 0 || searchQuery || quickFilter !== 'all' || showMyEventsOnly || showFeaturedOnly"
+              v-if="selectedTypes.length > 0 || selectedFormats.length > 0 || searchQuery || quickFilter !== 'all' || showMyEventsOnly || showFeaturedOnly || showInterestedOnly"
               @click="clearFilters"
               class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-red-600 bg-red-50 border border-red-200 hover:bg-red-100 transition-colors"
             >
@@ -1098,13 +1140,20 @@ function getCategoryCount(categoryId: string) {
                   <span class="attendee-count-premium">{{ event.attendees.length }} going</span>
                 </div>
                 <div class="card-action-buttons">
-                  <button class="card-action-btn" @click.stop title="Set Reminder">
-                    <i class="fas fa-bell"></i>
+                  <button
+                    @click.stop="toggleInterested(event.id)"
+                    :class="['card-action-btn', event.interested ? 'interested-active' : '']"
+                    :title="event.interested ? 'Remove Interest' : 'Mark as Interested'"
+                  >
+                    <i :class="event.interested ? 'fas fa-heart' : 'far fa-heart'"></i>
                   </button>
                   <button class="card-action-btn" @click.stop title="Share">
                     <i class="fas fa-share-alt"></i>
                   </button>
-                  <button :class="['rsvp-btn-premium', event.isGoing ? 'going' : 'pending']">
+                  <button
+                    @click.stop="toggleReserve(event.id)"
+                    :class="['rsvp-btn-premium', event.isGoing ? 'going' : 'pending']"
+                  >
                     <i :class="event.isGoing ? 'fas fa-check-circle' : 'fas fa-plus-circle'"></i>
                     {{ event.isGoing ? 'Going' : 'RSVP' }}
                   </button>
@@ -1148,8 +1197,12 @@ function getCategoryCount(categoryId: string) {
                   </div>
                 </div>
                 <div class="list-action-buttons">
-                  <button class="list-action-btn" @click.stop title="Set Reminder">
-                    <i class="fas fa-bell"></i>
+                  <button
+                    @click.stop="toggleInterested(event.id)"
+                    :class="['list-action-btn', event.interested ? 'interested-active' : '']"
+                    :title="event.interested ? 'Remove Interest' : 'Mark as Interested'"
+                  >
+                    <i :class="event.interested ? 'fas fa-heart' : 'far fa-heart'"></i>
                   </button>
                   <button class="list-action-btn" @click.stop title="Share">
                     <i class="fas fa-share-alt"></i>
@@ -1157,9 +1210,12 @@ function getCategoryCount(categoryId: string) {
                   <button class="list-action-btn" @click.stop title="Add to Calendar">
                     <i class="fas fa-calendar-plus"></i>
                   </button>
-                  <button :class="['list-rsvp-btn', event.isGoing ? 'going' : 'pending']">
+                  <button
+                    @click.stop="toggleReserve(event.id)"
+                    :class="['list-rsvp-btn', event.isGoing ? 'going' : 'pending']"
+                  >
                     <i :class="event.isGoing ? 'fas fa-check' : 'fas fa-plus'"></i>
-                    {{ event.isGoing ? 'Going' : 'RSVP' }}
+                    {{ event.isGoing ? 'Reserved' : 'Reserve' }}
                   </button>
                 </div>
               </div>
@@ -3895,6 +3951,18 @@ function getCategoryCount(categoryId: string) {
   box-shadow: 0 4px 8px rgba(13, 148, 136, 0.25);
 }
 
+.card-action-btn.interested-active {
+  background: #fef2f2;
+  color: #ef4444;
+  border: 1px solid #fecaca;
+}
+
+.card-action-btn.interested-active:hover {
+  background: #ef4444;
+  color: white;
+  box-shadow: 0 4px 8px rgba(239, 68, 68, 0.25);
+}
+
 /* ===============================================
    LIST ACTION BUTTONS
    =============================================== */
@@ -3920,6 +3988,17 @@ function getCategoryCount(categoryId: string) {
 
 .list-action-btn:hover {
   background: #0d9488;
+  color: white;
+}
+
+.list-action-btn.interested-active {
+  background: #fef2f2;
+  color: #ef4444;
+  border: 1px solid #fecaca;
+}
+
+.list-action-btn.interested-active:hover {
+  background: #ef4444;
   color: white;
 }
 
