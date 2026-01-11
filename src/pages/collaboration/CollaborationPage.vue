@@ -565,11 +565,11 @@ function getFileIcon(type: string): string {
     xlsx: 'fas fa-file-excel text-green-500',
     png: 'fas fa-file-image text-purple-500',
     jpg: 'fas fa-file-image text-purple-500',
-    zip: 'fas fa-file-archive text-amber-500',
-    default: 'fas fa-file text-gray-500'
+    zip: 'fas fa-file-archive text-amber-500'
   }
+  const defaultIcon = 'fas fa-file text-gray-500'
   const ext = type.split('.').pop()?.toLowerCase() || ''
-  return icons[ext] || icons.default
+  return icons[ext] ?? defaultIcon
 }
 
 function scrollToBottom() {
@@ -596,7 +596,7 @@ watch(messageInput, (val) => {
 </script>
 
 <template>
-  <div class="collaboration-hub flex h-[calc(100vh-64px)] -m-6 overflow-hidden">
+  <div class="collaboration-hub flex h-[calc(100vh-64px)] overflow-hidden">
     <!-- Left Sidebar -->
     <aside class="w-64 bg-slate-900 text-white flex flex-col flex-shrink-0">
       <!-- Workspace Header -->
@@ -829,7 +829,7 @@ watch(messageInput, (val) => {
           <template v-for="(message, idx) in currentMessages" :key="message.id">
             <!-- Date Separator -->
             <div
-              v-if="idx === 0 || formatDate(message.createdAt) !== formatDate(currentMessages[idx - 1].createdAt)"
+              v-if="idx === 0 || formatDate(message.createdAt) !== formatDate(currentMessages[idx - 1]?.createdAt || '')"
               class="flex items-center gap-4 my-6"
             >
               <div class="flex-1 border-t border-gray-200"></div>
@@ -1103,11 +1103,11 @@ watch(messageInput, (val) => {
       </div>
 
       <!-- Message Input -->
-      <div class="p-4 border-t border-gray-200 bg-white">
+      <div class="p-4 border-t border-gray-200 bg-white relative">
         <!-- Emoji Picker -->
         <div
           v-if="showEmojiPicker && activeEmojiMessageId"
-          class="absolute bottom-24 left-1/2 -translate-x-1/2 bg-white rounded-xl shadow-xl border border-gray-200 p-3 z-50"
+          class="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-white rounded-xl shadow-xl border border-gray-200 p-3 z-50"
         >
           <div class="flex flex-wrap gap-1 max-w-xs">
             <button
@@ -1124,7 +1124,7 @@ watch(messageInput, (val) => {
         <!-- Mention Autocomplete -->
         <div
           v-if="showMentionAutocomplete && filteredMembers.length"
-          class="absolute bottom-24 left-4 bg-white rounded-xl shadow-xl border border-gray-200 p-2 z-50 w-64"
+          class="absolute bottom-full mb-2 left-4 bg-white rounded-xl shadow-xl border border-gray-200 p-2 z-50 w-64"
         >
           <button
             v-for="member in filteredMembers"
