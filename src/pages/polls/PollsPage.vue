@@ -499,43 +499,142 @@ function goToCreatePoll() {
         </div>
       </div>
 
-      <!-- Featured Poll -->
-      <section v-if="featuredPoll" class="featured-poll mb-10 fade-in-up" style="animation-delay: 0.1s">
-        <div class="flex flex-col lg:flex-row gap-6">
-          <div class="flex-1">
-            <div class="flex items-center gap-3 mb-4">
-              <span class="featured-badge">
-                <i class="fas fa-star"></i> Featured Poll
+      <!-- Featured Poll - Premium Design -->
+      <section v-if="featuredPoll" class="featured-poll-premium mb-10 fade-in-up" style="animation-delay: 0.1s">
+        <!-- Floating Decorative Elements -->
+        <div class="featured-poll-decor">
+          <div class="decor-orb decor-orb-1"></div>
+          <div class="decor-orb decor-orb-2"></div>
+          <div class="decor-orb decor-orb-3"></div>
+          <div class="decor-shape decor-shape-1"></div>
+          <div class="decor-shape decor-shape-2"></div>
+          <div class="decor-pattern"></div>
+        </div>
+
+        <div class="featured-poll-content">
+          <!-- Left Content -->
+          <div class="featured-poll-left">
+            <!-- Badges Row -->
+            <div class="featured-badges-row">
+              <span class="featured-badge-premium">
+                <span class="badge-icon-glow">
+                  <i class="fas fa-star"></i>
+                </span>
+                <span>Featured Poll</span>
               </span>
-              <span v-if="featuredPoll.anonymous" class="featured-badge">
-                <i class="fas fa-user-secret"></i> Anonymous
+              <span v-if="featuredPoll.anonymous" class="featured-badge-premium secondary">
+                <i class="fas fa-user-secret"></i>
+                <span>Anonymous</span>
+              </span>
+              <span class="featured-badge-premium live">
+                <span class="live-dot"></span>
+                <span>Live</span>
               </span>
             </div>
-            <h2 class="text-xl lg:text-2xl font-bold mb-2">{{ featuredPoll.question }}</h2>
-            <p class="text-white/80 text-sm mb-4">{{ featuredPoll.description }}</p>
-            <div class="flex items-center gap-4 text-sm text-white/70">
-              <span><i class="fas fa-users mr-1"></i> {{ featuredPoll.totalVotes }} responses</span>
-              <span><i class="fas fa-clock mr-1"></i> {{ featuredPoll.endsIn }}</span>
-              <span><i class="fas fa-user mr-1"></i> By {{ featuredPoll.author }}</span>
+
+            <!-- Question -->
+            <h2 class="featured-poll-question">{{ featuredPoll.question }}</h2>
+            <p class="featured-poll-description">{{ featuredPoll.description }}</p>
+
+            <!-- Stats Row -->
+            <div class="featured-stats-row">
+              <div class="featured-stat">
+                <div class="featured-stat-icon">
+                  <i class="fas fa-users"></i>
+                </div>
+                <div class="featured-stat-content">
+                  <span class="featured-stat-value">{{ featuredPoll.totalVotes.toLocaleString() }}</span>
+                  <span class="featured-stat-label">responses</span>
+                </div>
+              </div>
+              <div class="featured-stat">
+                <div class="featured-stat-icon timer">
+                  <i class="fas fa-hourglass-half"></i>
+                </div>
+                <div class="featured-stat-content">
+                  <span class="featured-stat-value countdown">3</span>
+                  <span class="featured-stat-label">days left</span>
+                </div>
+              </div>
+              <div class="featured-stat">
+                <div class="featured-stat-icon author">
+                  <i class="fas fa-crown"></i>
+                </div>
+                <div class="featured-stat-content">
+                  <span class="featured-stat-value">{{ featuredPoll.author }}</span>
+                  <span class="featured-stat-label">created by</span>
+                </div>
+              </div>
             </div>
           </div>
-          <div class="lg:w-80 space-y-2">
-            <div
-              v-for="(option, idx) in featuredPoll.options"
-              :key="idx"
-              :class="['featured-option', { selected: featuredPoll.selectedOption === idx }]"
-              @click="selectFeaturedOption(idx)"
-            >
-              <div class="radio-circle"></div>
-              <span class="flex-1">{{ option.label }}</span>
-              <span v-if="featuredPoll.hasVoted" class="text-sm font-semibold">{{ option.percentage }}%</span>
+
+          <!-- Right Content - Voting Options -->
+          <div class="featured-poll-right">
+            <div class="voting-card">
+              <div class="voting-header">
+                <span class="voting-title">Cast Your Vote</span>
+                <span class="voting-progress">
+                  <i class="fas fa-chart-pie"></i>
+                  {{ featuredPoll.hasVoted ? 'Voted' : 'Select an option' }}
+                </span>
+              </div>
+
+              <div class="voting-options">
+                <div
+                  v-for="(option, idx) in featuredPoll.options"
+                  :key="idx"
+                  :class="['voting-option', {
+                    selected: featuredPoll.selectedOption === idx,
+                    voted: featuredPoll.hasVoted,
+                    leading: featuredPoll.hasVoted && option.percentage >= 40
+                  }]"
+                  @click="selectFeaturedOption(idx)"
+                >
+                  <!-- Progress Bar Background -->
+                  <div
+                    v-if="featuredPoll.hasVoted"
+                    class="voting-progress-bar"
+                    :style="{ width: option.percentage + '%' }"
+                  ></div>
+
+                  <!-- Option Content -->
+                  <div class="voting-option-content">
+                    <div class="voting-radio">
+                      <div class="radio-inner"></div>
+                    </div>
+                    <span class="voting-label">{{ option.label }}</span>
+                    <div v-if="featuredPoll.hasVoted" class="voting-percentage">
+                      <span class="percentage-value">{{ option.percentage }}</span>
+                      <span class="percentage-sign">%</span>
+                    </div>
+                    <div v-if="featuredPoll.hasVoted && option.percentage >= 40" class="leading-badge">
+                      <i class="fas fa-crown"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Submit Button -->
+              <button
+                v-if="!featuredPoll.hasVoted"
+                :disabled="featuredPoll.selectedOption === null"
+                class="voting-submit-btn"
+              >
+                <span class="btn-bg"></span>
+                <span class="btn-content">
+                  <i class="fas fa-paper-plane"></i>
+                  <span>Submit Vote</span>
+                </span>
+              </button>
+
+              <!-- Voted Confirmation -->
+              <div v-else class="voting-confirmed">
+                <div class="confirmed-icon">
+                  <i class="fas fa-check-circle"></i>
+                </div>
+                <span>Your vote has been recorded</span>
+              </div>
             </div>
-            <button
-              v-if="!featuredPoll.hasVoted"
-              class="w-full mt-4 py-3 bg-white text-teal-700 font-semibold rounded-xl hover:bg-white/90 transition-all"
-            >
-              Submit Vote
-            </button>
           </div>
         </div>
       </section>
@@ -896,75 +995,560 @@ function goToCreatePoll() {
 </template>
 
 <style scoped>
-/* Featured Poll */
-.featured-poll {
-  background: linear-gradient(135deg, #0d9488 0%, #14b8a6 50%, #2dd4bf 100%);
-  border-radius: 1.5rem;
-  padding: 2rem;
-  color: white;
+/* ============================================
+   Featured Poll - Premium Design
+   ============================================ */
+.featured-poll-premium {
   position: relative;
+  background: linear-gradient(135deg, #0d9488 0%, #0f766e 40%, #115e59 100%);
+  border-radius: 2rem;
+  padding: 2.5rem;
+  color: white;
   overflow: hidden;
+  box-shadow:
+    0 25px 50px -12px rgba(13, 148, 136, 0.4),
+    0 0 0 1px rgba(255, 255, 255, 0.1) inset;
 }
-.featured-poll::before {
-  content: '';
+
+/* Decorative Elements */
+.featured-poll-decor {
   position: absolute;
-  top: 0;
-  right: 0;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.decor-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px);
+  opacity: 0.4;
+  animation: float 8s ease-in-out infinite;
+}
+
+.decor-orb-1 {
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, #5eead4 0%, transparent 70%);
+  top: -100px;
+  right: -50px;
+  animation-delay: 0s;
+}
+
+.decor-orb-2 {
   width: 200px;
   height: 200px;
-  background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+  background: radial-gradient(circle, #2dd4bf 0%, transparent 70%);
+  bottom: -80px;
+  left: 10%;
+  animation-delay: 2s;
 }
-.featured-badge {
+
+.decor-orb-3 {
+  width: 150px;
+  height: 150px;
+  background: radial-gradient(circle, #99f6e4 0%, transparent 70%);
+  top: 50%;
+  left: 40%;
+  animation-delay: 4s;
+}
+
+.decor-shape {
+  position: absolute;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1rem;
+  transform: rotate(45deg);
+}
+
+.decor-shape-1 {
+  width: 80px;
+  height: 80px;
+  top: 20%;
+  right: 15%;
+  animation: spin-slow 20s linear infinite;
+}
+
+.decor-shape-2 {
+  width: 40px;
+  height: 40px;
+  bottom: 30%;
+  left: 5%;
+  animation: spin-slow 15s linear infinite reverse;
+}
+
+.decor-pattern {
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 20% 80%, rgba(255,255,255,0.03) 1px, transparent 1px),
+    radial-gradient(circle at 80% 20%, rgba(255,255,255,0.03) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-20px) scale(1.05); }
+}
+
+@keyframes spin-slow {
+  from { transform: rotate(45deg); }
+  to { transform: rotate(405deg); }
+}
+
+/* Content Layout */
+.featured-poll-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+@media (min-width: 1024px) {
+  .featured-poll-content {
+    flex-direction: row;
+    align-items: stretch;
+  }
+}
+
+/* Left Section */
+.featured-poll-left {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Badges Row */
+.featured-badges-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.featured-badge-premium {
   display: inline-flex;
   align-items: center;
-  gap: 0.375rem;
-  background: rgba(255,255,255,0.2);
+  gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.15);
   backdrop-filter: blur(10px);
-  padding: 0.375rem 0.75rem;
+  padding: 0.5rem 1rem;
   border-radius: 2rem;
-  font-size: 0.75rem;
+  font-size: 0.8125rem;
   font-weight: 600;
-}
-.featured-option {
-  background: rgba(255,255,255,0.15);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255,255,255,0.2);
-  border-radius: 0.75rem;
-  padding: 0.875rem 1rem;
-  cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, 0.2);
   transition: all 0.3s ease;
+}
+
+.featured-badge-premium:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateY(-2px);
+}
+
+.featured-badge-premium .badge-icon-glow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  border-radius: 50%;
+  font-size: 0.625rem;
+  color: white;
+  box-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 10px rgba(251, 191, 36, 0.5); }
+  50% { box-shadow: 0 0 20px rgba(251, 191, 36, 0.8); }
+}
+
+.featured-badge-premium.secondary {
+  background: rgba(148, 163, 184, 0.2);
+}
+
+.featured-badge-premium.live {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.live-dot {
+  width: 8px;
+  height: 8px;
+  background: #ef4444;
+  border-radius: 50%;
+  animation: pulse-live 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse-live {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.2); }
+}
+
+/* Question */
+.featured-poll-question {
+  font-size: 1.75rem;
+  font-weight: 800;
+  line-height: 1.3;
+  margin-bottom: 0.75rem;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+@media (min-width: 1024px) {
+  .featured-poll-question {
+    font-size: 2rem;
+  }
+}
+
+.featured-poll-description {
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.8);
+  line-height: 1.6;
+  margin-bottom: 2rem;
+  max-width: 500px;
+}
+
+/* Stats Row */
+.featured-stats-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin-top: auto;
+}
+
+.featured-stat {
   display: flex;
   align-items: center;
   gap: 0.75rem;
 }
-.featured-option:hover {
-  background: rgba(255,255,255,0.25);
+
+.featured-stat-icon {
+  width: 44px;
+  height: 44px;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  border-radius: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.featured-stat-icon.timer {
+  background: rgba(251, 191, 36, 0.2);
+  color: #fcd34d;
+}
+
+.featured-stat-icon.timer i {
+  animation: hourglass 3s ease-in-out infinite;
+}
+
+@keyframes hourglass {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(180deg); }
+  50% { transform: rotate(180deg); }
+  75% { transform: rotate(360deg); }
+}
+
+.featured-stat-icon.author {
+  background: rgba(167, 139, 250, 0.2);
+  color: #c4b5fd;
+}
+
+.featured-stat-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.featured-stat-value {
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+
+.featured-stat-value.countdown {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #fcd34d;
+}
+
+.featured-stat-label {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.6);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Right Section - Voting Card */
+.featured-poll-right {
+  flex: 0 0 360px;
+}
+
+.voting-card {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  border-radius: 1.5rem;
+  padding: 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.voting-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.voting-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+
+.voting-progress {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8125rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* Voting Options */
+.voting-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.voting-option {
+  position: relative;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1rem;
+  padding: 1rem 1.25rem;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+
+.voting-option:hover:not(.voted) {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
   transform: translateX(4px);
 }
-.featured-option.selected {
-  background: rgba(255,255,255,0.3);
-  border-color: white;
+
+.voting-option.selected:not(.voted) {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.5);
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
 }
-.featured-option .radio-circle {
-  width: 20px;
-  height: 20px;
-  border: 2px solid rgba(255,255,255,0.5);
+
+.voting-option.voted {
+  cursor: default;
+}
+
+.voting-option.leading {
+  border-color: rgba(251, 191, 36, 0.5);
+  background: rgba(251, 191, 36, 0.1);
+}
+
+/* Progress Bar */
+.voting-progress-bar {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, rgba(94, 234, 212, 0.3), rgba(45, 212, 191, 0.2));
+  border-radius: 1rem;
+  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.voting-option.leading .voting-progress-bar {
+  background: linear-gradient(90deg, rgba(251, 191, 36, 0.3), rgba(245, 158, 11, 0.2));
+}
+
+/* Option Content */
+.voting-option-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+}
+
+.voting-radio {
+  width: 22px;
+  height: 22px;
+  border: 2px solid rgba(255, 255, 255, 0.4);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
   transition: all 0.3s ease;
 }
-.featured-option.selected .radio-circle {
+
+.voting-option:hover:not(.voted) .voting-radio {
+  border-color: rgba(255, 255, 255, 0.7);
+}
+
+.voting-option.selected .voting-radio {
   border-color: white;
   background: white;
 }
-.featured-option.selected .radio-circle::after {
-  content: '';
-  width: 8px;
-  height: 8px;
-  background: #0d9488;
+
+.voting-radio .radio-inner {
+  width: 10px;
+  height: 10px;
+  background: transparent;
   border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.voting-option.selected .radio-inner {
+  background: #0d9488;
+}
+
+.voting-option.voted .voting-radio {
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.voting-option.voted.selected .voting-radio {
+  border-color: rgba(94, 234, 212, 0.8);
+  background: rgba(94, 234, 212, 0.3);
+}
+
+.voting-option.voted.selected .radio-inner {
+  background: #5eead4;
+}
+
+.voting-label {
+  flex: 1;
+  font-size: 0.9375rem;
+  font-weight: 500;
+}
+
+.voting-percentage {
+  display: flex;
+  align-items: baseline;
+  font-weight: 700;
+}
+
+.percentage-value {
+  font-size: 1.25rem;
+}
+
+.percentage-sign {
+  font-size: 0.875rem;
+  opacity: 0.7;
+}
+
+.leading-badge {
+  width: 28px;
+  height: 28px;
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  color: white;
+  box-shadow: 0 2px 10px rgba(251, 191, 36, 0.4);
+  animation: crown-bounce 2s ease-in-out infinite;
+}
+
+@keyframes crown-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+/* Submit Button */
+.voting-submit-btn {
+  position: relative;
+  width: 100%;
+  margin-top: 1.25rem;
+  padding: 1rem 1.5rem;
+  background: transparent;
+  border: none;
+  border-radius: 1rem;
+  cursor: pointer;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.voting-submit-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.voting-submit-btn .btn-bg {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, #ffffff 0%, #f0fdfa 100%);
+  border-radius: 1rem;
+  transition: all 0.3s ease;
+}
+
+.voting-submit-btn:not(:disabled):hover .btn-bg {
+  transform: scale(1.02);
+  box-shadow: 0 10px 30px rgba(255, 255, 255, 0.3);
+}
+
+.voting-submit-btn .btn-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.625rem;
+  color: #0d9488;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.voting-submit-btn:not(:disabled):hover .btn-content i {
+  animation: fly 0.5s ease-in-out;
+}
+
+@keyframes fly {
+  0%, 100% { transform: translateX(0) translateY(0); }
+  50% { transform: translateX(3px) translateY(-3px); }
+}
+
+/* Voted Confirmation */
+.voting-confirmed {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+  padding: 1rem;
+  background: rgba(94, 234, 212, 0.15);
+  border-radius: 1rem;
+  border: 1px solid rgba(94, 234, 212, 0.3);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: #5eead4;
+}
+
+.confirmed-icon {
+  width: 32px;
+  height: 32px;
+  background: rgba(94, 234, 212, 0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  animation: check-pop 0.5s ease-out;
+}
+
+@keyframes check-pop {
+  0% { transform: scale(0); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
 }
 
 /* Quick Poll Card */
