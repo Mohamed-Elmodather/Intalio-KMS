@@ -745,30 +745,11 @@ function goToCreatePoll() {
               </div>
             </div>
 
-            <!-- Response Rate Circle -->
-            <div class="trending-progress">
-              <svg width="56" height="56" viewBox="0 0 56 56">
-                <circle class="progress-bg" cx="28" cy="28" r="24"></circle>
-                <circle
-                  class="progress-ring"
-                  cx="28"
-                  cy="28"
-                  r="24"
-                  :stroke-dasharray="151"
-                  :stroke-dashoffset="151 - (151 * poll.responseRate / 100)"
-                  :class="{ 'high-rate': poll.responseRate >= 80 }"
-                ></circle>
-              </svg>
-              <div class="progress-value">
-                <span class="value-number">{{ poll.responseRate }}</span>
-                <span class="value-percent">%</span>
-              </div>
-            </div>
-
-            <!-- Hover Arrow -->
-            <div class="trending-arrow">
-              <i class="fas fa-chevron-right"></i>
-            </div>
+            <!-- Vote Now Button -->
+            <button class="trending-vote-btn">
+              <span class="btn-text">Vote Now</span>
+              <i class="fas fa-arrow-right"></i>
+            </button>
           </div>
         </div>
       </section>
@@ -2032,10 +2013,10 @@ function goToCreatePoll() {
    Trending Section - Enhanced
    ============================================ */
 .trending-section {
-  background: linear-gradient(135deg, #fef7f0 0%, #fff7ed 50%, #fffbeb 100%);
+  background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 50%, #f0fdfa 100%);
   border-radius: 1.5rem;
   padding: 2rem;
-  border: 1px solid rgba(251, 146, 60, 0.1);
+  border: 1px solid rgba(20, 184, 166, 0.1);
 }
 
 .trending-header {
@@ -2110,16 +2091,16 @@ function goToCreatePoll() {
   gap: 0.5rem;
   font-size: 0.875rem;
   font-weight: 600;
-  color: #f97316;
+  color: #0d9488;
   text-decoration: none;
   padding: 0.625rem 1rem;
   border-radius: 0.75rem;
-  background: rgba(249, 115, 22, 0.1);
+  background: rgba(20, 184, 166, 0.1);
   transition: all 0.3s ease;
 }
 
 .trending-view-all:hover {
-  background: rgba(249, 115, 22, 0.2);
+  background: rgba(20, 184, 166, 0.2);
   transform: translateX(4px);
 }
 
@@ -2170,15 +2151,15 @@ function goToCreatePoll() {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, transparent 0%, rgba(249, 115, 22, 0.03) 100%);
+  background: linear-gradient(135deg, transparent 0%, rgba(20, 184, 166, 0.03) 100%);
   opacity: 0;
   transition: opacity 0.3s ease;
 }
 
 .trending-card-enhanced:hover {
   transform: translateY(-4px);
-  box-shadow: 0 12px 30px rgba(249, 115, 22, 0.15);
-  border-color: rgba(249, 115, 22, 0.2);
+  box-shadow: 0 12px 30px rgba(20, 184, 166, 0.15);
+  border-color: rgba(20, 184, 166, 0.2);
 }
 
 .trending-card-enhanced:hover::before {
@@ -2190,18 +2171,18 @@ function goToCreatePoll() {
 }
 
 .trending-card-enhanced.top-three:nth-child(1) {
-  border-left-color: #fbbf24;
-  background: linear-gradient(135deg, #fffbeb 0%, white 30%);
+  border-left-color: #0d9488;
+  background: linear-gradient(135deg, #f0fdfa 0%, white 30%);
 }
 
 .trending-card-enhanced.top-three:nth-child(2) {
-  border-left-color: #9ca3af;
-  background: linear-gradient(135deg, #f9fafb 0%, white 30%);
+  border-left-color: #14b8a6;
+  background: linear-gradient(135deg, #f0fdfa 0%, white 30%);
 }
 
 .trending-card-enhanced.top-three:nth-child(3) {
-  border-left-color: #d97706;
-  background: linear-gradient(135deg, #fffbeb 0%, white 30%);
+  border-left-color: #2dd4bf;
+  background: linear-gradient(135deg, #f0fdfa 0%, white 30%);
 }
 
 /* Rank Badge */
@@ -2218,9 +2199,9 @@ function goToCreatePoll() {
 }
 
 .rank-badge.rank-1 {
-  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%);
   color: white;
-  box-shadow: 0 4px 12px rgba(251, 191, 36, 0.4);
+  box-shadow: 0 4px 12px rgba(13, 148, 136, 0.4);
 }
 
 .rank-badge.rank-1 i {
@@ -2233,22 +2214,22 @@ function goToCreatePoll() {
 }
 
 .rank-badge.rank-2 {
-  background: linear-gradient(135deg, #e5e7eb 0%, #9ca3af 100%);
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
   color: white;
-  box-shadow: 0 4px 12px rgba(156, 163, 175, 0.4);
+  box-shadow: 0 4px 12px rgba(20, 184, 166, 0.4);
 }
 
 .rank-badge.rank-3 {
-  background: linear-gradient(135deg, #fcd34d 0%, #d97706 100%);
+  background: linear-gradient(135deg, #2dd4bf 0%, #14b8a6 100%);
   color: white;
-  box-shadow: 0 4px 12px rgba(217, 119, 6, 0.4);
+  box-shadow: 0 4px 12px rgba(45, 212, 191, 0.4);
 }
 
 .rank-badge.rank-4,
 .rank-badge.rank-5,
 .rank-badge.rank-6 {
-  background: #f3f4f6;
-  color: #6b7280;
+  background: #f0fdfa;
+  color: #0d9488;
 }
 
 .rank-icon {
@@ -2285,7 +2266,7 @@ function goToCreatePoll() {
 }
 
 .trending-card-enhanced:hover .trending-question {
-  color: #f97316;
+  color: #0d9488;
 }
 
 .trending-stats {
@@ -2371,21 +2352,62 @@ function goToCreatePoll() {
   color: #9ca3af;
 }
 
-/* Hover Arrow */
-.trending-arrow {
-  position: absolute;
-  right: 1rem;
-  top: 50%;
-  transform: translateY(-50%) translateX(10px);
-  opacity: 0;
-  color: #f97316;
-  font-size: 0.875rem;
-  transition: all 0.3s ease;
+/* Vote Now Button */
+.trending-vote-btn {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1rem;
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+  color: white;
+  border: none;
+  border-radius: 0.75rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 12px rgba(20, 184, 166, 0.3);
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
 }
 
-.trending-card-enhanced:hover .trending-arrow {
+.trending-vote-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.trending-vote-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 20px rgba(20, 184, 166, 0.4);
+}
+
+.trending-vote-btn:hover::before {
   opacity: 1;
-  transform: translateY(-50%) translateX(0);
+}
+
+.trending-vote-btn .btn-text,
+.trending-vote-btn i {
+  position: relative;
+  z-index: 1;
+}
+
+.trending-vote-btn i {
+  font-size: 0.75rem;
+  transition: transform 0.3s ease;
+}
+
+.trending-vote-btn:hover i {
+  transform: translateX(3px);
+}
+
+.trending-vote-btn:active {
+  transform: scale(0.98);
 }
 
 /* Section Titles with Visual Effects */
