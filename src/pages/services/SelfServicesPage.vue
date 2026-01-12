@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { useRouter } from 'vue-router'
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
 import { useAIServicesStore } from '@/stores/aiServices'
 import { AILoadingIndicator, AISuggestionChip } from '@/components/ai'
+
+const router = useRouter()
 
 // Initialize AI store
 const aiStore = useAIServicesStore()
@@ -173,7 +176,7 @@ function submitRequest() {
 }
 
 function showRequestDetail(request: any) {
-  alert(`Viewing request ${request.id}: ${request.title}`)
+  router.push({ name: 'ServiceRequestDetail', params: { id: request.id } })
 }
 
 function askAI(query: string) {

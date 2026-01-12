@@ -725,7 +725,7 @@ function commentOnActivity(activityId: number, event: Event) {
 
 // Team Activity actions
 function viewUserProfile(userId: number) {
-  router.push(`/users/${userId}`)
+  router.push({ name: 'Profile', query: { user: userId.toString() } })
 }
 
 function viewActivityTarget(activity: any) {

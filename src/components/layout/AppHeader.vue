@@ -80,6 +80,29 @@ function markAllRead() {
   notificationsStore.markAllAsRead()
 }
 
+function viewAllNotifications() {
+  showNotifications.value = false
+  // Navigate to dashboard where notifications can be viewed
+  // In a future update, this could link to a dedicated notifications page
+  router.push({ name: 'Dashboard' })
+}
+
+function openMessages() {
+  router.push({ name: 'Collaboration' })
+}
+
+function handleNotificationClick(notif: { id: string; link?: string; isRead: boolean }) {
+  // Mark as read
+  if (!notif.isRead) {
+    notificationsStore.markAsRead(notif.id)
+  }
+  // Navigate if link exists
+  if (notif.link) {
+    showNotifications.value = false
+    router.push(notif.link)
+  }
+}
+
 onMounted(() => {
   document.addEventListener('click', closeDropdowns)
   notificationsStore.fetchUnreadCount()
@@ -210,8 +233,9 @@ onBeforeUnmount(() => {
                   <i class="fas fa-bell-slash text-2xl mb-2"></i>
                   <p class="text-sm">No notifications</p>
                 </div>
-                <a v-for="notif in recentNotifications" :key="notif.id" href="#"
-                   class="flex items-start gap-3 px-4 py-3 hover:bg-gray-50 transition-colors"
+                <button v-for="notif in recentNotifications" :key="notif.id"
+                   @click="handleNotificationClick(notif)"
+                   class="flex items-start gap-3 px-4 py-3 hover:bg-gray-50 transition-colors w-full text-left"
                    :class="{ 'bg-teal-50/50': !notif.isRead }">
                   <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
                        :class="notif.type === 'success' ? 'bg-green-100 text-green-600' :
@@ -224,20 +248,20 @@ onBeforeUnmount(() => {
                     <p class="text-xs text-gray-400 mt-0.5">{{ notif.message }}</p>
                   </div>
                   <div v-if="!notif.isRead" class="w-2 h-2 bg-teal-500 rounded-full flex-shrink-0 mt-2"></div>
-                </a>
+                </button>
               </div>
               <div class="px-4 py-3 border-t border-gray-100 bg-gray-50/50">
-                <router-link to="/notifications" class="text-sm text-teal-600 hover:text-teal-700 font-medium flex items-center justify-center gap-2">
+                <button @click="viewAllNotifications" class="w-full text-sm text-teal-600 hover:text-teal-700 font-medium flex items-center justify-center gap-2">
                   View all notifications
                   <i class="fas fa-arrow-right text-xs"></i>
-                </router-link>
+                </button>
               </div>
             </div>
           </Transition>
         </div>
 
         <!-- Messages -->
-        <button class="header-btn group" title="Messages">
+        <button @click="openMessages" class="header-btn group" title="Messages">
           <i class="fas fa-comment-dots text-gray-500 group-hover:text-teal-600 transition-colors"></i>
           <span class="notification-badge small">3</span>
         </button>

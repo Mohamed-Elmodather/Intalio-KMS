@@ -824,6 +824,13 @@ function scrollToBookmarks() {
   }
 }
 
+function scrollToAllArticles() {
+  const allArticlesSection = document.querySelector('.all-articles-section')
+  if (allArticlesSection) {
+    allArticlesSection.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+}
+
 function dismissToast(id: number) {
   toasts.value = toasts.value.filter(t => t.id !== id)
 }
@@ -1148,7 +1155,7 @@ onUnmounted(() => {
               <i class="fas fa-history text-purple-500"></i>
               Continue Reading
             </h2>
-            <router-link to="#" class="view-all-link">View All <i class="fas fa-arrow-right"></i></router-link>
+            <button @click="scrollToAllArticles" class="view-all-link">View All <i class="fas fa-arrow-right"></i></button>
           </div>
           <div class="section-scroll scrollbar-elegant">
             <div v-for="article in continueReadingArticles" :key="'continue-' + article!.id"
@@ -1187,7 +1194,7 @@ onUnmounted(() => {
               <i class="fas fa-bookmark text-yellow-500"></i>
               Your Bookmarks
             </h2>
-            <router-link to="#" class="view-all-link">View All ({{ bookmarkedArticles.length }}) <i class="fas fa-arrow-right"></i></router-link>
+            <button @click="scrollToAllArticles" class="view-all-link">View All ({{ bookmarkedArticles.length }}) <i class="fas fa-arrow-right"></i></button>
           </div>
           <div class="section-scroll scrollbar-elegant">
             <div v-for="article in bookmarkedArticles" :key="'bookmark-' + article!.id"
@@ -1424,9 +1431,9 @@ onUnmounted(() => {
               <i class="fas fa-fire text-red-500"></i>
               Trending
             </h2>
-            <router-link to="#" class="view-all-link">
+            <button @click="scrollToAllArticles" class="view-all-link">
               View All <i class="fas fa-arrow-right"></i>
-            </router-link>
+            </button>
           </div>
           <div class="trending-scroll scrollbar-elegant">
             <div v-for="(article, index) in trendingThisWeek" :key="'trending-' + article.id"
@@ -1476,9 +1483,9 @@ onUnmounted(() => {
               <i class="fas fa-history text-blue-500"></i>
               Recently Viewed
             </h2>
-            <router-link to="#" class="view-all-link">
+            <button @click="scrollToAllArticles" class="view-all-link">
               View All <i class="fas fa-arrow-right"></i>
-            </router-link>
+            </button>
           </div>
           <div class="recently-viewed-scroll scrollbar-elegant">
             <div v-for="article in recentlyViewedArticles" :key="'recent-' + article.id"
@@ -1524,7 +1531,7 @@ onUnmounted(() => {
          ============================================ -->
 
     <!-- Main Content Area -->
-    <div class="px-6 pb-6">
+    <div class="px-6 pb-6 all-articles-section">
       <!-- Section Header -->
       <div class="flex items-center justify-between mb-4">
         <h2 class="text-lg font-bold text-gray-900 flex items-center gap-3">

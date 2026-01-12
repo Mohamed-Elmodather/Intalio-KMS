@@ -78,17 +78,17 @@ function isActive(item: NavItem): boolean {
       <div class="mt-6 pt-6 border-t border-gray-100">
         <p v-show="!isCollapsed" class="px-3 mb-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">Workspaces</p>
         <div class="space-y-1">
-          <a
+          <router-link
             v-for="workspace in workspaceItems"
             :key="workspace.id"
-            href="#"
+            :to="{ name: 'Dashboard', query: { workspace: workspace.id } }"
             class="sidebar-workspace-item group"
           >
             <div class="workspace-avatar shadow-sm transition-transform group-hover:scale-110" :style="{ backgroundColor: workspace.color }">
               {{ workspace.initials }}
             </div>
             <span v-show="!isCollapsed" class="sidebar-item-label">{{ workspace.label }}</span>
-          </a>
+          </router-link>
         </div>
       </div>
 

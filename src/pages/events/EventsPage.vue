@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { useRouter } from 'vue-router'
 import { useAIServicesStore } from '@/stores/aiServices'
 import { AILoadingIndicator, AISuggestionChip, AIConfidenceBar } from '@/components/ai'
 import type { SummarizationResult, ClassificationResult } from '@/types/ai'
+
+const router = useRouter()
 
 // Initialize AI store
 const aiStore = useAIServicesStore()
@@ -504,8 +507,7 @@ function getShortTime(time: string) {
 }
 
 function openEvent(event: Event & { month?: string; day?: number }) {
-  // Navigate to event detail page using router
-  console.log('Opening event:', event.id)
+  router.push({ name: 'EventDetail', params: { id: event.id } })
 }
 
 function createEvent() {

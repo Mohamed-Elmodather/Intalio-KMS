@@ -171,6 +171,18 @@ const goToLearning = () => {
   router.push('/learning')
 }
 
+const goToArticles = () => {
+  router.push('/articles')
+}
+
+const goToDocuments = () => {
+  router.push('/documents')
+}
+
+const goToPolls = () => {
+  router.push('/polls')
+}
+
 const saveProfile = () => {
   showEditProfile.value = false
   // In a real app, this would save to the backend
@@ -673,7 +685,7 @@ function getInsightColor(type: string): string {
                   <i class="fas fa-chevron-right text-teal-400 group-hover:text-teal-600 transition-colors mt-1"></i>
                 </div>
               </router-link>
-              <button class="w-full py-2 text-center text-sm text-teal-600 hover:text-teal-800 font-medium">
+              <button @click="goToArticles" class="w-full py-2 text-center text-sm text-teal-600 hover:text-teal-800 font-medium">
                 View All Articles <i class="fas fa-arrow-right ml-1"></i>
               </button>
             </div>
@@ -705,7 +717,7 @@ function getInsightColor(type: string): string {
                   <i class="fas fa-chevron-right text-teal-400 group-hover:text-purple-600 transition-colors mt-3"></i>
                 </div>
               </router-link>
-              <button class="w-full py-2 text-center text-sm text-teal-600 hover:text-teal-800 font-medium">
+              <button @click="goToDocuments" class="w-full py-2 text-center text-sm text-teal-600 hover:text-teal-800 font-medium">
                 View All Documents <i class="fas fa-arrow-right ml-1"></i>
               </button>
             </div>
@@ -742,7 +754,7 @@ function getInsightColor(type: string): string {
                   <i class="fas fa-chevron-right text-teal-400 group-hover:text-blue-600 transition-colors mt-3"></i>
                 </div>
               </router-link>
-              <button class="w-full py-2 text-center text-sm text-teal-600 hover:text-teal-800 font-medium">
+              <button @click="goToPolls" class="w-full py-2 text-center text-sm text-teal-600 hover:text-teal-800 font-medium">
                 View All Polls <i class="fas fa-arrow-right ml-1"></i>
               </button>
             </div>
