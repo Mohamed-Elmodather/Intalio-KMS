@@ -1861,23 +1861,13 @@ watch(isViewingDM, (isDM) => {
       <!-- Panel Header (Context Aware) -->
       <div class="h-14 px-3 border-b border-gray-200 flex items-center bg-white" :class="rightPanelCollapsed ? 'justify-center' : 'justify-between'">
         <h3 v-if="!rightPanelCollapsed" class="font-semibold text-gray-900">{{ isViewingDM ? 'Profile' : 'Details' }}</h3>
-        <div class="flex items-center gap-1">
-          <button
-            @click="rightPanelCollapsed = !rightPanelCollapsed"
-            class="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
-            :title="rightPanelCollapsed ? 'Expand panel' : 'Collapse panel'"
-          >
-            <i :class="['fas text-gray-500', rightPanelCollapsed ? 'fa-chevron-left' : 'fa-chevron-right']"></i>
-          </button>
-          <button
-            v-if="!rightPanelCollapsed"
-            @click="showRightPanel = false"
-            class="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
-            title="Close panel"
-          >
-            <i class="fas fa-times text-gray-500"></i>
-          </button>
-        </div>
+        <button
+          @click="rightPanelCollapsed = !rightPanelCollapsed"
+          class="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
+          :title="rightPanelCollapsed ? 'Expand panel' : 'Collapse panel'"
+        >
+          <i :class="['fas text-gray-500', rightPanelCollapsed ? 'fa-chevron-left' : 'fa-chevron-right']"></i>
+        </button>
       </div>
 
       <!-- Collapsed View - Icons Only -->
