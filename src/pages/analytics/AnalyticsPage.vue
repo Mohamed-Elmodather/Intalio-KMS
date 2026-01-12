@@ -24,6 +24,21 @@ const contentTypes = [
   { value: 'events', label: 'Events' }
 ]
 
+// Content Engagement Data
+const contentEngagement = ref([
+  { name: 'Articles', views: 4200, interactions: 1800, color: '#14b8a6', colorLight: '#5eead4' },
+  { name: 'Courses', views: 2800, interactions: 1500, color: '#3b82f6', colorLight: '#93c5fd' },
+  { name: 'Events', views: 1900, interactions: 1400, color: '#8b5cf6', colorLight: '#c4b5fd' },
+  { name: 'Documents', views: 3100, interactions: 980, color: '#f59e0b', colorLight: '#fcd34d' },
+  { name: 'Polls', views: 1200, interactions: 890, color: '#ec4899', colorLight: '#f9a8d4' },
+  { name: 'Videos', views: 1600, interactions: 720, color: '#10b981', colorLight: '#6ee7b7' }
+])
+
+// Get max value for chart scaling
+const maxEngagementValue = computed(() => {
+  return Math.max(...contentEngagement.value.map(c => c.views))
+})
+
 // Department filters
 const departments = [
   { id: 'all', name: 'All Departments' },
@@ -431,50 +446,84 @@ function exportData(format: string) {
       <!-- Content Engagement Row -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <!-- Content Engagement by Type -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-          <div class="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
-            <h2 class="text-lg font-bold text-gray-900 flex items-center gap-3">
-              <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg shadow-blue-200">
-                <i class="fas fa-book-reader text-white text-sm"></i>
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100">
+          <div class="px-5 py-4 border-b border-gray-100">
+            <div class="flex flex-wrap items-center justify-between gap-3">
+              <h2 class="text-lg font-bold text-gray-900 flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg shadow-blue-200">
+                  <i class="fas fa-book-reader text-white text-sm"></i>
+                </div>
+                <div>
+                  <span class="block">Content Engagement by Type</span>
+                  <span class="text-xs font-medium text-gray-500">Views vs Interactions</span>
+                </div>
+              </h2>
+              <div class="flex items-center gap-1">
+                <button
+                  v-for="type in contentTypes"
+                  :key="type.value"
+                  @click="selectedContentType = type.value"
+                  :class="[
+                    'px-3 py-1.5 rounded-lg text-xs font-medium transition-all',
+                    selectedContentType === type.value ? 'bg-teal-500 text-white shadow-sm' : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
+                  ]"
+                >
+                  {{ type.label }}
+                </button>
               </div>
-              <div>
-                <span class="block">Content Engagement by Type</span>
-                <span class="text-xs font-medium text-gray-500">Views vs Interactions</span>
-              </div>
-            </h2>
-            <div class="flex items-center gap-2">
-              <button
-                v-for="type in contentTypes"
-                :key="type.value"
-                @click="selectedContentType = type.value"
-                :class="[
-                  'px-3 py-1 rounded-lg text-xs font-medium transition-all',
-                  selectedContentType === type.value ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                ]"
-              >
-                {{ type.label }}
-              </button>
             </div>
           </div>
           <div class="p-5">
-            <!-- Bar Chart Placeholder -->
-            <div class="h-48 flex items-end justify-around gap-4 px-4">
-              <div v-for="(item, idx) in ['Articles', 'Courses', 'Events', 'Documents', 'Polls', 'Videos']" :key="idx" class="flex-1 flex flex-col items-center gap-1">
-                <div class="w-full flex gap-1 items-end justify-center">
-                  <div class="w-5 bg-teal-500 rounded-t hover:bg-teal-600 transition-all" :style="{ height: [120, 90, 60, 100, 40, 50][idx] + 'px' }"></div>
-                  <div class="w-5 bg-blue-400 rounded-t hover:bg-blue-500 transition-all" :style="{ height: [55, 45, 42, 30, 27, 22][idx] + 'px' }"></div>
+            <!-- Enhanced Bar Chart -->
+            <div class="h-56 flex items-end justify-between gap-3">
+              <div
+                v-for="item in contentEngagement"
+                :key="item.name"
+                class="flex-1 flex flex-col items-center group"
+              >
+                <!-- Value Labels (show on hover) -->
+                <div class="opacity-0 group-hover:opacity-100 transition-opacity mb-1 text-center">
+                  <span class="text-[10px] font-semibold" :style="{ color: item.color }">{{ (item.views / 1000).toFixed(1) }}K</span>
                 </div>
-                <span class="text-[10px] text-gray-400 mt-2">{{ item }}</span>
+                <!-- Bar Container -->
+                <div class="w-full flex gap-1 items-end justify-center h-40">
+                  <!-- Views Bar -->
+                  <div
+                    class="engagement-bar w-5 rounded-t-md transition-all duration-300 group-hover:w-6 cursor-pointer relative"
+                    :style="{
+                      height: (item.views / maxEngagementValue * 100) + '%',
+                      background: `linear-gradient(to top, ${item.color}, ${item.colorLight})`
+                    }"
+                  >
+                    <div class="absolute -top-6 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                      <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-gray-800 text-white">{{ item.views.toLocaleString() }}</span>
+                    </div>
+                  </div>
+                  <!-- Interactions Bar -->
+                  <div
+                    class="engagement-bar w-5 rounded-t-md transition-all duration-300 group-hover:w-6 cursor-pointer relative"
+                    :style="{
+                      height: (item.interactions / maxEngagementValue * 100) + '%',
+                      background: `linear-gradient(to top, ${item.color}80, ${item.colorLight}80)`
+                    }"
+                  >
+                  </div>
+                </div>
+                <!-- Label -->
+                <div class="mt-3 text-center">
+                  <span class="text-[11px] font-medium text-gray-600 group-hover:text-gray-900 transition-colors">{{ item.name }}</span>
+                </div>
               </div>
             </div>
-            <div class="flex items-center justify-center gap-6 mt-4">
+            <!-- Legend -->
+            <div class="flex items-center justify-center gap-8 mt-5 pt-4 border-t border-gray-100">
               <div class="flex items-center gap-2">
-                <span class="w-3 h-3 rounded bg-teal-500"></span>
-                <span class="text-xs text-gray-500">Views</span>
+                <div class="w-4 h-3 rounded-sm bg-gradient-to-r from-teal-500 to-teal-300"></div>
+                <span class="text-xs font-medium text-gray-600">Views</span>
               </div>
               <div class="flex items-center gap-2">
-                <span class="w-3 h-3 rounded bg-blue-400"></span>
-                <span class="text-xs text-gray-500">Interactions</span>
+                <div class="w-4 h-3 rounded-sm bg-gradient-to-r from-teal-500/50 to-teal-300/50"></div>
+                <span class="text-xs font-medium text-gray-600">Interactions</span>
               </div>
             </div>
           </div>
@@ -977,4 +1026,36 @@ function exportData(format: string) {
 .animate-in {
   animation: fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
+
+/* Engagement Bar Styles */
+.engagement-bar {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+.engagement-bar:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transform: scaleY(1.02);
+  transform-origin: bottom;
+}
+
+/* Bar Animation on Load */
+@keyframes barGrow {
+  from {
+    transform: scaleY(0);
+    opacity: 0;
+  }
+  to {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+}
+
+.engagement-bar {
+  animation: barGrow 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  transform-origin: bottom;
+}
+
+.engagement-bar:nth-child(1) { animation-delay: 0.1s; }
+.engagement-bar:nth-child(2) { animation-delay: 0.15s; }
 </style>
