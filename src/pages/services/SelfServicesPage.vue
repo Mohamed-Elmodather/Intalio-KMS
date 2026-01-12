@@ -181,128 +181,151 @@ function askAI(query: string) {
 </script>
 
 <template>
-  <div>
+  <div class="min-h-screen bg-gray-50">
     <!-- Loading State -->
     <div v-if="isLoading" class="flex items-center justify-center min-h-[400px]">
       <LoadingSpinner size="lg" text="Loading services..." />
     </div>
 
     <template v-else>
-      <div class="page-view">
-        <!-- Hero Section -->
-        <div class="hero-section fade-in-up">
-          <div class="hero-content">
-            <div class="hero-left">
-              <div class="hero-header">
-                <div class="hero-icon">
-                  <i class="fas fa-concierge-bell"></i>
-                </div>
-                <div>
-                  <h1 class="hero-title"><span class="hero-title-highlight">Self-Service</span> Portal</h1>
-                  <p class="hero-subtitle">Request services, track progress, and get help</p>
-                </div>
-              </div>
-              <button @click="showNewRequest = true" class="hero-btn">
-                <i class="fas fa-plus"></i>
-                <span>New Request</span>
-              </button>
-            </div>
+      <!-- Hero Section - Documents Style -->
+      <div class="hero-gradient relative overflow-hidden">
+        <!-- Decorative elements with animations -->
+        <div class="circle-drift-1 absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full"></div>
+        <div class="circle-drift-2 absolute bottom-0 left-0 w-64 h-64 bg-white/5 rounded-full"></div>
+        <div class="circle-drift-3 absolute top-1/2 right-1/4 w-32 h-32 bg-white/10 rounded-full"></div>
 
-            <!-- Stats -->
-            <div class="hero-stats">
-              <div class="stat-card-hero">
-                <div class="stat-card-hero-icon teal">
-                  <i class="fas fa-clock"></i>
-                </div>
-                <div class="stat-card-hero-content">
-                  <p class="stat-card-hero-value">{{ openRequestsCount }}</p>
-                  <p class="stat-card-hero-label">Open Requests</p>
-                </div>
-              </div>
-              <div class="stat-card-hero">
-                <div class="stat-card-hero-icon teal">
-                  <i class="fas fa-check-circle"></i>
-                </div>
-                <div class="stat-card-hero-content">
-                  <p class="stat-card-hero-value">{{ completedRequestsCount }}</p>
-                  <p class="stat-card-hero-label">Completed</p>
-                </div>
-              </div>
-              <div class="stat-card-hero">
-                <div class="stat-card-hero-icon orange">
-                  <i class="fas fa-bolt"></i>
-                </div>
-                <div class="stat-card-hero-content">
-                  <p class="stat-card-hero-value">{{ avgResolutionTime }}h</p>
-                  <p class="stat-card-hero-label">Avg. Resolution</p>
-                </div>
-              </div>
-              <div class="stat-card-hero">
-                <div class="stat-card-hero-icon blue">
-                  <i class="fas fa-th-large"></i>
-                </div>
-                <div class="stat-card-hero-content">
-                  <p class="stat-card-hero-value">{{ totalServices }}</p>
-                  <p class="stat-card-hero-label">Services</p>
-                </div>
-              </div>
+        <!-- Stats - Absolute Top Right -->
+        <div class="stats-top-right">
+          <div class="stat-card-square">
+            <div class="stat-icon-box">
+              <i class="fas fa-clock"></i>
             </div>
+            <p class="stat-value-mini">{{ openRequestsCount }}</p>
+            <p class="stat-label-mini">Open</p>
+          </div>
+          <div class="stat-card-square">
+            <div class="stat-icon-box">
+              <i class="fas fa-check-circle"></i>
+            </div>
+            <p class="stat-value-mini">{{ completedRequestsCount }}</p>
+            <p class="stat-label-mini">Completed</p>
+          </div>
+          <div class="stat-card-square">
+            <div class="stat-icon-box">
+              <i class="fas fa-bolt"></i>
+            </div>
+            <p class="stat-value-mini">{{ avgResolutionTime }}h</p>
+            <p class="stat-label-mini">Avg. Time</p>
+          </div>
+          <div class="stat-card-square">
+            <div class="stat-icon-box">
+              <i class="fas fa-th-large"></i>
+            </div>
+            <p class="stat-value-mini">{{ totalServices }}</p>
+            <p class="stat-label-mini">Services</p>
           </div>
         </div>
 
-        <!-- Main Content -->
-        <div class="px-6 py-6">
+        <div class="relative px-8 py-8">
+          <div class="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-white text-xs font-semibold inline-flex items-center gap-2 mb-4">
+            <i class="fas fa-concierge-bell"></i>
+            AFC Asian Cup 2027
+          </div>
+
+          <h1 class="text-3xl font-bold text-white mb-2">Self-Service Portal</h1>
+          <p class="text-teal-100 max-w-lg">Request services, track progress, and get instant help from our support team.</p>
+
+          <div class="flex flex-wrap gap-3 mt-6">
+            <button @click="showNewRequest = true" class="px-5 py-2.5 bg-white text-teal-600 rounded-xl font-semibold text-sm flex items-center gap-2 hover:bg-teal-50 transition-all shadow-lg">
+              <i class="fas fa-plus"></i>
+              New Request
+            </button>
+            <button class="px-5 py-2.5 bg-white/20 backdrop-blur-sm border border-white/30 text-white rounded-xl font-semibold text-sm hover:bg-white/30 transition-all flex items-center gap-2">
+              <i class="fas fa-history"></i>
+              View History
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Content -->
+      <div class="px-8 py-6 space-y-6">
         <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
           <!-- Service Catalog -->
-          <div class="xl:col-span-2">
-            <div class="card-animated">
-              <div class="p-5 border-b border-gray-100">
-                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                  <h2 class="text-lg font-semibold text-gray-900">Service Catalog</h2>
-                  <div class="flex flex-wrap gap-2">
-                    <button v-for="cat in categories" :key="cat.id"
-                            @click="filterCategory = cat.id"
-                            :class="['px-4 py-2 rounded-xl text-sm font-medium transition-all ripple-effect',
-                                     filterCategory === cat.id ? 'btn-vibrant' : 'bg-teal-50 text-gray-700 hover:bg-teal-100']">
-                      {{ cat.label }}
-                    </button>
-                  </div>
+          <div class="xl:col-span-2 space-y-6">
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+              <div class="border-b border-gray-100">
+                <!-- Header Row -->
+                <div class="px-5 py-4 flex items-center justify-between">
+                  <h2 class="text-lg font-bold text-gray-900 flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center shadow-lg shadow-teal-200">
+                      <i class="fas fa-th-large text-white text-sm"></i>
+                    </div>
+                    <div>
+                      <span class="block">Service Catalog</span>
+                      <span class="text-xs font-medium text-gray-500">{{ filteredServices.length }} services available</span>
+                    </div>
+                  </h2>
+                  <button @click="showNewRequest = true" class="px-4 py-2 bg-gradient-to-r from-teal-500 to-teal-600 text-white rounded-lg text-sm font-medium hover:from-teal-600 hover:to-teal-700 transition-all flex items-center gap-2 shadow-sm shadow-teal-200">
+                    <i class="fas fa-plus"></i>
+                    New Request
+                  </button>
+                </div>
+                <!-- Filter Row -->
+                <div class="px-5 py-2 bg-gray-50/50 flex flex-wrap items-center gap-2">
+                  <button v-for="cat in categories" :key="cat.id"
+                          @click="filterCategory = cat.id"
+                          :class="['px-3 py-1.5 rounded-lg text-xs font-medium transition-all',
+                                   filterCategory === cat.id ? 'bg-teal-500 text-white shadow-sm' : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 hover:border-gray-300']">
+                    {{ cat.label }}
+                  </button>
                 </div>
               </div>
 
               <div class="p-5 grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div v-for="service in filteredServices" :key="service.id"
                      @click="selectService(service)"
-                     class="list-item-animated p-4 rounded-xl border-2 border-transparent bg-teal-50/50 hover:border-teal-300 hover:bg-teal-100/50 cursor-pointer transition-all group ripple-effect">
+                     class="group p-4 rounded-xl bg-white border border-gray-100 hover:border-teal-200 hover:shadow-lg cursor-pointer transition-all">
                   <div class="flex items-start gap-4">
-                    <div :class="['icon-soft w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 hover-scale', service.iconBg]">
-                      <i :class="[service.icon, service.iconColor, 'text-xl']"></i>
+                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-teal-50 to-teal-100 flex items-center justify-center flex-shrink-0 transition-transform group-hover:scale-110 group-hover:shadow-md">
+                      <i :class="[service.icon, 'text-teal-600 text-xl']"></i>
                     </div>
                     <div class="flex-1 min-w-0">
-                      <h3 class="font-semibold text-gray-900 group-hover:text-gray-700">{{ service.name }}</h3>
+                      <h3 class="font-semibold text-gray-900 group-hover:text-teal-600 transition-colors">{{ service.name }}</h3>
                       <p class="text-sm text-gray-500 mt-1">{{ service.description }}</p>
                       <div class="flex items-center gap-3 mt-2">
-                        <span class="text-xs text-gray-400"><i class="fas fa-clock mr-1"></i>{{ service.eta }}</span>
-                        <span :class="['text-xs px-2 py-0.5 rounded-full', service.priorityClass]">{{ service.priority }}</span>
+                        <span class="text-xs text-gray-400 flex items-center gap-1"><i class="fas fa-clock text-[10px]"></i>{{ service.eta }}</span>
+                        <span class="text-xs px-2 py-0.5 rounded-full bg-teal-50 text-teal-700">{{ service.priority }}</span>
                       </div>
                     </div>
-                    <i class="fas fa-chevron-right text-gray-300 group-hover:text-gray-500 transition-colors"></i>
+                    <i class="fas fa-arrow-right text-gray-300 group-hover:text-teal-500 group-hover:translate-x-1 transition-all"></i>
                   </div>
                 </div>
               </div>
             </div>
 
             <!-- My Requests -->
-            <div class="card-animated mt-6">
-              <div class="p-5 border-b border-gray-100 flex items-center justify-between">
-                <h2 class="text-lg font-semibold text-gray-900">My Requests</h2>
-                <div class="flex items-center gap-2">
-                  <select v-model="requestFilter" class="input text-sm py-2">
-                    <option value="all">All Status</option>
-                    <option value="pending">Pending</option>
-                    <option value="in-progress">In Progress</option>
-                    <option value="completed">Completed</option>
-                  </select>
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+              <div class="border-b border-gray-100">
+                <div class="px-5 py-4 flex items-center justify-between">
+                  <h2 class="text-lg font-bold text-gray-900 flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg shadow-blue-200">
+                      <i class="fas fa-clipboard-list text-white text-sm"></i>
+                    </div>
+                    <div>
+                      <span class="block">My Requests</span>
+                      <span class="text-xs font-medium text-gray-500">{{ filteredRequests.length }} requests</span>
+                    </div>
+                  </h2>
+                  <div class="flex items-center gap-2">
+                    <select v-model="requestFilter" class="px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-sm text-gray-600 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent">
+                      <option value="all">All Status</option>
+                      <option value="pending">Pending</option>
+                      <option value="in-progress">In Progress</option>
+                      <option value="completed">Completed</option>
+                    </select>
+                  </div>
                 </div>
               </div>
 
@@ -362,13 +385,13 @@ function askAI(query: string) {
           <!-- Right Sidebar -->
           <div class="space-y-6">
             <!-- AI Assistant Widget -->
-            <div class="card-animated">
+            <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
               <div class="flex items-center gap-3 mb-4">
-                <div class="icon-vibrant w-10 h-10 rounded-xl bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center hover-scale">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center shadow-lg shadow-purple-200">
                   <i class="fas fa-robot text-white"></i>
                 </div>
                 <div>
-                  <h3 class="font-semibold text-gray-900">AI Assistant</h3>
+                  <h3 class="font-bold text-gray-900">AI Assistant</h3>
                   <p class="text-xs text-gray-500">Get instant help</p>
                 </div>
               </div>
@@ -376,73 +399,85 @@ function askAI(query: string) {
               <div class="space-y-2 mb-4">
                 <button v-for="(query, idx) in quickQueries" :key="idx"
                         @click="askAI(query)"
-                        class="list-item-animated w-full p-3 text-left text-sm rounded-xl bg-teal-50 hover:bg-teal-100 text-gray-700 transition-colors ripple-effect">
-                  <i class="fas fa-comment-dots text-gray-400 mr-2"></i>{{ query }}
+                        class="w-full p-3 text-left text-sm rounded-xl bg-gray-50 hover:bg-teal-50 hover:border-teal-200 border border-gray-100 text-gray-700 transition-all">
+                  <i class="fas fa-comment-dots text-teal-500 mr-2"></i>{{ query }}
                 </button>
               </div>
 
               <div class="relative">
                 <input type="text" v-model="aiQuery" @keydown.enter="askAI(aiQuery)"
-                       placeholder="Ask anything..." class="input pr-10">
-                <button @click="askAI(aiQuery)" class="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-lg hover:bg-teal-50 text-gray-500 ripple-effect hover-scale">
+                       placeholder="Ask anything..."
+                       class="w-full pl-4 pr-10 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all">
+                <button @click="askAI(aiQuery)" class="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-lg hover:bg-teal-100 text-teal-500 transition-colors">
                   <i class="fas fa-paper-plane"></i>
                 </button>
               </div>
             </div>
 
             <!-- FAQ -->
-            <div class="card-animated">
-              <h3 class="font-semibold text-gray-900 mb-4">
-                <i class="fas fa-question-circle text-gray-500 mr-2 hover-scale"></i>Frequently Asked
-              </h3>
-              <div class="space-y-3">
-                <div v-for="(faq, idx) in faqs" :key="idx" class="list-item-animated border-b border-gray-100 last:border-0 pb-3 last:pb-0">
-                  <button @click="faq.open = !faq.open" class="w-full text-left flex items-center justify-between ripple-effect">
+            <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+              <div class="flex items-center gap-3 mb-4">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-amber-500 flex items-center justify-center shadow-lg shadow-amber-200">
+                  <i class="fas fa-question text-white"></i>
+                </div>
+                <div>
+                  <h3 class="font-bold text-gray-900">FAQ</h3>
+                  <p class="text-xs text-gray-500">Common questions</p>
+                </div>
+              </div>
+              <div class="space-y-2">
+                <div v-for="(faq, idx) in faqs" :key="idx" class="rounded-xl border border-gray-100 overflow-hidden">
+                  <button @click="faq.open = !faq.open" class="w-full p-3 text-left flex items-center justify-between bg-gray-50 hover:bg-gray-100 transition-colors">
                     <span class="text-sm font-medium text-gray-800">{{ faq.question }}</span>
-                    <i :class="['fas text-gray-400 transition-transform hover-scale', faq.open ? 'fa-chevron-up' : 'fa-chevron-down']"></i>
+                    <i :class="['fas text-gray-400 transition-transform text-xs', faq.open ? 'fa-chevron-up' : 'fa-chevron-down']"></i>
                   </button>
-                  <p v-if="faq.open" class="text-sm text-gray-600 mt-2 animate-fadeIn">{{ faq.answer }}</p>
+                  <div v-if="faq.open" class="p-3 text-sm text-gray-600 bg-white border-t border-gray-100">{{ faq.answer }}</div>
                 </div>
               </div>
             </div>
 
             <!-- Contact Support -->
-            <div class="card-animated">
-              <h3 class="font-semibold text-gray-900 mb-4">
-                <i class="fas fa-headset text-gray-500 mr-2 hover-scale"></i>Need More Help?
-              </h3>
-              <div class="space-y-3">
-                <a href="#" class="list-item-animated flex items-center gap-3 p-3 rounded-xl bg-teal-50 hover:bg-teal-100 transition-colors ripple-effect">
-                  <div class="icon-soft w-8 h-8 rounded-lg bg-teal-100 flex items-center justify-center hover-scale">
-                    <i class="fas fa-phone text-gray-600"></i>
+            <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+              <div class="flex items-center gap-3 mb-4">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center shadow-lg shadow-green-200">
+                  <i class="fas fa-headset text-white"></i>
+                </div>
+                <div>
+                  <h3 class="font-bold text-gray-900">Need Help?</h3>
+                  <p class="text-xs text-gray-500">Contact support</p>
+                </div>
+              </div>
+              <div class="space-y-2">
+                <a href="#" class="flex items-center gap-3 p-3 rounded-xl bg-gray-50 hover:bg-teal-50 border border-gray-100 hover:border-teal-200 transition-all group">
+                  <div class="w-9 h-9 rounded-lg bg-teal-100 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <i class="fas fa-phone text-teal-600 text-sm"></i>
                   </div>
                   <div>
-                    <p class="text-sm font-medium text-gray-800">Call Support</p>
+                    <p class="text-sm font-medium text-gray-800 group-hover:text-teal-600 transition-colors">Call Support</p>
                     <p class="text-xs text-gray-500">+1 (555) 123-4567</p>
                   </div>
                 </a>
-                <a href="#" class="list-item-animated flex items-center gap-3 p-3 rounded-xl bg-teal-50 hover:bg-teal-100 transition-colors ripple-effect">
-                  <div class="icon-soft w-8 h-8 rounded-lg bg-teal-100 flex items-center justify-center hover-scale">
-                    <i class="fas fa-envelope text-gray-600"></i>
+                <a href="#" class="flex items-center gap-3 p-3 rounded-xl bg-gray-50 hover:bg-teal-50 border border-gray-100 hover:border-teal-200 transition-all group">
+                  <div class="w-9 h-9 rounded-lg bg-blue-100 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <i class="fas fa-envelope text-blue-600 text-sm"></i>
                   </div>
                   <div>
-                    <p class="text-sm font-medium text-gray-800">Email Us</p>
-                    <p class="text-xs text-gray-500">support@intalio.com</p>
+                    <p class="text-sm font-medium text-gray-800 group-hover:text-teal-600 transition-colors">Email Us</p>
+                    <p class="text-xs text-gray-500">support@afc.com</p>
                   </div>
                 </a>
-                <a href="#" class="list-item-animated flex items-center gap-3 p-3 rounded-xl bg-teal-50 hover:bg-teal-100 transition-colors ripple-effect">
-                  <div class="icon-soft w-8 h-8 rounded-lg bg-teal-100 flex items-center justify-center hover-scale">
-                    <i class="fas fa-comments text-gray-700"></i>
+                <a href="#" class="flex items-center gap-3 p-3 rounded-xl bg-gray-50 hover:bg-teal-50 border border-gray-100 hover:border-teal-200 transition-all group">
+                  <div class="w-9 h-9 rounded-lg bg-purple-100 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <i class="fas fa-comments text-purple-600 text-sm"></i>
                   </div>
                   <div>
-                    <p class="text-sm font-medium text-gray-800">Live Chat</p>
+                    <p class="text-sm font-medium text-gray-800 group-hover:text-teal-600 transition-colors">Live Chat</p>
                     <p class="text-xs text-gray-500">Available 24/7</p>
                   </div>
                 </a>
               </div>
             </div>
           </div>
-        </div>
         </div>
       </div>
 
@@ -522,6 +557,96 @@ function askAI(query: string) {
 </template>
 
 <style scoped>
+/* Hero Gradient */
+.hero-gradient {
+  background: linear-gradient(135deg, #0d9488 0%, #14b8a6 50%, #10b981 100%);
+}
+
+/* Stats Top Right */
+.stats-top-right {
+  position: absolute;
+  top: 1rem;
+  right: 2rem;
+  display: flex;
+  gap: 0.75rem;
+  z-index: 10;
+}
+
+.stat-card-square {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 1rem;
+  padding: 0.75rem 1rem;
+  min-width: 90px;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.stat-card-square:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateY(-2px);
+}
+
+.stat-icon-box {
+  width: 2rem;
+  height: 2rem;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 0.5rem;
+  color: white;
+  font-size: 0.875rem;
+}
+
+.stat-value-mini {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: white;
+  line-height: 1;
+}
+
+.stat-label-mini {
+  font-size: 0.65rem;
+  color: rgba(255, 255, 255, 0.8);
+  margin-top: 0.25rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Decorative Circle Animations */
+.circle-drift-1 {
+  animation: drift1 20s ease-in-out infinite;
+}
+
+.circle-drift-2 {
+  animation: drift2 25s ease-in-out infinite;
+}
+
+.circle-drift-3 {
+  animation: drift3 15s ease-in-out infinite;
+}
+
+@keyframes drift1 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  25% { transform: translate(-30px, 20px) scale(1.05); }
+  50% { transform: translate(-20px, -30px) scale(0.95); }
+  75% { transform: translate(20px, -20px) scale(1.02); }
+}
+
+@keyframes drift2 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(40px, -20px) scale(1.1); }
+  66% { transform: translate(-30px, 30px) scale(0.9); }
+}
+
+@keyframes drift3 {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  50% { transform: translate(30px, 30px) rotate(180deg); }
+}
+
 /* Icon soft style for this page */
 .icon-soft {
   background: linear-gradient(135deg, #f0fdfa, #ccfbf1);
