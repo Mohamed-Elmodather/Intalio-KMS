@@ -816,7 +816,7 @@ function selectSortOption(value: string) {
               <!-- Dropdown Menu -->
               <div
                 v-if="showCategoryFilter"
-                class="absolute left-0 top-full mt-2 w-64 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
+                class="absolute left-0 top-full mt-2 w-64 bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-[100]"
               >
                 <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Select Categories</div>
                 <div class="max-h-48 overflow-y-auto">
@@ -860,7 +860,7 @@ function selectSortOption(value: string) {
               </div>
 
               <!-- Click outside to close -->
-              <div v-if="showCategoryFilter" @click="showCategoryFilter = false" class="fixed inset-0 z-40"></div>
+              <div v-if="showCategoryFilter" @click="showCategoryFilter = false" class="fixed inset-0 z-[99]"></div>
             </div>
 
             <!-- Status Filter -->
@@ -880,7 +880,7 @@ function selectSortOption(value: string) {
               <!-- Dropdown Menu -->
               <div
                 v-if="showStatusFilter"
-                class="absolute left-0 top-full mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
+                class="absolute left-0 top-full mt-2 w-56 bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-[100]"
               >
                 <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Filter by Status</div>
                 <div class="max-h-48 overflow-y-auto">
@@ -923,7 +923,7 @@ function selectSortOption(value: string) {
               </div>
 
               <!-- Click outside to close -->
-              <div v-if="showStatusFilter" @click="showStatusFilter = false" class="fixed inset-0 z-40"></div>
+              <div v-if="showStatusFilter" @click="showStatusFilter = false" class="fixed inset-0 z-[99]"></div>
             </div>
 
             <!-- Sort Options with Order Toggle -->
@@ -947,7 +947,7 @@ function selectSortOption(value: string) {
               <!-- Dropdown Menu -->
               <div
                 v-if="showSortDropdown"
-                class="absolute left-0 top-full mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
+                class="absolute left-0 top-full mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-[100]"
               >
                 <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Sort By</div>
                 <div class="max-h-64 overflow-y-auto">
@@ -966,7 +966,7 @@ function selectSortOption(value: string) {
                   </button>
                 </div>
               </div>
-              <div v-if="showSortDropdown" @click="showSortDropdown = false" class="fixed inset-0 z-40"></div>
+              <div v-if="showSortDropdown" @click="showSortDropdown = false" class="fixed inset-0 z-[99]"></div>
             </div>
 
             <!-- View Toggle -->
