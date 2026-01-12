@@ -693,36 +693,81 @@ function goToCreatePoll() {
         </div>
       </section>
 
-      <!-- Trending Polls -->
-      <section class="mb-10 fade-in-up" style="animation-delay: 0.25s">
-        <div class="section-header-polls">
-          <h2 class="section-title-polls">
-            <i class="fas fa-fire"></i>
-            Trending
-          </h2>
+      <!-- Trending Polls - Enhanced -->
+      <section class="trending-section mb-10 fade-in-up" style="animation-delay: 0.25s">
+        <!-- Section Header -->
+        <div class="trending-header">
+          <div class="trending-title-group">
+            <div class="trending-icon-wrapper">
+              <i class="fas fa-fire"></i>
+              <div class="fire-glow"></div>
+            </div>
+            <div>
+              <h2 class="trending-main-title">Trending Now</h2>
+              <p class="trending-subtitle">Most popular polls this week</p>
+            </div>
+          </div>
+          <a href="#" class="trending-view-all">
+            View All
+            <i class="fas fa-arrow-right"></i>
+          </a>
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <div v-for="poll in trendingPolls" :key="poll.id" class="trending-card">
-            <div class="flex-1 min-w-0">
-              <h4 class="font-medium text-gray-900 text-sm truncate">{{ poll.question }}</h4>
-              <div class="flex items-center gap-3 text-xs text-gray-500 mt-1">
-                <span><i class="fas fa-users mr-1"></i>{{ poll.totalVotes }}</span>
-                <span><i class="fas fa-chart-line mr-1"></i>+{{ poll.weeklyGrowth }}%</span>
+
+        <!-- Trending Grid -->
+        <div class="trending-grid">
+          <div
+            v-for="(poll, index) in trendingPolls"
+            :key="poll.id"
+            :class="['trending-card-enhanced', { 'top-three': index < 3 }]"
+          >
+            <!-- Rank Badge -->
+            <div :class="['rank-badge', `rank-${index + 1}`]">
+              <span v-if="index < 3" class="rank-icon">
+                <i :class="index === 0 ? 'fas fa-crown' : index === 1 ? 'fas fa-medal' : 'fas fa-award'"></i>
+              </span>
+              <span v-else class="rank-number">#{{ index + 1 }}</span>
+            </div>
+
+            <!-- Card Content -->
+            <div class="trending-card-content">
+              <h4 class="trending-question">{{ poll.question }}</h4>
+
+              <!-- Stats Row -->
+              <div class="trending-stats">
+                <div class="trending-stat">
+                  <i class="fas fa-users"></i>
+                  <span>{{ poll.totalVotes.toLocaleString() }}</span>
+                </div>
+                <div class="trending-stat growth">
+                  <i class="fas fa-arrow-trend-up"></i>
+                  <span>+{{ poll.weeklyGrowth }}%</span>
+                </div>
               </div>
             </div>
-            <div class="response-circle">
-              <svg width="44" height="44">
-                <circle class="bg" cx="22" cy="22" r="18"></circle>
+
+            <!-- Response Rate Circle -->
+            <div class="trending-progress">
+              <svg width="56" height="56" viewBox="0 0 56 56">
+                <circle class="progress-bg" cx="28" cy="28" r="24"></circle>
                 <circle
-                  class="progress"
-                  cx="22"
-                  cy="22"
-                  r="18"
-                  :stroke-dasharray="113"
-                  :stroke-dashoffset="113 - (113 * poll.responseRate / 100)"
+                  class="progress-ring"
+                  cx="28"
+                  cy="28"
+                  r="24"
+                  :stroke-dasharray="151"
+                  :stroke-dashoffset="151 - (151 * poll.responseRate / 100)"
+                  :class="{ 'high-rate': poll.responseRate >= 80 }"
                 ></circle>
               </svg>
-              <span class="value">{{ poll.responseRate }}%</span>
+              <div class="progress-value">
+                <span class="value-number">{{ poll.responseRate }}</span>
+                <span class="value-percent">%</span>
+              </div>
+            </div>
+
+            <!-- Hover Arrow -->
+            <div class="trending-arrow">
+              <i class="fas fa-chevron-right"></i>
             </div>
           </div>
         </div>
@@ -1983,21 +2028,364 @@ function goToCreatePoll() {
   box-shadow: 0 8px 25px rgba(0,0,0,0.1);
 }
 
-/* Trending Section */
-.trending-card {
-  position: relative;
-  background: white;
-  border-radius: 1rem;
-  padding: 1rem;
+/* ============================================
+   Trending Section - Enhanced
+   ============================================ */
+.trending-section {
+  background: linear-gradient(135deg, #fef7f0 0%, #fff7ed 50%, #fffbeb 100%);
+  border-radius: 1.5rem;
+  padding: 2rem;
+  border: 1px solid rgba(251, 146, 60, 0.1);
+}
+
+.trending-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.trending-title-group {
   display: flex;
   align-items: center;
   gap: 1rem;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.trending-icon-wrapper {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+  border-radius: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  color: white;
+  box-shadow: 0 4px 15px rgba(249, 115, 22, 0.4);
+}
+
+.trending-icon-wrapper i {
+  animation: flame-flicker 1.5s ease-in-out infinite;
+  position: relative;
+  z-index: 1;
+}
+
+.fire-glow {
+  position: absolute;
+  inset: -4px;
+  background: radial-gradient(circle, rgba(249, 115, 22, 0.4) 0%, transparent 70%);
+  border-radius: 1rem;
+  animation: glow-pulse 2s ease-in-out infinite;
+}
+
+@keyframes flame-flicker {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  25% { transform: scale(1.1) rotate(-3deg); }
+  50% { transform: scale(1) rotate(3deg); }
+  75% { transform: scale(1.05) rotate(-2deg); }
+}
+
+@keyframes glow-pulse {
+  0%, 100% { opacity: 0.5; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.1); }
+}
+
+.trending-main-title {
+  font-size: 1.375rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0;
+}
+
+.trending-subtitle {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin: 0.25rem 0 0;
+}
+
+.trending-view-all {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #f97316;
+  text-decoration: none;
+  padding: 0.625rem 1rem;
+  border-radius: 0.75rem;
+  background: rgba(249, 115, 22, 0.1);
   transition: all 0.3s ease;
 }
-.trending-card:hover {
+
+.trending-view-all:hover {
+  background: rgba(249, 115, 22, 0.2);
   transform: translateX(4px);
-  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.trending-view-all i {
+  transition: transform 0.3s ease;
+}
+
+.trending-view-all:hover i {
+  transform: translateX(4px);
+}
+
+/* Trending Grid */
+.trending-grid {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .trending-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .trending-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Trending Card */
+.trending-card-enhanced {
+  position: relative;
+  background: white;
+  border-radius: 1.25rem;
+  padding: 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.trending-card-enhanced::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, transparent 0%, rgba(249, 115, 22, 0.03) 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.trending-card-enhanced:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px rgba(249, 115, 22, 0.15);
+  border-color: rgba(249, 115, 22, 0.2);
+}
+
+.trending-card-enhanced:hover::before {
+  opacity: 1;
+}
+
+.trending-card-enhanced.top-three {
+  border-left: 3px solid;
+}
+
+.trending-card-enhanced.top-three:nth-child(1) {
+  border-left-color: #fbbf24;
+  background: linear-gradient(135deg, #fffbeb 0%, white 30%);
+}
+
+.trending-card-enhanced.top-three:nth-child(2) {
+  border-left-color: #9ca3af;
+  background: linear-gradient(135deg, #f9fafb 0%, white 30%);
+}
+
+.trending-card-enhanced.top-three:nth-child(3) {
+  border-left-color: #d97706;
+  background: linear-gradient(135deg, #fffbeb 0%, white 30%);
+}
+
+/* Rank Badge */
+.rank-badge {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  transition: all 0.3s ease;
+}
+
+.rank-badge.rank-1 {
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(251, 191, 36, 0.4);
+}
+
+.rank-badge.rank-1 i {
+  animation: crown-shine 2s ease-in-out infinite;
+}
+
+@keyframes crown-shine {
+  0%, 100% { filter: drop-shadow(0 0 0 transparent); }
+  50% { filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.8)); }
+}
+
+.rank-badge.rank-2 {
+  background: linear-gradient(135deg, #e5e7eb 0%, #9ca3af 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(156, 163, 175, 0.4);
+}
+
+.rank-badge.rank-3 {
+  background: linear-gradient(135deg, #fcd34d 0%, #d97706 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(217, 119, 6, 0.4);
+}
+
+.rank-badge.rank-4,
+.rank-badge.rank-5,
+.rank-badge.rank-6 {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+
+.rank-icon {
+  font-size: 1rem;
+}
+
+.rank-number {
+  font-size: 0.875rem;
+}
+
+.trending-card-enhanced:hover .rank-badge {
+  transform: scale(1.1) rotate(-5deg);
+}
+
+/* Card Content */
+.trending-card-content {
+  flex: 1;
+  min-width: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.trending-question {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 0.5rem;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  transition: color 0.3s ease;
+}
+
+.trending-card-enhanced:hover .trending-question {
+  color: #f97316;
+}
+
+.trending-stats {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.trending-stat {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.trending-stat i {
+  font-size: 0.6875rem;
+}
+
+.trending-stat.growth {
+  color: #10b981;
+  font-weight: 600;
+}
+
+.trending-stat.growth i {
+  animation: trend-up 1s ease-in-out infinite;
+}
+
+@keyframes trend-up {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-2px); }
+}
+
+/* Progress Circle */
+.trending-progress {
+  position: relative;
+  flex-shrink: 0;
+  width: 56px;
+  height: 56px;
+  z-index: 1;
+}
+
+.trending-progress svg {
+  transform: rotate(-90deg);
+}
+
+.trending-progress .progress-bg {
+  fill: none;
+  stroke: #f3f4f6;
+  stroke-width: 4;
+}
+
+.trending-progress .progress-ring {
+  fill: none;
+  stroke: #14b8a6;
+  stroke-width: 4;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.trending-progress .progress-ring.high-rate {
+  stroke: #10b981;
+}
+
+.progress-value {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.value-number {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.value-percent {
+  font-size: 0.625rem;
+  font-weight: 600;
+  color: #9ca3af;
+}
+
+/* Hover Arrow */
+.trending-arrow {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%) translateX(10px);
+  opacity: 0;
+  color: #f97316;
+  font-size: 0.875rem;
+  transition: all 0.3s ease;
+}
+
+.trending-card-enhanced:hover .trending-arrow {
+  opacity: 1;
+  transform: translateY(-50%) translateX(0);
 }
 
 /* Section Titles with Visual Effects */
