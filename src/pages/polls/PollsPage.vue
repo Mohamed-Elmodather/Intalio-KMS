@@ -431,7 +431,7 @@ function goToCreatePoll() {
 </script>
 
 <template>
-  <div class="space-y-6">
+  <div class="min-h-screen bg-gray-50">
     <!-- Loading State -->
     <div v-if="isLoading" class="flex items-center justify-center py-20">
       <LoadingSpinner size="lg" text="Loading polls..." />
@@ -439,7 +439,7 @@ function goToCreatePoll() {
 
     <template v-else>
       <!-- Hero Section - Documents Style -->
-      <div class="hero-gradient relative overflow-hidden mb-8">
+      <div class="hero-gradient relative overflow-hidden">
         <!-- Decorative elements with animations -->
         <div class="circle-drift-1 absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full"></div>
         <div class="circle-drift-2 absolute bottom-0 left-0 w-64 h-64 bg-white/5 rounded-full"></div>
@@ -499,8 +499,10 @@ function goToCreatePoll() {
         </div>
       </div>
 
+      <!-- Main Content Area -->
+      <div class="px-8 py-6 space-y-6">
       <!-- Featured Poll - Premium Design -->
-      <section v-if="featuredPoll" class="featured-poll-premium mb-10 fade-in-up" style="animation-delay: 0.1s">
+      <section v-if="featuredPoll" class="featured-poll-premium fade-in-up" style="animation-delay: 0.1s">
         <!-- Floating Decorative Elements -->
         <div class="featured-poll-decor">
           <div class="decor-orb decor-orb-1"></div>
@@ -963,6 +965,7 @@ function goToCreatePoll() {
             </div>
           </div>
         </div>
+      </div>
       </div>
     </template>
 
