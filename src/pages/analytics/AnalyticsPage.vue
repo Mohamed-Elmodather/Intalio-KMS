@@ -7,6 +7,7 @@ const selectedPeriod = ref('30d')
 const selectedMetric = ref('views')
 const selectedDepartment = ref('all')
 const selectedContentType = ref('all')
+const hoveredSegment = ref<string | null>(null)
 
 // Period options (Date ranges)
 const periodOptions = [
@@ -530,7 +531,7 @@ function exportData(format: string) {
         </div>
 
         <!-- Department Participation (Donut Chart) -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100">
           <div class="px-5 py-4 border-b border-gray-100">
             <h2 class="text-lg font-bold text-gray-900 flex items-center gap-3">
               <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center shadow-lg shadow-purple-200">
@@ -543,37 +544,63 @@ function exportData(format: string) {
             </h2>
           </div>
           <div class="p-5">
-            <!-- Donut Chart Placeholder -->
-            <div class="relative w-40 h-40 mx-auto mb-6">
-              <svg viewBox="0 0 100 100" class="w-full h-full -rotate-90">
-                <circle cx="50" cy="50" r="40" fill="none" stroke="#f3f4f6" stroke-width="12" />
-                <circle
-                  v-for="(cat, idx) in categoryBreakdown"
-                  :key="cat.name"
-                  cx="50"
-                  cy="50"
-                  r="40"
-                  fill="none"
-                  :stroke="cat.color"
-                  stroke-width="12"
-                  :stroke-dasharray="(cat.value / totalCategoryValue * 251.2) + ' 251.2'"
-                  :stroke-dashoffset="-categoryBreakdown.slice(0, idx).reduce((sum, c) => sum + (c.value / totalCategoryValue * 251.2), 0)"
-                  class="transition-all duration-500"
-                />
-              </svg>
-              <div class="absolute inset-0 flex items-center justify-center flex-col">
-                <span class="text-2xl font-bold text-gray-900">{{ totalCategoryValue }}</span>
-                <span class="text-xs text-gray-500">Total</span>
-              </div>
-            </div>
-            <!-- Legend -->
-            <div class="space-y-2">
-              <div v-for="cat in categoryBreakdown" :key="cat.name" class="flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                  <span class="w-3 h-3 rounded-full" :style="{ backgroundColor: cat.color }"></span>
-                  <span class="text-sm text-gray-700">{{ cat.name }}</span>
+            <div class="flex items-center gap-6">
+              <!-- Donut Chart -->
+              <div class="relative w-72 h-72 flex-shrink-0">
+                <svg viewBox="0 0 100 100" class="w-full h-full -rotate-90 donut-chart">
+                  <!-- Background circle -->
+                  <circle cx="50" cy="50" r="40" fill="none" stroke="#f1f5f9" stroke-width="8" />
+                  <!-- Segments -->
+                  <circle
+                    v-for="(cat, idx) in categoryBreakdown"
+                    :key="cat.name"
+                    cx="50"
+                    cy="50"
+                    r="40"
+                    fill="none"
+                    :stroke="cat.color"
+                    stroke-width="8"
+                    :stroke-dasharray="(cat.value / totalCategoryValue * 251.33) + ' 251.33'"
+                    :stroke-dashoffset="-categoryBreakdown.slice(0, idx).reduce((sum, c) => sum + (c.value / totalCategoryValue * 251.33), 0)"
+                    class="donut-segment transition-all duration-500 cursor-pointer"
+                    stroke-linecap="round"
+                    :style="{ '--segment-color': cat.color, animationDelay: (idx * 0.1) + 's' }"
+                    @mouseenter="hoveredSegment = cat.name"
+                    @mouseleave="hoveredSegment = null"
+                  />
+                </svg>
+                <!-- Center Content -->
+                <div class="absolute inset-0 flex items-center justify-center flex-col">
+                  <div class="w-36 h-36 rounded-full bg-white shadow-inner flex items-center justify-center flex-col">
+                    <span class="text-4xl font-bold text-gray-900">{{ totalCategoryValue }}%</span>
+                    <span class="text-xs text-gray-500 uppercase tracking-wide">Active</span>
+                  </div>
                 </div>
-                <span class="text-sm font-semibold text-gray-900">{{ cat.value }}%</span>
+              </div>
+              <!-- Legend with Progress -->
+              <div class="flex-1 space-y-2.5">
+                <div
+                  v-for="cat in categoryBreakdown"
+                  :key="cat.name"
+                  class="group p-2 rounded-lg transition-all cursor-pointer"
+                  :class="hoveredSegment === cat.name ? 'bg-gray-50 scale-[1.02]' : 'hover:bg-gray-50'"
+                  @mouseenter="hoveredSegment = cat.name"
+                  @mouseleave="hoveredSegment = null"
+                >
+                  <div class="flex items-center justify-between mb-1">
+                    <div class="flex items-center gap-2">
+                      <span class="w-2.5 h-2.5 rounded-full transition-transform group-hover:scale-125" :style="{ backgroundColor: cat.color }"></span>
+                      <span class="text-xs font-medium text-gray-700 group-hover:text-gray-900">{{ cat.name }}</span>
+                    </div>
+                    <span class="text-xs font-bold" :style="{ color: cat.color }">{{ cat.value }}%</span>
+                  </div>
+                  <div class="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                    <div
+                      class="h-full rounded-full transition-all duration-500 progress-bar-animated"
+                      :style="{ width: cat.value + '%', backgroundColor: cat.color }"
+                    ></div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -1058,4 +1085,41 @@ function exportData(format: string) {
 
 .engagement-bar:nth-child(1) { animation-delay: 0.1s; }
 .engagement-bar:nth-child(2) { animation-delay: 0.15s; }
+
+/* Donut Chart Styles */
+.donut-chart {
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.05));
+}
+
+.donut-segment {
+  transform-origin: center;
+  transition: all 0.3s ease;
+}
+
+.donut-segment:hover {
+  stroke-width: 14;
+  filter: brightness(1.1);
+}
+
+/* Donut segment animation */
+@keyframes donutDraw {
+  from {
+    stroke-dashoffset: 238.76;
+  }
+}
+
+.donut-segment {
+  animation: donutDraw 1s ease-out forwards;
+}
+
+/* Progress bar animation */
+@keyframes progressGrow {
+  from {
+    width: 0;
+  }
+}
+
+.progress-bar-animated {
+  animation: progressGrow 0.8s ease-out forwards;
+}
 </style>
