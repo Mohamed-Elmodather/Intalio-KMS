@@ -358,8 +358,8 @@ function exportData(format: string) {
       <!-- Charts Row -->
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Platform Usage Trends Chart -->
-        <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-          <div class="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+        <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-100">
+          <div class="px-5 py-4 border-b border-gray-100">
             <h2 class="text-lg font-bold text-gray-900 flex items-center gap-3">
               <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center shadow-lg shadow-teal-200">
                 <i class="fas fa-chart-area text-white text-sm"></i>
@@ -369,7 +369,26 @@ function exportData(format: string) {
                 <span class="text-xs font-medium text-gray-500">Active users vs target</span>
               </div>
             </h2>
-            <div class="flex items-center gap-4">
+          </div>
+          <div class="p-5">
+            <!-- Chart Area -->
+            <div class="h-56 flex items-end justify-between gap-2 mb-4">
+              <div v-for="(val, idx) in trafficData.datasets[0].data" :key="idx" class="flex-1 flex flex-col items-center">
+                <div class="w-full flex gap-0.5 items-end justify-center h-44">
+                  <div
+                    class="w-2/5 bg-teal-500 rounded-t transition-all hover:bg-teal-600"
+                    :style="{ height: (val / Math.max(...trafficData.datasets[0].data) * 100) + '%' }"
+                  ></div>
+                  <div
+                    class="w-2/5 bg-gray-300 rounded-t transition-all hover:bg-gray-400"
+                    :style="{ height: (trafficData.datasets[1].data[idx] / Math.max(...trafficData.datasets[0].data) * 100) + '%' }"
+                  ></div>
+                </div>
+                <span class="text-[10px] text-gray-400 mt-2">{{ trafficData.labels[idx] }}</span>
+              </div>
+            </div>
+            <!-- Legend -->
+            <div class="flex items-center justify-center gap-6 pt-2 border-t border-gray-100">
               <div class="flex items-center gap-2">
                 <span class="w-3 h-3 rounded-full bg-teal-500"></span>
                 <span class="text-xs text-gray-500">Active Users</span>
@@ -377,24 +396,6 @@ function exportData(format: string) {
               <div class="flex items-center gap-2">
                 <span class="w-3 h-3 rounded-full bg-gray-300"></span>
                 <span class="text-xs text-gray-500">Target</span>
-              </div>
-            </div>
-          </div>
-          <div class="p-5">
-            <!-- Chart Placeholder -->
-            <div class="h-64 flex items-end justify-between gap-2 px-4">
-              <div v-for="(val, idx) in trafficData.datasets[0].data" :key="idx" class="flex-1 flex flex-col items-center gap-1">
-                <div class="w-full flex flex-col gap-1">
-                  <div
-                    class="w-full bg-teal-500 rounded-t transition-all hover:bg-teal-600"
-                    :style="{ height: (val / Math.max(...trafficData.datasets[0].data) * 180) + 'px' }"
-                  ></div>
-                  <div
-                    class="w-full bg-gray-300 rounded-t transition-all hover:bg-gray-400"
-                    :style="{ height: (trafficData.datasets[1].data[idx] / Math.max(...trafficData.datasets[0].data) * 180) + 'px' }"
-                  ></div>
-                </div>
-                <span class="text-[10px] text-gray-400 mt-2">{{ trafficData.labels[idx] }}</span>
               </div>
             </div>
           </div>
