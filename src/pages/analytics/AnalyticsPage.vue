@@ -5,69 +5,125 @@ import { ref, computed } from 'vue'
 const isLoading = ref(false)
 const selectedPeriod = ref('30d')
 const selectedMetric = ref('views')
+const selectedDepartment = ref('all')
+const selectedContentType = ref('all')
 
-// Period options
+// Period options (Date ranges)
 const periodOptions = [
-  { value: '7d', label: 'Last 7 Days' },
-  { value: '30d', label: 'Last 30 Days' },
-  { value: '90d', label: 'Last 90 Days' },
-  { value: '12m', label: 'Last 12 Months' }
+  { value: '7d', label: '7 Days' },
+  { value: '30d', label: '30 Days' },
+  { value: '90d', label: 'Quarter' },
+  { value: 'ytd', label: 'YTD' }
 ]
 
-// Stats data
+// Content type filters
+const contentTypes = [
+  { value: 'all', label: 'All' },
+  { value: 'articles', label: 'Articles' },
+  { value: 'courses', label: 'Courses' },
+  { value: 'events', label: 'Events' }
+]
+
+// Department filters
+const departments = [
+  { id: 'all', name: 'All Departments' },
+  { id: 'engineering', name: 'Engineering' },
+  { id: 'marketing', name: 'Marketing' },
+  { id: 'sales', name: 'Sales' },
+  { id: 'hr', name: 'Human Resources' },
+  { id: 'finance', name: 'Finance' },
+  { id: 'operations', name: 'Operations' }
+]
+
+// Executive Stats (Hero)
 const stats = ref({
-  totalViews: 124589,
-  viewsGrowth: 12.5,
-  engagementRate: 78.4,
-  engagementGrowth: 5.2,
-  activeUsers: 3456,
-  usersGrowth: 8.7,
-  contentPublished: 245,
-  contentGrowth: 15.3
+  platformAdoption: 78,
+  activeUsers: 842,
+  totalContent: 1247,
+  engagementScore: 8.4
 })
 
-// KPI Cards data
+// Tournament KPIs - Asia Cup Statistics
 const kpiCards = ref([
   {
-    id: 'views',
-    title: 'Total Views',
-    value: '124.5K',
-    change: '+12.5%',
-    changeType: 'positive',
-    icon: 'fas fa-eye',
+    id: 'team-score',
+    title: 'Highest Team Score',
+    value: '354',
+    suffix: '/6',
+    change: '',
+    changeType: 'neutral',
+    icon: 'fas fa-futbol',
     color: 'teal',
-    sparkline: [30, 40, 35, 50, 49, 60, 70, 91, 85, 95, 100, 110]
+    sparkline: [280, 295, 310, 320, 298, 315, 340, 325, 354, 310, 305, 320]
   },
   {
-    id: 'engagement',
-    title: 'Engagement Rate',
-    value: '78.4%',
-    change: '+5.2%',
+    id: 'most-runs',
+    title: 'Most Runs (India)',
+    value: '2,847',
+    suffix: '',
+    change: '+12.3%',
     changeType: 'positive',
-    icon: 'fas fa-heart',
-    color: 'pink',
-    sparkline: [60, 65, 70, 68, 72, 75, 73, 78, 76, 80, 78, 82]
+    icon: 'fas fa-chart-line',
+    color: 'blue',
+    sparkline: [2100, 2200, 2350, 2400, 2500, 2580, 2650, 2700, 2750, 2800, 2820, 2847]
   },
   {
-    id: 'users',
-    title: 'Active Users',
-    value: '3,456',
+    id: 'most-wickets',
+    title: 'Most Wickets (Pakistan)',
+    value: '198',
+    suffix: '',
     change: '+8.7%',
     changeType: 'positive',
-    icon: 'fas fa-users',
-    color: 'blue',
-    sparkline: [20, 25, 30, 35, 32, 40, 45, 50, 48, 55, 60, 65]
+    icon: 'fas fa-bullseye',
+    color: 'purple',
+    sparkline: [150, 155, 160, 165, 170, 175, 180, 185, 188, 192, 195, 198]
   },
   {
-    id: 'content',
-    title: 'Content Published',
-    value: '245',
-    change: '+15.3%',
-    changeType: 'positive',
-    icon: 'fas fa-file-alt',
-    color: 'purple',
-    sparkline: [10, 15, 12, 18, 20, 25, 22, 30, 28, 35, 40, 45]
+    id: 'titles',
+    title: 'Tournament Titles',
+    value: '7',
+    suffix: ' (India)',
+    change: '',
+    changeType: 'neutral',
+    icon: 'fas fa-trophy',
+    color: 'amber',
+    sparkline: [1, 2, 3, 3, 4, 5, 5, 6, 6, 7, 7, 7]
   }
+])
+
+// Tournament Records (Weekly Highlights)
+const tournamentRecords = ref([
+  { id: 1, label: 'Highest Individual Score', value: '183', icon: 'fas fa-star', iconBg: 'bg-teal-50', iconColor: 'text-teal-600' },
+  { id: 2, label: 'Best Bowling', value: '6/19', icon: 'fas fa-bullseye', iconBg: 'bg-blue-50', iconColor: 'text-blue-600' },
+  { id: 3, label: 'Most Centuries', value: '18', icon: 'fas fa-medal', iconBg: 'bg-purple-50', iconColor: 'text-purple-600' },
+  { id: 4, label: 'Most Sixes', value: '145', icon: 'fas fa-bolt', iconBg: 'bg-orange-50', iconColor: 'text-orange-600' }
+])
+
+// Tournament Insights
+const tournamentInsights = ref([
+  { id: 1, icon: 'fas fa-chart-line', text: '<strong>India leads</strong> with 7 Asia Cup titles, followed by Sri Lanka with 6.' },
+  { id: 2, icon: 'fas fa-futbol', text: '<strong>Pakistan holds</strong> the record for highest team total - 354/6 vs Bangladesh (2023).' },
+  { id: 3, icon: 'fas fa-trophy', text: '<strong>Virat Kohli</strong> is the highest run-scorer in Asia Cup history with 1,782 runs.' },
+  { id: 4, icon: 'fas fa-star', text: '<strong>Dubai Stadium</strong> has hosted the most Asia Cup matches in the last decade.' }
+])
+
+// Team Statistics (Top Contributors/Teams)
+const teamStatistics = ref([
+  { id: 1, name: 'India', initials: 'IND', department: '7 Titles', contributions: 89, gradient: 'bg-gradient-to-br from-teal-500 to-teal-700' },
+  { id: 2, name: 'Sri Lanka', initials: 'SL', department: '6 Titles', contributions: 86, gradient: 'bg-gradient-to-br from-blue-500 to-blue-700' },
+  { id: 3, name: 'Pakistan', initials: 'PAK', department: '2 Titles', contributions: 84, gradient: 'bg-gradient-to-br from-purple-500 to-purple-700' },
+  { id: 4, name: 'Bangladesh', initials: 'BAN', department: '0 Titles', contributions: 72, gradient: 'bg-gradient-to-br from-orange-500 to-orange-700' },
+  { id: 5, name: 'Afghanistan', initials: 'AFG', department: '0 Titles', contributions: 68, gradient: 'bg-gradient-to-br from-pink-500 to-pink-700' }
+])
+
+// Department Stats
+const departmentStats = ref([
+  { id: 1, name: 'Engineering', initials: 'EN', employees: 156, adoption: 92, articles: 87, events: 12, gradient: 'bg-gradient-to-br from-teal-500 to-teal-700', color: '#14b8a6' },
+  { id: 2, name: 'Marketing', initials: 'MK', employees: 48, adoption: 88, articles: 124, events: 18, gradient: 'bg-gradient-to-br from-blue-500 to-blue-700', color: '#3b82f6' },
+  { id: 3, name: 'Sales', initials: 'SL', employees: 72, adoption: 76, articles: 45, events: 8, gradient: 'bg-gradient-to-br from-purple-500 to-purple-700', color: '#8b5cf6' },
+  { id: 4, name: 'Human Resources', initials: 'HR', employees: 24, adoption: 95, articles: 156, events: 24, gradient: 'bg-gradient-to-br from-pink-500 to-pink-700', color: '#ec4899' },
+  { id: 5, name: 'Finance', initials: 'FN', employees: 32, adoption: 58, articles: 28, events: 4, gradient: 'bg-gradient-to-br from-orange-500 to-orange-700', color: '#f97316' },
+  { id: 6, name: 'Operations', initials: 'OP', employees: 64, adoption: 71, articles: 52, events: 10, gradient: 'bg-gradient-to-br from-emerald-500 to-emerald-700', color: '#10b981' }
 ])
 
 // Traffic chart data (simulated)
@@ -78,6 +134,15 @@ const trafficData = ref({
     { label: 'Unique Visitors', data: [8000, 10000, 12000, 11000, 14000, 13000, 16000, 19000, 17000, 20000, 22000, 24000] }
   ]
 })
+
+// Top Performers - Asia Cup Stars
+const topPerformers = ref([
+  { id: 1, title: 'Virat Kohli', author: 'India', stats: '1,782 runs', icon: 'fas fa-user', iconBg: 'bg-amber-50', iconColor: 'text-amber-600', matches: '15 Matches', engagement: 98, completion: 89, color: '#f59e0b' },
+  { id: 2, title: 'Babar Azam', author: 'Pakistan', stats: '1,456 runs', icon: 'fas fa-user', iconBg: 'bg-emerald-50', iconColor: 'text-emerald-600', matches: '14 Matches', engagement: 95, completion: 87, color: '#10b981' },
+  { id: 3, title: 'Shaheen Afridi', author: 'Pakistan', stats: '42 wickets', icon: 'fas fa-user', iconBg: 'bg-red-50', iconColor: 'text-red-600', matches: '13 Matches', engagement: 92, completion: 85, color: '#ef4444' },
+  { id: 4, title: 'Jasprit Bumrah', author: 'India', stats: '38 wickets', icon: 'fas fa-user', iconBg: 'bg-blue-50', iconColor: 'text-blue-600', matches: '12 Matches', engagement: 90, completion: 83, color: '#3b82f6' },
+  { id: 5, title: 'Rashid Khan', author: 'Afghanistan', stats: '35 wickets', icon: 'fas fa-user', iconBg: 'bg-purple-50', iconColor: 'text-purple-600', matches: '11 Matches', engagement: 88, completion: 80, color: '#8b5cf6' }
+])
 
 // Content performance data
 const contentPerformance = ref([
@@ -97,12 +162,14 @@ const userActivity = ref([
   { id: 5, user: 'Carlos Rodriguez', action: 'Uploaded', item: 'New Media Assets', time: '25 mins ago', avatar: null }
 ])
 
-// Category breakdown
+// Department Participation breakdown
 const categoryBreakdown = ref([
-  { name: 'Documents', value: 45, color: '#14b8a6' },
-  { name: 'Articles', value: 28, color: '#8b5cf6' },
-  { name: 'Media', value: 15, color: '#f59e0b' },
-  { name: 'Events', value: 12, color: '#3b82f6' }
+  { name: 'Engineering', value: 28, color: '#14b8a6' },
+  { name: 'Marketing', value: 18, color: '#3b82f6' },
+  { name: 'HR', value: 15, color: '#ec4899' },
+  { name: 'Sales', value: 14, color: '#8b5cf6' },
+  { name: 'Product', value: 13, color: '#06b6d4' },
+  { name: 'Operations', value: 12, color: '#10b981' }
 ])
 
 // Reports list
@@ -130,7 +197,12 @@ function getColorClasses(color: string) {
     teal: { bg: 'from-teal-500 to-teal-600', icon: 'bg-teal-100', text: 'text-teal-600', shadow: 'shadow-teal-200' },
     pink: { bg: 'from-pink-500 to-pink-600', icon: 'bg-pink-100', text: 'text-pink-600', shadow: 'shadow-pink-200' },
     blue: { bg: 'from-blue-500 to-blue-600', icon: 'bg-blue-100', text: 'text-blue-600', shadow: 'shadow-blue-200' },
-    purple: { bg: 'from-purple-500 to-purple-600', icon: 'bg-purple-100', text: 'text-purple-600', shadow: 'shadow-purple-200' }
+    purple: { bg: 'from-purple-500 to-purple-600', icon: 'bg-purple-100', text: 'text-purple-600', shadow: 'shadow-purple-200' },
+    amber: { bg: 'from-amber-500 to-amber-600', icon: 'bg-amber-100', text: 'text-amber-600', shadow: 'shadow-amber-200' },
+    green: { bg: 'from-green-500 to-green-600', icon: 'bg-green-100', text: 'text-green-600', shadow: 'shadow-green-200' },
+    emerald: { bg: 'from-emerald-500 to-emerald-600', icon: 'bg-emerald-100', text: 'text-emerald-600', shadow: 'shadow-emerald-200' },
+    red: { bg: 'from-red-500 to-red-600', icon: 'bg-red-100', text: 'text-red-600', shadow: 'shadow-red-200' },
+    orange: { bg: 'from-orange-500 to-orange-600', icon: 'bg-orange-100', text: 'text-orange-600', shadow: 'shadow-orange-200' }
   }
   return colors[color] || colors.teal
 }
@@ -157,31 +229,31 @@ function exportData(format: string) {
       <div class="stats-top-right">
         <div class="stat-card-square">
           <div class="stat-icon-box">
-            <i class="fas fa-eye"></i>
-          </div>
-          <p class="stat-value-mini">{{ formatNumber(stats.totalViews) }}</p>
-          <p class="stat-label-mini">Views</p>
-        </div>
-        <div class="stat-card-square">
-          <div class="stat-icon-box">
-            <i class="fas fa-chart-line"></i>
-          </div>
-          <p class="stat-value-mini">{{ stats.engagementRate }}%</p>
-          <p class="stat-label-mini">Engagement</p>
-        </div>
-        <div class="stat-card-square">
-          <div class="stat-icon-box">
             <i class="fas fa-users"></i>
           </div>
-          <p class="stat-value-mini">{{ formatNumber(stats.activeUsers) }}</p>
-          <p class="stat-label-mini">Users</p>
+          <p class="stat-value-mini">{{ stats.platformAdoption }}%</p>
+          <p class="stat-label-mini">Adoption</p>
+        </div>
+        <div class="stat-card-square">
+          <div class="stat-icon-box">
+            <i class="fas fa-user-check"></i>
+          </div>
+          <p class="stat-value-mini">{{ stats.activeUsers }}</p>
+          <p class="stat-label-mini">Active Users</p>
         </div>
         <div class="stat-card-square">
           <div class="stat-icon-box">
             <i class="fas fa-file-alt"></i>
           </div>
-          <p class="stat-value-mini">{{ stats.contentPublished }}</p>
+          <p class="stat-value-mini">{{ formatNumber(stats.totalContent) }}</p>
           <p class="stat-label-mini">Content</p>
+        </div>
+        <div class="stat-card-square">
+          <div class="stat-icon-box">
+            <i class="fas fa-chart-line"></i>
+          </div>
+          <p class="stat-value-mini">{{ stats.engagementScore }}/10</p>
+          <p class="stat-label-mini">Engagement</p>
         </div>
       </div>
 
@@ -191,8 +263,8 @@ function exportData(format: string) {
           AFC Asian Cup 2027
         </div>
 
-        <h1 class="text-3xl font-bold text-white mb-2">Analytics & Reporting</h1>
-        <p class="text-teal-100 max-w-lg">Track performance metrics, user engagement, and content analytics across the platform.</p>
+        <h1 class="text-3xl font-bold text-white mb-2">Knowledge Hub Analytics</h1>
+        <p class="text-teal-100 max-w-lg">Track platform adoption, content engagement, and employee participation across all departments.</p>
 
         <div class="flex flex-wrap gap-3 mt-6">
           <button @click="exportData('PDF')" class="px-5 py-2.5 bg-white text-teal-600 rounded-xl font-semibold text-sm flex items-center gap-2 hover:bg-teal-50 transition-all shadow-lg">
@@ -239,25 +311,36 @@ function exportData(format: string) {
         </div>
       </div>
 
-      <!-- KPI Cards -->
+      <!-- Platform Health Metrics (KPI Cards) -->
+      <div class="mb-4">
+        <h2 class="text-lg font-bold text-gray-900 flex items-center gap-3 mb-4">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center shadow-lg shadow-teal-200">
+            <i class="fas fa-tachometer-alt text-white text-sm"></i>
+          </div>
+          <span>Platform Health Metrics</span>
+        </h2>
+      </div>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <div
           v-for="kpi in kpiCards"
           :key="kpi.id"
-          class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 hover:shadow-lg hover:border-teal-200 transition-all cursor-pointer group"
+          class="kpi-card bg-white rounded-2xl p-5 shadow-sm border border-gray-100 hover:shadow-lg transition-all cursor-pointer group"
+          :style="`--accent-color: ${getColorClasses(kpi.color).shadow.replace('shadow-', '')}`"
         >
           <div class="flex items-start justify-between mb-4">
             <div :class="['w-12 h-12 rounded-xl bg-gradient-to-br flex items-center justify-center shadow-lg', getColorClasses(kpi.color).bg, getColorClasses(kpi.color).shadow]">
               <i :class="[kpi.icon, 'text-white text-lg']"></i>
             </div>
-            <span :class="[
+            <span v-if="kpi.change" :class="[
               'px-2 py-1 rounded-full text-xs font-semibold',
-              kpi.changeType === 'positive' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+              kpi.changeType === 'positive' ? 'bg-green-100 text-green-700' : kpi.changeType === 'negative' ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-600'
             ]">
+              <i v-if="kpi.changeType === 'positive'" class="fas fa-arrow-up mr-1 text-[10px]"></i>
+              <i v-else-if="kpi.changeType === 'negative'" class="fas fa-arrow-down mr-1 text-[10px]"></i>
               {{ kpi.change }}
             </span>
           </div>
-          <p class="text-2xl font-bold text-gray-900 mb-1">{{ kpi.value }}</p>
+          <p class="text-2xl font-bold text-gray-900 mb-1">{{ kpi.value }}<span class="text-lg text-gray-500">{{ kpi.suffix }}</span></p>
           <p class="text-sm text-gray-500">{{ kpi.title }}</p>
 
           <!-- Mini Sparkline -->
@@ -274,7 +357,7 @@ function exportData(format: string) {
 
       <!-- Charts Row -->
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <!-- Traffic Overview Chart -->
+        <!-- Platform Usage Trends Chart -->
         <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
           <div class="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
             <h2 class="text-lg font-bold text-gray-900 flex items-center gap-3">
@@ -282,18 +365,18 @@ function exportData(format: string) {
                 <i class="fas fa-chart-area text-white text-sm"></i>
               </div>
               <div>
-                <span class="block">Traffic Overview</span>
-                <span class="text-xs font-medium text-gray-500">Page views and unique visitors</span>
+                <span class="block">Platform Usage Trends</span>
+                <span class="text-xs font-medium text-gray-500">Active users vs target</span>
               </div>
             </h2>
             <div class="flex items-center gap-4">
               <div class="flex items-center gap-2">
                 <span class="w-3 h-3 rounded-full bg-teal-500"></span>
-                <span class="text-xs text-gray-500">Page Views</span>
+                <span class="text-xs text-gray-500">Active Users</span>
               </div>
               <div class="flex items-center gap-2">
-                <span class="w-3 h-3 rounded-full bg-purple-500"></span>
-                <span class="text-xs text-gray-500">Unique Visitors</span>
+                <span class="w-3 h-3 rounded-full bg-gray-300"></span>
+                <span class="text-xs text-gray-500">Target</span>
               </div>
             </div>
           </div>
@@ -307,7 +390,7 @@ function exportData(format: string) {
                     :style="{ height: (val / Math.max(...trafficData.datasets[0].data) * 180) + 'px' }"
                   ></div>
                   <div
-                    class="w-full bg-purple-400 rounded-t transition-all hover:bg-purple-500"
+                    class="w-full bg-gray-300 rounded-t transition-all hover:bg-gray-400"
                     :style="{ height: (trafficData.datasets[1].data[idx] / Math.max(...trafficData.datasets[0].data) * 180) + 'px' }"
                   ></div>
                 </div>
@@ -317,16 +400,95 @@ function exportData(format: string) {
           </div>
         </div>
 
-        <!-- Category Breakdown -->
+        <!-- This Week's Highlights (Tournament Records) -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+          <div class="px-5 py-4 border-b border-gray-100">
+            <h2 class="text-lg font-bold text-gray-900 flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center shadow-lg shadow-amber-200">
+                <i class="fas fa-bolt text-white text-sm"></i>
+              </div>
+              <div>
+                <span class="block">This Week's Highlights</span>
+                <span class="text-xs font-medium text-gray-500">Tournament Records</span>
+              </div>
+            </h2>
+          </div>
+          <div class="p-4 space-y-3">
+            <div v-for="record in tournamentRecords" :key="record.id" class="flex items-center gap-3 p-3 rounded-xl bg-gray-50 hover:bg-teal-50 transition-colors">
+              <div :class="['w-10 h-10 rounded-lg flex items-center justify-center', record.iconBg]">
+                <i :class="[record.icon, record.iconColor]"></i>
+              </div>
+              <div class="flex-1">
+                <p class="text-xl font-bold text-gray-900">{{ record.value }}</p>
+                <p class="text-xs text-gray-500">{{ record.label }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Content Engagement Row -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Content Engagement by Type -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+          <div class="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+            <h2 class="text-lg font-bold text-gray-900 flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg shadow-blue-200">
+                <i class="fas fa-book-reader text-white text-sm"></i>
+              </div>
+              <div>
+                <span class="block">Content Engagement by Type</span>
+                <span class="text-xs font-medium text-gray-500">Views vs Interactions</span>
+              </div>
+            </h2>
+            <div class="flex items-center gap-2">
+              <button
+                v-for="type in contentTypes"
+                :key="type.value"
+                @click="selectedContentType = type.value"
+                :class="[
+                  'px-3 py-1 rounded-lg text-xs font-medium transition-all',
+                  selectedContentType === type.value ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                ]"
+              >
+                {{ type.label }}
+              </button>
+            </div>
+          </div>
+          <div class="p-5">
+            <!-- Bar Chart Placeholder -->
+            <div class="h-48 flex items-end justify-around gap-4 px-4">
+              <div v-for="(item, idx) in ['Articles', 'Courses', 'Events', 'Documents', 'Polls', 'Videos']" :key="idx" class="flex-1 flex flex-col items-center gap-1">
+                <div class="w-full flex gap-1 items-end justify-center">
+                  <div class="w-5 bg-teal-500 rounded-t hover:bg-teal-600 transition-all" :style="{ height: [120, 90, 60, 100, 40, 50][idx] + 'px' }"></div>
+                  <div class="w-5 bg-blue-400 rounded-t hover:bg-blue-500 transition-all" :style="{ height: [55, 45, 42, 30, 27, 22][idx] + 'px' }"></div>
+                </div>
+                <span class="text-[10px] text-gray-400 mt-2">{{ item }}</span>
+              </div>
+            </div>
+            <div class="flex items-center justify-center gap-6 mt-4">
+              <div class="flex items-center gap-2">
+                <span class="w-3 h-3 rounded bg-teal-500"></span>
+                <span class="text-xs text-gray-500">Views</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="w-3 h-3 rounded bg-blue-400"></span>
+                <span class="text-xs text-gray-500">Interactions</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Department Participation (Donut Chart) -->
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
           <div class="px-5 py-4 border-b border-gray-100">
             <h2 class="text-lg font-bold text-gray-900 flex items-center gap-3">
               <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center shadow-lg shadow-purple-200">
-                <i class="fas fa-chart-pie text-white text-sm"></i>
+                <i class="fas fa-building text-white text-sm"></i>
               </div>
               <div>
-                <span class="block">Content by Category</span>
-                <span class="text-xs font-medium text-gray-500">Distribution overview</span>
+                <span class="block">Department Participation</span>
+                <span class="text-xs font-medium text-gray-500">Platform adoption by team</span>
               </div>
             </h2>
           </div>
@@ -368,6 +530,84 @@ function exportData(format: string) {
         </div>
       </div>
 
+      <!-- Top Performers & Activity Row -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Top Performing Content (Full Width Table) -->
+        <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+          <div class="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+            <h2 class="text-lg font-bold text-gray-900 flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-lg shadow-orange-200">
+                <i class="fas fa-fire text-white text-sm"></i>
+              </div>
+              <div>
+                <span class="block">Top Performing Content</span>
+                <span class="text-xs font-medium text-gray-500">Top players & performers</span>
+              </div>
+            </h2>
+            <div class="flex items-center gap-2">
+              <button
+                v-for="type in contentTypes"
+                :key="type.value"
+                @click="selectedContentType = type.value"
+                :class="[
+                  'px-3 py-1 rounded-lg text-xs font-medium transition-all',
+                  selectedContentType === type.value ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                ]"
+              >
+                {{ type.label }}
+              </button>
+            </div>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full">
+              <thead>
+                <tr class="bg-gray-50 border-b border-gray-100">
+                  <th class="text-left px-5 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Content</th>
+                  <th class="text-left px-5 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Views</th>
+                  <th class="text-left px-5 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Engagement</th>
+                  <th class="text-left px-5 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Completion</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-50">
+                <tr
+                  v-for="performer in topPerformers"
+                  :key="performer.id"
+                  class="hover:bg-gray-50 transition-colors cursor-pointer"
+                >
+                  <td class="px-5 py-3">
+                    <div class="flex items-center gap-3">
+                      <div :class="['w-10 h-10 rounded-xl flex items-center justify-center', performer.iconBg]">
+                        <i :class="[performer.icon, performer.iconColor]"></i>
+                      </div>
+                      <div>
+                        <p class="text-sm font-semibold text-gray-900">{{ performer.title }}</p>
+                        <p class="text-xs text-gray-500">{{ performer.author }} · {{ performer.stats }}</p>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="px-5 py-3">
+                    <p class="text-sm font-medium text-gray-900">{{ performer.matches }}</p>
+                  </td>
+                  <td class="px-5 py-3">
+                    <div class="flex items-center gap-2">
+                      <div class="w-24 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                        <div class="h-full rounded-full transition-all" :style="{ width: performer.engagement + '%', backgroundColor: performer.color }"></div>
+                      </div>
+                      <span class="text-xs text-gray-600">{{ performer.engagement }}%</span>
+                    </div>
+                  </td>
+                  <td class="px-5 py-3">
+                    <span :class="['text-sm font-medium', performer.completion > 70 ? 'text-green-600' : performer.completion > 40 ? 'text-amber-600' : 'text-gray-500']">
+                      {{ performer.completion }}%
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
       <!-- Content Performance & Activity -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <!-- Top Content -->
@@ -378,8 +618,8 @@ function exportData(format: string) {
                 <i class="fas fa-trophy text-white text-sm"></i>
               </div>
               <div>
-                <span class="block">Top Performing Content</span>
-                <span class="text-xs font-medium text-gray-500">By views and engagement</span>
+                <span class="block">Top Content</span>
+                <span class="text-xs font-medium text-gray-500">By views and rating</span>
               </div>
             </h2>
             <button class="text-sm text-teal-600 hover:text-teal-700 font-medium flex items-center gap-1">
@@ -445,6 +685,101 @@ function exportData(format: string) {
                   <span class="font-medium text-teal-600">{{ activity.item }}</span>
                 </p>
                 <p class="text-xs text-gray-400">{{ activity.time }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Insights, Team Leaderboard & Department Stats Row -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- AI-Powered Insights -->
+        <div class="insights-card rounded-2xl p-6 text-white relative overflow-hidden">
+          <div class="relative z-10">
+            <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
+              <i class="fas fa-lightbulb text-teal-300"></i>
+              AI-Powered Insights
+            </h3>
+            <div class="space-y-4">
+              <div v-for="insight in tournamentInsights" :key="insight.id" class="flex items-start gap-3 pb-3 border-b border-white/10 last:border-0">
+                <div class="w-7 h-7 rounded-lg bg-teal-500/20 flex items-center justify-center flex-shrink-0">
+                  <i :class="[insight.icon, 'text-teal-300 text-xs']"></i>
+                </div>
+                <p class="text-sm text-gray-200 leading-relaxed" v-html="insight.text"></p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Team Leaderboard -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+          <div class="px-5 py-4 border-b border-gray-100">
+            <h2 class="text-lg font-bold text-gray-900 flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center shadow-lg shadow-purple-200">
+                <i class="fas fa-crown text-white text-sm"></i>
+              </div>
+              <div>
+                <span class="block">Team Leaderboard</span>
+                <span class="text-xs font-medium text-gray-500">Top contributing teams</span>
+              </div>
+            </h2>
+          </div>
+          <div class="p-4 space-y-2">
+            <div v-for="(team, idx) in teamStatistics" :key="team.id" class="flex items-center gap-3 p-2 rounded-xl hover:bg-gray-50 transition-colors">
+              <div :class="[
+                'w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold',
+                idx === 0 ? 'bg-gradient-to-br from-amber-400 to-amber-500 text-white' :
+                idx === 1 ? 'bg-gradient-to-br from-gray-300 to-gray-400 text-white' :
+                idx === 2 ? 'bg-gradient-to-br from-orange-400 to-orange-500 text-white' :
+                'bg-gray-100 text-gray-500'
+              ]">
+                {{ idx + 1 }}
+              </div>
+              <div :class="['w-9 h-9 rounded-full flex items-center justify-center text-white text-xs font-semibold', team.gradient]">
+                {{ team.initials }}
+              </div>
+              <div class="flex-1">
+                <p class="text-sm font-medium text-gray-900">{{ team.name }}</p>
+                <p class="text-xs text-gray-500">{{ team.department }}</p>
+              </div>
+              <div class="text-right">
+                <p class="text-sm font-bold text-gray-900">{{ team.contributions }}</p>
+                <p class="text-[10px] text-gray-400">points</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Department Stats Summary -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+          <div class="px-5 py-4 border-b border-gray-100">
+            <h2 class="text-lg font-bold text-gray-900 flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-200">
+                <i class="fas fa-building text-white text-sm"></i>
+              </div>
+              <div>
+                <span class="block">Department Stats</span>
+                <span class="text-xs font-medium text-gray-500">Adoption overview</span>
+              </div>
+            </h2>
+          </div>
+          <div class="p-4 space-y-3">
+            <div v-for="dept in departmentStats.slice(0, 4)" :key="dept.id" class="p-3 rounded-xl bg-gray-50 hover:bg-teal-50 transition-colors">
+              <div class="flex items-center justify-between mb-2">
+                <div class="flex items-center gap-2">
+                  <div :class="['w-8 h-8 rounded-lg flex items-center justify-center text-white text-xs font-semibold', dept.gradient]">
+                    {{ dept.initials }}
+                  </div>
+                  <span class="text-sm font-medium text-gray-900">{{ dept.name }}</span>
+                </div>
+                <span class="text-sm font-bold" :style="{ color: dept.color }">{{ dept.adoption }}%</span>
+              </div>
+              <div class="w-full h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                <div class="h-full rounded-full transition-all" :style="{ width: dept.adoption + '%', backgroundColor: dept.color }"></div>
+              </div>
+              <div class="flex items-center justify-between mt-2 text-[10px] text-gray-400">
+                <span>{{ dept.employees }} employees</span>
+                <span>{{ dept.articles }} articles · {{ dept.events }} events</span>
               </div>
             </div>
           </div>
@@ -587,5 +922,58 @@ function exportData(format: string) {
 @keyframes drift3 {
   0%, 100% { transform: translate(0, 0) rotate(0deg); }
   50% { transform: translate(30px, 30px) rotate(180deg); }
+}
+
+/* KPI Card with accent top border */
+.kpi-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.kpi-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent-color, #14b8a6), var(--accent-color-end, #0d9488));
+}
+
+.kpi-card:hover {
+  transform: translateY(-4px);
+  border-color: #ccfbf1;
+}
+
+/* Insights Card (Dark) */
+.insights-card {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+}
+
+.insights-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle, rgba(20, 184, 166, 0.3) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+/* Animation for fade-in */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-in {
+  animation: fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 </style>
