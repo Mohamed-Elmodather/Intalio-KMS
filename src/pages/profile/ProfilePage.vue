@@ -189,6 +189,21 @@ const saveProfile = () => {
   alert('Profile updated successfully!')
 }
 
+// Contact/Communication Methods
+const sendEmail = () => {
+  window.location.href = `mailto:${user.value.email}`
+}
+
+const openTeams = () => {
+  // Open Microsoft Teams chat with the user
+  window.open(`https://teams.microsoft.com/l/chat/0/0?users=${user.value.email}`, '_blank')
+}
+
+const openDM = () => {
+  // Navigate to collaboration page with DM to this user
+  router.push({ path: '/collaboration', query: { dm: user.value.email } })
+}
+
 // ==================== AI FEATURES ====================
 
 // AI State
@@ -486,6 +501,27 @@ function getInsightColor(type: string): string {
 
               <!-- Action Buttons (Right) -->
               <div class="flex items-center gap-2">
+                <!-- Contact Buttons -->
+                <button @click="sendEmail" class="w-9 h-9 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition-all flex items-center justify-center" title="Send Email">
+                  <i class="fas fa-envelope text-sm"></i>
+                </button>
+                <button @click="openTeams" class="w-9 h-9 bg-indigo-100 text-indigo-600 rounded-lg hover:bg-indigo-200 transition-all flex items-center justify-center" title="Microsoft Teams">
+                  <svg class="w-4 h-4" viewBox="0 0 2228.833 2073.333" fill="currentColor">
+                    <path d="M1554.637 777.5h575.713c54.391 0 98.483 44.092 98.483 98.483v524.398c0 199.901-162.051 361.952-361.952 361.952h-1.711c-199.901.028-361.975-162-362.004-361.901V828.971c.001-28.427 23.045-51.471 51.471-51.471z"/>
+                    <circle cx="1943.75" cy="440.583" r="233.25"/>
+                    <path d="M1218.083 777.5h681.25c56.558 0 102.417 45.859 102.417 102.416v552.084c0 225.489-182.262 408.333-407.751 408.333-.583 0-1.166 0-1.75-.001-225.489-.577-407.333-184.044-406.756-409.534V879.917c0-56.558 45.859-102.417 102.417-102.417h-.827z"/>
+                    <circle cx="1767.083" cy="340.417" r="297.5"/>
+                    <path d="M546.25 777.5h845.833c50.46 0 91.417 40.956 91.417 91.417v616.666c0 281.861-228.473 510.417-510.334 510.417C691.304 1996 462.75 1767.444 462.75 1485.583V868.917c0-50.46 40.956-91.417 91.417-91.417h-7.917z"/>
+                    <circle cx="969.167" cy="295.417" r="295.417"/>
+                  </svg>
+                </button>
+                <button @click="openDM" class="w-9 h-9 bg-teal-100 text-teal-600 rounded-lg hover:bg-teal-200 transition-all flex items-center justify-center" title="Direct Message">
+                  <i class="fas fa-comment-dots text-sm"></i>
+                </button>
+
+                <div class="w-px h-6 bg-gray-200 mx-1"></div>
+
+                <!-- Profile Actions -->
                 <button @click="loadAIInsights" class="px-3 py-2 bg-gradient-to-r from-violet-500 to-purple-600 text-white rounded-lg font-medium text-xs flex items-center gap-1.5 hover:from-violet-600 hover:to-purple-700 transition-all shadow-md">
                   <i class="fas fa-wand-magic-sparkles"></i>
                   AI Insights
