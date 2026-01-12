@@ -410,7 +410,7 @@ function getInsightColor(type: string): string {
 </script>
 
 <template>
-  <div>
+  <div class="px-6 py-6">
     <!-- Loading State -->
     <div v-if="isLoading" class="flex items-center justify-center min-h-[60vh]">
       <LoadingSpinner size="lg" text="Loading profile..." />
@@ -426,51 +426,104 @@ function getInsightColor(type: string): string {
         <span class="text-gray-900 font-medium">Profile</span>
       </nav>
 
-      <!-- Profile Header -->
-      <div class="card-animated fade-in-up rounded-2xl overflow-hidden mb-10" style="animation-delay: 0.1s">
-        <!-- Cover Photo -->
-        <div class="h-48 bg-gradient-to-r from-teal-500 via-teal-600 to-teal-700 relative">
-          <button class="btn-vibrant ripple absolute bottom-4 right-4 px-4 py-2 bg-white/20 backdrop-blur-sm rounded-lg text-white text-sm hover:bg-white/30 transition-colors">
-            <i class="fas fa-camera mr-2 icon-soft"></i>Change Cover
-          </button>
-        </div>
-
-        <!-- Profile Info -->
-        <div class="px-6 pb-6">
-          <div class="flex flex-col md:flex-row md:items-end gap-4 -mt-16 relative z-10">
-            <div class="relative">
-              <div class="w-32 h-32 rounded-2xl bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center text-white text-4xl font-bold border-4 border-white shadow-xl">
-                {{ user.initials }}
-              </div>
-              <button class="btn-vibrant ripple absolute -bottom-1 -right-1 w-10 h-10 rounded-full bg-teal-500 text-white flex items-center justify-center shadow-lg hover:bg-teal-600 transition-colors">
-                <i class="fas fa-camera icon-vibrant"></i>
+      <!-- Compact Profile Header -->
+      <div class="profile-header-container card-animated fade-in-up rounded-2xl overflow-hidden mb-6" style="animation-delay: 0.1s">
+        <!-- Cover with Avatar Overlapping -->
+        <div class="relative">
+          <!-- Cover Photo -->
+          <div class="h-32 bg-gradient-to-r from-teal-500 via-teal-600 to-emerald-600 relative overflow-hidden">
+            <!-- Subtle Pattern -->
+            <div class="absolute inset-0 opacity-10">
+              <div class="absolute top-0 right-0 w-64 h-64 bg-white rounded-full translate-x-1/2 -translate-y-1/2"></div>
+              <div class="absolute bottom-0 left-1/4 w-32 h-32 bg-white rounded-full translate-y-1/2"></div>
+            </div>
+            <!-- Cover Actions -->
+            <div class="absolute top-3 right-3 flex items-center gap-2">
+              <button class="p-2 bg-white/20 backdrop-blur-sm rounded-lg text-white text-sm hover:bg-white/30 transition-all">
+                <i class="fas fa-camera"></i>
               </button>
-              <span class="absolute top-2 right-2 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></span>
+            </div>
+          </div>
+
+          <!-- Profile Content Row -->
+          <div class="px-6 pb-5 bg-white">
+            <!-- Avatar Row -->
+            <div class="-mt-16 mb-4">
+              <div class="relative inline-block">
+                <div class="w-28 h-28 rounded-2xl bg-gradient-to-br from-teal-400 to-emerald-500 flex items-center justify-center text-white text-4xl font-bold border-4 border-white shadow-xl">
+                  {{ user.initials }}
+                </div>
+                <button class="absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-teal-500 text-white flex items-center justify-center shadow-lg hover:bg-teal-600 transition-colors">
+                  <i class="fas fa-camera text-xs"></i>
+                </button>
+                <span class="absolute top-1 right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></span>
+              </div>
             </div>
 
-            <div class="flex-1 md:pb-2">
-              <h1 class="text-2xl font-bold text-teal-900">{{ user.name }}</h1>
-              <p class="text-teal-600">{{ user.role }}</p>
-              <div class="flex flex-wrap items-center gap-4 mt-2 text-sm text-teal-500">
-                <span><i class="fas fa-building mr-1 icon-soft"></i>{{ user.department }}</span>
-                <span><i class="fas fa-map-marker-alt mr-1 icon-soft"></i>{{ user.location }}</span>
-                <span><i class="fas fa-calendar mr-1 icon-soft"></i>Joined {{ user.joinDate }}</span>
+            <!-- User Info & Actions Row -->
+            <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+              <!-- Info (Left) -->
+              <div>
+                <div class="flex items-center gap-2">
+                  <h1 class="text-xl font-bold text-gray-900">{{ user.name }}</h1>
+                  <span class="w-5 h-5 rounded-full bg-blue-500 flex items-center justify-center" title="Verified">
+                    <i class="fas fa-check text-white text-[10px]"></i>
+                  </span>
+                  <span class="px-2 py-0.5 bg-amber-100 text-amber-700 text-xs font-medium rounded-full">Lvl 42</span>
+                </div>
+                <p class="text-teal-600 font-medium text-sm">{{ user.role }}</p>
+                <div class="flex flex-wrap items-center gap-3 mt-1.5 text-xs text-gray-500">
+                  <span class="flex items-center gap-1">
+                    <i class="fas fa-building text-teal-500"></i>
+                    {{ user.department }}
+                  </span>
+                  <span class="flex items-center gap-1">
+                    <i class="fas fa-map-marker-alt text-red-400"></i>
+                    {{ user.location }}
+                  </span>
+                </div>
+              </div>
+
+              <!-- Action Buttons (Right) -->
+              <div class="flex items-center gap-2">
+                <button @click="loadAIInsights" class="px-3 py-2 bg-gradient-to-r from-violet-500 to-purple-600 text-white rounded-lg font-medium text-xs flex items-center gap-1.5 hover:from-violet-600 hover:to-purple-700 transition-all shadow-md">
+                  <i class="fas fa-wand-magic-sparkles"></i>
+                  AI Insights
+                </button>
+                <button @click="showEditProfile = true" class="px-3 py-2 bg-teal-500 text-white rounded-lg font-medium text-xs flex items-center gap-1.5 hover:bg-teal-600 transition-all shadow-md">
+                  <i class="fas fa-edit"></i>
+                  Edit
+                </button>
+                <button @click="goToSettings" class="p-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-all">
+                  <i class="fas fa-cog text-sm"></i>
+                </button>
               </div>
             </div>
 
-            <div class="flex gap-3">
-              <!-- AI Insights Button -->
-              <button @click="loadAIInsights"
-                      class="px-4 py-2 bg-gradient-to-r from-teal-500 to-emerald-500 text-white rounded-xl font-medium text-sm flex items-center gap-2 hover:from-teal-600 hover:to-emerald-600 transition-all shadow-lg">
-                <i class="fas fa-wand-magic-sparkles"></i>
-                AI Insights
-              </button>
-              <button @click="goToSettings" class="btn btn-secondary btn-vibrant ripple">
-                <i class="fas fa-cog icon-soft"></i> Settings
-              </button>
-              <button @click="showEditProfile = true" class="btn btn-primary btn-vibrant ripple">
-                <i class="fas fa-edit icon-vibrant"></i> Edit Profile
-              </button>
+            <!-- Stats Row -->
+            <div class="flex items-center justify-end mt-4 pt-4 border-t border-gray-100">
+              <div class="flex items-center gap-6">
+                <div class="text-center cursor-pointer hover:opacity-80 transition-opacity">
+                  <p class="text-lg font-bold text-gray-900">{{ stats.articles }}</p>
+                  <p class="text-xs text-gray-500">Articles</p>
+                </div>
+                <div class="text-center cursor-pointer hover:opacity-80 transition-opacity">
+                  <p class="text-lg font-bold text-gray-900">{{ stats.documents }}</p>
+                  <p class="text-xs text-gray-500">Documents</p>
+                </div>
+                <div class="text-center cursor-pointer hover:opacity-80 transition-opacity">
+                  <p class="text-lg font-bold text-gray-900">{{ stats.courses }}</p>
+                  <p class="text-xs text-gray-500">Courses</p>
+                </div>
+                <div class="text-center cursor-pointer hover:opacity-80 transition-opacity">
+                  <p class="text-lg font-bold text-gray-900">{{ followersCount }}</p>
+                  <p class="text-xs text-gray-500">Followers</p>
+                </div>
+                <div class="text-center cursor-pointer hover:opacity-80 transition-opacity">
+                  <p class="text-lg font-bold text-gray-900">{{ followingCount }}</p>
+                  <p class="text-xs text-gray-500">Following</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -1271,8 +1324,33 @@ function getInsightColor(type: string): string {
   transition: width 0.5s ease-out;
 }
 
-/* Cover photo button icon styling */
-.h-48 .icon-soft {
-  color: inherit;
+/* Profile Header Styles */
+.profile-header-container {
+  box-shadow: 0 4px 20px -5px rgba(0, 0, 0, 0.1);
+}
+
+.profile-cover {
+  background-image:
+    radial-gradient(circle at 20% 80%, rgba(255,255,255,0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(255,255,255,0.1) 0%, transparent 50%);
+}
+
+/* Floating Animation */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-10px) rotate(5deg);
+  }
+}
+
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}
+
+/* Stats hover effect */
+.profile-header-container .grid > div:hover {
+  box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.1);
 }
 </style>
