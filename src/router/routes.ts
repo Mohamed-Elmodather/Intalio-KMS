@@ -24,6 +24,7 @@ const SearchResultsPage = () => import('@/pages/search/SearchResultsPage.vue')
 const AIAssistantPage = () => import('@/pages/ai/AIAssistantPage.vue')
 const ProfilePage = () => import('@/pages/profile/ProfilePage.vue')
 const SettingsPage = () => import('@/pages/settings/SettingsPage.vue')
+const AnalyticsPage = () => import('@/pages/analytics/AnalyticsPage.vue')
 
 export const routes: RouteRecordRaw[] = [
   // Public routes
@@ -188,6 +189,14 @@ export const routes: RouteRecordRaw[] = [
     name: 'AIAssistant',
     component: AIAssistantPage,
     meta: { requiresAuth: true, title: 'AI Assistant' },
+  },
+
+  // Analytics
+  {
+    path: '/analytics',
+    name: 'Analytics',
+    component: AnalyticsPage,
+    meta: { requiresAuth: true, title: 'Analytics & Reporting' },
   },
 
   // Profile & Settings

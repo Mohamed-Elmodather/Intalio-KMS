@@ -39,6 +39,7 @@ const navigationItems: NavItem[] = [
   { id: 'collaboration', icon: 'fas fa-users', label: 'Collaboration', route: '/collaboration' },
   { id: 'polls', icon: 'fas fa-poll', label: 'Polls & Surveys', route: '/polls', badge: '3', badgeClass: 'bg-orange-200 text-orange-700' },
   { id: 'services', icon: 'fas fa-concierge-bell', label: 'Self-Services', route: '/self-services' },
+  { id: 'analytics', icon: 'fas fa-chart-bar', label: 'Analytics', route: '/analytics' },
 ]
 
 // Workspace items for sidebar
