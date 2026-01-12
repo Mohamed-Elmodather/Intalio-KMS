@@ -906,8 +906,7 @@ function getLessonIcon(type: string) {
 }
 
 .course-header-content {
-  max-width: 1400px;
-  margin: 0 auto;
+  /* Full width */
 }
 
 .back-btn {

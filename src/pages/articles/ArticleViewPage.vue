@@ -379,8 +379,8 @@ function navigateToArticle(slug: string) {
         <div v-else class="h-[300px] w-full bg-gradient-to-br from-teal-500 to-teal-700"></div>
 
         <!-- Header Content -->
-        <div class="absolute bottom-0 left-0 right-0 p-8">
-          <div class="max-w-4xl mx-auto">
+        <div class="absolute bottom-0 left-0 right-0 px-6 py-8">
+          <div>
             <!-- Back Button -->
             <button @click="goBack" class="mb-4 px-4 py-2 bg-white/20 backdrop-blur-sm text-white rounded-lg hover:bg-white/30 transition-colors">
               <i class="fas fa-arrow-left mr-2"></i>
