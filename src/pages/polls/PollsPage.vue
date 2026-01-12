@@ -12,6 +12,33 @@ const activeTab = ref('active')
 const searchQuery = ref('')
 const selectedCategory = ref('all')
 
+// Toolbar state
+const viewMode = ref<'grid' | 'list'>('grid')
+const sortBy = ref('recent')
+const sortOrder = ref<'asc' | 'desc'>('desc')
+const showCategoryFilter = ref(false)
+const showStatusFilter = ref(false)
+const showSortDropdown = ref(false)
+const selectedCategories = ref<string[]>([])
+const selectedStatuses = ref<string[]>([])
+
+// Sort options
+const sortOptions = [
+  { value: 'recent', label: 'Most Recent', icon: 'fas fa-clock' },
+  { value: 'popular', label: 'Most Popular', icon: 'fas fa-fire' },
+  { value: 'votes', label: 'Most Votes', icon: 'fas fa-users' },
+  { value: 'ending', label: 'Ending Soon', icon: 'fas fa-hourglass-end' },
+  { value: 'name', label: 'Name (A-Z)', icon: 'fas fa-font' }
+]
+
+// Status filter options
+const statusOptions = [
+  { id: 'active', label: 'Active', icon: 'fas fa-play-circle', color: 'text-green-500' },
+  { id: 'draft', label: 'Draft', icon: 'fas fa-file-alt', color: 'text-gray-500' },
+  { id: 'scheduled', label: 'Scheduled', icon: 'fas fa-calendar-alt', color: 'text-blue-500' },
+  { id: 'completed', label: 'Completed', icon: 'fas fa-check-circle', color: 'text-purple-500' }
+]
+
 // Interfaces
 interface PollOption {
   label: string
@@ -373,6 +400,49 @@ function createQuickPoll() {
 function goToCreatePoll() {
   router.push({ name: 'PollCreate' })
 }
+
+// Toolbar helper functions
+const currentSortOption = computed(() => {
+  return sortOptions.find(opt => opt.value === sortBy.value) || sortOptions[0]
+})
+
+const totalPollsCount = computed(() => {
+  if (activeTab.value === 'active') return filteredActivePolls.value.length
+  if (activeTab.value === 'my-polls') return myPolls.value.length
+  if (activeTab.value === 'completed') return completedPolls.value.length
+  return 0
+})
+
+function toggleCategory(categoryId: string) {
+  const idx = selectedCategories.value.indexOf(categoryId)
+  if (idx === -1) {
+    selectedCategories.value.push(categoryId)
+  } else {
+    selectedCategories.value.splice(idx, 1)
+  }
+}
+
+function isCategorySelected(categoryId: string): boolean {
+  return selectedCategories.value.includes(categoryId)
+}
+
+function toggleStatus(statusId: string) {
+  const idx = selectedStatuses.value.indexOf(statusId)
+  if (idx === -1) {
+    selectedStatuses.value.push(statusId)
+  } else {
+    selectedStatuses.value.splice(idx, 1)
+  }
+}
+
+function isStatusSelected(statusId: string): boolean {
+  return selectedStatuses.value.includes(statusId)
+}
+
+function selectSortOption(value: string) {
+  sortBy.value = value
+  showSortDropdown.value = false
+}
 </script>
 
 <template>
@@ -663,33 +733,265 @@ function goToCreatePoll() {
         </div>
       </section>
 
-      <!-- Filter Bar -->
-      <section class="filter-bar fade-in-up" style="animation-delay: 0.3s">
-        <div class="tab-pills">
-          <button
-            v-for="tab in tabs"
-            :key="tab.id"
-            :class="['tab-pill', { active: activeTab === tab.id }]"
-            @click="activeTab = tab.id"
-          >
-            <i :class="tab.icon"></i>
-            {{ tab.label }}
-            <span class="tab-count">{{ tab.count }}</span>
-          </button>
+      <!-- Section Header / Toolbar - Documents Style -->
+      <div class="bg-white rounded-xl border border-gray-100 shadow-sm fade-in-up" style="animation-delay: 0.3s">
+        <div class="border-b border-gray-100">
+          <!-- Top Row - Title and Primary Actions -->
+          <div class="px-4 py-3 flex items-center justify-between">
+            <h2 class="text-lg font-bold text-gray-900 flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center shadow-lg shadow-teal-200">
+                <i class="fas fa-poll text-white text-sm"></i>
+              </div>
+              <div>
+                <span class="block">All Polls</span>
+                <span class="text-xs font-medium text-gray-500">{{ totalPollsCount }} polls • {{ stats.participation }}% participation</span>
+              </div>
+            </h2>
+            <div class="flex items-center gap-2">
+              <!-- Primary Actions -->
+              <button @click="goToCreatePoll" class="px-4 py-2 bg-gradient-to-r from-teal-500 to-teal-600 text-white rounded-lg text-sm font-medium hover:from-teal-600 hover:to-teal-700 transition-all flex items-center gap-2 shadow-sm shadow-teal-200">
+                <i class="fas fa-plus"></i>
+                Create Poll
+              </button>
+              <button @click="showQuickPollModal = true" class="px-3 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 hover:border-gray-300 transition-all flex items-center gap-2">
+                <i class="fas fa-bolt text-amber-500"></i>
+                Quick Poll
+              </button>
+
+              <!-- Divider -->
+              <div class="w-px h-8 bg-gray-200 mx-1"></div>
+
+              <!-- Tab Pills -->
+              <div class="flex items-center bg-gray-100 rounded-lg p-1">
+                <button
+                  v-for="tab in tabs"
+                  :key="tab.id"
+                  :class="[
+                    'px-3 py-1.5 rounded-md text-xs font-medium transition-all flex items-center gap-2',
+                    activeTab === tab.id ? 'bg-white text-teal-600 shadow-sm' : 'text-gray-600 hover:text-gray-900'
+                  ]"
+                  @click="activeTab = tab.id"
+                >
+                  <i :class="tab.icon"></i>
+                  {{ tab.label }}
+                  <span :class="[
+                    'px-1.5 py-0.5 rounded-full text-[10px] font-semibold',
+                    activeTab === tab.id ? 'bg-teal-100 text-teal-700' : 'bg-gray-200 text-gray-600'
+                  ]">{{ tab.count }}</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom Row - Search, Filters, View Options -->
+          <div class="px-4 py-2 bg-gray-50/50 flex flex-wrap items-center gap-3">
+            <!-- Search -->
+            <div class="flex-1 min-w-[200px] max-w-md relative">
+              <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+              <input
+                v-model="searchQuery"
+                type="text"
+                placeholder="Search polls..."
+                class="w-full pl-9 pr-4 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all"
+              >
+              <button v-if="searchQuery" @click="searchQuery = ''" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                <i class="fas fa-times text-xs"></i>
+              </button>
+            </div>
+
+            <!-- Category Filter -->
+            <div class="relative">
+              <button
+                @click="showCategoryFilter = !showCategoryFilter"
+                :class="[
+                  'flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border',
+                  selectedCategories.length > 0 ? 'bg-teal-50 border-teal-200 text-teal-700' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+                ]"
+              >
+                <i class="fas fa-layer-group text-sm"></i>
+                <span>{{ selectedCategories.length > 0 ? `${selectedCategories.length} Categories` : 'Category' }}</span>
+                <i :class="showCategoryFilter ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ml-1"></i>
+              </button>
+
+              <!-- Dropdown Menu -->
+              <div
+                v-if="showCategoryFilter"
+                class="absolute left-0 top-full mt-2 w-64 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
+              >
+                <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Select Categories</div>
+                <div class="max-h-48 overflow-y-auto">
+                  <button
+                    v-for="cat in categories.filter(c => c.id !== 'all')"
+                    :key="cat.id"
+                    @click="toggleCategory(cat.id)"
+                    :class="[
+                      'w-full px-3 py-2 text-left text-sm flex items-center gap-3 transition-colors',
+                      isCategorySelected(cat.id) ? 'bg-teal-50 text-teal-700' : 'text-gray-700 hover:bg-gray-50'
+                    ]"
+                  >
+                    <div :class="[
+                      'w-4 h-4 rounded border-2 flex items-center justify-center transition-all',
+                      isCategorySelected(cat.id) ? 'bg-teal-500 border-teal-500' : 'border-gray-300'
+                    ]">
+                      <i v-if="isCategorySelected(cat.id)" class="fas fa-check text-white text-[8px]"></i>
+                    </div>
+                    <i :class="[cat.icon, 'text-sm text-gray-400']"></i>
+                    <span class="flex-1">{{ cat.label }}</span>
+                    <span class="text-xs text-gray-400">{{ cat.count }}</span>
+                  </button>
+                </div>
+
+                <div class="my-2 border-t border-gray-100"></div>
+
+                <div class="px-3 flex gap-2">
+                  <button
+                    @click="selectedCategories = []; showCategoryFilter = false"
+                    class="flex-1 px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                  >
+                    Clear All
+                  </button>
+                  <button
+                    @click="showCategoryFilter = false"
+                    class="flex-1 px-3 py-1.5 text-xs font-medium text-white bg-teal-500 rounded-lg hover:bg-teal-600 transition-colors"
+                  >
+                    Apply
+                  </button>
+                </div>
+              </div>
+
+              <!-- Click outside to close -->
+              <div v-if="showCategoryFilter" @click="showCategoryFilter = false" class="fixed inset-0 z-40"></div>
+            </div>
+
+            <!-- Status Filter -->
+            <div class="relative">
+              <button
+                @click="showStatusFilter = !showStatusFilter"
+                :class="[
+                  'flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border',
+                  selectedStatuses.length > 0 ? 'bg-teal-50 border-teal-200 text-teal-700' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+                ]"
+              >
+                <i class="fas fa-toggle-on text-sm"></i>
+                <span>{{ selectedStatuses.length > 0 ? `${selectedStatuses.length} Status` : 'Status' }}</span>
+                <i :class="showStatusFilter ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ml-1"></i>
+              </button>
+
+              <!-- Dropdown Menu -->
+              <div
+                v-if="showStatusFilter"
+                class="absolute left-0 top-full mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
+              >
+                <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Filter by Status</div>
+                <div class="max-h-48 overflow-y-auto">
+                  <button
+                    v-for="option in statusOptions"
+                    :key="option.id"
+                    @click="toggleStatus(option.id)"
+                    :class="[
+                      'w-full px-3 py-2 text-left text-sm flex items-center gap-3 transition-colors',
+                      isStatusSelected(option.id) ? 'bg-teal-50 text-teal-700' : 'text-gray-700 hover:bg-gray-50'
+                    ]"
+                  >
+                    <div :class="[
+                      'w-4 h-4 rounded border-2 flex items-center justify-center transition-all',
+                      isStatusSelected(option.id) ? 'bg-teal-500 border-teal-500' : 'border-gray-300'
+                    ]">
+                      <i v-if="isStatusSelected(option.id)" class="fas fa-check text-white text-[8px]"></i>
+                    </div>
+                    <i :class="[option.icon, option.color]"></i>
+                    <span class="flex-1">{{ option.label }}</span>
+                  </button>
+                </div>
+
+                <div class="my-2 border-t border-gray-100"></div>
+
+                <div class="px-3 flex gap-2">
+                  <button
+                    @click="selectedStatuses = []; showStatusFilter = false"
+                    class="flex-1 px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                  >
+                    Clear All
+                  </button>
+                  <button
+                    @click="showStatusFilter = false"
+                    class="flex-1 px-3 py-1.5 text-xs font-medium text-white bg-teal-500 rounded-lg hover:bg-teal-600 transition-colors"
+                  >
+                    Apply
+                  </button>
+                </div>
+              </div>
+
+              <!-- Click outside to close -->
+              <div v-if="showStatusFilter" @click="showStatusFilter = false" class="fixed inset-0 z-40"></div>
+            </div>
+
+            <!-- Sort Options with Order Toggle -->
+            <div class="relative ml-auto flex items-center">
+              <button
+                @click="showSortDropdown = !showSortDropdown"
+                class="flex items-center gap-2 px-3 py-1.5 rounded-l-lg text-xs font-medium transition-all border border-r-0 bg-white border-gray-200 text-gray-600 hover:bg-gray-50"
+              >
+                <i :class="[currentSortOption.icon, 'text-sm text-teal-500']"></i>
+                <span>{{ currentSortOption.label }}</span>
+                <i :class="showSortDropdown ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ml-1"></i>
+              </button>
+              <button
+                @click="sortOrder = sortOrder === 'asc' ? 'desc' : 'asc'"
+                class="flex items-center justify-center w-8 h-8 rounded-r-lg text-xs font-medium transition-all border bg-white border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-teal-600"
+                :title="sortOrder === 'asc' ? 'Ascending order - Click for descending' : 'Descending order - Click for ascending'"
+              >
+                <i :class="sortOrder === 'asc' ? 'fas fa-arrow-up' : 'fas fa-arrow-down'" class="text-sm text-teal-500"></i>
+              </button>
+
+              <!-- Dropdown Menu -->
+              <div
+                v-if="showSortDropdown"
+                class="absolute left-0 top-full mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
+              >
+                <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Sort By</div>
+                <div class="max-h-64 overflow-y-auto">
+                  <button
+                    v-for="option in sortOptions"
+                    :key="option.value"
+                    @click="selectSortOption(option.value)"
+                    :class="[
+                      'w-full px-3 py-2 text-left text-sm flex items-center gap-3 transition-colors',
+                      sortBy === option.value ? 'bg-teal-50 text-teal-700' : 'text-gray-700 hover:bg-gray-50'
+                    ]"
+                  >
+                    <i :class="[option.icon, 'text-sm w-4', sortBy === option.value ? 'text-teal-500' : 'text-gray-400']"></i>
+                    <span class="flex-1">{{ option.label }}</span>
+                    <i v-if="sortBy === option.value" class="fas fa-check text-teal-500 text-xs"></i>
+                  </button>
+                </div>
+              </div>
+              <div v-if="showSortDropdown" @click="showSortDropdown = false" class="fixed inset-0 z-40"></div>
+            </div>
+
+            <!-- View Toggle -->
+            <div class="flex items-center gap-0.5 bg-white border border-gray-200 rounded-lg p-1">
+              <button
+                @click="viewMode = 'grid'"
+                :class="['px-2.5 py-1 rounded-md transition-all', viewMode === 'grid' ? 'bg-teal-500 text-white' : 'text-gray-500 hover:bg-gray-100']"
+                title="Grid view"
+              >
+                <i class="fas fa-th-large text-xs"></i>
+              </button>
+              <button
+                @click="viewMode = 'list'"
+                :class="['px-2.5 py-1 rounded-md transition-all', viewMode === 'list' ? 'bg-teal-500 text-white' : 'text-gray-500 hover:bg-gray-100']"
+                title="List view"
+              >
+                <i class="fas fa-list text-xs"></i>
+              </button>
+            </div>
+          </div>
         </div>
-        <div class="search-input-polls">
-          <i class="fas fa-search text-gray-400"></i>
-          <input type="text" v-model="searchQuery" placeholder="Search polls...">
-        </div>
-        <div class="filter-dropdown">
-          <i class="fas fa-sort-amount-down text-gray-400"></i>
-          <span>Most Recent</span>
-          <i class="fas fa-chevron-down text-gray-400 text-xs"></i>
-        </div>
-      </section>
+      </div>
 
       <!-- Active Polls Grid -->
-      <div v-if="activeTab === 'active'" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div v-if="activeTab === 'active'" class="mt-6 grid gap-6" :class="viewMode === 'grid' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'">
         <div
           v-for="(poll, index) in filteredActivePolls"
           :key="poll.id"
@@ -773,7 +1075,7 @@ function goToCreatePoll() {
       </div>
 
       <!-- My Polls -->
-      <div v-if="activeTab === 'my-polls'" class="my-polls-card fade-in-up" style="animation-delay: 0.35s">
+      <div v-if="activeTab === 'my-polls'" class="mt-6 my-polls-card fade-in-up" style="animation-delay: 0.35s">
         <div class="p-4 border-b border-gray-100 flex items-center justify-between">
           <h3 class="font-semibold text-gray-900">Your Polls</h3>
           <div class="flex items-center gap-2">
@@ -824,7 +1126,7 @@ function goToCreatePoll() {
       </div>
 
       <!-- Completed Polls -->
-      <div v-if="activeTab === 'completed'" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div v-if="activeTab === 'completed'" class="mt-6 grid gap-6" :class="viewMode === 'grid' ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1'">
         <div
           v-for="(poll, index) in completedPolls"
           :key="poll.id"
