@@ -410,7 +410,7 @@ function navigateToArticle(slug: string) {
 
       <!-- Metadata Bar -->
       <div class="bg-white border-b border-gray-200 sticky top-0 z-20">
-        <div class="max-w-6xl mx-auto px-4 py-3">
+        <div class="px-6 py-3">
           <div class="flex items-center justify-between flex-wrap gap-4">
             <!-- Author & Meta -->
             <div class="flex items-center gap-4">
@@ -462,7 +462,7 @@ function navigateToArticle(slug: string) {
       </div>
 
       <!-- Main Content Area -->
-      <div class="max-w-6xl mx-auto px-4 py-8">
+      <div class="px-6 py-8">
         <div class="flex gap-8">
           <!-- Table of Contents (Left Sidebar) -->
           <aside v-if="tocItems.length > 0 && showToc" class="hidden lg:block w-64 flex-shrink-0">

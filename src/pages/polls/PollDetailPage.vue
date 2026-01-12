@@ -307,7 +307,7 @@ watch(() => route.params.id, () => {
     <template v-else-if="poll">
       <!-- Header -->
       <header class="bg-white border-b border-gray-200 sticky top-0 z-30">
-        <div class="max-w-6xl mx-auto px-4 py-4">
+        <div class="px-6 py-4">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-4">
               <button
@@ -347,7 +347,7 @@ watch(() => route.params.id, () => {
       </header>
 
       <!-- Main Content -->
-      <main class="max-w-6xl mx-auto px-4 py-8">
+      <main class="px-6 py-8">
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <!-- Left Column - Poll Content -->
           <div class="lg:col-span-2 space-y-6">

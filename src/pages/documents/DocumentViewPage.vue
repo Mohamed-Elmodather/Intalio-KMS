@@ -894,7 +894,7 @@ function formatVersionDate(date: Date): string {
     </div>
 
     <!-- Document Content -->
-    <div v-else-if="document" class="max-w-6xl mx-auto px-6 py-8 space-y-6">
+    <div v-else-if="document" class="px-6 py-8 space-y-6">
       <!-- Back Button -->
       <button @click="goBack" class="inline-flex items-center gap-2 text-gray-600 hover:text-teal-600 transition-colors group">
         <i class="fas fa-arrow-left group-hover:-translate-x-1 transition-transform"></i>

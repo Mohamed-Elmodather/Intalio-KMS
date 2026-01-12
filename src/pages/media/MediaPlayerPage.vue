@@ -462,7 +462,7 @@ function copySummary() {
     </div>
 
     <!-- Media Content -->
-    <div v-else-if="media" class="max-w-7xl mx-auto px-6 py-8">
+    <div v-else-if="media" class="px-6 py-8">
       <!-- Back Button -->
       <button @click="goBack" class="inline-flex items-center gap-2 text-gray-600 hover:text-teal-600 transition-colors group mb-6">
         <i class="fas fa-arrow-left group-hover:-translate-x-1 transition-transform"></i>
