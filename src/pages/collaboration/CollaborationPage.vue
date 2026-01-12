@@ -1128,25 +1128,13 @@ watch(isViewingDM, (isDM) => {
             </div>
           </div>
           <button
-            v-if="!leftPanelCollapsed"
-            @click="leftPanelCollapsed = true"
+            @click="leftPanelCollapsed = !leftPanelCollapsed"
             class="p-2 hover:bg-white/10 rounded-xl transition-all duration-200 group"
-            title="Collapse sidebar"
+            :title="leftPanelCollapsed ? 'Expand sidebar' : 'Collapse sidebar'"
           >
-            <i class="fas fa-chevron-left text-white/70 group-hover:text-white"></i>
+            <i :class="['fas text-white/70 group-hover:text-white transition-transform duration-200', leftPanelCollapsed ? 'fa-chevron-right' : 'fa-chevron-left']"></i>
           </button>
         </div>
-      </div>
-
-      <!-- Expand Button (when collapsed) -->
-      <div v-if="leftPanelCollapsed" class="p-2 border-b border-gray-100">
-        <button
-          @click="leftPanelCollapsed = false"
-          class="w-full flex items-center justify-center p-2 bg-teal-50 hover:bg-teal-100 rounded-xl transition-all duration-200 group"
-          title="Expand sidebar"
-        >
-          <i class="fas fa-chevron-right text-teal-600 group-hover:text-teal-700"></i>
-        </button>
       </div>
 
       <!-- Search with Premium Styling -->
@@ -1883,15 +1871,6 @@ watch(isViewingDM, (isDM) => {
 
       <!-- Collapsed View - Icons Only -->
       <div v-if="rightPanelCollapsed" class="flex-1 flex flex-col items-center py-3 gap-2">
-        <!-- Expand Button -->
-        <button
-          @click="rightPanelCollapsed = false"
-          class="w-10 h-10 rounded-xl flex items-center justify-center bg-teal-50 hover:bg-teal-100 transition-all duration-200 group mb-2"
-          title="Expand panel"
-        >
-          <i class="fas fa-chevron-left text-teal-600 group-hover:text-teal-700"></i>
-        </button>
-
         <!-- Tab Icons -->
         <button
           v-for="tab in rightPanelTabs"
