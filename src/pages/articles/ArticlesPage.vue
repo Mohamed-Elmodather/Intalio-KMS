@@ -1,10 +1,14 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import ContentActionsDropdown from '@/components/common/ContentActionsDropdown.vue'
 import AddToCollectionModal from '@/components/common/AddToCollectionModal.vue'
+import { useAIServicesStore } from '@/stores/aiServices'
+import { AISuggestionChip, AISentimentBadge, AILoadingIndicator } from '@/components/ai'
+import type { ContentRecommendation, SentimentResult } from '@/types/ai'
 
 const router = useRouter()
+const aiStore = useAIServicesStore()
 
 // ============================================
 // CORE STATE
@@ -41,6 +45,80 @@ const selectedItemForCollection = ref<{
   title: string
   thumbnail?: string
 } | null>(null)
+
+// ============================================
+// AI FEATURES STATE
+// ============================================
+const showAIRecommendations = ref(true)
+const aiRecommendations = ref<ContentRecommendation[]>([])
+const isLoadingRecommendations = ref(false)
+const showSearchSuggestions = ref(false)
+const searchSuggestions = ref<string[]>([])
+const isLoadingSearchSuggestions = ref(false)
+const articleSentiments = ref<Map<number, SentimentResult>>(new Map())
+const searchDebounceTimeout = ref<ReturnType<typeof setTimeout> | null>(null)
+
+// Mock AI search suggestions based on query
+const mockSearchSuggestions = [
+  'Getting started with the platform',
+  'Security best practices for teams',
+  'API integration guide',
+  'Remote collaboration tips',
+  'Employee benefits overview',
+  'Data privacy compliance',
+  'Cloud infrastructure setup',
+  'Meeting productivity hacks',
+  'Docker containerization tutorial',
+  'Machine learning fundamentals',
+]
+
+// Mock AI recommendations
+const mockAIRecommendations: ContentRecommendation[] = [
+  {
+    id: 'rec-1',
+    contentType: 'article',
+    title: 'Advanced Security Practices for 2027',
+    description: 'Based on your interest in security topics, this comprehensive guide covers the latest security protocols.',
+    relevanceScore: 0.95,
+    reason: 'Matches your security interests',
+    url: '/articles/1',
+  },
+  {
+    id: 'rec-2',
+    contentType: 'article',
+    title: 'AI-Powered Development Workflows',
+    description: 'Learn how to integrate AI tools into your development process for increased productivity.',
+    relevanceScore: 0.88,
+    reason: 'Popular among similar users',
+    url: '/articles/5',
+  },
+  {
+    id: 'rec-3',
+    contentType: 'article',
+    title: 'Team Collaboration Best Practices',
+    description: 'Discover proven strategies for effective team communication and project management.',
+    relevanceScore: 0.82,
+    reason: 'Related to recent activity',
+    url: '/articles/2',
+  },
+]
+
+// Mock sentiment for articles (simulating AI analysis)
+// Using valid EmotionType values: 'joy' | 'sadness' | 'anger' | 'fear' | 'surprise' | 'disgust' | 'trust' | 'anticipation'
+const mockSentiments: Record<number, SentimentResult> = {
+  1: { overall: 'positive', score: 0.85, confidence: 0.92, processingTime: 120, emotions: [{ emotion: 'joy', score: 0.9 }, { emotion: 'trust', score: 0.8 }] },
+  2: { overall: 'positive', score: 0.78, confidence: 0.88, processingTime: 95, emotions: [{ emotion: 'trust', score: 0.85 }] },
+  3: { overall: 'neutral', score: 0.55, confidence: 0.82, processingTime: 110, emotions: [{ emotion: 'anticipation', score: 0.9 }] },
+  4: { overall: 'positive', score: 0.82, confidence: 0.90, processingTime: 105, emotions: [{ emotion: 'trust', score: 0.88 }] },
+  5: { overall: 'positive', score: 0.92, confidence: 0.95, processingTime: 88, emotions: [{ emotion: 'joy', score: 0.95 }] },
+  6: { overall: 'positive', score: 0.75, confidence: 0.85, processingTime: 115, emotions: [{ emotion: 'anticipation', score: 0.85 }] },
+  7: { overall: 'positive', score: 0.88, confidence: 0.91, processingTime: 92, emotions: [{ emotion: 'joy', score: 0.9 }] },
+  8: { overall: 'neutral', score: 0.62, confidence: 0.78, processingTime: 125, emotions: [{ emotion: 'trust', score: 0.8 }] },
+  9: { overall: 'positive', score: 0.79, confidence: 0.86, processingTime: 98, emotions: [{ emotion: 'trust', score: 0.85 }] },
+  10: { overall: 'positive', score: 0.91, confidence: 0.94, processingTime: 85, emotions: [{ emotion: 'joy', score: 0.92 }] },
+  11: { overall: 'neutral', score: 0.58, confidence: 0.80, processingTime: 130, emotions: [{ emotion: 'anticipation', score: 0.7 }] },
+  12: { overall: 'positive', score: 0.86, confidence: 0.89, processingTime: 100, emotions: [{ emotion: 'surprise', score: 0.88 }] },
+}
 
 const sortOptions = ref([
   { value: 'recent', label: 'Recent', icon: 'fas fa-clock' },
@@ -863,11 +941,114 @@ function navigateToEditor() {
 }
 
 // ============================================
+// AI FEATURES FUNCTIONS
+// ============================================
+
+// Get AI search suggestions
+async function fetchSearchSuggestions(query: string) {
+  if (query.length < 2) {
+    showSearchSuggestions.value = false
+    searchSuggestions.value = []
+    return
+  }
+
+  isLoadingSearchSuggestions.value = true
+  showSearchSuggestions.value = true
+
+  // Simulate AI processing delay
+  await new Promise(resolve => setTimeout(resolve, 300))
+
+  // Filter mock suggestions based on query
+  const lowerQuery = query.toLowerCase()
+  searchSuggestions.value = mockSearchSuggestions
+    .filter(s => s.toLowerCase().includes(lowerQuery))
+    .slice(0, 5)
+
+  // If no matches, generate suggestions based on query
+  if (searchSuggestions.value.length === 0) {
+    searchSuggestions.value = [
+      `${query} best practices`,
+      `${query} tutorial`,
+      `How to ${query}`,
+      `${query} guide for beginners`,
+    ]
+  }
+
+  isLoadingSearchSuggestions.value = false
+}
+
+// Handle search input with debounce
+function handleSearchInput() {
+  if (searchDebounceTimeout.value) {
+    clearTimeout(searchDebounceTimeout.value)
+  }
+  searchDebounceTimeout.value = setTimeout(() => {
+    fetchSearchSuggestions(searchQuery.value)
+    filterArticles()
+  }, 300)
+}
+
+// Select a search suggestion
+function selectSearchSuggestion(suggestion: string) {
+  searchQuery.value = suggestion
+  showSearchSuggestions.value = false
+  filterArticles()
+}
+
+// Hide search suggestions
+function hideSearchSuggestions() {
+  setTimeout(() => {
+    showSearchSuggestions.value = false
+  }, 200)
+}
+
+// Fetch AI recommendations
+async function fetchAIRecommendations() {
+  isLoadingRecommendations.value = true
+
+  // Simulate API call
+  await new Promise(resolve => setTimeout(resolve, 800))
+
+  aiRecommendations.value = mockAIRecommendations
+  isLoadingRecommendations.value = false
+}
+
+// Dismiss a recommendation
+function dismissRecommendation(id: string) {
+  aiRecommendations.value = aiRecommendations.value.filter(r => r.id !== id)
+}
+
+// Get sentiment for an article
+function getArticleSentiment(articleId: number): SentimentResult | null {
+  return mockSentiments[articleId] || null
+}
+
+// Navigate to recommended article
+function goToRecommendation(url: string) {
+  router.push(url)
+}
+
+// Refresh AI recommendations
+async function refreshRecommendations() {
+  await fetchAIRecommendations()
+  toasts.value.push({ id: Date.now(), type: 'success', message: 'AI recommendations refreshed!' })
+  setTimeout(() => toasts.value.shift(), 3000)
+}
+
+// Toggle AI recommendations visibility
+function toggleAIRecommendations() {
+  showAIRecommendations.value = !showAIRecommendations.value
+}
+
+// ============================================
 // LIFECYCLE
 // ============================================
 
 onMounted(() => {
   startCarouselAutoPlay()
+
+  // Fetch AI recommendations on mount
+  fetchAIRecommendations()
 
   // Add ripple effect to buttons
   document.querySelectorAll('.btn-primary, .btn-secondary, .filter-btn').forEach(btn => {
@@ -1040,6 +1221,68 @@ onUnmounted(() => {
           </div>
         </section>
       </div>
+
+      <!-- AI Recommendations Section -->
+      <section v-if="showAIRecommendations" class="ai-recommendations-section mb-10 fade-in-up" style="animation-delay: 0.15s">
+        <div class="section-header-row">
+          <h2 class="section-title-sm ai-section-title">
+            <div class="ai-icon-wrapper">
+              <i class="fas fa-wand-magic-sparkles"></i>
+            </div>
+            Recommended for You
+            <span class="ai-powered-badge">AI Powered</span>
+          </h2>
+          <div class="flex items-center gap-2">
+            <button @click="refreshRecommendations" class="ai-refresh-btn" :disabled="isLoadingRecommendations">
+              <i :class="['fas fa-sync-alt', isLoadingRecommendations && 'fa-spin']"></i>
+              Refresh
+            </button>
+            <button @click="toggleAIRecommendations" class="ai-toggle-btn">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+        </div>
+
+        <div v-if="isLoadingRecommendations" class="ai-recommendations-loading">
+          <AILoadingIndicator variant="shimmer" text="Analyzing your preferences..." />
+        </div>
+
+        <div v-else class="ai-recommendations-grid">
+          <div
+            v-for="rec in aiRecommendations"
+            :key="rec.id"
+            class="ai-recommendation-card group"
+            @click="goToRecommendation(rec.url)"
+          >
+            <div class="ai-rec-content">
+              <div class="ai-rec-header">
+                <span class="ai-rec-type-badge">
+                  <i class="fas fa-newspaper"></i>
+                  Article
+                </span>
+                <button @click.stop="dismissRecommendation(rec.id)" class="ai-rec-dismiss">
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
+              <h4 class="ai-rec-title">{{ rec.title }}</h4>
+              <p class="ai-rec-description">{{ rec.description }}</p>
+              <div class="ai-rec-footer">
+                <div class="ai-rec-reason">
+                  <i class="fas fa-lightbulb"></i>
+                  {{ rec.reason }}
+                </div>
+                <div class="ai-rec-score">
+                  <span class="score-label">Match</span>
+                  <span class="score-value">{{ Math.round(rec.relevanceScore * 100) }}%</span>
+                </div>
+              </div>
+            </div>
+            <div class="ai-rec-action">
+              <i class="fas fa-arrow-right"></i>
+            </div>
+          </div>
+        </div>
+      </section>
 
     </div>
 
@@ -1298,19 +1541,50 @@ onUnmounted(() => {
       <!-- Toolbar (Documents Style) -->
       <div class="bg-white rounded-2xl shadow-sm border border-gray-100 mb-4">
         <div class="px-4 py-3 bg-gray-50/50 rounded-2xl flex flex-wrap items-center gap-3">
-          <!-- Search -->
+          <!-- Search with AI Suggestions -->
           <div class="flex-1 min-w-[200px] max-w-md relative">
-            <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+            <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm z-10"></i>
             <input
               v-model="searchQuery"
-              @input="filterArticles"
+              @input="handleSearchInput"
+              @focus="searchQuery.length >= 2 && (showSearchSuggestions = true)"
+              @blur="hideSearchSuggestions"
               type="text"
               placeholder="Search articles..."
-              class="w-full pl-9 pr-4 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all"
+              class="w-full pl-9 pr-10 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all"
             >
-            <button v-if="searchQuery" @click="searchQuery = ''; filterArticles()" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
-              <i class="fas fa-times text-xs"></i>
-            </button>
+            <div class="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1">
+              <i v-if="isLoadingSearchSuggestions" class="fas fa-spinner fa-spin text-teal-500 text-xs"></i>
+              <span v-else-if="!searchQuery" class="ai-search-badge">
+                <i class="fas fa-wand-magic-sparkles text-[10px]"></i>
+              </span>
+              <button v-if="searchQuery" @click="searchQuery = ''; filterArticles(); showSearchSuggestions = false" class="text-gray-400 hover:text-gray-600">
+                <i class="fas fa-times text-xs"></i>
+              </button>
+            </div>
+
+            <!-- AI Search Suggestions Dropdown -->
+            <div
+              v-if="showSearchSuggestions && searchSuggestions.length > 0"
+              class="ai-suggestions-dropdown"
+            >
+              <div class="ai-suggestions-header">
+                <i class="fas fa-wand-magic-sparkles text-teal-500"></i>
+                <span>AI Suggestions</span>
+              </div>
+              <div class="ai-suggestions-list">
+                <button
+                  v-for="suggestion in searchSuggestions"
+                  :key="suggestion"
+                  @click="selectSearchSuggestion(suggestion)"
+                  class="ai-suggestion-item"
+                >
+                  <i class="fas fa-search text-gray-400 text-xs"></i>
+                  <span>{{ suggestion }}</span>
+                  <i class="fas fa-arrow-right text-teal-500 text-xs opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                </button>
+              </div>
+            </div>
           </div>
 
           <!-- Type Filter -->
@@ -1751,6 +2025,14 @@ onUnmounted(() => {
                     <span v-if="article.featured" class="article-category-tag featured">
                       <i class="fas fa-star text-[8px]"></i> Featured
                     </span>
+                    <!-- AI Sentiment Badge -->
+                    <AISentimentBadge
+                      v-if="getArticleSentiment(article.id)"
+                      :sentiment="getArticleSentiment(article.id)!.overall"
+                      :score="getArticleSentiment(article.id)!.score"
+                      size="sm"
+                      class="sentiment-card-badge"
+                    />
                   </div>
                   <!-- Action Buttons -->
                   <div class="flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -1895,6 +2177,12 @@ onUnmounted(() => {
                     <i :class="[articleTypes.find(t => t.id === article.type)?.icon || 'fas fa-file', 'text-[8px]']"></i>
                     {{ getTypeName(article.type) }}
                   </span>
+                  <AISentimentBadge
+                    v-if="getArticleSentiment(article.id)"
+                    :sentiment="getArticleSentiment(article.id)!.overall"
+                    :score="getArticleSentiment(article.id)!.score"
+                    size="sm"
+                  />
                   <span class="text-[10px] text-gray-400 flex items-center gap-1">
                     <i class="fas fa-clock text-[8px]"></i>
                     {{ article.readTime }}
@@ -4208,5 +4496,349 @@ onUnmounted(() => {
   background: #fef3c7;
   color: #d97706;
   gap: 0.25rem;
+}
+
+/* ============================================
+   AI FEATURES STYLES
+   ============================================ */
+
+/* AI Search Badge */
+.ai-search-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+  border-radius: 4px;
+  color: white;
+}
+
+/* AI Suggestions Dropdown */
+.ai-suggestions-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  background: white;
+  border-radius: 0.75rem;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  border: 1px solid #e2e8f0;
+  z-index: 50;
+  overflow: hidden;
+  animation: suggestionSlideIn 0.2s ease-out;
+}
+
+@keyframes suggestionSlideIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.ai-suggestions-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: #f0fdfa;
+  border-bottom: 1px solid #ccfbf1;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #0d9488;
+}
+
+.ai-suggestions-list {
+  padding: 0.5rem 0;
+}
+
+.ai-suggestion-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.625rem 1rem;
+  background: none;
+  border: none;
+  text-align: left;
+  font-size: 0.875rem;
+  color: #334155;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.ai-suggestion-item:hover {
+  background: #f0fdfa;
+  color: #0d9488;
+}
+
+.ai-suggestion-item span {
+  flex: 1;
+}
+
+/* AI Recommendations Section */
+.ai-recommendations-section {
+  padding: 0 1.5rem;
+}
+
+.ai-section-title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.ai-icon-wrapper {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+  border-radius: 0.625rem;
+  color: white;
+  font-size: 1rem;
+  box-shadow: 0 4px 12px rgba(20, 184, 166, 0.3);
+}
+
+.ai-powered-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.5rem;
+  background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 100%);
+  border: 1px solid #99f6e4;
+  border-radius: 100px;
+  font-size: 0.625rem;
+  font-weight: 600;
+  color: #0d9488;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.ai-refresh-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem 0.875rem;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.ai-refresh-btn:hover:not(:disabled) {
+  background: #f0fdfa;
+  border-color: #99f6e4;
+  color: #0d9488;
+}
+
+.ai-refresh-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.ai-toggle-btn {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.375rem;
+  color: #94a3b8;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.ai-toggle-btn:hover {
+  background: #fef2f2;
+  border-color: #fecaca;
+  color: #ef4444;
+}
+
+.ai-recommendations-loading {
+  padding: 2rem;
+  background: white;
+  border-radius: 1rem;
+  border: 1px solid #f1f5f9;
+}
+
+.ai-recommendations-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 1.25rem;
+}
+
+.ai-recommendation-card {
+  display: flex;
+  align-items: stretch;
+  background: white;
+  border-radius: 1rem;
+  border: 1px solid #e2e8f0;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.ai-recommendation-card:hover {
+  border-color: #99f6e4;
+  box-shadow: 0 8px 25px rgba(20, 184, 166, 0.15);
+  transform: translateY(-4px);
+}
+
+.ai-rec-content {
+  flex: 1;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.ai-rec-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.75rem;
+}
+
+.ai-rec-type-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.625rem;
+  background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 100%);
+  color: #0d9488;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  border-radius: 0.25rem;
+  text-transform: uppercase;
+}
+
+.ai-rec-dismiss {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: 50%;
+  color: #94a3b8;
+  font-size: 0.75rem;
+  cursor: pointer;
+  opacity: 0;
+  transition: all 0.2s ease;
+}
+
+.ai-recommendation-card:hover .ai-rec-dismiss {
+  opacity: 1;
+}
+
+.ai-rec-dismiss:hover {
+  background: #fee2e2;
+  color: #ef4444;
+}
+
+.ai-rec-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0 0 0.5rem;
+  line-height: 1.4;
+}
+
+.ai-recommendation-card:hover .ai-rec-title {
+  color: #0d9488;
+}
+
+.ai-rec-description {
+  font-size: 0.8125rem;
+  color: #64748b;
+  line-height: 1.5;
+  margin: 0 0 1rem;
+  flex: 1;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.ai-rec-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 0.75rem;
+  border-top: 1px solid #f1f5f9;
+}
+
+.ai-rec-reason {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.75rem;
+  color: #94a3b8;
+}
+
+.ai-rec-reason i {
+  color: #fbbf24;
+}
+
+.ai-rec-score {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.ai-rec-score .score-label {
+  font-size: 0.6875rem;
+  color: #94a3b8;
+  text-transform: uppercase;
+}
+
+.ai-rec-score .score-value {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: #0d9488;
+}
+
+.ai-rec-action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 100%);
+  color: #0d9488;
+  transition: all 0.3s ease;
+}
+
+.ai-recommendation-card:hover .ai-rec-action {
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+  color: white;
+}
+
+.ai-rec-action i {
+  transition: transform 0.3s ease;
+}
+
+.ai-recommendation-card:hover .ai-rec-action i {
+  transform: translateX(4px);
+}
+
+/* Sentiment Badge on Cards */
+.sentiment-card-badge {
+  backdrop-filter: blur(4px);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .ai-recommendations-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ai-suggestions-dropdown {
+    left: -1rem;
+    right: -1rem;
+  }
 }
 </style>

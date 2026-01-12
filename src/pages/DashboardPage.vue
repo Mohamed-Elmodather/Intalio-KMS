@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useAIServicesStore } from '@/stores/aiServices'
+import { AILoadingIndicator, AISuggestionChip, AIConfidenceBar } from '@/components/ai'
 
 const router = useRouter()
+const aiStore = useAIServicesStore()
 
 // Time of day greeting
 const timeOfDay = computed(() => {
@@ -1009,6 +1012,253 @@ const toggleAutoPlay = () => {
   isAutoPlaying.value = !isAutoPlaying.value
 }
 
+// ============================================================================
+// AI Features - State & Functions
+// ============================================================================
+
+// AI State
+const showAIInsightsPanel = ref(false)
+const showRecommendationsModal = ref(false)
+const showAnomalyAlert = ref(true)
+const isLoadingInsights = ref(false)
+const isLoadingRecommendations = ref(false)
+
+// AI Interfaces
+interface AIInsight {
+  id: string
+  type: 'trend' | 'alert' | 'opportunity' | 'prediction'
+  title: string
+  description: string
+  metric?: string
+  change?: number
+  confidence: number
+  action?: string
+  actionLabel?: string
+}
+
+interface ContentRecommendation {
+  id: string
+  type: 'article' | 'document' | 'course' | 'event'
+  title: string
+  reason: string
+  relevanceScore: number
+  icon: string
+  iconBg: string
+}
+
+interface ActivityAnomaly {
+  id: string
+  type: 'spike' | 'drop' | 'unusual'
+  metric: string
+  description: string
+  severity: 'low' | 'medium' | 'high'
+  detectedAt: string
+  value: string
+  expectedValue: string
+}
+
+// AI Data
+const aiInsights = ref<AIInsight[]>([
+  {
+    id: '1',
+    type: 'trend',
+    title: 'Article Engagement Surge',
+    description: 'Article views increased by 34% this week, driven by tournament schedule content.',
+    metric: 'Article Views',
+    change: 34,
+    confidence: 0.92,
+    action: '/articles',
+    actionLabel: 'View Articles'
+  },
+  {
+    id: '2',
+    type: 'prediction',
+    title: 'Expected Traffic Spike',
+    description: 'AI predicts 45% increase in platform traffic during the opening match week.',
+    metric: 'User Sessions',
+    change: 45,
+    confidence: 0.87,
+    action: '/analytics',
+    actionLabel: 'View Analytics'
+  },
+  {
+    id: '3',
+    type: 'opportunity',
+    title: 'Content Gap Detected',
+    description: 'Users are searching for "ticket booking guide" but no dedicated content exists.',
+    confidence: 0.89,
+    action: '/articles/new',
+    actionLabel: 'Create Article'
+  },
+  {
+    id: '4',
+    type: 'alert',
+    title: 'Document Downloads Declining',
+    description: 'Policy document downloads dropped 18% - consider updating or promoting.',
+    metric: 'Downloads',
+    change: -18,
+    confidence: 0.85,
+    action: '/documents',
+    actionLabel: 'Review Documents'
+  }
+])
+
+const contentRecommendations = ref<ContentRecommendation[]>([
+  {
+    id: '1',
+    type: 'article',
+    title: 'Team Registration Deadline Reminder',
+    reason: 'High relevance based on your recent activity in team management',
+    relevanceScore: 0.95,
+    icon: 'fas fa-file-alt',
+    iconBg: 'bg-blue-100'
+  },
+  {
+    id: '2',
+    type: 'course',
+    title: 'Tournament Operations Masterclass',
+    reason: 'Recommended based on your role and upcoming responsibilities',
+    relevanceScore: 0.91,
+    icon: 'fas fa-graduation-cap',
+    iconBg: 'bg-green-100'
+  },
+  {
+    id: '3',
+    type: 'document',
+    title: 'Venue Safety Protocol 2027',
+    reason: 'Recently updated - important for stadium operations team',
+    relevanceScore: 0.88,
+    icon: 'fas fa-file-pdf',
+    iconBg: 'bg-red-100'
+  },
+  {
+    id: '4',
+    type: 'event',
+    title: 'Media Briefing - Pre-Tournament',
+    reason: 'Based on your media department affiliation',
+    relevanceScore: 0.84,
+    icon: 'fas fa-calendar',
+    iconBg: 'bg-amber-100'
+  },
+  {
+    id: '5',
+    type: 'article',
+    title: 'Broadcasting Rights Guidelines',
+    reason: 'Frequently accessed by users with similar roles',
+    relevanceScore: 0.82,
+    icon: 'fas fa-file-alt',
+    iconBg: 'bg-blue-100'
+  }
+])
+
+const activityAnomalies = ref<ActivityAnomaly[]>([
+  {
+    id: '1',
+    type: 'spike',
+    metric: 'Document Downloads',
+    description: 'Unusual spike in Venue Guidelines downloads detected',
+    severity: 'medium',
+    detectedAt: '2 hours ago',
+    value: '847',
+    expectedValue: '~250'
+  },
+  {
+    id: '2',
+    type: 'drop',
+    metric: 'Course Completions',
+    description: 'Course completion rate dropped below expected threshold',
+    severity: 'low',
+    detectedAt: '1 day ago',
+    value: '12%',
+    expectedValue: '~25%'
+  }
+])
+
+// Quick AI insights for hero section
+const quickAIInsight = computed(() => {
+  return {
+    text: 'Based on current trends, platform engagement is 23% above average this week.',
+    trend: 'positive'
+  }
+})
+
+// AI Functions
+async function loadAIInsights() {
+  isLoadingInsights.value = true
+  showAIInsightsPanel.value = true
+
+  try {
+    await new Promise(resolve => setTimeout(resolve, 800))
+    // Insights are already loaded from mock data
+  } finally {
+    isLoadingInsights.value = false
+  }
+}
+
+async function loadRecommendations() {
+  isLoadingRecommendations.value = true
+  showRecommendationsModal.value = true
+
+  try {
+    await new Promise(resolve => setTimeout(resolve, 600))
+    // Recommendations are already loaded from mock data
+  } finally {
+    isLoadingRecommendations.value = false
+  }
+}
+
+function dismissAnomaly(id: string) {
+  activityAnomalies.value = activityAnomalies.value.filter(a => a.id !== id)
+  if (activityAnomalies.value.length === 0) {
+    showAnomalyAlert.value = false
+  }
+}
+
+function getInsightTypeIcon(type: string): string {
+  switch (type) {
+    case 'trend': return 'fas fa-chart-line'
+    case 'prediction': return 'fas fa-crystal-ball'
+    case 'opportunity': return 'fas fa-lightbulb'
+    case 'alert': return 'fas fa-exclamation-triangle'
+    default: return 'fas fa-info-circle'
+  }
+}
+
+function getInsightTypeColor(type: string): string {
+  switch (type) {
+    case 'trend': return 'bg-blue-100 text-blue-600'
+    case 'prediction': return 'bg-purple-100 text-purple-600'
+    case 'opportunity': return 'bg-green-100 text-green-600'
+    case 'alert': return 'bg-amber-100 text-amber-600'
+    default: return 'bg-gray-100 text-gray-600'
+  }
+}
+
+function getAnomalySeverityColor(severity: string): string {
+  switch (severity) {
+    case 'high': return 'bg-red-100 text-red-700 border-red-200'
+    case 'medium': return 'bg-amber-100 text-amber-700 border-amber-200'
+    case 'low': return 'bg-blue-100 text-blue-700 border-blue-200'
+    default: return 'bg-gray-100 text-gray-700 border-gray-200'
+  }
+}
+
+function navigateToInsight(insight: AIInsight) {
+  if (insight.action) {
+    router.push(insight.action)
+  }
+}
+
+function navigateToRecommendation(rec: ContentRecommendation) {
+  const routes: Record<string, string> = {
+    article: '/articles',
+    document: '/documents',
+    course: '/learning',
+    event: '/events'
+  }
+  router.push(routes[rec.type] || '/')
+}
+
 // Lifecycle
 onMounted(() => {
   // Start counter animation
@@ -1074,6 +1324,66 @@ onUnmounted(() => {
             <i class="fas fa-calendar text-xs"></i>
             View Events
           </router-link>
+          <!-- AI Buttons -->
+          <button @click="loadAIInsights" class="px-5 py-2.5 bg-gradient-to-r from-emerald-400 to-teal-400 text-white rounded-xl font-semibold text-sm hover:from-emerald-500 hover:to-teal-500 transition-all flex items-center gap-2 shadow-lg shadow-teal-500/20">
+            <i class="fas fa-wand-magic-sparkles text-xs"></i>
+            AI Insights
+          </button>
+          <button @click="loadRecommendations" class="px-5 py-2.5 bg-white/20 backdrop-blur-sm border border-white/30 text-white rounded-xl font-semibold text-sm hover:bg-white/30 transition-all flex items-center gap-2">
+            <i class="fas fa-compass text-xs"></i>
+            For You
+          </button>
+        </div>
+
+        <!-- AI Quick Insight Badge -->
+        <div class="mt-4 fade-in-up" style="animation-delay: 0.6s;">
+          <div class="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-xl border border-white/20">
+            <i class="fas fa-robot text-emerald-300"></i>
+            <span class="text-sm text-white/90">{{ quickAIInsight.text }}</span>
+            <span class="flex items-center gap-1 text-xs text-emerald-300 font-semibold">
+              <i class="fas fa-arrow-up"></i> Trending
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AI Anomaly Alerts -->
+    <div v-if="showAnomalyAlert && activityAnomalies.length > 0" class="mb-6">
+      <div class="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-2xl p-4">
+        <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center">
+              <i class="fas fa-exclamation-triangle text-white"></i>
+            </div>
+            <div>
+              <h3 class="font-semibold text-gray-900">AI Detected Anomalies</h3>
+              <p class="text-xs text-gray-500">{{ activityAnomalies.length }} unusual activity patterns detected</p>
+            </div>
+          </div>
+          <button @click="showAnomalyAlert = false" class="p-2 hover:bg-amber-100 rounded-lg transition-colors">
+            <i class="fas fa-times text-gray-400"></i>
+          </button>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div v-for="anomaly in activityAnomalies" :key="anomaly.id"
+               :class="['p-3 rounded-xl border flex items-start gap-3', getAnomalySeverityColor(anomaly.severity)]">
+            <div class="w-8 h-8 rounded-lg bg-white/50 flex items-center justify-center flex-shrink-0">
+              <i :class="[anomaly.type === 'spike' ? 'fas fa-arrow-trend-up' : anomaly.type === 'drop' ? 'fas fa-arrow-trend-down' : 'fas fa-question']"></i>
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="font-medium text-sm">{{ anomaly.metric }}</p>
+              <p class="text-xs opacity-80">{{ anomaly.description }}</p>
+              <div class="flex items-center gap-3 mt-2 text-xs">
+                <span>Actual: <strong>{{ anomaly.value }}</strong></span>
+                <span>Expected: {{ anomaly.expectedValue }}</span>
+                <span class="opacity-60">{{ anomaly.detectedAt }}</span>
+              </div>
+            </div>
+            <button @click="dismissAnomaly(anomaly.id)" class="p-1 hover:bg-white/50 rounded transition-colors">
+              <i class="fas fa-times text-xs"></i>
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -1903,6 +2213,145 @@ onUnmounted(() => {
         </div>
       </div>
     </div>
+
+    <!-- AI Insights Panel Modal -->
+    <Teleport to="body">
+      <div v-if="showAIInsightsPanel" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[80vh] overflow-hidden">
+          <div class="p-5 border-b border-gray-100 bg-gradient-to-r from-teal-500 to-emerald-500">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
+                  <i class="fas fa-wand-magic-sparkles text-white"></i>
+                </div>
+                <div>
+                  <h3 class="font-semibold text-white">AI-Powered Insights</h3>
+                  <p class="text-xs text-white/80">Intelligent analysis of platform activity</p>
+                </div>
+              </div>
+              <button @click="showAIInsightsPanel = false" class="p-2 hover:bg-white/20 rounded-lg transition-colors">
+                <i class="fas fa-times text-white"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="p-5 overflow-y-auto max-h-[60vh]">
+            <div v-if="isLoadingInsights" class="text-center py-12">
+              <i class="fas fa-circle-notch fa-spin text-teal-500 text-3xl mb-3"></i>
+              <p class="text-gray-500">Analyzing platform data...</p>
+            </div>
+
+            <div v-else class="space-y-4">
+              <div v-for="insight in aiInsights" :key="insight.id"
+                   @click="navigateToInsight(insight)"
+                   class="p-4 rounded-xl border border-gray-200 hover:border-teal-300 hover:shadow-md transition-all cursor-pointer group">
+                <div class="flex items-start gap-4">
+                  <div :class="['w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0', getInsightTypeColor(insight.type)]">
+                    <i :class="[getInsightTypeIcon(insight.type), 'text-lg']"></i>
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-2 mb-1">
+                      <h4 class="font-semibold text-gray-900 group-hover:text-teal-700 transition-colors">{{ insight.title }}</h4>
+                      <span v-if="insight.change" :class="['text-xs font-bold', insight.change > 0 ? 'text-green-600' : 'text-red-600']">
+                        {{ insight.change > 0 ? '+' : '' }}{{ insight.change }}%
+                      </span>
+                    </div>
+                    <p class="text-sm text-gray-600 mb-2">{{ insight.description }}</p>
+                    <div class="flex items-center gap-4">
+                      <div class="flex items-center gap-1.5">
+                        <span class="text-xs text-gray-400">Confidence:</span>
+                        <div class="w-20 h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                          <div class="h-full bg-teal-500 rounded-full" :style="{ width: `${insight.confidence * 100}%` }"></div>
+                        </div>
+                        <span class="text-xs font-medium text-teal-600">{{ Math.round(insight.confidence * 100) }}%</span>
+                      </div>
+                      <span v-if="insight.actionLabel" class="text-xs text-teal-600 font-medium flex items-center gap-1">
+                        {{ insight.actionLabel }} <i class="fas fa-arrow-right"></i>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="p-4 border-t border-gray-100 bg-gray-50 flex justify-between items-center">
+            <p class="text-xs text-gray-500">
+              <i class="fas fa-info-circle mr-1"></i>
+              Insights generated based on last 30 days of activity
+            </p>
+            <button @click="showAIInsightsPanel = false"
+                    class="px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-colors text-sm font-medium">
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </Teleport>
+
+    <!-- AI Recommendations Modal -->
+    <Teleport to="body">
+      <div v-if="showRecommendationsModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[80vh] overflow-hidden">
+          <div class="p-5 border-b border-gray-100 bg-gradient-to-r from-purple-500 to-indigo-500">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
+                  <i class="fas fa-compass text-white"></i>
+                </div>
+                <div>
+                  <h3 class="font-semibold text-white">Recommended For You</h3>
+                  <p class="text-xs text-white/80">Personalized content suggestions</p>
+                </div>
+              </div>
+              <button @click="showRecommendationsModal = false" class="p-2 hover:bg-white/20 rounded-lg transition-colors">
+                <i class="fas fa-times text-white"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="p-4 overflow-y-auto max-h-[55vh]">
+            <div v-if="isLoadingRecommendations" class="text-center py-12">
+              <i class="fas fa-circle-notch fa-spin text-purple-500 text-3xl mb-3"></i>
+              <p class="text-gray-500">Finding content for you...</p>
+            </div>
+
+            <div v-else class="space-y-3">
+              <div v-for="rec in contentRecommendations" :key="rec.id"
+                   @click="navigateToRecommendation(rec)"
+                   class="p-4 rounded-xl border border-gray-200 hover:border-purple-300 hover:bg-purple-50/30 transition-all cursor-pointer group">
+                <div class="flex items-start gap-3">
+                  <div :class="['w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0', rec.iconBg]">
+                    <i :class="[rec.icon, 'text-gray-600']"></i>
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-center justify-between mb-1">
+                      <h4 class="font-medium text-gray-900 group-hover:text-purple-700 transition-colors">{{ rec.title }}</h4>
+                      <span class="text-xs font-bold text-purple-600">{{ Math.round(rec.relevanceScore * 100) }}% match</span>
+                    </div>
+                    <p class="text-xs text-gray-500">{{ rec.reason }}</p>
+                    <span class="inline-block mt-2 text-xs text-gray-400 capitalize">
+                      <i :class="rec.icon" class="mr-1"></i>{{ rec.type }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="p-4 border-t border-gray-100 bg-gray-50 flex justify-between items-center">
+            <p class="text-xs text-gray-500">
+              <i class="fas fa-robot mr-1"></i>
+              Based on your activity and role
+            </p>
+            <button @click="showRecommendationsModal = false"
+                    class="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors text-sm font-medium">
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </Teleport>
   </div>
 </template>
 

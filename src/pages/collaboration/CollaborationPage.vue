@@ -1,5 +1,10 @@
 <script setup lang="ts">
 import { ref, computed, nextTick, watch } from 'vue'
+import { useAIServicesStore } from '@/stores/aiServices'
+import { AILoadingIndicator, AISuggestionChip, AISentimentBadge } from '@/components/ai'
+import type { SentimentResult, SummarizationResult } from '@/types/ai'
+
+const aiStore = useAIServicesStore()
 
 // Types
 type UserPresenceStatus = 'online' | 'away' | 'busy' | 'offline'
@@ -1096,6 +1101,201 @@ watch(messageInput, (val) => {
 watch(isViewingDM, (isDM) => {
   rightPanelTab.value = isDM ? 'profile' : 'details'
 })
+
+// ============================================================================
+// AI FEATURES - Smart Replies, Meeting Summary, Sentiment Analysis
+// ============================================================================
+
+// AI State
+const showAISuggestions = ref(true)
+const isGeneratingReplies = ref(false)
+const isGeneratingSummary = ref(false)
+const isAnalyzingSentiment = ref(false)
+const showMeetingSummaryModal = ref(false)
+const showSentimentPanel = ref(false)
+
+// AI Smart Reply Suggestions
+interface AISmartReply {
+  id: string
+  text: string
+  tone: 'professional' | 'casual' | 'friendly' | 'formal'
+  context: string
+}
+
+const aiSmartReplies = ref<AISmartReply[]>([])
+
+// AI Meeting Summary
+interface MeetingSummary {
+  title: string
+  date: string
+  participants: string[]
+  keyPoints: string[]
+  decisions: string[]
+  actionItems: { task: string; assignee: string; dueDate: string }[]
+  nextSteps: string[]
+}
+
+const meetingSummary = ref<MeetingSummary | null>(null)
+
+// AI Conversation Sentiment
+interface ConversationSentiment {
+  overall: 'positive' | 'neutral' | 'negative' | 'mixed'
+  score: number
+  breakdown: { label: string; percentage: number; color: string }[]
+  highlights: { type: 'positive' | 'negative' | 'neutral'; message: string; sender: string }[]
+  trend: 'improving' | 'stable' | 'declining'
+}
+
+const conversationSentiment = ref<ConversationSentiment | null>(null)
+
+// Mock AI Smart Replies based on context
+const mockSmartReplies: Record<string, AISmartReply[]> = {
+  schedule: [
+    { id: 'sr1', text: 'That time works perfectly for me. I\'ll add it to my calendar.', tone: 'professional', context: 'schedule' },
+    { id: 'sr2', text: 'I have a conflict at that time. Could we move it to 3 PM instead?', tone: 'professional', context: 'schedule' },
+    { id: 'sr3', text: 'Let me check my availability and get back to you shortly.', tone: 'formal', context: 'schedule' }
+  ],
+  approval: [
+    { id: 'sr4', text: 'Looks great! Approved. Please proceed.', tone: 'professional', context: 'approval' },
+    { id: 'sr5', text: 'I have a few suggestions. Can we discuss before finalizing?', tone: 'professional', context: 'approval' },
+    { id: 'sr6', text: 'This needs some revisions. Let me share my feedback.', tone: 'formal', context: 'approval' }
+  ],
+  update: [
+    { id: 'sr7', text: 'Thanks for the update! Great progress.', tone: 'friendly', context: 'update' },
+    { id: 'sr8', text: 'Excellent work! Keep up the momentum.', tone: 'casual', context: 'update' },
+    { id: 'sr9', text: 'Noted. Please keep me posted on any further developments.', tone: 'formal', context: 'update' }
+  ],
+  general: [
+    { id: 'sr10', text: 'Thanks for sharing! I\'ll review this today.', tone: 'friendly', context: 'general' },
+    { id: 'sr11', text: 'Great point! I agree with your approach.', tone: 'casual', context: 'general' },
+    { id: 'sr12', text: 'Let me look into this and follow up with you.', tone: 'professional', context: 'general' }
+  ]
+}
+
+// Mock Meeting Summary
+const mockMeetingSummary: MeetingSummary = {
+  title: 'Tournament Planning Meeting',
+  date: 'January 11, 2027 at 2:00 PM',
+  participants: ['Sarah Ahmed', 'Mohammed Hassan', 'Fatima Al-Rashid', 'Ahmed Khalil', 'Layla Omar'],
+  keyPoints: [
+    'Opening ceremony rehearsal moved to Thursday',
+    'New venue designs uploaded and pending review',
+    'Ticketing API integration completed successfully',
+    'Media kit materials ready for distribution'
+  ],
+  decisions: [
+    'Approved new stadium layout design with minor modifications',
+    'Confirmed API rate limiting settings at 1000 requests/minute',
+    'Scheduled press release for January 15th'
+  ],
+  actionItems: [
+    { task: 'Finalize venue designs with stakeholder feedback', assignee: 'Fatima Al-Rashid', dueDate: 'Jan 13' },
+    { task: 'Update API documentation with new endpoints', assignee: 'Ahmed Khalil', dueDate: 'Jan 12' },
+    { task: 'Coordinate media coverage for opening ceremony', assignee: 'Layla Omar', dueDate: 'Jan 14' },
+    { task: 'Send calendar invites for rehearsal', assignee: 'Sarah Ahmed', dueDate: 'Jan 12' }
+  ],
+  nextSteps: [
+    'Review venue designs by end of day tomorrow',
+    'Begin ticket sales soft launch next week',
+    'Schedule follow-up meeting for January 15th'
+  ]
+}
+
+// Mock Conversation Sentiment
+const mockConversationSentiment: ConversationSentiment = {
+  overall: 'positive',
+  score: 78,
+  breakdown: [
+    { label: 'Positive', percentage: 65, color: '#10b981' },
+    { label: 'Neutral', percentage: 28, color: '#6b7280' },
+    { label: 'Negative', percentage: 7, color: '#ef4444' }
+  ],
+  highlights: [
+    { type: 'positive', message: 'Great work team!', sender: 'Layla Omar' },
+    { type: 'positive', message: 'This looks amazing!', sender: 'You' },
+    { type: 'positive', message: 'Design approved!', sender: 'Fatima Al-Rashid' },
+    { type: 'neutral', message: 'Quick reminder about the meeting', sender: 'Mohammed Hassan' }
+  ],
+  trend: 'improving'
+}
+
+// AI Functions
+async function generateSmartReplies() {
+  isGeneratingReplies.value = true
+  aiSmartReplies.value = []
+
+  // Simulate AI processing
+  await new Promise(resolve => setTimeout(resolve, 800))
+
+  // Analyze last message to determine context
+  const lastMessage = currentMessages.value[currentMessages.value.length - 1]
+  let context = 'general'
+
+  if (lastMessage) {
+    const content = lastMessage.content.toLowerCase()
+    if (content.includes('schedule') || content.includes('meeting') || content.includes('time')) {
+      context = 'schedule'
+    } else if (content.includes('review') || content.includes('approve') || content.includes('design')) {
+      context = 'approval'
+    } else if (content.includes('update') || content.includes('progress') || content.includes('done') || content.includes('ready')) {
+      context = 'update'
+    }
+  }
+
+  aiSmartReplies.value = mockSmartReplies[context] || mockSmartReplies.general
+  isGeneratingReplies.value = false
+}
+
+async function generateMeetingSummary() {
+  isGeneratingSummary.value = true
+
+  // Simulate AI processing
+  await new Promise(resolve => setTimeout(resolve, 1500))
+
+  meetingSummary.value = mockMeetingSummary
+  isGeneratingSummary.value = false
+  showMeetingSummaryModal.value = true
+}
+
+async function analyzeConversationSentiment() {
+  isAnalyzingSentiment.value = true
+
+  // Simulate AI processing
+  await new Promise(resolve => setTimeout(resolve, 1200))
+
+  conversationSentiment.value = mockConversationSentiment
+  isAnalyzingSentiment.value = false
+  showSentimentPanel.value = true
+}
+
+function useSmartReply(reply: AISmartReply) {
+  messageInput.value = reply.text
+  aiSmartReplies.value = []
+}
+
+function getSentimentColor(sentiment: string) {
+  switch (sentiment) {
+    case 'positive': return 'text-green-500'
+    case 'negative': return 'text-red-500'
+    case 'mixed': return 'text-amber-500'
+    default: return 'text-gray-500'
+  }
+}
+
+function getTrendIcon(trend: string) {
+  switch (trend) {
+    case 'improving': return 'fas fa-arrow-trend-up text-green-500'
+    case 'declining': return 'fas fa-arrow-trend-down text-red-500'
+    default: return 'fas fa-minus text-gray-500'
+  }
+}
+
+// Generate smart replies when conversation changes
+watch(currentMessages, () => {
+  if (showAISuggestions.value && currentMessages.value.length > 0) {
+    generateSmartReplies()
+  }
+}, { deep: true })
 </script>
 
 <template>
@@ -1803,6 +2003,30 @@ watch(isViewingDM, (isDM) => {
           </button>
         </div>
 
+        <!-- AI Smart Reply Suggestions -->
+        <div v-if="showAISuggestions && aiSmartReplies.length > 0" class="ai-smart-replies">
+          <div class="ai-replies-header">
+            <div class="flex items-center gap-2">
+              <i class="fas fa-wand-magic-sparkles text-teal-500"></i>
+              <span class="text-xs font-medium text-gray-600">AI Suggestions</span>
+            </div>
+            <button @click="showAISuggestions = false" class="text-gray-400 hover:text-gray-600">
+              <i class="fas fa-times text-xs"></i>
+            </button>
+          </div>
+          <div class="ai-replies-list">
+            <button
+              v-for="reply in aiSmartReplies"
+              :key="reply.id"
+              @click="useSmartReply(reply)"
+              class="ai-reply-chip"
+            >
+              <span class="ai-reply-text">{{ reply.text }}</span>
+              <span :class="['ai-reply-tone', `tone-${reply.tone}`]">{{ reply.tone }}</span>
+            </button>
+          </div>
+        </div>
+
         <div class="flex items-end gap-3">
           <div class="flex gap-1">
             <button class="p-2 hover:bg-gray-100 rounded-lg transition-colors" title="Attach file">
@@ -1814,6 +2038,23 @@ watch(isViewingDM, (isDM) => {
               title="Share content"
             >
               <i class="fas fa-share-square text-gray-500"></i>
+            </button>
+            <!-- AI Action Buttons -->
+            <button
+              @click="generateMeetingSummary"
+              :disabled="isGeneratingSummary"
+              class="p-2 hover:bg-teal-50 rounded-lg transition-colors group"
+              title="AI Meeting Summary"
+            >
+              <i :class="[isGeneratingSummary ? 'fas fa-spinner fa-spin' : 'fas fa-wand-magic-sparkles', 'text-teal-500 group-hover:text-teal-600']"></i>
+            </button>
+            <button
+              @click="analyzeConversationSentiment"
+              :disabled="isAnalyzingSentiment"
+              class="p-2 hover:bg-purple-50 rounded-lg transition-colors group"
+              title="Analyze Sentiment"
+            >
+              <i :class="[isAnalyzingSentiment ? 'fas fa-spinner fa-spin' : 'fas fa-chart-pie', 'text-purple-500 group-hover:text-purple-600']"></i>
             </button>
           </div>
 
@@ -2307,6 +2548,221 @@ watch(isViewingDM, (isDM) => {
       </div>
     </div>
   </div>
+
+  <!-- AI Meeting Summary Modal -->
+  <div v-if="showMeetingSummaryModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[80vh] overflow-hidden">
+      <div class="p-6 border-b border-gray-100">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-gradient-to-br from-teal-500 to-emerald-500 rounded-xl flex items-center justify-center">
+              <i class="fas fa-wand-magic-sparkles text-white"></i>
+            </div>
+            <div>
+              <h3 class="text-lg font-semibold text-gray-900">AI Meeting Summary</h3>
+              <p class="text-sm text-gray-500">Generated from conversation</p>
+            </div>
+          </div>
+          <button @click="showMeetingSummaryModal = false" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+            <i class="fas fa-times text-gray-400"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="p-6 overflow-y-auto max-h-[60vh]">
+        <AILoadingIndicator v-if="isGeneratingSummary" message="Generating meeting summary..." />
+
+        <div v-else-if="meetingSummary" class="space-y-6">
+          <!-- Summary Header -->
+          <div class="bg-gradient-to-r from-teal-50 to-emerald-50 rounded-xl p-4">
+            <h4 class="font-semibold text-gray-900 mb-2">{{ meetingSummary.title }}</h4>
+            <div class="flex items-center gap-4 text-sm text-gray-600">
+              <span><i class="fas fa-calendar mr-1"></i> {{ meetingSummary.date }}</span>
+              <span><i class="fas fa-clock mr-1"></i> {{ meetingSummary.duration }}</span>
+              <span><i class="fas fa-users mr-1"></i> {{ meetingSummary.participants.length }} participants</span>
+            </div>
+          </div>
+
+          <!-- Key Points -->
+          <div>
+            <h5 class="font-medium text-gray-900 mb-3 flex items-center gap-2">
+              <i class="fas fa-list-check text-teal-500"></i> Key Discussion Points
+            </h5>
+            <ul class="space-y-2">
+              <li v-for="(point, idx) in meetingSummary.keyPoints" :key="idx"
+                  class="flex items-start gap-2 text-gray-700">
+                <i class="fas fa-check-circle text-teal-500 mt-1 text-sm"></i>
+                <span>{{ point }}</span>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Decisions Made -->
+          <div>
+            <h5 class="font-medium text-gray-900 mb-3 flex items-center gap-2">
+              <i class="fas fa-gavel text-amber-500"></i> Decisions Made
+            </h5>
+            <ul class="space-y-2">
+              <li v-for="(decision, idx) in meetingSummary.decisions" :key="idx"
+                  class="flex items-start gap-2 text-gray-700 bg-amber-50 p-3 rounded-lg">
+                <i class="fas fa-circle-check text-amber-500 mt-0.5"></i>
+                <span>{{ decision }}</span>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Action Items -->
+          <div>
+            <h5 class="font-medium text-gray-900 mb-3 flex items-center gap-2">
+              <i class="fas fa-tasks text-blue-500"></i> Action Items
+            </h5>
+            <div class="space-y-2">
+              <div v-for="(action, idx) in meetingSummary.actionItems" :key="idx"
+                   class="flex items-center justify-between bg-blue-50 p-3 rounded-lg">
+                <div class="flex items-center gap-3">
+                  <i class="fas fa-circle text-blue-400 text-xs"></i>
+                  <span class="text-gray-700">{{ action.task }}</span>
+                </div>
+                <div class="flex items-center gap-3 text-sm">
+                  <span class="text-gray-500">{{ action.assignee }}</span>
+                  <span class="text-blue-600 font-medium">{{ action.dueDate }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Next Steps -->
+          <div class="bg-gray-50 rounded-xl p-4">
+            <h5 class="font-medium text-gray-900 mb-2 flex items-center gap-2">
+              <i class="fas fa-arrow-right text-gray-500"></i> Next Steps
+            </h5>
+            <p class="text-gray-700">{{ meetingSummary.nextSteps }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-4 border-t border-gray-100 flex justify-end gap-3">
+        <button @click="generateMeetingSummary"
+                class="px-4 py-2 text-teal-600 hover:bg-teal-50 rounded-lg transition-colors flex items-center gap-2">
+          <i class="fas fa-rotate"></i> Regenerate
+        </button>
+        <button @click="showMeetingSummaryModal = false"
+                class="px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-colors">
+          Done
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI Sentiment Analysis Panel -->
+  <div v-if="showSentimentPanel" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden">
+      <div class="p-6 border-b border-gray-100">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center">
+              <i class="fas fa-face-smile text-white"></i>
+            </div>
+            <div>
+              <h3 class="text-lg font-semibold text-gray-900">Conversation Sentiment</h3>
+              <p class="text-sm text-gray-500">AI-powered sentiment analysis</p>
+            </div>
+          </div>
+          <button @click="showSentimentPanel = false" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+            <i class="fas fa-times text-gray-400"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="p-6">
+        <AILoadingIndicator v-if="isAnalyzingSentiment" message="Analyzing conversation sentiment..." />
+
+        <div v-else-if="conversationSentiment" class="space-y-6">
+          <!-- Overall Sentiment -->
+          <div class="text-center">
+            <div class="inline-flex items-center justify-center w-20 h-20 rounded-full mb-3"
+                 :class="{
+                   'bg-green-100': conversationSentiment.overall === 'positive',
+                   'bg-yellow-100': conversationSentiment.overall === 'neutral',
+                   'bg-red-100': conversationSentiment.overall === 'negative'
+                 }">
+              <i class="text-4xl"
+                 :class="{
+                   'fas fa-face-smile text-green-500': conversationSentiment.overall === 'positive',
+                   'fas fa-face-meh text-yellow-500': conversationSentiment.overall === 'neutral',
+                   'fas fa-face-frown text-red-500': conversationSentiment.overall === 'negative'
+                 }"></i>
+            </div>
+            <h4 class="text-xl font-semibold text-gray-900 capitalize">{{ conversationSentiment.overall }}</h4>
+            <p class="text-gray-500">Overall conversation tone</p>
+          </div>
+
+          <!-- Confidence Score -->
+          <div class="bg-gray-50 rounded-xl p-4">
+            <div class="flex justify-between items-center mb-2">
+              <span class="text-sm font-medium text-gray-700">Confidence Score</span>
+              <span class="text-sm font-bold text-teal-600">{{ Math.round(conversationSentiment.score * 100) }}%</span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-2">
+              <div class="bg-gradient-to-r from-teal-500 to-emerald-500 h-2 rounded-full transition-all duration-500"
+                   :style="{ width: `${conversationSentiment.score * 100}%` }"></div>
+            </div>
+          </div>
+
+          <!-- Emotion Breakdown -->
+          <div>
+            <h5 class="font-medium text-gray-900 mb-3">Emotion Breakdown</h5>
+            <div class="space-y-3">
+              <div v-for="emotion in conversationSentiment.emotions" :key="emotion.name" class="flex items-center gap-3">
+                <span class="w-24 text-sm text-gray-600 capitalize">{{ emotion.name }}</span>
+                <div class="flex-1 bg-gray-200 rounded-full h-2">
+                  <div class="h-2 rounded-full transition-all duration-500"
+                       :class="{
+                         'bg-green-500': emotion.name === 'enthusiasm' || emotion.name === 'satisfaction',
+                         'bg-blue-500': emotion.name === 'engagement' || emotion.name === 'curiosity',
+                         'bg-purple-500': emotion.name === 'professionalism',
+                         'bg-yellow-500': emotion.name === 'concern' || emotion.name === 'uncertainty'
+                       }"
+                       :style="{ width: `${emotion.score * 100}%` }"></div>
+                </div>
+                <span class="text-sm font-medium text-gray-700 w-12 text-right">{{ Math.round(emotion.score * 100) }}%</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Key Topics -->
+          <div>
+            <h5 class="font-medium text-gray-900 mb-3">Discussion Topics</h5>
+            <div class="flex flex-wrap gap-2">
+              <span v-for="topic in conversationSentiment.topics" :key="topic"
+                    class="px-3 py-1 bg-teal-100 text-teal-700 rounded-full text-sm">
+                {{ topic }}
+              </span>
+            </div>
+          </div>
+
+          <!-- Summary -->
+          <div class="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl p-4">
+            <h5 class="font-medium text-gray-900 mb-2 flex items-center gap-2">
+              <i class="fas fa-lightbulb text-purple-500"></i> Summary
+            </h5>
+            <p class="text-gray-700 text-sm">{{ conversationSentiment.summary }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-4 border-t border-gray-100 flex justify-end gap-3">
+        <button @click="analyzeConversationSentiment"
+                class="px-4 py-2 text-purple-600 hover:bg-purple-50 rounded-lg transition-colors flex items-center gap-2">
+          <i class="fas fa-rotate"></i> Refresh
+        </button>
+        <button @click="showSentimentPanel = false"
+                class="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
 </template>
 
 <style scoped>
@@ -2354,4 +2810,76 @@ textarea {
   0%, 60%, 100% { transform: translateY(0); }
   30% { transform: translateY(-4px); }
 }
+
+/* AI Feature Styles */
+.ai-suggestions-panel {
+  animation: slideInUp 0.3s ease-out;
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.ai-action-btn {
+  transition: all 0.2s ease;
+}
+
+.ai-action-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(20, 184, 166, 0.2);
+}
+
+.ai-modal-enter-active {
+  animation: modalFadeIn 0.3s ease-out;
+}
+
+.ai-modal-leave-active {
+  animation: modalFadeIn 0.3s ease-out reverse;
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.ai-suggestion-chip {
+  transition: all 0.2s ease;
+}
+
+.ai-suggestion-chip:hover {
+  transform: scale(1.02);
+}
+
+.ai-pulse {
+  animation: aiPulse 2s ease-in-out infinite;
+}
+
+@keyframes aiPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.ai-gradient-text {
+  background: linear-gradient(135deg, #14b8a6 0%, #10b981 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.sentiment-positive { color: #22c55e; }
+.sentiment-neutral { color: #eab308; }
+.sentiment-negative { color: #ef4444; }
 </style>

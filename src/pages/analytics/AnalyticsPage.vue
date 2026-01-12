@@ -1,5 +1,9 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { useAIServicesStore } from '@/stores/aiServices'
+import { AILoadingIndicator, AIConfidenceBar } from '@/components/ai'
+
+const aiStore = useAIServicesStore()
 
 // State
 const isLoading = ref(false)
@@ -230,6 +234,237 @@ function downloadReport(report: any) {
 function exportData(format: string) {
   alert(`Exporting data as ${format}...`)
 }
+
+// ============================================================================
+// AI Features - State & Functions
+// ============================================================================
+
+// AI State
+const showNLQueryModal = ref(false)
+const showAIReportModal = ref(false)
+const showTrendPredictions = ref(false)
+const showAnomalyPanel = ref(false)
+const isProcessingQuery = ref(false)
+const isGeneratingReport = ref(false)
+const nlQuery = ref('')
+const nlQueryResult = ref<NLQueryResult | null>(null)
+
+// AI Interfaces
+interface NLQueryResult {
+  query: string
+  interpretation: string
+  answer: string
+  dataPoints: { label: string; value: string }[]
+  confidence: number
+  suggestedQueries: string[]
+}
+
+interface TrendPrediction {
+  id: string
+  metric: string
+  currentValue: string
+  predictedValue: string
+  timeframe: string
+  confidence: number
+  trend: 'up' | 'down' | 'stable'
+  insight: string
+}
+
+interface MetricAnomaly {
+  id: string
+  metric: string
+  anomalyType: 'spike' | 'drop' | 'pattern_change'
+  severity: 'low' | 'medium' | 'high'
+  description: string
+  value: string
+  expectedRange: string
+  detectedAt: string
+}
+
+interface AIGeneratedReport {
+  id: string
+  title: string
+  summary: string
+  highlights: string[]
+  recommendations: string[]
+  generatedAt: Date
+}
+
+// AI Data
+const trendPredictions = ref<TrendPrediction[]>([
+  {
+    id: '1',
+    metric: 'Platform Traffic',
+    currentValue: '35,000',
+    predictedValue: '52,000',
+    timeframe: 'Next 30 days',
+    confidence: 0.87,
+    trend: 'up',
+    insight: 'Expected increase due to upcoming tournament opening'
+  },
+  {
+    id: '2',
+    metric: 'Document Downloads',
+    currentValue: '8,492',
+    predictedValue: '12,100',
+    timeframe: 'Next 30 days',
+    confidence: 0.82,
+    trend: 'up',
+    insight: 'Policy documents demand rising as event approaches'
+  },
+  {
+    id: '3',
+    metric: 'Course Completions',
+    currentValue: '456',
+    predictedValue: '680',
+    timeframe: 'Next 30 days',
+    confidence: 0.79,
+    trend: 'up',
+    insight: 'Staff training acceleration expected'
+  },
+  {
+    id: '4',
+    metric: 'User Engagement',
+    currentValue: '8.4/10',
+    predictedValue: '8.1/10',
+    timeframe: 'Next 30 days',
+    confidence: 0.74,
+    trend: 'down',
+    insight: 'Slight dip expected during transition period'
+  }
+])
+
+const metricAnomalies = ref<MetricAnomaly[]>([
+  {
+    id: '1',
+    metric: 'Document Views',
+    anomalyType: 'spike',
+    severity: 'medium',
+    description: 'Unusual spike in Venue Guidelines views',
+    value: '847% above normal',
+    expectedRange: '200-400 views/day',
+    detectedAt: '2 hours ago'
+  },
+  {
+    id: '2',
+    metric: 'Login Frequency',
+    anomalyType: 'pattern_change',
+    severity: 'low',
+    description: 'Login pattern shift detected - more evening activity',
+    value: '+34% evening logins',
+    expectedRange: 'Peak at 9-11 AM',
+    detectedAt: '1 day ago'
+  }
+])
+
+const generatedReport = ref<AIGeneratedReport | null>(null)
+
+// Example NL queries
+const exampleQueries = [
+  'What was our top performing content last month?',
+  'Show me engagement trends for Engineering department',
+  'Compare article views vs course completions this quarter',
+  'Which content type has the highest completion rate?',
+  'What are the peak usage hours for the platform?'
+]
+
+// AI Functions
+async function processNLQuery() {
+  if (!nlQuery.value.trim()) return
+
+  isProcessingQuery.value = true
+
+  try {
+    await new Promise(resolve => setTimeout(resolve, 1500))
+
+    nlQueryResult.value = {
+      query: nlQuery.value,
+      interpretation: `Analyzing "${nlQuery.value}" across platform metrics and content data`,
+      answer: `Based on the analysis, the top performing content last month was "Tournament Regulations 2027" with 12,450 views and a 4.8 rating. This document saw a 34% increase in engagement compared to the previous month, driven primarily by the Engineering and Operations departments.`,
+      dataPoints: [
+        { label: 'Top Content', value: 'Tournament Regulations 2027' },
+        { label: 'Total Views', value: '12,450' },
+        { label: 'Rating', value: '4.8/5' },
+        { label: 'Month-over-Month', value: '+34%' },
+        { label: 'Primary Audience', value: 'Engineering, Operations' }
+      ],
+      confidence: 0.91,
+      suggestedQueries: [
+        'What content should we create next?',
+        'Show department breakdown for this content',
+        'Compare with previous quarter'
+      ]
+    }
+  } finally {
+    isProcessingQuery.value = false
+  }
+}
+
+function useExampleQuery(query: string) {
+  nlQuery.value = query
+  processNLQuery()
+}
+
+async function generateAIReport() {
+  isGeneratingReport.value = true
+  showAIReportModal.value = true
+
+  try {
+    await new Promise(resolve => setTimeout(resolve, 2000))
+
+    generatedReport.value = {
+      id: '1',
+      title: 'AI-Generated Analytics Summary',
+      summary: 'Platform performance remains strong with 78% adoption rate. Content engagement increased by 23% this period, driven primarily by tournament preparation materials. User activity patterns indicate healthy engagement across all departments.',
+      highlights: [
+        'Platform adoption reached 78%, exceeding target by 8%',
+        'Article engagement up 34% driven by tournament content',
+        'Engineering department leads with 92% adoption rate',
+        'Document downloads increased 23% month-over-month',
+        'Average session duration increased to 12.4 minutes'
+      ],
+      recommendations: [
+        'Create more video content for Operations department - low engagement detected',
+        'Schedule content updates during peak hours (9-11 AM) for maximum visibility',
+        'Consider gamification for Finance department to boost adoption from 58%',
+        'Develop mobile-optimized content - 34% increase in mobile usage detected',
+        'Archive low-performing content older than 6 months to improve search relevance'
+      ],
+      generatedAt: new Date()
+    }
+  } finally {
+    isGeneratingReport.value = false
+  }
+}
+
+function dismissAnomaly(id: string) {
+  metricAnomalies.value = metricAnomalies.value.filter(a => a.id !== id)
+}
+
+function getTrendIcon(trend: string): string {
+  switch (trend) {
+    case 'up': return 'fas fa-arrow-trend-up'
+    case 'down': return 'fas fa-arrow-trend-down'
+    default: return 'fas fa-minus'
+  }
+}
+
+function getTrendColor(trend: string): string {
+  switch (trend) {
+    case 'up': return 'text-green-600 bg-green-100'
+    case 'down': return 'text-red-600 bg-red-100'
+    default: return 'text-gray-600 bg-gray-100'
+  }
+}
+
+function getAnomalySeverityColor(severity: string): string {
+  switch (severity) {
+    case 'high': return 'bg-red-100 border-red-200 text-red-700'
+    case 'medium': return 'bg-amber-100 border-amber-200 text-amber-700'
+    case 'low': return 'bg-blue-100 border-blue-200 text-blue-700'
+    default: return 'bg-gray-100 border-gray-200 text-gray-700'
+  }
+}
 </script>
 
 <template>
@@ -290,6 +525,27 @@ function exportData(format: string) {
           <button class="px-5 py-2.5 bg-white/20 backdrop-blur-sm border border-white/30 text-white rounded-xl font-semibold text-sm hover:bg-white/30 transition-all flex items-center gap-2">
             <i class="fas fa-calendar-alt"></i>
             Schedule Report
+          </button>
+          <!-- AI Buttons -->
+          <button @click="showNLQueryModal = true" class="px-5 py-2.5 bg-gradient-to-r from-emerald-400 to-teal-400 text-white rounded-xl font-semibold text-sm hover:from-emerald-500 hover:to-teal-500 transition-all flex items-center gap-2 shadow-lg shadow-teal-500/20">
+            <i class="fas fa-comment-dots"></i>
+            Ask AI
+          </button>
+          <button @click="generateAIReport" class="px-5 py-2.5 bg-white/20 backdrop-blur-sm border border-white/30 text-white rounded-xl font-semibold text-sm hover:bg-white/30 transition-all flex items-center gap-2">
+            <i class="fas fa-wand-magic-sparkles"></i>
+            AI Report
+          </button>
+        </div>
+
+        <!-- AI Quick Stats -->
+        <div class="flex flex-wrap gap-4 mt-4">
+          <button @click="showTrendPredictions = true" class="px-4 py-2 bg-white/10 backdrop-blur-sm rounded-xl border border-white/20 text-white text-sm flex items-center gap-2 hover:bg-white/20 transition-all">
+            <i class="fas fa-crystal-ball text-purple-300"></i>
+            <span>{{ trendPredictions.length }} Predictions</span>
+          </button>
+          <button @click="showAnomalyPanel = true" class="px-4 py-2 bg-white/10 backdrop-blur-sm rounded-xl border border-white/20 text-white text-sm flex items-center gap-2 hover:bg-white/20 transition-all">
+            <i class="fas fa-exclamation-triangle text-amber-300"></i>
+            <span>{{ metricAnomalies.length }} Anomalies</span>
           </button>
         </div>
       </div>
@@ -907,6 +1163,326 @@ function exportData(format: string) {
         </div>
       </div>
     </div>
+
+    <!-- AI Natural Language Query Modal -->
+    <Teleport to="body">
+      <div v-if="showNLQueryModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[85vh] overflow-hidden">
+          <div class="p-5 border-b border-gray-100 bg-gradient-to-r from-teal-500 to-emerald-500">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
+                  <i class="fas fa-comment-dots text-white"></i>
+                </div>
+                <div>
+                  <h3 class="font-semibold text-white">Ask AI About Analytics</h3>
+                  <p class="text-xs text-white/80">Natural language queries for your data</p>
+                </div>
+              </div>
+              <button @click="showNLQueryModal = false" class="p-2 hover:bg-white/20 rounded-lg transition-colors">
+                <i class="fas fa-times text-white"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="p-5">
+            <!-- Query Input -->
+            <div class="relative mb-4">
+              <input v-model="nlQuery"
+                     @keyup.enter="processNLQuery"
+                     type="text"
+                     placeholder="Ask a question about your analytics data..."
+                     class="w-full pl-12 pr-24 py-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-gray-900">
+              <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+              <button @click="processNLQuery"
+                      :disabled="isProcessingQuery || !nlQuery.trim()"
+                      class="absolute right-2 top-1/2 -translate-y-1/2 px-4 py-2 bg-teal-500 text-white rounded-lg text-sm font-medium hover:bg-teal-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+                <i v-if="isProcessingQuery" class="fas fa-circle-notch fa-spin"></i>
+                <span v-else>Ask</span>
+              </button>
+            </div>
+
+            <!-- Example Queries -->
+            <div v-if="!nlQueryResult" class="mb-4">
+              <p class="text-xs text-gray-500 mb-2">Try asking:</p>
+              <div class="flex flex-wrap gap-2">
+                <button v-for="query in exampleQueries" :key="query"
+                        @click="useExampleQuery(query)"
+                        class="px-3 py-1.5 bg-gray-100 rounded-full text-xs text-gray-600 hover:bg-teal-100 hover:text-teal-700 transition-colors">
+                  {{ query }}
+                </button>
+              </div>
+            </div>
+
+            <!-- Query Result -->
+            <div v-if="nlQueryResult" class="space-y-4">
+              <div class="p-4 bg-gray-50 rounded-xl">
+                <div class="flex items-center gap-2 mb-2">
+                  <i class="fas fa-robot text-teal-500"></i>
+                  <span class="text-xs text-gray-500">{{ nlQueryResult.interpretation }}</span>
+                </div>
+                <p class="text-sm text-gray-700 leading-relaxed">{{ nlQueryResult.answer }}</p>
+              </div>
+
+              <!-- Data Points -->
+              <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                <div v-for="point in nlQueryResult.dataPoints" :key="point.label"
+                     class="p-3 bg-white border border-gray-200 rounded-xl">
+                  <p class="text-xs text-gray-500">{{ point.label }}</p>
+                  <p class="text-lg font-bold text-gray-900">{{ point.value }}</p>
+                </div>
+              </div>
+
+              <!-- Confidence -->
+              <div class="flex items-center gap-3">
+                <span class="text-xs text-gray-500">Confidence:</span>
+                <div class="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
+                  <div class="h-full bg-teal-500 rounded-full" :style="{ width: `${nlQueryResult.confidence * 100}%` }"></div>
+                </div>
+                <span class="text-xs font-bold text-teal-600">{{ Math.round(nlQueryResult.confidence * 100) }}%</span>
+              </div>
+
+              <!-- Suggested Follow-ups -->
+              <div>
+                <p class="text-xs text-gray-500 mb-2">Related questions:</p>
+                <div class="flex flex-wrap gap-2">
+                  <button v-for="query in nlQueryResult.suggestedQueries" :key="query"
+                          @click="useExampleQuery(query)"
+                          class="px-3 py-1.5 bg-teal-50 rounded-full text-xs text-teal-600 hover:bg-teal-100 transition-colors">
+                    {{ query }}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="p-4 border-t border-gray-100 bg-gray-50 flex justify-end">
+            <button @click="showNLQueryModal = false"
+                    class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm">
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </Teleport>
+
+    <!-- AI Trend Predictions Modal -->
+    <Teleport to="body">
+      <div v-if="showTrendPredictions" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[80vh] overflow-hidden">
+          <div class="p-5 border-b border-gray-100 bg-gradient-to-r from-purple-500 to-indigo-500">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
+                  <i class="fas fa-crystal-ball text-white"></i>
+                </div>
+                <div>
+                  <h3 class="font-semibold text-white">AI Trend Predictions</h3>
+                  <p class="text-xs text-white/80">Forecasted metrics based on historical data</p>
+                </div>
+              </div>
+              <button @click="showTrendPredictions = false" class="p-2 hover:bg-white/20 rounded-lg transition-colors">
+                <i class="fas fa-times text-white"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="p-5 overflow-y-auto max-h-[60vh]">
+            <div class="space-y-4">
+              <div v-for="prediction in trendPredictions" :key="prediction.id"
+                   class="p-4 rounded-xl border border-gray-200 hover:shadow-md transition-all">
+                <div class="flex items-start gap-4">
+                  <div :class="['w-12 h-12 rounded-xl flex items-center justify-center', getTrendColor(prediction.trend)]">
+                    <i :class="[getTrendIcon(prediction.trend), 'text-lg']"></i>
+                  </div>
+                  <div class="flex-1">
+                    <h4 class="font-semibold text-gray-900">{{ prediction.metric }}</h4>
+                    <div class="flex items-center gap-4 mt-2">
+                      <div>
+                        <p class="text-xs text-gray-500">Current</p>
+                        <p class="text-lg font-bold text-gray-700">{{ prediction.currentValue }}</p>
+                      </div>
+                      <i class="fas fa-arrow-right text-gray-300"></i>
+                      <div>
+                        <p class="text-xs text-gray-500">Predicted</p>
+                        <p :class="['text-lg font-bold', prediction.trend === 'up' ? 'text-green-600' : prediction.trend === 'down' ? 'text-red-600' : 'text-gray-600']">
+                          {{ prediction.predictedValue }}
+                        </p>
+                      </div>
+                    </div>
+                    <p class="text-sm text-gray-600 mt-2">{{ prediction.insight }}</p>
+                    <div class="flex items-center gap-3 mt-2">
+                      <span class="text-xs text-gray-400">{{ prediction.timeframe }}</span>
+                      <span class="text-xs text-purple-600 font-medium">{{ Math.round(prediction.confidence * 100) }}% confidence</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="p-4 border-t border-gray-100 bg-gray-50 flex justify-end">
+            <button @click="showTrendPredictions = false"
+                    class="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors text-sm">
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </Teleport>
+
+    <!-- AI Anomaly Panel Modal -->
+    <Teleport to="body">
+      <div v-if="showAnomalyPanel" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[80vh] overflow-hidden">
+          <div class="p-5 border-b border-gray-100 bg-gradient-to-r from-amber-500 to-orange-500">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
+                  <i class="fas fa-exclamation-triangle text-white"></i>
+                </div>
+                <div>
+                  <h3 class="font-semibold text-white">Detected Anomalies</h3>
+                  <p class="text-xs text-white/80">Unusual patterns in your metrics</p>
+                </div>
+              </div>
+              <button @click="showAnomalyPanel = false" class="p-2 hover:bg-white/20 rounded-lg transition-colors">
+                <i class="fas fa-times text-white"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="p-5 overflow-y-auto max-h-[55vh]">
+            <div v-if="metricAnomalies.length === 0" class="text-center py-8">
+              <i class="fas fa-check-circle text-green-500 text-4xl mb-3"></i>
+              <p class="text-gray-600">No anomalies detected. All metrics are within expected ranges.</p>
+            </div>
+
+            <div v-else class="space-y-3">
+              <div v-for="anomaly in metricAnomalies" :key="anomaly.id"
+                   :class="['p-4 rounded-xl border', getAnomalySeverityColor(anomaly.severity)]">
+                <div class="flex items-start justify-between">
+                  <div class="flex-1">
+                    <div class="flex items-center gap-2 mb-1">
+                      <span class="font-semibold">{{ anomaly.metric }}</span>
+                      <span class="px-2 py-0.5 rounded-full text-xs font-medium capitalize" :class="getAnomalySeverityColor(anomaly.severity)">
+                        {{ anomaly.severity }}
+                      </span>
+                    </div>
+                    <p class="text-sm opacity-90">{{ anomaly.description }}</p>
+                    <div class="flex items-center gap-4 mt-2 text-xs opacity-75">
+                      <span>Value: <strong>{{ anomaly.value }}</strong></span>
+                      <span>Expected: {{ anomaly.expectedRange }}</span>
+                    </div>
+                    <p class="text-xs opacity-60 mt-1">Detected {{ anomaly.detectedAt }}</p>
+                  </div>
+                  <button @click="dismissAnomaly(anomaly.id)" class="p-1 hover:bg-white/50 rounded transition-colors">
+                    <i class="fas fa-times text-sm"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="p-4 border-t border-gray-100 bg-gray-50 flex justify-end">
+            <button @click="showAnomalyPanel = false"
+                    class="px-4 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition-colors text-sm">
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </Teleport>
+
+    <!-- AI Generated Report Modal -->
+    <Teleport to="body">
+      <div v-if="showAIReportModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[85vh] overflow-hidden">
+          <div class="p-5 border-b border-gray-100 bg-gradient-to-r from-teal-500 to-emerald-500">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
+                  <i class="fas fa-wand-magic-sparkles text-white"></i>
+                </div>
+                <div>
+                  <h3 class="font-semibold text-white">AI-Generated Report</h3>
+                  <p class="text-xs text-white/80">Automated analytics summary</p>
+                </div>
+              </div>
+              <button @click="showAIReportModal = false" class="p-2 hover:bg-white/20 rounded-lg transition-colors">
+                <i class="fas fa-times text-white"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="p-5 overflow-y-auto max-h-[60vh]">
+            <div v-if="isGeneratingReport" class="text-center py-12">
+              <i class="fas fa-circle-notch fa-spin text-teal-500 text-4xl mb-4"></i>
+              <p class="text-gray-600">Analyzing data and generating report...</p>
+              <p class="text-xs text-gray-400 mt-2">This may take a few seconds</p>
+            </div>
+
+            <div v-else-if="generatedReport" class="space-y-6">
+              <div>
+                <h4 class="text-xl font-bold text-gray-900">{{ generatedReport.title }}</h4>
+                <p class="text-xs text-gray-500 mt-1">Generated {{ generatedReport.generatedAt.toLocaleString() }}</p>
+              </div>
+
+              <div class="p-4 bg-teal-50 rounded-xl border border-teal-100">
+                <h5 class="font-semibold text-teal-800 mb-2">Executive Summary</h5>
+                <p class="text-sm text-teal-700">{{ generatedReport.summary }}</p>
+              </div>
+
+              <div>
+                <h5 class="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                  <i class="fas fa-star text-amber-500"></i>
+                  Key Highlights
+                </h5>
+                <ul class="space-y-2">
+                  <li v-for="(highlight, idx) in generatedReport.highlights" :key="idx"
+                      class="flex items-start gap-2 text-sm text-gray-700">
+                    <i class="fas fa-check-circle text-green-500 mt-0.5"></i>
+                    <span>{{ highlight }}</span>
+                  </li>
+                </ul>
+              </div>
+
+              <div>
+                <h5 class="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                  <i class="fas fa-lightbulb text-amber-500"></i>
+                  AI Recommendations
+                </h5>
+                <ul class="space-y-2">
+                  <li v-for="(rec, idx) in generatedReport.recommendations" :key="idx"
+                      class="flex items-start gap-2 text-sm text-gray-700">
+                    <span class="w-5 h-5 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center text-xs font-bold flex-shrink-0">{{ idx + 1 }}</span>
+                    <span>{{ rec }}</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="p-4 border-t border-gray-100 bg-gray-50 flex justify-between items-center">
+            <p class="text-xs text-gray-500">
+              <i class="fas fa-robot mr-1"></i>
+              AI-generated based on current period data
+            </p>
+            <div class="flex gap-2">
+              <button @click="showAIReportModal = false"
+                      class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm">
+                Close
+              </button>
+              <button v-if="generatedReport"
+                      class="px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-colors text-sm flex items-center gap-2">
+                <i class="fas fa-download"></i>
+                Export PDF
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Teleport>
   </div>
 </template>
 

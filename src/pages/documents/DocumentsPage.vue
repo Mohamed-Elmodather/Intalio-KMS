@@ -1,10 +1,14 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import ContentActionsDropdown from '@/components/common/ContentActionsDropdown.vue'
 import AddToCollectionModal from '@/components/common/AddToCollectionModal.vue'
+import { useAIServicesStore } from '@/stores/aiServices'
+import { AISuggestionChip, AILoadingIndicator, AIConfidenceBar } from '@/components/ai'
+import type { ClassificationResult } from '@/types/ai'
 
 const router = useRouter()
+const aiStore = useAIServicesStore()
 
 // View state
 const isLoading = ref(false)
@@ -58,6 +62,91 @@ const selectedItemForCollection = ref<{
   title: string
   thumbnail?: string
 } | null>(null)
+
+// ============================================
+// AI FEATURES STATE
+// ============================================
+const showAIFeatures = ref(true)
+const showSearchSuggestions = ref(false)
+const searchSuggestions = ref<string[]>([])
+const isLoadingSearchSuggestions = ref(false)
+const searchDebounceTimeout = ref<ReturnType<typeof setTimeout> | null>(null)
+const showFolderSuggestions = ref(true)
+const isLoadingFolderSuggestions = ref(false)
+
+// Mock AI search suggestions for documents
+const mockDocSearchSuggestions = [
+  'Tournament regulations 2027',
+  'Opening ceremony documents',
+  'Stadium seating charts',
+  'Media accreditation guidelines',
+  'Team presentation templates',
+  'Brand guidelines and assets',
+  'Match day operations checklist',
+  'Press conference schedules',
+  'Volunteer training manual',
+  'WiFi network documentation',
+]
+
+// Mock AI classifications for documents (by document ID)
+interface AIDocClassification {
+  category: string
+  confidence: number
+  suggestedTags: string[]
+  suggestedFolder: string
+}
+
+const mockDocClassifications: Record<string, AIDocClassification> = {
+  '1': { category: 'Legal & Regulations', confidence: 0.95, suggestedTags: ['Official', 'Legal', 'Tournament'], suggestedFolder: 'regulations' },
+  '2': { category: 'Event Planning', confidence: 0.88, suggestedTags: ['Ceremony', 'Script', 'Event'], suggestedFolder: 'ceremonies' },
+  '3': { category: 'Venue Operations', confidence: 0.92, suggestedTags: ['Stadium', 'Layout', 'Seating'], suggestedFolder: 'stadiums' },
+  '4': { category: 'Media & Press', confidence: 0.90, suggestedTags: ['Media', 'Accreditation', 'Guidelines'], suggestedFolder: 'press' },
+  '5': { category: 'Team Resources', confidence: 0.85, suggestedTags: ['Template', 'Presentation', 'Brand'], suggestedFolder: 'teams' },
+  '6': { category: 'Brand & Marketing', confidence: 0.94, suggestedTags: ['Brand', 'Assets', 'Guidelines'], suggestedFolder: 'brand' },
+  '7': { category: 'Operations', confidence: 0.91, suggestedTags: ['Operations', 'Checklist', 'Match Day'], suggestedFolder: 'procedures' },
+  '8': { category: 'Media & Press', confidence: 0.87, suggestedTags: ['Schedule', 'Press', 'Media'], suggestedFolder: 'press' },
+  '9': { category: 'Training & HR', confidence: 0.89, suggestedTags: ['Training', 'Volunteers', 'Manual'], suggestedFolder: 'training' },
+  '10': { category: 'Technical', confidence: 0.86, suggestedTags: ['Technical', 'WiFi', 'Infrastructure'], suggestedFolder: 'stadiums' },
+  '11': { category: 'Team Resources', confidence: 0.93, suggestedTags: ['Photo', 'Team', 'Media'], suggestedFolder: 'photos' },
+  '12': { category: 'Media & Press', confidence: 0.82, suggestedTags: ['Audio', 'Anthem', 'Media'], suggestedFolder: 'media' },
+}
+
+// Mock AI folder organization suggestions
+interface FolderSuggestion {
+  documentId: string
+  documentName: string
+  currentFolder: string
+  suggestedFolder: string
+  reason: string
+  confidence: number
+}
+
+const folderSuggestions = ref<FolderSuggestion[]>([
+  {
+    documentId: '2',
+    documentName: 'Opening Ceremony Script - Final Draft.docx',
+    currentFolder: 'Tournament Documents',
+    suggestedFolder: 'Ceremonies',
+    reason: 'Content analysis indicates this is a ceremony-related document',
+    confidence: 0.88
+  },
+  {
+    documentId: '8',
+    documentName: 'Press Conference Schedule - Group Stage.xlsx',
+    currentFolder: 'Media Assets',
+    suggestedFolder: 'Press Releases',
+    reason: 'Schedule documents are better organized with press materials',
+    confidence: 0.85
+  },
+  {
+    documentId: '10',
+    documentName: 'Stadium WiFi Network Guide.pdf',
+    currentFolder: 'Venue Information',
+    suggestedFolder: 'Stadiums',
+    reason: 'Technical infrastructure document belongs with stadium files',
+    confidence: 0.82
+  }
+])
 
 // Pagination state
 const currentPage = ref(1)
@@ -906,6 +995,117 @@ function getFileIconBg(type: string): string {
   }
   return colors[type] || 'bg-gray-50'
 }
+
+// ============================================
+// AI FEATURES FUNCTIONS
+// ============================================
+
+// Get AI search suggestions
+async function fetchSearchSuggestions(query: string) {
+  if (query.length < 2) {
+    showSearchSuggestions.value = false
+    searchSuggestions.value = []
+    return
+  }
+
+  isLoadingSearchSuggestions.value = true
+  showSearchSuggestions.value = true
+
+  // Simulate AI processing delay
+  await new Promise(resolve => setTimeout(resolve, 300))
+
+  // Filter mock suggestions based on query
+  const lowerQuery = query.toLowerCase()
+  searchSuggestions.value = mockDocSearchSuggestions
+    .filter(s => s.toLowerCase().includes(lowerQuery))
+    .slice(0, 5)
+
+  // If no matches, generate suggestions based on query
+  if (searchSuggestions.value.length === 0) {
+    searchSuggestions.value = [
+      `${query} documents`,
+      `${query} templates`,
+      `Files containing ${query}`,
+      `${query} guidelines`,
+    ]
+  }
+
+  isLoadingSearchSuggestions.value = false
+}
+
+// Handle search input with debounce
+function handleSearchInput() {
+  if (searchDebounceTimeout.value) {
+    clearTimeout(searchDebounceTimeout.value)
+  }
+  searchDebounceTimeout.value = setTimeout(() => {
+    fetchSearchSuggestions(searchQuery.value)
+  }, 300)
+}
+
+// Select a search suggestion
+function selectSearchSuggestion(suggestion: string) {
+  searchQuery.value = suggestion
+  showSearchSuggestions.value = false
+}
+
+// Hide search suggestions
+function hideSearchSuggestions() {
+  setTimeout(() => {
+    showSearchSuggestions.value = false
+  }, 200)
+}
+
+// Get AI classification for a document
+function getDocClassification(docId: string): AIDocClassification | null {
+  return mockDocClassifications[docId] || null
+}
+
+// Apply folder suggestion
+function applyFolderSuggestion(suggestion: FolderSuggestion) {
+  const doc = documents.value.find(d => d.id === suggestion.documentId)
+  if (doc) {
+    // In a real app, this would move the document
+    console.log(`Moving ${doc.name} to ${suggestion.suggestedFolder}`)
+    // Remove from suggestions
+    folderSuggestions.value = folderSuggestions.value.filter(
+      s => s.documentId !== suggestion.documentId
+    )
+  }
+}
+
+// Dismiss folder suggestion
+function dismissFolderSuggestion(documentId: string) {
+  folderSuggestions.value = folderSuggestions.value.filter(
+    s => s.documentId !== documentId
+  )
+}
+
+// Toggle AI features visibility
+function toggleAIFeatures() {
+  showAIFeatures.value = !showAIFeatures.value
+}
+
+// Dismiss all folder suggestions
+function dismissAllFolderSuggestions() {
+  showFolderSuggestions.value = false
+}
+
+// Get category color for AI classification
+function getCategoryColor(category: string): string {
+  const colors: Record<string, string> = {
+    'Legal & Regulations': 'bg-red-50 text-red-700 border-red-200',
+    'Event Planning': 'bg-purple-50 text-purple-700 border-purple-200',
+    'Venue Operations': 'bg-amber-50 text-amber-700 border-amber-200',
+    'Media & Press': 'bg-blue-50 text-blue-700 border-blue-200',
+    'Team Resources': 'bg-emerald-50 text-emerald-700 border-emerald-200',
+    'Brand & Marketing': 'bg-pink-50 text-pink-700 border-pink-200',
+    'Operations': 'bg-indigo-50 text-indigo-700 border-indigo-200',
+    'Training & HR': 'bg-orange-50 text-orange-700 border-orange-200',
+    'Technical': 'bg-cyan-50 text-cyan-700 border-cyan-200',
+  }
+  return colors[category] || 'bg-gray-50 text-gray-700 border-gray-200'
+}
 </script>
 
 <template>
@@ -1124,6 +1324,91 @@ function getFileIconBg(type: string): string {
         </div>
       </div>
 
+      <!-- AI Folder Organization Suggestions -->
+      <div v-if="showAIFeatures && showFolderSuggestions && folderSuggestions.length > 0" class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 mb-6">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-base font-bold text-gray-900 flex items-center gap-3">
+            <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center shadow-lg shadow-teal-200">
+              <i class="fas fa-wand-magic-sparkles text-white text-sm"></i>
+            </div>
+            <div>
+              <span class="block">AI Organization Suggestions</span>
+              <span class="text-xs font-medium text-gray-500">Smart folder recommendations</span>
+            </div>
+            <span class="ai-powered-badge-doc">AI Powered</span>
+          </h2>
+          <div class="flex items-center gap-2">
+            <button @click="dismissAllFolderSuggestions" class="text-xs text-gray-500 hover:text-gray-700 px-2 py-1">
+              Dismiss all
+            </button>
+            <button @click="toggleAIFeatures" class="w-7 h-7 rounded-lg bg-gray-100 text-gray-400 hover:bg-red-50 hover:text-red-500 flex items-center justify-center transition-all">
+              <i class="fas fa-times text-xs"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="space-y-3">
+          <div
+            v-for="suggestion in folderSuggestions"
+            :key="suggestion.documentId"
+            class="ai-folder-suggestion-card"
+          >
+            <div class="flex items-start gap-4">
+              <!-- Document Info -->
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-medium text-gray-900 truncate">{{ suggestion.documentName }}</p>
+                <div class="flex items-center gap-2 mt-1 text-xs text-gray-500">
+                  <span class="flex items-center gap-1">
+                    <i class="fas fa-folder text-gray-400"></i>
+                    {{ suggestion.currentFolder }}
+                  </span>
+                  <i class="fas fa-arrow-right text-teal-500"></i>
+                  <span class="flex items-center gap-1 text-teal-600 font-medium">
+                    <i class="fas fa-folder text-teal-500"></i>
+                    {{ suggestion.suggestedFolder }}
+                  </span>
+                </div>
+                <p class="text-xs text-gray-400 mt-1 flex items-center gap-1">
+                  <i class="fas fa-lightbulb text-amber-400"></i>
+                  {{ suggestion.reason }}
+                </p>
+              </div>
+
+              <!-- Confidence & Actions -->
+              <div class="flex items-center gap-3">
+                <div class="text-right">
+                  <span class="text-xs text-gray-400">Confidence</span>
+                  <div class="flex items-center gap-1">
+                    <div class="w-16 h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                      <div
+                        class="h-full bg-gradient-to-r from-teal-400 to-teal-500 rounded-full"
+                        :style="{ width: `${suggestion.confidence * 100}%` }"
+                      ></div>
+                    </div>
+                    <span class="text-xs font-semibold text-teal-600">{{ Math.round(suggestion.confidence * 100) }}%</span>
+                  </div>
+                </div>
+                <div class="flex items-center gap-1">
+                  <button
+                    @click="applyFolderSuggestion(suggestion)"
+                    class="px-3 py-1.5 bg-teal-500 text-white text-xs font-medium rounded-lg hover:bg-teal-600 transition-all flex items-center gap-1"
+                  >
+                    <i class="fas fa-check"></i>
+                    Apply
+                  </button>
+                  <button
+                    @click="dismissFolderSuggestion(suggestion.documentId)"
+                    class="w-8 h-8 rounded-lg bg-gray-100 text-gray-400 hover:bg-gray-200 hover:text-gray-600 flex items-center justify-center transition-all"
+                  >
+                    <i class="fas fa-times text-xs"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- All Files Section with Folder Tree -->
       <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <!-- Section Header / Toolbar -->
@@ -1162,18 +1447,50 @@ function getFileIconBg(type: string): string {
 
           <!-- Bottom Row - Search, Filters, View Options -->
           <div class="px-4 py-2 bg-gray-50/50 flex flex-wrap items-center gap-3">
-            <!-- Search -->
+            <!-- Search with AI Suggestions -->
             <div class="flex-1 min-w-[200px] max-w-md relative">
-              <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+              <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm z-10"></i>
               <input
                 v-model="searchQuery"
+                @input="handleSearchInput"
+                @focus="searchQuery.length >= 2 && (showSearchSuggestions = true)"
+                @blur="hideSearchSuggestions"
                 type="text"
                 placeholder="Search files and folders..."
-                class="w-full pl-9 pr-4 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all"
+                class="w-full pl-9 pr-10 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all"
               >
-              <button v-if="searchQuery" @click="searchQuery = ''" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                <i class="fas fa-times text-xs"></i>
-              </button>
+              <div class="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                <i v-if="isLoadingSearchSuggestions" class="fas fa-spinner fa-spin text-teal-500 text-xs"></i>
+                <span v-else-if="!searchQuery" class="ai-search-badge-doc">
+                  <i class="fas fa-wand-magic-sparkles text-[10px]"></i>
+                </span>
+                <button v-if="searchQuery" @click="searchQuery = ''; showSearchSuggestions = false" class="text-gray-400 hover:text-gray-600">
+                  <i class="fas fa-times text-xs"></i>
+                </button>
+              </div>
+
+              <!-- AI Search Suggestions Dropdown -->
+              <div
+                v-if="showSearchSuggestions && searchSuggestions.length > 0"
+                class="ai-suggestions-dropdown-doc"
+              >
+                <div class="ai-suggestions-header-doc">
+                  <i class="fas fa-wand-magic-sparkles text-teal-500"></i>
+                  <span>AI Suggestions</span>
+                </div>
+                <div class="ai-suggestions-list-doc">
+                  <button
+                    v-for="suggestion in searchSuggestions"
+                    :key="suggestion"
+                    @click="selectSearchSuggestion(suggestion)"
+                    class="ai-suggestion-item-doc"
+                  >
+                    <i class="fas fa-search text-gray-400 text-xs"></i>
+                    <span>{{ suggestion }}</span>
+                    <i class="fas fa-arrow-right text-teal-500 text-xs ml-auto opacity-0 group-hover:opacity-100"></i>
+                  </button>
+                </div>
+              </div>
             </div>
 
             <!-- File Type Filter -->
@@ -1977,6 +2294,15 @@ function getFileIconBg(type: string): string {
                   </span>
                 </div>
 
+                <!-- AI Classification Badge -->
+                <div v-if="getDocClassification(doc.id)" class="mb-2">
+                  <div class="ai-classification-badge-doc" :class="getCategoryColor(getDocClassification(doc.id)!.category)">
+                    <i class="fas fa-wand-magic-sparkles text-[8px]"></i>
+                    <span>{{ getDocClassification(doc.id)!.category }}</span>
+                    <span class="ai-confidence-mini">{{ Math.round(getDocClassification(doc.id)!.confidence * 100) }}%</span>
+                  </div>
+                </div>
+
                 <!-- Meta Row -->
                 <div class="flex items-center justify-between pt-2 border-t border-gray-100">
                   <!-- Author -->
@@ -2705,5 +3031,138 @@ function getFileIconBg(type: string): string {
   border-radius: 2px;
   background: linear-gradient(90deg, #10b981, #14b8a6);
   transition: width 0.3s ease;
+}
+
+/* ============================================
+   AI FEATURES STYLES
+   ============================================ */
+
+/* AI Search Badge */
+.ai-search-badge-doc {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+  border-radius: 4px;
+  color: white;
+}
+
+/* AI Suggestions Dropdown */
+.ai-suggestions-dropdown-doc {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  background: white;
+  border-radius: 0.75rem;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  border: 1px solid #e2e8f0;
+  z-index: 50;
+  overflow: hidden;
+  animation: docSuggestionSlideIn 0.2s ease-out;
+}
+
+@keyframes docSuggestionSlideIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.ai-suggestions-header-doc {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: #f0fdfa;
+  border-bottom: 1px solid #ccfbf1;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #0d9488;
+}
+
+.ai-suggestions-list-doc {
+  padding: 0.5rem 0;
+}
+
+.ai-suggestion-item-doc {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.625rem 1rem;
+  background: none;
+  border: none;
+  text-align: left;
+  font-size: 0.875rem;
+  color: #334155;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.ai-suggestion-item-doc:hover {
+  background: #f0fdfa;
+  color: #0d9488;
+}
+
+.ai-suggestion-item-doc span {
+  flex: 1;
+}
+
+/* AI Powered Badge */
+.ai-powered-badge-doc {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.5rem;
+  background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 100%);
+  border: 1px solid #99f6e4;
+  border-radius: 100px;
+  font-size: 0.625rem;
+  font-weight: 600;
+  color: #0d9488;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* AI Folder Suggestion Card */
+.ai-folder-suggestion-card {
+  padding: 1rem;
+  background: #fafffe;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.75rem;
+  transition: all 0.2s ease;
+}
+
+.ai-folder-suggestion-card:hover {
+  border-color: #99f6e4;
+  box-shadow: 0 4px 12px rgba(20, 184, 166, 0.1);
+}
+
+/* AI Classification Badge */
+.ai-classification-badge-doc {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.375rem;
+  font-size: 0.625rem;
+  font-weight: 600;
+  border: 1px solid;
+}
+
+.ai-confidence-mini {
+  padding: 0.125rem 0.25rem;
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 0.25rem;
+  font-size: 0.5625rem;
+  font-weight: 700;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .ai-suggestions-dropdown-doc {
+    left: -1rem;
+    right: -1rem;
+  }
 }
 </style>

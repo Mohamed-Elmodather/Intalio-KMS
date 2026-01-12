@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
+import { useAIServicesStore } from '@/stores/aiServices'
+import { AILoadingIndicator, AIConfidenceBar } from '@/components/ai'
+
+const aiStore = useAIServicesStore()
 
 // Loading state
 const isLoading = ref(false)
@@ -22,6 +26,7 @@ const currentUser = ref({
 // Tabs configuration
 const tabs = ref([
   { id: 'account', label: 'Account', icon: 'fas fa-user' },
+  { id: 'ai', label: 'AI Settings', icon: 'fas fa-wand-magic-sparkles' },
   { id: 'notifications', label: 'Notifications', icon: 'fas fa-bell' },
   { id: 'privacy', label: 'Privacy', icon: 'fas fa-shield-alt' },
   { id: 'appearance', label: 'Appearance', icon: 'fas fa-palette' },
@@ -137,6 +142,185 @@ const connectedApps = ref([
   { id: 3, name: 'Slack', icon: 'fab fa-slack', bg: 'bg-purple-100', color: 'text-purple-600', connectedDate: 'Aug 2024' }
 ])
 
+// ==================== AI SETTINGS ====================
+
+// AI Settings State
+const showAITestModal = ref(false)
+const isTestingAI = ref(false)
+const aiTestResults = ref<AITestResult | null>(null)
+
+// AI Settings Interfaces
+interface AITestResult {
+  service: string
+  status: 'success' | 'error'
+  responseTime: number
+  message: string
+}
+
+interface AIFeatureToggle {
+  id: string
+  label: string
+  description: string
+  enabled: boolean
+  icon: string
+}
+
+interface AITranslationLanguage {
+  code: string
+  name: string
+  nativeName: string
+}
+
+// AI Feature Toggles
+const aiFeatureToggles = ref<AIFeatureToggle[]>([
+  {
+    id: 'suggestions',
+    label: 'Smart Suggestions',
+    description: 'Get AI-powered suggestions while creating content',
+    enabled: true,
+    icon: 'fas fa-lightbulb'
+  },
+  {
+    id: 'summarization',
+    label: 'Auto Summarization',
+    description: 'Automatically generate summaries for long content',
+    enabled: true,
+    icon: 'fas fa-compress-alt'
+  },
+  {
+    id: 'translation',
+    label: 'AI Translation',
+    description: 'Translate content to different languages using AI',
+    enabled: true,
+    icon: 'fas fa-language'
+  },
+  {
+    id: 'chatbot',
+    label: 'AI Assistant Chat',
+    description: 'Enable the AI chatbot for questions and assistance',
+    enabled: true,
+    icon: 'fas fa-robot'
+  },
+  {
+    id: 'classification',
+    label: 'Auto Classification',
+    description: 'Automatically categorize and tag uploaded content',
+    enabled: true,
+    icon: 'fas fa-tags'
+  },
+  {
+    id: 'ocr',
+    label: 'Document OCR',
+    description: 'Extract text from images and scanned documents',
+    enabled: true,
+    icon: 'fas fa-file-image'
+  },
+  {
+    id: 'sentiment',
+    label: 'Sentiment Analysis',
+    description: 'Analyze emotional tone in feedback and comments',
+    enabled: false,
+    icon: 'fas fa-smile'
+  },
+  {
+    id: 'recommendations',
+    label: 'Personalized Recommendations',
+    description: 'Get AI-powered content recommendations based on your activity',
+    enabled: true,
+    icon: 'fas fa-star'
+  }
+])
+
+// AI Translation Languages
+const aiTranslationLanguages = ref<AITranslationLanguage[]>([
+  { code: 'en', name: 'English', nativeName: 'English' },
+  { code: 'ar', name: 'Arabic', nativeName: 'العربية' },
+  { code: 'fr', name: 'French', nativeName: 'Français' },
+  { code: 'es', name: 'Spanish', nativeName: 'Español' },
+  { code: 'de', name: 'German', nativeName: 'Deutsch' },
+  { code: 'zh', name: 'Chinese', nativeName: '中文' },
+  { code: 'ja', name: 'Japanese', nativeName: '日本語' },
+  { code: 'ko', name: 'Korean', nativeName: '한국어' },
+  { code: 'pt', name: 'Portuguese', nativeName: 'Português' },
+  { code: 'ru', name: 'Russian', nativeName: 'Русский' }
+])
+
+// AI Preferences
+const aiPreferences = ref({
+  defaultTranslationLanguage: 'ar',
+  summaryLength: 'medium',
+  confidenceThreshold: 0.7,
+  autoApplySuggestions: false,
+  showConfidenceScores: true,
+  dataUsageConsent: true
+})
+
+// Summary Length Options
+const summaryLengthOptions = ref([
+  { id: 'brief', label: 'Brief', description: '2-3 sentences' },
+  { id: 'medium', label: 'Medium', description: '1-2 paragraphs' },
+  { id: 'detailed', label: 'Detailed', description: 'Comprehensive summary' }
+])
+
+// AI Usage Stats (Mock)
+const aiUsageStats = ref({
+  summariesGenerated: 156,
+  translationsPerformed: 89,
+  documentsScanned: 42,
+  chatMessages: 324,
+  suggestionsAccepted: 78,
+  lastUsed: '2 hours ago'
+})
+
+// AI Functions
+async function testAIConnection() {
+  isTestingAI.value = true
+  showAITestModal.value = true
+  aiTestResults.value = null
+
+  try {
+    await new Promise(resolve => setTimeout(resolve, 1500))
+    aiTestResults.value = {
+      service: 'Intalio AI Engine',
+      status: 'success',
+      responseTime: 245,
+      message: 'All AI services are operational and responding normally.'
+    }
+  } catch (error) {
+    aiTestResults.value = {
+      service: 'Intalio AI Engine',
+      status: 'error',
+      responseTime: 0,
+      message: 'Failed to connect to AI services. Please try again later.'
+    }
+  } finally {
+    isTestingAI.value = false
+  }
+}
+
+function saveAISettings() {
+  alert('AI settings saved successfully!')
+}
+
+function resetAISettings() {
+  aiFeatureToggles.value.forEach(toggle => toggle.enabled = true)
+  aiPreferences.value = {
+    defaultTranslationLanguage: 'ar',
+    summaryLength: 'medium',
+    confidenceThreshold: 0.7,
+    autoApplySuggestions: false,
+    showConfidenceScores: true,
+    dataUsageConsent: true
+  }
+  alert('AI settings reset to defaults!')
+}
+
+function clearAIHistory() {
+  if (confirm('Are you sure you want to clear your AI interaction history? This action cannot be undone.')) {
+    alert('AI history cleared successfully!')
+  }
+}
+
 // Methods
 function changePassword() {
   showChangePassword.value = false
@@ -242,6 +426,217 @@ function changePassword() {
                 <button class="btn btn-secondary ripple">Cancel</button>
                 <button class="btn-vibrant ripple">Save Changes</button>
               </div>
+            </div>
+          </div>
+
+          <!-- AI Settings -->
+          <div v-if="activeTab === 'ai'" class="space-y-6">
+            <!-- AI Settings Header Card -->
+            <div class="card-animated rounded-2xl overflow-hidden fade-in-up" style="animation-delay: 0.2s;">
+              <div class="p-6 bg-gradient-to-r from-teal-500 to-emerald-500">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-4">
+                    <div class="w-14 h-14 bg-white/20 backdrop-blur rounded-2xl flex items-center justify-center">
+                      <i class="fas fa-wand-magic-sparkles text-white text-2xl"></i>
+                    </div>
+                    <div>
+                      <h2 class="text-xl font-semibold text-white">AI Settings</h2>
+                      <p class="text-teal-100">Manage your AI features and preferences</p>
+                    </div>
+                  </div>
+                  <button @click="testAIConnection"
+                          class="px-4 py-2 bg-white/20 backdrop-blur text-white rounded-xl font-medium text-sm hover:bg-white/30 transition-all flex items-center gap-2">
+                    <i class="fas fa-plug"></i>
+                    Test Connection
+                  </button>
+                </div>
+
+                <!-- AI Usage Stats -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
+                  <div class="bg-white/10 backdrop-blur rounded-xl p-3 text-center">
+                    <p class="text-2xl font-bold text-white">{{ aiUsageStats.summariesGenerated }}</p>
+                    <p class="text-xs text-teal-100">Summaries</p>
+                  </div>
+                  <div class="bg-white/10 backdrop-blur rounded-xl p-3 text-center">
+                    <p class="text-2xl font-bold text-white">{{ aiUsageStats.translationsPerformed }}</p>
+                    <p class="text-xs text-teal-100">Translations</p>
+                  </div>
+                  <div class="bg-white/10 backdrop-blur rounded-xl p-3 text-center">
+                    <p class="text-2xl font-bold text-white">{{ aiUsageStats.chatMessages }}</p>
+                    <p class="text-xs text-teal-100">Chat Messages</p>
+                  </div>
+                  <div class="bg-white/10 backdrop-blur rounded-xl p-3 text-center">
+                    <p class="text-2xl font-bold text-white">{{ aiUsageStats.documentsScanned }}</p>
+                    <p class="text-xs text-teal-100">OCR Scans</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- AI Feature Toggles -->
+            <div class="card-animated rounded-2xl overflow-hidden fade-in-up" style="animation-delay: 0.3s;">
+              <div class="p-6 border-b border-teal-100">
+                <h3 class="text-lg font-semibold text-teal-900">AI Features</h3>
+                <p class="text-sm text-teal-500">Enable or disable specific AI capabilities</p>
+              </div>
+              <div class="p-6 space-y-4">
+                <div v-for="feature in aiFeatureToggles" :key="feature.id"
+                     class="flex items-center justify-between py-3 border-b border-teal-100 last:border-0 list-item-animated">
+                  <div class="flex items-center gap-4">
+                    <div class="w-10 h-10 rounded-xl bg-teal-100 flex items-center justify-center">
+                      <i :class="[feature.icon, 'text-teal-600']"></i>
+                    </div>
+                    <div>
+                      <p class="font-medium text-teal-800">{{ feature.label }}</p>
+                      <p class="text-sm text-teal-500">{{ feature.description }}</p>
+                    </div>
+                  </div>
+                  <label class="toggle">
+                    <input type="checkbox" v-model="feature.enabled">
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <!-- Translation Preferences -->
+            <div class="card-animated rounded-2xl overflow-hidden fade-in-up" style="animation-delay: 0.4s;">
+              <div class="p-6 border-b border-teal-100">
+                <h3 class="text-lg font-semibold text-teal-900">Translation Preferences</h3>
+                <p class="text-sm text-teal-500">Configure your preferred languages for AI translation</p>
+              </div>
+              <div class="p-6 space-y-6">
+                <div>
+                  <label class="block text-sm font-medium text-teal-700 mb-2">Default Translation Language</label>
+                  <select v-model="aiPreferences.defaultTranslationLanguage" class="input">
+                    <option v-for="lang in aiTranslationLanguages" :key="lang.code" :value="lang.code">
+                      {{ lang.name }} ({{ lang.nativeName }})
+                    </option>
+                  </select>
+                  <p class="text-xs text-teal-500 mt-1">Content will be translated to this language by default</p>
+                </div>
+
+                <div>
+                  <label class="block text-sm font-medium text-teal-700 mb-3">Preferred Summary Length</label>
+                  <div class="grid grid-cols-3 gap-4">
+                    <label v-for="option in summaryLengthOptions" :key="option.id"
+                           :class="[
+                             'p-4 rounded-xl border-2 cursor-pointer transition-all text-center ripple',
+                             aiPreferences.summaryLength === option.id ? 'border-teal-500 bg-teal-50' : 'border-teal-100 hover:border-teal-200'
+                           ]">
+                      <input type="radio" v-model="aiPreferences.summaryLength" :value="option.id" class="hidden">
+                      <p class="font-medium" :class="aiPreferences.summaryLength === option.id ? 'text-teal-700' : 'text-teal-500'">{{ option.label }}</p>
+                      <p class="text-xs text-teal-400 mt-1">{{ option.description }}</p>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- AI Behavior Preferences -->
+            <div class="card-animated rounded-2xl overflow-hidden fade-in-up" style="animation-delay: 0.5s;">
+              <div class="p-6 border-b border-teal-100">
+                <h3 class="text-lg font-semibold text-teal-900">AI Behavior</h3>
+                <p class="text-sm text-teal-500">Customize how AI features work for you</p>
+              </div>
+              <div class="p-6 space-y-6">
+                <!-- Confidence Threshold -->
+                <div>
+                  <div class="flex items-center justify-between mb-2">
+                    <label class="text-sm font-medium text-teal-700">Confidence Threshold</label>
+                    <span class="text-sm font-medium text-teal-600">{{ Math.round(aiPreferences.confidenceThreshold * 100) }}%</span>
+                  </div>
+                  <input type="range" v-model.number="aiPreferences.confidenceThreshold" min="0.5" max="0.95" step="0.05"
+                         class="w-full h-2 bg-teal-100 rounded-lg appearance-none cursor-pointer">
+                  <p class="text-xs text-teal-500 mt-1">Only show AI suggestions with confidence above this threshold</p>
+                </div>
+
+                <!-- Toggle Preferences -->
+                <div class="space-y-4">
+                  <div class="flex items-center justify-between py-3 border-b border-teal-100">
+                    <div>
+                      <p class="font-medium text-teal-800">Show Confidence Scores</p>
+                      <p class="text-sm text-teal-500">Display AI confidence levels on suggestions</p>
+                    </div>
+                    <label class="toggle">
+                      <input type="checkbox" v-model="aiPreferences.showConfidenceScores">
+                      <span class="toggle-slider"></span>
+                    </label>
+                  </div>
+
+                  <div class="flex items-center justify-between py-3 border-b border-teal-100">
+                    <div>
+                      <p class="font-medium text-teal-800">Auto-Apply Suggestions</p>
+                      <p class="text-sm text-teal-500">Automatically apply high-confidence suggestions</p>
+                    </div>
+                    <label class="toggle">
+                      <input type="checkbox" v-model="aiPreferences.autoApplySuggestions">
+                      <span class="toggle-slider"></span>
+                    </label>
+                  </div>
+
+                  <div class="flex items-center justify-between py-3">
+                    <div>
+                      <p class="font-medium text-teal-800">AI Data Usage Consent</p>
+                      <p class="text-sm text-teal-500">Allow your interactions to improve AI models</p>
+                    </div>
+                    <label class="toggle">
+                      <input type="checkbox" v-model="aiPreferences.dataUsageConsent">
+                      <span class="toggle-slider"></span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Data & Privacy -->
+            <div class="card-animated rounded-2xl overflow-hidden fade-in-up" style="animation-delay: 0.6s;">
+              <div class="p-6 border-b border-teal-100">
+                <h3 class="text-lg font-semibold text-teal-900">AI Data & Privacy</h3>
+                <p class="text-sm text-teal-500">Manage your AI interaction data</p>
+              </div>
+              <div class="p-6 space-y-4">
+                <div class="p-4 bg-teal-50 rounded-xl">
+                  <div class="flex items-start gap-4">
+                    <div class="w-10 h-10 rounded-xl bg-teal-100 flex items-center justify-center flex-shrink-0">
+                      <i class="fas fa-database text-teal-600"></i>
+                    </div>
+                    <div class="flex-1">
+                      <p class="font-medium text-teal-900">AI Interaction History</p>
+                      <p class="text-sm text-teal-600 mb-3">Your AI chat history, summaries, and translations are stored locally for personalization.</p>
+                      <div class="flex gap-3">
+                        <button class="px-4 py-2 text-sm font-medium text-teal-600 bg-white rounded-lg hover:bg-teal-100 transition-colors">
+                          <i class="fas fa-download mr-2"></i>Export Data
+                        </button>
+                        <button @click="clearAIHistory"
+                                class="px-4 py-2 text-sm font-medium text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition-colors">
+                          <i class="fas fa-trash mr-2"></i>Clear History
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="p-4 bg-blue-50 rounded-xl border border-blue-200">
+                  <div class="flex items-start gap-3">
+                    <i class="fas fa-info-circle text-blue-500 mt-0.5"></i>
+                    <div>
+                      <p class="text-sm text-blue-800 font-medium">About Your AI Data</p>
+                      <p class="text-sm text-blue-600 mt-1">Your AI interactions are processed securely by the Intalio AI Engine. Personal data is never shared with third parties without your explicit consent.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="flex justify-end gap-3 pt-4">
+              <button @click="resetAISettings" class="btn btn-secondary ripple">
+                <i class="fas fa-undo mr-2"></i>Reset to Defaults
+              </button>
+              <button @click="saveAISettings" class="btn-vibrant ripple">
+                <i class="fas fa-check mr-2"></i>Save AI Settings
+              </button>
             </div>
           </div>
 
@@ -589,6 +984,96 @@ function changePassword() {
         </form>
       </div>
     </div>
+
+    <!-- AI Connection Test Modal -->
+    <Teleport to="body">
+      <div v-if="showAITestModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+          <div class="p-6 border-b border-gray-100">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-gradient-to-br from-teal-500 to-emerald-500 rounded-xl flex items-center justify-center">
+                  <i class="fas fa-plug text-white"></i>
+                </div>
+                <div>
+                  <h3 class="text-lg font-semibold text-gray-900">AI Connection Test</h3>
+                  <p class="text-sm text-gray-500">Testing Intalio AI Engine connection</p>
+                </div>
+              </div>
+              <button @click="showAITestModal = false" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                <i class="fas fa-times text-gray-400"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="p-6">
+            <div v-if="isTestingAI" class="text-center py-8">
+              <div class="w-16 h-16 mx-auto mb-4 relative">
+                <div class="absolute inset-0 border-4 border-teal-200 rounded-full"></div>
+                <div class="absolute inset-0 border-4 border-teal-500 rounded-full border-t-transparent animate-spin"></div>
+              </div>
+              <p class="text-gray-600">Testing connection to AI services...</p>
+            </div>
+
+            <div v-else-if="aiTestResults" class="space-y-4">
+              <!-- Status -->
+              <div :class="[
+                'p-4 rounded-xl flex items-center gap-4',
+                aiTestResults.status === 'success' ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'
+              ]">
+                <div :class="[
+                  'w-12 h-12 rounded-full flex items-center justify-center',
+                  aiTestResults.status === 'success' ? 'bg-green-100' : 'bg-red-100'
+                ]">
+                  <i :class="[
+                    'text-xl',
+                    aiTestResults.status === 'success' ? 'fas fa-check text-green-600' : 'fas fa-times text-red-600'
+                  ]"></i>
+                </div>
+                <div>
+                  <p :class="[
+                    'font-semibold',
+                    aiTestResults.status === 'success' ? 'text-green-800' : 'text-red-800'
+                  ]">
+                    {{ aiTestResults.status === 'success' ? 'Connection Successful' : 'Connection Failed' }}
+                  </p>
+                  <p :class="aiTestResults.status === 'success' ? 'text-green-600' : 'text-red-600'" class="text-sm">
+                    {{ aiTestResults.message }}
+                  </p>
+                </div>
+              </div>
+
+              <!-- Details -->
+              <div v-if="aiTestResults.status === 'success'" class="space-y-3">
+                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <span class="text-sm text-gray-600">Service</span>
+                  <span class="text-sm font-medium text-gray-900">{{ aiTestResults.service }}</span>
+                </div>
+                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <span class="text-sm text-gray-600">Response Time</span>
+                  <span class="text-sm font-medium text-green-600">{{ aiTestResults.responseTime }}ms</span>
+                </div>
+                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <span class="text-sm text-gray-600">Status</span>
+                  <span class="px-2 py-1 text-xs font-medium bg-green-100 text-green-700 rounded-full">Operational</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="p-4 border-t border-gray-100 flex justify-end gap-3">
+            <button @click="testAIConnection"
+                    class="px-4 py-2 text-teal-600 hover:bg-teal-50 rounded-lg transition-colors flex items-center gap-2">
+              <i class="fas fa-rotate"></i> Test Again
+            </button>
+            <button @click="showAITestModal = false"
+                    class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </Teleport>
   </div>
 </template>
 

@@ -1,9 +1,27 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import { useAIServicesStore } from '@/stores/aiServices'
+import {
+  AILoadingIndicator,
+  AIConfidenceBar,
+  AIEntityHighlight,
+  AITranslateDropdown,
+  AIActionButton,
+  AIResultCard
+} from '@/components/ai'
+import type {
+  SummarizationResult,
+  TranslationResult,
+  NERResult,
+  OCRResult,
+  SupportedLanguage,
+  NamedEntity
+} from '@/types/ai'
 
 const router = useRouter()
 const route = useRoute()
+const aiStore = useAIServicesStore()
 
 const isLoading = ref(true)
 const document = ref<any>(null)
@@ -187,6 +205,625 @@ const relatedDocuments = computed(() => {
   if (!document.value) return []
   return mockDocuments.filter(d => d.id !== document.value.id).slice(0, 3)
 })
+
+// ============================================================================
+// AI Features State
+// ============================================================================
+
+const showAIPanel = ref(true)
+const activeAITab = ref<'summary' | 'entities' | 'translate' | 'ocr'>('summary')
+
+// Summary state
+const documentSummary = ref<SummarizationResult | null>(null)
+const isLoadingSummary = ref(false)
+const summaryType = ref<'brief' | 'detailed' | 'bullet-points'>('brief')
+
+// Entity extraction state
+const extractedEntities = ref<NERResult | null>(null)
+const isLoadingEntities = ref(false)
+const highlightedEntityType = ref<string | null>(null)
+
+// Translation state
+const translatedContent = ref<TranslationResult | null>(null)
+const isLoadingTranslation = ref(false)
+const targetLanguage = ref<SupportedLanguage>('ar')
+
+// OCR state
+const ocrResult = ref<OCRResult | null>(null)
+const isLoadingOCR = ref(false)
+const ocrConfidence = ref(0)
+
+// Mock document content for AI analysis
+const mockDocumentContent: Record<number, string> = {
+  1: `AFC Asian Cup 2027 Saudi Arabia - Complete Tournament Schedule
+
+The AFC Asian Cup 2027 will be hosted across five world-class stadiums in Saudi Arabia from January 10 to February 10, 2027. This prestigious tournament will feature 24 teams competing in 51 matches across the group stage and knockout rounds.
+
+Group Stage Overview:
+- 6 groups of 4 teams each
+- Top 2 teams from each group advance to knockout rounds
+- Best 4 third-placed teams also qualify
+
+Key Venues:
+1. King Fahd International Stadium, Riyadh (Capacity: 68,000) - Opening Match & Final
+2. King Abdullah Sports City, Jeddah (Capacity: 62,000) - Semi-finals
+3. Prince Mohamed bin Fahd Stadium, Dammam (Capacity: 35,000)
+4. King Saud University Stadium, Riyadh (Capacity: 25,000)
+5. Prince Abdullah Al Faisal Stadium, Jeddah (Capacity: 24,000)
+
+Tournament Timeline:
+- Group Stage: January 10-22, 2027
+- Round of 16: January 25-28, 2027
+- Quarter-finals: January 31 - February 1, 2027
+- Semi-finals: February 5-6, 2027
+- Third Place Match: February 9, 2027
+- Final: February 10, 2027
+
+The opening match will feature host nation Saudi Arabia at King Fahd International Stadium. The final will also be held at the same venue, with an expected global audience of over 1 billion viewers.
+
+Ticketing:
+- General sales begin March 2026
+- Priority access for AFC members
+- Stadium hospitality packages available
+
+Broadcast Partners:
+- beIN Sports (MENA region)
+- Various international broadcasters to be announced
+
+Contact: media@afc.com
+Official Website: www.afcasiancup2027.com`,
+
+  2: `Stadium Operations Manual - AFC Asian Cup 2027
+
+Version 3.0 - Last Updated: January 2024
+Prepared by: AFC Operations Team
+
+1. INTRODUCTION
+
+This comprehensive operations manual provides detailed guidelines for all stadium operations during the AFC Asian Cup 2027. All venue managers, security personnel, and event staff must familiarize themselves with these procedures.
+
+2. SECURITY PROTOCOLS
+
+2.1 Access Control
+- All personnel must display valid accreditation at all times
+- Biometric verification required for restricted areas
+- Vehicle screening at all entry points
+- Prohibited items include: weapons, drones, fireworks, alcohol
+
+2.2 Emergency Procedures
+- Evacuation routes clearly marked in multiple languages
+- Medical stations located at Gates A, C, E, and G
+- Coordination with local emergency services
+- Crisis communication protocols
+
+3. EVENT MANAGEMENT
+
+3.1 Match Day Timeline
+- T-6 hours: Final security sweep
+- T-4 hours: Staff briefing
+- T-3 hours: Gates open for hospitality
+- T-2 hours: General admission
+- T-30 min: Team arrivals
+- T-0: Kickoff
+
+3.2 Crowd Management
+- Maximum capacity management
+- Flow control through designated pathways
+- VIP and media access coordination
+- Accessibility services
+
+4. FACILITY OPERATIONS
+
+4.1 Pitch Management
+- FIFA quality certification requirements
+- Pre-match preparation procedures
+- Weather contingency plans
+
+4.2 Broadcast Requirements
+- Camera positions and power supplies
+- Commentary positions
+- Media mixed zone operations
+
+5. VENDOR MANAGEMENT
+
+- Approved catering providers only
+- Cash and digital payment systems
+- Food safety compliance
+- Merchandising guidelines
+
+For emergency contacts, see Appendix A.
+Document Classification: CONFIDENTIAL`,
+
+  3: `AFC Asian Cup 2027 - Team Statistics Database
+
+Participating Nations Statistics Overview
+
+EAST ASIA
+- Japan: FIFA Ranking #17, 4x AFC Asian Cup winners
+- South Korea: FIFA Ranking #23, 2x AFC Asian Cup winners
+- China PR: FIFA Ranking #79, Host 2004
+- Australia: FIFA Ranking #25, 1x AFC Asian Cup winner (2015)
+
+WEST ASIA
+- Iran: FIFA Ranking #21, 3x AFC Asian Cup winners
+- Saudi Arabia: FIFA Ranking #56, Host 2027, 3x AFC Asian Cup winners
+- Iraq: FIFA Ranking #68, 1x AFC Asian Cup winner (2007)
+- Qatar: FIFA Ranking #37, 1x AFC Asian Cup winner (2019), FIFA World Cup 2022 Host
+- UAE: FIFA Ranking #69
+- Jordan: FIFA Ranking #87
+- Syria: FIFA Ranking #93
+- Palestine: FIFA Ranking #95
+- Lebanon: FIFA Ranking #99
+- Oman: FIFA Ranking #75
+- Bahrain: FIFA Ranking #86
+- Kuwait: FIFA Ranking #137
+
+SOUTH ASIA
+- India: FIFA Ranking #101
+- Pakistan: FIFA Ranking #193
+
+CENTRAL ASIA
+- Uzbekistan: FIFA Ranking #73
+- Tajikistan: FIFA Ranking #106
+- Kyrgyzstan: FIFA Ranking #95
+
+SOUTHEAST ASIA
+- Vietnam: FIFA Ranking #94
+- Thailand: FIFA Ranking #113
+- Indonesia: FIFA Ranking #134
+- Malaysia: FIFA Ranking #130
+
+Historical Performance Data:
+- Total matches played in Asian Cup history: 589
+- Total goals scored: 1,847
+- Average goals per match: 3.14
+- Largest victory: Iran 19-0 Maldives (1998)`,
+
+  4: `AFC Asian Cup 2027 Opening Ceremony Plan
+
+CONFIDENTIAL - Events Team Internal Document
+
+Theme: "Unity Through Football"
+
+Ceremony Duration: 90 minutes (18:00 - 19:30 local time)
+Kickoff: 20:00
+
+SEGMENT BREAKDOWN:
+
+1. WELCOME (15 minutes)
+- Countdown video on giant screens
+- Fireworks display
+- Parade of flags (24 participating nations)
+- Traditional Saudi welcome performance
+
+2. CULTURAL SHOWCASE (25 minutes)
+- "Journey Through Arabia" dance performance (300 performers)
+- Holographic display of football heritage
+- Traditional music fusion with contemporary beats
+- Guest appearance: International music artists (TBA)
+
+3. OFFICIAL PROTOCOL (20 minutes)
+- Entry of dignitaries
+- Speech by AFC President
+- Speech by Saudi Arabia Sports Minister
+- Ceremonial trophy presentation
+
+4. ENTERTAINMENT FINALE (20 minutes)
+- International superstar performance (Artist TBA)
+- Drone light show (500 drones)
+- Fireworks finale
+
+5. TEAM PRESENTATION (10 minutes)
+- All 24 teams enter stadium
+- National anthems (Saudi Arabia)
+- Referee team introduction
+
+TECHNICAL REQUIREMENTS:
+- 12 LED screens (various sizes)
+- 2,500 lighting fixtures
+- 500 synchronized drones
+- Pyrotechnics certified
+- Sound system: 360-degree coverage
+
+REHEARSAL SCHEDULE:
+- Technical rehearsal: January 5-7, 2027
+- Dress rehearsal: January 8, 2027
+- Final rehearsal: January 9, 2027
+
+BUDGET: SAR 75,000,000 (approx. USD 20 million)
+
+Contact: events@afc2027.sa`
+}
+
+// ============================================================================
+// AI Functions
+// ============================================================================
+
+async function generateSummary() {
+  if (!document.value || isLoadingSummary.value) return
+
+  isLoadingSummary.value = true
+  documentSummary.value = null
+
+  try {
+    // Simulate API call with mock data
+    await new Promise(resolve => setTimeout(resolve, 1200))
+
+    const content = mockDocumentContent[document.value.id] || document.value.description
+    const summaries: Record<string, Record<string, SummarizationResult>> = {
+      '1': {
+        brief: {
+          summary: 'The AFC Asian Cup 2027 will be hosted in Saudi Arabia from January 10 to February 10, featuring 24 teams in 51 matches across 5 stadiums. The tournament includes group stages and knockout rounds, with the final at King Fahd International Stadium.',
+          keyPoints: [
+            '24 teams competing in 51 matches',
+            '5 world-class venues across Saudi Arabia',
+            'Group Stage: Jan 10-22, Knockout: Jan 25 - Feb 10',
+            'Expected global audience of 1 billion viewers'
+          ],
+          wordCount: content.split(' ').length,
+          processingTime: 1.2,
+          confidence: 0.94
+        },
+        detailed: {
+          summary: 'The AFC Asian Cup 2027 represents a landmark football tournament hosted across Saudi Arabia from January 10 to February 10, 2027. The competition will showcase 24 of Asia\'s finest national teams competing in 51 matches across five premier stadiums. The tournament structure comprises a group stage with 6 groups of 4 teams, followed by a knockout phase. Key venues include King Fahd International Stadium (68,000 capacity) for the opening and final, and King Abdullah Sports City for semi-finals. The event anticipates over 1 billion global viewers, with ticket sales beginning March 2026.',
+          keyPoints: [
+            '24 participating nations in 6 groups',
+            'King Fahd International Stadium hosts opening and final',
+            'Group stage runs January 10-22, knockout phase follows',
+            'Semi-finals at King Abdullah Sports City, Jeddah',
+            'Global broadcast through beIN Sports and partners',
+            'Ticket sales open March 2026 with AFC priority access'
+          ],
+          wordCount: content.split(' ').length,
+          processingTime: 1.8,
+          confidence: 0.96
+        },
+        'bullet-points': {
+          summary: '• Tournament: AFC Asian Cup 2027\n• Host: Saudi Arabia\n• Dates: January 10 - February 10, 2027\n• Teams: 24 nations\n• Matches: 51 total\n• Main Venue: King Fahd International Stadium\n• Capacity: Up to 68,000\n• Broadcast: beIN Sports (MENA)',
+          keyPoints: [
+            '6 groups of 4 teams each',
+            'Top 2 plus best 4 third-placed teams advance',
+            '5 stadium venues across Saudi Arabia',
+            'Final expected to draw 1B+ viewers'
+          ],
+          wordCount: content.split(' ').length,
+          processingTime: 0.9,
+          confidence: 0.92
+        }
+      },
+      '2': {
+        brief: {
+          summary: 'Comprehensive stadium operations manual covering security protocols, event management procedures, and facility operations for AFC Asian Cup 2027 venues. Includes access control, emergency procedures, and broadcast requirements.',
+          keyPoints: [
+            'Security protocols with biometric verification',
+            'Match day timeline from T-6 hours',
+            'Emergency and evacuation procedures',
+            'FIFA pitch certification requirements'
+          ],
+          wordCount: content.split(' ').length,
+          processingTime: 1.1,
+          confidence: 0.93
+        },
+        detailed: {
+          summary: 'This Version 3.0 operations manual provides exhaustive guidelines for AFC Asian Cup 2027 stadium management. Security measures include biometric access control, vehicle screening, and prohibition of weapons, drones, and alcohol. Match day operations follow a strict timeline beginning 6 hours before kickoff with security sweeps, followed by staff briefings, hospitality opening, and general admission. Emergency protocols coordinate with local services and maintain medical stations at multiple gates. Facility operations cover FIFA pitch certification, weather contingencies, and broadcast infrastructure requirements.',
+          keyPoints: [
+            'Mandatory accreditation with biometric verification',
+            'Comprehensive prohibited items list',
+            'Medical stations at Gates A, C, E, and G',
+            'Match day timeline from T-6 hours to kickoff',
+            'VIP, media, and accessibility coordination',
+            'FIFA quality pitch certification required'
+          ],
+          wordCount: content.split(' ').length,
+          processingTime: 1.9,
+          confidence: 0.95
+        },
+        'bullet-points': {
+          summary: '• Document: Stadium Operations Manual v3.0\n• Security: Biometric + vehicle screening\n• Access: Valid accreditation required\n• Match Day: Timeline starts T-6 hours\n• Medical: Stations at Gates A, C, E, G\n• Pitch: FIFA certified\n• Classification: CONFIDENTIAL',
+          keyPoints: [
+            'Emergency evacuation routes in multiple languages',
+            'Approved vendors and catering only',
+            'Crowd flow control through designated paths',
+            'Broadcast camera positions specified'
+          ],
+          wordCount: content.split(' ').length,
+          processingTime: 0.8,
+          confidence: 0.91
+        }
+      }
+    }
+
+    const docId = document.value.id.toString()
+    const mockResult = summaries[docId]?.[summaryType.value] || {
+      summary: `Summary of ${document.value.name}: ${document.value.description}`,
+      keyPoints: ['Key information extracted from document', 'Important points highlighted', 'Main topics identified'],
+      wordCount: document.value.description.split(' ').length,
+      processingTime: 1.0,
+      confidence: 0.85
+    }
+
+    documentSummary.value = mockResult
+  } catch (error) {
+    console.error('Failed to generate summary:', error)
+  } finally {
+    isLoadingSummary.value = false
+  }
+}
+
+async function extractDocumentEntities() {
+  if (!document.value || isLoadingEntities.value) return
+
+  isLoadingEntities.value = true
+  extractedEntities.value = null
+
+  try {
+    await new Promise(resolve => setTimeout(resolve, 1000))
+
+    const mockEntities: Record<number, NERResult> = {
+      1: {
+        entities: [
+          { text: 'AFC Asian Cup 2027', type: 'event', confidence: 0.98, startOffset: 0, endOffset: 18 },
+          { text: 'Saudi Arabia', type: 'location', confidence: 0.97, startOffset: 45, endOffset: 57 },
+          { text: 'January 10', type: 'date', confidence: 0.96, startOffset: 90, endOffset: 100 },
+          { text: 'February 10, 2027', type: 'date', confidence: 0.96, startOffset: 104, endOffset: 121 },
+          { text: 'King Fahd International Stadium', type: 'location', confidence: 0.95, startOffset: 200, endOffset: 231 },
+          { text: 'Riyadh', type: 'location', confidence: 0.97, startOffset: 233, endOffset: 239 },
+          { text: 'King Abdullah Sports City', type: 'location', confidence: 0.94, startOffset: 280, endOffset: 305 },
+          { text: 'Jeddah', type: 'location', confidence: 0.97, startOffset: 307, endOffset: 313 },
+          { text: 'Dammam', type: 'location', confidence: 0.96, startOffset: 350, endOffset: 356 },
+          { text: 'beIN Sports', type: 'organization', confidence: 0.93, startOffset: 500, endOffset: 511 }
+        ],
+        processingTime: 1.0,
+        modelVersion: '2.1.0'
+      },
+      2: {
+        entities: [
+          { text: 'AFC Asian Cup 2027', type: 'event', confidence: 0.98, startOffset: 0, endOffset: 18 },
+          { text: 'AFC Operations Team', type: 'organization', confidence: 0.95, startOffset: 80, endOffset: 99 },
+          { text: 'January 2024', type: 'date', confidence: 0.94, startOffset: 45, endOffset: 57 },
+          { text: 'Gates A, C, E, G', type: 'location', confidence: 0.88, startOffset: 400, endOffset: 416 },
+          { text: 'FIFA', type: 'organization', confidence: 0.97, startOffset: 600, endOffset: 604 }
+        ],
+        processingTime: 0.9,
+        modelVersion: '2.1.0'
+      },
+      3: {
+        entities: [
+          { text: 'Japan', type: 'location', confidence: 0.98, startOffset: 50, endOffset: 55 },
+          { text: 'South Korea', type: 'location', confidence: 0.98, startOffset: 100, endOffset: 111 },
+          { text: 'China PR', type: 'location', confidence: 0.97, startOffset: 150, endOffset: 158 },
+          { text: 'Australia', type: 'location', confidence: 0.98, startOffset: 200, endOffset: 209 },
+          { text: 'Iran', type: 'location', confidence: 0.98, startOffset: 250, endOffset: 254 },
+          { text: 'Saudi Arabia', type: 'location', confidence: 0.98, startOffset: 300, endOffset: 312 },
+          { text: 'Qatar', type: 'location', confidence: 0.98, startOffset: 400, endOffset: 405 },
+          { text: 'FIFA World Cup 2022', type: 'event', confidence: 0.96, startOffset: 420, endOffset: 439 }
+        ],
+        processingTime: 1.1,
+        modelVersion: '2.1.0'
+      },
+      4: {
+        entities: [
+          { text: 'AFC Asian Cup 2027', type: 'event', confidence: 0.98, startOffset: 0, endOffset: 18 },
+          { text: 'AFC President', type: 'person', confidence: 0.89, startOffset: 400, endOffset: 413 },
+          { text: 'Saudi Arabia Sports Minister', type: 'person', confidence: 0.87, startOffset: 450, endOffset: 478 },
+          { text: 'January 5-7, 2027', type: 'date', confidence: 0.95, startOffset: 700, endOffset: 717 },
+          { text: 'January 8, 2027', type: 'date', confidence: 0.95, startOffset: 750, endOffset: 765 },
+          { text: 'January 9, 2027', type: 'date', confidence: 0.95, startOffset: 800, endOffset: 815 },
+          { text: 'SAR 75,000,000', type: 'money', confidence: 0.92, startOffset: 900, endOffset: 914 },
+          { text: 'USD 20 million', type: 'money', confidence: 0.91, startOffset: 920, endOffset: 934 }
+        ],
+        processingTime: 1.0,
+        modelVersion: '2.1.0'
+      }
+    }
+
+    extractedEntities.value = mockEntities[document.value.id] || {
+      entities: [
+        { text: document.value.author.name, type: 'organization', confidence: 0.9, startOffset: 0, endOffset: 10 }
+      ],
+      processingTime: 0.5,
+      modelVersion: '2.1.0'
+    }
+  } catch (error) {
+    console.error('Failed to extract entities:', error)
+  } finally {
+    isLoadingEntities.value = false
+  }
+}
+
+async function translateDocument(lang: SupportedLanguage) {
+  if (!document.value || isLoadingTranslation.value) return
+
+  targetLanguage.value = lang
+  isLoadingTranslation.value = true
+  translatedContent.value = null
+
+  try {
+    await new Promise(resolve => setTimeout(resolve, 1500))
+
+    const translations: Record<SupportedLanguage, Record<number, string>> = {
+      ar: {
+        1: 'كأس آسيا 2027 - جدول البطولة الكامل\n\nستقام بطولة كأس آسيا 2027 في المملكة العربية السعودية في الفترة من 10 يناير إلى 10 فبراير 2027. ستشهد البطولة مشاركة 24 منتخباً في 51 مباراة عبر خمسة ملاعب عالمية المستوى.',
+        2: 'دليل عمليات الاستاد - كأس آسيا 2027\n\nيوفر هذا الدليل الشامل إرشادات تفصيلية لجميع عمليات الاستاد خلال بطولة كأس آسيا 2027. يجب على جميع مديري الأماكن وأفراد الأمن والموظفين التعرف على هذه الإجراءات.',
+        3: 'قاعدة بيانات إحصائيات الفرق - كأس آسيا 2027\n\nنظرة عامة على إحصائيات الدول المشاركة\n\nشرق آسيا:\n- اليابان: التصنيف 17، 4 مرات بطل كأس آسيا\n- كوريا الجنوبية: التصنيف 23، مرتان بطل كأس آسيا',
+        4: 'خطة حفل الافتتاح - كأس آسيا 2027\n\nالموضوع: "الوحدة من خلال كرة القدم"\n\nمدة الحفل: 90 دقيقة\nالانطلاق: الساعة 20:00'
+      },
+      fr: {
+        1: 'Coupe d\'Asie de l\'AFC 2027 - Calendrier complet du tournoi\n\nLa Coupe d\'Asie de l\'AFC 2027 sera organisée en Arabie Saoudite du 10 janvier au 10 février 2027. Ce tournoi prestigieux mettra en vedette 24 équipes dans 51 matchs à travers cinq stades de classe mondiale.',
+        2: 'Manuel des opérations du stade - Coupe d\'Asie 2027\n\nCe manuel complet fournit des directives détaillées pour toutes les opérations du stade. Tout le personnel doit se familiariser avec ces procédures.',
+        3: 'Base de données des statistiques des équipes - Coupe d\'Asie 2027\n\nAperçu des statistiques des nations participantes\n\nAsie de l\'Est:\n- Japon: Classement FIFA #17, 4x vainqueur\n- Corée du Sud: Classement FIFA #23, 2x vainqueur',
+        4: 'Plan de la cérémonie d\'ouverture - Coupe d\'Asie 2027\n\nThème: "L\'unité par le football"\n\nDurée: 90 minutes\nCoup d\'envoi: 20h00'
+      },
+      es: {
+        1: 'Copa Asiática de la AFC 2027 - Calendario completo del torneo\n\nLa Copa Asiática de la AFC 2027 se celebrará en Arabia Saudita del 10 de enero al 10 de febrero de 2027. Este prestigioso torneo contará con 24 equipos en 51 partidos en cinco estadios de clase mundial.',
+        2: 'Manual de operaciones del estadio - Copa Asiática 2027\n\nEste manual completo proporciona pautas detalladas para todas las operaciones del estadio. Todo el personal debe familiarizarse con estos procedimientos.',
+        3: 'Base de datos de estadísticas de equipos - Copa Asiática 2027\n\nResumen de estadísticas de las naciones participantes\n\nAsia Oriental:\n- Japón: Ranking FIFA #17, 4 veces campeón\n- Corea del Sur: Ranking FIFA #23, 2 veces campeón',
+        4: 'Plan de ceremonia de apertura - Copa Asiática 2027\n\nTema: "Unidad a través del fútbol"\n\nDuración: 90 minutos\nInicio: 20:00'
+      },
+      zh: {
+        1: '2027年亚洲杯 - 完整赛程\n\n2027年亚洲杯将于2027年1月10日至2月10日在沙特阿拉伯举行。这项著名的赛事将有24支球队在5座世界级体育场进行51场比赛。',
+        2: '体育场运营手册 - 2027年亚洲杯\n\n本综合手册为所有体育场运营提供详细指南。所有场馆经理、安保人员和工作人员必须熟悉这些程序。',
+        3: '球队统计数据库 - 2027年亚洲杯\n\n参赛国家统计概览\n\n东亚：\n- 日本：FIFA排名第17，4次亚洲杯冠军\n- 韩国：FIFA排名第23，2次亚洲杯冠军',
+        4: '开幕式计划 - 2027年亚洲杯\n\n主题："足球带来的团结"\n\n时长：90分钟\n开球时间：20:00'
+      },
+      ja: {
+        1: 'AFCアジアカップ2027 - 大会日程\n\nAFCアジアカップ2027は、2027年1月10日から2月10日までサウジアラビアで開催されます。24チームが5つのワールドクラスのスタジアムで51試合を行います。',
+        2: 'スタジアム運営マニュアル - アジアカップ2027\n\nこの包括的なマニュアルは、すべてのスタジアム運営の詳細なガイドラインを提供します。すべてのスタッフはこれらの手順を熟知する必要があります。',
+        3: 'チーム統計データベース - アジアカップ2027\n\n参加国統計概要\n\n東アジア：\n- 日本：FIFAランキング17位、4回優勝\n- 韓国：FIFAランキング23位、2回優勝',
+        4: '開会式計画 - アジアカップ2027\n\nテーマ：「サッカーを通じた団結」\n\n所要時間：90分\nキックオフ：20:00'
+      },
+      de: {
+        1: 'AFC Asien-Pokal 2027 - Vollständiger Turnierplan\n\nDer AFC Asien-Pokal 2027 wird vom 10. Januar bis 10. Februar 2027 in Saudi-Arabien ausgetragen. 24 Mannschaften werden in 51 Spielen in fünf Weltklasse-Stadien antreten.',
+        2: 'Stadion-Betriebshandbuch - Asien-Pokal 2027\n\nDieses umfassende Handbuch enthält detaillierte Richtlinien für alle Stadionbetriebe. Alle Mitarbeiter müssen sich mit diesen Verfahren vertraut machen.',
+        3: 'Team-Statistik-Datenbank - Asien-Pokal 2027\n\nStatistik-Übersicht der teilnehmenden Nationen\n\nOstasien:\n- Japan: FIFA-Ranking #17, 4x Sieger\n- Südkorea: FIFA-Ranking #23, 2x Sieger',
+        4: 'Eröffnungszeremonie Plan - Asien-Pokal 2027\n\nThema: "Einheit durch Fußball"\n\nDauer: 90 Minuten\nAnstoß: 20:00 Uhr'
+      },
+      en: {
+        1: mockDocumentContent[1],
+        2: mockDocumentContent[2],
+        3: mockDocumentContent[3],
+        4: mockDocumentContent[4]
+      }
+    }
+
+    const langNames: Record<SupportedLanguage, string> = {
+      en: 'English',
+      ar: 'Arabic',
+      fr: 'French',
+      es: 'Spanish',
+      zh: 'Chinese',
+      ja: 'Japanese',
+      de: 'German'
+    }
+
+    translatedContent.value = {
+      translatedText: translations[lang]?.[document.value.id] || `[Translated to ${langNames[lang]}]\n\n${document.value.description}`,
+      sourceLanguage: 'en',
+      targetLanguage: lang,
+      confidence: 0.94,
+      processingTime: 1.5
+    }
+  } catch (error) {
+    console.error('Failed to translate document:', error)
+  } finally {
+    isLoadingTranslation.value = false
+  }
+}
+
+async function performDocumentOCR() {
+  if (!document.value || isLoadingOCR.value) return
+
+  isLoadingOCR.value = true
+  ocrResult.value = null
+
+  try {
+    // Simulate OCR processing
+    await new Promise(resolve => setTimeout(resolve, 2000))
+
+    const mockOCRResults: Record<number, OCRResult> = {
+      1: {
+        text: mockDocumentContent[1],
+        confidence: 0.96,
+        language: 'en',
+        processingTime: 2.0,
+        pages: [
+          { pageNumber: 1, text: 'AFC Asian Cup 2027 Saudi Arabia\nComplete Tournament Schedule', confidence: 0.97 },
+          { pageNumber: 2, text: 'Group Stage Overview\n6 groups of 4 teams each', confidence: 0.95 },
+          { pageNumber: 3, text: 'Key Venues and Stadium Information', confidence: 0.96 }
+        ],
+        wordCount: mockDocumentContent[1].split(' ').length,
+        characterCount: mockDocumentContent[1].length
+      },
+      2: {
+        text: mockDocumentContent[2],
+        confidence: 0.94,
+        language: 'en',
+        processingTime: 2.5,
+        pages: [
+          { pageNumber: 1, text: 'Stadium Operations Manual\nVersion 3.0', confidence: 0.95 },
+          { pageNumber: 2, text: 'Security Protocols\nAccess Control Guidelines', confidence: 0.93 }
+        ],
+        wordCount: mockDocumentContent[2].split(' ').length,
+        characterCount: mockDocumentContent[2].length
+      }
+    }
+
+    ocrResult.value = mockOCRResults[document.value.id] || {
+      text: `[OCR extracted text from ${document.value.name}]\n\n${document.value.description}`,
+      confidence: 0.88,
+      language: 'en',
+      processingTime: 1.8,
+      wordCount: 150,
+      characterCount: 800
+    }
+
+    ocrConfidence.value = ocrResult.value.confidence * 100
+  } catch (error) {
+    console.error('Failed to perform OCR:', error)
+  } finally {
+    isLoadingOCR.value = false
+  }
+}
+
+function getEntityIcon(type: string): string {
+  const icons: Record<string, string> = {
+    person: 'fas fa-user',
+    organization: 'fas fa-building',
+    location: 'fas fa-map-marker-alt',
+    date: 'fas fa-calendar',
+    event: 'fas fa-calendar-check',
+    money: 'fas fa-dollar-sign'
+  }
+  return icons[type] || 'fas fa-tag'
+}
+
+function getEntityColor(type: string): string {
+  const colors: Record<string, string> = {
+    person: 'text-blue-600 bg-blue-50',
+    organization: 'text-purple-600 bg-purple-50',
+    location: 'text-green-600 bg-green-50',
+    date: 'text-orange-600 bg-orange-50',
+    event: 'text-teal-600 bg-teal-50',
+    money: 'text-yellow-600 bg-yellow-50'
+  }
+  return colors[type] || 'text-gray-600 bg-gray-50'
+}
+
+function filterEntitiesByType(type: string | null): NamedEntity[] {
+  if (!extractedEntities.value) return []
+  if (!type) return extractedEntities.value.entities
+  return extractedEntities.value.entities.filter(e => e.type === type)
+}
+
+function getUniqueEntityTypes(): string[] {
+  if (!extractedEntities.value) return []
+  return [...new Set(extractedEntities.value.entities.map(e => e.type))]
+}
+
+function toggleAIPanel() {
+  showAIPanel.value = !showAIPanel.value
+}
+
+function copyOCRText() {
+  if (ocrResult.value) {
+    navigator.clipboard.writeText(ocrResult.value.text)
+    alert('OCR text copied to clipboard!')
+  }
+}
+
+function copyTranslation() {
+  if (translatedContent.value) {
+    navigator.clipboard.writeText(translatedContent.value.translatedText)
+    alert('Translation copied to clipboard!')
+  }
+}
+
+function copySummary() {
+  if (documentSummary.value) {
+    navigator.clipboard.writeText(documentSummary.value.summary)
+    alert('Summary copied to clipboard!')
+  }
+}
 </script>
 
 <template>
@@ -283,8 +920,284 @@ const relatedDocuments = computed(() => {
           </div>
         </div>
 
-        <!-- Right Column - Metadata -->
+        <!-- Right Column - Metadata & AI Features -->
         <div class="space-y-6">
+          <!-- AI Features Panel -->
+          <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <!-- AI Panel Header -->
+            <div class="px-6 py-4 bg-gradient-to-r from-teal-500 to-teal-600 flex items-center justify-between">
+              <div class="flex items-center gap-2 text-white">
+                <i class="fas fa-wand-magic-sparkles"></i>
+                <span class="font-semibold">AI Analysis</span>
+              </div>
+              <button @click="toggleAIPanel" class="text-white/80 hover:text-white transition-colors">
+                <i :class="['fas', showAIPanel ? 'fa-chevron-up' : 'fa-chevron-down']"></i>
+              </button>
+            </div>
+
+            <!-- AI Panel Content -->
+            <div v-if="showAIPanel" class="p-4">
+              <!-- AI Tab Navigation -->
+              <div class="flex gap-1 mb-4 bg-gray-100 rounded-lg p-1">
+                <button
+                  v-for="tab in [
+                    { id: 'summary', icon: 'fas fa-file-lines', label: 'Summary' },
+                    { id: 'entities', icon: 'fas fa-tags', label: 'Entities' },
+                    { id: 'translate', icon: 'fas fa-language', label: 'Translate' },
+                    { id: 'ocr', icon: 'fas fa-file-image', label: 'OCR' }
+                  ]"
+                  :key="tab.id"
+                  @click="activeAITab = tab.id as any"
+                  :class="[
+                    'flex-1 px-2 py-2 rounded-md text-xs font-medium transition-all flex items-center justify-center gap-1',
+                    activeAITab === tab.id
+                      ? 'bg-white text-teal-600 shadow-sm'
+                      : 'text-gray-500 hover:text-gray-700'
+                  ]"
+                >
+                  <i :class="tab.icon"></i>
+                  <span class="hidden sm:inline">{{ tab.label }}</span>
+                </button>
+              </div>
+
+              <!-- Summary Tab -->
+              <div v-if="activeAITab === 'summary'" class="space-y-4">
+                <!-- Summary Type Selection -->
+                <div class="flex gap-2">
+                  <button
+                    v-for="type in [
+                      { id: 'brief', label: 'Brief' },
+                      { id: 'detailed', label: 'Detailed' },
+                      { id: 'bullet-points', label: 'Bullets' }
+                    ]"
+                    :key="type.id"
+                    @click="summaryType = type.id as any"
+                    :class="[
+                      'flex-1 px-3 py-1.5 rounded-lg text-xs font-medium transition-all',
+                      summaryType === type.id
+                        ? 'bg-teal-100 text-teal-700'
+                        : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
+                    ]"
+                  >
+                    {{ type.label }}
+                  </button>
+                </div>
+
+                <!-- Generate Button -->
+                <button
+                  @click="generateSummary"
+                  :disabled="isLoadingSummary"
+                  class="w-full px-4 py-2.5 bg-teal-500 hover:bg-teal-600 disabled:bg-teal-300 text-white rounded-lg font-medium flex items-center justify-center gap-2 transition-colors"
+                >
+                  <i :class="['fas', isLoadingSummary ? 'fa-spinner fa-spin' : 'fa-wand-magic-sparkles']"></i>
+                  {{ isLoadingSummary ? 'Generating...' : 'Generate Summary' }}
+                </button>
+
+                <!-- Summary Result -->
+                <div v-if="documentSummary" class="space-y-3">
+                  <div class="bg-teal-50 rounded-lg p-4 border border-teal-100">
+                    <p class="text-sm text-gray-700 whitespace-pre-line">{{ documentSummary.summary }}</p>
+                  </div>
+
+                  <!-- Key Points -->
+                  <div v-if="documentSummary.keyPoints?.length" class="space-y-2">
+                    <p class="text-xs font-semibold text-gray-500 uppercase">Key Points</p>
+                    <ul class="space-y-1">
+                      <li v-for="(point, idx) in documentSummary.keyPoints" :key="idx" class="flex items-start gap-2 text-sm text-gray-600">
+                        <i class="fas fa-check-circle text-teal-500 mt-0.5 flex-shrink-0"></i>
+                        <span>{{ point }}</span>
+                      </li>
+                    </ul>
+                  </div>
+
+                  <!-- Actions -->
+                  <div class="flex items-center justify-between text-xs text-gray-400">
+                    <span>{{ (documentSummary.confidence * 100).toFixed(0) }}% confidence</span>
+                    <button @click="copySummary" class="flex items-center gap-1 text-teal-600 hover:text-teal-700">
+                      <i class="fas fa-copy"></i>
+                      Copy
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Entities Tab -->
+              <div v-if="activeAITab === 'entities'" class="space-y-4">
+                <button
+                  @click="extractDocumentEntities"
+                  :disabled="isLoadingEntities"
+                  class="w-full px-4 py-2.5 bg-teal-500 hover:bg-teal-600 disabled:bg-teal-300 text-white rounded-lg font-medium flex items-center justify-center gap-2 transition-colors"
+                >
+                  <i :class="['fas', isLoadingEntities ? 'fa-spinner fa-spin' : 'fa-magnifying-glass']"></i>
+                  {{ isLoadingEntities ? 'Extracting...' : 'Extract Entities' }}
+                </button>
+
+                <!-- Entity Filter -->
+                <div v-if="extractedEntities" class="flex flex-wrap gap-2">
+                  <button
+                    @click="highlightedEntityType = null"
+                    :class="[
+                      'px-2 py-1 rounded-full text-xs font-medium transition-all',
+                      highlightedEntityType === null
+                        ? 'bg-teal-100 text-teal-700'
+                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    ]"
+                  >
+                    All ({{ extractedEntities.entities.length }})
+                  </button>
+                  <button
+                    v-for="type in getUniqueEntityTypes()"
+                    :key="type"
+                    @click="highlightedEntityType = type"
+                    :class="[
+                      'px-2 py-1 rounded-full text-xs font-medium transition-all capitalize',
+                      highlightedEntityType === type
+                        ? 'bg-teal-100 text-teal-700'
+                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    ]"
+                  >
+                    {{ type }} ({{ extractedEntities.entities.filter(e => e.type === type).length }})
+                  </button>
+                </div>
+
+                <!-- Entity List -->
+                <div v-if="extractedEntities" class="space-y-2 max-h-64 overflow-y-auto">
+                  <div
+                    v-for="(entity, idx) in filterEntitiesByType(highlightedEntityType)"
+                    :key="idx"
+                    :class="['flex items-center gap-2 p-2 rounded-lg', getEntityColor(entity.type)]"
+                  >
+                    <i :class="[getEntityIcon(entity.type), 'text-sm']"></i>
+                    <span class="flex-1 text-sm font-medium truncate">{{ entity.text }}</span>
+                    <span class="text-xs opacity-70">{{ (entity.confidence * 100).toFixed(0) }}%</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Translation Tab -->
+              <div v-if="activeAITab === 'translate'" class="space-y-4">
+                <!-- Language Selection -->
+                <div class="grid grid-cols-3 gap-2">
+                  <button
+                    v-for="lang in [
+                      { code: 'ar', label: 'Arabic', flag: '🇸🇦' },
+                      { code: 'fr', label: 'French', flag: '🇫🇷' },
+                      { code: 'es', label: 'Spanish', flag: '🇪🇸' },
+                      { code: 'zh', label: 'Chinese', flag: '🇨🇳' },
+                      { code: 'ja', label: 'Japanese', flag: '🇯🇵' },
+                      { code: 'de', label: 'German', flag: '🇩🇪' }
+                    ]"
+                    :key="lang.code"
+                    @click="translateDocument(lang.code as SupportedLanguage)"
+                    :disabled="isLoadingTranslation"
+                    :class="[
+                      'px-2 py-2 rounded-lg text-xs font-medium transition-all flex flex-col items-center gap-1',
+                      targetLanguage === lang.code && translatedContent
+                        ? 'bg-teal-100 text-teal-700 ring-2 ring-teal-300'
+                        : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
+                    ]"
+                  >
+                    <span class="text-lg">{{ lang.flag }}</span>
+                    <span>{{ lang.label }}</span>
+                  </button>
+                </div>
+
+                <!-- Loading State -->
+                <div v-if="isLoadingTranslation" class="flex items-center justify-center py-8">
+                  <div class="text-center">
+                    <i class="fas fa-spinner fa-spin text-2xl text-teal-500 mb-2"></i>
+                    <p class="text-sm text-gray-500">Translating document...</p>
+                  </div>
+                </div>
+
+                <!-- Translation Result -->
+                <div v-if="translatedContent && !isLoadingTranslation" class="space-y-3">
+                  <div class="bg-blue-50 rounded-lg p-4 border border-blue-100 max-h-48 overflow-y-auto">
+                    <p class="text-sm text-gray-700 whitespace-pre-line" :dir="targetLanguage === 'ar' ? 'rtl' : 'ltr'">
+                      {{ translatedContent.translatedText }}
+                    </p>
+                  </div>
+                  <div class="flex items-center justify-between text-xs text-gray-400">
+                    <span>{{ (translatedContent.confidence * 100).toFixed(0) }}% confidence</span>
+                    <button @click="copyTranslation" class="flex items-center gap-1 text-teal-600 hover:text-teal-700">
+                      <i class="fas fa-copy"></i>
+                      Copy
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- OCR Tab -->
+              <div v-if="activeAITab === 'ocr'" class="space-y-4">
+                <div class="bg-amber-50 rounded-lg p-3 border border-amber-200">
+                  <div class="flex items-start gap-2">
+                    <i class="fas fa-info-circle text-amber-500 mt-0.5"></i>
+                    <p class="text-xs text-amber-700">OCR extracts text from scanned documents, images, and PDFs that contain image-based content.</p>
+                  </div>
+                </div>
+
+                <button
+                  @click="performDocumentOCR"
+                  :disabled="isLoadingOCR"
+                  class="w-full px-4 py-2.5 bg-teal-500 hover:bg-teal-600 disabled:bg-teal-300 text-white rounded-lg font-medium flex items-center justify-center gap-2 transition-colors"
+                >
+                  <i :class="['fas', isLoadingOCR ? 'fa-spinner fa-spin' : 'fa-file-image']"></i>
+                  {{ isLoadingOCR ? 'Processing OCR...' : 'Extract Text (OCR)' }}
+                </button>
+
+                <!-- OCR Result -->
+                <div v-if="ocrResult" class="space-y-3">
+                  <!-- Confidence Bar -->
+                  <div class="space-y-1">
+                    <div class="flex items-center justify-between text-xs">
+                      <span class="text-gray-500">Confidence</span>
+                      <span class="font-medium text-gray-700">{{ ocrConfidence.toFixed(0) }}%</span>
+                    </div>
+                    <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
+                      <div
+                        class="h-full bg-teal-500 rounded-full transition-all duration-500"
+                        :style="{ width: `${ocrConfidence}%` }"
+                      ></div>
+                    </div>
+                  </div>
+
+                  <!-- Stats -->
+                  <div class="grid grid-cols-2 gap-2">
+                    <div class="bg-gray-50 rounded-lg p-2 text-center">
+                      <p class="text-lg font-bold text-gray-800">{{ ocrResult.wordCount }}</p>
+                      <p class="text-xs text-gray-500">Words</p>
+                    </div>
+                    <div class="bg-gray-50 rounded-lg p-2 text-center">
+                      <p class="text-lg font-bold text-gray-800">{{ ocrResult.characterCount?.toLocaleString() }}</p>
+                      <p class="text-xs text-gray-500">Characters</p>
+                    </div>
+                  </div>
+
+                  <!-- Extracted Text Preview -->
+                  <div class="bg-gray-50 rounded-lg p-3 border border-gray-200 max-h-48 overflow-y-auto">
+                    <p class="text-xs text-gray-700 whitespace-pre-line font-mono">{{ ocrResult.text.substring(0, 500) }}{{ ocrResult.text.length > 500 ? '...' : '' }}</p>
+                  </div>
+
+                  <!-- Page Breakdown -->
+                  <div v-if="ocrResult.pages?.length" class="space-y-2">
+                    <p class="text-xs font-semibold text-gray-500 uppercase">Page Breakdown</p>
+                    <div class="space-y-1">
+                      <div v-for="page in ocrResult.pages" :key="page.pageNumber" class="flex items-center justify-between text-xs bg-gray-50 rounded p-2">
+                        <span class="text-gray-600">Page {{ page.pageNumber }}</span>
+                        <span class="text-gray-400">{{ (page.confidence * 100).toFixed(0) }}% conf.</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <button @click="copyOCRText" class="w-full px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm font-medium flex items-center justify-center gap-2 transition-colors">
+                    <i class="fas fa-copy"></i>
+                    Copy Full Text
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <!-- Document Details -->
           <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
             <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
@@ -483,5 +1396,122 @@ const relatedDocuments = computed(() => {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+/* AI Panel Animations */
+.ai-panel-enter-active,
+.ai-panel-leave-active {
+  transition: all 0.3s ease;
+}
+
+.ai-panel-enter-from,
+.ai-panel-leave-to {
+  opacity: 0;
+  max-height: 0;
+}
+
+.ai-panel-enter-to,
+.ai-panel-leave-from {
+  opacity: 1;
+  max-height: 1000px;
+}
+
+/* AI Loading Shimmer */
+.ai-shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(20, 184, 166, 0.1) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Entity highlight animation */
+.entity-highlight {
+  animation: entityPulse 0.3s ease-out;
+}
+
+@keyframes entityPulse {
+  0% {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Custom scrollbar for AI panels */
+.ai-scroll::-webkit-scrollbar {
+  width: 4px;
+}
+
+.ai-scroll::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 2px;
+}
+
+.ai-scroll::-webkit-scrollbar-thumb {
+  background: #14b8a6;
+  border-radius: 2px;
+}
+
+.ai-scroll::-webkit-scrollbar-thumb:hover {
+  background: #0d9488;
+}
+
+/* AI Result card slide in */
+.ai-result-enter-active {
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Confidence bar fill animation */
+.confidence-fill {
+  animation: fillBar 0.8s ease-out forwards;
+}
+
+@keyframes fillBar {
+  from {
+    width: 0;
+  }
+}
+
+/* Tab transition */
+.tab-content-enter-active,
+.tab-content-leave-active {
+  transition: all 0.2s ease;
+}
+
+.tab-content-enter-from {
+  opacity: 0;
+  transform: translateY(5px);
+}
+
+.tab-content-leave-to {
+  opacity: 0;
+  transform: translateY(-5px);
 }
 </style>

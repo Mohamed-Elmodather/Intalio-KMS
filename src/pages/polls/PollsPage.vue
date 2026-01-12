@@ -2,8 +2,14 @@
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
+import { useAIServicesStore } from '@/stores/aiServices'
+import { AILoadingIndicator, AISuggestionChip, AISentimentBadge } from '@/components/ai'
+import type { SentimentResult } from '@/types/ai'
 
 const router = useRouter()
+
+// Initialize AI store
+const aiStore = useAIServicesStore()
 
 // State
 const isLoading = ref(false)
@@ -443,6 +449,227 @@ function selectSortOption(value: string) {
   sortBy.value = value
   showSortDropdown.value = false
 }
+
+// ============================================================================
+// AI Features State & Functions
+// ============================================================================
+
+// AI State
+const showAIInsightsPanel = ref(false)
+const showSentimentModal = ref(false)
+const showPatternAnalysisModal = ref(false)
+const isAnalyzingSentiment = ref(false)
+const isAnalyzingPatterns = ref(false)
+const isFetchingInsights = ref(false)
+const selectedPollForAI = ref<ActivePoll | FeaturedPoll | CompletedPoll | null>(null)
+
+// AI Interfaces
+interface PollSentimentAnalysis {
+  overall: 'positive' | 'neutral' | 'negative'
+  score: number
+  breakdown: {
+    option: string
+    sentiment: 'positive' | 'neutral' | 'negative'
+    confidence: number
+    keywords: string[]
+  }[]
+  summary: string
+  recommendations: string[]
+}
+
+interface ResponsePattern {
+  id: string
+  name: string
+  description: string
+  percentage: number
+  trend: 'up' | 'down' | 'stable'
+  insights: string[]
+}
+
+interface PollInsight {
+  id: string
+  type: 'trend' | 'anomaly' | 'prediction' | 'recommendation'
+  title: string
+  description: string
+  confidence: number
+  icon: string
+  color: string
+}
+
+// AI Data
+const pollSentiment = ref<PollSentimentAnalysis | null>(null)
+const responsePatterns = ref<ResponsePattern[]>([])
+const aiInsights = ref<PollInsight[]>([])
+
+// Mock Data
+const mockPollSentiment: PollSentimentAnalysis = {
+  overall: 'positive',
+  score: 0.78,
+  breakdown: [
+    { option: 'Product Innovation', sentiment: 'positive', confidence: 0.85, keywords: ['growth', 'innovation', 'future', 'excited'] },
+    { option: 'Customer Experience', sentiment: 'positive', confidence: 0.79, keywords: ['satisfaction', 'improvement', 'care'] },
+    { option: 'Team Growth', sentiment: 'neutral', confidence: 0.65, keywords: ['development', 'training', 'resources'] },
+    { option: 'Market Expansion', sentiment: 'neutral', confidence: 0.58, keywords: ['risk', 'opportunity', 'competition'] }
+  ],
+  summary: 'Overall sentiment towards the poll options is positive, with strong enthusiasm for Product Innovation and Customer Experience. Voters express confidence in company direction while showing measured consideration for growth-related options.',
+  recommendations: [
+    'Consider combining Product Innovation with Customer Experience initiatives',
+    'Address concerns about resource allocation for Team Growth',
+    'Provide more context on Market Expansion risks and benefits'
+  ]
+}
+
+const mockResponsePatterns: ResponsePattern[] = [
+  {
+    id: '1',
+    name: 'Early Bird Trend',
+    description: 'Employees who vote within first 24 hours tend to favor innovation-focused options',
+    percentage: 68,
+    trend: 'up',
+    insights: ['Higher engagement from tech teams', 'Morning votes show stronger preferences']
+  },
+  {
+    id: '2',
+    name: 'Department Clustering',
+    description: 'Similar voting patterns within department groups',
+    percentage: 74,
+    trend: 'stable',
+    insights: ['Engineering prefers Product Innovation', 'Sales favors Market Expansion', 'HR supports Team Growth']
+  },
+  {
+    id: '3',
+    name: 'Seniority Influence',
+    description: 'Senior employees influence voting patterns of their teams',
+    percentage: 45,
+    trend: 'down',
+    insights: ['Team leads vote 2x faster than average', 'Correlation decreases over poll duration']
+  },
+  {
+    id: '4',
+    name: 'Time-based Shift',
+    description: 'Preference shifts from Innovation to Experience over poll duration',
+    percentage: 32,
+    trend: 'up',
+    insights: ['Later voters more pragmatic', 'Weekend votes favor experience improvements']
+  }
+]
+
+const mockAIInsights: PollInsight[] = [
+  {
+    id: '1',
+    type: 'trend',
+    title: 'Rising Engagement',
+    description: 'Poll participation is 23% higher than last quarter. Innovation topics drive most engagement.',
+    confidence: 0.89,
+    icon: 'fas fa-chart-line',
+    color: 'text-green-500'
+  },
+  {
+    id: '2',
+    type: 'prediction',
+    title: 'Expected Winner',
+    description: 'Product Innovation likely to win with 40-45% of final votes based on current trajectory.',
+    confidence: 0.82,
+    icon: 'fas fa-trophy',
+    color: 'text-amber-500'
+  },
+  {
+    id: '3',
+    type: 'anomaly',
+    title: 'Unusual Pattern Detected',
+    description: 'Marketing team voting 3x slower than usual. Consider targeted reminders.',
+    confidence: 0.75,
+    icon: 'fas fa-exclamation-triangle',
+    color: 'text-orange-500'
+  },
+  {
+    id: '4',
+    type: 'recommendation',
+    title: 'Optimal Poll Timing',
+    description: 'Best engagement on Tuesday-Thursday mornings. Schedule important polls accordingly.',
+    confidence: 0.91,
+    icon: 'fas fa-lightbulb',
+    color: 'text-blue-500'
+  }
+]
+
+// AI Functions
+async function analyzePollSentiment(poll?: ActivePoll | FeaturedPoll | CompletedPoll) {
+  isAnalyzingSentiment.value = true
+  showSentimentModal.value = true
+  selectedPollForAI.value = poll || null
+
+  try {
+    await new Promise(resolve => setTimeout(resolve, 1200))
+    pollSentiment.value = mockPollSentiment
+  } catch (error) {
+    console.error('Failed to analyze sentiment:', error)
+  } finally {
+    isAnalyzingSentiment.value = false
+  }
+}
+
+async function analyzeResponsePatterns() {
+  isAnalyzingPatterns.value = true
+  showPatternAnalysisModal.value = true
+
+  try {
+    await new Promise(resolve => setTimeout(resolve, 1500))
+    responsePatterns.value = mockResponsePatterns
+  } catch (error) {
+    console.error('Failed to analyze patterns:', error)
+  } finally {
+    isAnalyzingPatterns.value = false
+  }
+}
+
+async function fetchAIInsights() {
+  isFetchingInsights.value = true
+  showAIInsightsPanel.value = true
+
+  try {
+    await new Promise(resolve => setTimeout(resolve, 1000))
+    aiInsights.value = mockAIInsights
+  } catch (error) {
+    console.error('Failed to fetch insights:', error)
+  } finally {
+    isFetchingInsights.value = false
+  }
+}
+
+function getSentimentColor(sentiment: string) {
+  switch (sentiment) {
+    case 'positive': return 'text-green-600 bg-green-100'
+    case 'negative': return 'text-red-600 bg-red-100'
+    default: return 'text-yellow-600 bg-yellow-100'
+  }
+}
+
+function getSentimentIcon(sentiment: string) {
+  switch (sentiment) {
+    case 'positive': return 'fas fa-smile'
+    case 'negative': return 'fas fa-frown'
+    default: return 'fas fa-meh'
+  }
+}
+
+function getTrendIcon(trend: string) {
+  switch (trend) {
+    case 'up': return 'fas fa-arrow-up text-green-500'
+    case 'down': return 'fas fa-arrow-down text-red-500'
+    default: return 'fas fa-minus text-gray-500'
+  }
+}
+
+function getInsightTypeColor(type: string) {
+  switch (type) {
+    case 'trend': return 'bg-green-100 text-green-700'
+    case 'prediction': return 'bg-amber-100 text-amber-700'
+    case 'anomaly': return 'bg-orange-100 text-orange-700'
+    case 'recommendation': return 'bg-blue-100 text-blue-700'
+    default: return 'bg-gray-100 text-gray-700'
+  }
+}
 </script>
 
 <template>
@@ -509,6 +736,17 @@ function selectSortOption(value: string) {
             <button @click="showQuickPollModal = true" class="px-5 py-2.5 bg-white/20 backdrop-blur-sm border border-white/30 text-white rounded-xl font-semibold text-sm hover:bg-white/30 transition-all flex items-center gap-2">
               <i class="fas fa-bolt"></i>
               Quick Poll
+            </button>
+            <!-- AI Action Buttons -->
+            <button @click="fetchAIInsights"
+                    class="px-5 py-2.5 bg-gradient-to-r from-teal-500/20 to-emerald-500/20 backdrop-blur-sm text-white rounded-xl font-semibold text-sm flex items-center gap-2 hover:from-teal-500/30 hover:to-emerald-500/30 transition-all border border-white/20">
+              <i class="fas fa-wand-magic-sparkles"></i>
+              AI Insights
+            </button>
+            <button @click="analyzeResponsePatterns"
+                    class="px-5 py-2.5 bg-white/10 backdrop-blur-sm text-white rounded-xl font-semibold text-sm flex items-center gap-2 hover:bg-white/20 transition-all border border-white/20">
+              <i class="fas fa-chart-bar"></i>
+              Pattern Analysis
             </button>
           </div>
         </div>
@@ -1224,6 +1462,257 @@ function selectSortOption(value: string) {
             <button class="btn btn-secondary" @click="showQuickPollModal = false">Cancel</button>
             <button class="btn-vibrant" @click="createQuickPoll">
               <i class="fas fa-paper-plane mr-1"></i> Create Poll
+            </button>
+          </div>
+        </div>
+      </div>
+    </Teleport>
+
+    <!-- AI Insights Panel Modal -->
+    <Teleport to="body">
+      <div v-if="showAIInsightsPanel" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[80vh] overflow-hidden">
+          <div class="p-6 border-b border-gray-100">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-gradient-to-br from-teal-500 to-emerald-500 rounded-xl flex items-center justify-center">
+                  <i class="fas fa-wand-magic-sparkles text-white"></i>
+                </div>
+                <div>
+                  <h3 class="text-lg font-semibold text-gray-900">AI Poll Insights</h3>
+                  <p class="text-sm text-gray-500">Smart analytics and predictions</p>
+                </div>
+              </div>
+              <button @click="showAIInsightsPanel = false" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                <i class="fas fa-times text-gray-400"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="p-6 overflow-y-auto max-h-[60vh]">
+            <AILoadingIndicator v-if="isFetchingInsights" message="Analyzing poll data..." />
+
+            <div v-else-if="aiInsights.length > 0" class="space-y-4">
+              <div class="bg-gradient-to-r from-teal-50 to-emerald-50 rounded-xl p-4 mb-4">
+                <div class="flex items-center gap-2 text-teal-700 font-medium mb-1">
+                  <i class="fas fa-brain"></i>
+                  AI Analysis Complete
+                </div>
+                <p class="text-sm text-gray-600">Based on {{ stats.responses.toLocaleString() }} responses across {{ stats.active }} active polls</p>
+              </div>
+
+              <div v-for="insight in aiInsights" :key="insight.id"
+                   class="border border-gray-200 rounded-xl p-4 hover:border-teal-300 transition-all">
+                <div class="flex items-start gap-4">
+                  <div class="w-10 h-10 rounded-xl flex items-center justify-center bg-gray-100">
+                    <i :class="[insight.icon, insight.color]"></i>
+                  </div>
+                  <div class="flex-1">
+                    <div class="flex items-center gap-2 mb-1">
+                      <span :class="['px-2 py-0.5 rounded-full text-xs font-semibold capitalize', getInsightTypeColor(insight.type)]">
+                        {{ insight.type }}
+                      </span>
+                      <h4 class="font-semibold text-gray-900">{{ insight.title }}</h4>
+                    </div>
+                    <p class="text-sm text-gray-600">{{ insight.description }}</p>
+                  </div>
+                  <div class="text-right">
+                    <div class="text-lg font-bold text-teal-600">{{ Math.round(insight.confidence * 100) }}%</div>
+                    <div class="text-xs text-gray-500">Confidence</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="p-4 border-t border-gray-100 flex justify-end gap-3">
+            <button @click="fetchAIInsights"
+                    class="px-4 py-2 text-teal-600 hover:bg-teal-50 rounded-lg transition-colors flex items-center gap-2">
+              <i class="fas fa-rotate"></i> Refresh
+            </button>
+            <button @click="showAIInsightsPanel = false"
+                    class="px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-colors">
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </Teleport>
+
+    <!-- AI Sentiment Analysis Modal -->
+    <Teleport to="body">
+      <div v-if="showSentimentModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[80vh] overflow-hidden">
+          <div class="p-6 border-b border-gray-100">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center">
+                  <i class="fas fa-face-smile text-white"></i>
+                </div>
+                <div>
+                  <h3 class="text-lg font-semibold text-gray-900">Sentiment Analysis</h3>
+                  <p class="text-sm text-gray-500">Understand voter sentiment</p>
+                </div>
+              </div>
+              <button @click="showSentimentModal = false" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                <i class="fas fa-times text-gray-400"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="p-6 overflow-y-auto max-h-[60vh]">
+            <AILoadingIndicator v-if="isAnalyzingSentiment" message="Analyzing sentiment..." />
+
+            <div v-else-if="pollSentiment" class="space-y-6">
+              <!-- Overall Sentiment -->
+              <div class="text-center bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl p-6">
+                <div class="inline-flex items-center justify-center w-16 h-16 rounded-full mb-3"
+                     :class="{
+                       'bg-green-100': pollSentiment.overall === 'positive',
+                       'bg-yellow-100': pollSentiment.overall === 'neutral',
+                       'bg-red-100': pollSentiment.overall === 'negative'
+                     }">
+                  <i :class="[getSentimentIcon(pollSentiment.overall), 'text-3xl',
+                     pollSentiment.overall === 'positive' ? 'text-green-500' :
+                     pollSentiment.overall === 'negative' ? 'text-red-500' : 'text-yellow-500']"></i>
+                </div>
+                <h4 class="text-xl font-semibold text-gray-900 capitalize mb-1">{{ pollSentiment.overall }} Sentiment</h4>
+                <p class="text-gray-600">{{ Math.round(pollSentiment.score * 100) }}% confidence score</p>
+              </div>
+
+              <!-- Option Breakdown -->
+              <div>
+                <h5 class="font-medium text-gray-900 mb-3 flex items-center gap-2">
+                  <i class="fas fa-list text-purple-500"></i> Option Sentiment Breakdown
+                </h5>
+                <div class="space-y-3">
+                  <div v-for="item in pollSentiment.breakdown" :key="item.option"
+                       class="border border-gray-200 rounded-lg p-3">
+                    <div class="flex items-center justify-between mb-2">
+                      <span class="font-medium text-gray-900">{{ item.option }}</span>
+                      <span :class="['px-2 py-1 rounded-full text-xs font-semibold capitalize', getSentimentColor(item.sentiment)]">
+                        <i :class="[getSentimentIcon(item.sentiment), 'mr-1']"></i>
+                        {{ item.sentiment }}
+                      </span>
+                    </div>
+                    <div class="flex flex-wrap gap-1">
+                      <span v-for="keyword in item.keywords" :key="keyword"
+                            class="px-2 py-0.5 bg-gray-100 text-gray-600 rounded text-xs">
+                        {{ keyword }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Summary -->
+              <div class="bg-gray-50 rounded-xl p-4">
+                <h5 class="font-medium text-gray-900 mb-2 flex items-center gap-2">
+                  <i class="fas fa-lightbulb text-purple-500"></i> Analysis Summary
+                </h5>
+                <p class="text-gray-700 text-sm">{{ pollSentiment.summary }}</p>
+              </div>
+
+              <!-- Recommendations -->
+              <div>
+                <h5 class="font-medium text-gray-900 mb-3 flex items-center gap-2">
+                  <i class="fas fa-check-circle text-purple-500"></i> AI Recommendations
+                </h5>
+                <ul class="space-y-2">
+                  <li v-for="(rec, idx) in pollSentiment.recommendations" :key="idx"
+                      class="flex items-start gap-2 text-gray-700 text-sm">
+                    <i class="fas fa-arrow-right text-purple-400 mt-1"></i>
+                    <span>{{ rec }}</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="p-4 border-t border-gray-100 flex justify-end gap-3">
+            <button @click="analyzePollSentiment()"
+                    class="px-4 py-2 text-purple-600 hover:bg-purple-50 rounded-lg transition-colors flex items-center gap-2">
+              <i class="fas fa-rotate"></i> Refresh
+            </button>
+            <button @click="showSentimentModal = false"
+                    class="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors">
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </Teleport>
+
+    <!-- AI Pattern Analysis Modal -->
+    <Teleport to="body">
+      <div v-if="showPatternAnalysisModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[80vh] overflow-hidden">
+          <div class="p-6 border-b border-gray-100">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-xl flex items-center justify-center">
+                  <i class="fas fa-chart-bar text-white"></i>
+                </div>
+                <div>
+                  <h3 class="text-lg font-semibold text-gray-900">Response Pattern Analysis</h3>
+                  <p class="text-sm text-gray-500">Discover voting behavior patterns</p>
+                </div>
+              </div>
+              <button @click="showPatternAnalysisModal = false" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                <i class="fas fa-times text-gray-400"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="p-6 overflow-y-auto max-h-[60vh]">
+            <AILoadingIndicator v-if="isAnalyzingPatterns" message="Analyzing response patterns..." />
+
+            <div v-else-if="responsePatterns.length > 0" class="space-y-4">
+              <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4 mb-4">
+                <div class="flex items-center gap-2 text-blue-700 font-medium mb-1">
+                  <i class="fas fa-chart-line"></i>
+                  Pattern Detection Complete
+                </div>
+                <p class="text-sm text-gray-600">Identified {{ responsePatterns.length }} significant voting patterns</p>
+              </div>
+
+              <div v-for="pattern in responsePatterns" :key="pattern.id"
+                   class="border border-gray-200 rounded-xl p-4 hover:border-blue-300 transition-all">
+                <div class="flex items-start justify-between mb-3">
+                  <div>
+                    <div class="flex items-center gap-2 mb-1">
+                      <h4 class="font-semibold text-gray-900">{{ pattern.name }}</h4>
+                      <i :class="getTrendIcon(pattern.trend)"></i>
+                    </div>
+                    <p class="text-sm text-gray-600">{{ pattern.description }}</p>
+                  </div>
+                  <div class="text-right">
+                    <div class="text-2xl font-bold text-blue-600">{{ pattern.percentage }}%</div>
+                    <div class="text-xs text-gray-500">Occurrence</div>
+                  </div>
+                </div>
+                <div class="bg-gray-50 rounded-lg p-3">
+                  <h5 class="text-xs font-semibold text-gray-500 uppercase mb-2">Key Insights</h5>
+                  <ul class="space-y-1">
+                    <li v-for="(insight, idx) in pattern.insights" :key="idx"
+                        class="text-sm text-gray-700 flex items-start gap-2">
+                      <i class="fas fa-circle text-blue-400 text-[6px] mt-1.5"></i>
+                      {{ insight }}
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="p-4 border-t border-gray-100 flex justify-end gap-3">
+            <button @click="analyzeResponsePatterns"
+                    class="px-4 py-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors flex items-center gap-2">
+              <i class="fas fa-rotate"></i> Refresh
+            </button>
+            <button @click="showPatternAnalysisModal = false"
+                    class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
+              Close
             </button>
           </div>
         </div>
@@ -2923,4 +3412,49 @@ function selectSortOption(value: string) {
   border: 2px solid #cbd5e1;
   accent-color: #14b8a6;
 }
+
+/* ============================================
+   AI Feature Styles
+   ============================================ */
+.ai-action-btn {
+  transition: all 0.2s ease;
+}
+
+.ai-action-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(20, 184, 166, 0.2);
+}
+
+.ai-insight-card {
+  transition: all 0.2s ease;
+}
+
+.ai-insight-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.ai-pulse {
+  animation: aiPulse 2s ease-in-out infinite;
+}
+
+@keyframes aiPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.ai-gradient-text {
+  background: linear-gradient(135deg, #14b8a6 0%, #10b981 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.sentiment-positive { color: #22c55e; }
+.sentiment-neutral { color: #eab308; }
+.sentiment-negative { color: #ef4444; }
+
+.trend-up { color: #22c55e; }
+.trend-down { color: #ef4444; }
+.trend-stable { color: #6b7280; }
 </style>

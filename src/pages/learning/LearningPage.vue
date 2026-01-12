@@ -1,11 +1,363 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useAIServicesStore } from '@/stores/aiServices'
+import { AILoadingIndicator, AIConfidenceBar, AISuggestionChip } from '@/components/ai'
+import type { ClassificationResult, NERResult } from '@/types/ai'
 
 const router = useRouter()
+const aiStore = useAIServicesStore()
 
 // Loading state
 const isLoading = ref(false)
+
+// ============================================================================
+// AI FEATURES - Personalized Recommendations, Skill Gap Analysis, Learning Paths
+// ============================================================================
+
+// AI Processing States
+const isAIAnalyzing = ref(false)
+const isGeneratingRecommendations = ref(false)
+const isAnalyzingSkillGaps = ref(false)
+const isGeneratingLearningPath = ref(false)
+const showAIInsightsPanel = ref(false)
+const showSkillGapModal = ref(false)
+const showAILearningPathModal = ref(false)
+
+// AI Personalized Recommendations
+interface AIPersonalizedCourse {
+  courseId: number
+  title: string
+  reason: string
+  matchScore: number
+  skillsGained: string[]
+  estimatedTime: string
+  priority: 'high' | 'medium' | 'low'
+}
+
+const aiPersonalizedRecommendations = ref<AIPersonalizedCourse[]>([])
+
+// AI Skill Gap Analysis
+interface SkillGap {
+  skill: string
+  currentLevel: number
+  targetLevel: number
+  gap: number
+  category: string
+  priority: 'critical' | 'high' | 'medium' | 'low'
+  relatedCourses: number[]
+}
+
+interface SkillGapAnalysis {
+  overallReadiness: number
+  strengths: string[]
+  weaknesses: string[]
+  gaps: SkillGap[]
+  recommendedFocus: string[]
+  estimatedTimeToClose: string
+}
+
+const skillGapAnalysis = ref<SkillGapAnalysis | null>(null)
+
+// AI Learning Path Suggestions
+interface AILearningPathStep {
+  order: number
+  courseId: number
+  title: string
+  duration: string
+  skills: string[]
+  dependencies: number[]
+  milestone: string
+}
+
+interface AILearningPath {
+  id: string
+  title: string
+  description: string
+  goal: string
+  totalDuration: string
+  steps: AILearningPathStep[]
+  expectedOutcomes: string[]
+  careerImpact: string
+  confidence: number
+}
+
+const aiLearningPaths = ref<AILearningPath[]>([])
+const selectedAIPath = ref<AILearningPath | null>(null)
+
+// AI Insights for the user
+interface AILearningInsight {
+  id: string
+  type: 'tip' | 'milestone' | 'recommendation' | 'warning' | 'achievement'
+  title: string
+  message: string
+  actionLabel?: string
+  actionCourseId?: number
+  icon: string
+  color: string
+}
+
+const aiInsights = ref<AILearningInsight[]>([])
+
+// Mock AI data for skill gap analysis
+const mockSkillGapAnalysis: SkillGapAnalysis = {
+  overallReadiness: 72,
+  strengths: ['Data Analysis', 'Project Management', 'Communication', 'Leadership Basics'],
+  weaknesses: ['Machine Learning', 'Cloud Architecture', 'Advanced Security'],
+  gaps: [
+    { skill: 'Machine Learning', currentLevel: 25, targetLevel: 80, gap: 55, category: 'Technology', priority: 'critical', relatedCourses: [10] },
+    { skill: 'Cloud Architecture', currentLevel: 30, targetLevel: 75, gap: 45, category: 'Technology', priority: 'high', relatedCourses: [13] },
+    { skill: 'Advanced Cybersecurity', currentLevel: 60, targetLevel: 90, gap: 30, category: 'Security', priority: 'high', relatedCourses: [3] },
+    { skill: 'Strategic Planning', currentLevel: 45, targetLevel: 70, gap: 25, category: 'Business', priority: 'medium', relatedCourses: [11] },
+    { skill: 'UX Design Principles', currentLevel: 20, targetLevel: 50, gap: 30, category: 'Design', priority: 'medium', relatedCourses: [14] },
+    { skill: 'Public Speaking', currentLevel: 55, targetLevel: 80, gap: 25, category: 'Soft Skills', priority: 'low', relatedCourses: [12] }
+  ],
+  recommendedFocus: ['Machine Learning', 'Cloud Architecture', 'Advanced Cybersecurity'],
+  estimatedTimeToClose: '45-60 hours'
+}
+
+// Mock AI personalized recommendations
+const mockAIRecommendations: AIPersonalizedCourse[] = [
+  {
+    courseId: 10,
+    title: 'Machine Learning Basics',
+    reason: 'Based on your Data Analytics progress, ML is the natural next step to advance your data science career.',
+    matchScore: 96,
+    skillsGained: ['ML Fundamentals', 'Python ML Libraries', 'Model Training'],
+    estimatedTime: '4 hours',
+    priority: 'high'
+  },
+  {
+    courseId: 13,
+    title: 'Cloud Architecture Fundamentals',
+    reason: 'Your project management skills combined with cloud knowledge will unlock DevOps opportunities.',
+    matchScore: 89,
+    skillsGained: ['AWS', 'Cloud Design', 'Scalability'],
+    estimatedTime: '8 hours',
+    priority: 'high'
+  },
+  {
+    courseId: 11,
+    title: 'Strategic Planning',
+    reason: 'Complement your leadership training with strategic thinking to prepare for senior roles.',
+    matchScore: 85,
+    skillsGained: ['Strategy Development', 'Business Planning', 'Decision Making'],
+    estimatedTime: '3 hours',
+    priority: 'medium'
+  },
+  {
+    courseId: 14,
+    title: 'UX Design Principles',
+    reason: 'Understanding UX will enhance your data visualization and project delivery skills.',
+    matchScore: 78,
+    skillsGained: ['User Research', 'Design Thinking', 'Prototyping'],
+    estimatedTime: '5 hours',
+    priority: 'medium'
+  }
+]
+
+// Mock AI learning paths
+const mockAILearningPaths: AILearningPath[] = [
+  {
+    id: 'path-data-leader',
+    title: 'Data Science Leader',
+    description: 'Become a data science team leader combining technical expertise with management skills',
+    goal: 'Lead data science initiatives and teams',
+    totalDuration: '25 hours',
+    steps: [
+      { order: 1, courseId: 1, title: 'Advanced Data Analytics', duration: '8h', skills: ['Analytics', 'Visualization'], dependencies: [], milestone: 'Analytics Expert' },
+      { order: 2, courseId: 10, title: 'Machine Learning Basics', duration: '4h', skills: ['ML', 'Python'], dependencies: [1], milestone: 'ML Practitioner' },
+      { order: 3, courseId: 17, title: 'Python for Data Science', duration: '6h', skills: ['Python', 'Data Manipulation'], dependencies: [1], milestone: 'Python Developer' },
+      { order: 4, courseId: 2, title: 'Leadership Essentials', duration: '6h', skills: ['Leadership', 'Team Management'], dependencies: [], milestone: 'Team Leader' },
+      { order: 5, courseId: 11, title: 'Strategic Planning', duration: '3h', skills: ['Strategy', 'Planning'], dependencies: [4], milestone: 'Strategic Thinker' }
+    ],
+    expectedOutcomes: ['Lead data science projects', 'Build and manage analytics teams', 'Drive data-driven decisions'],
+    careerImpact: 'Positions you for Data Science Manager or Analytics Director roles',
+    confidence: 94
+  },
+  {
+    id: 'path-tech-architect',
+    title: 'Technical Architect',
+    description: 'Master cloud and system architecture for enterprise solutions',
+    goal: 'Design scalable enterprise architectures',
+    totalDuration: '30 hours',
+    steps: [
+      { order: 1, courseId: 13, title: 'Cloud Architecture Fundamentals', duration: '8h', skills: ['AWS', 'Cloud Design'], dependencies: [], milestone: 'Cloud Certified' },
+      { order: 2, courseId: 3, title: 'Cybersecurity Fundamentals', duration: '4h', skills: ['Security', 'Compliance'], dependencies: [], milestone: 'Security Aware' },
+      { order: 3, courseId: 5, title: 'Project Management Pro', duration: '10h', skills: ['Agile', 'Project Delivery'], dependencies: [], milestone: 'PM Certified' },
+      { order: 4, courseId: 11, title: 'Strategic Planning', duration: '3h', skills: ['Strategy', 'Business Alignment'], dependencies: [3], milestone: 'Strategic Planner' }
+    ],
+    expectedOutcomes: ['Design cloud-native architectures', 'Lead technical transformations', 'Ensure security compliance'],
+    careerImpact: 'Opens doors to Solutions Architect and CTO track positions',
+    confidence: 88
+  },
+  {
+    id: 'path-people-leader',
+    title: 'People & Culture Leader',
+    description: 'Develop comprehensive people management and organizational skills',
+    goal: 'Excel in people management and organizational development',
+    totalDuration: '20 hours',
+    steps: [
+      { order: 1, courseId: 2, title: 'Leadership Essentials', duration: '6h', skills: ['Leadership', 'Motivation'], dependencies: [], milestone: 'Emerging Leader' },
+      { order: 2, courseId: 4, title: 'Effective Communication', duration: '5h', skills: ['Communication', 'Presentation'], dependencies: [], milestone: 'Communicator' },
+      { order: 3, courseId: 12, title: 'Public Speaking Mastery', duration: '2h', skills: ['Public Speaking', 'Confidence'], dependencies: [2], milestone: 'Speaker' },
+      { order: 4, courseId: 11, title: 'Strategic Planning', duration: '3h', skills: ['Strategy', 'Vision'], dependencies: [1], milestone: 'Strategic Leader' }
+    ],
+    expectedOutcomes: ['Build high-performing teams', 'Drive organizational culture', 'Communicate vision effectively'],
+    careerImpact: 'Prepares for HR Director, VP of People, or COO roles',
+    confidence: 91
+  }
+]
+
+// Mock AI insights
+const mockAIInsights: AILearningInsight[] = [
+  {
+    id: 'insight-1',
+    type: 'milestone',
+    title: 'Almost There!',
+    message: 'You\'re 75% through Advanced Data Analytics. Complete 3 more lessons to earn your certificate!',
+    actionLabel: 'Continue Course',
+    actionCourseId: 1,
+    icon: 'fas fa-trophy',
+    color: 'amber'
+  },
+  {
+    id: 'insight-2',
+    type: 'recommendation',
+    title: 'Skill Boost Opportunity',
+    message: 'Based on your progress, Machine Learning Basics would increase your market value by 23%.',
+    actionLabel: 'View Course',
+    actionCourseId: 10,
+    icon: 'fas fa-rocket',
+    color: 'teal'
+  },
+  {
+    id: 'insight-3',
+    type: 'tip',
+    title: 'Learning Pattern Detected',
+    message: 'You learn best between 9-11 AM. Schedule your next session during this peak time!',
+    icon: 'fas fa-lightbulb',
+    color: 'blue'
+  },
+  {
+    id: 'insight-4',
+    type: 'achievement',
+    title: 'Streak Champion',
+    message: 'You\'ve maintained a 12-day learning streak! Keep it going for bonus rewards.',
+    icon: 'fas fa-fire',
+    color: 'orange'
+  },
+  {
+    id: 'insight-5',
+    type: 'warning',
+    title: 'Course Expiring Soon',
+    message: 'Your Leadership Essentials enrollment expires in 14 days. Resume to keep your progress.',
+    actionLabel: 'Resume Now',
+    actionCourseId: 2,
+    icon: 'fas fa-exclamation-triangle',
+    color: 'red'
+  }
+]
+
+// AI Functions
+async function generateAIRecommendations() {
+  isGeneratingRecommendations.value = true
+
+  // Simulate AI processing
+  await new Promise(resolve => setTimeout(resolve, 1200))
+
+  aiPersonalizedRecommendations.value = mockAIRecommendations
+  isGeneratingRecommendations.value = false
+}
+
+async function analyzeSkillGaps() {
+  isAnalyzingSkillGaps.value = true
+
+  // Simulate AI analysis
+  await new Promise(resolve => setTimeout(resolve, 1500))
+
+  skillGapAnalysis.value = mockSkillGapAnalysis
+  isAnalyzingSkillGaps.value = false
+  showSkillGapModal.value = true
+}
+
+async function generateAILearningPaths() {
+  isGeneratingLearningPath.value = true
+
+  // Simulate AI processing
+  await new Promise(resolve => setTimeout(resolve, 1800))
+
+  aiLearningPaths.value = mockAILearningPaths
+  isGeneratingLearningPath.value = false
+  showAILearningPathModal.value = true
+}
+
+async function fetchAIInsights() {
+  // Simulate fetching insights
+  await new Promise(resolve => setTimeout(resolve, 800))
+  aiInsights.value = mockAIInsights
+}
+
+function selectAIPath(path: AILearningPath) {
+  selectedAIPath.value = path
+}
+
+function enrollInAIPath(path: AILearningPath) {
+  // Logic to enroll user in all courses of the path
+  console.log('Enrolling in AI-suggested path:', path.title)
+  showAILearningPathModal.value = false
+}
+
+function dismissInsight(insightId: string) {
+  aiInsights.value = aiInsights.value.filter(i => i.id !== insightId)
+}
+
+function getInsightColor(color: string) {
+  const colors: Record<string, string> = {
+    'teal': 'bg-teal-50 border-teal-200 text-teal-700',
+    'blue': 'bg-blue-50 border-blue-200 text-blue-700',
+    'amber': 'bg-amber-50 border-amber-200 text-amber-700',
+    'orange': 'bg-orange-50 border-orange-200 text-orange-700',
+    'red': 'bg-red-50 border-red-200 text-red-700',
+    'purple': 'bg-purple-50 border-purple-200 text-purple-700'
+  }
+  return colors[color] || colors['teal']
+}
+
+function getInsightIconBg(color: string) {
+  const colors: Record<string, string> = {
+    'teal': 'bg-teal-500',
+    'blue': 'bg-blue-500',
+    'amber': 'bg-amber-500',
+    'orange': 'bg-orange-500',
+    'red': 'bg-red-500',
+    'purple': 'bg-purple-500'
+  }
+  return colors[color] || colors['teal']
+}
+
+function getPriorityColor(priority: string) {
+  switch (priority) {
+    case 'critical': return 'bg-red-100 text-red-700 border-red-200'
+    case 'high': return 'bg-orange-100 text-orange-700 border-orange-200'
+    case 'medium': return 'bg-blue-100 text-blue-700 border-blue-200'
+    case 'low': return 'bg-gray-100 text-gray-700 border-gray-200'
+    default: return 'bg-gray-100 text-gray-700'
+  }
+}
+
+function getSkillGapColor(gap: number) {
+  if (gap >= 50) return 'text-red-500'
+  if (gap >= 30) return 'text-orange-500'
+  if (gap >= 15) return 'text-amber-500'
+  return 'text-green-500'
+}
+
+// Initialize AI features on mount
+onMounted(() => {
+  generateAIRecommendations()
+  fetchAIInsights()
+})
 
 // Continue Learning carousel ref
 const continueLearningRef = ref<HTMLElement | null>(null)
@@ -1373,8 +1725,70 @@ function resumeFeaturedAutoPlay() {
             <i class="fas fa-play"></i>
             Continue Learning
           </button>
+          <!-- AI Action Buttons -->
+          <button
+            @click="analyzeSkillGaps"
+            :disabled="isAnalyzingSkillGaps"
+            class="px-5 py-2.5 bg-gradient-to-r from-purple-500 to-indigo-500 text-white rounded-xl font-semibold text-sm flex items-center gap-2 hover:from-purple-600 hover:to-indigo-600 transition-all shadow-lg disabled:opacity-50"
+          >
+            <i :class="isAnalyzingSkillGaps ? 'fas fa-spinner fa-spin' : 'fas fa-wand-magic-sparkles'"></i>
+            {{ isAnalyzingSkillGaps ? 'Analyzing...' : 'Skill Gap Analysis' }}
+          </button>
+          <button
+            @click="generateAILearningPaths"
+            :disabled="isGeneratingLearningPath"
+            class="px-5 py-2.5 bg-gradient-to-r from-teal-500 to-cyan-500 text-white rounded-xl font-semibold text-sm flex items-center gap-2 hover:from-teal-600 hover:to-cyan-600 transition-all shadow-lg disabled:opacity-50"
+          >
+            <i :class="isGeneratingLearningPath ? 'fas fa-spinner fa-spin' : 'fas fa-route'"></i>
+            {{ isGeneratingLearningPath ? 'Generating...' : 'AI Learning Paths' }}
+          </button>
         </div>
       </div>
+    </div>
+
+    <!-- AI Insights Panel -->
+    <div v-if="aiInsights.length > 0" class="ai-insights-bar">
+      <div class="ai-insights-header">
+        <div class="flex items-center gap-2">
+          <div class="ai-icon-badge">
+            <i class="fas fa-wand-magic-sparkles"></i>
+          </div>
+          <span class="font-semibold text-gray-800">AI Insights</span>
+          <span class="text-xs px-2 py-0.5 bg-teal-100 text-teal-700 rounded-full">{{ aiInsights.length }} new</span>
+        </div>
+        <button @click="showAIInsightsPanel = !showAIInsightsPanel" class="text-gray-500 hover:text-gray-700">
+          <i :class="showAIInsightsPanel ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"></i>
+        </button>
+      </div>
+      <transition name="slide">
+        <div v-if="showAIInsightsPanel" class="ai-insights-content">
+          <div
+            v-for="insight in aiInsights"
+            :key="insight.id"
+            :class="['ai-insight-card', getInsightColor(insight.color)]"
+          >
+            <div class="flex items-start gap-3">
+              <div :class="['ai-insight-icon', getInsightIconBg(insight.color)]">
+                <i :class="insight.icon"></i>
+              </div>
+              <div class="flex-1">
+                <h4 class="font-semibold text-sm">{{ insight.title }}</h4>
+                <p class="text-xs mt-0.5 opacity-90">{{ insight.message }}</p>
+                <button
+                  v-if="insight.actionLabel"
+                  @click="navigateToCourse(insight.actionCourseId!)"
+                  class="mt-2 text-xs font-semibold underline hover:no-underline"
+                >
+                  {{ insight.actionLabel }}
+                </button>
+              </div>
+              <button @click="dismissInsight(insight.id)" class="text-gray-400 hover:text-gray-600 p-1">
+                <i class="fas fa-times text-xs"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </transition>
     </div>
 
     <!-- View Navigation -->
@@ -3465,6 +3879,315 @@ function resumeFeaturedAutoPlay() {
               </div>
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AI Personalized Recommendations Section -->
+    <div v-if="aiPersonalizedRecommendations.length > 0 && currentView === 'my-courses'" class="ai-recommendations-section mx-8 mb-6">
+      <div class="ai-section-header">
+        <div class="flex items-center gap-3">
+          <div class="ai-section-icon">
+            <i class="fas fa-wand-magic-sparkles"></i>
+          </div>
+          <div>
+            <h2 class="text-xl font-bold text-gray-900">AI-Powered Recommendations</h2>
+            <p class="text-sm text-gray-500">Personalized courses based on your learning journey</p>
+          </div>
+        </div>
+        <button
+          @click="generateAIRecommendations"
+          :disabled="isGeneratingRecommendations"
+          class="px-4 py-2 bg-gradient-to-r from-teal-500 to-cyan-500 text-white rounded-lg text-sm font-medium flex items-center gap-2 hover:from-teal-600 hover:to-cyan-600 transition-all disabled:opacity-50"
+        >
+          <i :class="isGeneratingRecommendations ? 'fas fa-spinner fa-spin' : 'fas fa-sync-alt'"></i>
+          {{ isGeneratingRecommendations ? 'Refreshing...' : 'Refresh' }}
+        </button>
+      </div>
+
+      <div v-if="isGeneratingRecommendations" class="ai-loading-state">
+        <AILoadingIndicator />
+        <p class="text-gray-500 mt-2">Analyzing your learning patterns...</p>
+      </div>
+
+      <div v-else class="ai-recommendations-grid">
+        <div
+          v-for="rec in aiPersonalizedRecommendations"
+          :key="rec.courseId"
+          class="ai-recommendation-card"
+          @click="navigateToCourse(rec.courseId)"
+        >
+          <div class="ai-rec-header">
+            <div class="ai-match-score">
+              <AIConfidenceBar :confidence="rec.matchScore / 100" size="sm" />
+              <span class="text-sm font-bold text-teal-600">{{ rec.matchScore }}% Match</span>
+            </div>
+            <span :class="['ai-priority-badge', rec.priority === 'high' ? 'priority-high' : 'priority-medium']">
+              <i :class="rec.priority === 'high' ? 'fas fa-fire' : 'fas fa-star'"></i>
+              {{ rec.priority === 'high' ? 'High Priority' : 'Recommended' }}
+            </span>
+          </div>
+
+          <h3 class="ai-rec-title">{{ rec.title }}</h3>
+
+          <div class="ai-rec-reason">
+            <i class="fas fa-lightbulb text-amber-500"></i>
+            <p>{{ rec.reason }}</p>
+          </div>
+
+          <div class="ai-rec-skills">
+            <span class="text-xs font-medium text-gray-500 mb-1.5 block">Skills you'll gain:</span>
+            <div class="flex flex-wrap gap-1.5">
+              <AISuggestionChip
+                v-for="skill in rec.skillsGained"
+                :key="skill"
+                :label="skill"
+                size="sm"
+              />
+            </div>
+          </div>
+
+          <div class="ai-rec-footer">
+            <span class="text-sm text-gray-500">
+              <i class="fas fa-clock mr-1"></i>
+              {{ rec.estimatedTime }}
+            </span>
+            <button class="ai-rec-enroll-btn">
+              <i class="fas fa-plus"></i>
+              Enroll Now
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Skill Gap Analysis Modal -->
+    <div v-if="showSkillGapModal" class="modal-overlay" @click.self="showSkillGapModal = false">
+      <div class="skill-gap-modal">
+        <div class="modal-header bg-gradient-to-r from-purple-500 to-indigo-500">
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+              <i class="fas fa-wand-magic-sparkles text-white text-xl"></i>
+            </div>
+            <div>
+              <h2 class="text-xl font-bold text-white">AI Skill Gap Analysis</h2>
+              <p class="text-purple-100 text-sm">Personalized assessment of your skill development</p>
+            </div>
+          </div>
+          <button @click="showSkillGapModal = false" class="text-white/70 hover:text-white">
+            <i class="fas fa-times text-xl"></i>
+          </button>
+        </div>
+
+        <div v-if="skillGapAnalysis" class="modal-body">
+          <!-- Overall Readiness -->
+          <div class="skill-overview">
+            <div class="readiness-score">
+              <div class="readiness-circle">
+                <svg viewBox="0 0 100 100">
+                  <circle cx="50" cy="50" r="45" fill="none" stroke="#e5e7eb" stroke-width="8" />
+                  <circle
+                    cx="50" cy="50" r="45" fill="none" stroke="url(#gradient)" stroke-width="8"
+                    :stroke-dasharray="skillGapAnalysis.overallReadiness * 2.83 + ', 283'"
+                    stroke-linecap="round"
+                    transform="rotate(-90 50 50)"
+                  />
+                  <defs>
+                    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%">
+                      <stop offset="0%" stop-color="#8b5cf6" />
+                      <stop offset="100%" stop-color="#6366f1" />
+                    </linearGradient>
+                  </defs>
+                </svg>
+                <div class="readiness-value">
+                  <span class="text-3xl font-bold text-gray-900">{{ skillGapAnalysis.overallReadiness }}%</span>
+                  <span class="text-xs text-gray-500">Career Ready</span>
+                </div>
+              </div>
+              <p class="text-sm text-gray-600 mt-3 text-center">Based on industry standards and your learning goals</p>
+            </div>
+
+            <div class="strength-weakness">
+              <div class="sw-section strengths">
+                <h4><i class="fas fa-check-circle text-green-500"></i> Your Strengths</h4>
+                <div class="sw-chips">
+                  <span v-for="s in skillGapAnalysis.strengths" :key="s" class="sw-chip strength">{{ s }}</span>
+                </div>
+              </div>
+              <div class="sw-section weaknesses">
+                <h4><i class="fas fa-exclamation-circle text-amber-500"></i> Areas to Improve</h4>
+                <div class="sw-chips">
+                  <span v-for="w in skillGapAnalysis.weaknesses" :key="w" class="sw-chip weakness">{{ w }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Skill Gaps List -->
+          <div class="skill-gaps-list">
+            <h3 class="text-lg font-bold text-gray-900 mb-4">Skill Gap Details</h3>
+            <div class="skill-gap-items">
+              <div v-for="gap in skillGapAnalysis.gaps" :key="gap.skill" class="skill-gap-item">
+                <div class="gap-header">
+                  <div class="flex items-center gap-2">
+                    <span class="font-semibold text-gray-800">{{ gap.skill }}</span>
+                    <span :class="['priority-tag', getPriorityColor(gap.priority)]">{{ gap.priority }}</span>
+                  </div>
+                  <span class="text-xs text-gray-500">{{ gap.category }}</span>
+                </div>
+                <div class="gap-bars">
+                  <div class="gap-bar-container">
+                    <div class="gap-bar-label">
+                      <span>Current</span>
+                      <span class="font-medium">{{ gap.currentLevel }}%</span>
+                    </div>
+                    <div class="gap-bar">
+                      <div class="gap-bar-fill current" :style="{ width: gap.currentLevel + '%' }"></div>
+                    </div>
+                  </div>
+                  <div class="gap-bar-container">
+                    <div class="gap-bar-label">
+                      <span>Target</span>
+                      <span class="font-medium">{{ gap.targetLevel }}%</span>
+                    </div>
+                    <div class="gap-bar">
+                      <div class="gap-bar-fill target" :style="{ width: gap.targetLevel + '%' }"></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="gap-delta" :class="getSkillGapColor(gap.gap)">
+                  <i class="fas fa-arrow-up"></i>
+                  {{ gap.gap }}% gap to close
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recommended Focus -->
+          <div class="recommended-focus">
+            <h4><i class="fas fa-bullseye text-teal-500"></i> Recommended Focus Areas</h4>
+            <div class="focus-items">
+              <span v-for="focus in skillGapAnalysis.recommendedFocus" :key="focus" class="focus-item">
+                {{ focus }}
+              </span>
+            </div>
+            <p class="time-estimate">
+              <i class="fas fa-clock"></i>
+              Estimated time to close gaps: <strong>{{ skillGapAnalysis.estimatedTimeToClose }}</strong>
+            </p>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button @click="showSkillGapModal = false" class="btn-secondary">Close</button>
+          <button @click="generateAILearningPaths(); showSkillGapModal = false" class="btn-primary">
+            <i class="fas fa-route"></i>
+            Get AI Learning Path
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- AI Learning Path Modal -->
+    <div v-if="showAILearningPathModal" class="modal-overlay" @click.self="showAILearningPathModal = false">
+      <div class="ai-path-modal">
+        <div class="modal-header bg-gradient-to-r from-teal-500 to-cyan-500">
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+              <i class="fas fa-route text-white text-xl"></i>
+            </div>
+            <div>
+              <h2 class="text-xl font-bold text-white">AI-Generated Learning Paths</h2>
+              <p class="text-teal-100 text-sm">Personalized roadmaps to achieve your career goals</p>
+            </div>
+          </div>
+          <button @click="showAILearningPathModal = false" class="text-white/70 hover:text-white">
+            <i class="fas fa-times text-xl"></i>
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <div class="ai-paths-container">
+            <!-- Path Selection -->
+            <div class="ai-paths-list">
+              <div
+                v-for="path in aiLearningPaths"
+                :key="path.id"
+                :class="['ai-path-card', { 'selected': selectedAIPath?.id === path.id }]"
+                @click="selectAIPath(path)"
+              >
+                <div class="path-confidence">
+                  <AIConfidenceBar :confidence="path.confidence / 100" size="sm" />
+                  <span class="text-xs font-semibold text-teal-600">{{ path.confidence }}% match</span>
+                </div>
+                <h3 class="path-title">{{ path.title }}</h3>
+                <p class="path-description">{{ path.description }}</p>
+                <div class="path-meta">
+                  <span><i class="fas fa-book"></i> {{ path.steps.length }} courses</span>
+                  <span><i class="fas fa-clock"></i> {{ path.totalDuration }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Path Details -->
+            <div v-if="selectedAIPath" class="ai-path-details">
+              <div class="path-details-header">
+                <h3>{{ selectedAIPath.title }}</h3>
+                <span class="path-goal"><i class="fas fa-bullseye"></i> {{ selectedAIPath.goal }}</span>
+              </div>
+
+              <!-- Path Steps -->
+              <div class="path-steps">
+                <div
+                  v-for="(step, index) in selectedAIPath.steps"
+                  :key="step.courseId"
+                  class="path-step"
+                >
+                  <div class="step-number">{{ index + 1 }}</div>
+                  <div class="step-connector" v-if="index < selectedAIPath.steps.length - 1"></div>
+                  <div class="step-content">
+                    <div class="step-header">
+                      <h4>{{ step.title }}</h4>
+                      <span class="step-duration">{{ step.duration }}</span>
+                    </div>
+                    <div class="step-skills">
+                      <span v-for="skill in step.skills" :key="skill" class="step-skill">{{ skill }}</span>
+                    </div>
+                    <div class="step-milestone">
+                      <i class="fas fa-trophy text-amber-500"></i>
+                      <span>Milestone: {{ step.milestone }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Expected Outcomes -->
+              <div class="path-outcomes">
+                <h4><i class="fas fa-check-circle text-green-500"></i> Expected Outcomes</h4>
+                <ul>
+                  <li v-for="outcome in selectedAIPath.expectedOutcomes" :key="outcome">{{ outcome }}</li>
+                </ul>
+              </div>
+
+              <!-- Career Impact -->
+              <div class="path-impact">
+                <i class="fas fa-rocket text-purple-500"></i>
+                <p>{{ selectedAIPath.careerImpact }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button @click="showAILearningPathModal = false" class="btn-secondary">Close</button>
+          <button
+            v-if="selectedAIPath"
+            @click="enrollInAIPath(selectedAIPath)"
+            class="btn-primary"
+          >
+            <i class="fas fa-rocket"></i>
+            Start This Path
+          </button>
         </div>
       </div>
     </div>
@@ -7984,6 +8707,767 @@ function resumeFeaturedAutoPlay() {
 
   .cert-pagination-controls {
     justify-content: center;
+  }
+}
+
+/* ============================================================================
+   AI FEATURES STYLES
+   ============================================================================ */
+
+/* AI Insights Bar */
+.ai-insights-bar {
+  background: linear-gradient(135deg, #f0fdfa 0%, #f0f9ff 100%);
+  border-bottom: 1px solid rgba(20, 184, 166, 0.1);
+  padding: 0.75rem 2rem;
+}
+
+.ai-insights-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.ai-icon-badge {
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(135deg, #14b8a6 0%, #06b6d4 100%);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 0.875rem;
+}
+
+.ai-insights-content {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(20, 184, 166, 0.1);
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+}
+
+.ai-insight-card {
+  min-width: 280px;
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  border: 1px solid;
+  flex-shrink: 0;
+}
+
+.ai-insight-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 0.75rem;
+  flex-shrink: 0;
+}
+
+/* AI Recommendations Section */
+.ai-recommendations-section {
+  background: white;
+  border-radius: 16px;
+  border: 1px solid #e5e7eb;
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.ai-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.ai-section-icon {
+  width: 44px;
+  height: 44px;
+  background: linear-gradient(135deg, #14b8a6 0%, #06b6d4 100%);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.125rem;
+  box-shadow: 0 4px 12px rgba(20, 184, 166, 0.3);
+}
+
+.ai-loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+}
+
+.ai-recommendations-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.25rem;
+}
+
+.ai-recommendation-card {
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 1.25rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.ai-recommendation-card:hover {
+  border-color: #14b8a6;
+  box-shadow: 0 8px 24px rgba(20, 184, 166, 0.15);
+  transform: translateY(-4px);
+}
+
+.ai-rec-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.ai-match-score {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.ai-priority-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.ai-priority-badge.priority-high {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  color: #92400e;
+}
+
+.ai-priority-badge.priority-medium {
+  background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+  color: #0369a1;
+}
+
+.ai-rec-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 0.75rem;
+}
+
+.ai-rec-reason {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  background: #fffbeb;
+  border-radius: 10px;
+  margin-bottom: 1rem;
+}
+
+.ai-rec-reason p {
+  font-size: 0.8rem;
+  color: #78350f;
+  line-height: 1.4;
+}
+
+.ai-rec-skills {
+  margin-bottom: 1rem;
+}
+
+.ai-rec-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 0.75rem;
+  border-top: 1px solid #f3f4f6;
+}
+
+.ai-rec-enroll-btn {
+  padding: 0.5rem 1rem;
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.ai-rec-enroll-btn:hover {
+  background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%);
+  transform: scale(1.02);
+}
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 2rem;
+}
+
+.skill-gap-modal,
+.ai-path-modal {
+  background: white;
+  border-radius: 20px;
+  max-width: 900px;
+  width: 100%;
+  max-height: 85vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+.modal-header {
+  padding: 1.5rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.modal-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.5rem 2rem;
+}
+
+.modal-footer {
+  padding: 1rem 2rem;
+  background: #f9fafb;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+.btn-secondary {
+  padding: 0.625rem 1.25rem;
+  background: white;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  color: #4b5563;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-secondary:hover {
+  background: #f3f4f6;
+}
+
+.btn-primary {
+  padding: 0.625rem 1.25rem;
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+  border: none;
+  border-radius: 10px;
+  color: white;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%);
+  transform: translateY(-1px);
+}
+
+/* Skill Gap Modal Styles */
+.skill-overview {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 2rem;
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.readiness-score {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.readiness-circle {
+  position: relative;
+  width: 140px;
+  height: 140px;
+}
+
+.readiness-circle svg {
+  width: 100%;
+  height: 100%;
+}
+
+.readiness-value {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.strength-weakness {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.sw-section h4 {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.sw-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.sw-chip {
+  padding: 0.375rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.sw-chip.strength {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.sw-chip.weakness {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.skill-gaps-list {
+  margin-bottom: 1.5rem;
+}
+
+.skill-gap-items {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.skill-gap-item {
+  background: #f9fafb;
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+.gap-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.priority-tag {
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  border: 1px solid;
+}
+
+.gap-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.gap-bar-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.gap-bar-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.gap-bar {
+  height: 8px;
+  background: #e5e7eb;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.gap-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.5s ease;
+}
+
+.gap-bar-fill.current {
+  background: linear-gradient(90deg, #f59e0b 0%, #f97316 100%);
+}
+
+.gap-bar-fill.target {
+  background: linear-gradient(90deg, #22c55e 0%, #16a34a 100%);
+}
+
+.gap-delta {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-top: 0.5rem;
+}
+
+.recommended-focus {
+  background: linear-gradient(135deg, #f0fdfa 0%, #ecfeff 100%);
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+.recommended-focus h4 {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #0f766e;
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.focus-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.focus-item {
+  padding: 0.375rem 0.75rem;
+  background: white;
+  border: 1px solid #99f6e4;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #0f766e;
+}
+
+.time-estimate {
+  font-size: 0.8rem;
+  color: #4b5563;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* AI Learning Path Modal */
+.ai-paths-container {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 1.5rem;
+  min-height: 400px;
+}
+
+.ai-paths-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.ai-path-card {
+  padding: 1rem;
+  background: #f9fafb;
+  border: 2px solid transparent;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.ai-path-card:hover {
+  background: #f0fdfa;
+  border-color: #99f6e4;
+}
+
+.ai-path-card.selected {
+  background: linear-gradient(135deg, #f0fdfa 0%, #ecfeff 100%);
+  border-color: #14b8a6;
+}
+
+.path-confidence {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.path-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 0.25rem;
+}
+
+.path-description {
+  font-size: 0.75rem;
+  color: #6b7280;
+  line-height: 1.4;
+  margin-bottom: 0.5rem;
+}
+
+.path-meta {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.7rem;
+  color: #9ca3af;
+}
+
+.path-meta span {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.ai-path-details {
+  background: #f9fafb;
+  border-radius: 12px;
+  padding: 1.5rem;
+  overflow-y: auto;
+}
+
+.path-details-header {
+  margin-bottom: 1.5rem;
+}
+
+.path-details-header h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 0.5rem;
+}
+
+.path-goal {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.375rem 0.75rem;
+  background: #f0fdf4;
+  color: #166534;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.path-steps {
+  margin-bottom: 1.5rem;
+}
+
+.path-step {
+  position: relative;
+  display: flex;
+  gap: 1rem;
+  padding-bottom: 1.5rem;
+}
+
+.step-number {
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.875rem;
+  font-weight: 700;
+  flex-shrink: 0;
+  z-index: 1;
+}
+
+.step-connector {
+  position: absolute;
+  left: 15px;
+  top: 32px;
+  width: 2px;
+  height: calc(100% - 32px);
+  background: #d1d5db;
+}
+
+.step-content {
+  flex: 1;
+  background: white;
+  border-radius: 10px;
+  padding: 1rem;
+  border: 1px solid #e5e7eb;
+}
+
+.step-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.step-header h4 {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.step-duration {
+  font-size: 0.75rem;
+  color: #6b7280;
+  background: #f3f4f6;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+}
+
+.step-skills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+  margin-bottom: 0.5rem;
+}
+
+.step-skill {
+  padding: 0.25rem 0.5rem;
+  background: #e0f2fe;
+  color: #0369a1;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 500;
+}
+
+.step-milestone {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.75rem;
+  color: #78350f;
+}
+
+.path-outcomes {
+  background: white;
+  border-radius: 10px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.path-outcomes h4 {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #166534;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.path-outcomes ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.path-outcomes li {
+  position: relative;
+  padding-left: 1rem;
+  font-size: 0.8rem;
+  color: #4b5563;
+  margin-bottom: 0.375rem;
+}
+
+.path-outcomes li::before {
+  content: '•';
+  position: absolute;
+  left: 0;
+  color: #22c55e;
+}
+
+.path-impact {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: linear-gradient(135deg, #faf5ff 0%, #f5f3ff 100%);
+  border-radius: 10px;
+  border: 1px solid #e9d5ff;
+}
+
+.path-impact p {
+  font-size: 0.85rem;
+  color: #6b21a8;
+  line-height: 1.4;
+}
+
+/* Slide Transition */
+.slide-enter-active,
+.slide-leave-active {
+  transition: all 0.3s ease;
+}
+
+.slide-enter-from,
+.slide-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .skill-overview {
+    grid-template-columns: 1fr;
+  }
+
+  .ai-paths-container {
+    grid-template-columns: 1fr;
+  }
+
+  .ai-insights-content {
+    flex-direction: column;
+  }
+
+  .ai-insight-card {
+    min-width: auto;
+  }
+
+  .ai-recommendations-grid {
+    grid-template-columns: 1fr;
   }
 }
 </style>

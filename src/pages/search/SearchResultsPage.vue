@@ -2,6 +2,11 @@
 import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
+import { useAIServicesStore } from '@/stores/aiServices'
+import { AILoadingIndicator, AISuggestionChip, AIConfidenceBar } from '@/components/ai'
+
+// Initialize AI store
+const aiStore = useAIServicesStore()
 
 interface QuickFilter {
   id: string
@@ -238,6 +243,183 @@ function highlightText(text: string): string {
 function toggleTag(tag: Tag): void {
   tag.active = !tag.active
 }
+
+// ============================================================================
+// AI Features State & Functions
+// ============================================================================
+
+// AI State
+const showAIPanel = ref(true)
+const isAnalyzingQuery = ref(false)
+const showEntityFilter = ref(false)
+const showDidYouMean = ref(true)
+
+// AI Interfaces
+interface QueryIntent {
+  type: 'informational' | 'navigational' | 'transactional'
+  confidence: number
+  description: string
+}
+
+interface ExtractedEntity {
+  text: string
+  type: 'person' | 'organization' | 'topic' | 'date' | 'location'
+  confidence: number
+}
+
+interface DidYouMeanSuggestion {
+  original: string
+  suggestion: string
+  reason: string
+}
+
+interface AISearchInsight {
+  id: string
+  type: 'tip' | 'related' | 'refine'
+  text: string
+  action?: string
+}
+
+// AI Data
+const queryIntent = ref<QueryIntent>({
+  type: 'informational',
+  confidence: 0.92,
+  description: 'Looking for learning resources and guides'
+})
+
+const extractedEntities = ref<ExtractedEntity[]>([
+  { text: 'Employee', type: 'topic', confidence: 0.95 },
+  { text: 'Onboarding', type: 'topic', confidence: 0.98 },
+  { text: 'HR Team', type: 'organization', confidence: 0.85 }
+])
+
+const didYouMeanSuggestions = ref<DidYouMeanSuggestion[]>([
+  { original: 'employee onboarding', suggestion: 'new employee onboarding process', reason: 'More specific results' },
+  { original: 'employee onboarding', suggestion: 'employee onboarding checklist', reason: 'Popular search' }
+])
+
+const aiSearchInsights = ref<AISearchInsight[]>([
+  { id: '1', type: 'tip', text: 'Try adding "2024" for the latest content', action: 'employee onboarding 2024' },
+  { id: '2', type: 'related', text: 'Users also searched for: "new hire training"', action: 'new hire training' },
+  { id: '3', type: 'refine', text: 'Filter by HR Team for official policies', action: 'filter:author:HR Team' }
+])
+
+const relatedSearches = ref([
+  'new hire orientation',
+  'onboarding checklist template',
+  'first day employee guide',
+  '30-60-90 day plan',
+  'employee handbook'
+])
+
+// AI Functions
+async function analyzeSearchQuery(query: string) {
+  isAnalyzingQuery.value = true
+
+  try {
+    await new Promise(resolve => setTimeout(resolve, 500))
+
+    // Simulate AI analysis
+    if (query.toLowerCase().includes('onboarding')) {
+      queryIntent.value = {
+        type: 'informational',
+        confidence: 0.92,
+        description: 'Looking for learning resources and guides'
+      }
+      extractedEntities.value = [
+        { text: 'Employee', type: 'topic', confidence: 0.95 },
+        { text: 'Onboarding', type: 'topic', confidence: 0.98 }
+      ]
+    } else if (query.toLowerCase().includes('policy')) {
+      queryIntent.value = {
+        type: 'navigational',
+        confidence: 0.88,
+        description: 'Looking for specific policy documents'
+      }
+    } else {
+      queryIntent.value = {
+        type: 'informational',
+        confidence: 0.75,
+        description: 'General information search'
+      }
+    }
+  } catch (error) {
+    console.error('Query analysis failed:', error)
+  } finally {
+    isAnalyzingQuery.value = false
+  }
+}
+
+function applyDidYouMean(suggestion: string) {
+  searchQuery.value = suggestion
+  performSearch()
+  showDidYouMean.value = false
+}
+
+function applyEntityFilter(entity: ExtractedEntity) {
+  // Add entity to search query or filter
+  const filterQuery = `${searchQuery.value} ${entity.text}`
+  searchQuery.value = filterQuery
+  performSearch()
+}
+
+function applySearchInsight(insight: AISearchInsight) {
+  if (insight.action) {
+    if (insight.action.startsWith('filter:')) {
+      // Handle filter action
+      const [, filterType, filterValue] = insight.action.split(':')
+      console.log('Apply filter:', filterType, filterValue)
+    } else {
+      searchQuery.value = insight.action
+      performSearch()
+    }
+  }
+}
+
+function getEntityTypeColor(type: string) {
+  switch (type) {
+    case 'person': return 'bg-blue-100 text-blue-700'
+    case 'organization': return 'bg-purple-100 text-purple-700'
+    case 'topic': return 'bg-teal-100 text-teal-700'
+    case 'date': return 'bg-amber-100 text-amber-700'
+    case 'location': return 'bg-green-100 text-green-700'
+    default: return 'bg-gray-100 text-gray-700'
+  }
+}
+
+function getEntityTypeIcon(type: string) {
+  switch (type) {
+    case 'person': return 'fas fa-user'
+    case 'organization': return 'fas fa-building'
+    case 'topic': return 'fas fa-tag'
+    case 'date': return 'fas fa-calendar'
+    case 'location': return 'fas fa-map-marker-alt'
+    default: return 'fas fa-circle'
+  }
+}
+
+function getIntentTypeColor(type: string) {
+  switch (type) {
+    case 'informational': return 'bg-blue-100 text-blue-700'
+    case 'navigational': return 'bg-purple-100 text-purple-700'
+    case 'transactional': return 'bg-green-100 text-green-700'
+    default: return 'bg-gray-100 text-gray-700'
+  }
+}
+
+// Enhanced search with AI
+function performAISearch(): void {
+  if (searchQuery.value.trim()) {
+    isLoading.value = true
+    displayQuery.value = searchQuery.value
+    analyzeSearchQuery(searchQuery.value)
+    showDidYouMean.value = true
+
+    setTimeout(() => {
+      isLoading.value = false
+    }, 800)
+  }
+}
 </script>
 
 <template>
@@ -277,6 +459,45 @@ function toggleTag(tag: Tag): void {
           >
             <i :class="[filter.icon, 'icon-soft mr-1.5']"></i>{{ filter.label }}
           </button>
+        </div>
+
+        <!-- AI: Did You Mean Suggestions -->
+        <div v-if="showDidYouMean && didYouMeanSuggestions.length > 0" class="mt-4 p-3 bg-amber-50 rounded-xl border border-amber-200">
+          <div class="flex items-center gap-2 mb-2">
+            <i class="fas fa-lightbulb text-amber-500"></i>
+            <span class="text-sm font-medium text-amber-700">Did you mean:</span>
+          </div>
+          <div class="flex flex-wrap gap-2">
+            <button
+              v-for="suggestion in didYouMeanSuggestions"
+              :key="suggestion.suggestion"
+              @click="applyDidYouMean(suggestion.suggestion)"
+              class="px-3 py-1.5 bg-white border border-amber-300 rounded-lg text-sm text-amber-800 hover:bg-amber-100 transition-colors flex items-center gap-2"
+            >
+              <span class="font-medium">{{ suggestion.suggestion }}</span>
+              <span class="text-xs text-amber-600">({{ suggestion.reason }})</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- AI: Extracted Entities Filter -->
+        <div v-if="extractedEntities.length > 0" class="mt-4">
+          <div class="flex items-center gap-2 mb-2">
+            <i class="fas fa-wand-magic-sparkles text-teal-500"></i>
+            <span class="text-sm font-medium text-gray-700">AI Detected Entities:</span>
+          </div>
+          <div class="flex flex-wrap gap-2">
+            <button
+              v-for="entity in extractedEntities"
+              :key="entity.text"
+              @click="applyEntityFilter(entity)"
+              :class="['px-3 py-1.5 rounded-lg text-sm font-medium transition-all flex items-center gap-2 hover:shadow-md', getEntityTypeColor(entity.type)]"
+            >
+              <i :class="getEntityTypeIcon(entity.type)"></i>
+              <span>{{ entity.text }}</span>
+              <span class="text-xs opacity-75">{{ Math.round(entity.confidence * 100) }}%</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -371,11 +592,24 @@ function toggleTag(tag: Tag): void {
         <!-- Results Header -->
         <div class="flex items-center justify-between mb-4">
           <div>
-            <p class="text-teal-600">
-              <span class="font-semibold text-teal-900">{{ totalResults }}</span> results for
-              "<span class="font-medium text-teal-800">{{ displayQuery }}</span>"
+            <div class="flex items-center gap-3 mb-1">
+              <p class="text-teal-600">
+                <span class="font-semibold text-teal-900">{{ totalResults }}</span> results for
+                "<span class="font-medium text-teal-800">{{ displayQuery }}</span>"
+              </p>
+              <!-- AI Query Intent Badge -->
+              <span v-if="queryIntent" :class="['px-2.5 py-1 rounded-full text-xs font-medium flex items-center gap-1.5', getIntentTypeColor(queryIntent.type)]">
+                <i class="fas fa-brain"></i>
+                {{ queryIntent.type === 'informational' ? 'Looking for info' : queryIntent.type === 'navigational' ? 'Finding specific' : 'Taking action' }}
+                <span class="opacity-75">({{ Math.round(queryIntent.confidence * 100) }}%)</span>
+              </span>
+            </div>
+            <p class="text-sm text-teal-500">
+              Search completed in {{ searchTime }}ms
+              <span v-if="isAnalyzingQuery" class="ml-2 text-teal-600">
+                <i class="fas fa-circle-notch fa-spin"></i> AI analyzing...
+              </span>
             </p>
-            <p class="text-sm text-teal-500">Search completed in {{ searchTime }}ms</p>
           </div>
           <div class="flex items-center gap-3">
             <select v-model="sortBy" class="input text-sm py-2">
@@ -418,6 +652,51 @@ function toggleTag(tag: Tag): void {
                 </button>
               </div>
             </div>
+          </div>
+        </div>
+
+        <!-- AI Search Insights Panel -->
+        <div v-if="showAIPanel && aiSearchInsights.length > 0" class="card-animated fade-in-up rounded-2xl p-5 mb-6" style="animation-delay: 0.35s;">
+          <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center gap-2">
+              <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-teal-400 to-emerald-500 flex items-center justify-center">
+                <i class="fas fa-wand-magic-sparkles text-white text-sm"></i>
+              </div>
+              <h4 class="font-semibold text-gray-900">AI Search Insights</h4>
+            </div>
+            <button @click="showAIPanel = false" class="p-1.5 hover:bg-gray-100 rounded-lg transition-colors">
+              <i class="fas fa-times text-gray-400 text-sm"></i>
+            </button>
+          </div>
+          <div class="space-y-2">
+            <button
+              v-for="insight in aiSearchInsights"
+              :key="insight.id"
+              @click="applySearchInsight(insight)"
+              :class="['w-full p-3 rounded-xl text-left transition-all flex items-start gap-3 group',
+                       insight.type === 'tip' ? 'bg-amber-50 hover:bg-amber-100' :
+                       insight.type === 'related' ? 'bg-blue-50 hover:bg-blue-100' : 'bg-purple-50 hover:bg-purple-100']"
+            >
+              <div :class="['w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0',
+                            insight.type === 'tip' ? 'bg-amber-200' :
+                            insight.type === 'related' ? 'bg-blue-200' : 'bg-purple-200']">
+                <i :class="['text-sm',
+                            insight.type === 'tip' ? 'fas fa-lightbulb text-amber-700' :
+                            insight.type === 'related' ? 'fas fa-search-plus text-blue-700' : 'fas fa-filter text-purple-700']"></i>
+              </div>
+              <div class="flex-1">
+                <p :class="['text-sm font-medium',
+                            insight.type === 'tip' ? 'text-amber-800' :
+                            insight.type === 'related' ? 'text-blue-800' : 'text-purple-800']">
+                  {{ insight.text }}
+                </p>
+                <span v-if="insight.action" :class="['text-xs mt-0.5 inline-block',
+                              insight.type === 'tip' ? 'text-amber-600' :
+                              insight.type === 'related' ? 'text-blue-600' : 'text-purple-600']">
+                  Click to apply →
+                </span>
+              </div>
+            </button>
           </div>
         </div>
 
@@ -507,6 +786,31 @@ function toggleTag(tag: Tag): void {
             </button>
           </div>
         </div>
+
+        <!-- AI Related Searches -->
+        <div class="mt-8 card-animated fade-in-up rounded-2xl p-5" style="animation-delay: 1s;">
+          <div class="flex items-center gap-2 mb-4">
+            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-teal-400 to-emerald-500 flex items-center justify-center">
+              <i class="fas fa-wand-magic-sparkles text-white text-sm"></i>
+            </div>
+            <h4 class="font-semibold text-gray-900">AI Related Searches</h4>
+          </div>
+          <div class="flex flex-wrap gap-2">
+            <button
+              v-for="search in relatedSearches"
+              :key="search"
+              @click="searchQuery = search; performAISearch()"
+              class="px-4 py-2 bg-gradient-to-r from-teal-50 to-emerald-50 border border-teal-200 rounded-xl text-sm font-medium text-teal-700 hover:from-teal-100 hover:to-emerald-100 hover:border-teal-300 transition-all flex items-center gap-2"
+            >
+              <i class="fas fa-search text-teal-500 text-xs"></i>
+              {{ search }}
+            </button>
+          </div>
+          <p class="text-xs text-gray-500 mt-3">
+            <i class="fas fa-info-circle mr-1"></i>
+            Based on your search patterns and popular queries
+          </p>
+        </div>
       </div>
     </div>
   </div>
@@ -536,5 +840,47 @@ function toggleTag(tag: Tag): void {
 .input-group .input {
   width: 100%;
   padding-right: 6rem;
+}
+
+/* AI Feature Animations */
+@keyframes ai-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+@keyframes ai-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.ai-analyzing {
+  animation: ai-pulse 1.5s ease-in-out infinite;
+}
+
+.ai-shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(20, 184, 166, 0.1) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: ai-shimmer 2s infinite;
+}
+
+/* Entity chip hover effects */
+.entity-chip:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(20, 184, 166, 0.2);
+}
+
+/* AI insight card hover */
+.ai-insight-card:hover {
+  transform: translateX(4px);
+}
+
+/* Related search button hover */
+.related-search-btn:hover {
+  transform: scale(1.02);
 }
 </style>

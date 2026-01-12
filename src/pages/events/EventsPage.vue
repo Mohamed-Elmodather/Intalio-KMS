@@ -1,5 +1,11 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { useAIServicesStore } from '@/stores/aiServices'
+import { AILoadingIndicator, AISuggestionChip, AIConfidenceBar } from '@/components/ai'
+import type { SummarizationResult, ClassificationResult } from '@/types/ai'
+
+// Initialize AI store
+const aiStore = useAIServicesStore()
 
 // State
 const showCreateModal = ref(false)
@@ -649,6 +655,227 @@ function toggleReserve(eventId: number) {
     }
   }
 }
+
+// ============================================================================
+// AI Features State & Functions
+// ============================================================================
+
+// AI State
+const showAIPanel = ref(true)
+const isGeneratingDescription = ref(false)
+const isAnalyzingSchedule = ref(false)
+const isFetchingRelated = ref(false)
+const showAIDescriptionModal = ref(false)
+const showSmartScheduleModal = ref(false)
+const showRelatedEventsPanel = ref(false)
+
+// AI Interfaces
+interface AIEventDescription {
+  title: string
+  description: string
+  highlights: string[]
+  targetAudience: string
+  tags: string[]
+}
+
+interface ScheduleSuggestion {
+  id: string
+  timeSlot: string
+  date: string
+  score: number
+  reason: string
+  conflicts: string[]
+  recommendation: 'optimal' | 'good' | 'available'
+}
+
+interface RelatedEvent {
+  id: number
+  title: string
+  date: string
+  category: string
+  similarity: number
+  reason: string
+}
+
+// AI Data
+const generatedDescription = ref<AIEventDescription | null>(null)
+const scheduleSuggestions = ref<ScheduleSuggestion[]>([])
+const relatedEvents = ref<RelatedEvent[]>([])
+const selectedEventForAI = ref<Event | null>(null)
+
+// Mock AI Data
+const mockGeneratedDescription: AIEventDescription = {
+  title: 'Quarterly Strategy & Innovation Summit',
+  description: 'Join us for an engaging session where leadership will share key updates on organizational progress, strategic initiatives, and upcoming opportunities. This event brings together teams across departments to align on goals and celebrate achievements.',
+  highlights: [
+    'Q4 Performance Review & Key Metrics',
+    'Strategic Initiatives for 2026',
+    'Team Recognition & Awards',
+    'Interactive Q&A with Leadership',
+    'Networking Opportunities'
+  ],
+  targetAudience: 'All employees, particularly those interested in company direction and cross-team collaboration',
+  tags: ['Strategy', 'Leadership', 'Team Building', 'Quarterly Update', 'All-Hands']
+}
+
+const mockScheduleSuggestions: ScheduleSuggestion[] = [
+  {
+    id: '1',
+    timeSlot: '10:00 AM - 11:30 AM',
+    date: '2025-12-27',
+    score: 0.95,
+    reason: 'Most team members are available, no conflicting meetings, optimal focus time',
+    conflicts: [],
+    recommendation: 'optimal'
+  },
+  {
+    id: '2',
+    timeSlot: '2:00 PM - 3:30 PM',
+    date: '2025-12-27',
+    score: 0.82,
+    reason: 'Good availability after lunch, allows preparation time',
+    conflicts: ['2 optional meetings'],
+    recommendation: 'good'
+  },
+  {
+    id: '3',
+    timeSlot: '9:00 AM - 10:30 AM',
+    date: '2025-12-28',
+    score: 0.75,
+    reason: 'Morning slot available, some team members on PTO',
+    conflicts: ['3 team members unavailable'],
+    recommendation: 'available'
+  },
+  {
+    id: '4',
+    timeSlot: '3:00 PM - 4:30 PM',
+    date: '2025-12-29',
+    score: 0.68,
+    reason: 'End of week slot, lower energy but available',
+    conflicts: ['Weekend proximity', '1 conflicting review'],
+    recommendation: 'available'
+  }
+]
+
+const mockRelatedEvents: RelatedEvent[] = [
+  {
+    id: 101,
+    title: 'Leadership Town Hall - January',
+    date: '2026-01-15',
+    category: 'meeting',
+    similarity: 0.92,
+    reason: 'Similar format and audience - leadership communication event'
+  },
+  {
+    id: 102,
+    title: 'Team Sync: Cross-Department Collaboration',
+    date: '2026-01-08',
+    category: 'meeting',
+    similarity: 0.85,
+    reason: 'Cross-team alignment focus, similar objectives'
+  },
+  {
+    id: 103,
+    title: 'Annual Planning Workshop',
+    date: '2026-01-22',
+    category: 'training',
+    similarity: 0.78,
+    reason: 'Strategic planning context, complementary to quarterly review'
+  },
+  {
+    id: 104,
+    title: 'Innovation Showcase',
+    date: '2026-02-05',
+    category: 'webinar',
+    similarity: 0.71,
+    reason: 'Shares innovation and progress theme'
+  }
+]
+
+// AI Functions
+async function generateEventDescription(event?: Event) {
+  isGeneratingDescription.value = true
+  showAIDescriptionModal.value = true
+  selectedEventForAI.value = event || null
+
+  try {
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 1200))
+    generatedDescription.value = mockGeneratedDescription
+  } catch (error) {
+    console.error('Failed to generate description:', error)
+  } finally {
+    isGeneratingDescription.value = false
+  }
+}
+
+async function analyzeSmartSchedule() {
+  isAnalyzingSchedule.value = true
+  showSmartScheduleModal.value = true
+
+  try {
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 1500))
+    scheduleSuggestions.value = mockScheduleSuggestions
+  } catch (error) {
+    console.error('Failed to analyze schedule:', error)
+  } finally {
+    isAnalyzingSchedule.value = false
+  }
+}
+
+async function fetchRelatedEvents(event?: Event) {
+  isFetchingRelated.value = true
+  showRelatedEventsPanel.value = true
+  selectedEventForAI.value = event || events.value[0] || null
+
+  try {
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 1000))
+    relatedEvents.value = mockRelatedEvents
+  } catch (error) {
+    console.error('Failed to fetch related events:', error)
+  } finally {
+    isFetchingRelated.value = false
+  }
+}
+
+function applyGeneratedDescription() {
+  if (generatedDescription.value) {
+    newEvent.value.title = generatedDescription.value.title
+    newEvent.value.description = generatedDescription.value.description
+    showAIDescriptionModal.value = false
+  }
+}
+
+function applyScheduleSuggestion(suggestion: ScheduleSuggestion) {
+  newEvent.value.startDate = suggestion.date
+  // Parse time slot
+  const times = suggestion.timeSlot.split(' - ')
+  if (times.length > 0) {
+    // Could parse and apply time if needed
+  }
+  showSmartScheduleModal.value = false
+}
+
+function getRecommendationColor(rec: string) {
+  switch (rec) {
+    case 'optimal': return 'text-green-600 bg-green-100'
+    case 'good': return 'text-blue-600 bg-blue-100'
+    case 'available': return 'text-gray-600 bg-gray-100'
+    default: return 'text-gray-600 bg-gray-100'
+  }
+}
+
+function getCategoryIcon(category: string) {
+  const type = eventTypes.value.find(t => t.id === category)
+  return type ? type.icon : 'fas fa-calendar'
+}
+
+function getCategoryColor(category: string) {
+  const type = eventTypes.value.find(t => t.id === category)
+  return type ? type.color : '#6b7280'
+}
 </script>
 
 <template>
@@ -705,6 +932,17 @@ function toggleReserve(eventId: number) {
           <button @click="showCreateModal = true" class="px-5 py-2.5 bg-white text-teal-600 rounded-xl font-semibold text-sm flex items-center gap-2 hover:bg-teal-50 transition-all shadow-lg">
             <i class="fas fa-plus"></i>
             Create Event
+          </button>
+          <!-- AI Action Buttons -->
+          <button @click="analyzeSmartSchedule"
+                  class="px-5 py-2.5 bg-gradient-to-r from-teal-500/20 to-emerald-500/20 backdrop-blur-sm text-white rounded-xl font-semibold text-sm flex items-center gap-2 hover:from-teal-500/30 hover:to-emerald-500/30 transition-all border border-white/20">
+            <i class="fas fa-wand-magic-sparkles"></i>
+            Smart Scheduling
+          </button>
+          <button @click="fetchRelatedEvents()"
+                  class="px-5 py-2.5 bg-white/10 backdrop-blur-sm text-white rounded-xl font-semibold text-sm flex items-center gap-2 hover:bg-white/20 transition-all border border-white/20">
+            <i class="fas fa-robot"></i>
+            AI Suggestions
           </button>
         </div>
       </div>
@@ -1707,7 +1945,15 @@ function toggleReserve(eventId: number) {
                 </div>
               </div>
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                <div class="flex items-center justify-between mb-1">
+                  <label class="block text-sm font-medium text-gray-700">Description</label>
+                  <button @click="generateEventDescription()"
+                          type="button"
+                          class="px-3 py-1 text-xs font-medium text-teal-600 bg-teal-50 rounded-lg hover:bg-teal-100 transition-colors flex items-center gap-1">
+                    <i class="fas fa-wand-magic-sparkles"></i>
+                    AI Generate
+                  </button>
+                </div>
                 <textarea v-model="newEvent.description" placeholder="Event description..." rows="3"
                           class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500"></textarea>
               </div>
@@ -1848,6 +2094,255 @@ function toggleReserve(eventId: number) {
           </div>
         </div>
       </Transition>
+    </Teleport>
+
+    <!-- AI Smart Scheduling Modal -->
+    <Teleport to="body">
+      <div v-if="showSmartScheduleModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[80vh] overflow-hidden">
+          <div class="p-6 border-b border-gray-100">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-gradient-to-br from-teal-500 to-emerald-500 rounded-xl flex items-center justify-center">
+                  <i class="fas fa-wand-magic-sparkles text-white"></i>
+                </div>
+                <div>
+                  <h3 class="text-lg font-semibold text-gray-900">AI Smart Scheduling</h3>
+                  <p class="text-sm text-gray-500">Find the optimal time for your event</p>
+                </div>
+              </div>
+              <button @click="showSmartScheduleModal = false" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                <i class="fas fa-times text-gray-400"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="p-6 overflow-y-auto max-h-[60vh]">
+            <AILoadingIndicator v-if="isAnalyzingSchedule" message="Analyzing calendars and finding optimal times..." />
+
+            <div v-else-if="scheduleSuggestions.length > 0" class="space-y-4">
+              <div class="bg-gradient-to-r from-teal-50 to-emerald-50 rounded-xl p-4 mb-4">
+                <div class="flex items-center gap-2 text-teal-700 font-medium mb-1">
+                  <i class="fas fa-lightbulb"></i>
+                  AI Analysis Complete
+                </div>
+                <p class="text-sm text-gray-600">Based on team availability, existing events, and meeting patterns, here are the best time slots:</p>
+              </div>
+
+              <div v-for="suggestion in scheduleSuggestions" :key="suggestion.id"
+                   class="border border-gray-200 rounded-xl p-4 hover:border-teal-300 hover:bg-teal-50/30 transition-all cursor-pointer"
+                   @click="applyScheduleSuggestion(suggestion)">
+                <div class="flex items-start justify-between">
+                  <div class="flex-1">
+                    <div class="flex items-center gap-3 mb-2">
+                      <span :class="['px-2 py-1 rounded-full text-xs font-semibold capitalize', getRecommendationColor(suggestion.recommendation)]">
+                        {{ suggestion.recommendation }}
+                      </span>
+                      <span class="text-lg font-semibold text-gray-900">{{ suggestion.timeSlot }}</span>
+                    </div>
+                    <div class="text-sm text-gray-600 mb-2">
+                      <i class="fas fa-calendar mr-1"></i>
+                      {{ new Date(suggestion.date).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' }) }}
+                    </div>
+                    <p class="text-sm text-gray-600">{{ suggestion.reason }}</p>
+                    <div v-if="suggestion.conflicts.length > 0" class="mt-2 flex flex-wrap gap-2">
+                      <span v-for="conflict in suggestion.conflicts" :key="conflict"
+                            class="px-2 py-1 bg-amber-100 text-amber-700 rounded text-xs">
+                        <i class="fas fa-exclamation-triangle mr-1"></i>{{ conflict }}
+                      </span>
+                    </div>
+                  </div>
+                  <div class="text-right">
+                    <div class="text-2xl font-bold text-teal-600">{{ Math.round(suggestion.score * 100) }}%</div>
+                    <div class="text-xs text-gray-500">Match Score</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="p-4 border-t border-gray-100 flex justify-end gap-3">
+            <button @click="analyzeSmartSchedule"
+                    class="px-4 py-2 text-teal-600 hover:bg-teal-50 rounded-lg transition-colors flex items-center gap-2">
+              <i class="fas fa-rotate"></i> Refresh
+            </button>
+            <button @click="showSmartScheduleModal = false"
+                    class="px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-colors">
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </Teleport>
+
+    <!-- AI Event Description Generator Modal -->
+    <Teleport to="body">
+      <div v-if="showAIDescriptionModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[80vh] overflow-hidden">
+          <div class="p-6 border-b border-gray-100">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center">
+                  <i class="fas fa-pen-fancy text-white"></i>
+                </div>
+                <div>
+                  <h3 class="text-lg font-semibold text-gray-900">AI Event Description</h3>
+                  <p class="text-sm text-gray-500">Generate compelling event content</p>
+                </div>
+              </div>
+              <button @click="showAIDescriptionModal = false" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                <i class="fas fa-times text-gray-400"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="p-6 overflow-y-auto max-h-[60vh]">
+            <AILoadingIndicator v-if="isGeneratingDescription" message="Generating event description..." />
+
+            <div v-else-if="generatedDescription" class="space-y-6">
+              <!-- Generated Title -->
+              <div>
+                <h5 class="font-medium text-gray-900 mb-2 flex items-center gap-2">
+                  <i class="fas fa-heading text-purple-500"></i> Suggested Title
+                </h5>
+                <div class="bg-purple-50 rounded-lg p-3">
+                  <p class="text-gray-900 font-medium">{{ generatedDescription.title }}</p>
+                </div>
+              </div>
+
+              <!-- Generated Description -->
+              <div>
+                <h5 class="font-medium text-gray-900 mb-2 flex items-center gap-2">
+                  <i class="fas fa-align-left text-purple-500"></i> Description
+                </h5>
+                <div class="bg-gray-50 rounded-lg p-4">
+                  <p class="text-gray-700 whitespace-pre-line">{{ generatedDescription.description }}</p>
+                </div>
+              </div>
+
+              <!-- Highlights -->
+              <div>
+                <h5 class="font-medium text-gray-900 mb-2 flex items-center gap-2">
+                  <i class="fas fa-list-check text-purple-500"></i> Key Highlights
+                </h5>
+                <ul class="space-y-2">
+                  <li v-for="(highlight, idx) in generatedDescription.highlights" :key="idx"
+                      class="flex items-start gap-2 text-gray-700">
+                    <i class="fas fa-check-circle text-purple-500 mt-1 text-sm"></i>
+                    <span>{{ highlight }}</span>
+                  </li>
+                </ul>
+              </div>
+
+              <!-- Target Audience -->
+              <div>
+                <h5 class="font-medium text-gray-900 mb-2 flex items-center gap-2">
+                  <i class="fas fa-users text-purple-500"></i> Target Audience
+                </h5>
+                <p class="text-gray-700 bg-gray-50 rounded-lg p-3">{{ generatedDescription.targetAudience }}</p>
+              </div>
+
+              <!-- Suggested Tags -->
+              <div>
+                <h5 class="font-medium text-gray-900 mb-2 flex items-center gap-2">
+                  <i class="fas fa-tags text-purple-500"></i> Suggested Tags
+                </h5>
+                <div class="flex flex-wrap gap-2">
+                  <span v-for="tag in generatedDescription.tags" :key="tag"
+                        class="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm">
+                    {{ tag }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="p-4 border-t border-gray-100 flex justify-end gap-3">
+            <button @click="generateEventDescription()"
+                    class="px-4 py-2 text-purple-600 hover:bg-purple-50 rounded-lg transition-colors flex items-center gap-2">
+              <i class="fas fa-rotate"></i> Regenerate
+            </button>
+            <button @click="applyGeneratedDescription"
+                    class="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors flex items-center gap-2">
+              <i class="fas fa-check"></i> Apply
+            </button>
+          </div>
+        </div>
+      </div>
+    </Teleport>
+
+    <!-- AI Related Events Panel -->
+    <Teleport to="body">
+      <div v-if="showRelatedEventsPanel" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[80vh] overflow-hidden">
+          <div class="p-6 border-b border-gray-100">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-xl flex items-center justify-center">
+                  <i class="fas fa-robot text-white"></i>
+                </div>
+                <div>
+                  <h3 class="text-lg font-semibold text-gray-900">AI Suggestions</h3>
+                  <p class="text-sm text-gray-500">Related events you might like</p>
+                </div>
+              </div>
+              <button @click="showRelatedEventsPanel = false" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                <i class="fas fa-times text-gray-400"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="p-6 overflow-y-auto max-h-[60vh]">
+            <AILoadingIndicator v-if="isFetchingRelated" message="Finding related events..." />
+
+            <div v-else-if="relatedEvents.length > 0" class="space-y-4">
+              <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4 mb-4">
+                <div class="flex items-center gap-2 text-blue-700 font-medium mb-1">
+                  <i class="fas fa-brain"></i>
+                  Personalized Recommendations
+                </div>
+                <p class="text-sm text-gray-600">Based on your interests and activity patterns</p>
+              </div>
+
+              <div v-for="event in relatedEvents" :key="event.id"
+                   class="border border-gray-200 rounded-xl p-4 hover:border-blue-300 hover:bg-blue-50/30 transition-all cursor-pointer">
+                <div class="flex items-start justify-between">
+                  <div class="flex-1">
+                    <div class="flex items-center gap-2 mb-2">
+                      <div class="w-8 h-8 rounded-lg flex items-center justify-center"
+                           :style="{ backgroundColor: getCategoryColor(event.category) + '20' }">
+                        <i :class="getCategoryIcon(event.category)"
+                           :style="{ color: getCategoryColor(event.category) }"></i>
+                      </div>
+                      <h4 class="font-semibold text-gray-900">{{ event.title }}</h4>
+                    </div>
+                    <div class="text-sm text-gray-600 mb-2">
+                      <i class="fas fa-calendar mr-1"></i>
+                      {{ new Date(event.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) }}
+                    </div>
+                    <p class="text-sm text-gray-500">{{ event.reason }}</p>
+                  </div>
+                  <div class="text-right ml-4">
+                    <div class="text-xl font-bold text-blue-600">{{ Math.round(event.similarity * 100) }}%</div>
+                    <div class="text-xs text-gray-500">Match</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="p-4 border-t border-gray-100 flex justify-end gap-3">
+            <button @click="fetchRelatedEvents()"
+                    class="px-4 py-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors flex items-center gap-2">
+              <i class="fas fa-rotate"></i> Refresh
+            </button>
+            <button @click="showRelatedEventsPanel = false"
+                    class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
     </Teleport>
   </div>
 </template>
@@ -5232,5 +5727,90 @@ function toggleReserve(eventId: number) {
   .list-action-buttons {
     flex-wrap: wrap;
   }
+}
+
+/* ===============================================
+   AI FEATURE STYLES
+   =============================================== */
+
+.ai-action-btn {
+  transition: all 0.2s ease;
+}
+
+.ai-action-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(20, 184, 166, 0.2);
+}
+
+.ai-modal-overlay {
+  animation: modalFadeIn 0.3s ease-out;
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.ai-modal-content {
+  animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.ai-suggestion-card {
+  transition: all 0.2s ease;
+}
+
+.ai-suggestion-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.ai-pulse {
+  animation: aiPulse 2s ease-in-out infinite;
+}
+
+@keyframes aiPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.ai-gradient-text {
+  background: linear-gradient(135deg, #14b8a6 0%, #10b981 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.ai-score-bar {
+  transition: width 0.5s ease-out;
+}
+
+.recommendation-optimal {
+  background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+  border-color: #86efac;
+}
+
+.recommendation-good {
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+  border-color: #93c5fd;
+}
+
+.recommendation-available {
+  background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+  border-color: #d1d5db;
 }
 </style>

@@ -1,6 +1,11 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
+import { useAIServicesStore } from '@/stores/aiServices'
+import { AILoadingIndicator, AISuggestionChip } from '@/components/ai'
+
+// Initialize AI store
+const aiStore = useAIServicesStore()
 
 // State
 const showNewRequest = ref(false)
@@ -174,8 +179,146 @@ function showRequestDetail(request: any) {
 function askAI(query: string) {
   if (query) {
     // Show AI chat or handle query
-    console.log('AI Query:', query)
+    processAIQuery(query)
     aiQuery.value = ''
+  }
+}
+
+// ============================================================================
+// AI Features State & Functions
+// ============================================================================
+
+// AI State
+const showAIRecommendationsPanel = ref(false)
+const showAutoFillModal = ref(false)
+const isProcessingAI = ref(false)
+const isGeneratingAutoFill = ref(false)
+const aiResponse = ref('')
+const aiRecommendations = ref<AIServiceRecommendation[]>([])
+const autoFillSuggestions = ref<AutoFillSuggestion | null>(null)
+
+// AI Interfaces
+interface AIServiceRecommendation {
+  id: string
+  serviceId: number
+  serviceName: string
+  reason: string
+  confidence: number
+  matchType: 'exact' | 'related' | 'suggested'
+}
+
+interface AutoFillSuggestion {
+  subject: string
+  description: string
+  priority: string
+  additionalInfo: string[]
+}
+
+// Mock AI Data
+const mockAIResponses: Record<string, string> = {
+  'password': 'To reset your password, go to IT Services > Password Reset. The process takes less than 1 hour. You\'ll receive an email with reset instructions.',
+  'leave': 'You can check your leave balance in HR Services > Leave Request. Current balance: 15 vacation days, 5 sick days remaining.',
+  'room': 'To book a meeting room, go to Facilities > Room Booking. Available rooms can be reserved instantly through the calendar system.',
+  'vpn': 'VPN access can be requested through IT Services. Processing takes 1-2 business days. Make sure to specify your work-from-home schedule.',
+  'default': 'I can help you find the right service. Try asking about password reset, leave balance, room booking, or VPN access.'
+}
+
+const mockRecommendations: AIServiceRecommendation[] = [
+  { id: '1', serviceId: 1, serviceName: 'Password Reset', reason: 'Most commonly requested IT service', confidence: 0.95, matchType: 'exact' },
+  { id: '2', serviceId: 4, serviceName: 'VPN Access', reason: 'Popular among remote workers', confidence: 0.85, matchType: 'related' },
+  { id: '3', serviceId: 5, serviceName: 'Leave Request', reason: 'Upcoming holiday season', confidence: 0.78, matchType: 'suggested' }
+]
+
+const mockAutoFillSuggestion: AutoFillSuggestion = {
+  subject: 'Request for new development laptop',
+  description: 'I am requesting a new laptop for my development work. My current machine is experiencing performance issues that affect productivity.',
+  priority: 'medium',
+  additionalInfo: [
+    'Preferred model: MacBook Pro 14" or equivalent',
+    'Required software: VS Code, Docker, Node.js',
+    'Current laptop age: 3+ years',
+    'Impact: Reduced build times and better multitasking'
+  ]
+}
+
+// AI Functions
+async function processAIQuery(query: string) {
+  isProcessingAI.value = true
+
+  try {
+    await new Promise(resolve => setTimeout(resolve, 800))
+
+    const lowerQuery = query.toLowerCase()
+    if (lowerQuery.includes('password')) {
+      aiResponse.value = mockAIResponses['password']
+    } else if (lowerQuery.includes('leave') || lowerQuery.includes('vacation')) {
+      aiResponse.value = mockAIResponses['leave']
+    } else if (lowerQuery.includes('room') || lowerQuery.includes('meeting')) {
+      aiResponse.value = mockAIResponses['room']
+    } else if (lowerQuery.includes('vpn') || lowerQuery.includes('remote')) {
+      aiResponse.value = mockAIResponses['vpn']
+    } else {
+      aiResponse.value = mockAIResponses['default']
+    }
+
+    // Also generate recommendations
+    await fetchAIRecommendations()
+  } catch (error) {
+    console.error('AI query failed:', error)
+    aiResponse.value = 'Sorry, I couldn\'t process your request. Please try again.'
+  } finally {
+    isProcessingAI.value = false
+  }
+}
+
+async function fetchAIRecommendations() {
+  showAIRecommendationsPanel.value = true
+
+  try {
+    await new Promise(resolve => setTimeout(resolve, 600))
+    aiRecommendations.value = mockRecommendations
+  } catch (error) {
+    console.error('Failed to fetch recommendations:', error)
+  }
+}
+
+async function generateAutoFill() {
+  isGeneratingAutoFill.value = true
+  showAutoFillModal.value = true
+
+  try {
+    await new Promise(resolve => setTimeout(resolve, 1000))
+    autoFillSuggestions.value = mockAutoFillSuggestion
+  } catch (error) {
+    console.error('Auto-fill generation failed:', error)
+  } finally {
+    isGeneratingAutoFill.value = false
+  }
+}
+
+function applyAutoFill() {
+  if (autoFillSuggestions.value) {
+    newRequest.value.subject = autoFillSuggestions.value.subject
+    newRequest.value.description = autoFillSuggestions.value.description
+    newRequest.value.priority = autoFillSuggestions.value.priority
+    showAutoFillModal.value = false
+  }
+}
+
+function selectRecommendedService(recommendation: AIServiceRecommendation) {
+  const service = services.value.find(s => s.id === recommendation.serviceId)
+  if (service) {
+    selectService(service)
+    showAIRecommendationsPanel.value = false
+  }
+}
+
+function getMatchTypeColor(type: string) {
+  switch (type) {
+    case 'exact': return 'bg-green-100 text-green-700'
+    case 'related': return 'bg-blue-100 text-blue-700'
+    case 'suggested': return 'bg-amber-100 text-amber-700'
+    default: return 'bg-gray-100 text-gray-700'
   }
 }
 </script>
@@ -244,6 +387,12 @@ function askAI(query: string) {
             <button class="px-5 py-2.5 bg-white/20 backdrop-blur-sm border border-white/30 text-white rounded-xl font-semibold text-sm hover:bg-white/30 transition-all flex items-center gap-2">
               <i class="fas fa-history"></i>
               View History
+            </button>
+            <!-- AI Action Buttons -->
+            <button @click="fetchAIRecommendations"
+                    class="px-5 py-2.5 bg-gradient-to-r from-teal-500/20 to-emerald-500/20 backdrop-blur-sm text-white rounded-xl font-semibold text-sm flex items-center gap-2 hover:from-teal-500/30 hover:to-emerald-500/30 transition-all border border-white/20">
+              <i class="fas fa-wand-magic-sparkles"></i>
+              Smart Suggestions
             </button>
           </div>
         </div>
@@ -527,7 +676,14 @@ function askAI(query: string) {
               </div>
 
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                <div class="flex items-center justify-between mb-2">
+                  <label class="block text-sm font-medium text-gray-700">Description</label>
+                  <button @click="generateAutoFill" type="button"
+                          class="px-3 py-1 text-xs font-medium text-teal-600 bg-teal-50 rounded-lg hover:bg-teal-100 transition-colors flex items-center gap-1">
+                    <i class="fas fa-wand-magic-sparkles"></i>
+                    AI Auto-fill
+                  </button>
+                </div>
                 <textarea v-model="newRequest.description" class="input" rows="4" placeholder="Provide detailed information about your request..." required></textarea>
               </div>
 
@@ -552,6 +708,144 @@ function askAI(query: string) {
           </div>
         </div>
       </div>
+
+      <!-- AI Recommendations Panel -->
+      <Teleport to="body">
+        <div v-if="showAIRecommendationsPanel" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[80vh] overflow-hidden">
+            <div class="p-6 border-b border-gray-100">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 bg-gradient-to-br from-teal-500 to-emerald-500 rounded-xl flex items-center justify-center">
+                    <i class="fas fa-wand-magic-sparkles text-white"></i>
+                  </div>
+                  <div>
+                    <h3 class="text-lg font-semibold text-gray-900">Smart Suggestions</h3>
+                    <p class="text-sm text-gray-500">AI-recommended services for you</p>
+                  </div>
+                </div>
+                <button @click="showAIRecommendationsPanel = false" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                  <i class="fas fa-times text-gray-400"></i>
+                </button>
+              </div>
+            </div>
+
+            <div class="p-6 overflow-y-auto max-h-[60vh]">
+              <!-- AI Response -->
+              <div v-if="aiResponse" class="bg-gradient-to-r from-teal-50 to-emerald-50 rounded-xl p-4 mb-4">
+                <div class="flex items-start gap-3">
+                  <div class="w-8 h-8 bg-teal-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-robot text-white text-sm"></i>
+                  </div>
+                  <p class="text-gray-700 text-sm">{{ aiResponse }}</p>
+                </div>
+              </div>
+
+              <!-- Recommended Services -->
+              <div v-if="aiRecommendations.length > 0" class="space-y-3">
+                <h4 class="text-sm font-semibold text-gray-500 uppercase">Recommended Services</h4>
+                <div v-for="rec in aiRecommendations" :key="rec.id"
+                     class="border border-gray-200 rounded-xl p-4 hover:border-teal-300 hover:bg-teal-50/30 transition-all cursor-pointer"
+                     @click="selectRecommendedService(rec)">
+                  <div class="flex items-start justify-between">
+                    <div class="flex-1">
+                      <div class="flex items-center gap-2 mb-1">
+                        <h5 class="font-semibold text-gray-900">{{ rec.serviceName }}</h5>
+                        <span :class="['px-2 py-0.5 rounded-full text-xs font-medium capitalize', getMatchTypeColor(rec.matchType)]">
+                          {{ rec.matchType }}
+                        </span>
+                      </div>
+                      <p class="text-sm text-gray-600">{{ rec.reason }}</p>
+                    </div>
+                    <div class="text-right ml-4">
+                      <div class="text-lg font-bold text-teal-600">{{ Math.round(rec.confidence * 100) }}%</div>
+                      <div class="text-xs text-gray-500">Match</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="p-4 border-t border-gray-100 flex justify-end gap-3">
+              <button @click="fetchAIRecommendations"
+                      class="px-4 py-2 text-teal-600 hover:bg-teal-50 rounded-lg transition-colors flex items-center gap-2">
+                <i class="fas fa-rotate"></i> Refresh
+              </button>
+              <button @click="showAIRecommendationsPanel = false"
+                      class="px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-colors">
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      </Teleport>
+
+      <!-- AI Auto-fill Modal -->
+      <Teleport to="body">
+        <div v-if="showAutoFillModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[80vh] overflow-hidden">
+            <div class="p-6 border-b border-gray-100">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center">
+                    <i class="fas fa-pen-fancy text-white"></i>
+                  </div>
+                  <div>
+                    <h3 class="text-lg font-semibold text-gray-900">AI Auto-fill</h3>
+                    <p class="text-sm text-gray-500">Suggested request details</p>
+                  </div>
+                </div>
+                <button @click="showAutoFillModal = false" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                  <i class="fas fa-times text-gray-400"></i>
+                </button>
+              </div>
+            </div>
+
+            <div class="p-6 overflow-y-auto max-h-[60vh]">
+              <AILoadingIndicator v-if="isGeneratingAutoFill" message="Generating form suggestions..." />
+
+              <div v-else-if="autoFillSuggestions" class="space-y-4">
+                <div>
+                  <label class="text-xs font-semibold text-gray-500 uppercase">Subject</label>
+                  <p class="mt-1 p-3 bg-gray-50 rounded-lg text-gray-900">{{ autoFillSuggestions.subject }}</p>
+                </div>
+
+                <div>
+                  <label class="text-xs font-semibold text-gray-500 uppercase">Description</label>
+                  <p class="mt-1 p-3 bg-gray-50 rounded-lg text-gray-700 text-sm">{{ autoFillSuggestions.description }}</p>
+                </div>
+
+                <div>
+                  <label class="text-xs font-semibold text-gray-500 uppercase">Priority</label>
+                  <p class="mt-1 px-3 py-1 bg-amber-100 text-amber-700 rounded-full text-sm inline-block capitalize">{{ autoFillSuggestions.priority }}</p>
+                </div>
+
+                <div>
+                  <label class="text-xs font-semibold text-gray-500 uppercase">Additional Information</label>
+                  <ul class="mt-2 space-y-2">
+                    <li v-for="(info, idx) in autoFillSuggestions.additionalInfo" :key="idx"
+                        class="flex items-start gap-2 text-sm text-gray-600">
+                      <i class="fas fa-check-circle text-purple-500 mt-0.5"></i>
+                      {{ info }}
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div class="p-4 border-t border-gray-100 flex justify-end gap-3">
+              <button @click="generateAutoFill"
+                      class="px-4 py-2 text-purple-600 hover:bg-purple-50 rounded-lg transition-colors flex items-center gap-2">
+                <i class="fas fa-rotate"></i> Regenerate
+              </button>
+              <button @click="applyAutoFill"
+                      class="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors flex items-center gap-2">
+                <i class="fas fa-check"></i> Apply
+              </button>
+            </div>
+          </div>
+        </div>
+      </Teleport>
     </template>
   </div>
 </template>
@@ -747,5 +1041,40 @@ select.input {
   background-repeat: no-repeat;
   background-size: 1.5em 1.5em;
   padding-right: 2.5rem;
+}
+
+/* AI Feature Styles */
+.ai-action-btn {
+  transition: all 0.2s ease;
+}
+
+.ai-action-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(20, 184, 166, 0.2);
+}
+
+.ai-recommendation-card {
+  transition: all 0.2s ease;
+}
+
+.ai-recommendation-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.ai-pulse {
+  animation: aiPulse 2s ease-in-out infinite;
+}
+
+@keyframes aiPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.ai-gradient-text {
+  background: linear-gradient(135deg, #14b8a6 0%, #10b981 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 </style>

@@ -2,8 +2,11 @@
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
+import { useAIServicesStore } from '@/stores/aiServices'
+import { AILoadingIndicator, AISuggestionChip, AIConfidenceBar } from '@/components/ai'
 
 const router = useRouter()
+const aiStore = useAIServicesStore()
 
 // Loading state
 const isLoading = ref(false)
@@ -141,6 +144,225 @@ const saveProfile = () => {
   // In a real app, this would save to the backend
   alert('Profile updated successfully!')
 }
+
+// ==================== AI FEATURES ====================
+
+// AI State
+const showAIProfileModal = ref(false)
+const showAISkillsModal = ref(false)
+const showAIInsightsModal = ref(false)
+const isGeneratingProfile = ref(false)
+const isAnalyzingSkills = ref(false)
+const isLoadingInsights = ref(false)
+
+// AI Interfaces
+interface AIProfileSummary {
+  professional: string
+  strengths: string[]
+  expertise: string[]
+  impactStatement: string
+  confidence: number
+}
+
+interface AISkillAnalysis {
+  detectedSkills: Array<{
+    name: string
+    level: 'beginner' | 'intermediate' | 'advanced' | 'expert'
+    confidence: number
+    source: string
+  }>
+  suggestedSkills: Array<{
+    name: string
+    reason: string
+    relevance: number
+  }>
+  skillGaps: Array<{
+    skill: string
+    importance: string
+    recommendation: string
+  }>
+}
+
+interface AIProfileInsight {
+  id: string
+  type: 'strength' | 'growth' | 'recommendation' | 'achievement'
+  title: string
+  description: string
+  metric?: string
+  actionLabel?: string
+}
+
+// AI Generated Data
+const aiProfileSummary = ref<AIProfileSummary | null>(null)
+const aiSkillAnalysis = ref<AISkillAnalysis | null>(null)
+const aiProfileInsights = ref<AIProfileInsight[]>([])
+
+// Mock AI Profile Summary
+const mockProfileSummary: AIProfileSummary = {
+  professional: 'Visionary Product Director with 10+ years of experience driving enterprise software innovation. Known for transforming complex business requirements into user-centric solutions that deliver measurable ROI. Currently spearheading the Intalio Knowledge Hub initiative, demonstrating exceptional leadership in digital transformation.',
+  strengths: [
+    'Strategic product vision and roadmap development',
+    'Cross-functional team leadership and mentorship',
+    'Data-driven decision making with strong analytical skills',
+    'Stakeholder communication and executive presentations'
+  ],
+  expertise: [
+    'Enterprise SaaS product management',
+    'Agile transformation and process optimization',
+    'AI/ML integration in business applications',
+    'User experience design and research'
+  ],
+  impactStatement: 'Consistently delivered products that increased user engagement by 40% and reduced operational costs by 25% across multiple organizations.',
+  confidence: 0.92
+}
+
+// Mock AI Skill Analysis
+const mockSkillAnalysis: AISkillAnalysis = {
+  detectedSkills: [
+    { name: 'Product Strategy', level: 'expert', confidence: 0.95, source: 'Articles published, course completions' },
+    { name: 'Team Leadership', level: 'expert', confidence: 0.92, source: 'Team collaborations, mentoring activities' },
+    { name: 'UX Design', level: 'advanced', confidence: 0.88, source: 'Articles, course: UX Design Foundations' },
+    { name: 'Data Analytics', level: 'advanced', confidence: 0.85, source: 'Course: Data-Driven Decisions (60% complete)' },
+    { name: 'Agile/Scrum', level: 'expert', confidence: 0.94, source: 'Certificate: Agile Scrum Master' },
+    { name: 'AI/ML Integration', level: 'intermediate', confidence: 0.72, source: 'Course: AI Fundamentals (40% complete)' }
+  ],
+  suggestedSkills: [
+    { name: 'Cloud Architecture', reason: 'Highly relevant for enterprise product leaders in 2024', relevance: 0.85 },
+    { name: 'Product-Led Growth', reason: 'Emerging methodology aligned with your expertise', relevance: 0.82 },
+    { name: 'OKR Management', reason: 'Complements your strategic planning skills', relevance: 0.78 }
+  ],
+  skillGaps: [
+    { skill: 'Technical Architecture', importance: 'High for product directors', recommendation: 'Consider "System Design for PMs" course' },
+    { skill: 'Financial Modeling', importance: 'Essential for product business cases', recommendation: 'Take "Product Economics 101" course' }
+  ]
+}
+
+// Mock AI Profile Insights
+const mockProfileInsights: AIProfileInsight[] = [
+  {
+    id: '1',
+    type: 'achievement',
+    title: 'Top 10% Contributor',
+    description: 'Your article publication rate puts you in the top 10% of all knowledge contributors this quarter.',
+    metric: '24 articles published'
+  },
+  {
+    id: '2',
+    type: 'strength',
+    title: 'Exceptional Engagement',
+    description: 'Your content receives 3x more comments than average, indicating high-value contributions.',
+    metric: '156 total comments received'
+  },
+  {
+    id: '3',
+    type: 'growth',
+    title: 'Learning Momentum',
+    description: 'You\'ve completed 4 courses this quarter. At this pace, you\'ll earn 3 more certificates by year end.',
+    metric: '12 courses completed'
+  },
+  {
+    id: '4',
+    type: 'recommendation',
+    title: 'Skill Development Opportunity',
+    description: 'Based on your interests, "Advanced AI for Product Managers" would complement your current learning path.',
+    actionLabel: 'View Course'
+  },
+  {
+    id: '5',
+    type: 'strength',
+    title: 'Knowledge Leader',
+    description: 'Your documents have been accessed 500+ times, making you a key knowledge resource in your department.',
+    metric: '38 documents shared'
+  }
+]
+
+// AI Functions
+async function generateAIProfileSummary() {
+  isGeneratingProfile.value = true
+  showAIProfileModal.value = true
+
+  try {
+    await new Promise(resolve => setTimeout(resolve, 1500))
+    aiProfileSummary.value = mockProfileSummary
+  } catch (error) {
+    console.error('Failed to generate AI profile summary:', error)
+  } finally {
+    isGeneratingProfile.value = false
+  }
+}
+
+async function analyzeSkills() {
+  isAnalyzingSkills.value = true
+  showAISkillsModal.value = true
+
+  try {
+    await new Promise(resolve => setTimeout(resolve, 1800))
+    aiSkillAnalysis.value = mockSkillAnalysis
+  } catch (error) {
+    console.error('Failed to analyze skills:', error)
+  } finally {
+    isAnalyzingSkills.value = false
+  }
+}
+
+async function loadAIInsights() {
+  isLoadingInsights.value = true
+  showAIInsightsModal.value = true
+
+  try {
+    await new Promise(resolve => setTimeout(resolve, 1200))
+    aiProfileInsights.value = mockProfileInsights
+  } catch (error) {
+    console.error('Failed to load AI insights:', error)
+  } finally {
+    isLoadingInsights.value = false
+  }
+}
+
+function applyAISummary() {
+  if (aiProfileSummary.value) {
+    user.value.bio = aiProfileSummary.value.professional
+    showAIProfileModal.value = false
+    alert('AI-generated summary applied to your profile!')
+  }
+}
+
+function addSuggestedSkill(skill: { name: string }) {
+  if (!user.value.skills.includes(skill.name)) {
+    user.value.skills.push(skill.name)
+    alert(`"${skill.name}" added to your skills!`)
+  }
+}
+
+function getSkillLevelColor(level: string): string {
+  const colors: Record<string, string> = {
+    'beginner': 'bg-gray-100 text-gray-700',
+    'intermediate': 'bg-blue-100 text-blue-700',
+    'advanced': 'bg-teal-100 text-teal-700',
+    'expert': 'bg-purple-100 text-purple-700'
+  }
+  return colors[level] || 'bg-gray-100 text-gray-700'
+}
+
+function getInsightIcon(type: string): string {
+  const icons: Record<string, string> = {
+    'strength': 'fas fa-star',
+    'growth': 'fas fa-chart-line',
+    'recommendation': 'fas fa-lightbulb',
+    'achievement': 'fas fa-trophy'
+  }
+  return icons[type] || 'fas fa-info-circle'
+}
+
+function getInsightColor(type: string): string {
+  const colors: Record<string, string> = {
+    'strength': 'text-yellow-600 bg-yellow-100',
+    'growth': 'text-green-600 bg-green-100',
+    'recommendation': 'text-blue-600 bg-blue-100',
+    'achievement': 'text-purple-600 bg-purple-100'
+  }
+  return colors[type] || 'text-gray-600 bg-gray-100'
+}
 </script>
 
 <template>
@@ -193,6 +415,12 @@ const saveProfile = () => {
             </div>
 
             <div class="flex gap-3">
+              <!-- AI Insights Button -->
+              <button @click="loadAIInsights"
+                      class="px-4 py-2 bg-gradient-to-r from-teal-500 to-emerald-500 text-white rounded-xl font-medium text-sm flex items-center gap-2 hover:from-teal-600 hover:to-emerald-600 transition-all shadow-lg">
+                <i class="fas fa-wand-magic-sparkles"></i>
+                AI Insights
+              </button>
               <button @click="goToSettings" class="btn btn-secondary btn-vibrant ripple">
                 <i class="fas fa-cog icon-soft"></i> Settings
               </button>
@@ -209,12 +437,26 @@ const saveProfile = () => {
         <div class="xl:col-span-2 space-y-6">
           <!-- About -->
           <div class="card-animated fade-in-up rounded-2xl p-6" style="animation-delay: 0.2s">
-            <h2 class="text-lg font-semibold text-teal-900 mb-4">About</h2>
+            <div class="flex items-center justify-between mb-4">
+              <h2 class="text-lg font-semibold text-teal-900">About</h2>
+              <button @click="generateAIProfileSummary"
+                      class="px-3 py-1.5 text-xs font-medium text-teal-600 bg-teal-50 rounded-lg hover:bg-teal-100 transition-colors flex items-center gap-1.5">
+                <i class="fas fa-wand-magic-sparkles"></i>
+                AI Generate Bio
+              </button>
+            </div>
             <p class="text-teal-700 leading-relaxed">{{ user.bio }}</p>
 
             <!-- Skills -->
             <div class="mt-6">
-              <h3 class="text-sm font-semibold text-teal-500 uppercase tracking-wider mb-3">Skills & Expertise</h3>
+              <div class="flex items-center justify-between mb-3">
+                <h3 class="text-sm font-semibold text-teal-500 uppercase tracking-wider">Skills & Expertise</h3>
+                <button @click="analyzeSkills"
+                        class="px-3 py-1 text-xs font-medium text-teal-600 bg-teal-50 rounded-lg hover:bg-teal-100 transition-colors flex items-center gap-1">
+                  <i class="fas fa-brain"></i>
+                  AI Analyze Skills
+                </button>
+              </div>
               <div class="flex flex-wrap gap-2">
                 <span
                   v-for="skill in user.skills"
@@ -476,6 +718,269 @@ const saveProfile = () => {
                 <button type="submit" class="btn btn-primary btn-vibrant ripple flex-1">Save Changes</button>
               </div>
             </form>
+          </div>
+        </div>
+
+        <!-- AI Profile Summary Modal -->
+        <div v-if="showAIProfileModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[85vh] overflow-hidden">
+            <div class="p-6 border-b border-gray-100">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 bg-gradient-to-br from-teal-500 to-emerald-500 rounded-xl flex items-center justify-center">
+                    <i class="fas fa-wand-magic-sparkles text-white"></i>
+                  </div>
+                  <div>
+                    <h3 class="text-lg font-semibold text-gray-900">AI Profile Summary</h3>
+                    <p class="text-sm text-gray-500">Professional bio generated from your activities</p>
+                  </div>
+                </div>
+                <button @click="showAIProfileModal = false" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                  <i class="fas fa-times text-gray-400"></i>
+                </button>
+              </div>
+            </div>
+
+            <div class="p-6 overflow-y-auto max-h-[60vh]">
+              <AILoadingIndicator v-if="isGeneratingProfile" message="Analyzing your profile data..." />
+
+              <div v-else-if="aiProfileSummary" class="space-y-6">
+                <!-- Confidence -->
+                <div class="flex items-center gap-3 p-3 bg-teal-50 rounded-xl">
+                  <AIConfidenceBar :confidence="aiProfileSummary.confidence" />
+                  <span class="text-sm text-teal-700">{{ Math.round(aiProfileSummary.confidence * 100) }}% confidence based on your activities</span>
+                </div>
+
+                <!-- Professional Summary -->
+                <div>
+                  <h4 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">Professional Summary</h4>
+                  <p class="text-gray-800 leading-relaxed bg-gray-50 p-4 rounded-xl border border-gray-200">
+                    {{ aiProfileSummary.professional }}
+                  </p>
+                </div>
+
+                <!-- Strengths -->
+                <div>
+                  <h4 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">Key Strengths</h4>
+                  <ul class="space-y-2">
+                    <li v-for="(strength, idx) in aiProfileSummary.strengths" :key="idx"
+                        class="flex items-start gap-2 text-gray-700">
+                      <i class="fas fa-check-circle text-teal-500 mt-1"></i>
+                      {{ strength }}
+                    </li>
+                  </ul>
+                </div>
+
+                <!-- Areas of Expertise -->
+                <div>
+                  <h4 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">Areas of Expertise</h4>
+                  <div class="flex flex-wrap gap-2">
+                    <span v-for="(exp, idx) in aiProfileSummary.expertise" :key="idx"
+                          class="px-3 py-1.5 bg-teal-100 text-teal-700 rounded-full text-sm">
+                      {{ exp }}
+                    </span>
+                  </div>
+                </div>
+
+                <!-- Impact Statement -->
+                <div>
+                  <h4 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">Impact Statement</h4>
+                  <div class="p-4 bg-gradient-to-r from-teal-50 to-emerald-50 rounded-xl border border-teal-200">
+                    <i class="fas fa-quote-left text-teal-300 text-xl mb-2"></i>
+                    <p class="text-gray-800 italic">{{ aiProfileSummary.impactStatement }}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="p-4 border-t border-gray-100 flex justify-end gap-3">
+              <button @click="generateAIProfileSummary"
+                      class="px-4 py-2 text-teal-600 hover:bg-teal-50 rounded-lg transition-colors flex items-center gap-2">
+                <i class="fas fa-rotate"></i> Regenerate
+              </button>
+              <button @click="showAIProfileModal = false"
+                      class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
+                Cancel
+              </button>
+              <button @click="applyAISummary"
+                      class="px-4 py-2 bg-gradient-to-r from-teal-500 to-emerald-500 text-white rounded-lg hover:from-teal-600 hover:to-emerald-600 transition-colors flex items-center gap-2">
+                <i class="fas fa-check"></i> Apply to Profile
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- AI Skills Analysis Modal -->
+        <div v-if="showAISkillsModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[85vh] overflow-hidden">
+            <div class="p-6 border-b border-gray-100">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center">
+                    <i class="fas fa-brain text-white"></i>
+                  </div>
+                  <div>
+                    <h3 class="text-lg font-semibold text-gray-900">AI Skills Analysis</h3>
+                    <p class="text-sm text-gray-500">Skills detected from your activity patterns</p>
+                  </div>
+                </div>
+                <button @click="showAISkillsModal = false" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                  <i class="fas fa-times text-gray-400"></i>
+                </button>
+              </div>
+            </div>
+
+            <div class="p-6 overflow-y-auto max-h-[60vh]">
+              <AILoadingIndicator v-if="isAnalyzingSkills" message="Analyzing your skills from activities..." />
+
+              <div v-else-if="aiSkillAnalysis" class="space-y-6">
+                <!-- Detected Skills -->
+                <div>
+                  <h4 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">
+                    <i class="fas fa-check-circle text-green-500 mr-2"></i>Detected Skills
+                  </h4>
+                  <div class="space-y-3">
+                    <div v-for="skill in aiSkillAnalysis.detectedSkills" :key="skill.name"
+                         class="p-4 bg-gray-50 rounded-xl border border-gray-200 hover:border-teal-300 transition-colors">
+                      <div class="flex items-center justify-between mb-2">
+                        <div class="flex items-center gap-3">
+                          <span class="font-medium text-gray-900">{{ skill.name }}</span>
+                          <span :class="['px-2 py-0.5 rounded-full text-xs font-medium capitalize', getSkillLevelColor(skill.level)]">
+                            {{ skill.level }}
+                          </span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                          <AIConfidenceBar :confidence="skill.confidence" size="sm" />
+                          <span class="text-xs text-gray-500">{{ Math.round(skill.confidence * 100) }}%</span>
+                        </div>
+                      </div>
+                      <p class="text-sm text-gray-500">
+                        <i class="fas fa-info-circle mr-1"></i>{{ skill.source }}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Suggested Skills -->
+                <div>
+                  <h4 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">
+                    <i class="fas fa-lightbulb text-yellow-500 mr-2"></i>Suggested Skills to Add
+                  </h4>
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div v-for="skill in aiSkillAnalysis.suggestedSkills" :key="skill.name"
+                         class="p-4 bg-yellow-50 rounded-xl border border-yellow-200 hover:border-yellow-400 transition-colors cursor-pointer"
+                         @click="addSuggestedSkill(skill)">
+                      <div class="flex items-center justify-between mb-2">
+                        <span class="font-medium text-gray-900">{{ skill.name }}</span>
+                        <span class="text-xs text-yellow-700 bg-yellow-100 px-2 py-0.5 rounded-full">
+                          {{ Math.round(skill.relevance * 100) }}% relevant
+                        </span>
+                      </div>
+                      <p class="text-sm text-gray-600">{{ skill.reason }}</p>
+                      <button class="mt-2 text-xs text-teal-600 font-medium flex items-center gap-1 hover:text-teal-700">
+                        <i class="fas fa-plus"></i> Add to Profile
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Skill Gaps -->
+                <div>
+                  <h4 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">
+                    <i class="fas fa-exclamation-triangle text-orange-500 mr-2"></i>Skill Gap Analysis
+                  </h4>
+                  <div class="space-y-3">
+                    <div v-for="gap in aiSkillAnalysis.skillGaps" :key="gap.skill"
+                         class="p-4 bg-orange-50 rounded-xl border border-orange-200">
+                      <div class="flex items-center justify-between mb-2">
+                        <span class="font-medium text-gray-900">{{ gap.skill }}</span>
+                        <span class="text-xs text-orange-700">{{ gap.importance }}</span>
+                      </div>
+                      <p class="text-sm text-gray-600">
+                        <i class="fas fa-graduation-cap mr-1 text-orange-500"></i>{{ gap.recommendation }}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="p-4 border-t border-gray-100 flex justify-end gap-3">
+              <button @click="analyzeSkills"
+                      class="px-4 py-2 text-teal-600 hover:bg-teal-50 rounded-lg transition-colors flex items-center gap-2">
+                <i class="fas fa-rotate"></i> Re-analyze
+              </button>
+              <button @click="showAISkillsModal = false"
+                      class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- AI Profile Insights Modal -->
+        <div v-if="showAIInsightsModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[85vh] overflow-hidden">
+            <div class="p-6 border-b border-gray-100">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 bg-gradient-to-br from-teal-500 to-emerald-500 rounded-xl flex items-center justify-center">
+                    <i class="fas fa-chart-line text-white"></i>
+                  </div>
+                  <div>
+                    <h3 class="text-lg font-semibold text-gray-900">AI Profile Insights</h3>
+                    <p class="text-sm text-gray-500">Personalized insights based on your activity</p>
+                  </div>
+                </div>
+                <button @click="showAIInsightsModal = false" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                  <i class="fas fa-times text-gray-400"></i>
+                </button>
+              </div>
+            </div>
+
+            <div class="p-6 overflow-y-auto max-h-[60vh]">
+              <AILoadingIndicator v-if="isLoadingInsights" message="Generating personalized insights..." />
+
+              <div v-else-if="aiProfileInsights.length > 0" class="space-y-4">
+                <div v-for="insight in aiProfileInsights" :key="insight.id"
+                     class="p-4 rounded-xl border border-gray-200 hover:border-teal-300 hover:shadow-md transition-all">
+                  <div class="flex items-start gap-4">
+                    <div :class="['w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0', getInsightColor(insight.type)]">
+                      <i :class="getInsightIcon(insight.type)"></i>
+                    </div>
+                    <div class="flex-1">
+                      <div class="flex items-center justify-between mb-1">
+                        <h4 class="font-semibold text-gray-900">{{ insight.title }}</h4>
+                        <span v-if="insight.metric" class="text-xs text-teal-600 bg-teal-50 px-2 py-1 rounded-full">
+                          {{ insight.metric }}
+                        </span>
+                      </div>
+                      <p class="text-sm text-gray-600">{{ insight.description }}</p>
+                      <button v-if="insight.actionLabel"
+                              class="mt-2 text-sm text-teal-600 font-medium flex items-center gap-1 hover:text-teal-700">
+                        {{ insight.actionLabel }} <i class="fas fa-arrow-right text-xs"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div v-else class="text-center py-8 text-gray-500">
+                <i class="fas fa-chart-pie text-4xl mb-3 text-gray-300"></i>
+                <p>No insights available yet. Keep contributing to unlock personalized insights!</p>
+              </div>
+            </div>
+
+            <div class="p-4 border-t border-gray-100 flex justify-end gap-3">
+              <button @click="loadAIInsights"
+                      class="px-4 py-2 text-teal-600 hover:bg-teal-50 rounded-lg transition-colors flex items-center gap-2">
+                <i class="fas fa-rotate"></i> Refresh
+              </button>
+              <button @click="showAIInsightsModal = false"
+                      class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
+                Close
+              </button>
+            </div>
           </div>
         </div>
       </Teleport>

@@ -3,8 +3,12 @@ import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import ContentActionsDropdown from '@/components/common/ContentActionsDropdown.vue'
 import AddToCollectionModal from '@/components/common/AddToCollectionModal.vue'
+import { useAIServicesStore } from '@/stores/aiServices'
+import { AILoadingIndicator, AIConfidenceBar, AISuggestionChip } from '@/components/ai'
+import type { AutoTagResult, OCRResult, ClassificationResult } from '@/types/ai'
 
 const router = useRouter()
+const aiStore = useAIServicesStore()
 
 // State
 const showUploadModal = ref(false)
@@ -874,6 +878,278 @@ function createParticles() {
     particle.style.height = particle.style.width
     particlesContainer.appendChild(particle)
   }
+}
+
+// ============================================================================
+// AI Features State & Functions
+// ============================================================================
+
+const showAIFeatures = ref(true)
+const showAIAnalysisModal = ref(false)
+const selectedMediaForAI = ref<any>(null)
+const isAnalyzingMedia = ref(false)
+const showAISuggestionsPanel = ref(false)
+
+// AI Analysis Results
+interface AIMediaAnalysis {
+  mediaId: number
+  autoTags: string[]
+  category: string
+  categoryConfidence: number
+  description: string
+  ocrText?: string
+  ocrConfidence?: number
+  faces?: number
+  objects?: string[]
+  colors?: string[]
+  processingTime: number
+}
+
+const aiAnalysisResults = ref<Map<number, AIMediaAnalysis>>(new Map())
+const aiSuggestedTags = ref<string[]>([])
+const aiSuggestedCategories = ref<{ name: string; confidence: number }[]>([])
+
+// Mock AI Analysis Data
+const mockAIAnalysis: Record<number, AIMediaAnalysis> = {
+  5: {
+    mediaId: 5,
+    autoTags: ['Saudi Arabia', 'Japan', 'Football', 'Preview', 'Match', 'Tournament', 'Asian Cup'],
+    category: 'Sports Preview',
+    categoryConfidence: 0.94,
+    description: 'Pre-match preview video featuring analysis of the upcoming Saudi Arabia vs Japan opening match, including team formations, key players to watch, and tactical predictions.',
+    objects: ['Football field', 'Players', 'Stadium', 'Flags'],
+    colors: ['Green', 'White', 'Blue'],
+    processingTime: 1.2
+  },
+  6: {
+    mediaId: 6,
+    autoTags: ['Stadium', 'King Fahd', 'Tour', 'Behind the Scenes', 'Riyadh', 'Infrastructure'],
+    category: 'Venue Tour',
+    categoryConfidence: 0.96,
+    description: 'Exclusive behind-the-scenes tour of King Fahd International Stadium showcasing state-of-the-art facilities, pitch quality, and spectator amenities.',
+    objects: ['Stadium seats', 'Pitch', 'Scoreboard', 'VIP area'],
+    colors: ['Green', 'Gray', 'Blue'],
+    processingTime: 1.4
+  },
+  13: {
+    mediaId: 13,
+    autoTags: ['Draw Ceremony', 'Official', 'AFC', 'Teams', 'Groups', 'Event'],
+    category: 'Official Event',
+    categoryConfidence: 0.98,
+    description: 'Photo gallery capturing key moments from the AFC Asian Cup 2027 Official Draw Ceremony, featuring team representatives and the group stage reveal.',
+    faces: 24,
+    objects: ['Stage', 'Trophy', 'Flags', 'Podium'],
+    colors: ['Gold', 'White', 'Red'],
+    processingTime: 2.1
+  },
+  19: {
+    mediaId: 19,
+    autoTags: ['Aerial', 'Stadium', 'King Fahd', 'Riyadh', 'Architecture', 'Drone'],
+    category: 'Venue Photography',
+    categoryConfidence: 0.95,
+    description: 'Stunning aerial photograph of King Fahd International Stadium captured by drone, showcasing the stadium\'s impressive architecture and surrounding facilities.',
+    ocrText: 'King Fahd International Stadium - Capacity: 68,000',
+    ocrConfidence: 0.89,
+    objects: ['Stadium', 'Parking lots', 'Roads', 'Landscape'],
+    colors: ['Green', 'Gray', 'Brown'],
+    processingTime: 1.8
+  },
+  21: {
+    mediaId: 21,
+    autoTags: ['Team Photo', 'Saudi Arabia', 'Official', 'Players', 'Squad', '2027'],
+    category: 'Team Content',
+    categoryConfidence: 0.97,
+    description: 'Official team photograph of the Saudi Arabia national football team for the AFC Asian Cup 2027, featuring all squad members in their home kit.',
+    faces: 26,
+    objects: ['Players', 'Jerseys', 'Football', 'Backdrop'],
+    colors: ['Green', 'White'],
+    processingTime: 1.5
+  },
+  22: {
+    mediaId: 22,
+    autoTags: ['Trophy', 'Unveiling', 'Ceremony', 'AFC', 'Official', 'Event'],
+    category: 'Official Event',
+    categoryConfidence: 0.96,
+    description: 'Image capturing the ceremonial unveiling of the AFC Asian Cup trophy, a key moment in the tournament preparations.',
+    ocrText: 'AFC Asian Cup 2027',
+    ocrConfidence: 0.92,
+    objects: ['Trophy', 'Stage', 'Lights', 'Curtain'],
+    colors: ['Gold', 'Blue', 'White'],
+    processingTime: 1.3
+  }
+}
+
+// AI Smart Search Suggestions
+const aiSearchSuggestions = ref<string[]>([])
+const isLoadingAISuggestions = ref(false)
+const searchDebounceTimeout = ref<ReturnType<typeof setTimeout> | null>(null)
+
+async function fetchAISearchSuggestions(query: string) {
+  if (!query || query.length < 2) {
+    aiSearchSuggestions.value = []
+    return
+  }
+
+  isLoadingAISuggestions.value = true
+
+  try {
+    await new Promise(resolve => setTimeout(resolve, 400))
+
+    // Mock AI-powered search suggestions
+    const allSuggestions = [
+      'Saudi Arabia match highlights',
+      'Stadium tour videos',
+      'Opening ceremony preparations',
+      'Team training sessions',
+      'Player interviews',
+      'Behind the scenes content',
+      'Fan zone activities',
+      'Trophy unveiling ceremony',
+      'Group stage draw',
+      'Aerial stadium views',
+      'Official team photos',
+      'Podcast episodes',
+      'Match previews',
+      'Tactical analysis videos'
+    ]
+
+    const q = query.toLowerCase()
+    aiSearchSuggestions.value = allSuggestions
+      .filter(s => s.toLowerCase().includes(q))
+      .slice(0, 5)
+
+    // Add AI-generated suggestions based on context
+    if (q.includes('match') || q.includes('game')) {
+      aiSearchSuggestions.value.unshift('AI suggests: Match highlights and replays')
+    }
+    if (q.includes('team') || q.includes('player')) {
+      aiSearchSuggestions.value.unshift('AI suggests: Team profiles and interviews')
+    }
+  } finally {
+    isLoadingAISuggestions.value = false
+  }
+}
+
+function handleSearchInput() {
+  if (searchDebounceTimeout.value) {
+    clearTimeout(searchDebounceTimeout.value)
+  }
+  searchDebounceTimeout.value = setTimeout(() => {
+    fetchAISearchSuggestions(searchQuery.value)
+  }, 300)
+}
+
+function selectAISuggestion(suggestion: string) {
+  // Remove "AI suggests: " prefix if present
+  searchQuery.value = suggestion.replace('AI suggests: ', '')
+  aiSearchSuggestions.value = []
+}
+
+// AI Analysis Functions
+async function analyzeMedia(media: any) {
+  if (isAnalyzingMedia.value) return
+
+  selectedMediaForAI.value = media
+  showAIAnalysisModal.value = true
+  isAnalyzingMedia.value = true
+
+  try {
+    // Check if we already have analysis cached
+    if (aiAnalysisResults.value.has(media.id)) {
+      isAnalyzingMedia.value = false
+      return
+    }
+
+    // Simulate AI analysis
+    await new Promise(resolve => setTimeout(resolve, 1500))
+
+    // Get mock analysis or generate default
+    const analysis = mockAIAnalysis[media.id] || {
+      mediaId: media.id,
+      autoTags: media.tags || ['Media', 'Content', media.category],
+      category: media.category,
+      categoryConfidence: 0.85,
+      description: `AI-generated description for "${media.title}": This ${media.type} content is categorized under ${media.category} and contains relevant information about AFC Asian Cup 2027.`,
+      objects: ['Content'],
+      colors: ['Various'],
+      processingTime: 1.0
+    }
+
+    aiAnalysisResults.value.set(media.id, analysis)
+  } finally {
+    isAnalyzingMedia.value = false
+  }
+}
+
+function getAIAnalysis(mediaId: number): AIMediaAnalysis | null {
+  return aiAnalysisResults.value.get(mediaId) || null
+}
+
+function hasAIAnalysis(mediaId: number): boolean {
+  return aiAnalysisResults.value.has(mediaId)
+}
+
+async function bulkAnalyzeMedia() {
+  const selectedIds = Array.from(selectedMedia.value)
+  if (selectedIds.length === 0) return
+
+  isAnalyzingMedia.value = true
+
+  try {
+    for (const id of selectedIds) {
+      const media = mediaItems.value.find(m => m.id === id)
+      if (media && !aiAnalysisResults.value.has(id)) {
+        await new Promise(resolve => setTimeout(resolve, 500))
+
+        const analysis = mockAIAnalysis[id] || {
+          mediaId: id,
+          autoTags: media.tags || ['Media', media.category],
+          category: media.category,
+          categoryConfidence: 0.85,
+          description: `AI analysis of ${media.title}`,
+          processingTime: 0.5
+        }
+
+        aiAnalysisResults.value.set(id, analysis)
+      }
+    }
+    alert(`AI analysis complete for ${selectedIds.length} items!`)
+  } finally {
+    isAnalyzingMedia.value = false
+  }
+}
+
+function applyAITags(mediaId: number) {
+  const analysis = aiAnalysisResults.value.get(mediaId)
+  if (analysis) {
+    const media = mediaItems.value.find(m => m.id === mediaId)
+    if (media) {
+      media.tags = [...new Set([...(media.tags || []), ...analysis.autoTags])]
+      alert(`Applied ${analysis.autoTags.length} AI-suggested tags!`)
+    }
+  }
+}
+
+function closeAIModal() {
+  showAIAnalysisModal.value = false
+  selectedMediaForAI.value = null
+}
+
+function toggleAIFeatures() {
+  showAIFeatures.value = !showAIFeatures.value
+}
+
+// Get AI category badge color
+function getAICategoryColor(category: string): string {
+  const colors: Record<string, string> = {
+    'Sports Preview': 'bg-blue-100 text-blue-700',
+    'Venue Tour': 'bg-green-100 text-green-700',
+    'Official Event': 'bg-purple-100 text-purple-700',
+    'Venue Photography': 'bg-teal-100 text-teal-700',
+    'Team Content': 'bg-amber-100 text-amber-700',
+    'Interview': 'bg-rose-100 text-rose-700'
+  }
+  return colors[category] || 'bg-gray-100 text-gray-700'
 }
 
 onMounted(() => {
@@ -1960,6 +2236,23 @@ onUnmounted(() => {
                       title="Share">
                       <i class="fas fa-share-alt"></i>
                     </button>
+                    <!-- AI Analyze Button -->
+                    <button
+                      v-if="showAIFeatures"
+                      class="card-action-btn ai-action"
+                      :class="{ analyzed: hasAIAnalysis(media.id) }"
+                      @click.stop="analyzeMedia(media)"
+                      title="AI Analyze">
+                      <i class="fas fa-wand-magic-sparkles"></i>
+                    </button>
+                  </div>
+
+                  <!-- AI Analysis Badge -->
+                  <div v-if="showAIFeatures && hasAIAnalysis(media.id)" class="absolute top-2 right-2 z-30">
+                    <span class="px-2 py-1 bg-teal-500 text-white text-[10px] font-medium rounded-full flex items-center gap-1 shadow-lg">
+                      <i class="fas fa-wand-magic-sparkles text-[8px]"></i>
+                      AI Analyzed
+                    </span>
                   </div>
 
                   <!-- Watch Progress (if any) -->
@@ -1988,9 +2281,14 @@ onUnmounted(() => {
                   </h3>
 
                   <!-- Category -->
-                  <p class="text-xs text-gray-500 mb-3">
+                  <p class="text-xs text-gray-500 mb-3 flex items-center gap-2">
                     <span class="px-2 py-0.5 bg-teal-50 text-teal-600 text-[10px] font-medium rounded-full">
                       {{ media.category }}
+                    </span>
+                    <!-- AI Category Badge -->
+                    <span v-if="showAIFeatures && hasAIAnalysis(media.id)" :class="['px-2 py-0.5 text-[10px] font-medium rounded-full flex items-center gap-1', getAICategoryColor(getAIAnalysis(media.id)?.category || '')]">
+                      <i class="fas fa-wand-magic-sparkles text-[8px]"></i>
+                      {{ getAIAnalysis(media.id)?.category }}
                     </span>
                   </p>
 
@@ -2002,6 +2300,11 @@ onUnmounted(() => {
                       class="px-2 py-0.5 bg-gray-100 text-gray-600 text-[10px] font-medium rounded-full hover:bg-teal-50 hover:text-teal-600 transition-colors"
                     >
                       {{ tag }}
+                    </span>
+                    <!-- AI Suggested Tags indicator -->
+                    <span v-if="showAIFeatures && hasAIAnalysis(media.id) && (getAIAnalysis(media.id)?.autoTags?.length || 0) > (media.tags?.length || 0)" class="px-2 py-0.5 bg-teal-50 text-teal-600 text-[10px] font-medium rounded-full flex items-center gap-1">
+                      <i class="fas fa-plus text-[8px]"></i>
+                      {{ (getAIAnalysis(media.id)?.autoTags?.length || 0) - (media.tags?.length || 0) }} AI tags
                     </span>
                   </div>
 
@@ -2294,6 +2597,177 @@ onUnmounted(() => {
       @close="showAddToCollectionModal = false; selectedItemForCollection = null"
       @added="handleAddedToCollection"
     />
+
+    <!-- AI Analysis Modal -->
+    <Teleport to="body">
+      <Transition name="modal">
+        <div v-if="showAIAnalysisModal" class="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+          <!-- Backdrop -->
+          <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" @click="closeAIModal"></div>
+
+          <!-- Modal Content -->
+          <div class="ai-analysis-modal relative bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden">
+            <!-- Modal Header -->
+            <div class="px-6 py-4 bg-gradient-to-r from-teal-500 to-teal-600 text-white flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
+                  <i class="fas fa-wand-magic-sparkles text-lg"></i>
+                </div>
+                <div>
+                  <h3 class="font-semibold">AI Media Analysis</h3>
+                  <p class="text-xs text-teal-100">Powered by Intalio AI Engine</p>
+                </div>
+              </div>
+              <button @click="closeAIModal" class="w-8 h-8 rounded-lg bg-white/20 hover:bg-white/30 flex items-center justify-center transition-colors">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="p-6 overflow-y-auto max-h-[calc(90vh-180px)]">
+              <!-- Loading State -->
+              <div v-if="isAnalyzingMedia" class="py-12 text-center">
+                <div class="w-16 h-16 border-4 border-teal-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                <p class="text-gray-600 font-medium">Analyzing media...</p>
+                <p class="text-sm text-gray-400 mt-1">AI is processing your content</p>
+              </div>
+
+              <!-- Analysis Results -->
+              <div v-else-if="selectedMediaForAI && getAIAnalysis(selectedMediaForAI.id)" class="space-y-6">
+                <!-- Media Preview -->
+                <div class="flex gap-4 p-4 bg-gray-50 rounded-xl">
+                  <img :src="selectedMediaForAI.thumbnail" :alt="selectedMediaForAI.title" class="w-32 h-20 object-cover rounded-lg" />
+                  <div class="flex-1">
+                    <h4 class="font-semibold text-gray-800">{{ selectedMediaForAI.title }}</h4>
+                    <p class="text-sm text-gray-500">{{ selectedMediaForAI.type }} • {{ selectedMediaForAI.category }}</p>
+                    <div class="flex items-center gap-2 mt-2">
+                      <span class="px-2 py-0.5 bg-teal-100 text-teal-700 text-xs font-medium rounded-full">
+                        {{ (getAIAnalysis(selectedMediaForAI.id)?.categoryConfidence * 100).toFixed(0) }}% confidence
+                      </span>
+                      <span class="text-xs text-gray-400">
+                        Processed in {{ getAIAnalysis(selectedMediaForAI.id)?.processingTime }}s
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- AI Description -->
+                <div class="space-y-2">
+                  <h5 class="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                    <i class="fas fa-align-left text-teal-500"></i>
+                    AI-Generated Description
+                  </h5>
+                  <p class="text-sm text-gray-600 bg-teal-50 p-4 rounded-lg border border-teal-100">
+                    {{ getAIAnalysis(selectedMediaForAI.id)?.description }}
+                  </p>
+                </div>
+
+                <!-- Auto Tags -->
+                <div class="space-y-2">
+                  <h5 class="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                    <i class="fas fa-tags text-teal-500"></i>
+                    AI-Suggested Tags
+                  </h5>
+                  <div class="flex flex-wrap gap-2">
+                    <span
+                      v-for="tag in getAIAnalysis(selectedMediaForAI.id)?.autoTags"
+                      :key="tag"
+                      class="px-3 py-1.5 bg-teal-100 text-teal-700 text-sm font-medium rounded-full"
+                    >
+                      {{ tag }}
+                    </span>
+                  </div>
+                  <button
+                    @click="applyAITags(selectedMediaForAI.id)"
+                    class="mt-2 px-4 py-2 bg-teal-500 hover:bg-teal-600 text-white text-sm font-medium rounded-lg flex items-center gap-2 transition-colors"
+                  >
+                    <i class="fas fa-plus"></i>
+                    Apply AI Tags
+                  </button>
+                </div>
+
+                <!-- Detected Objects -->
+                <div v-if="getAIAnalysis(selectedMediaForAI.id)?.objects?.length" class="space-y-2">
+                  <h5 class="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                    <i class="fas fa-shapes text-purple-500"></i>
+                    Detected Objects
+                  </h5>
+                  <div class="flex flex-wrap gap-2">
+                    <span
+                      v-for="obj in getAIAnalysis(selectedMediaForAI.id)?.objects"
+                      :key="obj"
+                      class="px-3 py-1.5 bg-purple-100 text-purple-700 text-sm font-medium rounded-full"
+                    >
+                      {{ obj }}
+                    </span>
+                  </div>
+                </div>
+
+                <!-- Detected Colors -->
+                <div v-if="getAIAnalysis(selectedMediaForAI.id)?.colors?.length" class="space-y-2">
+                  <h5 class="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                    <i class="fas fa-palette text-amber-500"></i>
+                    Color Palette
+                  </h5>
+                  <div class="flex flex-wrap gap-2">
+                    <span
+                      v-for="color in getAIAnalysis(selectedMediaForAI.id)?.colors"
+                      :key="color"
+                      class="px-3 py-1.5 bg-amber-100 text-amber-700 text-sm font-medium rounded-full"
+                    >
+                      {{ color }}
+                    </span>
+                  </div>
+                </div>
+
+                <!-- Face Detection -->
+                <div v-if="getAIAnalysis(selectedMediaForAI.id)?.faces" class="space-y-2">
+                  <h5 class="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                    <i class="fas fa-users text-blue-500"></i>
+                    Face Detection
+                  </h5>
+                  <div class="p-3 bg-blue-50 rounded-lg border border-blue-100">
+                    <p class="text-sm text-blue-700">
+                      <span class="font-bold text-lg">{{ getAIAnalysis(selectedMediaForAI.id)?.faces }}</span>
+                      faces detected in this media
+                    </p>
+                  </div>
+                </div>
+
+                <!-- OCR Results -->
+                <div v-if="getAIAnalysis(selectedMediaForAI.id)?.ocrText" class="space-y-2">
+                  <h5 class="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                    <i class="fas fa-file-lines text-rose-500"></i>
+                    OCR - Extracted Text
+                    <span class="text-xs text-gray-400 font-normal">
+                      ({{ (getAIAnalysis(selectedMediaForAI.id)?.ocrConfidence * 100).toFixed(0) }}% confidence)
+                    </span>
+                  </h5>
+                  <div class="p-3 bg-rose-50 rounded-lg border border-rose-100">
+                    <p class="text-sm text-rose-700 font-mono">
+                      {{ getAIAnalysis(selectedMediaForAI.id)?.ocrText }}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="px-6 py-4 bg-gray-50 border-t border-gray-100 flex items-center justify-between">
+              <p class="text-xs text-gray-400">
+                <i class="fas fa-info-circle mr-1"></i>
+                AI analysis is for reference only
+              </p>
+              <div class="flex gap-2">
+                <button @click="closeAIModal" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg text-sm font-medium transition-colors">
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Transition>
+    </Teleport>
   </div>
 </template>
 
@@ -6067,6 +6541,87 @@ onUnmounted(() => {
   .card-hover-actions {
     opacity: 1;
     transform: translateX(0);
+  }
+}
+
+/* AI Feature Styles */
+.card-action-btn.ai-action {
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+  color: white;
+}
+
+.card-action-btn.ai-action:hover {
+  background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%);
+  transform: scale(1.1);
+}
+
+.card-action-btn.ai-action.analyzed {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+}
+
+/* AI Analysis Modal */
+.ai-analysis-modal {
+  animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* AI Badge Animation */
+.ai-badge-pulse {
+  animation: aiBadgePulse 2s infinite;
+}
+
+@keyframes aiBadgePulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(20, 184, 166, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(20, 184, 166, 0);
+  }
+}
+
+/* AI Search Suggestions */
+.ai-search-suggestion {
+  transition: all 0.2s ease;
+}
+
+.ai-search-suggestion:hover {
+  background: linear-gradient(90deg, #f0fdfa 0%, #ffffff 100%);
+  transform: translateX(4px);
+}
+
+.ai-search-suggestion.ai-generated {
+  background: linear-gradient(90deg, #f0fdfa 0%, #ccfbf1 100%);
+  border-left: 3px solid #14b8a6;
+}
+
+/* AI Loading Shimmer */
+.ai-shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(20, 184, 166, 0.1) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
   }
 }
 </style>
