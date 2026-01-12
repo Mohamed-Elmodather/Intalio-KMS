@@ -3,11 +3,42 @@ import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAIServicesStore } from '@/stores/aiServices'
 import { AILoadingIndicator, AIConfidenceBar, AISuggestionChip } from '@/components/ai'
+import {
+  CommentsSection,
+  RatingStars,
+  RelatedContentCarousel,
+  BookmarkButton
+} from '@/components/common'
+import { useComments } from '@/composables/useComments'
+import { useRatings } from '@/composables/useRatings'
 import type { SummarizationResult } from '@/types/ai'
 
 const router = useRouter()
 const route = useRoute()
 const aiStore = useAIServicesStore()
+
+// Comments / Discussion
+const courseIdStr = computed(() => route.params.id as string || '1')
+const {
+  comments: discussionComments,
+  isLoading: discussionLoading,
+  loadComments: loadDiscussion,
+  addComment: addDiscussionPost
+} = useComments('course', courseIdStr.value)
+
+// Course Ratings
+const { rating: courseRating, submitRating, loadRating } = useRatings('course', courseIdStr.value)
+
+// Active sidebar tab
+const activeSidebarTab = ref<'ai' | 'discussion' | 'certificate'>('ai')
+
+// Certificate state
+const showCertificatePreview = ref(false)
+
+// Handle rating
+async function handleCourseRating(stars: number) {
+  await submitRating(stars)
+}
 
 // ============================================================================
 // Course Data
@@ -131,7 +162,7 @@ const currentLesson = ref<Lesson | null>(null)
 const selectedLessonIndex = ref(0)
 
 // Set initial lesson
-onMounted(() => {
+onMounted(async () => {
   const current = course.value.syllabus.find(l => l.current)
   if (current) {
     currentLesson.value = current
@@ -140,6 +171,12 @@ onMounted(() => {
     currentLesson.value = course.value.syllabus[0]
     selectedLessonIndex.value = 0
   }
+
+  // Load discussion and ratings
+  await Promise.all([
+    loadDiscussion(),
+    loadRating()
+  ])
 })
 
 // ============================================================================
@@ -151,7 +188,7 @@ const isGeneratingSummary = ref(false)
 const isExtractingConcepts = ref(false)
 const isGeneratingQuiz = ref(false)
 const showAISidebar = ref(true)
-const activeAITab = ref<'summary' | 'concepts' | 'quiz' | 'notes'>('summary')
+const activeAITab = ref<'summary' | 'concepts' | 'quiz' | 'discuss'>('summary')
 
 // AI Results
 interface CourseSummary {
@@ -516,6 +553,11 @@ function getLessonIcon(type: string) {
             <span :class="['level-badge', course.levelClass]">{{ course.level }}</span>
             <span class="duration-badge"><i class="fas fa-clock"></i> {{ course.duration }}</span>
             <span class="rating-badge"><i class="fas fa-star text-amber-400"></i> {{ course.rating }}</span>
+            <BookmarkButton
+              :content-id="course.id.toString()"
+              content-type="course"
+              size="sm"
+            />
           </div>
           <h1 class="course-title">{{ course.title }}</h1>
           <div class="course-instructor">
@@ -655,7 +697,7 @@ function getLessonIcon(type: string) {
           <!-- AI Tabs -->
           <div class="ai-tabs">
             <button
-              v-for="tab in ['summary', 'concepts', 'quiz', 'notes']"
+              v-for="tab in ['summary', 'concepts', 'quiz', 'discuss']"
               :key="tab"
               :class="['ai-tab', { 'active': activeAITab === tab }]"
               @click="activeAITab = tab as typeof activeAITab"
@@ -664,7 +706,7 @@ function getLessonIcon(type: string) {
                 'fas fa-file-alt': tab === 'summary',
                 'fas fa-lightbulb': tab === 'concepts',
                 'fas fa-question-circle': tab === 'quiz',
-                'fas fa-sticky-note': tab === 'notes'
+                'fas fa-comments': tab === 'discuss'
               }"></i>
               <span>{{ tab.charAt(0).toUpperCase() + tab.slice(1) }}</span>
             </button>
@@ -818,17 +860,33 @@ function getLessonIcon(type: string) {
             </div>
           </div>
 
-          <!-- Notes Tab -->
-          <div v-if="activeAITab === 'notes'" class="ai-tab-content">
+          <!-- Discussion Tab -->
+          <div v-if="activeAITab === 'discuss'" class="ai-tab-content">
             <div class="ai-action-header">
-              <h4>My Notes</h4>
+              <h4>Discussion</h4>
+              <span class="text-xs text-gray-500">{{ discussionComments.length }} posts</span>
             </div>
-            <textarea
-              v-model="aiNotes"
-              class="notes-textarea"
-              placeholder="Take notes while learning..."
-            ></textarea>
+            <CommentsSection
+              content-type="course"
+              :content-id="course.id.toString()"
+              :comments="discussionComments"
+              :is-loading="discussionLoading"
+              @add-comment="addDiscussionPost"
+            />
           </div>
+        </div>
+
+        <!-- Course Rating Section (shown at bottom of sidebar when collapsed) -->
+        <div class="course-rating-section p-4 border-t border-gray-200 bg-gray-50 rounded-b-xl">
+          <h4 class="text-sm font-semibold text-gray-700 mb-2">Rate this Course</h4>
+          <RatingStars
+            :model-value="courseRating?.userRating || 0"
+            :average="courseRating?.average"
+            :count="courseRating?.count"
+            size="md"
+            :show-count="true"
+            @update:model-value="handleCourseRating"
+          />
         </div>
       </div>
     </div>

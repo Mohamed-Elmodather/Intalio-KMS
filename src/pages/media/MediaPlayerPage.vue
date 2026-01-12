@@ -3,11 +3,37 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAIServicesStore } from '@/stores/aiServices'
 import { AILoadingIndicator, AIConfidenceBar } from '@/components/ai'
+import {
+  CommentsSection,
+  RatingStars,
+  SocialShareButtons,
+  RelatedContentCarousel,
+  BookmarkButton
+} from '@/components/common'
+import { useComments } from '@/composables/useComments'
+import { useRatings } from '@/composables/useRatings'
 import type { SummarizationResult, TranslationResult, SupportedLanguage } from '@/types/ai'
 
 const router = useRouter()
 const route = useRoute()
 const aiStore = useAIServicesStore()
+
+// Comments
+const mediaIdStr = computed(() => route.params.id as string)
+const {
+  comments,
+  isLoading: commentsLoading,
+  loadComments,
+  addComment
+} = useComments('media', mediaIdStr.value)
+
+// Ratings
+const { rating, submitRating, loadRating } = useRatings('media', mediaIdStr.value)
+
+// Handle rating
+async function handleRating(stars: number) {
+  await submitRating(stars)
+}
 
 // State
 const isLoading = ref(true)
@@ -194,11 +220,17 @@ const mockKeyMoments: Record<number, KeyMoment[]> = {
 // Load Data
 // ============================================================================
 
-onMounted(() => {
-  setTimeout(() => {
+onMounted(async () => {
+  setTimeout(async () => {
     media.value = mockMedia.find(m => m.id === mediaId.value) || mockMedia[0]
     duration.value = media.value?.durationSeconds || 0
     isLoading.value = false
+
+    // Load comments and ratings
+    await Promise.all([
+      loadComments(),
+      loadRating()
+    ])
   }, 500)
 })
 
@@ -760,6 +792,56 @@ function copySummary() {
             </div>
           </div>
         </div>
+      </div>
+
+      <!-- Rating & Engagement Section -->
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+        <div class="flex items-center justify-between flex-wrap gap-4">
+          <div>
+            <h3 class="font-semibold text-gray-900 mb-1">Rate this {{ media.type === 'video' ? 'Video' : 'Audio' }}</h3>
+            <p class="text-sm text-gray-500">Help others discover great content</p>
+          </div>
+          <div class="flex items-center gap-4">
+            <RatingStars
+              :model-value="rating?.userRating || 0"
+              :average="rating?.average"
+              :count="rating?.count"
+              size="lg"
+              :show-count="true"
+              @update:model-value="handleRating"
+            />
+            <BookmarkButton
+              :content-id="media.id.toString()"
+              content-type="media"
+              size="md"
+              variant="button"
+              :show-label="true"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- Share Section -->
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+        <h3 class="font-semibold text-gray-900 mb-4">Share this {{ media.type === 'video' ? 'Video' : 'Audio' }}</h3>
+        <SocialShareButtons
+          :title="media.title"
+          :description="media.description"
+          layout="horizontal"
+          size="lg"
+          :show-labels="true"
+        />
+      </div>
+
+      <!-- Comments Section -->
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+        <CommentsSection
+          content-type="media"
+          :content-id="media.id.toString()"
+          :comments="comments"
+          :is-loading="commentsLoading"
+          @add-comment="addComment"
+        />
       </div>
     </div>
 

@@ -10,6 +10,14 @@ import {
   AIActionButton,
   AIResultCard
 } from '@/components/ai'
+import {
+  CommentsSection,
+  RatingStars,
+  SocialShareButtons,
+  BookmarkButton
+} from '@/components/common'
+import { useComments } from '@/composables/useComments'
+import { useRatings } from '@/composables/useRatings'
 import type {
   SummarizationResult,
   TranslationResult,
@@ -22,6 +30,30 @@ import type {
 const router = useRouter()
 const route = useRoute()
 const aiStore = useAIServicesStore()
+
+// Comments
+const documentId = computed(() => route.params.id as string)
+const {
+  comments,
+  isLoading: commentsLoading,
+  loadComments,
+  addComment
+} = useComments('document', documentId.value)
+
+// Ratings
+const { rating, submitRating, loadRating } = useRatings('document', documentId.value)
+
+// Version History
+interface Version {
+  id: string
+  version: string
+  author: string
+  date: Date
+  changes: string
+  size: string
+}
+const versions = ref<Version[]>([])
+const showVersionHistory = ref(false)
 
 const isLoading = ref(true)
 const document = ref<any>(null)
@@ -126,11 +158,24 @@ const documentId = computed(() => Number(route.params.id))
 const isPreviewMode = computed(() => route.query.preview === 'true')
 const isFullscreen = ref(false)
 
-onMounted(() => {
+onMounted(async () => {
   // Simulate API call
-  setTimeout(() => {
-    document.value = mockDocuments.find(d => d.id === documentId.value) || mockDocuments[0]
+  setTimeout(async () => {
+    document.value = mockDocuments.find(d => d.id === Number(route.params.id)) || mockDocuments[0]
     isLoading.value = false
+
+    // Load version history
+    versions.value = [
+      { id: '3', version: document.value?.version || '2.1', author: document.value?.author.name || 'Unknown', date: new Date(document.value?.updatedAt || Date.now()), changes: 'Updated tournament schedule with final venue assignments', size: document.value?.size || '4.2 MB' },
+      { id: '2', version: '2.0', author: document.value?.author.name || 'Unknown', date: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), changes: 'Added knockout round schedule', size: '3.8 MB' },
+      { id: '1', version: '1.0', author: document.value?.author.name || 'Unknown', date: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000), changes: 'Initial document upload', size: '2.1 MB' }
+    ]
+
+    // Load comments and ratings
+    await Promise.all([
+      loadComments(),
+      loadRating()
+    ])
   }, 500)
 })
 
@@ -824,6 +869,18 @@ function copySummary() {
     alert('Summary copied to clipboard!')
   }
 }
+
+async function handleRating(stars: number) {
+  await submitRating(stars)
+}
+
+function formatVersionDate(date: Date): string {
+  return new Date(date).toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric'
+  })
+}
 </script>
 
 <template>
@@ -886,9 +943,18 @@ function copySummary() {
                   <i class="fas fa-print"></i>
                   <span>Print</span>
                 </button>
-                <button class="px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-medium flex items-center justify-center gap-2 transition-colors">
-                  <i class="far fa-bookmark"></i>
-                </button>
+                <BookmarkButton
+                  :content-id="document.id.toString()"
+                  content-type="document"
+                  size="md"
+                  variant="button"
+                />
+                <SocialShareButtons
+                  :title="document.name"
+                  :description="document.description"
+                  layout="horizontal"
+                  size="sm"
+                />
               </div>
             </div>
           </div>
@@ -1317,6 +1383,81 @@ function copySummary() {
             </div>
           </div>
         </div>
+      </div>
+
+      <!-- Version History -->
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
+            <i class="fas fa-history text-teal-500"></i>
+            Version History
+          </h2>
+          <button
+            @click="showVersionHistory = !showVersionHistory"
+            class="text-sm text-teal-600 hover:text-teal-700"
+          >
+            {{ showVersionHistory ? 'Hide' : 'Show All' }}
+          </button>
+        </div>
+
+        <div class="space-y-4">
+          <div
+            v-for="(ver, index) in (showVersionHistory ? versions : versions.slice(0, 2))"
+            :key="ver.id"
+            class="relative pl-6 pb-4"
+            :class="{ 'border-l-2 border-gray-200': index < versions.length - 1 }"
+          >
+            <!-- Timeline dot -->
+            <div class="absolute left-0 top-0 w-3 h-3 rounded-full -translate-x-1.5"
+                 :class="index === 0 ? 'bg-teal-500' : 'bg-gray-300'"></div>
+
+            <div class="flex items-start justify-between">
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="font-semibold text-gray-900">v{{ ver.version }}</span>
+                  <span v-if="index === 0" class="px-2 py-0.5 bg-teal-100 text-teal-700 text-xs rounded-full font-medium">Current</span>
+                </div>
+                <p class="text-sm text-gray-600 mt-1">{{ ver.changes }}</p>
+                <p class="text-xs text-gray-400 mt-1">
+                  {{ ver.author }} • {{ formatVersionDate(ver.date) }} • {{ ver.size }}
+                </p>
+              </div>
+              <button class="text-sm text-teal-600 hover:text-teal-700 flex items-center gap-1">
+                <i class="fas fa-download text-xs"></i>
+                Download
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Rating Section -->
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-lg font-semibold text-gray-900 mb-1">Rate this Document</h2>
+            <p class="text-sm text-gray-500">Help others find useful documents</p>
+          </div>
+          <RatingStars
+            :model-value="rating?.userRating || 0"
+            :average="rating?.average"
+            :count="rating?.count"
+            size="lg"
+            :show-count="true"
+            @update:model-value="handleRating"
+          />
+        </div>
+      </div>
+
+      <!-- Comments Section -->
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+        <CommentsSection
+          content-type="document"
+          :content-id="document.id.toString()"
+          :comments="comments"
+          :is-loading="commentsLoading"
+          @add-comment="addComment"
+        />
       </div>
     </div>
 

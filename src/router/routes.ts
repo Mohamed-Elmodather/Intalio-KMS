@@ -19,7 +19,9 @@ const CourseViewPage = () => import('@/pages/learning/CourseViewPage.vue')
 const CollaborationPage = () => import('@/pages/collaboration/CollaborationPage.vue')
 const PollsPage = () => import('@/pages/polls/PollsPage.vue')
 const PollCreatePage = () => import('@/pages/polls/PollCreatePage.vue')
+const PollDetailPage = () => import('@/pages/polls/PollDetailPage.vue')
 const SelfServicesPage = () => import('@/pages/services/SelfServicesPage.vue')
+const ServiceRequestDetailPage = () => import('@/pages/services/ServiceRequestDetailPage.vue')
 const SearchResultsPage = () => import('@/pages/search/SearchResultsPage.vue')
 const AIAssistantPage = () => import('@/pages/ai/AIAssistantPage.vue')
 const ProfilePage = () => import('@/pages/profile/ProfilePage.vue')
@@ -166,6 +168,12 @@ export const routes: RouteRecordRaw[] = [
     component: PollCreatePage,
     meta: { requiresAuth: true, title: 'Create Poll', roles: ['admin', 'editor'] },
   },
+  {
+    path: '/polls/:id',
+    name: 'PollDetail',
+    component: PollDetailPage,
+    meta: { requiresAuth: true, title: 'Poll Details' },
+  },
 
   // Self Services
   {
@@ -173,6 +181,12 @@ export const routes: RouteRecordRaw[] = [
     name: 'SelfServices',
     component: SelfServicesPage,
     meta: { requiresAuth: true, title: 'Self Services' },
+  },
+  {
+    path: '/self-services/request/:id',
+    name: 'ServiceRequestDetail',
+    component: ServiceRequestDetailPage,
+    meta: { requiresAuth: true, title: 'Service Request' },
   },
 
   // Search

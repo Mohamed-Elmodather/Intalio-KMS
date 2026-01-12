@@ -39,6 +39,38 @@ const stats = ref({
   courses: 12
 })
 
+// Followers/Following
+const followersCount = ref(234)
+const followingCount = ref(156)
+const mutualConnections = ref(45)
+const followers = ref([
+  { id: 1, name: 'Sarah Chen', initials: 'SC', role: 'Engineering Lead', isFollowing: true },
+  { id: 2, name: 'Mike Johnson', initials: 'MJ', role: 'Senior Designer', isFollowing: true },
+  { id: 3, name: 'Emily Davis', initials: 'ED', role: 'Product Manager', isFollowing: false },
+  { id: 4, name: 'Alex Thompson', initials: 'AT', role: 'Developer', isFollowing: true },
+  { id: 5, name: 'Lisa Wang', initials: 'LW', role: 'UX Designer', isFollowing: false }
+])
+
+// Content Authored
+const authoredContent = ref({
+  articles: [
+    { id: 1, title: 'Complete Employee Onboarding Guide 2024', views: 1250, likes: 89, date: '2 days ago' },
+    { id: 2, title: 'Building Effective Remote Teams', views: 980, likes: 67, date: '1 week ago' },
+    { id: 3, title: 'Product Strategy Best Practices', views: 2100, likes: 156, date: '2 weeks ago' }
+  ],
+  documents: [
+    { id: 1, title: 'Q4 Product Roadmap', downloads: 234, date: '3 days ago' },
+    { id: 2, title: 'Team Performance Review Template', downloads: 189, date: '1 week ago' }
+  ],
+  polls: [
+    { id: 1, title: 'Team Meeting Time Preferences', votes: 45, status: 'completed' },
+    { id: 2, title: 'Office Return Policy Survey', votes: 78, status: 'active' }
+  ]
+})
+
+// Active content tab
+const activeContentTab = ref<'articles' | 'documents' | 'polls'>('articles')
+
 // Edit form
 const editForm = ref({
   firstName: 'Ahmed',
@@ -536,10 +568,18 @@ function getInsightColor(type: string): string {
           <div class="card-animated fade-in-up rounded-2xl p-6" style="animation-delay: 0.4s">
             <h2 class="text-lg font-semibold text-teal-900 mb-6">Contributions</h2>
 
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+            <div class="grid grid-cols-3 md:grid-cols-6 gap-4 mb-6">
               <div class="text-center p-4 rounded-xl bg-teal-50 list-item-animated ripple" style="animation-delay: 0.45s">
                 <p class="text-2xl font-bold text-teal-600">{{ stats.articles }}</p>
                 <p class="text-sm text-teal-500">Articles</p>
+              </div>
+              <div class="text-center p-4 rounded-xl bg-purple-50 list-item-animated ripple cursor-pointer hover:bg-purple-100" style="animation-delay: 0.46s">
+                <p class="text-2xl font-bold text-purple-600">{{ followersCount }}</p>
+                <p class="text-sm text-purple-500">Followers</p>
+              </div>
+              <div class="text-center p-4 rounded-xl bg-indigo-50 list-item-animated ripple cursor-pointer hover:bg-indigo-100" style="animation-delay: 0.47s">
+                <p class="text-2xl font-bold text-indigo-600">{{ followingCount }}</p>
+                <p class="text-sm text-indigo-500">Following</p>
               </div>
               <div class="text-center p-4 rounded-xl bg-blue-50 list-item-animated ripple" style="animation-delay: 0.5s">
                 <p class="text-2xl font-bold text-blue-600">{{ stats.comments }}</p>
@@ -567,6 +607,145 @@ function getInsightColor(type: string): string {
               </div>
             </div>
             <p class="text-center text-sm text-teal-500 mt-2">Last 12 months contribution activity</p>
+          </div>
+
+          <!-- Content Authored -->
+          <div class="card-animated fade-in-up rounded-2xl p-6" style="animation-delay: 0.5s">
+            <div class="flex items-center justify-between mb-6">
+              <h2 class="text-lg font-semibold text-teal-900">Content Authored</h2>
+              <div class="flex gap-1 bg-teal-50 rounded-lg p-1">
+                <button
+                  @click="activeContentTab = 'articles'"
+                  :class="[
+                    'px-3 py-1.5 text-sm font-medium rounded-md transition-all',
+                    activeContentTab === 'articles'
+                      ? 'bg-white text-teal-700 shadow-sm'
+                      : 'text-teal-600 hover:text-teal-800'
+                  ]"
+                >
+                  Articles
+                </button>
+                <button
+                  @click="activeContentTab = 'documents'"
+                  :class="[
+                    'px-3 py-1.5 text-sm font-medium rounded-md transition-all',
+                    activeContentTab === 'documents'
+                      ? 'bg-white text-teal-700 shadow-sm'
+                      : 'text-teal-600 hover:text-teal-800'
+                  ]"
+                >
+                  Documents
+                </button>
+                <button
+                  @click="activeContentTab = 'polls'"
+                  :class="[
+                    'px-3 py-1.5 text-sm font-medium rounded-md transition-all',
+                    activeContentTab === 'polls'
+                      ? 'bg-white text-teal-700 shadow-sm'
+                      : 'text-teal-600 hover:text-teal-800'
+                  ]"
+                >
+                  Polls
+                </button>
+              </div>
+            </div>
+
+            <!-- Articles Tab -->
+            <div v-if="activeContentTab === 'articles'" class="space-y-3">
+              <router-link
+                v-for="(article, idx) in authoredContent.articles"
+                :key="article.id"
+                :to="`/articles/${article.id}`"
+                class="block p-4 rounded-xl bg-teal-50/50 hover:bg-teal-50 transition-all group list-item-animated ripple"
+                :style="{ 'animation-delay': (0.55 + idx * 0.05) + 's' }"
+              >
+                <div class="flex items-start justify-between">
+                  <div class="flex-1">
+                    <h3 class="font-medium text-teal-900 group-hover:text-teal-700 transition-colors">
+                      {{ article.title }}
+                    </h3>
+                    <div class="flex items-center gap-4 mt-2 text-sm text-teal-500">
+                      <span><i class="fas fa-eye mr-1"></i>{{ article.views.toLocaleString() }} views</span>
+                      <span><i class="fas fa-heart mr-1"></i>{{ article.likes }} likes</span>
+                      <span><i class="fas fa-clock mr-1"></i>{{ article.date }}</span>
+                    </div>
+                  </div>
+                  <i class="fas fa-chevron-right text-teal-400 group-hover:text-teal-600 transition-colors mt-1"></i>
+                </div>
+              </router-link>
+              <button class="w-full py-2 text-center text-sm text-teal-600 hover:text-teal-800 font-medium">
+                View All Articles <i class="fas fa-arrow-right ml-1"></i>
+              </button>
+            </div>
+
+            <!-- Documents Tab -->
+            <div v-if="activeContentTab === 'documents'" class="space-y-3">
+              <router-link
+                v-for="(doc, idx) in authoredContent.documents"
+                :key="doc.id"
+                :to="`/documents/${doc.id}`"
+                class="block p-4 rounded-xl bg-purple-50/50 hover:bg-purple-50 transition-all group list-item-animated ripple"
+                :style="{ 'animation-delay': (0.55 + idx * 0.05) + 's' }"
+              >
+                <div class="flex items-start justify-between">
+                  <div class="flex items-start gap-3 flex-1">
+                    <div class="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center flex-shrink-0">
+                      <i class="fas fa-file-alt text-purple-600"></i>
+                    </div>
+                    <div>
+                      <h3 class="font-medium text-teal-900 group-hover:text-purple-700 transition-colors">
+                        {{ doc.title }}
+                      </h3>
+                      <div class="flex items-center gap-4 mt-1 text-sm text-teal-500">
+                        <span><i class="fas fa-download mr-1"></i>{{ doc.downloads }} downloads</span>
+                        <span><i class="fas fa-clock mr-1"></i>{{ doc.date }}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <i class="fas fa-chevron-right text-teal-400 group-hover:text-purple-600 transition-colors mt-3"></i>
+                </div>
+              </router-link>
+              <button class="w-full py-2 text-center text-sm text-teal-600 hover:text-teal-800 font-medium">
+                View All Documents <i class="fas fa-arrow-right ml-1"></i>
+              </button>
+            </div>
+
+            <!-- Polls Tab -->
+            <div v-if="activeContentTab === 'polls'" class="space-y-3">
+              <router-link
+                v-for="(poll, idx) in authoredContent.polls"
+                :key="poll.id"
+                :to="`/polls/${poll.id}`"
+                class="block p-4 rounded-xl bg-blue-50/50 hover:bg-blue-50 transition-all group list-item-animated ripple"
+                :style="{ 'animation-delay': (0.55 + idx * 0.05) + 's' }"
+              >
+                <div class="flex items-start justify-between">
+                  <div class="flex items-start gap-3 flex-1">
+                    <div class="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0">
+                      <i class="fas fa-poll text-blue-600"></i>
+                    </div>
+                    <div>
+                      <h3 class="font-medium text-teal-900 group-hover:text-blue-700 transition-colors">
+                        {{ poll.title }}
+                      </h3>
+                      <div class="flex items-center gap-4 mt-1 text-sm text-teal-500">
+                        <span><i class="fas fa-vote-yea mr-1"></i>{{ poll.votes }} votes</span>
+                        <span :class="[
+                          'px-2 py-0.5 rounded-full text-xs font-medium',
+                          poll.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'
+                        ]">
+                          {{ poll.status === 'active' ? 'Active' : 'Completed' }}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <i class="fas fa-chevron-right text-teal-400 group-hover:text-blue-600 transition-colors mt-3"></i>
+                </div>
+              </router-link>
+              <button class="w-full py-2 text-center text-sm text-teal-600 hover:text-teal-800 font-medium">
+                View All Polls <i class="fas fa-arrow-right ml-1"></i>
+              </button>
+            </div>
           </div>
         </div>
 
@@ -673,6 +852,61 @@ function getInsightColor(type: string): string {
               </div>
             </div>
           </div>
+
+          <!-- Followers & Following -->
+          <div class="card-animated fade-in-up rounded-2xl p-6" style="animation-delay: 0.6s">
+            <div class="flex items-center justify-between mb-4">
+              <h2 class="text-lg font-semibold text-teal-900">Connections</h2>
+              <span class="text-xs text-teal-500">{{ mutualConnections }} mutual</span>
+            </div>
+
+            <!-- Quick Stats -->
+            <div class="grid grid-cols-2 gap-3 mb-4">
+              <div class="text-center p-3 rounded-xl bg-purple-50 cursor-pointer hover:bg-purple-100 transition-colors">
+                <p class="text-lg font-bold text-purple-600">{{ followersCount }}</p>
+                <p class="text-xs text-purple-500">Followers</p>
+              </div>
+              <div class="text-center p-3 rounded-xl bg-indigo-50 cursor-pointer hover:bg-indigo-100 transition-colors">
+                <p class="text-lg font-bold text-indigo-600">{{ followingCount }}</p>
+                <p class="text-xs text-indigo-500">Following</p>
+              </div>
+            </div>
+
+            <!-- Recent Followers -->
+            <p class="text-xs font-semibold text-teal-500 uppercase tracking-wider mb-3">Recent Followers</p>
+            <div class="space-y-2">
+              <div
+                v-for="(follower, idx) in followers.slice(0, 4)"
+                :key="follower.id"
+                class="flex items-center justify-between p-2 rounded-xl hover:bg-teal-50 transition-colors list-item-animated"
+                :style="{ 'animation-delay': (0.65 + idx * 0.05) + 's' }"
+              >
+                <div class="flex items-center gap-3">
+                  <div class="w-9 h-9 rounded-full bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center text-white text-xs font-medium">
+                    {{ follower.initials }}
+                  </div>
+                  <div>
+                    <p class="text-sm font-medium text-teal-900">{{ follower.name }}</p>
+                    <p class="text-xs text-teal-500">{{ follower.role }}</p>
+                  </div>
+                </div>
+                <button
+                  :class="[
+                    'px-3 py-1 text-xs font-medium rounded-full transition-colors',
+                    follower.isFollowing
+                      ? 'bg-teal-100 text-teal-700 hover:bg-teal-200'
+                      : 'bg-teal-500 text-white hover:bg-teal-600'
+                  ]"
+                >
+                  {{ follower.isFollowing ? 'Following' : 'Follow Back' }}
+                </button>
+              </div>
+            </div>
+
+            <button class="btn-vibrant ripple w-full mt-4 py-2 text-center text-sm text-teal-600 hover:text-teal-800">
+              View All Connections <i class="fas fa-arrow-right ml-1 icon-soft"></i>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -747,7 +981,7 @@ function getInsightColor(type: string): string {
               <div v-else-if="aiProfileSummary" class="space-y-6">
                 <!-- Confidence -->
                 <div class="flex items-center gap-3 p-3 bg-teal-50 rounded-xl">
-                  <AIConfidenceBar :confidence="aiProfileSummary.confidence" />
+                  <AIConfidenceBar :value="aiProfileSummary.confidence" />
                   <span class="text-sm text-teal-700">{{ Math.round(aiProfileSummary.confidence * 100) }}% confidence based on your activities</span>
                 </div>
 
@@ -850,7 +1084,7 @@ function getInsightColor(type: string): string {
                           </span>
                         </div>
                         <div class="flex items-center gap-2">
-                          <AIConfidenceBar :confidence="skill.confidence" size="sm" />
+                          <AIConfidenceBar :value="skill.confidence" size="sm" />
                           <span class="text-xs text-gray-500">{{ Math.round(skill.confidence * 100) }}%</span>
                         </div>
                       </div>
