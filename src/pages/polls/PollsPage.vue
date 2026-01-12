@@ -32,17 +32,6 @@ interface FeaturedPoll {
   selectedOption: number | null
 }
 
-interface PollForYou {
-  id: number
-  question: string
-  category: string
-  categoryClass: string
-  categoryIcon: string
-  totalVotes: number
-  endsIn: string
-  urgencyClass: string
-}
-
 interface TrendingPoll {
   id: number
   question: string
@@ -134,50 +123,6 @@ const featuredPoll = ref<FeaturedPoll>({
   hasVoted: false,
   selectedOption: null
 })
-
-// Polls For You
-const pollsForYou = ref<PollForYou[]>([
-  {
-    id: 1,
-    question: "What's your preferred remote work schedule?",
-    category: 'HR',
-    categoryClass: 'hr',
-    categoryIcon: 'fas fa-users',
-    totalVotes: 234,
-    endsIn: '2 days',
-    urgencyClass: 'safe'
-  },
-  {
-    id: 2,
-    question: 'Which feature should we build next?',
-    category: 'Product',
-    categoryClass: 'product',
-    categoryIcon: 'fas fa-box',
-    totalVotes: 189,
-    endsIn: '5 hours',
-    urgencyClass: 'urgent'
-  },
-  {
-    id: 3,
-    question: 'Rate our new onboarding process',
-    category: 'Feedback',
-    categoryClass: 'feedback',
-    categoryIcon: 'fas fa-comment-dots',
-    totalVotes: 67,
-    endsIn: '1 week',
-    urgencyClass: 'safe'
-  },
-  {
-    id: 4,
-    question: 'Best day for team lunch?',
-    category: 'Team',
-    categoryClass: 'team',
-    categoryIcon: 'fas fa-user-friends',
-    totalVotes: 45,
-    endsIn: '12 hours',
-    urgencyClass: 'warning'
-  }
-])
 
 // Trending Polls
 const trendingPolls = ref<TrendingPoll[]>([
@@ -654,44 +599,6 @@ function goToCreatePoll() {
             {{ cat.label }}
             <span v-if="cat.count" class="text-xs opacity-70">({{ cat.count }})</span>
           </button>
-        </div>
-      </section>
-
-      <!-- Polls For You -->
-      <section class="mb-10 fade-in-up" style="animation-delay: 0.2s">
-        <div class="section-header-polls">
-          <h2 class="section-title-polls">
-            <i class="fas fa-hand-point-right"></i>
-            Polls For You
-          </h2>
-          <a href="#" class="text-sm text-teal-600 hover:text-teal-700 font-medium">View All <i class="fas fa-arrow-right ml-1"></i></a>
-        </div>
-        <div class="polls-scroll scrollbar-elegant">
-          <div v-for="poll in pollsForYou" :key="poll.id" class="poll-scroll-card">
-            <div class="flex items-center justify-between mb-3">
-              <span :class="['poll-category-tag', poll.categoryClass]">
-                <i :class="poll.categoryIcon"></i> {{ poll.category }}
-              </span>
-              <span :class="['deadline-badge', poll.urgencyClass]">
-                <i class="fas fa-clock"></i> {{ poll.endsIn }}
-              </span>
-            </div>
-            <h3 class="font-semibold text-gray-900 mb-3 line-clamp-2">{{ poll.question }}</h3>
-            <div class="flex items-center justify-between text-sm text-gray-500">
-              <span><i class="fas fa-users mr-1"></i> {{ poll.totalVotes }} votes</span>
-              <button class="px-3 py-1.5 bg-teal-50 text-teal-600 rounded-lg font-medium hover:bg-teal-100 transition-all">
-                Vote Now
-              </button>
-            </div>
-          </div>
-          <!-- Quick Poll Card -->
-          <div class="poll-scroll-card quick-poll-card" @click="showQuickPollModal = true">
-            <div class="quick-poll-icon">
-              <i class="fas fa-plus"></i>
-            </div>
-            <h3 class="font-semibold text-gray-900 mb-1">Quick Poll</h3>
-            <p class="text-sm text-gray-500">Create a poll in seconds</p>
-          </div>
         </div>
       </section>
 
