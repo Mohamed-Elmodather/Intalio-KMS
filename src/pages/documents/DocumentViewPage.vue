@@ -1461,19 +1461,20 @@ function formatVersionDate(date: Date): string {
                 <div class="flex gap-2">
                   <button
                     v-for="type in [
-                      { id: 'brief', label: 'Brief' },
-                      { id: 'detailed', label: 'Detailed' },
-                      { id: 'bullet-points', label: 'Bullets' }
+                      { id: 'brief', label: 'Brief', icon: 'fas fa-bolt' },
+                      { id: 'detailed', label: 'Detailed', icon: 'fas fa-align-left' },
+                      { id: 'bullet-points', label: 'Bullets', icon: 'fas fa-list-ul' }
                     ]"
                     :key="type.id"
                     @click="summaryType = type.id as any"
                     :class="[
-                      'flex-1 px-3 py-2 rounded-lg text-xs font-medium transition-all',
+                      'flex-1 px-3 py-2 rounded-lg text-xs font-medium transition-all cursor-pointer flex items-center justify-center gap-1.5',
                       summaryType === type.id
-                        ? 'bg-teal-100 text-teal-700'
-                        : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
+                        ? 'bg-teal-500 text-white shadow-sm'
+                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                     ]"
                   >
+                    <i :class="type.icon"></i>
                     {{ type.label }}
                   </button>
                 </div>
