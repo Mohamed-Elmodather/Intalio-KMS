@@ -666,48 +666,172 @@ function getInsightColor(type: string): string {
           </div>
 
           <!-- Contributions -->
-          <div class="card-animated fade-in-up rounded-2xl p-6" style="animation-delay: 0.4s">
-            <h2 class="text-lg font-semibold text-teal-900 mb-6">Contributions</h2>
+          <div class="card-animated fade-in-up rounded-2xl overflow-hidden" style="animation-delay: 0.4s">
+            <!-- Header -->
+            <div class="p-6 bg-gradient-to-r from-teal-500 to-emerald-500">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                  <div class="w-12 h-12 bg-white/20 backdrop-blur rounded-xl flex items-center justify-center">
+                    <i class="fas fa-chart-line text-white text-xl"></i>
+                  </div>
+                  <div>
+                    <h2 class="text-lg font-semibold text-white">Contributions</h2>
+                    <p class="text-teal-100 text-sm">Your activity and impact</p>
+                  </div>
+                </div>
+                <select class="px-3 py-1.5 bg-white/20 backdrop-blur text-white text-sm rounded-lg border border-white/30 focus:outline-none">
+                  <option value="year" class="text-gray-800">This Year</option>
+                  <option value="month" class="text-gray-800">This Month</option>
+                  <option value="week" class="text-gray-800">This Week</option>
+                </select>
+              </div>
 
-            <div class="grid grid-cols-3 md:grid-cols-6 gap-4 mb-6">
-              <div class="text-center p-4 rounded-xl bg-teal-50 list-item-animated ripple" style="animation-delay: 0.45s">
-                <p class="text-2xl font-bold text-teal-600">{{ stats.articles }}</p>
-                <p class="text-sm text-teal-500">Articles</p>
-              </div>
-              <div class="text-center p-4 rounded-xl bg-purple-50 list-item-animated ripple cursor-pointer hover:bg-purple-100" style="animation-delay: 0.46s">
-                <p class="text-2xl font-bold text-purple-600">{{ followersCount }}</p>
-                <p class="text-sm text-purple-500">Followers</p>
-              </div>
-              <div class="text-center p-4 rounded-xl bg-indigo-50 list-item-animated ripple cursor-pointer hover:bg-indigo-100" style="animation-delay: 0.47s">
-                <p class="text-2xl font-bold text-indigo-600">{{ followingCount }}</p>
-                <p class="text-sm text-indigo-500">Following</p>
-              </div>
-              <div class="text-center p-4 rounded-xl bg-blue-50 list-item-animated ripple" style="animation-delay: 0.5s">
-                <p class="text-2xl font-bold text-blue-600">{{ stats.comments }}</p>
-                <p class="text-sm text-teal-500">Comments</p>
-              </div>
-              <div class="text-center p-4 rounded-xl bg-purple-50 list-item-animated ripple" style="animation-delay: 0.55s">
-                <p class="text-2xl font-bold text-purple-600">{{ stats.documents }}</p>
-                <p class="text-sm text-teal-500">Documents</p>
-              </div>
-              <div class="text-center p-4 rounded-xl bg-green-50 list-item-animated ripple" style="animation-delay: 0.6s">
-                <p class="text-2xl font-bold text-green-600">{{ stats.courses }}</p>
-                <p class="text-sm text-teal-500">Courses Completed</p>
+              <!-- Streak & Highlights -->
+              <div class="flex items-center gap-4 mt-4">
+                <div class="flex items-center gap-2 px-3 py-1.5 bg-white/20 backdrop-blur rounded-full">
+                  <i class="fas fa-fire text-orange-300"></i>
+                  <span class="text-white text-sm font-medium">32 day streak</span>
+                </div>
+                <div class="flex items-center gap-2 px-3 py-1.5 bg-white/20 backdrop-blur rounded-full">
+                  <i class="fas fa-trophy text-yellow-300"></i>
+                  <span class="text-white text-sm font-medium">Top 5% contributor</span>
+                </div>
               </div>
             </div>
 
-            <!-- Contribution Chart (Placeholder) -->
-            <div class="h-32 bg-teal-50 rounded-xl flex items-center justify-center">
-              <div class="flex items-end gap-1 h-24">
-                <div
-                  v-for="(val, idx) in contributionData"
-                  :key="idx"
-                  :style="{ height: val + '%' }"
-                  class="w-3 bg-teal-400 rounded-t hover:bg-teal-500 transition-colors cursor-pointer"
-                ></div>
+            <div class="p-6">
+              <!-- Stats Grid -->
+              <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                <div class="p-4 rounded-xl bg-gradient-to-br from-teal-50 to-teal-100 border border-teal-200">
+                  <div class="flex items-center justify-between mb-2">
+                    <div class="w-10 h-10 rounded-lg bg-teal-500 flex items-center justify-center">
+                      <i class="fas fa-file-alt text-white"></i>
+                    </div>
+                    <span class="flex items-center gap-1 text-xs text-green-600 font-medium">
+                      <i class="fas fa-arrow-up"></i> 12%
+                    </span>
+                  </div>
+                  <p class="text-2xl font-bold text-teal-700">{{ stats.articles }}</p>
+                  <p class="text-sm text-teal-600">Articles Published</p>
+                </div>
+
+                <div class="p-4 rounded-xl bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200">
+                  <div class="flex items-center justify-between mb-2">
+                    <div class="w-10 h-10 rounded-lg bg-blue-500 flex items-center justify-center">
+                      <i class="fas fa-comments text-white"></i>
+                    </div>
+                    <span class="flex items-center gap-1 text-xs text-green-600 font-medium">
+                      <i class="fas fa-arrow-up"></i> 8%
+                    </span>
+                  </div>
+                  <p class="text-2xl font-bold text-blue-700">{{ stats.comments }}</p>
+                  <p class="text-sm text-blue-600">Comments Made</p>
+                </div>
+
+                <div class="p-4 rounded-xl bg-gradient-to-br from-purple-50 to-purple-100 border border-purple-200">
+                  <div class="flex items-center justify-between mb-2">
+                    <div class="w-10 h-10 rounded-lg bg-purple-500 flex items-center justify-center">
+                      <i class="fas fa-folder text-white"></i>
+                    </div>
+                    <span class="flex items-center gap-1 text-xs text-green-600 font-medium">
+                      <i class="fas fa-arrow-up"></i> 5%
+                    </span>
+                  </div>
+                  <p class="text-2xl font-bold text-purple-700">{{ stats.documents }}</p>
+                  <p class="text-sm text-purple-600">Documents Shared</p>
+                </div>
+
+                <div class="p-4 rounded-xl bg-gradient-to-br from-green-50 to-green-100 border border-green-200">
+                  <div class="flex items-center justify-between mb-2">
+                    <div class="w-10 h-10 rounded-lg bg-green-500 flex items-center justify-center">
+                      <i class="fas fa-graduation-cap text-white"></i>
+                    </div>
+                    <span class="flex items-center gap-1 text-xs text-green-600 font-medium">
+                      <i class="fas fa-arrow-up"></i> 15%
+                    </span>
+                  </div>
+                  <p class="text-2xl font-bold text-green-700">{{ stats.courses }}</p>
+                  <p class="text-sm text-green-600">Courses Completed</p>
+                </div>
+              </div>
+
+              <!-- Activity Chart -->
+              <div class="bg-gray-50 rounded-xl p-4">
+                <div class="flex items-center justify-between mb-4">
+                  <h3 class="text-sm font-semibold text-gray-700">Activity Overview</h3>
+                  <div class="flex items-center gap-4 text-xs">
+                    <span class="flex items-center gap-1">
+                      <span class="w-3 h-3 rounded-full bg-teal-500"></span> Contributions
+                    </span>
+                    <span class="flex items-center gap-1">
+                      <span class="w-3 h-3 rounded-full bg-teal-200"></span> Avg
+                    </span>
+                  </div>
+                </div>
+
+                <!-- Chart with labels -->
+                <div class="relative">
+                  <div class="flex items-end gap-2 h-32">
+                    <div
+                      v-for="(val, idx) in contributionData"
+                      :key="idx"
+                      class="flex-1 flex flex-col items-center gap-1 group"
+                    >
+                      <div class="relative w-full flex justify-center">
+                        <div
+                          :style="{ height: val * 1.2 + 'px' }"
+                          class="w-full max-w-8 bg-gradient-to-t from-teal-500 to-teal-400 rounded-t-lg hover:from-teal-600 hover:to-teal-500 transition-all cursor-pointer group-hover:shadow-lg"
+                        ></div>
+                        <!-- Tooltip -->
+                        <div class="absolute -top-8 left-1/2 -translate-x-1/2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
+                          {{ val }} contributions
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- Month labels -->
+                  <div class="flex gap-2 mt-2">
+                    <div v-for="month in ['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D']" :key="month" class="flex-1 text-center text-xs text-gray-500">
+                      {{ month }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Weekly Activity -->
+              <div class="mt-6">
+                <h3 class="text-sm font-semibold text-gray-700 mb-3">This Week's Activity</h3>
+                <div class="grid grid-cols-7 gap-2">
+                  <div v-for="(day, idx) in ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']" :key="day" class="text-center">
+                    <div
+                      :class="[
+                        'w-full aspect-square rounded-lg flex items-center justify-center text-xs font-medium mb-1',
+                        idx < 5 ? 'bg-teal-500 text-white' : idx === 5 ? 'bg-teal-200 text-teal-700' : 'bg-gray-100 text-gray-400'
+                      ]"
+                    >
+                      {{ [3, 5, 2, 4, 1, 2, 0][idx] }}
+                    </div>
+                    <span class="text-xs text-gray-500">{{ day }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Impact Summary -->
+              <div class="mt-6 p-4 bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl border border-amber-200">
+                <div class="flex items-start gap-3">
+                  <div class="w-10 h-10 rounded-lg bg-amber-500 flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-star text-white"></i>
+                  </div>
+                  <div>
+                    <h4 class="font-semibold text-amber-800">Your Impact</h4>
+                    <p class="text-sm text-amber-700 mt-1">
+                      Your contributions have been viewed <strong>12,450</strong> times and helped
+                      <strong>234</strong> colleagues this month. Keep up the great work!
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
-            <p class="text-center text-sm text-teal-500 mt-2">Last 12 months contribution activity</p>
           </div>
 
           <!-- Content Authored -->
