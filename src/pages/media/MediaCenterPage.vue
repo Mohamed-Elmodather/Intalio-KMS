@@ -1519,6 +1519,14 @@ function handleSearchInput() {
     // In normal mode, apply filter immediately
     searchQuery.value = unifiedSearchQuery.value
   }
+
+  // Debounced AI suggestions fetch
+  if (searchDebounceTimeout.value) {
+    clearTimeout(searchDebounceTimeout.value)
+  }
+  searchDebounceTimeout.value = setTimeout(() => {
+    fetchAISearchSuggestions(unifiedSearchQuery.value || searchQuery.value)
+  }, 300)
 }
 
 function clearUnifiedSearch() {
@@ -1649,15 +1657,6 @@ async function fetchAISearchSuggestions(query: string) {
   } finally {
     isLoadingAISuggestions.value = false
   }
-}
-
-function handleSearchInput() {
-  if (searchDebounceTimeout.value) {
-    clearTimeout(searchDebounceTimeout.value)
-  }
-  searchDebounceTimeout.value = setTimeout(() => {
-    fetchAISearchSuggestions(searchQuery.value)
-  }, 300)
 }
 
 function selectAISuggestion(suggestion: string) {
