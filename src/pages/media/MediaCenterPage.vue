@@ -3079,15 +3079,21 @@ onUnmounted(() => {
                       title="AI Insights">
                       <i class="fas fa-brain"></i>
                     </button>
-                    <!-- Compare Button -->
-                    <button
-                      class="card-action-btn"
-                      :class="{ 'bg-purple-500 text-white': isInComparison(media.id) }"
-                      @click.stop="toggleComparison(media)"
-                      :title="isInComparison(media.id) ? 'Remove from Compare' : 'Add to Compare'">
-                      <i class="fas fa-layer-group"></i>
-                    </button>
                   </div>
+
+                  <!-- Compare Button (visible on hover or when selected) -->
+                  <button
+                    class="absolute top-2 left-10 z-30 w-6 h-6 rounded-lg flex items-center justify-center transition-all shadow-sm"
+                    :class="[
+                      isInComparison(media.id)
+                        ? 'bg-purple-500 text-white ring-2 ring-purple-300'
+                        : 'bg-white/90 backdrop-blur-sm text-gray-500 hover:bg-purple-50 hover:text-purple-600 opacity-0 group-hover:opacity-100'
+                    ]"
+                    @click.stop="toggleComparison(media)"
+                    :title="isInComparison(media.id) ? 'Remove from Compare' : 'Add to Compare'"
+                  >
+                    <i class="fas fa-layer-group text-[10px]"></i>
+                  </button>
 
                   <!-- AI Analysis Badge -->
                   <div v-if="showAIFeatures && hasAIAnalysis(media.id)" class="absolute top-2 right-2 z-30">
@@ -3266,6 +3272,16 @@ onUnmounted(() => {
                     @click.stop="shareMedia(media)"
                     title="Share">
                     <i class="fas fa-share-alt"></i>
+                  </button>
+                  <!-- Compare Button -->
+                  <button
+                    :class="[
+                      'list-action-btn',
+                      isInComparison(media.id) ? 'bg-purple-500 text-white' : ''
+                    ]"
+                    @click.stop="toggleComparison(media)"
+                    :title="isInComparison(media.id) ? 'Remove from Compare' : 'Add to Compare'">
+                    <i class="fas fa-layer-group"></i>
                   </button>
                 </div>
               </div>

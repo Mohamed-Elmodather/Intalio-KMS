@@ -2274,7 +2274,7 @@ onUnmounted(() => {
                     />
                   </div>
                   <!-- Action Buttons -->
-                  <div class="flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div class="flex items-center gap-1.5">
                     <button
                       @click.stop="toggleBookmark(article.id)"
                       :class="[
@@ -2284,12 +2284,19 @@ onUnmounted(() => {
                     >
                       <i :class="bookmarks.includes(article.id) ? 'fas fa-bookmark' : 'far fa-bookmark'" class="text-xs"></i>
                     </button>
-                    <ContentActionsDropdown
-                      :show-download="false"
-                      @add-to-collection="openAddToCollection(article)"
-                      @share="openShareModal(article)"
-                      @copy-link="copyArticleLink(article.id)"
-                    />
+                    <!-- Compare button -->
+                    <button
+                      @click.stop="toggleComparison(article)"
+                      :class="[
+                        'w-7 h-7 rounded-full flex items-center justify-center transition-all shadow-sm',
+                        isInComparison(article.id)
+                          ? 'bg-purple-500 text-white ring-2 ring-purple-300'
+                          : 'bg-white/90 backdrop-blur-sm text-gray-400 hover:bg-purple-50 hover:text-purple-600'
+                      ]"
+                      :title="isInComparison(article.id) ? 'Remove from Compare' : 'Add to Compare'"
+                    >
+                      <i class="fas fa-layer-group text-xs"></i>
+                    </button>
                   </div>
                 </div>
 
@@ -2476,42 +2483,46 @@ onUnmounted(() => {
               </div>
 
               <!-- Actions -->
-              <div class="flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                <button
-                  @click.stop="toggleBookmark(article.id)"
-                  :class="[
-                    'w-8 h-8 rounded-lg flex items-center justify-center transition-colors',
-                    bookmarks.includes(article.id) ? 'bg-teal-50 text-teal-600' : 'bg-gray-50 text-gray-400 hover:bg-teal-50 hover:text-teal-600'
-                  ]"
-                  title="Bookmark"
-                >
-                  <i :class="bookmarks.includes(article.id) ? 'fas fa-bookmark' : 'far fa-bookmark'" class="text-xs"></i>
-                </button>
-                <button
-                  @click.stop="openShareModal(article)"
-                  class="w-8 h-8 rounded-lg bg-gray-50 text-gray-400 hover:bg-teal-50 hover:text-teal-600 flex items-center justify-center transition-colors"
-                  title="Share"
-                >
-                  <i class="fas fa-share-alt text-xs"></i>
-                </button>
+              <div class="flex flex-col gap-2">
+                <!-- Compare button - always visible -->
                 <button
                   @click.stop="toggleComparison(article)"
                   :class="[
-                    'w-8 h-8 rounded-lg flex items-center justify-center transition-colors',
+                    'w-8 h-8 rounded-lg flex items-center justify-center transition-all shadow-sm',
                     isInComparison(article.id)
-                      ? 'bg-purple-500 text-white'
-                      : 'bg-gray-50 text-gray-400 hover:bg-purple-50 hover:text-purple-600'
+                      ? 'bg-purple-500 text-white ring-2 ring-purple-300'
+                      : 'bg-white text-gray-400 hover:bg-purple-50 hover:text-purple-600 border border-gray-200'
                   ]"
                   :title="isInComparison(article.id) ? 'Remove from Compare' : 'Add to Compare'"
                 >
                   <i class="fas fa-layer-group text-xs"></i>
                 </button>
-                <ContentActionsDropdown
-                  :show-download="false"
-                  @add-to-collection="openAddToCollection(article)"
-                  @share="openShareModal(article)"
-                  @copy-link="copyArticleLink(article.id)"
-                />
+                <!-- Other actions - visible on hover -->
+                <div class="flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <button
+                    @click.stop="toggleBookmark(article.id)"
+                    :class="[
+                      'w-8 h-8 rounded-lg flex items-center justify-center transition-colors',
+                      bookmarks.includes(article.id) ? 'bg-teal-50 text-teal-600' : 'bg-gray-50 text-gray-400 hover:bg-teal-50 hover:text-teal-600'
+                    ]"
+                    title="Bookmark"
+                  >
+                    <i :class="bookmarks.includes(article.id) ? 'fas fa-bookmark' : 'far fa-bookmark'" class="text-xs"></i>
+                  </button>
+                  <button
+                    @click.stop="openShareModal(article)"
+                    class="w-8 h-8 rounded-lg bg-gray-50 text-gray-400 hover:bg-teal-50 hover:text-teal-600 flex items-center justify-center transition-colors"
+                    title="Share"
+                  >
+                    <i class="fas fa-share-alt text-xs"></i>
+                  </button>
+                  <ContentActionsDropdown
+                    :show-download="false"
+                    @add-to-collection="openAddToCollection(article)"
+                    @share="openShareModal(article)"
+                    @copy-link="copyArticleLink(article.id)"
+                  />
+                </div>
               </div>
             </article>
           </div>

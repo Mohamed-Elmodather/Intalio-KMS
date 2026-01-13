@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import ContentActionsDropdown from '@/components/common/ContentActionsDropdown.vue'
 import AddToCollectionModal from '@/components/common/AddToCollectionModal.vue'
 import { useAIServicesStore } from '@/stores/aiServices'
 import { useComparisonStore } from '@/stores/comparison'
@@ -1385,13 +1384,6 @@ function getCategoryColor(category: string): string {
                 >
                   <i class="fas fa-download text-xs"></i>
                 </button>
-                <ContentActionsDropdown
-                  :show-download="true"
-                  @add-to-collection="openAddToCollection(doc)"
-                  @share="shareDocument(doc)"
-                  @download="downloadDocument(doc)"
-                  @copy-link="() => copyDocumentLink(doc.id)"
-                />
               </div>
             </div>
           </div>
@@ -1461,13 +1453,6 @@ function getCategoryColor(category: string): string {
                 >
                   <i class="fas fa-download text-xs"></i>
                 </button>
-                <ContentActionsDropdown
-                  :show-download="true"
-                  @add-to-collection="openAddToCollection(doc)"
-                  @share="shareDocument(doc)"
-                  @download="downloadDocument(doc)"
-                  @copy-link="() => copyDocumentLink(doc.id)"
-                />
               </div>
             </div>
           </div>
@@ -2509,14 +2494,6 @@ function getCategoryColor(category: string): string {
                     >
                       <i class="fas fa-layer-group text-xs"></i>
                     </button>
-                    <ContentActionsDropdown
-                      v-if="currentView !== 'trash'"
-                      :show-download="true"
-                      @add-to-collection="openAddToCollection(doc)"
-                      @share="shareDocument(doc)"
-                      @download="downloadDocument(doc)"
-                      @copy-link="() => copyDocumentLink(doc.id)"
-                    />
                   </div>
 
                 </div>
@@ -2890,13 +2867,6 @@ function getCategoryColor(category: string): string {
                         >
                           <i class="fas fa-layer-group text-sm"></i>
                         </button>
-                        <ContentActionsDropdown
-                          :show-download="true"
-                          @add-to-collection="openAddToCollection(doc)"
-                          @share="shareDocument(doc)"
-                          @download="downloadDocument(doc)"
-                          @copy-link="() => copyDocumentLink(doc.id)"
-                        />
                       </template>
                       <template v-else>
                         <button
