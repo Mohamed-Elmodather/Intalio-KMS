@@ -380,14 +380,19 @@ function changePassword() {
     </div>
 
     <div v-else>
-      <!-- Breadcrumb -->
-      <nav class="flex items-center gap-2 text-sm text-gray-500 mb-6">
-        <router-link to="/" class="hover:text-teal-600 transition-colors">
-          <i class="fas fa-home"></i>
-        </router-link>
-        <i class="fas fa-chevron-right text-xs"></i>
-        <span class="text-gray-900 font-medium">Settings</span>
-      </nav>
+      <!-- Back Button & Breadcrumb -->
+      <div class="flex items-center gap-4 mb-6">
+        <button @click="$router.back()" class="w-10 h-10 rounded-xl bg-white border border-gray-200 flex items-center justify-center text-gray-600 hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm">
+          <i class="fas fa-arrow-left"></i>
+        </button>
+        <nav class="flex items-center gap-2 text-sm text-gray-500">
+          <router-link to="/" class="hover:text-teal-600 transition-colors">
+            <i class="fas fa-home"></i>
+          </router-link>
+          <i class="fas fa-chevron-right text-xs"></i>
+          <span class="text-gray-900 font-medium">Settings</span>
+        </nav>
+      </div>
 
       <!-- Enhanced Header with User Card -->
       <div class="card-animated rounded-2xl overflow-hidden mb-6 fade-in-up">
