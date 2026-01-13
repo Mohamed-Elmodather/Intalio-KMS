@@ -678,6 +678,13 @@ function changeItemsPerPage(count: number) {
 
 function filterArticles() {
   currentPage.value = 1
+
+  // If AI search mode is active and has results, use those
+  if (isAISearchMode.value && aiSearchResults.value.length > 0) {
+    filteredArticles.value = aiSearchResults.value
+    return
+  }
+
   let result = [...articles.value]
 
   // Search filter
@@ -1057,6 +1064,7 @@ async function processNaturalLanguageSearch() {
     }
 
     aiSearchResults.value = results.slice(0, 12)
+    filterArticles()
   } finally {
     isProcessingNLSearch.value = false
   }

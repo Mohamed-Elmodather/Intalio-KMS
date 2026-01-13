@@ -277,6 +277,18 @@ const calendarFilteredEvents = computed(() => {
 })
 
 const filteredEvents = computed(() => {
+  // If AI search mode is active and has results, use those
+  if (isAISearchMode.value && aiSearchResults.value.length > 0) {
+    return aiSearchResults.value.map(e => {
+      const d = new Date(e.date)
+      return {
+        ...e,
+        month: d.toLocaleString('default', { month: 'short' }).toUpperCase(),
+        day: d.getDate()
+      }
+    })
+  }
+
   const today = new Date().toISOString().split('T')[0]
   const weekFromNow = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
 

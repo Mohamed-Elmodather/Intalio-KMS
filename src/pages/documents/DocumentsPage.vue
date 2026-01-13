@@ -565,6 +565,11 @@ const viewCounts = computed(() => ({
 }))
 
 const filteredDocuments = computed(() => {
+  // If AI search mode is active and has results, use those
+  if (isAISearchMode.value && aiSearchResults.value.length > 0) {
+    return aiSearchResults.value
+  }
+
   let result = [...documents.value]
 
   // First apply view filter

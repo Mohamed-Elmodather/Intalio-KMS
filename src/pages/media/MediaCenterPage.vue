@@ -486,6 +486,11 @@ const activeFiltersCount = computed(() => {
 
 // Computed: Filtered Media
 const filteredMedia = computed(() => {
+  // If AI search mode is active and has results, use those
+  if (isAISearchMode.value && aiSearchResults.value.length > 0) {
+    return aiSearchResults.value
+  }
+
   let result = [...mediaItems.value]
 
   // Filter by active tab (quick filter)

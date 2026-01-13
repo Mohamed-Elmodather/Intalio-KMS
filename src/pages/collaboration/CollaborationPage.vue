@@ -817,6 +817,10 @@ const currentMessages = computed(() => {
 })
 
 const filteredChannels = computed(() => {
+  // If AI search mode is active and has results, use those
+  if (isAISearchMode.value && aiSearchResults.value.length > 0) {
+    return aiSearchResults.value
+  }
   if (!searchQuery.value) return channels.value
   const q = searchQuery.value.toLowerCase()
   return channels.value.filter(c => c.name.toLowerCase().includes(q))
