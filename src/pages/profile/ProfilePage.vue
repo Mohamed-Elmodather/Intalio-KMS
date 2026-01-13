@@ -41,7 +41,47 @@ const usersDatabase = ref([
     phone: '+971 50 123 4567',
     bio: 'Experienced product leader with 10+ years in enterprise software. Passionate about building user-centric products that drive business value. Leading the Intalio Knowledge Hub initiative to transform how organizations manage and share knowledge.',
     skills: ['Product Strategy', 'UX Design', 'Agile/Scrum', 'Data Analytics', 'Team Leadership', 'Enterprise Software', 'AI/ML Integration'],
-    color: '#14b8a6'
+    color: '#14b8a6',
+    stats: { articles: 24, comments: 156, documents: 38, courses: 12 },
+    followersCount: 234,
+    followingCount: 156,
+    mutualConnections: 45,
+    contributionData: [30, 45, 60, 75, 50, 85, 90, 70, 55, 80, 95, 60],
+    activities: [
+      { id: 1, type: 'Article', typeBadge: 'badge-blue', icon: 'fas fa-file-alt', iconBg: 'bg-blue-500', iconColor: 'text-white', title: 'Published "Complete Employee Onboarding Guide 2024"', description: '', time: '2 hours ago', link: '/articles/1' },
+      { id: 2, type: 'Comment', typeBadge: 'badge-purple', icon: 'fas fa-comment', iconBg: 'bg-purple-500', iconColor: 'text-white', title: 'Commented on "Remote Work Best Practices"', description: 'Great insights on async communication!', time: '5 hours ago', link: '/articles/2' },
+      { id: 3, type: 'Course', typeBadge: 'badge-green', icon: 'fas fa-graduation-cap', iconBg: 'bg-green-500', iconColor: 'text-white', title: 'Completed "Advanced Product Management"', description: '', time: 'Yesterday', link: '/learning/course/1' },
+      { id: 4, type: 'Document', typeBadge: 'badge-orange', icon: 'fas fa-file-upload', iconBg: 'bg-orange-500', iconColor: 'text-white', title: 'Uploaded "Q4 Product Roadmap"', description: '', time: '2 days ago', link: '/documents/1' }
+    ],
+    authoredContent: {
+      articles: [
+        { id: 1, title: 'Complete Employee Onboarding Guide 2024', views: 1250, likes: 89, date: '2 days ago' },
+        { id: 2, title: 'Building Effective Remote Teams', views: 980, likes: 67, date: '1 week ago' },
+        { id: 3, title: 'Product Strategy Best Practices', views: 2100, likes: 156, date: '2 weeks ago' }
+      ],
+      documents: [
+        { id: 1, title: 'Q4 Product Roadmap', downloads: 234, date: '3 days ago' },
+        { id: 2, title: 'Team Performance Review Template', downloads: 189, date: '1 week ago' }
+      ],
+      polls: [
+        { id: 1, title: 'Team Meeting Time Preferences', votes: 45, status: 'completed' },
+        { id: 2, title: 'Office Return Policy Survey', votes: 78, status: 'active' }
+      ]
+    },
+    badges: [
+      { id: 1, name: 'Top Author', icon: 'fas fa-pen-fancy', bg: 'bg-blue-100', color: 'text-blue-600', description: 'Published 20+ articles' },
+      { id: 2, name: 'Mentor', icon: 'fas fa-hands-helping', bg: 'bg-purple-100', color: 'text-purple-600', description: 'Helped 50+ colleagues' },
+      { id: 3, name: 'Fast Learner', icon: 'fas fa-rocket', bg: 'bg-green-100', color: 'text-green-600', description: 'Completed 10 courses' },
+      { id: 4, name: 'Innovator', icon: 'fas fa-lightbulb', bg: 'bg-yellow-100', color: 'text-yellow-600', description: 'Submitted 5 ideas' },
+      { id: 5, name: 'Team Player', icon: 'fas fa-users', bg: 'bg-teal-100', color: 'text-teal-600', description: 'Collaborated on 20+ projects' },
+      { id: 6, name: 'Early Adopter', icon: 'fas fa-star', bg: 'bg-pink-100', color: 'text-pink-600', description: 'Joined in first month' }
+    ],
+    teamMembers: [
+      { id: 1, name: 'Sarah Chen', initials: 'SC', color: '#8B5CF6', role: 'Engineering Lead', online: true },
+      { id: 2, name: 'Mike Johnson', initials: 'MJ', color: '#3B82F6', role: 'Senior Designer', online: true },
+      { id: 3, name: 'Emily Davis', initials: 'ED', color: '#10B981', role: 'Product Manager', online: false },
+      { id: 4, name: 'Alex Thompson', initials: 'AT', color: '#F59E0B', role: 'Developer', online: true }
+    ]
   },
   {
     id: 1,
@@ -55,7 +95,40 @@ const usersDatabase = ref([
     phone: '+65 9123 4567',
     bio: 'Engineering leader with expertise in distributed systems and cloud architecture. Leading the backend infrastructure team to build scalable and reliable systems.',
     skills: ['System Design', 'Cloud Architecture', 'Team Management', 'Microservices', 'DevOps', 'Python', 'Go'],
-    color: '#8B5CF6'
+    color: '#8B5CF6',
+    stats: { articles: 12, comments: 89, documents: 24, courses: 8 },
+    followersCount: 189,
+    followingCount: 134,
+    mutualConnections: 32,
+    contributionData: [45, 55, 40, 65, 70, 55, 80, 60, 75, 85, 70, 90],
+    activities: [
+      { id: 1, type: 'Article', typeBadge: 'badge-blue', icon: 'fas fa-file-alt', iconBg: 'bg-blue-500', iconColor: 'text-white', title: 'Published "Microservices Architecture Patterns"', description: '', time: '1 day ago', link: '/articles/5' },
+      { id: 2, type: 'Course', typeBadge: 'badge-green', icon: 'fas fa-graduation-cap', iconBg: 'bg-green-500', iconColor: 'text-white', title: 'Completed "AWS Solutions Architect"', description: '', time: '3 days ago', link: '/learning/course/2' },
+      { id: 3, type: 'Comment', typeBadge: 'badge-purple', icon: 'fas fa-comment', iconBg: 'bg-purple-500', iconColor: 'text-white', title: 'Commented on "DevOps Best Practices"', description: 'Great CI/CD pipeline setup!', time: '1 week ago', link: '/articles/6' }
+    ],
+    authoredContent: {
+      articles: [
+        { id: 5, title: 'Microservices Architecture Patterns', views: 2340, likes: 145, date: '1 day ago' },
+        { id: 6, title: 'Scaling Node.js Applications', views: 1890, likes: 112, date: '2 weeks ago' }
+      ],
+      documents: [
+        { id: 3, title: 'System Architecture Diagram', downloads: 156, date: '1 week ago' },
+        { id: 4, title: 'API Documentation Template', downloads: 234, date: '3 weeks ago' }
+      ],
+      polls: [
+        { id: 3, title: 'Preferred CI/CD Tool', votes: 34, status: 'completed' }
+      ]
+    },
+    badges: [
+      { id: 1, name: 'Tech Lead', icon: 'fas fa-code', bg: 'bg-indigo-100', color: 'text-indigo-600', description: 'Led 5+ technical projects' },
+      { id: 2, name: 'Architect', icon: 'fas fa-drafting-compass', bg: 'bg-blue-100', color: 'text-blue-600', description: 'Designed system architecture' },
+      { id: 3, name: 'Mentor', icon: 'fas fa-chalkboard-teacher', bg: 'bg-purple-100', color: 'text-purple-600', description: 'Mentored 10+ engineers' }
+    ],
+    teamMembers: [
+      { id: 0, name: 'Ahmed Imam', initials: 'AI', color: '#14b8a6', role: 'Product Director', online: true },
+      { id: 4, name: 'Alex Thompson', initials: 'AT', color: '#F59E0B', role: 'Developer', online: true },
+      { id: 5, name: 'David Kim', initials: 'DK', color: '#EF4444', role: 'Backend Developer', online: false }
+    ]
   },
   {
     id: 2,
@@ -69,7 +142,35 @@ const usersDatabase = ref([
     phone: '+44 7700 900123',
     bio: 'Creative designer with a passion for user-centered design. Specializing in creating intuitive interfaces that delight users and drive engagement.',
     skills: ['UI Design', 'UX Research', 'Figma', 'Design Systems', 'Prototyping', 'User Testing'],
-    color: '#3B82F6'
+    color: '#3B82F6',
+    stats: { articles: 8, comments: 67, documents: 45, courses: 6 },
+    followersCount: 156,
+    followingCount: 98,
+    mutualConnections: 28,
+    contributionData: [20, 35, 50, 45, 60, 55, 70, 65, 50, 60, 75, 55],
+    activities: [
+      { id: 1, type: 'Document', typeBadge: 'badge-orange', icon: 'fas fa-file-upload', iconBg: 'bg-orange-500', iconColor: 'text-white', title: 'Uploaded "Design System v2.0"', description: '', time: '4 hours ago', link: '/documents/5' },
+      { id: 2, type: 'Article', typeBadge: 'badge-blue', icon: 'fas fa-file-alt', iconBg: 'bg-blue-500', iconColor: 'text-white', title: 'Published "Accessible Design Principles"', description: '', time: '2 days ago', link: '/articles/7' }
+    ],
+    authoredContent: {
+      articles: [
+        { id: 7, title: 'Accessible Design Principles', views: 890, likes: 78, date: '2 days ago' },
+        { id: 8, title: 'Creating Consistent Design Systems', views: 1560, likes: 134, date: '3 weeks ago' }
+      ],
+      documents: [
+        { id: 5, title: 'Design System v2.0', downloads: 345, date: '4 hours ago' },
+        { id: 6, title: 'Brand Guidelines 2024', downloads: 267, date: '1 month ago' }
+      ],
+      polls: []
+    },
+    badges: [
+      { id: 1, name: 'Design Star', icon: 'fas fa-palette', bg: 'bg-pink-100', color: 'text-pink-600', description: 'Created award-winning designs' },
+      { id: 2, name: 'UX Expert', icon: 'fas fa-user-check', bg: 'bg-blue-100', color: 'text-blue-600', description: 'Conducted 50+ user tests' }
+    ],
+    teamMembers: [
+      { id: 0, name: 'Ahmed Imam', initials: 'AI', color: '#14b8a6', role: 'Product Director', online: true },
+      { id: 3, name: 'Emily Davis', initials: 'ED', color: '#10B981', role: 'Product Manager', online: false }
+    ]
   },
   {
     id: 3,
@@ -83,7 +184,35 @@ const usersDatabase = ref([
     phone: '+1 555 123 4567',
     bio: 'Product manager focused on customer success and data-driven decision making. Building features that solve real user problems.',
     skills: ['Product Strategy', 'Data Analysis', 'User Research', 'Roadmapping', 'Stakeholder Management'],
-    color: '#10B981'
+    color: '#10B981',
+    stats: { articles: 6, comments: 45, documents: 18, courses: 4 },
+    followersCount: 98,
+    followingCount: 112,
+    mutualConnections: 21,
+    contributionData: [15, 25, 30, 40, 35, 45, 50, 40, 55, 45, 60, 50],
+    activities: [
+      { id: 1, type: 'Article', typeBadge: 'badge-blue', icon: 'fas fa-file-alt', iconBg: 'bg-blue-500', iconColor: 'text-white', title: 'Published "Customer Journey Mapping Guide"', description: '', time: '1 week ago', link: '/articles/9' },
+      { id: 2, type: 'Poll', typeBadge: 'badge-teal', icon: 'fas fa-poll', iconBg: 'bg-teal-500', iconColor: 'text-white', title: 'Created poll "Feature Priority Survey"', description: '', time: '2 weeks ago', link: '/polls/4' }
+    ],
+    authoredContent: {
+      articles: [
+        { id: 9, title: 'Customer Journey Mapping Guide', views: 670, likes: 56, date: '1 week ago' }
+      ],
+      documents: [
+        { id: 7, title: 'Product Requirements Document', downloads: 123, date: '2 weeks ago' }
+      ],
+      polls: [
+        { id: 4, title: 'Feature Priority Survey', votes: 56, status: 'active' }
+      ]
+    },
+    badges: [
+      { id: 1, name: 'Rising Star', icon: 'fas fa-star', bg: 'bg-yellow-100', color: 'text-yellow-600', description: 'New member with high impact' },
+      { id: 2, name: 'Data Driven', icon: 'fas fa-chart-bar', bg: 'bg-green-100', color: 'text-green-600', description: 'Uses data for decisions' }
+    ],
+    teamMembers: [
+      { id: 0, name: 'Ahmed Imam', initials: 'AI', color: '#14b8a6', role: 'Product Director', online: true },
+      { id: 2, name: 'Mike Johnson', initials: 'MJ', color: '#3B82F6', role: 'Senior Designer', online: true }
+    ]
   },
   {
     id: 4,
@@ -97,7 +226,36 @@ const usersDatabase = ref([
     phone: '+1 416 555 7890',
     bio: 'Full-stack developer passionate about clean code and modern web technologies. Building performant and accessible web applications.',
     skills: ['Vue.js', 'TypeScript', 'Node.js', 'PostgreSQL', 'GraphQL', 'Testing'],
-    color: '#F59E0B'
+    color: '#F59E0B',
+    stats: { articles: 5, comments: 78, documents: 12, courses: 7 },
+    followersCount: 87,
+    followingCount: 145,
+    mutualConnections: 19,
+    contributionData: [25, 40, 35, 50, 45, 60, 55, 70, 60, 75, 65, 80],
+    activities: [
+      { id: 1, type: 'Article', typeBadge: 'badge-blue', icon: 'fas fa-file-alt', iconBg: 'bg-blue-500', iconColor: 'text-white', title: 'Published "Vue 3 Composition API Deep Dive"', description: '', time: '3 days ago', link: '/articles/10' },
+      { id: 2, type: 'Course', typeBadge: 'badge-green', icon: 'fas fa-graduation-cap', iconBg: 'bg-green-500', iconColor: 'text-white', title: 'Completed "Advanced TypeScript"', description: '', time: '1 week ago', link: '/learning/course/3' },
+      { id: 3, type: 'Comment', typeBadge: 'badge-purple', icon: 'fas fa-comment', iconBg: 'bg-purple-500', iconColor: 'text-white', title: 'Commented on "Testing Best Practices"', description: 'Great testing strategies!', time: '2 weeks ago', link: '/articles/11' }
+    ],
+    authoredContent: {
+      articles: [
+        { id: 10, title: 'Vue 3 Composition API Deep Dive', views: 1230, likes: 98, date: '3 days ago' },
+        { id: 11, title: 'Building Accessible Web Apps', views: 890, likes: 67, date: '1 month ago' }
+      ],
+      documents: [
+        { id: 8, title: 'Frontend Coding Standards', downloads: 178, date: '2 weeks ago' }
+      ],
+      polls: []
+    },
+    badges: [
+      { id: 1, name: 'Code Master', icon: 'fas fa-code', bg: 'bg-orange-100', color: 'text-orange-600', description: 'Wrote 10k+ lines of code' },
+      { id: 2, name: 'Fast Learner', icon: 'fas fa-bolt', bg: 'bg-yellow-100', color: 'text-yellow-600', description: 'Completed 5 courses in 1 month' },
+      { id: 3, name: 'Helper', icon: 'fas fa-hands-helping', bg: 'bg-teal-100', color: 'text-teal-600', description: 'Answered 50+ questions' }
+    ],
+    teamMembers: [
+      { id: 1, name: 'Sarah Chen', initials: 'SC', color: '#8B5CF6', role: 'Engineering Lead', online: true },
+      { id: 0, name: 'Ahmed Imam', initials: 'AI', color: '#14b8a6', role: 'Product Director', online: true }
+    ]
   }
 ])
 
@@ -116,12 +274,69 @@ const user = ref({
   color: '#14b8a6'
 })
 
+// Stats - dynamically loaded
+const stats = ref({ articles: 24, comments: 156, documents: 38, courses: 12 })
+
+// Followers/Following - dynamically loaded
+const followersCount = ref(234)
+const followingCount = ref(156)
+const mutualConnections = ref(45)
+
+// Content Authored - dynamically loaded
+const authoredContent = ref({
+  articles: [] as any[],
+  documents: [] as any[],
+  polls: [] as any[]
+})
+
+// Contribution data - dynamically loaded
+const contributionData = ref([30, 45, 60, 75, 50, 85, 90, 70, 55, 80, 95, 60])
+
+// Activities - dynamically loaded
+const activities = ref([] as any[])
+
+// Badges - dynamically loaded
+const badges = ref([] as any[])
+
+// Team Members - dynamically loaded
+const teamMembers = ref([] as any[])
+
+// Followers list (generated from other users)
+const followers = ref([
+  { id: 1, name: 'Sarah Chen', initials: 'SC', role: 'Engineering Lead', isFollowing: true },
+  { id: 2, name: 'Mike Johnson', initials: 'MJ', role: 'Senior Designer', isFollowing: true },
+  { id: 3, name: 'Emily Davis', initials: 'ED', role: 'Product Manager', isFollowing: false },
+  { id: 4, name: 'Alex Thompson', initials: 'AT', role: 'Developer', isFollowing: true },
+  { id: 5, name: 'Lisa Wang', initials: 'LW', role: 'UX Designer', isFollowing: false }
+])
+
 // Load user data based on userId
 const loadUserData = () => {
   const userId = route.query.userId ? parseInt(route.query.userId as string) : 0
   const foundUser = usersDatabase.value.find(u => u.id === userId)
   if (foundUser) {
     user.value = { ...foundUser }
+    stats.value = foundUser.stats
+    followersCount.value = foundUser.followersCount
+    followingCount.value = foundUser.followingCount
+    mutualConnections.value = foundUser.mutualConnections
+    contributionData.value = foundUser.contributionData
+    activities.value = foundUser.activities
+    authoredContent.value = foundUser.authoredContent
+    badges.value = foundUser.badges
+    teamMembers.value = foundUser.teamMembers
+
+    // Generate followers list from other users (excluding current profile)
+    followers.value = usersDatabase.value
+      .filter(u => u.id !== userId)
+      .slice(0, 5)
+      .map(u => ({
+        id: u.id,
+        name: u.name,
+        initials: u.initials,
+        role: u.role,
+        isFollowing: Math.random() > 0.5
+      }))
   }
 }
 
@@ -134,42 +349,8 @@ onMounted(() => {
   loadUserData()
 })
 
-// Stats
-const stats = ref({
-  articles: 24,
-  comments: 156,
-  documents: 38,
-  courses: 12
-})
-
-// Followers/Following
-const followersCount = ref(234)
-const followingCount = ref(156)
-const mutualConnections = ref(45)
-const followers = ref([
-  { id: 1, name: 'Sarah Chen', initials: 'SC', role: 'Engineering Lead', isFollowing: true },
-  { id: 2, name: 'Mike Johnson', initials: 'MJ', role: 'Senior Designer', isFollowing: true },
-  { id: 3, name: 'Emily Davis', initials: 'ED', role: 'Product Manager', isFollowing: false },
-  { id: 4, name: 'Alex Thompson', initials: 'AT', role: 'Developer', isFollowing: true },
-  { id: 5, name: 'Lisa Wang', initials: 'LW', role: 'UX Designer', isFollowing: false }
-])
-
-// Content Authored
-const authoredContent = ref({
-  articles: [
-    { id: 1, title: 'Complete Employee Onboarding Guide 2024', views: 1250, likes: 89, date: '2 days ago' },
-    { id: 2, title: 'Building Effective Remote Teams', views: 980, likes: 67, date: '1 week ago' },
-    { id: 3, title: 'Product Strategy Best Practices', views: 2100, likes: 156, date: '2 weeks ago' }
-  ],
-  documents: [
-    { id: 1, title: 'Q4 Product Roadmap', downloads: 234, date: '3 days ago' },
-    { id: 2, title: 'Team Performance Review Template', downloads: 189, date: '1 week ago' }
-  ],
-  polls: [
-    { id: 1, title: 'Team Meeting Time Preferences', votes: 45, status: 'completed' },
-    { id: 2, title: 'Office Return Policy Survey', votes: 78, status: 'active' }
-  ]
-})
+// Total badges computed
+const totalBadges = computed(() => badges.value.length + 3)
 
 // Active content tab
 const activeContentTab = ref<'articles' | 'documents' | 'polls'>('articles')
@@ -184,73 +365,6 @@ const editForm = ref({
   location: 'Dubai, UAE'
 })
 
-// Contribution data for chart
-const contributionData = ref([30, 45, 60, 75, 50, 85, 90, 70, 55, 80, 95, 60])
-
-// Activities
-const activities = ref([
-  {
-    id: 1,
-    type: 'Article',
-    typeBadge: 'badge-blue',
-    icon: 'fas fa-file-alt',
-    iconBg: 'bg-blue-500',
-    iconColor: 'text-white',
-    title: 'Published "Complete Employee Onboarding Guide 2024"',
-    description: '',
-    time: '2 hours ago',
-    link: '/articles/1'
-  },
-  {
-    id: 2,
-    type: 'Comment',
-    typeBadge: 'badge-purple',
-    icon: 'fas fa-comment',
-    iconBg: 'bg-purple-500',
-    iconColor: 'text-white',
-    title: 'Commented on "Remote Work Best Practices"',
-    description: 'Great insights on async communication!',
-    time: '5 hours ago',
-    link: '/articles/2'
-  },
-  {
-    id: 3,
-    type: 'Course',
-    typeBadge: 'badge-green',
-    icon: 'fas fa-graduation-cap',
-    iconBg: 'bg-green-500',
-    iconColor: 'text-white',
-    title: 'Completed "Advanced Product Management"',
-    description: '',
-    time: 'Yesterday',
-    link: '/learning/course/1'
-  },
-  {
-    id: 4,
-    type: 'Document',
-    typeBadge: 'badge-orange',
-    icon: 'fas fa-file-upload',
-    iconBg: 'bg-orange-500',
-    iconColor: 'text-white',
-    title: 'Uploaded "Q4 Product Roadmap"',
-    description: '',
-    time: '2 days ago',
-    link: '/documents/1'
-  }
-])
-
-// Badges
-const badges = ref([
-  { id: 1, name: 'Top Author', icon: 'fas fa-pen-fancy', bg: 'bg-blue-100', color: 'text-blue-600', description: 'Published 20+ articles' },
-  { id: 2, name: 'Mentor', icon: 'fas fa-hands-helping', bg: 'bg-purple-100', color: 'text-purple-600', description: 'Helped 50+ colleagues' },
-  { id: 3, name: 'Fast Learner', icon: 'fas fa-rocket', bg: 'bg-green-100', color: 'text-green-600', description: 'Completed 10 courses' },
-  { id: 4, name: 'Innovator', icon: 'fas fa-lightbulb', bg: 'bg-yellow-100', color: 'text-yellow-600', description: 'Submitted 5 ideas' },
-  { id: 5, name: 'Team Player', icon: 'fas fa-users', bg: 'bg-pink-100', color: 'text-pink-600', description: 'Active collaborator' },
-  { id: 6, name: 'Explorer', icon: 'fas fa-compass', bg: 'bg-teal-100', color: 'text-teal-600', description: 'Used all features' }
-])
-
-const totalBadges = ref(15)
-
 // Learning Progress
 const learningProgress = ref([
   { id: 1, name: 'Leadership Essentials', progress: 85 },
@@ -263,14 +377,6 @@ const certificates = ref([
   { id: 1, name: 'Product Management Professional', date: 'Dec 2024' },
   { id: 2, name: 'Agile Scrum Master', date: 'Nov 2024' },
   { id: 3, name: 'UX Design Foundations', date: 'Oct 2024' }
-])
-
-// Team Members
-const teamMembers = ref([
-  { id: 1, name: 'Sarah Chen', initials: 'SC', color: '#8B5CF6', role: 'Engineering Lead', online: true },
-  { id: 2, name: 'Mike Johnson', initials: 'MJ', color: '#3B82F6', role: 'Senior Designer', online: true },
-  { id: 3, name: 'Emily Davis', initials: 'ED', color: '#10B981', role: 'Product Manager', online: false },
-  { id: 4, name: 'Alex Thompson', initials: 'AT', color: '#F59E0B', role: 'Developer', online: true }
 ])
 
 // Methods
