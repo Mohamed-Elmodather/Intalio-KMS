@@ -162,6 +162,60 @@ const documentIdNum = computed(() => Number(route.params.id))
 const isPreviewMode = computed(() => route.query.preview === 'true')
 const isFullscreen = ref(false)
 
+// Preview controls
+const currentPage = ref(1)
+const zoomLevel = ref(100)
+const showThumbnails = ref(true)
+const zoomLevels = [50, 75, 100, 125, 150, 200]
+
+// Preview computed
+const totalPages = computed(() => document.value?.pages || 1)
+const canGoPrev = computed(() => currentPage.value > 1)
+const canGoNext = computed(() => currentPage.value < totalPages.value)
+const zoomScale = computed(() => zoomLevel.value / 100)
+
+// Page navigation methods
+function goToPage(page: number) {
+  if (page >= 1 && page <= totalPages.value) {
+    currentPage.value = page
+  }
+}
+
+function nextPage() {
+  if (canGoNext.value) {
+    currentPage.value++
+  }
+}
+
+function prevPage() {
+  if (canGoPrev.value) {
+    currentPage.value--
+  }
+}
+
+// Zoom methods
+function setZoom(level: number) {
+  zoomLevel.value = Math.max(50, Math.min(200, level))
+}
+
+function zoomIn() {
+  const currentIndex = zoomLevels.indexOf(zoomLevel.value)
+  if (currentIndex < zoomLevels.length - 1) {
+    zoomLevel.value = zoomLevels[currentIndex + 1]
+  } else if (zoomLevel.value < 200) {
+    zoomLevel.value = Math.min(200, zoomLevel.value + 25)
+  }
+}
+
+function zoomOut() {
+  const currentIndex = zoomLevels.indexOf(zoomLevel.value)
+  if (currentIndex > 0) {
+    zoomLevel.value = zoomLevels[currentIndex - 1]
+  } else if (zoomLevel.value > 50) {
+    zoomLevel.value = Math.max(50, zoomLevel.value - 25)
+  }
+}
+
 onMounted(async () => {
   // Simulate API call
   setTimeout(async () => {
@@ -983,28 +1037,261 @@ function formatVersionDate(date: Date): string {
           </div>
 
           <!-- Document Preview -->
-          <div :class="['bg-white rounded-2xl shadow-sm border border-gray-100 p-6', isPreviewMode ? 'ring-2 ring-teal-500' : '']">
-            <div class="flex items-center justify-between mb-4">
-              <h2 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                <i class="fas fa-eye text-teal-500"></i>
-                Preview
-                <span v-if="isPreviewMode" class="px-2 py-0.5 bg-teal-100 text-teal-700 text-xs rounded-full font-medium">Active</span>
-              </h2>
-              <button @click="toggleFullscreen" class="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors">
-                <i class="fas fa-expand"></i>
-                Fullscreen
-              </button>
-            </div>
-            <div :class="['bg-gray-100 rounded-xl flex items-center justify-center border-2 border-dashed border-gray-200', isPreviewMode ? 'aspect-[3/2]' : 'aspect-[4/3]']">
-              <div class="text-center p-8">
-                <div :class="[document.iconBg, 'w-24 h-24 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg']">
-                  <i :class="[document.icon, document.iconColor, 'text-4xl']"></i>
+          <div :class="['bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden', isPreviewMode ? 'ring-2 ring-teal-500' : '']">
+            <!-- Preview Header/Toolbar -->
+            <div class="px-4 py-3 bg-gray-800 flex items-center justify-between flex-wrap gap-3">
+              <!-- Left: Page Navigation -->
+              <div class="flex items-center gap-2">
+                <button
+                  @click="prevPage"
+                  :disabled="!canGoPrev"
+                  class="w-8 h-8 rounded-lg flex items-center justify-center transition-colors"
+                  :class="canGoPrev ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-700/50 text-gray-500 cursor-not-allowed'"
+                >
+                  <i class="fas fa-chevron-left text-sm"></i>
+                </button>
+                <div class="flex items-center gap-1.5 text-white text-sm">
+                  <span class="text-gray-400">Page</span>
+                  <input
+                    type="number"
+                    :value="currentPage"
+                    @change="goToPage(Number(($event.target as HTMLInputElement).value))"
+                    min="1"
+                    :max="totalPages"
+                    class="w-12 h-7 rounded bg-gray-700 border-0 text-center text-white text-sm focus:ring-2 focus:ring-teal-500"
+                  >
+                  <span class="text-gray-400">of {{ totalPages }}</span>
                 </div>
-                <p class="text-gray-500 mb-4">Preview not available</p>
-                <button @click="downloadDocument" class="px-4 py-2 bg-teal-500 hover:bg-teal-600 text-white rounded-lg text-sm font-medium transition-colors">
-                  Download to View
+                <button
+                  @click="nextPage"
+                  :disabled="!canGoNext"
+                  class="w-8 h-8 rounded-lg flex items-center justify-center transition-colors"
+                  :class="canGoNext ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-700/50 text-gray-500 cursor-not-allowed'"
+                >
+                  <i class="fas fa-chevron-right text-sm"></i>
                 </button>
               </div>
+
+              <!-- Center: Zoom Controls -->
+              <div class="flex items-center gap-2">
+                <button
+                  @click="zoomOut"
+                  :disabled="zoomLevel <= 50"
+                  class="w-8 h-8 rounded-lg flex items-center justify-center transition-colors"
+                  :class="zoomLevel > 50 ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-700/50 text-gray-500 cursor-not-allowed'"
+                >
+                  <i class="fas fa-minus text-sm"></i>
+                </button>
+                <select
+                  :value="zoomLevel"
+                  @change="setZoom(Number(($event.target as HTMLSelectElement).value))"
+                  class="h-8 px-2 rounded-lg bg-gray-700 border-0 text-white text-sm focus:ring-2 focus:ring-teal-500 cursor-pointer"
+                >
+                  <option v-for="level in zoomLevels" :key="level" :value="level">{{ level }}%</option>
+                </select>
+                <button
+                  @click="zoomIn"
+                  :disabled="zoomLevel >= 200"
+                  class="w-8 h-8 rounded-lg flex items-center justify-center transition-colors"
+                  :class="zoomLevel < 200 ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-700/50 text-gray-500 cursor-not-allowed'"
+                >
+                  <i class="fas fa-plus text-sm"></i>
+                </button>
+              </div>
+
+              <!-- Right: View Options -->
+              <div class="flex items-center gap-2">
+                <button
+                  @click="showThumbnails = !showThumbnails"
+                  class="w-8 h-8 rounded-lg flex items-center justify-center transition-colors"
+                  :class="showThumbnails ? 'bg-teal-600 text-white' : 'bg-gray-700 hover:bg-gray-600 text-white'"
+                  title="Toggle thumbnails"
+                >
+                  <i class="fas fa-th-list text-sm"></i>
+                </button>
+                <button
+                  @click="toggleFullscreen"
+                  class="w-8 h-8 rounded-lg bg-gray-700 hover:bg-gray-600 text-white flex items-center justify-center transition-colors"
+                  title="Fullscreen"
+                >
+                  <i class="fas fa-expand text-sm"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Preview Content Area -->
+            <div class="flex bg-gray-100" style="height: 900px;">
+              <!-- Thumbnails Sidebar -->
+              <Transition name="slide">
+                <div
+                  v-if="showThumbnails && totalPages > 1"
+                  class="w-24 bg-gray-200 border-r border-gray-300 overflow-y-auto p-2 space-y-2 flex-shrink-0"
+                >
+                  <button
+                    v-for="page in totalPages"
+                    :key="page"
+                    @click="goToPage(page)"
+                    class="w-full aspect-[3/4] rounded-lg overflow-hidden transition-all"
+                    :class="currentPage === page ? 'ring-2 ring-teal-500 ring-offset-2' : 'hover:ring-2 hover:ring-gray-400'"
+                  >
+                    <div class="w-full h-full bg-white flex flex-col items-center justify-center p-1">
+                      <i :class="[document.icon, document.iconColor, 'text-lg mb-1']"></i>
+                      <span class="text-[10px] text-gray-500">{{ page }}</span>
+                    </div>
+                  </button>
+                </div>
+              </Transition>
+
+              <!-- Main Preview Area -->
+              <div class="flex-1 overflow-auto p-6 flex items-start justify-center">
+                <div
+                  class="bg-white shadow-2xl transition-transform duration-200 origin-top"
+                  :style="{ transform: `scale(${zoomScale})` }"
+                >
+                  <!-- PDF Preview -->
+                  <div v-if="document.type === 'PDF'" class="w-[595px] min-h-[842px] p-12 relative">
+                    <div class="text-center mb-8 pb-4 border-b-2 border-gray-200">
+                      <div :class="[document.iconBg, 'w-16 h-16 rounded-xl flex items-center justify-center mx-auto mb-3']">
+                        <i :class="[document.icon, document.iconColor, 'text-2xl']"></i>
+                      </div>
+                      <h3 class="text-xl font-bold text-gray-900">{{ document.name }}</h3>
+                      <p class="text-sm text-gray-500 mt-1">{{ document.library }}</p>
+                    </div>
+                    <div class="space-y-4 text-gray-700 text-sm leading-relaxed">
+                      <div class="h-3 bg-gray-200 rounded w-full"></div>
+                      <div class="h-3 bg-gray-200 rounded w-11/12"></div>
+                      <div class="h-3 bg-gray-200 rounded w-full"></div>
+                      <div class="h-3 bg-gray-200 rounded w-4/5"></div>
+                      <div class="h-20 bg-gray-100 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center my-6">
+                        <span class="text-gray-400 text-xs">Image Placeholder</span>
+                      </div>
+                      <div class="h-3 bg-gray-200 rounded w-full"></div>
+                      <div class="h-3 bg-gray-200 rounded w-10/12"></div>
+                      <div class="h-3 bg-gray-200 rounded w-full"></div>
+                      <div class="h-3 bg-gray-200 rounded w-3/4"></div>
+                      <div class="h-3 bg-gray-200 rounded w-full"></div>
+                      <div class="h-3 bg-gray-200 rounded w-11/12"></div>
+                    </div>
+                    <div class="absolute bottom-8 left-0 right-0 text-center text-gray-400 text-xs">
+                      Page {{ currentPage }} of {{ totalPages }}
+                    </div>
+                  </div>
+
+                  <!-- Word Preview -->
+                  <div v-else-if="document.type === 'Word'" class="w-[595px] min-h-[842px] p-16 relative">
+                    <h1 class="text-2xl font-bold text-gray-900 mb-6">{{ document.name.replace('.docx', '') }}</h1>
+                    <div class="space-y-4">
+                      <p class="text-gray-600 text-sm leading-relaxed">
+                        <span class="h-3 bg-gray-200 rounded inline-block w-full mb-1"></span>
+                        <span class="h-3 bg-gray-200 rounded inline-block w-11/12 mb-1"></span>
+                        <span class="h-3 bg-gray-200 rounded inline-block w-full mb-1"></span>
+                        <span class="h-3 bg-gray-200 rounded inline-block w-4/5"></span>
+                      </p>
+                      <h2 class="text-lg font-semibold text-gray-800 mt-6">Section 1.{{ currentPage }}</h2>
+                      <ul class="space-y-2 ml-4">
+                        <li class="flex items-center gap-2">
+                          <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+                          <span class="h-3 bg-gray-200 rounded w-3/4"></span>
+                        </li>
+                        <li class="flex items-center gap-2">
+                          <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+                          <span class="h-3 bg-gray-200 rounded w-2/3"></span>
+                        </li>
+                        <li class="flex items-center gap-2">
+                          <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+                          <span class="h-3 bg-gray-200 rounded w-4/5"></span>
+                        </li>
+                      </ul>
+                      <div class="h-3 bg-gray-200 rounded w-full mt-4"></div>
+                      <div class="h-3 bg-gray-200 rounded w-10/12"></div>
+                      <div class="h-3 bg-gray-200 rounded w-full"></div>
+                    </div>
+                    <div class="absolute bottom-8 right-16 text-gray-400 text-xs">
+                      {{ currentPage }}
+                    </div>
+                  </div>
+
+                  <!-- Excel Preview -->
+                  <div v-else-if="document.type === 'Excel'" class="w-[700px] min-h-[500px] p-4">
+                    <div class="border border-gray-300 rounded overflow-hidden">
+                      <div class="bg-emerald-600 text-white px-4 py-2 text-sm font-medium flex items-center gap-2">
+                        <i class="fas fa-file-excel"></i>
+                        {{ document.name }}
+                      </div>
+                      <div class="overflow-x-auto">
+                        <table class="w-full text-sm">
+                          <thead>
+                            <tr class="bg-emerald-50">
+                              <th class="w-10 px-2 py-2 text-center text-gray-500 bg-gray-100 border-r border-b"></th>
+                              <th v-for="col in ['A', 'B', 'C', 'D', 'E', 'F']" :key="col" class="px-4 py-2 text-center text-gray-600 font-semibold border-r border-b bg-emerald-50">{{ col }}</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr v-for="row in 12" :key="row" :class="row % 2 === 0 ? 'bg-gray-50' : 'bg-white'">
+                              <td class="px-2 py-2 text-center text-gray-500 bg-gray-100 border-r text-xs">{{ row }}</td>
+                              <td v-for="col in 6" :key="col" class="px-4 py-2 border-r border-b">
+                                <div class="h-3 bg-gray-200 rounded" :style="{ width: `${40 + Math.random() * 40}%` }"></div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div class="bg-gray-100 px-4 py-2 text-xs text-gray-500 flex items-center gap-4">
+                        <span class="px-2 py-1 bg-white rounded border">Sheet {{ currentPage }}</span>
+                        <span>Ready</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- PowerPoint Preview -->
+                  <div v-else-if="document.type === 'PowerPoint'" class="w-[800px] aspect-video bg-gradient-to-br from-orange-500 to-orange-600 p-8 relative">
+                    <div class="h-full bg-white rounded-lg shadow-xl p-8 flex flex-col">
+                      <div class="flex-1">
+                        <h1 class="text-3xl font-bold text-gray-900 mb-2">{{ document.name.replace('.pptx', '') }}</h1>
+                        <p class="text-lg text-gray-500 mb-8">Slide {{ currentPage }}</p>
+                        <div class="grid grid-cols-2 gap-6">
+                          <div class="bg-gray-100 rounded-lg p-4 h-32 flex items-center justify-center">
+                            <span class="text-gray-400">Content Block</span>
+                          </div>
+                          <div class="bg-gray-100 rounded-lg p-4 h-32 flex items-center justify-center">
+                            <span class="text-gray-400">Image/Chart</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="flex items-center justify-between text-sm text-gray-400 pt-4 border-t">
+                        <span>{{ document.author.name }}</span>
+                        <span>{{ currentPage }} / {{ totalPages }}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Default Preview -->
+                  <div v-else class="w-[500px] min-h-[400px] p-12 flex flex-col items-center justify-center">
+                    <div :class="[document.iconBg, 'w-24 h-24 rounded-2xl flex items-center justify-center mb-6 shadow-lg']">
+                      <i :class="[document.icon, document.iconColor, 'text-4xl']"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">{{ document.name }}</h3>
+                    <p class="text-gray-500 mb-6">{{ document.type }} Document</p>
+                    <button @click="downloadDocument" class="px-6 py-3 bg-teal-500 hover:bg-teal-600 text-white rounded-xl font-medium transition-colors">
+                      <i class="fas fa-download mr-2"></i>
+                      Download to View
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Preview Footer -->
+            <div class="px-4 py-2 bg-gray-50 border-t border-gray-200 flex items-center justify-between text-sm">
+              <div class="flex items-center gap-4 text-gray-500">
+                <span><i class="fas fa-file mr-1"></i> {{ document.type }}</span>
+                <span><i class="fas fa-weight mr-1"></i> {{ document.size }}</span>
+                <span v-if="document.pages"><i class="fas fa-copy mr-1"></i> {{ document.pages }} pages</span>
+              </div>
+              <button @click="downloadDocument" class="px-3 py-1.5 bg-teal-500 hover:bg-teal-600 text-white rounded-lg text-sm font-medium transition-colors flex items-center gap-2">
+                <i class="fas fa-download"></i>
+                Download
+              </button>
             </div>
           </div>
         </div>
@@ -1575,6 +1862,19 @@ function formatVersionDate(date: Date): string {
 
 .hero-gradient {
   background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+}
+
+/* Thumbnail Sidebar Slide */
+.slide-enter-active,
+.slide-leave-active {
+  transition: all 0.3s ease;
+}
+
+.slide-enter-from,
+.slide-leave-to {
+  width: 0;
+  opacity: 0;
+  padding: 0;
 }
 
 /* AI Panel Animations */
