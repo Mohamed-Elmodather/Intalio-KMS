@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAIServicesStore } from '@/stores/aiServices'
 import { AILoadingIndicator, AISuggestionChip, AIConfidenceBar } from '@/components/ai'
@@ -60,6 +60,22 @@ const dateRangeOptions = [
 const showMyEventsOnly = ref(false)
 const showFeaturedOnly = ref(false)
 const showInterestedOnly = ref(false)
+
+// Unified Search State
+const showAIFeatures = ref(true)
+const unifiedSearchQuery = ref('')
+const isAISearchMode = ref(false)
+const showAISuggestions = ref(false)
+const naturalLanguageQuery = ref('')
+const aiSearchResults = ref<any[]>([])
+const isProcessingNLSearch = ref(false)
+const nlSearchSuggestions = [
+  'Find virtual meetings this week',
+  'Show me training sessions',
+  'Upcoming webinars',
+  'Events I registered for',
+  'Social events this month'
+]
 
 // Custom date range state
 const customDateStart = ref('')
@@ -531,6 +547,7 @@ function clearFilters() {
   selectedTypes.value = []
   selectedFormats.value = []
   searchQuery.value = ''
+  unifiedSearchQuery.value = ''
   quickFilter.value = 'all'
   customDateStart.value = ''
   customDateEnd.value = ''
@@ -540,6 +557,103 @@ function clearFilters() {
   showInterestedOnly.value = false
   currentPage.value = 1
 }
+
+// Unified Search Handlers
+function handleSearchInput() {
+  if (isAISearchMode.value) {
+    showAISuggestions.value = !unifiedSearchQuery.value
+  } else {
+    searchQuery.value = unifiedSearchQuery.value
+  }
+}
+
+async function processNaturalLanguageSearch() {
+  if (!naturalLanguageQuery.value || isProcessingNLSearch.value) return
+
+  isProcessingNLSearch.value = true
+
+  try {
+    await new Promise(resolve => setTimeout(resolve, 1000))
+
+    const query = naturalLanguageQuery.value.toLowerCase()
+    const allEvents = events.value
+
+    let results = allEvents
+
+    if (query.includes('virtual') || query.includes('online')) {
+      results = results.filter(e => e.virtual)
+    }
+    if (query.includes('in-person') || query.includes('in person')) {
+      results = results.filter(e => !e.virtual)
+    }
+    if (query.includes('meeting')) {
+      results = results.filter(e => e.category === 'meeting')
+    }
+    if (query.includes('training')) {
+      results = results.filter(e => e.category === 'training')
+    }
+    if (query.includes('webinar')) {
+      results = results.filter(e => e.category === 'webinar')
+    }
+    if (query.includes('social')) {
+      results = results.filter(e => e.category === 'social')
+    }
+    if (query.includes('registered') || query.includes('my events')) {
+      results = results.filter(e => e.isGoing)
+    }
+    if (query.includes('this week') || query.includes('upcoming')) {
+      const now = new Date()
+      const weekFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000)
+      results = results.filter(e => {
+        const eventDate = new Date(e.date)
+        return eventDate >= now && eventDate <= weekFromNow
+      })
+    }
+    if (query.includes('this month')) {
+      const now = new Date()
+      const monthFromNow = new Date(now.getFullYear(), now.getMonth() + 1, now.getDate())
+      results = results.filter(e => {
+        const eventDate = new Date(e.date)
+        return eventDate >= now && eventDate <= monthFromNow
+      })
+    }
+
+    aiSearchResults.value = results.slice(0, 12)
+  } finally {
+    isProcessingNLSearch.value = false
+  }
+}
+
+function handleUnifiedSearch() {
+  if (!unifiedSearchQuery.value) return
+
+  if (isAISearchMode.value) {
+    naturalLanguageQuery.value = unifiedSearchQuery.value
+    processNaturalLanguageSearch()
+  } else {
+    searchQuery.value = unifiedSearchQuery.value
+  }
+  showAISuggestions.value = false
+}
+
+function clearUnifiedSearch() {
+  unifiedSearchQuery.value = ''
+  searchQuery.value = ''
+  naturalLanguageQuery.value = ''
+  aiSearchResults.value = []
+  showAISuggestions.value = false
+}
+
+watch(isAISearchMode, (newValue) => {
+  if (newValue && !unifiedSearchQuery.value) {
+    showAISuggestions.value = true
+  } else {
+    showAISuggestions.value = false
+  }
+  if (!newValue) {
+    searchQuery.value = unifiedSearchQuery.value
+  }
+})
 
 // Filter toggle methods
 function toggleEventType(typeId: string) {
@@ -1068,18 +1182,102 @@ function getCategoryColor(category: string) {
 
           <!-- Bottom Row - Search, Filters, View Options -->
           <div class="px-4 py-2 bg-gray-50/50 flex flex-wrap items-center gap-3">
-            <!-- Search -->
-            <div class="min-w-[200px] max-w-md relative flex-1">
-              <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
-              <input
-                v-model="searchQuery"
-                type="text"
-                placeholder="Search events..."
-                class="w-full pl-9 pr-4 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all"
+            <!-- Unified Search with AI Integration -->
+            <div class="relative flex-1 max-w-xl">
+              <div class="flex items-stretch">
+                <!-- AI Mode Toggle -->
+                <button
+                  v-if="showAIFeatures"
+                  @click="isAISearchMode = !isAISearchMode"
+                  :class="[
+                    'px-3 rounded-l-lg border border-r-0 flex items-center gap-1.5 text-xs font-medium transition-all',
+                    isAISearchMode
+                      ? 'bg-gradient-to-r from-teal-500 to-cyan-500 border-teal-500 text-white'
+                      : 'bg-gray-100 border-gray-200 text-gray-500 hover:bg-gray-200'
+                  ]"
+                  title="Toggle AI Search"
+                >
+                  <i class="fas fa-wand-magic-sparkles"></i>
+                  <span class="hidden sm:inline">AI</span>
+                </button>
+
+                <!-- Search Input -->
+                <div class="relative flex-1">
+                  <i :class="[
+                    'absolute left-3 top-1/2 -translate-y-1/2 text-sm transition-colors',
+                    isAISearchMode ? 'fas fa-brain text-teal-500' : 'fas fa-search text-gray-400'
+                  ]"></i>
+                  <input
+                    v-model="unifiedSearchQuery"
+                    type="text"
+                    :placeholder="isAISearchMode ? 'Ask AI: Find virtual meetings this week...' : 'Search events...'"
+                    @keyup.enter="handleUnifiedSearch"
+                    @input="handleSearchInput"
+                    :class="[
+                      'w-full pl-9 pr-20 py-2 text-sm focus:outline-none transition-all',
+                      showAIFeatures ? 'rounded-r-lg' : 'rounded-lg',
+                      isAISearchMode
+                        ? 'bg-gradient-to-r from-teal-50 to-cyan-50 border border-teal-200 focus:ring-2 focus:ring-teal-400 focus:border-transparent placeholder:text-teal-400'
+                        : 'bg-white border border-gray-200 focus:ring-2 focus:ring-teal-500 focus:border-transparent',
+                      !showAIFeatures && 'rounded-l-lg'
+                    ]"
+                  >
+                  <!-- Clear & Search Buttons -->
+                  <div class="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                    <button
+                      v-if="unifiedSearchQuery"
+                      @click="clearUnifiedSearch"
+                      :class="['p-1 rounded transition-colors', isAISearchMode ? 'text-teal-400 hover:text-teal-600' : 'text-gray-400 hover:text-gray-600']"
+                    >
+                      <i class="fas fa-times text-xs"></i>
+                    </button>
+                    <button
+                      v-if="isAISearchMode && unifiedSearchQuery"
+                      @click="handleUnifiedSearch"
+                      :disabled="isProcessingNLSearch"
+                      class="p-1 rounded text-teal-500 hover:text-teal-600 disabled:opacity-50"
+                    >
+                      <i :class="isProcessingNLSearch ? 'fas fa-spinner animate-spin' : 'fas fa-arrow-right'" class="text-sm"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- AI Search Suggestions Dropdown -->
+              <div
+                v-if="showAIFeatures && isAISearchMode && showAISuggestions && !unifiedSearchQuery"
+                class="absolute left-0 top-full mt-2 w-full bg-white rounded-xl shadow-lg border border-teal-100 py-2 z-50"
               >
-              <button v-if="searchQuery" @click="searchQuery = ''" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                <i class="fas fa-times text-xs"></i>
-              </button>
+                <div class="px-3 py-1.5 text-xs font-semibold text-teal-500 flex items-center gap-2">
+                  <i class="fas fa-lightbulb"></i>
+                  Try asking:
+                </div>
+                <button
+                  v-for="suggestion in nlSearchSuggestions"
+                  :key="suggestion"
+                  @click="unifiedSearchQuery = suggestion; handleUnifiedSearch()"
+                  class="w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-teal-50 flex items-center gap-2"
+                >
+                  <i class="fas fa-search text-teal-400 text-xs"></i>
+                  {{ suggestion }}
+                </button>
+              </div>
+
+              <!-- AI Processing Indicator -->
+              <div
+                v-if="isProcessingNLSearch"
+                class="absolute left-0 top-full mt-2 w-full bg-gradient-to-r from-teal-50 to-cyan-50 rounded-xl shadow-lg border border-teal-100 p-4 z-50"
+              >
+                <div class="flex items-center gap-3">
+                  <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-teal-500 to-cyan-500 flex items-center justify-center">
+                    <i class="fas fa-brain text-white text-sm animate-pulse"></i>
+                  </div>
+                  <div>
+                    <div class="text-sm font-medium text-teal-700">AI is searching...</div>
+                    <div class="text-xs text-teal-500">Analyzing your query</div>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <!-- Date Range Filter Dropdown -->

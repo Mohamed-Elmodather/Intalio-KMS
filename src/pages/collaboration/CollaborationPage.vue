@@ -109,6 +109,22 @@ const selectedDMId = ref<string | null>(null)
 const messageInput = ref('')
 const searchQuery = ref('')
 const showRightPanel = ref(true)
+
+// Unified Search State
+const showAIFeatures = ref(true)
+const unifiedSearchQuery = ref('')
+const isAISearchMode = ref(false)
+const showAISuggestions = ref(false)
+const naturalLanguageQuery = ref('')
+const aiSearchResults = ref<any[]>([])
+const isProcessingNLSearch = ref(false)
+const nlSearchSuggestions = [
+  'Messages from Sarah',
+  'Files shared today',
+  'Conversations about the project',
+  'Recent announcements',
+  'Unread messages'
+]
 const leftPanelCollapsed = ref(false)
 const rightPanelCollapsed = ref(false)
 const showCreateChannelModal = ref(false)
@@ -824,6 +840,76 @@ const totalUnreadCount = computed(() => {
   return channelUnread + dmUnread
 })
 
+// Unified Search Handlers
+function handleSearchInput() {
+  if (isAISearchMode.value) {
+    showAISuggestions.value = !unifiedSearchQuery.value
+  } else {
+    searchQuery.value = unifiedSearchQuery.value
+  }
+}
+
+async function processNaturalLanguageSearch() {
+  if (!naturalLanguageQuery.value || isProcessingNLSearch.value) return
+
+  isProcessingNLSearch.value = true
+
+  try {
+    await new Promise(resolve => setTimeout(resolve, 1000))
+
+    const query = naturalLanguageQuery.value.toLowerCase()
+
+    // Simple NL processing for channels and DMs
+    let results: any[] = []
+
+    if (query.includes('unread')) {
+      results = channels.value.filter(c => c.unreadCount > 0)
+    } else if (query.includes('announcement')) {
+      results = channels.value.filter(c => c.name.toLowerCase().includes('announcement'))
+    } else if (query.includes('file') || query.includes('shared')) {
+      // Would return file-related results
+      results = channels.value.slice(0, 3)
+    } else {
+      results = channels.value.filter(c => c.name.toLowerCase().includes(query))
+    }
+
+    aiSearchResults.value = results.slice(0, 10)
+  } finally {
+    isProcessingNLSearch.value = false
+  }
+}
+
+function handleUnifiedSearch() {
+  if (!unifiedSearchQuery.value) return
+
+  if (isAISearchMode.value) {
+    naturalLanguageQuery.value = unifiedSearchQuery.value
+    processNaturalLanguageSearch()
+  } else {
+    searchQuery.value = unifiedSearchQuery.value
+  }
+  showAISuggestions.value = false
+}
+
+function clearUnifiedSearch() {
+  unifiedSearchQuery.value = ''
+  searchQuery.value = ''
+  naturalLanguageQuery.value = ''
+  aiSearchResults.value = []
+  showAISuggestions.value = false
+}
+
+watch(isAISearchMode, (newValue) => {
+  if (newValue && !unifiedSearchQuery.value) {
+    showAISuggestions.value = true
+  } else {
+    showAISuggestions.value = false
+  }
+  if (!newValue) {
+    searchQuery.value = unifiedSearchQuery.value
+  }
+})
+
 // Methods
 function selectChannel(channelId: string) {
   selectedChannelId.value = channelId
@@ -1107,7 +1193,7 @@ watch(isViewingDM, (isDM) => {
 // ============================================================================
 
 // AI State
-const showAISuggestions = ref(true)
+const showSmartReplies = ref(true)
 const isGeneratingReplies = ref(false)
 const isGeneratingSummary = ref(false)
 const isAnalyzingSentiment = ref(false)
@@ -1296,7 +1382,7 @@ function getTrendIcon(trend: string) {
 
 // Generate smart replies when conversation changes
 watch(currentMessages, () => {
-  if (showAISuggestions.value && currentMessages.value.length > 0) {
+  if (showSmartReplies.value && currentMessages.value.length > 0) {
     generateSmartReplies()
   }
 }, { deep: true })
@@ -1341,16 +1427,101 @@ watch(currentMessages, () => {
         </div>
       </div>
 
-      <!-- Search with Premium Styling -->
+      <!-- Unified Search with AI Integration -->
       <div class="p-3 border-b border-gray-100">
-        <div v-if="!leftPanelCollapsed" class="relative group">
-          <i class="fas fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-sm group-focus-within:text-teal-500 transition-colors"></i>
-          <input
-            v-model="searchQuery"
-            type="text"
-            placeholder="Search conversations..."
-            class="w-full bg-gray-50 text-sm text-gray-700 placeholder-gray-400 rounded-xl pl-10 pr-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:bg-white border border-gray-200 focus:border-teal-400 transition-all duration-200"
-          />
+        <div v-if="!leftPanelCollapsed" class="relative">
+          <div class="flex items-stretch">
+            <!-- AI Mode Toggle -->
+            <button
+              v-if="showAIFeatures"
+              @click="isAISearchMode = !isAISearchMode"
+              :class="[
+                'px-2 rounded-l-xl border border-r-0 flex items-center gap-1 text-[10px] font-medium transition-all',
+                isAISearchMode
+                  ? 'bg-gradient-to-r from-teal-500 to-cyan-500 border-teal-500 text-white'
+                  : 'bg-gray-100 border-gray-200 text-gray-500 hover:bg-gray-200'
+              ]"
+              title="Toggle AI Search"
+            >
+              <i class="fas fa-wand-magic-sparkles text-[10px]"></i>
+            </button>
+
+            <!-- Search Input -->
+            <div class="relative flex-1">
+              <i :class="[
+                'absolute left-3 top-1/2 -translate-y-1/2 text-xs transition-colors',
+                isAISearchMode ? 'fas fa-brain text-teal-500' : 'fas fa-search text-gray-400'
+              ]"></i>
+              <input
+                v-model="unifiedSearchQuery"
+                type="text"
+                :placeholder="isAISearchMode ? 'Ask AI: Find messages...' : 'Search conversations...'"
+                @keyup.enter="handleUnifiedSearch"
+                @input="handleSearchInput"
+                :class="[
+                  'w-full pl-8 pr-10 py-2.5 text-sm focus:outline-none transition-all',
+                  showAIFeatures ? 'rounded-r-xl' : 'rounded-xl',
+                  isAISearchMode
+                    ? 'bg-gradient-to-r from-teal-50 to-cyan-50 border border-teal-200 focus:ring-2 focus:ring-teal-400 focus:border-transparent placeholder:text-teal-400'
+                    : 'bg-gray-50 border border-gray-200 focus:ring-2 focus:ring-teal-500/30 focus:bg-white focus:border-teal-400',
+                  !showAIFeatures && 'rounded-l-xl'
+                ]"
+              >
+              <!-- Clear & Search Buttons -->
+              <div class="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-0.5">
+                <button
+                  v-if="unifiedSearchQuery"
+                  @click="clearUnifiedSearch"
+                  :class="['p-1 rounded transition-colors', isAISearchMode ? 'text-teal-400 hover:text-teal-600' : 'text-gray-400 hover:text-gray-600']"
+                >
+                  <i class="fas fa-times text-[10px]"></i>
+                </button>
+                <button
+                  v-if="isAISearchMode && unifiedSearchQuery"
+                  @click="handleUnifiedSearch"
+                  :disabled="isProcessingNLSearch"
+                  class="p-1 rounded text-teal-500 hover:text-teal-600 disabled:opacity-50"
+                >
+                  <i :class="isProcessingNLSearch ? 'fas fa-spinner animate-spin' : 'fas fa-arrow-right'" class="text-xs"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- AI Search Suggestions Dropdown -->
+          <div
+            v-if="showAIFeatures && isAISearchMode && showAISuggestions && !unifiedSearchQuery"
+            class="absolute left-0 top-full mt-2 w-full bg-white rounded-xl shadow-lg border border-teal-100 py-2 z-50"
+          >
+            <div class="px-3 py-1.5 text-[10px] font-semibold text-teal-500 flex items-center gap-2">
+              <i class="fas fa-lightbulb"></i>
+              Try asking:
+            </div>
+            <button
+              v-for="suggestion in nlSearchSuggestions"
+              :key="suggestion"
+              @click="unifiedSearchQuery = suggestion; handleUnifiedSearch()"
+              class="w-full px-3 py-1.5 text-left text-xs text-gray-700 hover:bg-teal-50 flex items-center gap-2"
+            >
+              <i class="fas fa-search text-teal-400 text-[10px]"></i>
+              {{ suggestion }}
+            </button>
+          </div>
+
+          <!-- AI Processing Indicator -->
+          <div
+            v-if="isProcessingNLSearch"
+            class="absolute left-0 top-full mt-2 w-full bg-gradient-to-r from-teal-50 to-cyan-50 rounded-xl shadow-lg border border-teal-100 p-3 z-50"
+          >
+            <div class="flex items-center gap-2">
+              <div class="w-6 h-6 rounded-lg bg-gradient-to-br from-teal-500 to-cyan-500 flex items-center justify-center">
+                <i class="fas fa-brain text-white text-[10px] animate-pulse"></i>
+              </div>
+              <div>
+                <div class="text-xs font-medium text-teal-700">AI is searching...</div>
+              </div>
+            </div>
+          </div>
         </div>
         <button
           v-else
@@ -2008,13 +2179,13 @@ watch(currentMessages, () => {
         </div>
 
         <!-- AI Smart Reply Suggestions -->
-        <div v-if="showAISuggestions && aiSmartReplies.length > 0" class="ai-smart-replies">
+        <div v-if="showSmartReplies && aiSmartReplies.length > 0" class="ai-smart-replies">
           <div class="ai-replies-header">
             <div class="flex items-center gap-2">
               <i class="fas fa-wand-magic-sparkles text-teal-500"></i>
               <span class="text-xs font-medium text-gray-600">AI Suggestions</span>
             </div>
-            <button @click="showAISuggestions = false" class="text-gray-400 hover:text-gray-600">
+            <button @click="showSmartReplies = false" class="text-gray-400 hover:text-gray-600">
               <i class="fas fa-times text-xs"></i>
             </button>
           </div>
