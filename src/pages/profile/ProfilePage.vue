@@ -669,15 +669,6 @@ function getInsightColor(type: string): string {
     </div>
 
     <template v-else>
-      <!-- Breadcrumb -->
-      <nav class="flex items-center gap-2 text-sm text-gray-500 mb-6">
-        <router-link to="/" class="hover:text-primary-600 transition-colors">
-          <i class="fas fa-home"></i>
-        </router-link>
-        <i class="fas fa-chevron-right text-xs"></i>
-        <span class="text-gray-900 font-medium">Profile</span>
-      </nav>
-
       <!-- Compact Profile Header -->
       <div class="profile-header-container card-animated fade-in-up rounded-2xl overflow-hidden mb-6" style="animation-delay: 0.1s">
         <!-- Cover with Avatar Overlapping -->
