@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, computed, onMounted, watch } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
 import { useAIServicesStore } from '@/stores/aiServices'
 import { AILoadingIndicator, AISuggestionChip, AIConfidenceBar } from '@/components/ai'
 
 const router = useRouter()
+const route = useRoute()
 const aiStore = useAIServicesStore()
 
 // Loading state
@@ -17,7 +18,90 @@ const showEditProfile = ref(false)
 // Activity filter
 const activityFilter = ref('all')
 
-// User data
+// Current logged-in user ID (in real app, this would come from auth store)
+const currentUserId = 0
+
+// Check if viewing own profile
+const isOwnProfile = computed(() => {
+  const viewingUserId = route.query.userId
+  return !viewingUserId || viewingUserId === '0'
+})
+
+// All users data (mock database)
+const usersDatabase = ref([
+  {
+    id: 0,
+    name: 'Ahmed Imam',
+    initials: 'AI',
+    role: 'Product Director',
+    department: 'Product Management',
+    location: 'Dubai, UAE',
+    joinDate: 'March 2022',
+    email: 'ahmed.imam@intalio.com',
+    phone: '+971 50 123 4567',
+    bio: 'Experienced product leader with 10+ years in enterprise software. Passionate about building user-centric products that drive business value. Leading the Intalio Knowledge Hub initiative to transform how organizations manage and share knowledge.',
+    skills: ['Product Strategy', 'UX Design', 'Agile/Scrum', 'Data Analytics', 'Team Leadership', 'Enterprise Software', 'AI/ML Integration'],
+    color: '#14b8a6'
+  },
+  {
+    id: 1,
+    name: 'Sarah Chen',
+    initials: 'SC',
+    role: 'Engineering Lead',
+    department: 'Engineering',
+    location: 'Singapore',
+    joinDate: 'January 2021',
+    email: 'sarah.chen@intalio.com',
+    phone: '+65 9123 4567',
+    bio: 'Engineering leader with expertise in distributed systems and cloud architecture. Leading the backend infrastructure team to build scalable and reliable systems.',
+    skills: ['System Design', 'Cloud Architecture', 'Team Management', 'Microservices', 'DevOps', 'Python', 'Go'],
+    color: '#8B5CF6'
+  },
+  {
+    id: 2,
+    name: 'Mike Johnson',
+    initials: 'MJ',
+    role: 'Senior Designer',
+    department: 'Design',
+    location: 'London, UK',
+    joinDate: 'June 2022',
+    email: 'mike.johnson@intalio.com',
+    phone: '+44 7700 900123',
+    bio: 'Creative designer with a passion for user-centered design. Specializing in creating intuitive interfaces that delight users and drive engagement.',
+    skills: ['UI Design', 'UX Research', 'Figma', 'Design Systems', 'Prototyping', 'User Testing'],
+    color: '#3B82F6'
+  },
+  {
+    id: 3,
+    name: 'Emily Davis',
+    initials: 'ED',
+    role: 'Product Manager',
+    department: 'Product',
+    location: 'New York, USA',
+    joinDate: 'September 2023',
+    email: 'emily.davis@intalio.com',
+    phone: '+1 555 123 4567',
+    bio: 'Product manager focused on customer success and data-driven decision making. Building features that solve real user problems.',
+    skills: ['Product Strategy', 'Data Analysis', 'User Research', 'Roadmapping', 'Stakeholder Management'],
+    color: '#10B981'
+  },
+  {
+    id: 4,
+    name: 'Alex Thompson',
+    initials: 'AT',
+    role: 'Developer',
+    department: 'Engineering',
+    location: 'Toronto, Canada',
+    joinDate: 'April 2023',
+    email: 'alex.thompson@intalio.com',
+    phone: '+1 416 555 7890',
+    bio: 'Full-stack developer passionate about clean code and modern web technologies. Building performant and accessible web applications.',
+    skills: ['Vue.js', 'TypeScript', 'Node.js', 'PostgreSQL', 'GraphQL', 'Testing'],
+    color: '#F59E0B'
+  }
+])
+
+// User data - dynamically loaded based on route
 const user = ref({
   name: 'Ahmed Imam',
   initials: 'AI',
@@ -28,7 +112,26 @@ const user = ref({
   email: 'ahmed.imam@intalio.com',
   phone: '+971 50 123 4567',
   bio: 'Experienced product leader with 10+ years in enterprise software. Passionate about building user-centric products that drive business value. Leading the Intalio Knowledge Hub initiative to transform how organizations manage and share knowledge.',
-  skills: ['Product Strategy', 'UX Design', 'Agile/Scrum', 'Data Analytics', 'Team Leadership', 'Enterprise Software', 'AI/ML Integration']
+  skills: ['Product Strategy', 'UX Design', 'Agile/Scrum', 'Data Analytics', 'Team Leadership', 'Enterprise Software', 'AI/ML Integration'],
+  color: '#14b8a6'
+})
+
+// Load user data based on userId
+const loadUserData = () => {
+  const userId = route.query.userId ? parseInt(route.query.userId as string) : 0
+  const foundUser = usersDatabase.value.find(u => u.id === userId)
+  if (foundUser) {
+    user.value = { ...foundUser }
+  }
+}
+
+// Watch for route changes
+watch(() => route.query.userId, () => {
+  loadUserData()
+}, { immediate: true })
+
+onMounted(() => {
+  loadUserData()
 })
 
 // Stats
@@ -493,10 +596,13 @@ function getInsightColor(type: string): string {
             <!-- Avatar Row -->
             <div class="-mt-16 mb-4">
               <div class="relative inline-block">
-                <div class="w-28 h-28 rounded-2xl bg-gradient-to-br from-teal-400 to-emerald-500 flex items-center justify-center text-white text-4xl font-bold border-4 border-white shadow-xl">
+                <div
+                  class="w-28 h-28 rounded-2xl flex items-center justify-center text-white text-4xl font-bold border-4 border-white shadow-xl"
+                  :style="{ background: `linear-gradient(135deg, ${user.color || '#14b8a6'}, ${user.color || '#10b981'})` }"
+                >
                   {{ user.initials }}
                 </div>
-                <button class="absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-teal-500 text-white flex items-center justify-center shadow-lg hover:bg-teal-600 transition-colors">
+                <button v-if="isOwnProfile" class="absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-teal-500 text-white flex items-center justify-center shadow-lg hover:bg-teal-600 transition-colors">
                   <i class="fas fa-camera text-xs"></i>
                 </button>
                 <span class="absolute top-1 right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></span>
@@ -529,38 +635,44 @@ function getInsightColor(type: string): string {
 
               <!-- Action Buttons (Right) -->
               <div class="flex items-center gap-2">
-                <!-- Contact Buttons -->
-                <button @click="sendEmail" class="w-9 h-9 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition-all flex items-center justify-center" title="Send Email">
-                  <i class="fas fa-envelope text-sm"></i>
-                </button>
-                <button @click="openTeams" class="w-9 h-9 bg-indigo-100 text-indigo-600 rounded-lg hover:bg-indigo-200 transition-all flex items-center justify-center" title="Microsoft Teams">
-                  <svg class="w-4 h-4" viewBox="0 0 2228.833 2073.333" fill="currentColor">
-                    <path d="M1554.637 777.5h575.713c54.391 0 98.483 44.092 98.483 98.483v524.398c0 199.901-162.051 361.952-361.952 361.952h-1.711c-199.901.028-361.975-162-362.004-361.901V828.971c.001-28.427 23.045-51.471 51.471-51.471z"/>
-                    <circle cx="1943.75" cy="440.583" r="233.25"/>
-                    <path d="M1218.083 777.5h681.25c56.558 0 102.417 45.859 102.417 102.416v552.084c0 225.489-182.262 408.333-407.751 408.333-.583 0-1.166 0-1.75-.001-225.489-.577-407.333-184.044-406.756-409.534V879.917c0-56.558 45.859-102.417 102.417-102.417h-.827z"/>
-                    <circle cx="1767.083" cy="340.417" r="297.5"/>
-                    <path d="M546.25 777.5h845.833c50.46 0 91.417 40.956 91.417 91.417v616.666c0 281.861-228.473 510.417-510.334 510.417C691.304 1996 462.75 1767.444 462.75 1485.583V868.917c0-50.46 40.956-91.417 91.417-91.417h-7.917z"/>
-                    <circle cx="969.167" cy="295.417" r="295.417"/>
-                  </svg>
-                </button>
-                <button @click="openDM" class="w-9 h-9 bg-teal-100 text-teal-600 rounded-lg hover:bg-teal-200 transition-all flex items-center justify-center" title="Direct Message">
-                  <i class="fas fa-comment-dots text-sm"></i>
-                </button>
+                <!-- Contact Buttons (shown when viewing other's profile) -->
+                <template v-if="!isOwnProfile">
+                  <button @click="sendEmail" class="w-9 h-9 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition-all flex items-center justify-center" title="Send Email">
+                    <i class="fas fa-envelope text-sm"></i>
+                  </button>
+                  <button @click="openTeams" class="w-9 h-9 bg-indigo-100 text-indigo-600 rounded-lg hover:bg-indigo-200 transition-all flex items-center justify-center" title="Microsoft Teams">
+                    <svg class="w-4 h-4" viewBox="0 0 2228.833 2073.333" fill="currentColor">
+                      <path d="M1554.637 777.5h575.713c54.391 0 98.483 44.092 98.483 98.483v524.398c0 199.901-162.051 361.952-361.952 361.952h-1.711c-199.901.028-361.975-162-362.004-361.901V828.971c.001-28.427 23.045-51.471 51.471-51.471z"/>
+                      <circle cx="1943.75" cy="440.583" r="233.25"/>
+                      <path d="M1218.083 777.5h681.25c56.558 0 102.417 45.859 102.417 102.416v552.084c0 225.489-182.262 408.333-407.751 408.333-.583 0-1.166 0-1.75-.001-225.489-.577-407.333-184.044-406.756-409.534V879.917c0-56.558 45.859-102.417 102.417-102.417h-.827z"/>
+                      <circle cx="1767.083" cy="340.417" r="297.5"/>
+                      <path d="M546.25 777.5h845.833c50.46 0 91.417 40.956 91.417 91.417v616.666c0 281.861-228.473 510.417-510.334 510.417C691.304 1996 462.75 1767.444 462.75 1485.583V868.917c0-50.46 40.956-91.417 91.417-91.417h-7.917z"/>
+                      <circle cx="969.167" cy="295.417" r="295.417"/>
+                    </svg>
+                  </button>
+                  <button @click="openDM" class="w-9 h-9 bg-teal-100 text-teal-600 rounded-lg hover:bg-teal-200 transition-all flex items-center justify-center" title="Direct Message">
+                    <i class="fas fa-comment-dots text-sm"></i>
+                  </button>
+                  <button class="px-4 py-2 bg-teal-500 text-white rounded-lg font-medium text-sm flex items-center gap-1.5 hover:bg-teal-600 transition-all shadow-md">
+                    <i class="fas fa-user-plus"></i>
+                    Follow
+                  </button>
+                </template>
 
-                <div class="w-px h-6 bg-gray-200 mx-1"></div>
-
-                <!-- Profile Actions -->
-                <button @click="loadAIInsights" class="px-3 py-2 bg-gradient-to-r from-violet-500 to-purple-600 text-white rounded-lg font-medium text-xs flex items-center gap-1.5 hover:from-violet-600 hover:to-purple-700 transition-all shadow-md">
-                  <i class="fas fa-wand-magic-sparkles"></i>
-                  AI Insights
-                </button>
-                <button @click="showEditProfile = true" class="px-3 py-2 bg-teal-500 text-white rounded-lg font-medium text-xs flex items-center gap-1.5 hover:bg-teal-600 transition-all shadow-md">
-                  <i class="fas fa-edit"></i>
-                  Edit
-                </button>
-                <button @click="goToSettings" class="p-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-all">
-                  <i class="fas fa-cog text-sm"></i>
-                </button>
+                <!-- Own Profile Actions -->
+                <template v-else>
+                  <button @click="loadAIInsights" class="px-3 py-2 bg-gradient-to-r from-violet-500 to-purple-600 text-white rounded-lg font-medium text-xs flex items-center gap-1.5 hover:from-violet-600 hover:to-purple-700 transition-all shadow-md">
+                    <i class="fas fa-wand-magic-sparkles"></i>
+                    AI Insights
+                  </button>
+                  <button @click="showEditProfile = true" class="px-3 py-2 bg-teal-500 text-white rounded-lg font-medium text-xs flex items-center gap-1.5 hover:bg-teal-600 transition-all shadow-md">
+                    <i class="fas fa-edit"></i>
+                    Edit
+                  </button>
+                  <button @click="goToSettings" class="p-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-all">
+                    <i class="fas fa-cog text-sm"></i>
+                  </button>
+                </template>
               </div>
             </div>
 
