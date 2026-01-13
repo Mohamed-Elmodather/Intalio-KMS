@@ -1413,20 +1413,27 @@ function formatVersionDate(date: Date): string {
           <!-- AI Features Panel -->
           <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
             <!-- AI Panel Header -->
-            <div class="px-6 py-4 bg-gradient-to-r from-teal-500 to-teal-600 flex items-center justify-between">
-              <div class="flex items-center gap-2 text-white">
-                <i class="fas fa-wand-magic-sparkles"></i>
-                <span class="font-semibold">AI Analysis</span>
+            <div class="px-6 py-4 bg-gradient-to-r from-teal-50 to-transparent border-b border-teal-100">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center">
+                    <i class="fas fa-wand-magic-sparkles text-white"></i>
+                  </div>
+                  <div>
+                    <h3 class="text-lg font-semibold text-gray-900">AI Analysis</h3>
+                    <p class="text-sm text-gray-500">Powered by Intalio AI</p>
+                  </div>
+                </div>
+                <button @click="toggleAIPanel" class="w-8 h-8 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 flex items-center justify-center transition-all">
+                  <i :class="['fas transition-transform duration-300', showAIPanel ? 'fa-chevron-up' : 'fa-chevron-down']"></i>
+                </button>
               </div>
-              <button @click="toggleAIPanel" class="text-white/80 hover:text-white transition-colors">
-                <i :class="['fas', showAIPanel ? 'fa-chevron-up' : 'fa-chevron-down']"></i>
-              </button>
             </div>
 
             <!-- AI Panel Content -->
-            <div v-if="showAIPanel" class="p-4">
+            <div v-if="showAIPanel" class="p-4 space-y-4">
               <!-- AI Tab Navigation -->
-              <div class="flex gap-1 mb-4 bg-gray-100 rounded-lg p-1">
+              <div class="grid grid-cols-4 gap-2">
                 <button
                   v-for="tab in [
                     { id: 'summary', icon: 'fas fa-file-lines', label: 'Summary' },
@@ -1437,19 +1444,19 @@ function formatVersionDate(date: Date): string {
                   :key="tab.id"
                   @click="activeAITab = tab.id as any"
                   :class="[
-                    'flex-1 px-2 py-2 rounded-md text-xs font-medium transition-all flex items-center justify-center gap-1',
+                    'px-3 py-2.5 rounded-xl text-xs font-medium transition-all flex flex-col items-center gap-1.5',
                     activeAITab === tab.id
-                      ? 'bg-white text-teal-600 shadow-sm'
-                      : 'text-gray-500 hover:text-gray-700'
+                      ? 'bg-teal-50 text-teal-700 border-2 border-teal-200'
+                      : 'bg-gray-50 text-gray-600 border-2 border-transparent hover:bg-gray-100'
                   ]"
                 >
-                  <i :class="tab.icon"></i>
-                  <span class="hidden sm:inline">{{ tab.label }}</span>
+                  <i :class="[tab.icon, 'text-base']"></i>
+                  <span>{{ tab.label }}</span>
                 </button>
               </div>
 
               <!-- Summary Tab -->
-              <div v-if="activeAITab === 'summary'" class="space-y-4">
+              <div v-if="activeAITab === 'summary'" class="space-y-3">
                 <!-- Summary Type Selection -->
                 <div class="flex gap-2">
                   <button
@@ -1461,7 +1468,7 @@ function formatVersionDate(date: Date): string {
                     :key="type.id"
                     @click="summaryType = type.id as any"
                     :class="[
-                      'flex-1 px-3 py-1.5 rounded-lg text-xs font-medium transition-all',
+                      'flex-1 px-3 py-2 rounded-lg text-xs font-medium transition-all',
                       summaryType === type.id
                         ? 'bg-teal-100 text-teal-700'
                         : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
@@ -1482,35 +1489,46 @@ function formatVersionDate(date: Date): string {
                 </button>
 
                 <!-- Summary Result -->
-                <div v-if="documentSummary" class="space-y-3">
-                  <div class="bg-teal-50 rounded-lg p-4 border border-teal-100">
-                    <p class="text-sm text-gray-700 whitespace-pre-line">{{ documentSummary.summary }}</p>
-                  </div>
+                <Transition name="slide-fade">
+                  <div v-if="documentSummary" class="space-y-3 pt-3 border-t border-gray-100">
+                    <div class="p-3 bg-teal-50 rounded-xl">
+                      <div class="flex items-center justify-between mb-2">
+                        <span class="text-sm font-medium text-teal-700">Summary</span>
+                        <button @click="documentSummary = null" class="text-teal-400 hover:text-teal-600">
+                          <i class="fas fa-times text-sm"></i>
+                        </button>
+                      </div>
+                      <p class="text-sm text-teal-800 leading-relaxed">{{ documentSummary.summary }}</p>
+                    </div>
 
-                  <!-- Key Points -->
-                  <div v-if="documentSummary.keyPoints?.length" class="space-y-2">
-                    <p class="text-xs font-semibold text-gray-500 uppercase">Key Points</p>
-                    <ul class="space-y-1">
-                      <li v-for="(point, idx) in documentSummary.keyPoints" :key="idx" class="flex items-start gap-2 text-sm text-gray-600">
-                        <i class="fas fa-check-circle text-teal-500 mt-0.5 flex-shrink-0"></i>
-                        <span>{{ point }}</span>
-                      </li>
-                    </ul>
-                  </div>
+                    <!-- Key Points -->
+                    <div v-if="documentSummary.keyPoints?.length" class="p-3 bg-gray-50 rounded-xl">
+                      <div class="flex items-center gap-2 mb-2">
+                        <i class="fas fa-lightbulb text-amber-500"></i>
+                        <span class="text-sm font-medium text-gray-700">Key Points</span>
+                      </div>
+                      <ul class="space-y-1.5">
+                        <li v-for="(point, idx) in documentSummary.keyPoints" :key="idx" class="flex items-start gap-2 text-sm text-gray-600">
+                          <i class="fas fa-check-circle text-teal-500 mt-0.5 flex-shrink-0"></i>
+                          <span>{{ point }}</span>
+                        </li>
+                      </ul>
+                    </div>
 
-                  <!-- Actions -->
-                  <div class="flex items-center justify-between text-xs text-gray-400">
-                    <span>{{ ((documentSummary.confidence ?? 0) * 100).toFixed(0) }}% confidence</span>
-                    <button @click="copySummary" class="flex items-center gap-1 text-teal-600 hover:text-teal-700">
-                      <i class="fas fa-copy"></i>
-                      Copy
-                    </button>
+                    <!-- Confidence & Copy -->
+                    <div class="flex items-center justify-between text-xs text-gray-400">
+                      <span>{{ ((documentSummary.confidence ?? 0) * 100).toFixed(0) }}% confidence</span>
+                      <button @click="copySummary" class="flex items-center gap-1 text-teal-600 hover:text-teal-700">
+                        <i class="fas fa-copy"></i>
+                        Copy
+                      </button>
+                    </div>
                   </div>
-                </div>
+                </Transition>
               </div>
 
               <!-- Entities Tab -->
-              <div v-if="activeAITab === 'entities'" class="space-y-4">
+              <div v-if="activeAITab === 'entities'" class="space-y-3">
                 <button
                   @click="extractDocumentEntities"
                   :disabled="isLoadingEntities"
@@ -1520,50 +1538,54 @@ function formatVersionDate(date: Date): string {
                   {{ isLoadingEntities ? 'Extracting...' : 'Extract Entities' }}
                 </button>
 
-                <!-- Entity Filter -->
-                <div v-if="extractedEntities" class="flex flex-wrap gap-2">
-                  <button
-                    @click="highlightedEntityType = null"
-                    :class="[
-                      'px-2 py-1 rounded-full text-xs font-medium transition-all',
-                      highlightedEntityType === null
-                        ? 'bg-teal-100 text-teal-700'
-                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                    ]"
-                  >
-                    All ({{ extractedEntities.entities.length }})
-                  </button>
-                  <button
-                    v-for="type in getUniqueEntityTypes()"
-                    :key="type"
-                    @click="highlightedEntityType = type"
-                    :class="[
-                      'px-2 py-1 rounded-full text-xs font-medium transition-all capitalize',
-                      highlightedEntityType === type
-                        ? 'bg-teal-100 text-teal-700'
-                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                    ]"
-                  >
-                    {{ type }} ({{ extractedEntities.entities.filter(e => e.type === type).length }})
-                  </button>
-                </div>
+                <Transition name="slide-fade">
+                  <div v-if="extractedEntities" class="space-y-3 pt-3 border-t border-gray-100">
+                    <!-- Entity Filter -->
+                    <div class="flex flex-wrap gap-1.5">
+                      <button
+                        @click="highlightedEntityType = null"
+                        :class="[
+                          'px-2 py-1 rounded-full text-xs font-medium transition-all',
+                          highlightedEntityType === null
+                            ? 'bg-teal-100 text-teal-700'
+                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                        ]"
+                      >
+                        All ({{ extractedEntities.entities.length }})
+                      </button>
+                      <button
+                        v-for="type in getUniqueEntityTypes()"
+                        :key="type"
+                        @click="highlightedEntityType = type"
+                        :class="[
+                          'px-2 py-1 rounded-full text-xs font-medium transition-all capitalize',
+                          highlightedEntityType === type
+                            ? 'bg-teal-100 text-teal-700'
+                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                        ]"
+                      >
+                        {{ type }} ({{ extractedEntities.entities.filter(e => e.type === type).length }})
+                      </button>
+                    </div>
 
-                <!-- Entity List -->
-                <div v-if="extractedEntities" class="space-y-2 max-h-64 overflow-y-auto">
-                  <div
-                    v-for="(entity, idx) in filterEntitiesByType(highlightedEntityType)"
-                    :key="idx"
-                    :class="['flex items-center gap-2 p-2 rounded-lg', getEntityColor(entity.type)]"
-                  >
-                    <i :class="[getEntityIcon(entity.type), 'text-sm']"></i>
-                    <span class="flex-1 text-sm font-medium truncate">{{ entity.text }}</span>
-                    <span class="text-xs opacity-70">{{ (entity.confidence * 100).toFixed(0) }}%</span>
+                    <!-- Entity List -->
+                    <div class="space-y-1.5 max-h-56 overflow-y-auto">
+                      <div
+                        v-for="(entity, idx) in filterEntitiesByType(highlightedEntityType)"
+                        :key="idx"
+                        :class="['flex items-center gap-2 p-2 rounded-lg transition-all', getEntityColor(entity.type)]"
+                      >
+                        <i :class="[getEntityIcon(entity.type), 'text-sm']"></i>
+                        <span class="flex-1 text-sm font-medium truncate">{{ entity.text }}</span>
+                        <span class="text-xs opacity-70">{{ (entity.confidence * 100).toFixed(0) }}%</span>
+                      </div>
+                    </div>
                   </div>
-                </div>
+                </Transition>
               </div>
 
               <!-- Translation Tab -->
-              <div v-if="activeAITab === 'translate'" class="space-y-4">
+              <div v-if="activeAITab === 'translate'" class="space-y-3">
                 <!-- Language Selection -->
                 <div class="grid grid-cols-3 gap-2">
                   <button
@@ -1591,7 +1613,7 @@ function formatVersionDate(date: Date): string {
                 </div>
 
                 <!-- Loading State -->
-                <div v-if="isLoadingTranslation" class="flex items-center justify-center py-8">
+                <div v-if="isLoadingTranslation" class="flex items-center justify-center py-6">
                   <div class="text-center">
                     <i class="fas fa-spinner fa-spin text-2xl text-teal-500 mb-2"></i>
                     <p class="text-sm text-gray-500">Translating document...</p>
@@ -1599,24 +1621,32 @@ function formatVersionDate(date: Date): string {
                 </div>
 
                 <!-- Translation Result -->
-                <div v-if="translatedContent && !isLoadingTranslation" class="space-y-3">
-                  <div class="bg-blue-50 rounded-lg p-4 border border-blue-100 max-h-48 overflow-y-auto">
-                    <p class="text-sm text-gray-700 whitespace-pre-line" :dir="targetLanguage === 'ar' ? 'rtl' : 'ltr'">
-                      {{ translatedContent.translatedText }}
-                    </p>
+                <Transition name="slide-fade">
+                  <div v-if="translatedContent && !isLoadingTranslation" class="space-y-3 pt-3 border-t border-gray-100">
+                    <div class="p-3 bg-blue-50 rounded-xl">
+                      <div class="flex items-center justify-between mb-2">
+                        <span class="text-sm font-medium text-blue-700">Translation</span>
+                        <button @click="translatedContent = null" class="text-blue-400 hover:text-blue-600">
+                          <i class="fas fa-times text-sm"></i>
+                        </button>
+                      </div>
+                      <p class="text-sm text-blue-800 leading-relaxed max-h-40 overflow-y-auto" :dir="targetLanguage === 'ar' ? 'rtl' : 'ltr'">
+                        {{ translatedContent.translatedText }}
+                      </p>
+                    </div>
+                    <div class="flex items-center justify-between text-xs text-gray-400">
+                      <span>{{ (translatedContent.confidence * 100).toFixed(0) }}% confidence</span>
+                      <button @click="copyTranslation" class="flex items-center gap-1 text-teal-600 hover:text-teal-700">
+                        <i class="fas fa-copy"></i>
+                        Copy
+                      </button>
+                    </div>
                   </div>
-                  <div class="flex items-center justify-between text-xs text-gray-400">
-                    <span>{{ (translatedContent.confidence * 100).toFixed(0) }}% confidence</span>
-                    <button @click="copyTranslation" class="flex items-center gap-1 text-teal-600 hover:text-teal-700">
-                      <i class="fas fa-copy"></i>
-                      Copy
-                    </button>
-                  </div>
-                </div>
+                </Transition>
               </div>
 
               <!-- OCR Tab -->
-              <div v-if="activeAITab === 'ocr'" class="space-y-4">
+              <div v-if="activeAITab === 'ocr'" class="space-y-3">
                 <div class="bg-amber-50 rounded-lg p-3 border border-amber-200">
                   <div class="flex items-start gap-2">
                     <i class="fas fa-info-circle text-amber-500 mt-0.5"></i>
@@ -1634,54 +1664,64 @@ function formatVersionDate(date: Date): string {
                 </button>
 
                 <!-- OCR Result -->
-                <div v-if="ocrResult" class="space-y-3">
-                  <!-- Confidence Bar -->
-                  <div class="space-y-1">
-                    <div class="flex items-center justify-between text-xs">
-                      <span class="text-gray-500">Confidence</span>
-                      <span class="font-medium text-gray-700">{{ ocrConfidence.toFixed(0) }}%</span>
-                    </div>
-                    <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
-                      <div
-                        class="h-full bg-teal-500 rounded-full transition-all duration-500"
-                        :style="{ width: `${ocrConfidence}%` }"
-                      ></div>
-                    </div>
-                  </div>
-
-                  <!-- Stats -->
-                  <div class="grid grid-cols-2 gap-2">
-                    <div class="bg-gray-50 rounded-lg p-2 text-center">
-                      <p class="text-lg font-bold text-gray-800">{{ ocrResult.wordCount }}</p>
-                      <p class="text-xs text-gray-500">Words</p>
-                    </div>
-                    <div class="bg-gray-50 rounded-lg p-2 text-center">
-                      <p class="text-lg font-bold text-gray-800">{{ ocrResult.characterCount?.toLocaleString() }}</p>
-                      <p class="text-xs text-gray-500">Characters</p>
-                    </div>
-                  </div>
-
-                  <!-- Extracted Text Preview -->
-                  <div class="bg-gray-50 rounded-lg p-3 border border-gray-200 max-h-48 overflow-y-auto">
-                    <p class="text-xs text-gray-700 whitespace-pre-line font-mono">{{ ocrResult.text.substring(0, 500) }}{{ ocrResult.text.length > 500 ? '...' : '' }}</p>
-                  </div>
-
-                  <!-- Page Breakdown -->
-                  <div v-if="Array.isArray(ocrResult.pages) && ocrResult.pages.length" class="space-y-2">
-                    <p class="text-xs font-semibold text-gray-500 uppercase">Page Breakdown</p>
+                <Transition name="slide-fade">
+                  <div v-if="ocrResult" class="space-y-3 pt-3 border-t border-gray-100">
+                    <!-- Confidence Bar -->
                     <div class="space-y-1">
-                      <div v-for="page in ocrResult.pages" :key="page.pageNumber" class="flex items-center justify-between text-xs bg-gray-50 rounded p-2">
-                        <span class="text-gray-600">Page {{ page.pageNumber }}</span>
-                        <span class="text-gray-400">{{ (page.confidence * 100).toFixed(0) }}% conf.</span>
+                      <div class="flex items-center justify-between text-xs">
+                        <span class="text-gray-500">Confidence</span>
+                        <span class="font-medium text-gray-700">{{ ocrConfidence.toFixed(0) }}%</span>
+                      </div>
+                      <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
+                        <div
+                          class="h-full bg-teal-500 rounded-full transition-all duration-500"
+                          :style="{ width: `${ocrConfidence}%` }"
+                        ></div>
                       </div>
                     </div>
-                  </div>
 
-                  <button @click="copyOCRText" class="w-full px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm font-medium flex items-center justify-center gap-2 transition-colors">
-                    <i class="fas fa-copy"></i>
-                    Copy Full Text
-                  </button>
-                </div>
+                    <!-- Stats -->
+                    <div class="grid grid-cols-2 gap-2">
+                      <div class="bg-gray-50 rounded-lg p-2 text-center">
+                        <p class="text-lg font-bold text-gray-800">{{ ocrResult.wordCount }}</p>
+                        <p class="text-xs text-gray-500">Words</p>
+                      </div>
+                      <div class="bg-gray-50 rounded-lg p-2 text-center">
+                        <p class="text-lg font-bold text-gray-800">{{ ocrResult.characterCount?.toLocaleString() }}</p>
+                        <p class="text-xs text-gray-500">Characters</p>
+                      </div>
+                    </div>
+
+                    <!-- Extracted Text Preview -->
+                    <div class="p-3 bg-gray-50 rounded-xl">
+                      <div class="flex items-center justify-between mb-2">
+                        <span class="text-sm font-medium text-gray-700">Extracted Text</span>
+                        <button @click="ocrResult = null" class="text-gray-400 hover:text-gray-600">
+                          <i class="fas fa-times text-sm"></i>
+                        </button>
+                      </div>
+                      <div class="bg-white rounded-lg p-2 border border-gray-200 max-h-32 overflow-y-auto">
+                        <p class="text-xs text-gray-700 whitespace-pre-line font-mono">{{ ocrResult.text.substring(0, 500) }}{{ ocrResult.text.length > 500 ? '...' : '' }}</p>
+                      </div>
+                    </div>
+
+                    <!-- Page Breakdown -->
+                    <div v-if="Array.isArray(ocrResult.pages) && ocrResult.pages.length" class="space-y-2">
+                      <p class="text-xs font-semibold text-gray-500 uppercase">Page Breakdown</p>
+                      <div class="space-y-1">
+                        <div v-for="page in ocrResult.pages" :key="page.pageNumber" class="flex items-center justify-between text-xs bg-gray-50 rounded p-2">
+                          <span class="text-gray-600">Page {{ page.pageNumber }}</span>
+                          <span class="text-gray-400">{{ (page.confidence * 100).toFixed(0) }}% conf.</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <button @click="copyOCRText" class="w-full px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm font-medium flex items-center justify-center gap-2 transition-colors">
+                      <i class="fas fa-copy"></i>
+                      Copy Full Text
+                    </button>
+                  </div>
+                </Transition>
               </div>
             </div>
           </div>
@@ -2032,22 +2072,30 @@ function formatVersionDate(date: Date): string {
   padding: 0;
 }
 
-/* AI Panel Animations */
-.ai-panel-enter-active,
-.ai-panel-leave-active {
-  transition: all 0.3s ease;
+/* AI Panel Slide-Fade Transition */
+.slide-fade-enter-active {
+  transition: all 0.3s ease-out;
 }
 
-.ai-panel-enter-from,
-.ai-panel-leave-to {
+.slide-fade-leave-active {
+  transition: all 0.2s cubic-bezier(1, 0.5, 0.8, 1);
+}
+
+.slide-fade-enter-from,
+.slide-fade-leave-to {
+  transform: translateY(-10px);
   opacity: 0;
-  max-height: 0;
 }
 
-.ai-panel-enter-to,
-.ai-panel-leave-from {
-  opacity: 1;
-  max-height: 1000px;
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* AI Loading Shimmer */
