@@ -15,6 +15,9 @@ const showUploadModal = ref(false)
 const isDragging = ref(false)
 const activeTab = ref('all')
 const searchQuery = ref('')
+const unifiedSearchQuery = ref('')
+const isAISearchMode = ref(false)
+const showAISuggestions = ref(false)
 const categoryFilter = ref('')
 const sortBy = ref('recent')
 const sortOrder = ref<'asc' | 'desc'>('desc')
@@ -1493,6 +1496,52 @@ async function processNaturalLanguageSearch() {
   }
 }
 
+// Unified Search Handlers
+function handleUnifiedSearch() {
+  if (!unifiedSearchQuery.value) return
+
+  if (isAISearchMode.value) {
+    // Use AI-powered search
+    naturalLanguageQuery.value = unifiedSearchQuery.value
+    processNaturalLanguageSearch()
+  } else {
+    // Use normal text search
+    searchQuery.value = unifiedSearchQuery.value
+  }
+  showAISuggestions.value = false
+}
+
+function handleSearchInput() {
+  if (isAISearchMode.value) {
+    // In AI mode, don't auto-search, wait for enter or button click
+    showAISuggestions.value = !unifiedSearchQuery.value
+  } else {
+    // In normal mode, apply filter immediately
+    searchQuery.value = unifiedSearchQuery.value
+  }
+}
+
+function clearUnifiedSearch() {
+  unifiedSearchQuery.value = ''
+  searchQuery.value = ''
+  naturalLanguageQuery.value = ''
+  aiSearchResults.value = []
+  showAISuggestions.value = false
+}
+
+// Watch for AI mode toggle to show suggestions
+watch(isAISearchMode, (newValue) => {
+  if (newValue && !unifiedSearchQuery.value) {
+    showAISuggestions.value = true
+  } else {
+    showAISuggestions.value = false
+  }
+  // Sync the search query when switching modes
+  if (!newValue) {
+    searchQuery.value = unifiedSearchQuery.value
+  }
+})
+
 function getEntityTypeColor(type: string): string {
   const colors: Record<string, string> = {
     'Team': 'bg-blue-100 text-blue-700',
@@ -2153,62 +2202,99 @@ onUnmounted(() => {
 
           <!-- Bottom Row - Search, Filters, View Options -->
           <div class="px-4 py-2 bg-gray-50/50 flex flex-wrap items-center gap-3">
-              <!-- Search -->
-              <div class="min-w-[200px] max-w-md relative">
-              <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
-              <input
-                v-model="searchQuery"
-                type="text"
-                placeholder="Search media..."
-                class="w-full pl-9 pr-4 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all"
-              >
-              <button v-if="searchQuery" @click="searchQuery = ''" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                <i class="fas fa-times text-xs"></i>
-              </button>
-            </div>
+            <!-- Unified Search with AI Integration -->
+            <div class="relative flex-1 max-w-xl">
+              <div class="flex items-stretch">
+                <!-- AI Mode Toggle -->
+                <button
+                  v-if="showAIFeatures"
+                  @click="isAISearchMode = !isAISearchMode"
+                  :class="[
+                    'px-3 rounded-l-lg border border-r-0 flex items-center gap-1.5 text-xs font-medium transition-all',
+                    isAISearchMode
+                      ? 'bg-gradient-to-r from-teal-500 to-cyan-500 border-teal-500 text-white'
+                      : 'bg-gray-100 border-gray-200 text-gray-500 hover:bg-gray-200'
+                  ]"
+                  title="Toggle AI Search"
+                >
+                  <i class="fas fa-wand-magic-sparkles"></i>
+                  <span class="hidden sm:inline">AI</span>
+                </button>
 
-            <!-- AI Natural Language Search -->
-            <div v-if="showAIFeatures" class="relative">
-              <div class="flex items-center gap-2">
-                <div class="relative">
-                  <i class="fas fa-brain absolute left-3 top-1/2 -translate-y-1/2 text-purple-400 text-sm"></i>
+                <!-- Search Input -->
+                <div class="relative flex-1">
+                  <i :class="[
+                    'absolute left-3 top-1/2 -translate-y-1/2 text-sm transition-colors',
+                    isAISearchMode ? 'fas fa-brain text-teal-500' : 'fas fa-search text-gray-400'
+                  ]"></i>
                   <input
-                    v-model="naturalLanguageQuery"
+                    v-model="unifiedSearchQuery"
                     type="text"
-                    placeholder="Ask AI: 'Show me highlights from Japan matches...'"
-                    @keyup.enter="processNaturalLanguageSearch"
-                    class="w-80 pl-9 pr-10 py-2 bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all placeholder:text-purple-300"
+                    :placeholder="isAISearchMode ? 'Ask AI: Show me highlights from Japan matches...' : 'Search media...'"
+                    @keyup.enter="handleUnifiedSearch"
+                    @input="handleSearchInput"
+                    :class="[
+                      'w-full pl-9 pr-20 py-2 text-sm focus:outline-none transition-all',
+                      showAIFeatures ? 'rounded-r-lg' : 'rounded-lg',
+                      isAISearchMode
+                        ? 'bg-gradient-to-r from-teal-50 to-cyan-50 border border-teal-200 focus:ring-2 focus:ring-teal-400 focus:border-transparent placeholder:text-teal-400'
+                        : 'bg-white border border-gray-200 focus:ring-2 focus:ring-teal-500 focus:border-transparent',
+                      !showAIFeatures && 'rounded-l-lg'
+                    ]"
                   >
-                  <button
-                    v-if="naturalLanguageQuery"
-                    @click="naturalLanguageQuery = ''; aiSearchResults = []"
-                    class="absolute right-8 top-1/2 -translate-y-1/2 text-purple-400 hover:text-purple-600"
-                  >
-                    <i class="fas fa-times text-xs"></i>
-                  </button>
-                  <button
-                    @click="processNaturalLanguageSearch"
-                    :disabled="isProcessingNLSearch || !naturalLanguageQuery"
-                    class="absolute right-2 top-1/2 -translate-y-1/2 text-purple-500 hover:text-purple-600 disabled:opacity-50"
-                  >
-                    <i :class="isProcessingNLSearch ? 'fas fa-spinner animate-spin' : 'fas fa-arrow-right'" class="text-sm"></i>
-                  </button>
+                  <!-- Clear & Search Buttons -->
+                  <div class="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                    <button
+                      v-if="unifiedSearchQuery"
+                      @click="clearUnifiedSearch"
+                      :class="['p-1 rounded transition-colors', isAISearchMode ? 'text-teal-400 hover:text-teal-600' : 'text-gray-400 hover:text-gray-600']"
+                    >
+                      <i class="fas fa-times text-xs"></i>
+                    </button>
+                    <button
+                      v-if="isAISearchMode && unifiedSearchQuery"
+                      @click="handleUnifiedSearch"
+                      :disabled="isProcessingNLSearch"
+                      class="p-1 rounded text-teal-500 hover:text-teal-600 disabled:opacity-50"
+                    >
+                      <i :class="isProcessingNLSearch ? 'fas fa-spinner animate-spin' : 'fas fa-arrow-right'" class="text-sm"></i>
+                    </button>
+                  </div>
                 </div>
               </div>
+
               <!-- AI Search Suggestions Dropdown -->
-              <div v-if="!naturalLanguageQuery && showAIFeatures" class="absolute left-0 top-full mt-2 w-80 bg-white rounded-xl shadow-lg border border-purple-100 py-2 z-50 hidden group-focus-within:block">
-                <div class="px-3 py-1.5 text-xs font-semibold text-purple-400 flex items-center gap-2">
+              <div
+                v-if="showAIFeatures && isAISearchMode && showAISuggestions && !unifiedSearchQuery"
+                class="absolute left-0 top-full mt-2 w-full bg-white rounded-xl shadow-lg border border-teal-100 py-2 z-50"
+              >
+                <div class="px-3 py-1.5 text-xs font-semibold text-teal-500 flex items-center gap-2">
                   <i class="fas fa-lightbulb"></i>
                   Try asking:
                 </div>
                 <button
                   v-for="suggestion in nlSearchSuggestions"
                   :key="suggestion"
-                  @click="naturalLanguageQuery = suggestion; processNaturalLanguageSearch()"
-                  class="w-full px-3 py-2 text-left text-sm text-gray-600 hover:bg-purple-50 hover:text-purple-700 transition-colors"
+                  @click="unifiedSearchQuery = suggestion; handleUnifiedSearch()"
+                  class="w-full px-3 py-2 text-left text-sm text-gray-600 hover:bg-teal-50 hover:text-teal-700 transition-colors"
                 >
+                  <i class="fas fa-wand-magic-sparkles text-teal-400 mr-2 text-xs"></i>
                   {{ suggestion }}
                 </button>
+              </div>
+
+              <!-- AI Processing Indicator -->
+              <div
+                v-if="isProcessingNLSearch"
+                class="absolute left-0 top-full mt-2 w-full bg-white rounded-xl shadow-lg border border-teal-100 p-4 z-50"
+              >
+                <div class="flex items-center gap-3">
+                  <div class="w-8 h-8 border-2 border-teal-500 border-t-transparent rounded-full animate-spin"></div>
+                  <div>
+                    <p class="text-sm font-medium text-gray-700">AI is analyzing your query...</p>
+                    <p class="text-xs text-gray-400">Finding relevant media content</p>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -2525,10 +2611,14 @@ onUnmounted(() => {
           </div>
           <div class="flex flex-wrap gap-2 flex-1">
             <!-- Search Filter -->
-            <span v-if="searchQuery" class="px-2.5 py-1 bg-gray-100 text-gray-700 rounded-lg text-xs font-medium flex items-center gap-1.5 border border-gray-200">
-              <i class="fas fa-search text-[10px]"></i>
-              "{{ searchQuery }}"
-              <button @click="searchQuery = ''" class="ml-1 hover:text-gray-900 hover:bg-gray-200 rounded-full w-4 h-4 flex items-center justify-center"><i class="fas fa-times text-[10px]"></i></button>
+            <span v-if="unifiedSearchQuery || searchQuery" :class="[
+              'px-2.5 py-1 rounded-lg text-xs font-medium flex items-center gap-1.5 border',
+              isAISearchMode ? 'bg-teal-50 text-teal-700 border-teal-200' : 'bg-gray-100 text-gray-700 border-gray-200'
+            ]">
+              <i :class="['text-[10px]', isAISearchMode ? 'fas fa-wand-magic-sparkles text-teal-500' : 'fas fa-search']"></i>
+              <span v-if="isAISearchMode" class="text-teal-500 font-semibold">AI:</span>
+              "{{ unifiedSearchQuery || searchQuery }}"
+              <button @click="clearUnifiedSearch" :class="['ml-1 rounded-full w-4 h-4 flex items-center justify-center', isAISearchMode ? 'hover:text-teal-900 hover:bg-teal-100' : 'hover:text-gray-900 hover:bg-gray-200']"><i class="fas fa-times text-[10px]"></i></button>
             </span>
             <!-- Folder Filter -->
             <span v-if="selectedFolder" class="px-2.5 py-1 bg-blue-50 text-blue-700 rounded-lg text-xs font-medium flex items-center gap-1.5 border border-blue-100">
