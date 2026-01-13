@@ -2,9 +2,13 @@
 import { ref, computed, nextTick } from 'vue'
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
 import { useAIServicesStore } from '@/stores/aiServices'
+import { useComparisonStore } from '@/stores/comparison'
 import { AILoadingIndicator } from '@/components/ai'
+import ComparisonPanel from '@/components/ai/ComparisonPanel.vue'
+import ComparisonModal from '@/components/ai/ComparisonModal.vue'
 
 const aiStore = useAIServicesStore()
+const comparisonStore = useComparisonStore()
 
 // Types
 interface Chat {
@@ -470,8 +474,17 @@ function triggerAction(action: QuickAction) {
   }
 
   if (action.id === 'compare') {
-    openContentBrowser()
-    inputMessage.value = 'Compare the following documents: '
+    // If we have items selected for comparison, open the comparison modal
+    if (comparisonStore.canCompare) {
+      comparisonStore.startComparison()
+    } else if (comparisonStore.hasItems) {
+      // Show a hint that more items need to be selected
+      inputMessage.value = 'Select at least 2 items to compare. You currently have ' + comparisonStore.itemCount + ' item(s) selected.'
+    } else {
+      // Open content browser to select items
+      openContentBrowser()
+      inputMessage.value = 'Select documents, articles, or other content to compare. Use the "Add to Compare" button on items across the portal.'
+    }
     return
   }
 
@@ -1119,6 +1132,10 @@ function saveSettings() {
         </div>
       </div>
     </Teleport>
+
+    <!-- Comparison Components -->
+    <ComparisonPanel />
+    <ComparisonModal />
   </div>
 </template>
 

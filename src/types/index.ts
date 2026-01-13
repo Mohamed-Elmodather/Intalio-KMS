@@ -411,3 +411,62 @@ export interface ApiError {
   message: string
   errors?: Record<string, string[]>
 }
+
+// Comparison Types
+export type ComparisonItemType = 'document' | 'article' | 'media' | 'event'
+
+export interface ComparisonItem {
+  id: string
+  type: ComparisonItemType
+  title: string
+  thumbnail?: string
+  description?: string
+  metadata: {
+    author?: string
+    date?: string
+    size?: number
+    duration?: number
+    category?: string
+    tags?: string[]
+    [key: string]: any
+  }
+}
+
+export interface ComparisonEntity {
+  name: string
+  type: 'person' | 'organization' | 'location' | 'date' | 'topic'
+  occurrences: number
+  items: string[] // IDs of items containing this entity
+}
+
+export interface SentimentData {
+  itemId: string
+  itemTitle: string
+  score: number // -1 to 1
+  label: 'positive' | 'neutral' | 'negative'
+  confidence: number
+}
+
+export interface ComparisonAnalysis {
+  id: string
+  similarity: number
+  summary: string
+  commonEntities: ComparisonEntity[]
+  sentimentComparison: SentimentData[]
+  commonTopics: {
+    topic: string
+    relevance: number
+    items: string[]
+  }[]
+  differences: string[]
+  keyPoints: {
+    itemId: string
+    points: string[]
+  }[]
+  classifications: {
+    itemId: string
+    category: string
+    confidence: number
+  }[]
+  createdAt: string
+}

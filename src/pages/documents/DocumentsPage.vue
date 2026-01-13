@@ -4,11 +4,16 @@ import { useRouter } from 'vue-router'
 import ContentActionsDropdown from '@/components/common/ContentActionsDropdown.vue'
 import AddToCollectionModal from '@/components/common/AddToCollectionModal.vue'
 import { useAIServicesStore } from '@/stores/aiServices'
+import { useComparisonStore } from '@/stores/comparison'
 import { AISuggestionChip, AILoadingIndicator, AIConfidenceBar } from '@/components/ai'
+import ComparisonPanel from '@/components/ai/ComparisonPanel.vue'
+import ComparisonModal from '@/components/ai/ComparisonModal.vue'
+import type { ComparisonItem } from '@/types'
 import type { ClassificationResult } from '@/types/ai'
 
 const router = useRouter()
 const aiStore = useAIServicesStore()
+const comparisonStore = useComparisonStore()
 
 // View state
 const isLoading = ref(false)
@@ -876,6 +881,38 @@ function bulkRestore() {
     }
   })
   clearDocumentSelection()
+}
+
+// Comparison Functions
+function addToComparison(doc: typeof documents.value[0]) {
+  const comparisonItem: ComparisonItem = {
+    id: doc.id,
+    type: 'document',
+    title: doc.name,
+    thumbnail: doc.thumbnail || undefined,
+    description: `${doc.type.toUpperCase()} document - ${formatFileSize(doc.size)}`,
+    metadata: {
+      author: doc.author?.name || 'Unknown',
+      date: doc.updatedAt,
+      size: doc.size,
+      category: doc.libraryId,
+      tags: doc.tags,
+      fileType: doc.type,
+    },
+  }
+  comparisonStore.addItem(comparisonItem)
+}
+
+function isInComparison(docId: string): boolean {
+  return comparisonStore.isItemSelected(docId)
+}
+
+function toggleComparison(doc: typeof documents.value[0]) {
+  if (isInComparison(doc.id)) {
+    comparisonStore.removeItem(doc.id)
+  } else {
+    addToComparison(doc)
+  }
 }
 
 function bulkPermanentDelete() {
@@ -2459,6 +2496,19 @@ function getCategoryColor(category: string): string {
                     >
                       <i class="fas fa-share-alt text-xs"></i>
                     </button>
+                    <button
+                      v-if="currentView !== 'trash'"
+                      @click.stop="toggleComparison(doc)"
+                      :class="[
+                        'w-7 h-7 rounded-lg flex items-center justify-center transition-all shadow-sm backdrop-blur-sm',
+                        isInComparison(doc.id)
+                          ? 'bg-purple-500 text-white'
+                          : 'bg-white/95 text-gray-500 hover:bg-purple-500 hover:text-white'
+                      ]"
+                      :title="isInComparison(doc.id) ? 'Remove from Compare' : 'Add to Compare'"
+                    >
+                      <i class="fas fa-layer-group text-xs"></i>
+                    </button>
                     <ContentActionsDropdown
                       v-if="currentView !== 'trash'"
                       :show-download="true"
@@ -2828,6 +2878,18 @@ function getCategoryColor(category: string): string {
                         >
                           <i class="fas fa-share-alt text-sm"></i>
                         </button>
+                        <button
+                          @click.stop="toggleComparison(doc)"
+                          :class="[
+                            'w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-200 shadow-sm hover:shadow-md',
+                            isInComparison(doc.id)
+                              ? 'bg-purple-500 text-white'
+                              : 'bg-gray-100 text-gray-500 hover:bg-purple-100 hover:text-purple-600'
+                          ]"
+                          :title="isInComparison(doc.id) ? 'Remove from Compare' : 'Add to Compare'"
+                        >
+                          <i class="fas fa-layer-group text-sm"></i>
+                        </button>
                         <ContentActionsDropdown
                           :show-download="true"
                           @add-to-collection="openAddToCollection(doc)"
@@ -2973,6 +3035,10 @@ function getCategoryColor(category: string): string {
       @close="showAddToCollectionModal = false; selectedItemForCollection = null"
       @added="handleAddedToCollection"
     />
+
+    <!-- Comparison Components -->
+    <ComparisonPanel />
+    <ComparisonModal />
   </div>
 </template>
 

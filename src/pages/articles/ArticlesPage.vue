@@ -4,11 +4,16 @@ import { useRouter } from 'vue-router'
 import ContentActionsDropdown from '@/components/common/ContentActionsDropdown.vue'
 import AddToCollectionModal from '@/components/common/AddToCollectionModal.vue'
 import { useAIServicesStore } from '@/stores/aiServices'
+import { useComparisonStore } from '@/stores/comparison'
 import { AISuggestionChip, AISentimentBadge, AILoadingIndicator } from '@/components/ai'
+import ComparisonPanel from '@/components/ai/ComparisonPanel.vue'
+import ComparisonModal from '@/components/ai/ComparisonModal.vue'
 import type { ContentRecommendation, SentimentResult } from '@/types/ai'
+import type { ComparisonItem } from '@/types'
 
 const router = useRouter()
 const aiStore = useAIServicesStore()
+const comparisonStore = useComparisonStore()
 
 // ============================================
 // CORE STATE
@@ -906,6 +911,37 @@ function openAddToCollection(article: any) {
     thumbnail: article.coverImage || undefined
   }
   showAddToCollectionModal.value = true
+}
+
+// Comparison Functions
+function addToComparison(article: typeof articles.value[0]) {
+  const comparisonItem: ComparisonItem = {
+    id: String(article.id),
+    type: 'article',
+    title: article.title,
+    thumbnail: article.image,
+    description: article.excerpt,
+    metadata: {
+      author: article.author?.name || 'Unknown',
+      date: article.date,
+      category: article.category,
+      tags: article.tags,
+      readTime: article.readTime,
+    },
+  }
+  comparisonStore.addItem(comparisonItem)
+}
+
+function isInComparison(articleId: number): boolean {
+  return comparisonStore.isItemSelected(String(articleId))
+}
+
+function toggleComparison(article: typeof articles.value[0]) {
+  if (isInComparison(article.id)) {
+    comparisonStore.removeItem(String(article.id))
+  } else {
+    addToComparison(article)
+  }
 }
 
 function handleAddedToCollection(collectionIds: string[]) {
@@ -2458,6 +2494,18 @@ onUnmounted(() => {
                 >
                   <i class="fas fa-share-alt text-xs"></i>
                 </button>
+                <button
+                  @click.stop="toggleComparison(article)"
+                  :class="[
+                    'w-8 h-8 rounded-lg flex items-center justify-center transition-colors',
+                    isInComparison(article.id)
+                      ? 'bg-purple-500 text-white'
+                      : 'bg-gray-50 text-gray-400 hover:bg-purple-50 hover:text-purple-600'
+                  ]"
+                  :title="isInComparison(article.id) ? 'Remove from Compare' : 'Add to Compare'"
+                >
+                  <i class="fas fa-layer-group text-xs"></i>
+                </button>
                 <ContentActionsDropdown
                   :show-download="false"
                   @add-to-collection="openAddToCollection(article)"
@@ -2576,6 +2624,10 @@ onUnmounted(() => {
       @close="showAddToCollectionModal = false"
       @added="handleAddedToCollection"
     />
+
+    <!-- Comparison Components -->
+    <ComparisonPanel />
+    <ComparisonModal />
   </div>
 </template>
 

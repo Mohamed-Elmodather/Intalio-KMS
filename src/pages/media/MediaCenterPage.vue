@@ -4,11 +4,16 @@ import { useRouter } from 'vue-router'
 import ContentActionsDropdown from '@/components/common/ContentActionsDropdown.vue'
 import AddToCollectionModal from '@/components/common/AddToCollectionModal.vue'
 import { useAIServicesStore } from '@/stores/aiServices'
+import { useComparisonStore } from '@/stores/comparison'
 import { AILoadingIndicator, AIConfidenceBar, AISuggestionChip } from '@/components/ai'
+import ComparisonPanel from '@/components/ai/ComparisonPanel.vue'
+import ComparisonModal from '@/components/ai/ComparisonModal.vue'
 import type { AutoTagResult, OCRResult, ClassificationResult } from '@/types/ai'
+import type { ComparisonItem } from '@/types'
 
 const router = useRouter()
 const aiStore = useAIServicesStore()
+const comparisonStore = useComparisonStore()
 
 // State
 const showUploadModal = ref(false)
@@ -661,6 +666,39 @@ function handleAddedToCollection(collectionIds: string[]) {
   }
   showAddToCollectionModal.value = false
   selectedItemForCollection.value = null
+}
+
+// Comparison Functions
+function addToComparison(media: typeof mediaItems.value[0]) {
+  const comparisonItem: ComparisonItem = {
+    id: String(media.id),
+    type: 'media',
+    title: media.title,
+    thumbnail: media.thumbnail,
+    description: `${media.type} media - ${media.category}`,
+    metadata: {
+      author: 'Unknown',
+      date: media.date,
+      duration: media.duration ? parseInt(media.duration.toString()) : undefined,
+      category: media.category,
+      tags: media.tags,
+      views: media.views,
+      mediaType: media.type,
+    },
+  }
+  comparisonStore.addItem(comparisonItem)
+}
+
+function isInComparison(mediaId: number): boolean {
+  return comparisonStore.isItemSelected(String(mediaId))
+}
+
+function toggleComparison(media: typeof mediaItems.value[0]) {
+  if (isInComparison(media.id)) {
+    comparisonStore.removeItem(String(media.id))
+  } else {
+    addToComparison(media)
+  }
 }
 
 function handleDrop(e: DragEvent) {
@@ -3041,6 +3079,14 @@ onUnmounted(() => {
                       title="AI Insights">
                       <i class="fas fa-brain"></i>
                     </button>
+                    <!-- Compare Button -->
+                    <button
+                      class="card-action-btn"
+                      :class="{ 'bg-purple-500 text-white': isInComparison(media.id) }"
+                      @click.stop="toggleComparison(media)"
+                      :title="isInComparison(media.id) ? 'Remove from Compare' : 'Add to Compare'">
+                      <i class="fas fa-layer-group"></i>
+                    </button>
                   </div>
 
                   <!-- AI Analysis Badge -->
@@ -4007,6 +4053,10 @@ onUnmounted(() => {
         </div>
       </Transition>
     </Teleport>
+
+    <!-- Comparison Components -->
+    <ComparisonPanel />
+    <ComparisonModal />
   </div>
 </template>
 

@@ -2,13 +2,18 @@
 import { ref, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAIServicesStore } from '@/stores/aiServices'
+import { useComparisonStore } from '@/stores/comparison'
 import { AILoadingIndicator, AISuggestionChip, AIConfidenceBar } from '@/components/ai'
+import ComparisonPanel from '@/components/ai/ComparisonPanel.vue'
+import ComparisonModal from '@/components/ai/ComparisonModal.vue'
 import type { SummarizationResult, ClassificationResult } from '@/types/ai'
+import type { ComparisonItem } from '@/types'
 
 const router = useRouter()
 
 // Initialize AI store
 const aiStore = useAIServicesStore()
+const comparisonStore = useComparisonStore()
 
 // State
 const showCreateModal = ref(false)
@@ -781,6 +786,42 @@ function toggleReserve(eventId: number) {
     if (event.isGoing) {
       event.interested = false
     }
+  }
+}
+
+// ============================================================================
+// Comparison Functions
+// ============================================================================
+
+function addToComparison(event: typeof events.value[0]) {
+  const comparisonItem: ComparisonItem = {
+    id: String(event.id),
+    type: 'event',
+    title: event.title,
+    thumbnail: undefined,
+    description: event.description,
+    metadata: {
+      author: 'Event Organizer',
+      date: event.date,
+      category: event.category,
+      tags: [],
+      location: event.location,
+      virtual: event.virtual,
+      attendees: event.attendees?.length || 0,
+    },
+  }
+  comparisonStore.addItem(comparisonItem)
+}
+
+function isInComparison(eventId: number): boolean {
+  return comparisonStore.isItemSelected(String(eventId))
+}
+
+function toggleComparison(event: typeof events.value[0]) {
+  if (isInComparison(event.id)) {
+    comparisonStore.removeItem(String(event.id))
+  } else {
+    addToComparison(event)
   }
 }
 
@@ -1859,6 +1900,13 @@ function getCategoryColor(category: string) {
                     <i class="fas fa-share-alt"></i>
                   </button>
                   <button
+                    @click.stop="toggleComparison(event)"
+                    :class="['card-action-btn', isInComparison(event.id) ? 'bg-purple-500 text-white' : '']"
+                    :title="isInComparison(event.id) ? 'Remove from Compare' : 'Add to Compare'"
+                  >
+                    <i class="fas fa-layer-group"></i>
+                  </button>
+                  <button
                     @click.stop="toggleReserve(event.id)"
                     :class="['rsvp-btn-premium', event.isGoing ? 'going' : 'pending']"
                   >
@@ -2556,6 +2604,10 @@ function getCategoryColor(category: string) {
         </div>
       </div>
     </Teleport>
+
+    <!-- Comparison Components -->
+    <ComparisonPanel />
+    <ComparisonModal />
   </div>
 </template>
 
