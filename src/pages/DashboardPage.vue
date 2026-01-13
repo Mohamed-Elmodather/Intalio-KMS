@@ -7,6 +7,20 @@ import { AILoadingIndicator, AISuggestionChip, AIConfidenceBar } from '@/compone
 const router = useRouter()
 const aiStore = useAIServicesStore()
 
+// Current user data (would come from auth store in production)
+const currentUser = ref({
+  id: 0,
+  name: 'Ahmed',
+  fullName: 'Ahmed Imam',
+  role: 'Media Director',
+  avatar: '',
+  initials: 'AI'
+})
+
+// Dynamic counts (would come from API in production)
+const pendingTasksCount = ref(3)
+const newUpdatesCount = ref(5)
+
 // Time of day greeting
 const timeOfDay = computed(() => {
   const hour = new Date().getHours()
@@ -567,6 +581,14 @@ function isBookmarked(articleId: number): boolean {
   return bookmarkedArticles.value.has(articleId)
 }
 
+// Document modal state
+const showUploadModal = ref(false)
+
+function openUploadDocument() {
+  // Navigate to documents page with upload modal open
+  router.push({ path: '/documents', query: { action: 'upload' } })
+}
+
 // Document actions
 function previewDocument(doc: any, event: Event) {
   event.stopPropagation()
@@ -725,7 +747,7 @@ function commentOnActivity(activityId: number, event: Event) {
 
 // Team Activity actions
 function viewUserProfile(userId: number) {
-  router.push({ name: 'Profile', query: { user: userId.toString() } })
+  router.push({ name: 'Profile', query: { userId: userId.toString() } })
 }
 
 function viewActivityTarget(activity: any) {
@@ -733,7 +755,9 @@ function viewActivityTarget(activity: any) {
     article: '/articles',
     document: '/documents',
     course: '/learning',
-    event: '/events'
+    event: '/events',
+    poll: '/polls',
+    media: '/media'
   }
   const basePath = routes[activity.targetType] || '/'
   router.push(`${basePath}/${activity.targetId}`)
@@ -1302,12 +1326,12 @@ onUnmounted(() => {
         </div>
 
         <h1 class="text-3xl font-bold text-white mb-3 fade-in-up" style="animation-delay: 0.3s;">
-          Good {{ timeOfDay }}, Ahmed! <span class="text-2xl inline-block icon-float">👋</span>
+          Good {{ timeOfDay }}, {{ currentUser.name }}! <span class="text-2xl inline-block icon-float">👋</span>
         </h1>
         <p class="text-teal-100 max-w-lg fade-in-up text-base" style="animation-delay: 0.4s;">
           Welcome to the Knowledge Management System. You have
-          <span class="font-semibold text-white">3 pending tasks</span> and
-          <span class="font-semibold text-white">5 new updates</span> to review.
+          <span class="font-semibold text-white">{{ pendingTasksCount }} pending tasks</span> and
+          <span class="font-semibold text-white">{{ newUpdatesCount }} new updates</span> to review.
         </p>
 
         <!-- Quick Action Buttons -->
@@ -1666,7 +1690,7 @@ onUnmounted(() => {
           </div>
         </div>
         <!-- Upload Button -->
-        <button class="w-full mt-4 py-3 text-sm font-semibold text-teal-600 bg-teal-50 hover:bg-teal-100 border-2 border-dashed border-teal-200 hover:border-teal-300 rounded-xl transition-all flex items-center justify-center gap-2">
+        <button @click="openUploadDocument" class="w-full mt-4 py-3 text-sm font-semibold text-teal-600 bg-teal-50 hover:bg-teal-100 border-2 border-dashed border-teal-200 hover:border-teal-300 rounded-xl transition-all flex items-center justify-center gap-2">
           <i class="fas fa-cloud-upload-alt"></i>
           Upload New Document
         </button>
