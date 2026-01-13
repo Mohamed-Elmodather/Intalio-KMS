@@ -1675,7 +1675,7 @@ function formatVersionDate(date: Date): string {
       </div>
 
       <!-- Related Documents -->
-      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mt-6">
         <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
           <i class="fas fa-folder-open text-teal-500"></i>
           Related Documents
@@ -1696,7 +1696,7 @@ function formatVersionDate(date: Date): string {
       </div>
 
       <!-- Version History -->
-      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mt-6">
         <div class="flex items-center justify-between mb-4">
           <h2 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
             <i class="fas fa-history text-teal-500"></i>
@@ -1742,7 +1742,7 @@ function formatVersionDate(date: Date): string {
       </div>
 
       <!-- Rating Section -->
-      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mt-6">
         <div class="flex items-center justify-between">
           <div>
             <h2 class="text-lg font-semibold text-gray-900 mb-1">Rate this Document</h2>
@@ -1760,7 +1760,7 @@ function formatVersionDate(date: Date): string {
       </div>
 
       <!-- Comments Section -->
-      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mt-6">
         <CommentsSection
           content-type="document"
           :content-id="document.id.toString()"
