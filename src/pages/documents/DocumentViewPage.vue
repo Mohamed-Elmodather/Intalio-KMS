@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAIServicesStore } from '@/stores/aiServices'
 import {
@@ -370,6 +370,55 @@ function toggleFullscreen() {
 function closeFullscreen() {
   isFullscreen.value = false
 }
+
+// Keyboard navigation handler
+function handleKeydown(event: KeyboardEvent) {
+  // Only handle when fullscreen is active or document viewer is focused
+  if (isFullscreen.value) {
+    switch (event.key) {
+      case 'Escape':
+        closeFullscreen()
+        break
+      case 'ArrowLeft':
+        event.preventDefault()
+        prevPage()
+        break
+      case 'ArrowRight':
+        event.preventDefault()
+        nextPage()
+        break
+      case '+':
+      case '=':
+        event.preventDefault()
+        zoomIn()
+        break
+      case '-':
+        event.preventDefault()
+        zoomOut()
+        break
+    }
+  }
+}
+
+// Body scroll lock when fullscreen
+watch(isFullscreen, (value) => {
+  if (value) {
+    window.document.body.style.overflow = 'hidden'
+  } else {
+    window.document.body.style.overflow = ''
+  }
+})
+
+// Add keyboard event listener
+onMounted(() => {
+  window.addEventListener('keydown', handleKeydown)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('keydown', handleKeydown)
+  // Ensure scroll is restored on unmount
+  window.document.body.style.overflow = ''
+})
 
 function formatDate(dateString: string): string {
   return new Date(dateString).toLocaleDateString('en-US', {
@@ -2017,50 +2066,247 @@ function formatVersionDate(date: Date): string {
 
     <!-- Fullscreen Preview Modal -->
     <Teleport to="body">
-      <div v-if="isFullscreen && document" class="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-8">
-        <!-- Close Button -->
-        <button @click="closeFullscreen" class="absolute top-6 right-6 w-12 h-12 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-colors">
-          <i class="fas fa-times text-xl"></i>
-        </button>
-
-        <!-- Document Info -->
-        <div class="absolute top-6 left-6 text-white">
-          <h3 class="text-xl font-semibold">{{ document.name }}</h3>
-          <p class="text-white/70 text-sm">{{ document.type }} • {{ document.size }}</p>
-        </div>
-
-        <!-- Action Buttons -->
-        <div class="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-4">
-          <button @click="downloadDocument" class="px-6 py-3 bg-teal-500 hover:bg-teal-600 text-white rounded-xl font-medium flex items-center gap-2 transition-colors">
-            <i class="fas fa-download"></i>
-            Download
-          </button>
-          <button @click="printDocument" class="px-6 py-3 bg-white/10 hover:bg-white/20 text-white rounded-xl font-medium flex items-center gap-2 transition-colors">
-            <i class="fas fa-print"></i>
-            Print
-          </button>
-          <button @click="shareDocument" class="px-6 py-3 bg-white/10 hover:bg-white/20 text-white rounded-xl font-medium flex items-center gap-2 transition-colors">
-            <i class="fas fa-share-alt"></i>
-            Share
-          </button>
-        </div>
-
-        <!-- Preview Content -->
-        <div class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full aspect-[4/3] flex items-center justify-center">
-          <div class="text-center p-12">
-            <div :class="[document.iconBg, 'w-32 h-32 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-xl']">
-              <i :class="[document.icon, document.iconColor, 'text-6xl']"></i>
+      <Transition name="fullscreen-fade">
+        <div v-if="isFullscreen && document" class="fixed inset-0 z-50 bg-black/95 flex flex-col">
+          <!-- Fullscreen Header -->
+          <div class="flex items-center justify-between px-6 py-3 bg-gray-900/80 backdrop-blur-sm">
+            <!-- Document Info -->
+            <div class="flex items-center gap-4 text-white">
+              <div :class="[document.iconBg, 'w-10 h-10 rounded-lg flex items-center justify-center']">
+                <i :class="[document.icon, document.iconColor, 'text-lg']"></i>
+              </div>
+              <div>
+                <h3 class="font-semibold">{{ document.name }}</h3>
+                <p class="text-white/60 text-sm">{{ document.type }} • {{ document.size }} • v{{ document.version }}</p>
+              </div>
             </div>
-            <h4 class="text-2xl font-bold text-gray-900 mb-2">{{ document.name }}</h4>
-            <p class="text-gray-500 mb-6">{{ document.description }}</p>
-            <div class="flex items-center justify-center gap-6 text-sm text-gray-500">
-              <span><i class="fas fa-file-alt mr-2"></i>{{ document.pages || 'N/A' }} pages</span>
-              <span><i class="fas fa-hdd mr-2"></i>{{ document.size }}</span>
-              <span><i class="fas fa-code-branch mr-2"></i>v{{ document.version }}</span>
+
+            <!-- Center: Navigation & Zoom -->
+            <div class="flex items-center gap-6">
+              <!-- Page Navigation -->
+              <div class="flex items-center gap-2">
+                <button
+                  @click="prevPage"
+                  :disabled="!canGoPrev"
+                  class="w-9 h-9 rounded-lg flex items-center justify-center transition-colors"
+                  :class="canGoPrev ? 'bg-white/10 hover:bg-white/20 text-white' : 'bg-white/5 text-white/30 cursor-not-allowed'"
+                >
+                  <i class="fas fa-chevron-left"></i>
+                </button>
+                <div class="flex items-center gap-2 text-white text-sm">
+                  <input
+                    type="number"
+                    :value="currentPage"
+                    @change="goToPage(Number(($event.target as HTMLInputElement).value))"
+                    min="1"
+                    :max="totalPages"
+                    class="w-12 h-8 rounded bg-white/10 border-0 text-center text-white text-sm focus:ring-2 focus:ring-teal-500"
+                  >
+                  <span class="text-white/60">of {{ totalPages }}</span>
+                </div>
+                <button
+                  @click="nextPage"
+                  :disabled="!canGoNext"
+                  class="w-9 h-9 rounded-lg flex items-center justify-center transition-colors"
+                  :class="canGoNext ? 'bg-white/10 hover:bg-white/20 text-white' : 'bg-white/5 text-white/30 cursor-not-allowed'"
+                >
+                  <i class="fas fa-chevron-right"></i>
+                </button>
+              </div>
+
+              <!-- Divider -->
+              <div class="w-px h-8 bg-white/20"></div>
+
+              <!-- Zoom Controls -->
+              <div class="flex items-center gap-2">
+                <button
+                  @click="zoomOut"
+                  :disabled="zoomLevel <= 50"
+                  class="w-9 h-9 rounded-lg flex items-center justify-center transition-colors"
+                  :class="zoomLevel > 50 ? 'bg-white/10 hover:bg-white/20 text-white' : 'bg-white/5 text-white/30 cursor-not-allowed'"
+                >
+                  <i class="fas fa-minus"></i>
+                </button>
+                <select
+                  :value="zoomLevel"
+                  @change="setZoom(Number(($event.target as HTMLSelectElement).value))"
+                  class="h-8 px-3 rounded-lg bg-white/10 border-0 text-white text-sm focus:ring-2 focus:ring-teal-500 cursor-pointer"
+                >
+                  <option v-for="level in zoomLevels" :key="level" :value="level" class="bg-gray-900 text-white">{{ level }}%</option>
+                </select>
+                <button
+                  @click="zoomIn"
+                  :disabled="zoomLevel >= 200"
+                  class="w-9 h-9 rounded-lg flex items-center justify-center transition-colors"
+                  :class="zoomLevel < 200 ? 'bg-white/10 hover:bg-white/20 text-white' : 'bg-white/5 text-white/30 cursor-not-allowed'"
+                >
+                  <i class="fas fa-plus"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Right: Actions -->
+            <div class="flex items-center gap-2">
+              <button @click="downloadDocument" class="px-4 py-2 bg-teal-500 hover:bg-teal-600 text-white rounded-lg text-sm font-medium flex items-center gap-2 transition-colors">
+                <i class="fas fa-download"></i>
+                Download
+              </button>
+              <button @click="printDocument" class="w-9 h-9 bg-white/10 hover:bg-white/20 text-white rounded-lg flex items-center justify-center transition-colors" title="Print">
+                <i class="fas fa-print"></i>
+              </button>
+              <button @click="shareDocument" class="w-9 h-9 bg-white/10 hover:bg-white/20 text-white rounded-lg flex items-center justify-center transition-colors" title="Share">
+                <i class="fas fa-share-alt"></i>
+              </button>
+              <div class="w-px h-8 bg-white/20 mx-2"></div>
+              <button @click="closeFullscreen" class="w-9 h-9 bg-white/10 hover:bg-red-500/80 text-white rounded-lg flex items-center justify-center transition-colors" title="Close (ESC)">
+                <i class="fas fa-times"></i>
+              </button>
             </div>
           </div>
+
+          <!-- Fullscreen Preview Content -->
+          <div class="flex-1 overflow-auto flex items-center justify-center p-8">
+            <div
+              class="bg-white shadow-2xl transition-transform duration-200 origin-center"
+              :style="{ transform: `scale(${zoomScale})` }"
+            >
+              <!-- PDF Preview -->
+              <div v-if="document.type === 'PDF'" class="w-[595px] min-h-[842px] p-12 relative">
+                <div class="text-center mb-8 pb-4 border-b-2 border-gray-200">
+                  <div :class="[document.iconBg, 'w-16 h-16 rounded-xl flex items-center justify-center mx-auto mb-3']">
+                    <i :class="[document.icon, document.iconColor, 'text-2xl']"></i>
+                  </div>
+                  <h3 class="text-xl font-bold text-gray-900">{{ document.name }}</h3>
+                  <p class="text-sm text-gray-500 mt-1">{{ document.library }}</p>
+                </div>
+                <div class="space-y-4 text-gray-700 text-sm leading-relaxed">
+                  <div class="h-3 bg-gray-200 rounded w-full"></div>
+                  <div class="h-3 bg-gray-200 rounded w-11/12"></div>
+                  <div class="h-3 bg-gray-200 rounded w-full"></div>
+                  <div class="h-3 bg-gray-200 rounded w-4/5"></div>
+                  <div class="h-20 bg-gray-100 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center my-6">
+                    <span class="text-gray-400 text-xs">Image Placeholder</span>
+                  </div>
+                  <div class="h-3 bg-gray-200 rounded w-full"></div>
+                  <div class="h-3 bg-gray-200 rounded w-10/12"></div>
+                  <div class="h-3 bg-gray-200 rounded w-full"></div>
+                  <div class="h-3 bg-gray-200 rounded w-3/4"></div>
+                  <div class="h-3 bg-gray-200 rounded w-full"></div>
+                  <div class="h-3 bg-gray-200 rounded w-11/12"></div>
+                </div>
+                <div class="absolute bottom-8 left-0 right-0 text-center text-gray-400 text-xs">
+                  Page {{ currentPage }} of {{ totalPages }}
+                </div>
+              </div>
+
+              <!-- Word Preview -->
+              <div v-else-if="document.type === 'Word'" class="w-[595px] min-h-[842px] p-16 relative">
+                <h1 class="text-2xl font-bold text-gray-900 mb-6">{{ document.name.replace('.docx', '') }}</h1>
+                <div class="space-y-4">
+                  <p class="text-gray-600 text-sm leading-relaxed">
+                    <span class="h-3 bg-gray-200 rounded inline-block w-full mb-1"></span>
+                    <span class="h-3 bg-gray-200 rounded inline-block w-11/12 mb-1"></span>
+                    <span class="h-3 bg-gray-200 rounded inline-block w-full mb-1"></span>
+                    <span class="h-3 bg-gray-200 rounded inline-block w-4/5"></span>
+                  </p>
+                  <h2 class="text-lg font-semibold text-gray-800 mt-6">Section 1.{{ currentPage }}</h2>
+                  <ul class="space-y-2 ml-4">
+                    <li class="flex items-center gap-2">
+                      <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+                      <span class="h-3 bg-gray-200 rounded w-3/4"></span>
+                    </li>
+                    <li class="flex items-center gap-2">
+                      <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+                      <span class="h-3 bg-gray-200 rounded w-2/3"></span>
+                    </li>
+                    <li class="flex items-center gap-2">
+                      <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+                      <span class="h-3 bg-gray-200 rounded w-4/5"></span>
+                    </li>
+                  </ul>
+                  <div class="h-3 bg-gray-200 rounded w-full mt-4"></div>
+                  <div class="h-3 bg-gray-200 rounded w-10/12"></div>
+                  <div class="h-3 bg-gray-200 rounded w-full"></div>
+                </div>
+                <div class="absolute bottom-8 right-16 text-gray-400 text-xs">
+                  {{ currentPage }}
+                </div>
+              </div>
+
+              <!-- Excel Preview -->
+              <div v-else-if="document.type === 'Excel'" class="w-[800px] min-h-[600px] p-4">
+                <div class="border border-gray-300 rounded overflow-hidden">
+                  <div class="bg-emerald-600 text-white px-4 py-2 text-sm font-medium flex items-center gap-2">
+                    <i class="fas fa-file-excel"></i>
+                    {{ document.name }}
+                  </div>
+                  <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                      <thead>
+                        <tr class="bg-emerald-50">
+                          <th class="w-10 px-2 py-2 text-center text-gray-500 bg-gray-100 border-r border-b"></th>
+                          <th v-for="col in ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']" :key="col" class="px-4 py-2 text-center text-gray-600 font-semibold border-r border-b bg-emerald-50">{{ col }}</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr v-for="row in 15" :key="row" :class="row % 2 === 0 ? 'bg-gray-50' : 'bg-white'">
+                          <td class="px-2 py-2 text-center text-gray-500 bg-gray-100 border-r text-xs">{{ row }}</td>
+                          <td v-for="col in 8" :key="col" class="px-4 py-2 border-r border-b">
+                            <div class="h-3 bg-gray-200 rounded" :style="{ width: `${40 + Math.random() * 40}%` }"></div>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <div class="bg-gray-100 px-4 py-2 text-xs text-gray-500 flex items-center gap-4">
+                    <span class="px-2 py-1 bg-white rounded border">Sheet {{ currentPage }}</span>
+                    <span>Ready</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- PowerPoint Preview -->
+              <div v-else-if="document.type === 'PowerPoint'" class="w-[960px] aspect-video p-8 bg-gradient-to-br from-orange-500 to-orange-600">
+                <div class="h-full bg-white rounded-lg shadow-xl p-8 flex flex-col">
+                  <div class="flex-1">
+                    <h1 class="text-4xl font-bold text-gray-900 mb-2">{{ document.name.replace('.pptx', '') }}</h1>
+                    <p class="text-xl text-gray-500 mb-8">Slide {{ currentPage }}</p>
+                    <div class="grid grid-cols-2 gap-8">
+                      <div class="bg-gray-100 rounded-lg p-6 h-40 flex items-center justify-center">
+                        <span class="text-gray-400 text-lg">Content Block</span>
+                      </div>
+                      <div class="bg-gray-100 rounded-lg p-6 h-40 flex items-center justify-center">
+                        <span class="text-gray-400 text-lg">Image/Chart</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="flex items-center justify-between text-sm text-gray-400 pt-4 border-t">
+                    <span>{{ document.author.name }}</span>
+                    <span>{{ currentPage }} / {{ totalPages }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Default Preview -->
+              <div v-else class="w-[600px] min-h-[500px] p-12 flex flex-col items-center justify-center">
+                <div :class="[document.iconBg, 'w-32 h-32 rounded-2xl flex items-center justify-center mb-6 shadow-lg']">
+                  <i :class="[document.icon, document.iconColor, 'text-5xl']"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-gray-900 mb-2">{{ document.name }}</h3>
+                <p class="text-gray-500 mb-6">{{ document.type }} Document</p>
+                <p class="text-sm text-gray-400">{{ document.description }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Keyboard Shortcuts Hint -->
+          <div class="absolute bottom-4 right-4 text-white/40 text-xs flex items-center gap-4">
+            <span><kbd class="px-1.5 py-0.5 bg-white/10 rounded">←</kbd> <kbd class="px-1.5 py-0.5 bg-white/10 rounded">→</kbd> Navigate</span>
+            <span><kbd class="px-1.5 py-0.5 bg-white/10 rounded">+</kbd> <kbd class="px-1.5 py-0.5 bg-white/10 rounded">-</kbd> Zoom</span>
+            <span><kbd class="px-1.5 py-0.5 bg-white/10 rounded">ESC</kbd> Close</span>
+          </div>
         </div>
-      </div>
+      </Transition>
     </Teleport>
 
     <!-- Add to Collection Modal -->
@@ -2122,6 +2368,25 @@ function formatVersionDate(date: Date): string {
 .slide-fade-leave-to {
   transform: translateY(-10px);
   opacity: 0;
+}
+
+/* Fullscreen Modal Transition */
+.fullscreen-fade-enter-active {
+  transition: all 0.3s ease-out;
+}
+
+.fullscreen-fade-leave-active {
+  transition: all 0.2s ease-in;
+}
+
+.fullscreen-fade-enter-from,
+.fullscreen-fade-leave-to {
+  opacity: 0;
+}
+
+.fullscreen-fade-enter-from .bg-white,
+.fullscreen-fade-leave-to .bg-white {
+  transform: scale(0.95);
 }
 
 @keyframes fadeInUp {
