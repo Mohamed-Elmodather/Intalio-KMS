@@ -2038,11 +2038,11 @@ onUnmounted(() => {
 
       <!-- AI Recommendations Section -->
       <section v-if="showAIFeatures" class="ai-recommendations-section mb-10 animate-in delay-2">
-        <div class="bg-gradient-to-br from-purple-50 via-indigo-50 to-teal-50 rounded-2xl border border-purple-100 overflow-hidden">
+        <div class="bg-gradient-to-br from-teal-50 via-cyan-50 to-teal-50 rounded-2xl border border-teal-100 overflow-hidden">
           <!-- Section Header -->
-          <div class="px-6 py-4 flex items-center justify-between border-b border-purple-100/50">
+          <div class="px-6 py-4 flex items-center justify-between border-b border-teal-100/50">
             <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-indigo-500 flex items-center justify-center shadow-lg shadow-purple-200">
+              <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500 to-cyan-500 flex items-center justify-center shadow-lg shadow-teal-200">
                 <i class="fas fa-brain text-white text-sm"></i>
               </div>
               <div>
@@ -2055,7 +2055,7 @@ onUnmounted(() => {
                 v-for="type in [{ id: 'forYou', label: 'For You', icon: 'fas fa-user' }, { id: 'similar', label: 'Similar', icon: 'fas fa-clone' }, { id: 'trending', label: 'Trending', icon: 'fas fa-fire' }]"
                 :key="type.id"
                 @click="recommendationType = type.id as any; loadAIRecommendations()"
-                :class="['px-3 py-1.5 rounded-lg text-xs font-medium transition-colors flex items-center gap-1.5', recommendationType === type.id ? 'bg-purple-500 text-white' : 'bg-white/80 text-gray-600 hover:bg-white']"
+                :class="['px-3 py-1.5 rounded-lg text-xs font-medium transition-colors flex items-center gap-1.5', recommendationType === type.id ? 'bg-teal-500 text-white' : 'bg-white/80 text-gray-600 hover:bg-white']"
               >
                 <i :class="type.icon"></i>
                 {{ type.label }}
@@ -2067,7 +2067,7 @@ onUnmounted(() => {
           <div class="p-4">
             <!-- Loading State -->
             <div v-if="isLoadingRecommendations" class="flex items-center justify-center py-12">
-              <div class="w-10 h-10 border-3 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
+              <div class="w-10 h-10 border-3 border-teal-500 border-t-transparent rounded-full animate-spin"></div>
             </div>
 
             <!-- Recommendations Grid -->
@@ -2086,16 +2086,16 @@ onUnmounted(() => {
                   </div>
                   <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                     <div class="w-10 h-10 rounded-full bg-white/90 flex items-center justify-center">
-                      <i class="fas fa-play text-purple-500 ml-0.5"></i>
+                      <i class="fas fa-play text-teal-500 ml-0.5"></i>
                     </div>
                   </div>
                   <!-- AI Match Badge -->
-                  <div class="absolute top-2 left-2 px-1.5 py-0.5 bg-purple-500 text-white text-[9px] font-medium rounded flex items-center gap-1">
+                  <div class="absolute top-2 left-2 px-1.5 py-0.5 bg-teal-500 text-white text-[9px] font-medium rounded flex items-center gap-1">
                     <i class="fas fa-sparkles text-[8px]"></i>
                     {{ Math.floor(Math.random() * 15) + 85 }}% match
                   </div>
                 </div>
-                <h4 class="text-xs font-medium text-gray-800 line-clamp-2 group-hover:text-purple-600 transition-colors">{{ media.title }}</h4>
+                <h4 class="text-xs font-medium text-gray-800 line-clamp-2 group-hover:text-teal-600 transition-colors">{{ media.title }}</h4>
                 <p class="text-[10px] text-gray-400 mt-0.5">{{ media.views }} views</p>
               </div>
             </div>
@@ -2104,7 +2104,7 @@ onUnmounted(() => {
             <div v-else class="text-center py-12 text-gray-400">
               <i class="fas fa-brain text-4xl mb-3 opacity-30"></i>
               <p class="text-sm">Select a recommendation type to get personalized suggestions</p>
-              <button @click="loadAIRecommendations" class="mt-3 px-4 py-2 bg-purple-500 text-white text-sm rounded-lg hover:bg-purple-600 transition-colors">
+              <button @click="loadAIRecommendations" class="mt-3 px-4 py-2 bg-teal-500 text-white text-sm rounded-lg hover:bg-teal-600 transition-colors">
                 Get Recommendations
               </button>
             </div>
