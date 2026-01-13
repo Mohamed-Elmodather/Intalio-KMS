@@ -1040,6 +1040,512 @@ const mockAIAnalysis: Record<number, AIMediaAnalysis> = {
   }
 }
 
+// ============================================================================
+// Enhanced AI Features - Sidebar Panel, Recommendations, Insights
+// ============================================================================
+
+// AI Sidebar Panel State
+const showAISidebar = ref(false)
+const aiSidebarTab = ref<'summary' | 'transcript' | 'entities' | 'translate'>('summary')
+const selectedMediaForSidebar = ref<any>(null)
+
+// AI Summary State
+const aiSummaryType = ref<'brief' | 'detailed' | 'bullets'>('brief')
+const aiSummary = ref<{ text: string; keyPoints: string[]; confidence: number } | null>(null)
+const isGeneratingSummary = ref(false)
+
+// AI Transcript State
+const aiTranscript = ref<{ text: string; timestamps: { time: string; text: string }[]; language: string; confidence: number } | null>(null)
+const isGeneratingTranscript = ref(false)
+
+// AI Entities State
+const aiEntities = ref<{ type: string; name: string; count: number }[]>([])
+const isExtractingEntities = ref(false)
+const entityFilterType = ref<string | null>(null)
+
+// AI Translation State
+const aiTranslation = ref<{ language: string; text: string } | null>(null)
+const isTranslating = ref(false)
+const targetLanguage = ref('ar')
+const availableLanguages = [
+  { code: 'ar', name: 'Arabic', flag: '🇸🇦' },
+  { code: 'ja', name: 'Japanese', flag: '🇯🇵' },
+  { code: 'ko', name: 'Korean', flag: '🇰🇷' },
+  { code: 'zh', name: 'Chinese', flag: '🇨🇳' },
+  { code: 'fr', name: 'French', flag: '🇫🇷' },
+  { code: 'es', name: 'Spanish', flag: '🇪🇸' }
+]
+
+// AI Recommendations State
+const aiRecommendations = ref<any[]>([])
+const isLoadingRecommendations = ref(false)
+const recommendationType = ref<'forYou' | 'similar' | 'trending'>('forYou')
+
+// AI Video Insights State
+interface KeyMoment {
+  timestamp: string
+  title: string
+  description: string
+  type: 'goal' | 'highlight' | 'interview' | 'ceremony' | 'general'
+}
+interface Speaker {
+  name: string
+  role: string
+  speakingTime: string
+  segments: number
+}
+interface SentimentData {
+  overall: 'positive' | 'neutral' | 'negative'
+  score: number
+  breakdown: { label: string; value: number }[]
+}
+
+const aiKeyMoments = ref<KeyMoment[]>([])
+const aiSpeakers = ref<Speaker[]>([])
+const aiSentiment = ref<SentimentData | null>(null)
+const isAnalyzingInsights = ref(false)
+
+// AI Accessibility State
+const aiCaptions = ref<{ time: string; text: string }[]>([])
+const aiAudioDescription = ref<string>('')
+const isGeneratingCaptions = ref(false)
+const isGeneratingAudioDesc = ref(false)
+
+// AI Natural Language Search
+const naturalLanguageQuery = ref('')
+const aiSearchResults = ref<any[]>([])
+const isProcessingNLSearch = ref(false)
+const nlSearchSuggestions = [
+  'Show me highlights from Japan matches',
+  'Find interviews with Saudi players',
+  'Stadium tours with behind the scenes',
+  'Most viewed videos this week',
+  'Content about fan celebrations'
+]
+
+// Mock AI Data for Summaries
+const mockSummaries: Record<number, Record<string, { text: string; keyPoints: string[]; confidence: number }>> = {
+  5: {
+    brief: { text: 'Preview of the Saudi Arabia vs Japan opening match featuring tactical analysis and key player insights.', keyPoints: ['Opening match analysis', 'Key players highlighted'], confidence: 0.92 },
+    detailed: { text: 'This comprehensive preview explores the highly anticipated opening match between Saudi Arabia and Japan. The analysis covers both teams\' recent form, tactical approaches, and key players to watch. Saudi Arabia enters as hosts with home advantage, while Japan brings their technical excellence and tournament experience.', keyPoints: ['Saudi Arabia home advantage', 'Japan technical strength', 'Tactical formations analysis', 'Key matchups identified'], confidence: 0.94 },
+    bullets: { text: '• Opening match: Saudi Arabia vs Japan\n• Saudi Arabia: Home advantage, passionate crowd support\n• Japan: Technical excellence, tournament experience\n• Key players: Al-Dawsari (SAU), Mitoma (JPN)\n• Expected tactical battle between possession styles', keyPoints: [], confidence: 0.91 }
+  },
+  6: {
+    brief: { text: 'Exclusive tour of King Fahd International Stadium showcasing world-class facilities prepared for AFC Asian Cup 2027.', keyPoints: ['Stadium facilities', 'Tournament preparations'], confidence: 0.95 },
+    detailed: { text: 'Take an exclusive behind-the-scenes tour of King Fahd International Stadium, one of the premier venues for AFC Asian Cup 2027. This video showcases the stadium\'s state-of-the-art facilities including the hybrid grass pitch, modern VIP lounges, press facilities, and fan zones. The venue has undergone significant upgrades to meet FIFA standards.', keyPoints: ['Hybrid grass pitch technology', 'VIP and hospitality areas', 'Media facilities tour', 'Fan zone preparations', 'Accessibility features'], confidence: 0.96 },
+    bullets: { text: '• King Fahd International Stadium tour\n• Capacity: 68,000 spectators\n• Hybrid grass pitch technology\n• Modern VIP and hospitality suites\n• State-of-the-art media center\n• Enhanced accessibility features', keyPoints: [], confidence: 0.93 }
+  }
+}
+
+// Mock AI Data for Transcripts
+const mockTranscripts: Record<number, { text: string; timestamps: { time: string; text: string }[]; language: string; confidence: number }> = {
+  5: {
+    text: 'Welcome to our preview of the opening match between Saudi Arabia and Japan. This highly anticipated clash will set the tone for the entire tournament...',
+    timestamps: [
+      { time: '00:00', text: 'Welcome to our preview of the opening match' },
+      { time: '00:15', text: 'Saudi Arabia enters as hosts with tremendous support' },
+      { time: '00:45', text: 'Japan brings technical excellence and experience' },
+      { time: '01:30', text: 'Key player analysis: Salem Al-Dawsari' },
+      { time: '02:15', text: 'Japanese tactics under manager discussion' },
+      { time: '03:00', text: 'Predicted lineups and formations' },
+      { time: '04:30', text: 'Historical head-to-head record' },
+      { time: '05:45', text: 'Match prediction and final thoughts' }
+    ],
+    language: 'English',
+    confidence: 0.94
+  },
+  6: {
+    text: 'Join us for an exclusive behind-the-scenes tour of King Fahd International Stadium, the crown jewel of AFC Asian Cup 2027 venues...',
+    timestamps: [
+      { time: '00:00', text: 'Introduction to King Fahd Stadium' },
+      { time: '00:30', text: 'Arriving at the main entrance' },
+      { time: '01:15', text: 'Tour of the pitch and playing surface' },
+      { time: '02:30', text: 'VIP lounges and hospitality areas' },
+      { time: '04:00', text: 'Press facilities and media center' },
+      { time: '05:30', text: 'Fan zones and concourse areas' },
+      { time: '07:00', text: 'Behind the scenes: Operations center' },
+      { time: '08:30', text: 'Final preparations for tournament' }
+    ],
+    language: 'English',
+    confidence: 0.96
+  }
+}
+
+// Mock AI Data for Entities
+const mockEntities: Record<number, { type: string; name: string; count: number }[]> = {
+  5: [
+    { type: 'Team', name: 'Saudi Arabia', count: 12 },
+    { type: 'Team', name: 'Japan', count: 10 },
+    { type: 'Person', name: 'Salem Al-Dawsari', count: 5 },
+    { type: 'Person', name: 'Kaoru Mitoma', count: 4 },
+    { type: 'Location', name: 'King Fahd Stadium', count: 3 },
+    { type: 'Event', name: 'AFC Asian Cup 2027', count: 8 },
+    { type: 'Organization', name: 'AFC', count: 4 }
+  ],
+  6: [
+    { type: 'Location', name: 'King Fahd International Stadium', count: 15 },
+    { type: 'Location', name: 'Riyadh', count: 6 },
+    { type: 'Organization', name: 'AFC', count: 4 },
+    { type: 'Event', name: 'AFC Asian Cup 2027', count: 7 },
+    { type: 'Facility', name: 'VIP Lounge', count: 3 },
+    { type: 'Facility', name: 'Media Center', count: 4 }
+  ]
+}
+
+// Mock AI Data for Key Moments
+const mockKeyMoments: Record<number, KeyMoment[]> = {
+  5: [
+    { timestamp: '00:45', title: 'Team Analysis Begins', description: 'In-depth look at both teams\' strengths', type: 'general' },
+    { timestamp: '02:15', title: 'Star Player Spotlight', description: 'Focus on Al-Dawsari\'s form', type: 'highlight' },
+    { timestamp: '04:30', title: 'Tactical Breakdown', description: 'Formation analysis and strategies', type: 'general' },
+    { timestamp: '06:00', title: 'Historical Rivalry', description: 'Past encounters between the teams', type: 'highlight' }
+  ],
+  8: [
+    { timestamp: '00:30', title: 'Goal #10', description: 'Spectacular long-range strike', type: 'goal' },
+    { timestamp: '01:45', title: 'Goal #9', description: 'Clinical header from corner', type: 'goal' },
+    { timestamp: '03:00', title: 'Goal #8', description: 'Team play finishing move', type: 'goal' },
+    { timestamp: '04:15', title: 'Goal #7', description: 'Solo dribble and finish', type: 'goal' },
+    { timestamp: '05:30', title: 'Goal #6', description: 'Free kick masterclass', type: 'goal' }
+  ]
+}
+
+// Mock AI Data for Speakers
+const mockSpeakers: Record<number, Speaker[]> = {
+  7: [
+    { name: 'Roberto Mancini', role: 'Saudi Arabia Manager', speakingTime: '8:30', segments: 12 },
+    { name: 'Interviewer', role: 'Sports Journalist', speakingTime: '4:15', segments: 15 },
+    { name: 'Translator', role: 'Arabic-English', speakingTime: '2:30', segments: 8 }
+  ],
+  10: [
+    { name: 'Salem Al-Dawsari', role: 'Saudi Arabia Captain', speakingTime: '10:45', segments: 18 },
+    { name: 'Sports Desk Host', role: 'Interviewer', speakingTime: '5:30', segments: 20 }
+  ]
+}
+
+// Mock AI Data for Sentiment
+const mockSentiment: Record<number, SentimentData> = {
+  5: { overall: 'positive', score: 0.78, breakdown: [{ label: 'Excitement', value: 85 }, { label: 'Anticipation', value: 90 }, { label: 'Confidence', value: 72 }] },
+  7: { overall: 'positive', score: 0.82, breakdown: [{ label: 'Optimism', value: 88 }, { label: 'Determination', value: 85 }, { label: 'Respect', value: 79 }] },
+  14: { overall: 'positive', score: 0.95, breakdown: [{ label: 'Joy', value: 98 }, { label: 'Excitement', value: 95 }, { label: 'Pride', value: 92 }] }
+}
+
+// AI Functions
+async function openAISidebar(media: any) {
+  selectedMediaForSidebar.value = media
+  showAISidebar.value = true
+  aiSidebarTab.value = 'summary'
+  // Reset states
+  aiSummary.value = null
+  aiTranscript.value = null
+  aiEntities.value = []
+  aiTranslation.value = null
+  aiKeyMoments.value = []
+  aiSpeakers.value = []
+  aiSentiment.value = null
+}
+
+function closeAISidebar() {
+  showAISidebar.value = false
+  selectedMediaForSidebar.value = null
+}
+
+async function generateAISummary() {
+  if (!selectedMediaForSidebar.value || isGeneratingSummary.value) return
+
+  isGeneratingSummary.value = true
+  aiSummary.value = null
+
+  try {
+    await new Promise(resolve => setTimeout(resolve, 1200))
+    const mediaId = selectedMediaForSidebar.value.id
+    aiSummary.value = mockSummaries[mediaId]?.[aiSummaryType.value] || {
+      text: `AI-generated ${aiSummaryType.value} summary of "${selectedMediaForSidebar.value.title}": This ${selectedMediaForSidebar.value.type} content provides valuable insights about ${selectedMediaForSidebar.value.category}.`,
+      keyPoints: ['Key insight from content', 'Important highlight', 'Notable information'],
+      confidence: 0.85
+    }
+  } finally {
+    isGeneratingSummary.value = false
+  }
+}
+
+async function generateAITranscript() {
+  if (!selectedMediaForSidebar.value || isGeneratingTranscript.value) return
+  if (!['video', 'audio'].includes(selectedMediaForSidebar.value.type)) return
+
+  isGeneratingTranscript.value = true
+  aiTranscript.value = null
+
+  try {
+    await new Promise(resolve => setTimeout(resolve, 1800))
+    const mediaId = selectedMediaForSidebar.value.id
+    aiTranscript.value = mockTranscripts[mediaId] || {
+      text: `[AI-generated transcript for "${selectedMediaForSidebar.value.title}"]\n\nThis is an automatically generated transcript of the ${selectedMediaForSidebar.value.type} content. The speech-to-text AI has processed the audio track to provide this textual representation.`,
+      timestamps: [
+        { time: '00:00', text: 'Introduction and welcome' },
+        { time: '01:00', text: 'Main content begins' },
+        { time: '03:00', text: 'Key points discussed' },
+        { time: '05:00', text: 'Conclusion and summary' }
+      ],
+      language: 'English',
+      confidence: 0.88
+    }
+  } finally {
+    isGeneratingTranscript.value = false
+  }
+}
+
+async function extractAIEntities() {
+  if (!selectedMediaForSidebar.value || isExtractingEntities.value) return
+
+  isExtractingEntities.value = true
+  aiEntities.value = []
+
+  try {
+    await new Promise(resolve => setTimeout(resolve, 1000))
+    const mediaId = selectedMediaForSidebar.value.id
+    aiEntities.value = mockEntities[mediaId] || [
+      { type: 'Event', name: 'AFC Asian Cup 2027', count: 5 },
+      { type: 'Organization', name: 'AFC', count: 3 },
+      { type: 'Location', name: selectedMediaForSidebar.value.category, count: 2 }
+    ]
+  } finally {
+    isExtractingEntities.value = false
+  }
+}
+
+async function translateContent() {
+  if (!selectedMediaForSidebar.value || isTranslating.value) return
+
+  isTranslating.value = true
+  aiTranslation.value = null
+
+  try {
+    await new Promise(resolve => setTimeout(resolve, 1500))
+    const langName = availableLanguages.find(l => l.code === targetLanguage.value)?.name || 'Arabic'
+    const content = aiTranscript.value?.text || selectedMediaForSidebar.value.title
+
+    // Mock translations
+    const translations: Record<string, string> = {
+      ar: `[ترجمة عربية]\n${content}`,
+      ja: `[日本語翻訳]\n${content}`,
+      ko: `[한국어 번역]\n${content}`,
+      zh: `[中文翻译]\n${content}`,
+      fr: `[Traduction française]\n${content}`,
+      es: `[Traducción al español]\n${content}`
+    }
+
+    aiTranslation.value = {
+      language: langName,
+      text: translations[targetLanguage.value] || `[Translated to ${langName}]\n${content}`
+    }
+  } finally {
+    isTranslating.value = false
+  }
+}
+
+async function loadAIRecommendations() {
+  isLoadingRecommendations.value = true
+
+  try {
+    await new Promise(resolve => setTimeout(resolve, 800))
+
+    // Generate recommendations based on type
+    const allMedia = mediaItems.value
+
+    if (recommendationType.value === 'forYou') {
+      // Based on watch history categories
+      const watchedCategories = watchHistory.value.map(w => w.category)
+      aiRecommendations.value = allMedia
+        .filter(m => watchedCategories.includes(m.category) || m.isNew)
+        .slice(0, 6)
+    } else if (recommendationType.value === 'similar') {
+      // Based on selected media
+      const selected = selectedMediaForSidebar.value
+      if (selected) {
+        aiRecommendations.value = allMedia
+          .filter(m => m.id !== selected.id && (m.category === selected.category || m.tags?.some((t: string) => selected.tags?.includes(t))))
+          .slice(0, 6)
+      }
+    } else {
+      // Trending - sorted by views
+      aiRecommendations.value = [...allMedia]
+        .sort((a, b) => {
+          const viewsA = parseFloat(a.views.replace('K', '')) * (a.views.includes('K') ? 1000 : 1)
+          const viewsB = parseFloat(b.views.replace('K', '')) * (b.views.includes('K') ? 1000 : 1)
+          return viewsB - viewsA
+        })
+        .slice(0, 6)
+    }
+  } finally {
+    isLoadingRecommendations.value = false
+  }
+}
+
+async function analyzeVideoInsights() {
+  if (!selectedMediaForSidebar.value || isAnalyzingInsights.value) return
+
+  isAnalyzingInsights.value = true
+
+  try {
+    await new Promise(resolve => setTimeout(resolve, 1500))
+    const mediaId = selectedMediaForSidebar.value.id
+
+    aiKeyMoments.value = mockKeyMoments[mediaId] || [
+      { timestamp: '00:00', title: 'Introduction', description: 'Content begins', type: 'general' },
+      { timestamp: '02:00', title: 'Main Segment', description: 'Core content', type: 'highlight' }
+    ]
+
+    aiSpeakers.value = mockSpeakers[mediaId] || []
+    aiSentiment.value = mockSentiment[mediaId] || { overall: 'neutral', score: 0.5, breakdown: [{ label: 'Neutral', value: 50 }] }
+  } finally {
+    isAnalyzingInsights.value = false
+  }
+}
+
+async function generateAICaptions() {
+  if (!selectedMediaForSidebar.value || isGeneratingCaptions.value) return
+
+  isGeneratingCaptions.value = true
+
+  try {
+    await new Promise(resolve => setTimeout(resolve, 2000))
+
+    // Use transcript timestamps as captions if available
+    if (aiTranscript.value?.timestamps) {
+      aiCaptions.value = aiTranscript.value.timestamps
+    } else {
+      aiCaptions.value = [
+        { time: '00:00', text: '[Opening scene]' },
+        { time: '00:05', text: 'Welcome to AFC Asian Cup 2027 coverage' },
+        { time: '00:15', text: '[Background music playing]' },
+        { time: '00:30', text: 'Today we bring you exclusive content' }
+      ]
+    }
+  } finally {
+    isGeneratingCaptions.value = false
+  }
+}
+
+async function generateAudioDescription() {
+  if (!selectedMediaForSidebar.value || isGeneratingAudioDesc.value) return
+
+  isGeneratingAudioDesc.value = true
+
+  try {
+    await new Promise(resolve => setTimeout(resolve, 1500))
+
+    const media = selectedMediaForSidebar.value
+    aiAudioDescription.value = `[Audio Description for "${media.title}"]\n\n` +
+      `This ${media.type} content from the ${media.category} category shows ` +
+      `scenes related to AFC Asian Cup 2027. ` +
+      (media.type === 'gallery' ? `The gallery contains ${media.photoCount} photos. ` : '') +
+      `Visual elements include sports imagery, tournament branding, and ` +
+      `${media.category.toLowerCase()} related content. ` +
+      `Created by ${media.author}.`
+  } finally {
+    isGeneratingAudioDesc.value = false
+  }
+}
+
+async function processNaturalLanguageSearch() {
+  if (!naturalLanguageQuery.value || isProcessingNLSearch.value) return
+
+  isProcessingNLSearch.value = true
+
+  try {
+    await new Promise(resolve => setTimeout(resolve, 1000))
+
+    const query = naturalLanguageQuery.value.toLowerCase()
+    const allMedia = mediaItems.value
+
+    // Simple NL processing
+    let results = allMedia
+
+    if (query.includes('highlight') || query.includes('goals')) {
+      results = results.filter(m => m.category === 'Highlights' || m.tags?.some((t: string) => t.toLowerCase().includes('goal')))
+    }
+    if (query.includes('interview')) {
+      results = results.filter(m => m.category === 'Interviews' || m.type === 'audio')
+    }
+    if (query.includes('stadium') || query.includes('tour') || query.includes('venue')) {
+      results = results.filter(m => m.category === 'Venues' || m.tags?.some((t: string) => t.toLowerCase().includes('stadium')))
+    }
+    if (query.includes('japan')) {
+      results = results.filter(m => m.tags?.some((t: string) => t.toLowerCase().includes('japan')))
+    }
+    if (query.includes('saudi')) {
+      results = results.filter(m => m.tags?.some((t: string) => t.toLowerCase().includes('saudi')))
+    }
+    if (query.includes('most viewed') || query.includes('popular')) {
+      results = [...results].sort((a, b) => {
+        const viewsA = parseFloat(a.views.replace('K', '')) * (a.views.includes('K') ? 1000 : 1)
+        const viewsB = parseFloat(b.views.replace('K', '')) * (b.views.includes('K') ? 1000 : 1)
+        return viewsB - viewsA
+      })
+    }
+    if (query.includes('fan') || query.includes('celebration')) {
+      results = results.filter(m => m.category === 'Fans')
+    }
+
+    aiSearchResults.value = results.slice(0, 12)
+  } finally {
+    isProcessingNLSearch.value = false
+  }
+}
+
+function getEntityTypeColor(type: string): string {
+  const colors: Record<string, string> = {
+    'Team': 'bg-blue-100 text-blue-700',
+    'Person': 'bg-purple-100 text-purple-700',
+    'Location': 'bg-green-100 text-green-700',
+    'Event': 'bg-amber-100 text-amber-700',
+    'Organization': 'bg-teal-100 text-teal-700',
+    'Facility': 'bg-rose-100 text-rose-700'
+  }
+  return colors[type] || 'bg-gray-100 text-gray-700'
+}
+
+function getMomentTypeIcon(type: string): string {
+  const icons: Record<string, string> = {
+    'goal': 'fas fa-futbol',
+    'highlight': 'fas fa-star',
+    'interview': 'fas fa-microphone',
+    'ceremony': 'fas fa-award',
+    'general': 'fas fa-bookmark'
+  }
+  return icons[type] || 'fas fa-bookmark'
+}
+
+function getSentimentColor(sentiment: string): string {
+  const colors: Record<string, string> = {
+    'positive': 'text-green-600',
+    'neutral': 'text-gray-600',
+    'negative': 'text-red-600'
+  }
+  return colors[sentiment] || 'text-gray-600'
+}
+
+function copyTranscript() {
+  if (aiTranscript.value) {
+    navigator.clipboard.writeText(aiTranscript.value.text)
+    alert('Transcript copied to clipboard!')
+  }
+}
+
+function copySummaryText() {
+  if (aiSummary.value) {
+    navigator.clipboard.writeText(aiSummary.value.text)
+    alert('Summary copied to clipboard!')
+  }
+}
+
+function copyTranslation() {
+  if (aiTranslation.value) {
+    navigator.clipboard.writeText(aiTranslation.value.text)
+    alert('Translation copied to clipboard!')
+  }
+}
+
 // AI Smart Search Suggestions
 const aiSearchSuggestions = ref<string[]>([])
 const isLoadingAISuggestions = ref(false)
@@ -1530,6 +2036,82 @@ onUnmounted(() => {
         </div>
       </section>
 
+      <!-- AI Recommendations Section -->
+      <section v-if="showAIFeatures" class="ai-recommendations-section mb-10 animate-in delay-2">
+        <div class="bg-gradient-to-br from-purple-50 via-indigo-50 to-teal-50 rounded-2xl border border-purple-100 overflow-hidden">
+          <!-- Section Header -->
+          <div class="px-6 py-4 flex items-center justify-between border-b border-purple-100/50">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-indigo-500 flex items-center justify-center shadow-lg shadow-purple-200">
+                <i class="fas fa-brain text-white text-sm"></i>
+              </div>
+              <div>
+                <h2 class="text-lg font-bold text-gray-800">AI Recommendations</h2>
+                <p class="text-xs text-gray-500">Personalized content suggestions powered by AI</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <button
+                v-for="type in [{ id: 'forYou', label: 'For You', icon: 'fas fa-user' }, { id: 'similar', label: 'Similar', icon: 'fas fa-clone' }, { id: 'trending', label: 'Trending', icon: 'fas fa-fire' }]"
+                :key="type.id"
+                @click="recommendationType = type.id as any; loadAIRecommendations()"
+                :class="['px-3 py-1.5 rounded-lg text-xs font-medium transition-colors flex items-center gap-1.5', recommendationType === type.id ? 'bg-purple-500 text-white' : 'bg-white/80 text-gray-600 hover:bg-white']"
+              >
+                <i :class="type.icon"></i>
+                {{ type.label }}
+              </button>
+            </div>
+          </div>
+
+          <!-- Recommendations Content -->
+          <div class="p-4">
+            <!-- Loading State -->
+            <div v-if="isLoadingRecommendations" class="flex items-center justify-center py-12">
+              <div class="w-10 h-10 border-3 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
+            </div>
+
+            <!-- Recommendations Grid -->
+            <div v-else-if="aiRecommendations.length > 0" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+              <div
+                v-for="media in aiRecommendations"
+                :key="'rec-' + media.id"
+                @click="goToMedia(media)"
+                class="group cursor-pointer"
+              >
+                <div class="relative aspect-video rounded-xl overflow-hidden bg-gray-100 mb-2">
+                  <img :src="media.thumbnail" :alt="media.title" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                  <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                  <div class="absolute bottom-2 right-2 px-1.5 py-0.5 bg-black/70 text-white text-[10px] font-medium rounded">
+                    {{ media.duration || (media.photoCount ? media.photoCount + ' photos' : 'View') }}
+                  </div>
+                  <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div class="w-10 h-10 rounded-full bg-white/90 flex items-center justify-center">
+                      <i class="fas fa-play text-purple-500 ml-0.5"></i>
+                    </div>
+                  </div>
+                  <!-- AI Match Badge -->
+                  <div class="absolute top-2 left-2 px-1.5 py-0.5 bg-purple-500 text-white text-[9px] font-medium rounded flex items-center gap-1">
+                    <i class="fas fa-sparkles text-[8px]"></i>
+                    {{ Math.floor(Math.random() * 15) + 85 }}% match
+                  </div>
+                </div>
+                <h4 class="text-xs font-medium text-gray-800 line-clamp-2 group-hover:text-purple-600 transition-colors">{{ media.title }}</h4>
+                <p class="text-[10px] text-gray-400 mt-0.5">{{ media.views }} views</p>
+              </div>
+            </div>
+
+            <!-- Empty State -->
+            <div v-else class="text-center py-12 text-gray-400">
+              <i class="fas fa-brain text-4xl mb-3 opacity-30"></i>
+              <p class="text-sm">Select a recommendation type to get personalized suggestions</p>
+              <button @click="loadAIRecommendations" class="mt-3 px-4 py-2 bg-purple-500 text-white text-sm rounded-lg hover:bg-purple-600 transition-colors">
+                Get Recommendations
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <!-- All Media Section -->
       <div class="all-media-wrapper bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-10 animate-in delay-3">
         <!-- Section Header / Toolbar -->
@@ -1583,6 +2165,51 @@ onUnmounted(() => {
               <button v-if="searchQuery" @click="searchQuery = ''" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
                 <i class="fas fa-times text-xs"></i>
               </button>
+            </div>
+
+            <!-- AI Natural Language Search -->
+            <div v-if="showAIFeatures" class="relative">
+              <div class="flex items-center gap-2">
+                <div class="relative">
+                  <i class="fas fa-brain absolute left-3 top-1/2 -translate-y-1/2 text-purple-400 text-sm"></i>
+                  <input
+                    v-model="naturalLanguageQuery"
+                    type="text"
+                    placeholder="Ask AI: 'Show me highlights from Japan matches...'"
+                    @keyup.enter="processNaturalLanguageSearch"
+                    class="w-80 pl-9 pr-10 py-2 bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all placeholder:text-purple-300"
+                  >
+                  <button
+                    v-if="naturalLanguageQuery"
+                    @click="naturalLanguageQuery = ''; aiSearchResults = []"
+                    class="absolute right-8 top-1/2 -translate-y-1/2 text-purple-400 hover:text-purple-600"
+                  >
+                    <i class="fas fa-times text-xs"></i>
+                  </button>
+                  <button
+                    @click="processNaturalLanguageSearch"
+                    :disabled="isProcessingNLSearch || !naturalLanguageQuery"
+                    class="absolute right-2 top-1/2 -translate-y-1/2 text-purple-500 hover:text-purple-600 disabled:opacity-50"
+                  >
+                    <i :class="isProcessingNLSearch ? 'fas fa-spinner animate-spin' : 'fas fa-arrow-right'" class="text-sm"></i>
+                  </button>
+                </div>
+              </div>
+              <!-- AI Search Suggestions Dropdown -->
+              <div v-if="!naturalLanguageQuery && showAIFeatures" class="absolute left-0 top-full mt-2 w-80 bg-white rounded-xl shadow-lg border border-purple-100 py-2 z-50 hidden group-focus-within:block">
+                <div class="px-3 py-1.5 text-xs font-semibold text-purple-400 flex items-center gap-2">
+                  <i class="fas fa-lightbulb"></i>
+                  Try asking:
+                </div>
+                <button
+                  v-for="suggestion in nlSearchSuggestions"
+                  :key="suggestion"
+                  @click="naturalLanguageQuery = suggestion; processNaturalLanguageSearch()"
+                  class="w-full px-3 py-2 text-left text-sm text-gray-600 hover:bg-purple-50 hover:text-purple-700 transition-colors"
+                >
+                  {{ suggestion }}
+                </button>
+              </div>
             </div>
 
             <!-- Media Type Filter Dropdown -->
@@ -2312,6 +2939,14 @@ onUnmounted(() => {
                       title="AI Analyze">
                       <i class="fas fa-wand-magic-sparkles"></i>
                     </button>
+                    <!-- AI Insights Button -->
+                    <button
+                      v-if="showAIFeatures && (media.type === 'video' || media.type === 'audio')"
+                      class="card-action-btn ai-insights"
+                      @click.stop="openAISidebar(media)"
+                      title="AI Insights">
+                      <i class="fas fa-brain"></i>
+                    </button>
                   </div>
 
                   <!-- AI Analysis Badge -->
@@ -2829,6 +3464,386 @@ onUnmounted(() => {
                 <button @click="closeAIModal" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg text-sm font-medium transition-colors">
                   Close
                 </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Transition>
+    </Teleport>
+
+    <!-- AI Sidebar Panel -->
+    <Teleport to="body">
+      <Transition name="slide-right">
+        <div v-if="showAISidebar" class="fixed inset-0 z-[9999] flex justify-end">
+          <!-- Backdrop -->
+          <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" @click="closeAISidebar"></div>
+
+          <!-- Sidebar Panel -->
+          <div class="relative w-full max-w-lg bg-white shadow-2xl h-full overflow-hidden flex flex-col">
+            <!-- Header -->
+            <div class="px-5 py-4 bg-gradient-to-r from-teal-500 to-cyan-500 text-white flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
+                  <i class="fas fa-brain text-lg"></i>
+                </div>
+                <div>
+                  <h3 class="font-semibold">AI Insights</h3>
+                  <p class="text-xs text-teal-100">{{ selectedMediaForSidebar?.title }}</p>
+                </div>
+              </div>
+              <button @click="closeAISidebar" class="w-8 h-8 rounded-lg bg-white/20 hover:bg-white/30 flex items-center justify-center transition-colors">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+
+            <!-- Tabs -->
+            <div class="flex border-b border-gray-200 bg-gray-50">
+              <button
+                @click="aiSidebarTab = 'summary'; generateAISummary()"
+                :class="['flex-1 px-4 py-3 text-sm font-medium transition-colors flex items-center justify-center gap-2', aiSidebarTab === 'summary' ? 'text-teal-600 border-b-2 border-teal-500 bg-white' : 'text-gray-500 hover:text-gray-700']"
+              >
+                <i class="fas fa-align-left"></i>
+                Summary
+              </button>
+              <button
+                @click="aiSidebarTab = 'transcript'; generateAITranscript()"
+                :class="['flex-1 px-4 py-3 text-sm font-medium transition-colors flex items-center justify-center gap-2', aiSidebarTab === 'transcript' ? 'text-teal-600 border-b-2 border-teal-500 bg-white' : 'text-gray-500 hover:text-gray-700']"
+              >
+                <i class="fas fa-closed-captioning"></i>
+                Transcript
+              </button>
+              <button
+                @click="aiSidebarTab = 'entities'; extractAIEntities()"
+                :class="['flex-1 px-4 py-3 text-sm font-medium transition-colors flex items-center justify-center gap-2', aiSidebarTab === 'entities' ? 'text-teal-600 border-b-2 border-teal-500 bg-white' : 'text-gray-500 hover:text-gray-700']"
+              >
+                <i class="fas fa-tags"></i>
+                Entities
+              </button>
+              <button
+                @click="aiSidebarTab = 'translate'"
+                :class="['flex-1 px-4 py-3 text-sm font-medium transition-colors flex items-center justify-center gap-2', aiSidebarTab === 'translate' ? 'text-teal-600 border-b-2 border-teal-500 bg-white' : 'text-gray-500 hover:text-gray-700']"
+              >
+                <i class="fas fa-language"></i>
+                Translate
+              </button>
+            </div>
+
+            <!-- Content -->
+            <div class="flex-1 overflow-y-auto p-5">
+              <!-- Summary Tab -->
+              <div v-if="aiSidebarTab === 'summary'" class="space-y-4">
+                <!-- Summary Type Selector -->
+                <div class="flex gap-2 mb-4">
+                  <button
+                    v-for="type in ['brief', 'detailed', 'bullets']"
+                    :key="type"
+                    @click="aiSummaryType = type as any; generateAISummary()"
+                    :class="['px-3 py-1.5 rounded-lg text-xs font-medium transition-colors capitalize', aiSummaryType === type ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200']"
+                  >
+                    {{ type }}
+                  </button>
+                </div>
+
+                <!-- Loading -->
+                <div v-if="isGeneratingSummary" class="py-8 text-center">
+                  <div class="w-10 h-10 border-3 border-teal-500 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
+                  <p class="text-sm text-gray-500">Generating summary...</p>
+                </div>
+
+                <!-- Summary Content -->
+                <div v-else-if="aiSummary" class="space-y-4">
+                  <div class="p-4 bg-teal-50 rounded-xl border border-teal-100">
+                    <p class="text-sm text-gray-700 leading-relaxed whitespace-pre-line">{{ aiSummary.text }}</p>
+                  </div>
+
+                  <div v-if="aiSummary.keyPoints.length > 0" class="space-y-2">
+                    <h4 class="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                      <i class="fas fa-key text-amber-500"></i>
+                      Key Points
+                    </h4>
+                    <ul class="space-y-2">
+                      <li v-for="point in aiSummary.keyPoints" :key="point" class="flex items-start gap-2 text-sm text-gray-600">
+                        <i class="fas fa-check-circle text-teal-500 mt-0.5"></i>
+                        {{ point }}
+                      </li>
+                    </ul>
+                  </div>
+
+                  <div class="flex items-center justify-between pt-3 border-t border-gray-100">
+                    <span class="text-xs text-gray-400">
+                      <i class="fas fa-chart-line mr-1"></i>
+                      {{ (aiSummary.confidence * 100).toFixed(0) }}% confidence
+                    </span>
+                    <button @click="copySummaryText" class="text-xs text-teal-600 hover:text-teal-700 flex items-center gap-1">
+                      <i class="fas fa-copy"></i>
+                      Copy
+                    </button>
+                  </div>
+                </div>
+
+                <div v-else class="py-8 text-center text-gray-400">
+                  <i class="fas fa-align-left text-4xl mb-3 opacity-30"></i>
+                  <p class="text-sm">Click a summary type to generate</p>
+                </div>
+              </div>
+
+              <!-- Transcript Tab -->
+              <div v-if="aiSidebarTab === 'transcript'" class="space-y-4">
+                <!-- Loading -->
+                <div v-if="isGeneratingTranscript" class="py-8 text-center">
+                  <div class="w-10 h-10 border-3 border-teal-500 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
+                  <p class="text-sm text-gray-500">Generating transcript...</p>
+                </div>
+
+                <!-- Transcript Content -->
+                <div v-else-if="aiTranscript" class="space-y-4">
+                  <div class="flex items-center justify-between mb-2">
+                    <span class="text-xs text-gray-500 flex items-center gap-1">
+                      <i class="fas fa-language"></i>
+                      {{ aiTranscript.language }}
+                    </span>
+                    <button @click="copyTranscript" class="text-xs text-teal-600 hover:text-teal-700 flex items-center gap-1">
+                      <i class="fas fa-copy"></i>
+                      Copy
+                    </button>
+                  </div>
+
+                  <!-- Timestamps -->
+                  <div class="space-y-2">
+                    <div
+                      v-for="segment in aiTranscript.timestamps"
+                      :key="segment.time"
+                      class="flex gap-3 p-3 bg-gray-50 rounded-lg hover:bg-teal-50 transition-colors cursor-pointer group"
+                    >
+                      <span class="text-xs font-mono text-teal-600 bg-teal-100 px-2 py-0.5 rounded">{{ segment.time }}</span>
+                      <p class="text-sm text-gray-700 flex-1">{{ segment.text }}</p>
+                    </div>
+                  </div>
+
+                  <div class="pt-3 border-t border-gray-100">
+                    <span class="text-xs text-gray-400">
+                      <i class="fas fa-chart-line mr-1"></i>
+                      {{ (aiTranscript.confidence * 100).toFixed(0) }}% accuracy
+                    </span>
+                  </div>
+                </div>
+
+                <div v-else class="py-8 text-center text-gray-400">
+                  <i class="fas fa-closed-captioning text-4xl mb-3 opacity-30"></i>
+                  <p class="text-sm">Transcript will generate automatically</p>
+                </div>
+              </div>
+
+              <!-- Entities Tab -->
+              <div v-if="aiSidebarTab === 'entities'" class="space-y-4">
+                <!-- Loading -->
+                <div v-if="isExtractingEntities" class="py-8 text-center">
+                  <div class="w-10 h-10 border-3 border-teal-500 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
+                  <p class="text-sm text-gray-500">Extracting entities...</p>
+                </div>
+
+                <!-- Entities Content -->
+                <div v-else-if="aiEntities.length > 0" class="space-y-4">
+                  <!-- Entity Type Filter -->
+                  <div class="flex flex-wrap gap-2 mb-4">
+                    <button
+                      @click="entityFilterType = null"
+                      :class="['px-3 py-1.5 rounded-lg text-xs font-medium transition-colors', !entityFilterType ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200']"
+                    >
+                      All
+                    </button>
+                    <button
+                      v-for="type in [...new Set(aiEntities.map(e => e.type))]"
+                      :key="type"
+                      @click="entityFilterType = type"
+                      :class="['px-3 py-1.5 rounded-lg text-xs font-medium transition-colors', entityFilterType === type ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200']"
+                    >
+                      {{ type }}
+                    </button>
+                  </div>
+
+                  <!-- Entity List -->
+                  <div class="space-y-2">
+                    <div
+                      v-for="entity in aiEntities.filter(e => !entityFilterType || e.type === entityFilterType)"
+                      :key="entity.name"
+                      class="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                    >
+                      <div class="flex items-center gap-3">
+                        <span :class="['px-2 py-0.5 text-xs font-medium rounded-full', getEntityTypeColor(entity.type)]">
+                          {{ entity.type }}
+                        </span>
+                        <span class="text-sm text-gray-700 font-medium">{{ entity.name }}</span>
+                      </div>
+                      <span class="text-xs text-gray-400">{{ entity.count }} mentions</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div v-else class="py-8 text-center text-gray-400">
+                  <i class="fas fa-tags text-4xl mb-3 opacity-30"></i>
+                  <p class="text-sm">Entities will extract automatically</p>
+                </div>
+              </div>
+
+              <!-- Translate Tab -->
+              <div v-if="aiSidebarTab === 'translate'" class="space-y-4">
+                <!-- Language Selector -->
+                <div class="space-y-2">
+                  <label class="text-sm font-medium text-gray-700">Translate to:</label>
+                  <div class="grid grid-cols-3 gap-2">
+                    <button
+                      v-for="lang in availableLanguages"
+                      :key="lang.code"
+                      @click="targetLanguage = lang.code"
+                      :class="['px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2', targetLanguage === lang.code ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200']"
+                    >
+                      <span>{{ lang.flag }}</span>
+                      {{ lang.name }}
+                    </button>
+                  </div>
+                </div>
+
+                <button
+                  @click="translateContent"
+                  :disabled="isTranslating"
+                  class="w-full px-4 py-2.5 bg-gradient-to-r from-teal-500 to-cyan-500 text-white rounded-lg font-medium flex items-center justify-center gap-2 hover:from-teal-600 hover:to-cyan-600 transition-colors disabled:opacity-50"
+                >
+                  <i v-if="isTranslating" class="fas fa-spinner animate-spin"></i>
+                  <i v-else class="fas fa-language"></i>
+                  {{ isTranslating ? 'Translating...' : 'Translate Content' }}
+                </button>
+
+                <!-- Translation Result -->
+                <div v-if="aiTranslation" class="space-y-2">
+                  <div class="flex items-center justify-between">
+                    <h4 class="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                      <i class="fas fa-check-circle text-green-500"></i>
+                      Translated to {{ aiTranslation.language }}
+                    </h4>
+                    <button @click="copyTranslation" class="text-xs text-teal-600 hover:text-teal-700 flex items-center gap-1">
+                      <i class="fas fa-copy"></i>
+                      Copy
+                    </button>
+                  </div>
+                  <div class="p-4 bg-gray-50 rounded-xl border border-gray-200" dir="auto">
+                    <p class="text-sm text-gray-700 leading-relaxed whitespace-pre-line">{{ aiTranslation.text }}</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Accessibility Section (shown in all tabs) -->
+              <div class="mt-6 pt-4 border-t border-gray-200">
+                <h4 class="text-sm font-semibold text-gray-700 flex items-center gap-2 mb-3">
+                  <i class="fas fa-universal-access text-blue-500"></i>
+                  AI Accessibility Features
+                </h4>
+
+                <div class="grid grid-cols-2 gap-3">
+                  <!-- Generate Captions -->
+                  <button
+                    @click="generateAICaptions"
+                    :disabled="isGeneratingCaptions"
+                    class="p-3 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-xl text-left transition-colors disabled:opacity-50"
+                  >
+                    <div class="flex items-center gap-2 mb-1">
+                      <i v-if="isGeneratingCaptions" class="fas fa-spinner animate-spin text-blue-500"></i>
+                      <i v-else class="fas fa-closed-captioning text-blue-500"></i>
+                      <span class="text-sm font-medium text-blue-700">Captions</span>
+                    </div>
+                    <p class="text-[10px] text-blue-600">
+                      {{ aiCaptions.length > 0 ? `${aiCaptions.length} captions generated` : 'Generate AI captions' }}
+                    </p>
+                  </button>
+
+                  <!-- Generate Audio Description -->
+                  <button
+                    @click="generateAudioDescription"
+                    :disabled="isGeneratingAudioDesc"
+                    class="p-3 bg-purple-50 hover:bg-purple-100 border border-purple-200 rounded-xl text-left transition-colors disabled:opacity-50"
+                  >
+                    <div class="flex items-center gap-2 mb-1">
+                      <i v-if="isGeneratingAudioDesc" class="fas fa-spinner animate-spin text-purple-500"></i>
+                      <i v-else class="fas fa-audio-description text-purple-500"></i>
+                      <span class="text-sm font-medium text-purple-700">Audio Desc</span>
+                    </div>
+                    <p class="text-[10px] text-purple-600">
+                      {{ aiAudioDescription ? 'Description ready' : 'Generate description' }}
+                    </p>
+                  </button>
+                </div>
+
+                <!-- Captions Preview -->
+                <div v-if="aiCaptions.length > 0" class="mt-3 p-3 bg-blue-50 rounded-lg border border-blue-100">
+                  <div class="flex items-center justify-between mb-2">
+                    <span class="text-xs font-medium text-blue-700">Generated Captions</span>
+                    <span class="text-[10px] text-blue-500">{{ aiCaptions.length }} segments</span>
+                  </div>
+                  <div class="max-h-24 overflow-y-auto space-y-1">
+                    <div v-for="caption in aiCaptions.slice(0, 5)" :key="caption.time" class="flex gap-2 text-xs">
+                      <span class="font-mono text-blue-600 shrink-0">{{ caption.time }}</span>
+                      <span class="text-gray-600">{{ caption.text }}</span>
+                    </div>
+                    <p v-if="aiCaptions.length > 5" class="text-[10px] text-blue-400">+ {{ aiCaptions.length - 5 }} more...</p>
+                  </div>
+                </div>
+
+                <!-- Audio Description Preview -->
+                <div v-if="aiAudioDescription" class="mt-3 p-3 bg-purple-50 rounded-lg border border-purple-100">
+                  <div class="flex items-center justify-between mb-2">
+                    <span class="text-xs font-medium text-purple-700">Audio Description</span>
+                    <button class="text-[10px] text-purple-500 hover:text-purple-700">
+                      <i class="fas fa-volume-up mr-1"></i> Play
+                    </button>
+                  </div>
+                  <p class="text-xs text-gray-600 leading-relaxed line-clamp-4">{{ aiAudioDescription }}</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Footer with Video Insights -->
+            <div class="border-t border-gray-200 bg-gray-50 p-4">
+              <button
+                @click="analyzeVideoInsights"
+                :disabled="isAnalyzingInsights"
+                class="w-full px-4 py-2.5 bg-gradient-to-r from-purple-500 to-indigo-500 text-white rounded-lg font-medium flex items-center justify-center gap-2 hover:from-purple-600 hover:to-indigo-600 transition-colors disabled:opacity-50"
+              >
+                <i v-if="isAnalyzingInsights" class="fas fa-spinner animate-spin"></i>
+                <i v-else class="fas fa-chart-line"></i>
+                {{ isAnalyzingInsights ? 'Analyzing...' : 'Analyze Video Insights' }}
+              </button>
+
+              <!-- Insights Results -->
+              <div v-if="aiKeyMoments.length > 0 || aiSpeakers.length > 0 || aiSentiment" class="mt-4 space-y-4">
+                <!-- Key Moments -->
+                <div v-if="aiKeyMoments.length > 0" class="space-y-2">
+                  <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Key Moments</h4>
+                  <div class="flex gap-2 overflow-x-auto pb-2">
+                    <div
+                      v-for="moment in aiKeyMoments.slice(0, 4)"
+                      :key="moment.timestamp"
+                      class="flex-shrink-0 p-2 bg-white rounded-lg border border-gray-200 text-center w-24"
+                    >
+                      <i :class="[getMomentTypeIcon(moment.type), 'text-teal-500 mb-1']"></i>
+                      <p class="text-[10px] font-mono text-teal-600">{{ moment.timestamp }}</p>
+                      <p class="text-[10px] text-gray-600 truncate">{{ moment.title }}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Sentiment -->
+                <div v-if="aiSentiment" class="flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-200">
+                  <div :class="['w-10 h-10 rounded-full flex items-center justify-center', aiSentiment.overall === 'positive' ? 'bg-green-100' : aiSentiment.overall === 'negative' ? 'bg-red-100' : 'bg-gray-100']">
+                    <i :class="['fas', aiSentiment.overall === 'positive' ? 'fa-smile text-green-600' : aiSentiment.overall === 'negative' ? 'fa-frown text-red-600' : 'fa-meh text-gray-600']"></i>
+                  </div>
+                  <div class="flex-1">
+                    <p class="text-sm font-medium text-gray-700 capitalize">{{ aiSentiment.overall }} Sentiment</p>
+                    <div class="w-full h-1.5 bg-gray-200 rounded-full mt-1">
+                      <div :class="['h-full rounded-full', aiSentiment.overall === 'positive' ? 'bg-green-500' : aiSentiment.overall === 'negative' ? 'bg-red-500' : 'bg-gray-500']" :style="{ width: (aiSentiment.score * 100) + '%' }"></div>
+                    </div>
+                  </div>
+                  <span class="text-xs text-gray-400">{{ (aiSentiment.score * 100).toFixed(0) }}%</span>
+                </div>
               </div>
             </div>
           </div>
@@ -6624,6 +7639,38 @@ onUnmounted(() => {
 
 .card-action-btn.ai-action.analyzed {
   background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+}
+
+/* AI Insights Button */
+.card-action-btn.ai-insights {
+  background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+  color: white;
+}
+
+.card-action-btn.ai-insights:hover {
+  background: linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%);
+  transform: scale(1.1);
+}
+
+/* Slide Right Transition for AI Sidebar */
+.slide-right-enter-active,
+.slide-right-leave-active {
+  transition: all 0.3s ease;
+}
+
+.slide-right-enter-active > div:last-child,
+.slide-right-leave-active > div:last-child {
+  transition: transform 0.3s ease;
+}
+
+.slide-right-enter-from,
+.slide-right-leave-to {
+  opacity: 0;
+}
+
+.slide-right-enter-from > div:last-child,
+.slide-right-leave-to > div:last-child {
+  transform: translateX(100%);
 }
 
 /* AI Analysis Modal */
