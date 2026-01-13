@@ -3902,7 +3902,7 @@ body {
 }
 
 /* Floating Action Button */
-.fab {
+.floating-action-btn {
     position: fixed;
     bottom: 2rem;
     right: 2rem;
@@ -3922,7 +3922,7 @@ body {
     z-index: 50;
 }
 
-.fab:hover {
+.floating-action-btn:hover {
     transform: scale(1.1);
     box-shadow: 0 12px 32px rgba(20, 184, 166, 0.5);
 }
