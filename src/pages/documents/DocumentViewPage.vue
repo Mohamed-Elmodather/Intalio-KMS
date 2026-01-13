@@ -55,6 +55,7 @@ interface Version {
 }
 const versions = ref<Version[]>([])
 const showVersionHistory = ref(false)
+const activeVersion = ref<Version | null>(null)
 
 // Sidebar tabs
 const activeDetailTab = ref<'details' | 'activity' | 'history'>('details')
@@ -268,6 +269,51 @@ function downloadDocument() {
   link.click()
   window.document.body.removeChild(link)
   URL.revokeObjectURL(url)
+}
+
+function downloadVersion(ver: Version) {
+  if (!document.value) return
+
+  const mimeTypes: Record<string, string> = {
+    'PDF': 'application/pdf',
+    'Word': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'Excel': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    'PowerPoint': 'application/vnd.openxmlformats-officedocument.presentationml.presentation'
+  }
+
+  // Create a placeholder blob for demo purposes
+  const content = `This is a placeholder for: ${document.value.name} (Version ${ver.version})\n\nDocument Details:\n- Type: ${document.value.type}\n- Size: ${ver.size}\n- Version: ${ver.version}\n- Changes: ${ver.changes}\n- Date: ${ver.date}\n\nIn production, this would download the actual file version from the server.`
+  const blob = new Blob([content], { type: mimeTypes[document.value.type] || 'application/octet-stream' })
+  const url = URL.createObjectURL(blob)
+
+  // Get file extension
+  const extensions: Record<string, string> = {
+    'PDF': '.pdf',
+    'Word': '.docx',
+    'Excel': '.xlsx',
+    'PowerPoint': '.pptx'
+  }
+  const ext = extensions[document.value.type] || ''
+  const baseName = document.value.name.replace(/\.[^/.]+$/, '')
+  const fileName = `${baseName}_v${ver.version}${ext}`
+
+  const link = window.document.createElement('a')
+  link.href = url
+  link.download = fileName
+  window.document.body.appendChild(link)
+  link.click()
+  window.document.body.removeChild(link)
+  URL.revokeObjectURL(url)
+}
+
+function viewVersion(ver: Version) {
+  // Switch to that version's preview
+  currentPage.value = 1
+  activeVersion.value = ver
+}
+
+function viewCurrentVersion() {
+  activeVersion.value = null
 }
 
 function shareDocument() {
@@ -1132,8 +1178,44 @@ function formatVersionDate(date: Date): string {
               </div>
             </div>
 
+            <!-- Version Banner -->
+            <div
+              v-if="activeVersion"
+              class="px-4 py-2 bg-amber-50 border-b border-amber-200 flex items-center justify-between"
+            >
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center">
+                  <i class="fas fa-history text-amber-600 text-sm"></i>
+                </div>
+                <div>
+                  <p class="text-sm font-medium text-amber-800">
+                    Viewing Version {{ activeVersion.version }}
+                  </p>
+                  <p class="text-xs text-amber-600">
+                    {{ activeVersion.changes }} • {{ formatVersionDate(activeVersion.date) }}
+                  </p>
+                </div>
+              </div>
+              <div class="flex items-center gap-2">
+                <button
+                  @click="downloadVersion(activeVersion)"
+                  class="px-3 py-1.5 text-xs font-medium text-amber-700 hover:bg-amber-100 rounded-lg transition-colors flex items-center gap-1.5"
+                >
+                  <i class="fas fa-download"></i>
+                  Download
+                </button>
+                <button
+                  @click="viewCurrentVersion"
+                  class="px-3 py-1.5 text-xs font-medium bg-amber-600 hover:bg-amber-700 text-white rounded-lg transition-colors flex items-center gap-1.5"
+                >
+                  <i class="fas fa-arrow-left"></i>
+                  Back to Current
+                </button>
+              </div>
+            </div>
+
             <!-- Preview Content Area -->
-            <div class="flex bg-gray-100" style="height: 900px;">
+            <div class="flex bg-gray-100" :style="{ height: activeVersion ? '860px' : '900px' }">
               <!-- Thumbnails Sidebar -->
               <Transition name="slide">
                 <div
@@ -1164,10 +1246,11 @@ function formatVersionDate(date: Date): string {
                   <!-- PDF Preview -->
                   <div v-if="document.type === 'PDF'" class="w-[595px] min-h-[842px] p-12 relative">
                     <div class="text-center mb-8 pb-4 border-b-2 border-gray-200">
-                      <div :class="[document.iconBg, 'w-16 h-16 rounded-xl flex items-center justify-center mx-auto mb-3']">
-                        <i :class="[document.icon, document.iconColor, 'text-2xl']"></i>
+                      <div :class="[activeVersion ? 'bg-amber-100' : document.iconBg, 'w-16 h-16 rounded-xl flex items-center justify-center mx-auto mb-3']">
+                        <i :class="[activeVersion ? 'fas fa-history' : document.icon, activeVersion ? 'text-amber-600' : document.iconColor, 'text-2xl']"></i>
                       </div>
                       <h3 class="text-xl font-bold text-gray-900">{{ document.name }}</h3>
+                      <p v-if="activeVersion" class="text-sm text-amber-600 mt-1 font-medium">Version {{ activeVersion.version }}</p>
                       <p class="text-sm text-gray-500 mt-1">{{ document.library }}</p>
                     </div>
                     <div class="space-y-4 text-gray-700 text-sm leading-relaxed">
@@ -1192,7 +1275,12 @@ function formatVersionDate(date: Date): string {
 
                   <!-- Word Preview -->
                   <div v-else-if="document.type === 'Word'" class="w-[595px] min-h-[842px] p-16 relative">
-                    <h1 class="text-2xl font-bold text-gray-900 mb-6">{{ document.name.replace('.docx', '') }}</h1>
+                    <h1 class="text-2xl font-bold text-gray-900 mb-2">{{ document.name.replace('.docx', '') }}</h1>
+                    <p v-if="activeVersion" class="text-sm text-amber-600 mb-6 font-medium flex items-center gap-2">
+                      <i class="fas fa-history"></i>
+                      Version {{ activeVersion.version }}
+                    </p>
+                    <div v-else class="mb-6"></div>
                     <div class="space-y-4">
                       <p class="text-gray-600 text-sm leading-relaxed">
                         <span class="h-3 bg-gray-200 rounded inline-block w-full mb-1"></span>
@@ -1227,9 +1315,14 @@ function formatVersionDate(date: Date): string {
                   <!-- Excel Preview -->
                   <div v-else-if="document.type === 'Excel'" class="w-[700px] min-h-[500px] p-4">
                     <div class="border border-gray-300 rounded overflow-hidden">
-                      <div class="bg-emerald-600 text-white px-4 py-2 text-sm font-medium flex items-center gap-2">
-                        <i class="fas fa-file-excel"></i>
-                        {{ document.name }}
+                      <div :class="[activeVersion ? 'bg-amber-500' : 'bg-emerald-600', 'text-white px-4 py-2 text-sm font-medium flex items-center justify-between']">
+                        <span class="flex items-center gap-2">
+                          <i :class="activeVersion ? 'fas fa-history' : 'fas fa-file-excel'"></i>
+                          {{ document.name }}
+                        </span>
+                        <span v-if="activeVersion" class="text-xs bg-white/20 px-2 py-0.5 rounded">
+                          Version {{ activeVersion.version }}
+                        </span>
                       </div>
                       <div class="overflow-x-auto">
                         <table class="w-full text-sm">
@@ -1257,11 +1350,17 @@ function formatVersionDate(date: Date): string {
                   </div>
 
                   <!-- PowerPoint Preview -->
-                  <div v-else-if="document.type === 'PowerPoint'" class="w-[800px] aspect-video bg-gradient-to-br from-orange-500 to-orange-600 p-8 relative">
+                  <div v-else-if="document.type === 'PowerPoint'" class="w-[800px] aspect-video p-8 relative" :class="activeVersion ? 'bg-gradient-to-br from-amber-500 to-amber-600' : 'bg-gradient-to-br from-orange-500 to-orange-600'">
                     <div class="h-full bg-white rounded-lg shadow-xl p-8 flex flex-col">
                       <div class="flex-1">
                         <h1 class="text-3xl font-bold text-gray-900 mb-2">{{ document.name.replace('.pptx', '') }}</h1>
-                        <p class="text-lg text-gray-500 mb-8">Slide {{ currentPage }}</p>
+                        <p class="text-lg mb-8" :class="activeVersion ? 'text-amber-600' : 'text-gray-500'">
+                          <span v-if="activeVersion" class="flex items-center gap-2">
+                            <i class="fas fa-history"></i>
+                            Version {{ activeVersion.version }} • Slide {{ currentPage }}
+                          </span>
+                          <span v-else>Slide {{ currentPage }}</span>
+                        </p>
                         <div class="grid grid-cols-2 gap-6">
                           <div class="bg-gray-100 rounded-lg p-4 h-32 flex items-center justify-center">
                             <span class="text-gray-400">Content Block</span>
@@ -1726,13 +1825,33 @@ function formatVersionDate(date: Date): string {
                     <div class="absolute left-0 top-0.5 w-2.5 h-2.5 rounded-full -translate-x-1"
                          :class="index === 0 ? 'bg-teal-500' : 'bg-gray-300'"></div>
 
-                    <div>
+                    <div class="flex-1">
                       <div class="flex items-center gap-2">
                         <span class="font-medium text-gray-900 text-sm">v{{ ver.version }}</span>
                         <span v-if="index === 0" class="px-1.5 py-0.5 bg-teal-100 text-teal-700 text-[10px] rounded-full font-medium">Current</span>
                       </div>
                       <p class="text-xs text-gray-600 mt-0.5">{{ ver.changes }}</p>
                       <p class="text-[10px] text-gray-400 mt-0.5">{{ formatVersionDate(ver.date) }} • {{ ver.author }}</p>
+
+                      <!-- Version Actions -->
+                      <div class="flex items-center gap-2 mt-2">
+                        <button
+                          @click="viewVersion(ver)"
+                          class="px-2 py-1 text-[10px] font-medium text-teal-600 hover:text-teal-700 hover:bg-teal-50 rounded transition-colors flex items-center gap-1"
+                          title="View this version"
+                        >
+                          <i class="fas fa-eye"></i>
+                          View
+                        </button>
+                        <button
+                          @click="downloadVersion(ver)"
+                          class="px-2 py-1 text-[10px] font-medium text-gray-600 hover:text-gray-700 hover:bg-gray-100 rounded transition-colors flex items-center gap-1"
+                          title="Download this version"
+                        >
+                          <i class="fas fa-download"></i>
+                          Download
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
