@@ -3480,256 +3480,319 @@ onUnmounted(() => {
 
           <!-- Sidebar Panel -->
           <div class="relative w-full max-w-lg bg-white shadow-2xl h-full overflow-hidden flex flex-col">
-            <!-- Header -->
-            <div class="px-5 py-4 bg-gradient-to-r from-teal-500 to-cyan-500 text-white flex items-center justify-between">
-              <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
-                  <i class="fas fa-brain text-lg"></i>
+            <!-- Header (Documents Page Style) -->
+            <div class="px-6 py-4 bg-gradient-to-r from-teal-50 to-transparent border-b border-teal-100">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center">
+                    <i class="fas fa-wand-magic-sparkles text-white"></i>
+                  </div>
+                  <div>
+                    <h3 class="text-lg font-semibold text-gray-900">AI Analysis</h3>
+                    <p class="text-sm text-gray-500">Powered by Intalio AI</p>
+                  </div>
                 </div>
-                <div>
-                  <h3 class="font-semibold">AI Insights</h3>
-                  <p class="text-xs text-teal-100">{{ selectedMediaForSidebar?.title }}</p>
-                </div>
+                <button @click="closeAISidebar" class="w-8 h-8 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 flex items-center justify-center transition-all">
+                  <i class="fas fa-times"></i>
+                </button>
               </div>
-              <button @click="closeAISidebar" class="w-8 h-8 rounded-lg bg-white/20 hover:bg-white/30 flex items-center justify-center transition-colors">
-                <i class="fas fa-times"></i>
-              </button>
             </div>
 
-            <!-- Tabs -->
-            <div class="flex border-b border-gray-200 bg-gray-50">
-              <button
-                @click="aiSidebarTab = 'summary'; generateAISummary()"
-                :class="['flex-1 px-4 py-3 text-sm font-medium transition-colors flex items-center justify-center gap-2', aiSidebarTab === 'summary' ? 'text-teal-600 border-b-2 border-teal-500 bg-white' : 'text-gray-500 hover:text-gray-700']"
-              >
-                <i class="fas fa-align-left"></i>
-                Summary
-              </button>
-              <button
-                @click="aiSidebarTab = 'transcript'; generateAITranscript()"
-                :class="['flex-1 px-4 py-3 text-sm font-medium transition-colors flex items-center justify-center gap-2', aiSidebarTab === 'transcript' ? 'text-teal-600 border-b-2 border-teal-500 bg-white' : 'text-gray-500 hover:text-gray-700']"
-              >
-                <i class="fas fa-closed-captioning"></i>
-                Transcript
-              </button>
-              <button
-                @click="aiSidebarTab = 'entities'; extractAIEntities()"
-                :class="['flex-1 px-4 py-3 text-sm font-medium transition-colors flex items-center justify-center gap-2', aiSidebarTab === 'entities' ? 'text-teal-600 border-b-2 border-teal-500 bg-white' : 'text-gray-500 hover:text-gray-700']"
-              >
-                <i class="fas fa-tags"></i>
-                Entities
-              </button>
-              <button
-                @click="aiSidebarTab = 'translate'"
-                :class="['flex-1 px-4 py-3 text-sm font-medium transition-colors flex items-center justify-center gap-2', aiSidebarTab === 'translate' ? 'text-teal-600 border-b-2 border-teal-500 bg-white' : 'text-gray-500 hover:text-gray-700']"
-              >
-                <i class="fas fa-language"></i>
-                Translate
-              </button>
+            <!-- Media Preview -->
+            <div v-if="selectedMediaForSidebar" class="px-4 py-3 bg-gray-50 border-b border-gray-100">
+              <div class="flex gap-3">
+                <img :src="selectedMediaForSidebar.thumbnail" :alt="selectedMediaForSidebar.title" class="w-20 h-14 object-cover rounded-lg" />
+                <div class="flex-1 min-w-0">
+                  <h4 class="text-sm font-medium text-gray-800 truncate">{{ selectedMediaForSidebar.title }}</h4>
+                  <p class="text-xs text-gray-500">{{ selectedMediaForSidebar.type }} • {{ selectedMediaForSidebar.category }}</p>
+                </div>
+              </div>
             </div>
 
             <!-- Content -->
-            <div class="flex-1 overflow-y-auto p-5">
+            <div class="flex-1 overflow-y-auto p-4 space-y-4">
+              <!-- AI Tab Navigation (Documents Page Style) -->
+              <div class="grid grid-cols-4 gap-2">
+                <button
+                  v-for="tab in [
+                    { id: 'summary', icon: 'fas fa-file-lines', label: 'Summary' },
+                    { id: 'transcript', icon: 'fas fa-closed-captioning', label: 'Transcript' },
+                    { id: 'entities', icon: 'fas fa-tags', label: 'Entities' },
+                    { id: 'translate', icon: 'fas fa-language', label: 'Translate' }
+                  ]"
+                  :key="tab.id"
+                  @click="aiSidebarTab = tab.id as any; tab.id === 'summary' ? generateAISummary() : tab.id === 'transcript' ? generateAITranscript() : tab.id === 'entities' ? extractAIEntities() : null"
+                  :class="[
+                    'px-3 py-2.5 rounded-xl text-xs font-medium transition-all flex flex-col items-center gap-1.5',
+                    aiSidebarTab === tab.id
+                      ? 'bg-teal-50 text-teal-700 border-2 border-teal-200'
+                      : 'bg-gray-50 text-gray-600 border-2 border-transparent hover:bg-gray-100'
+                  ]"
+                >
+                  <i :class="[tab.icon, 'text-base']"></i>
+                  <span>{{ tab.label }}</span>
+                </button>
+              </div>
+
               <!-- Summary Tab -->
-              <div v-if="aiSidebarTab === 'summary'" class="space-y-4">
-                <!-- Summary Type Selector -->
-                <div class="flex gap-2 mb-4">
+              <div v-if="aiSidebarTab === 'summary'" class="space-y-3">
+                <!-- Summary Type Selection (Documents Page Style) -->
+                <div class="flex gap-2">
                   <button
-                    v-for="type in ['brief', 'detailed', 'bullets']"
-                    :key="type"
-                    @click="aiSummaryType = type as any; generateAISummary()"
-                    :class="['px-3 py-1.5 rounded-lg text-xs font-medium transition-colors capitalize', aiSummaryType === type ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200']"
+                    v-for="type in [
+                      { id: 'brief', label: 'Brief', icon: 'fas fa-bolt' },
+                      { id: 'detailed', label: 'Detailed', icon: 'fas fa-align-left' },
+                      { id: 'bullets', label: 'Bullets', icon: 'fas fa-list-ul' }
+                    ]"
+                    :key="type.id"
+                    @click="aiSummaryType = type.id as any; generateAISummary()"
+                    :class="[
+                      'flex-1 px-3 py-2 rounded-lg text-xs font-medium transition-all cursor-pointer flex items-center justify-center gap-1.5',
+                      aiSummaryType === type.id
+                        ? 'bg-teal-500 text-white shadow-sm'
+                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    ]"
                   >
-                    {{ type }}
+                    <i :class="type.icon"></i>
+                    {{ type.label }}
                   </button>
                 </div>
 
-                <!-- Loading -->
-                <div v-if="isGeneratingSummary" class="py-8 text-center">
-                  <div class="w-10 h-10 border-3 border-teal-500 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
-                  <p class="text-sm text-gray-500">Generating summary...</p>
-                </div>
+                <!-- Generate Button -->
+                <button
+                  @click="generateAISummary"
+                  :disabled="isGeneratingSummary"
+                  class="w-full px-4 py-2.5 bg-teal-500 hover:bg-teal-600 disabled:bg-teal-300 text-white rounded-lg font-medium flex items-center justify-center gap-2 transition-colors"
+                >
+                  <i :class="['fas', isGeneratingSummary ? 'fa-spinner fa-spin' : 'fa-wand-magic-sparkles']"></i>
+                  {{ isGeneratingSummary ? 'Generating...' : 'Generate Summary' }}
+                </button>
 
-                <!-- Summary Content -->
-                <div v-else-if="aiSummary" class="space-y-4">
-                  <div class="p-4 bg-teal-50 rounded-xl border border-teal-100">
-                    <p class="text-sm text-gray-700 leading-relaxed whitespace-pre-line">{{ aiSummary.text }}</p>
+                <!-- Summary Result (Documents Page Style) -->
+                <Transition name="slide-fade">
+                  <div v-if="aiSummary" class="space-y-3 pt-3 border-t border-gray-100">
+                    <div class="p-3 bg-teal-50 rounded-xl">
+                      <div class="flex items-center justify-between mb-2">
+                        <span class="text-sm font-medium text-teal-700">Summary</span>
+                        <button @click="aiSummary = null" class="text-teal-400 hover:text-teal-600">
+                          <i class="fas fa-times text-sm"></i>
+                        </button>
+                      </div>
+                      <p class="text-sm text-teal-800 leading-relaxed whitespace-pre-line">{{ aiSummary.text }}</p>
+                    </div>
+
+                    <!-- Key Points -->
+                    <div v-if="aiSummary.keyPoints?.length" class="p-3 bg-gray-50 rounded-xl">
+                      <div class="flex items-center gap-2 mb-2">
+                        <i class="fas fa-lightbulb text-amber-500"></i>
+                        <span class="text-sm font-medium text-gray-700">Key Points</span>
+                      </div>
+                      <ul class="space-y-1.5">
+                        <li v-for="point in aiSummary.keyPoints" :key="point" class="flex items-start gap-2 text-sm text-gray-600">
+                          <i class="fas fa-check-circle text-teal-500 mt-0.5 flex-shrink-0"></i>
+                          <span>{{ point }}</span>
+                        </li>
+                      </ul>
+                    </div>
+
+                    <!-- Confidence & Copy -->
+                    <div class="flex items-center justify-between text-xs text-gray-400">
+                      <span>{{ (aiSummary.confidence * 100).toFixed(0) }}% confidence</span>
+                      <button @click="copySummaryText" class="flex items-center gap-1 text-teal-600 hover:text-teal-700">
+                        <i class="fas fa-copy"></i>
+                        Copy
+                      </button>
+                    </div>
                   </div>
-
-                  <div v-if="aiSummary.keyPoints.length > 0" class="space-y-2">
-                    <h4 class="text-sm font-semibold text-gray-700 flex items-center gap-2">
-                      <i class="fas fa-key text-amber-500"></i>
-                      Key Points
-                    </h4>
-                    <ul class="space-y-2">
-                      <li v-for="point in aiSummary.keyPoints" :key="point" class="flex items-start gap-2 text-sm text-gray-600">
-                        <i class="fas fa-check-circle text-teal-500 mt-0.5"></i>
-                        {{ point }}
-                      </li>
-                    </ul>
-                  </div>
-
-                  <div class="flex items-center justify-between pt-3 border-t border-gray-100">
-                    <span class="text-xs text-gray-400">
-                      <i class="fas fa-chart-line mr-1"></i>
-                      {{ (aiSummary.confidence * 100).toFixed(0) }}% confidence
-                    </span>
-                    <button @click="copySummaryText" class="text-xs text-teal-600 hover:text-teal-700 flex items-center gap-1">
-                      <i class="fas fa-copy"></i>
-                      Copy
-                    </button>
-                  </div>
-                </div>
-
-                <div v-else class="py-8 text-center text-gray-400">
-                  <i class="fas fa-align-left text-4xl mb-3 opacity-30"></i>
-                  <p class="text-sm">Click a summary type to generate</p>
-                </div>
+                </Transition>
               </div>
 
               <!-- Transcript Tab -->
-              <div v-if="aiSidebarTab === 'transcript'" class="space-y-4">
-                <!-- Loading -->
-                <div v-if="isGeneratingTranscript" class="py-8 text-center">
-                  <div class="w-10 h-10 border-3 border-teal-500 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
-                  <p class="text-sm text-gray-500">Generating transcript...</p>
+              <div v-if="aiSidebarTab === 'transcript'" class="space-y-3">
+                <!-- Generate Button -->
+                <button
+                  @click="generateAITranscript"
+                  :disabled="isGeneratingTranscript"
+                  class="w-full px-4 py-2.5 bg-teal-500 hover:bg-teal-600 disabled:bg-teal-300 text-white rounded-lg font-medium flex items-center justify-center gap-2 transition-colors"
+                >
+                  <i :class="['fas', isGeneratingTranscript ? 'fa-spinner fa-spin' : 'fa-closed-captioning']"></i>
+                  {{ isGeneratingTranscript ? 'Generating...' : 'Generate Transcript' }}
+                </button>
+
+                <!-- Loading State -->
+                <div v-if="isGeneratingTranscript" class="flex items-center justify-center py-6">
+                  <div class="text-center">
+                    <i class="fas fa-spinner fa-spin text-2xl text-teal-500 mb-2"></i>
+                    <p class="text-sm text-gray-500">Processing audio...</p>
+                  </div>
                 </div>
 
-                <!-- Transcript Content -->
-                <div v-else-if="aiTranscript" class="space-y-4">
-                  <div class="flex items-center justify-between mb-2">
-                    <span class="text-xs text-gray-500 flex items-center gap-1">
-                      <i class="fas fa-language"></i>
-                      {{ aiTranscript.language }}
-                    </span>
-                    <button @click="copyTranscript" class="text-xs text-teal-600 hover:text-teal-700 flex items-center gap-1">
-                      <i class="fas fa-copy"></i>
-                      Copy
-                    </button>
-                  </div>
+                <!-- Transcript Result -->
+                <Transition name="slide-fade">
+                  <div v-if="aiTranscript && !isGeneratingTranscript" class="space-y-3 pt-3 border-t border-gray-100">
+                    <!-- Language Badge -->
+                    <div class="flex items-center justify-between">
+                      <span class="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full flex items-center gap-1">
+                        <i class="fas fa-language"></i>
+                        {{ aiTranscript.language }}
+                      </span>
+                      <button @click="aiTranscript = null" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times text-sm"></i>
+                      </button>
+                    </div>
 
-                  <!-- Timestamps -->
-                  <div class="space-y-2">
-                    <div
-                      v-for="segment in aiTranscript.timestamps"
-                      :key="segment.time"
-                      class="flex gap-3 p-3 bg-gray-50 rounded-lg hover:bg-teal-50 transition-colors cursor-pointer group"
-                    >
-                      <span class="text-xs font-mono text-teal-600 bg-teal-100 px-2 py-0.5 rounded">{{ segment.time }}</span>
-                      <p class="text-sm text-gray-700 flex-1">{{ segment.text }}</p>
+                    <!-- Timestamps List -->
+                    <div class="space-y-1.5 max-h-56 overflow-y-auto">
+                      <div
+                        v-for="segment in aiTranscript.timestamps"
+                        :key="segment.time"
+                        class="flex items-start gap-2 p-2 rounded-lg hover:bg-teal-50 transition-all cursor-pointer group"
+                      >
+                        <span class="text-xs font-mono text-teal-600 bg-teal-100 px-2 py-0.5 rounded flex-shrink-0">{{ segment.time }}</span>
+                        <p class="text-sm text-gray-700 flex-1">{{ segment.text }}</p>
+                      </div>
+                    </div>
+
+                    <!-- Confidence & Copy -->
+                    <div class="flex items-center justify-between text-xs text-gray-400 pt-2 border-t border-gray-100">
+                      <span>{{ (aiTranscript.confidence * 100).toFixed(0) }}% accuracy</span>
+                      <button @click="copyTranscript" class="flex items-center gap-1 text-teal-600 hover:text-teal-700">
+                        <i class="fas fa-copy"></i>
+                        Copy Full Transcript
+                      </button>
                     </div>
                   </div>
-
-                  <div class="pt-3 border-t border-gray-100">
-                    <span class="text-xs text-gray-400">
-                      <i class="fas fa-chart-line mr-1"></i>
-                      {{ (aiTranscript.confidence * 100).toFixed(0) }}% accuracy
-                    </span>
-                  </div>
-                </div>
-
-                <div v-else class="py-8 text-center text-gray-400">
-                  <i class="fas fa-closed-captioning text-4xl mb-3 opacity-30"></i>
-                  <p class="text-sm">Transcript will generate automatically</p>
-                </div>
+                </Transition>
               </div>
 
               <!-- Entities Tab -->
-              <div v-if="aiSidebarTab === 'entities'" class="space-y-4">
-                <!-- Loading -->
-                <div v-if="isExtractingEntities" class="py-8 text-center">
-                  <div class="w-10 h-10 border-3 border-teal-500 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
-                  <p class="text-sm text-gray-500">Extracting entities...</p>
-                </div>
+              <div v-if="aiSidebarTab === 'entities'" class="space-y-3">
+                <!-- Generate Button -->
+                <button
+                  @click="extractAIEntities"
+                  :disabled="isExtractingEntities"
+                  class="w-full px-4 py-2.5 bg-teal-500 hover:bg-teal-600 disabled:bg-teal-300 text-white rounded-lg font-medium flex items-center justify-center gap-2 transition-colors"
+                >
+                  <i :class="['fas', isExtractingEntities ? 'fa-spinner fa-spin' : 'fa-magnifying-glass']"></i>
+                  {{ isExtractingEntities ? 'Extracting...' : 'Extract Entities' }}
+                </button>
 
-                <!-- Entities Content -->
-                <div v-else-if="aiEntities.length > 0" class="space-y-4">
-                  <!-- Entity Type Filter -->
-                  <div class="flex flex-wrap gap-2 mb-4">
-                    <button
-                      @click="entityFilterType = null"
-                      :class="['px-3 py-1.5 rounded-lg text-xs font-medium transition-colors', !entityFilterType ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200']"
-                    >
-                      All
-                    </button>
-                    <button
-                      v-for="type in [...new Set(aiEntities.map(e => e.type))]"
-                      :key="type"
-                      @click="entityFilterType = type"
-                      :class="['px-3 py-1.5 rounded-lg text-xs font-medium transition-colors', entityFilterType === type ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200']"
-                    >
-                      {{ type }}
-                    </button>
-                  </div>
+                <!-- Entities Result -->
+                <Transition name="slide-fade">
+                  <div v-if="aiEntities.length > 0" class="space-y-3 pt-3 border-t border-gray-100">
+                    <!-- Entity Filter -->
+                    <div class="flex flex-wrap gap-1.5">
+                      <button
+                        @click="entityFilterType = null"
+                        :class="[
+                          'px-2 py-1 rounded-full text-xs font-medium transition-all',
+                          entityFilterType === null
+                            ? 'bg-teal-100 text-teal-700'
+                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                        ]"
+                      >
+                        All ({{ aiEntities.length }})
+                      </button>
+                      <button
+                        v-for="type in [...new Set(aiEntities.map(e => e.type))]"
+                        :key="type"
+                        @click="entityFilterType = type"
+                        :class="[
+                          'px-2 py-1 rounded-full text-xs font-medium transition-all capitalize',
+                          entityFilterType === type
+                            ? 'bg-teal-100 text-teal-700'
+                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                        ]"
+                      >
+                        {{ type }} ({{ aiEntities.filter(e => e.type === type).length }})
+                      </button>
+                    </div>
 
-                  <!-- Entity List -->
-                  <div class="space-y-2">
-                    <div
-                      v-for="entity in aiEntities.filter(e => !entityFilterType || e.type === entityFilterType)"
-                      :key="entity.name"
-                      class="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
-                    >
-                      <div class="flex items-center gap-3">
-                        <span :class="['px-2 py-0.5 text-xs font-medium rounded-full', getEntityTypeColor(entity.type)]">
-                          {{ entity.type }}
-                        </span>
-                        <span class="text-sm text-gray-700 font-medium">{{ entity.name }}</span>
+                    <!-- Entity List -->
+                    <div class="space-y-1.5 max-h-56 overflow-y-auto">
+                      <div
+                        v-for="entity in aiEntities.filter(e => !entityFilterType || e.type === entityFilterType)"
+                        :key="entity.name"
+                        :class="['flex items-center gap-2 p-2 rounded-lg transition-all', getEntityTypeColor(entity.type)]"
+                      >
+                        <i :class="[entity.type === 'Team' ? 'fas fa-users' : entity.type === 'Person' ? 'fas fa-user' : entity.type === 'Location' ? 'fas fa-map-marker-alt' : entity.type === 'Event' ? 'fas fa-calendar' : entity.type === 'Organization' ? 'fas fa-building' : 'fas fa-tag', 'text-sm']"></i>
+                        <span class="flex-1 text-sm font-medium truncate">{{ entity.name }}</span>
+                        <span class="text-xs opacity-70">{{ entity.count }}x</span>
                       </div>
-                      <span class="text-xs text-gray-400">{{ entity.count }} mentions</span>
                     </div>
                   </div>
-                </div>
-
-                <div v-else class="py-8 text-center text-gray-400">
-                  <i class="fas fa-tags text-4xl mb-3 opacity-30"></i>
-                  <p class="text-sm">Entities will extract automatically</p>
-                </div>
+                </Transition>
               </div>
 
               <!-- Translate Tab -->
-              <div v-if="aiSidebarTab === 'translate'" class="space-y-4">
-                <!-- Language Selector -->
-                <div class="space-y-2">
-                  <label class="text-sm font-medium text-gray-700">Translate to:</label>
-                  <div class="grid grid-cols-3 gap-2">
-                    <button
-                      v-for="lang in availableLanguages"
-                      :key="lang.code"
-                      @click="targetLanguage = lang.code"
-                      :class="['px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2', targetLanguage === lang.code ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200']"
-                    >
-                      <span>{{ lang.flag }}</span>
-                      {{ lang.name }}
-                    </button>
-                  </div>
+              <div v-if="aiSidebarTab === 'translate'" class="space-y-3">
+                <!-- Language Selection (Documents Page Style) -->
+                <div class="grid grid-cols-3 gap-2">
+                  <button
+                    v-for="lang in [
+                      { code: 'ar', label: 'Arabic', flag: '🇸🇦' },
+                      { code: 'fr', label: 'French', flag: '🇫🇷' },
+                      { code: 'es', label: 'Spanish', flag: '🇪🇸' },
+                      { code: 'zh', label: 'Chinese', flag: '🇨🇳' },
+                      { code: 'ja', label: 'Japanese', flag: '🇯🇵' },
+                      { code: 'ko', label: 'Korean', flag: '🇰🇷' }
+                    ]"
+                    :key="lang.code"
+                    @click="targetLanguage = lang.code"
+                    :disabled="isTranslating"
+                    :class="[
+                      'px-2 py-2 rounded-lg text-xs font-medium transition-all flex flex-col items-center gap-1',
+                      targetLanguage === lang.code && aiTranslation
+                        ? 'bg-teal-100 text-teal-700 ring-2 ring-teal-300'
+                        : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
+                    ]"
+                  >
+                    <span class="text-lg">{{ lang.flag }}</span>
+                    <span>{{ lang.label }}</span>
+                  </button>
                 </div>
 
+                <!-- Translate Button -->
                 <button
                   @click="translateContent"
                   :disabled="isTranslating"
-                  class="w-full px-4 py-2.5 bg-gradient-to-r from-teal-500 to-cyan-500 text-white rounded-lg font-medium flex items-center justify-center gap-2 hover:from-teal-600 hover:to-cyan-600 transition-colors disabled:opacity-50"
+                  class="w-full px-4 py-2.5 bg-teal-500 hover:bg-teal-600 disabled:bg-teal-300 text-white rounded-lg font-medium flex items-center justify-center gap-2 transition-colors"
                 >
-                  <i v-if="isTranslating" class="fas fa-spinner animate-spin"></i>
-                  <i v-else class="fas fa-language"></i>
+                  <i :class="['fas', isTranslating ? 'fa-spinner fa-spin' : 'fa-language']"></i>
                   {{ isTranslating ? 'Translating...' : 'Translate Content' }}
                 </button>
 
-                <!-- Translation Result -->
-                <div v-if="aiTranslation" class="space-y-2">
-                  <div class="flex items-center justify-between">
-                    <h4 class="text-sm font-semibold text-gray-700 flex items-center gap-2">
-                      <i class="fas fa-check-circle text-green-500"></i>
-                      Translated to {{ aiTranslation.language }}
-                    </h4>
-                    <button @click="copyTranslation" class="text-xs text-teal-600 hover:text-teal-700 flex items-center gap-1">
-                      <i class="fas fa-copy"></i>
-                      Copy
-                    </button>
-                  </div>
-                  <div class="p-4 bg-gray-50 rounded-xl border border-gray-200" dir="auto">
-                    <p class="text-sm text-gray-700 leading-relaxed whitespace-pre-line">{{ aiTranslation.text }}</p>
+                <!-- Loading State -->
+                <div v-if="isTranslating" class="flex items-center justify-center py-6">
+                  <div class="text-center">
+                    <i class="fas fa-spinner fa-spin text-2xl text-teal-500 mb-2"></i>
+                    <p class="text-sm text-gray-500">Translating content...</p>
                   </div>
                 </div>
+
+                <!-- Translation Result (Documents Page Style) -->
+                <Transition name="slide-fade">
+                  <div v-if="aiTranslation && !isTranslating" class="space-y-3 pt-3 border-t border-gray-100">
+                    <div class="p-3 bg-blue-50 rounded-xl">
+                      <div class="flex items-center justify-between mb-2">
+                        <span class="text-sm font-medium text-blue-700">Translation</span>
+                        <button @click="aiTranslation = null" class="text-blue-400 hover:text-blue-600">
+                          <i class="fas fa-times text-sm"></i>
+                        </button>
+                      </div>
+                      <p class="text-sm text-blue-800 leading-relaxed max-h-40 overflow-y-auto" :dir="targetLanguage === 'ar' ? 'rtl' : 'ltr'">
+                        {{ aiTranslation.text }}
+                      </p>
+                    </div>
+                    <div class="flex items-center justify-between text-xs text-gray-400">
+                      <span>Translated to {{ aiTranslation.language }}</span>
+                      <button @click="copyTranslation" class="flex items-center gap-1 text-teal-600 hover:text-teal-700">
+                        <i class="fas fa-copy"></i>
+                        Copy
+                      </button>
+                    </div>
+                  </div>
+                </Transition>
               </div>
 
               <!-- Accessibility Section (shown in all tabs) -->
@@ -7671,6 +7734,25 @@ onUnmounted(() => {
 .slide-right-enter-from > div:last-child,
 .slide-right-leave-to > div:last-child {
   transform: translateX(100%);
+}
+
+/* Slide Fade Transition (Documents Page Style) */
+.slide-fade-enter-active {
+  transition: all 0.3s ease-out;
+}
+
+.slide-fade-leave-active {
+  transition: all 0.2s ease-in;
+}
+
+.slide-fade-enter-from {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+.slide-fade-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
 }
 
 /* AI Analysis Modal */
