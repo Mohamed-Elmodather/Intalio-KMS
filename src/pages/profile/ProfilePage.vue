@@ -87,6 +87,7 @@ const contributionData = ref([30, 45, 60, 75, 50, 85, 90, 70, 55, 80, 95, 60])
 // Activities
 const activities = ref([
   {
+    id: 1,
     type: 'Article',
     typeBadge: 'badge-blue',
     icon: 'fas fa-file-alt',
@@ -94,9 +95,11 @@ const activities = ref([
     iconColor: 'text-white',
     title: 'Published "Complete Employee Onboarding Guide 2024"',
     description: '',
-    time: '2 hours ago'
+    time: '2 hours ago',
+    link: '/articles/1'
   },
   {
+    id: 2,
     type: 'Comment',
     typeBadge: 'badge-purple',
     icon: 'fas fa-comment',
@@ -104,9 +107,11 @@ const activities = ref([
     iconColor: 'text-white',
     title: 'Commented on "Remote Work Best Practices"',
     description: 'Great insights on async communication!',
-    time: '5 hours ago'
+    time: '5 hours ago',
+    link: '/articles/2'
   },
   {
+    id: 3,
     type: 'Course',
     typeBadge: 'badge-green',
     icon: 'fas fa-graduation-cap',
@@ -114,9 +119,11 @@ const activities = ref([
     iconColor: 'text-white',
     title: 'Completed "Advanced Product Management"',
     description: '',
-    time: 'Yesterday'
+    time: 'Yesterday',
+    link: '/learning/course/1'
   },
   {
+    id: 4,
     type: 'Document',
     typeBadge: 'badge-orange',
     icon: 'fas fa-file-upload',
@@ -124,7 +131,8 @@ const activities = ref([
     iconColor: 'text-white',
     title: 'Uploaded "Q4 Product Roadmap"',
     description: '',
-    time: '2 days ago'
+    time: '2 days ago',
+    link: '/documents/1'
   }
 ])
 
@@ -181,6 +189,26 @@ const goToDocuments = () => {
 
 const goToPolls = () => {
   router.push('/polls')
+}
+
+const goToUserProfile = (userId: number) => {
+  router.push({ name: 'Profile', query: { userId: userId.toString() } })
+}
+
+const goToArticle = (articleId: number) => {
+  router.push({ name: 'ArticleView', params: { slug: `article-${articleId}` } })
+}
+
+const goToDocument = (documentId: number) => {
+  router.push({ name: 'DocumentView', params: { id: documentId.toString() } })
+}
+
+const goToPoll = (pollId: number) => {
+  router.push({ name: 'PollDetail', params: { id: pollId.toString() } })
+}
+
+const goToActivityLink = (link: string) => {
+  router.push(link)
 }
 
 const saveProfile = () => {
@@ -642,19 +670,22 @@ function getInsightColor(type: string): string {
 
               <div
                 v-for="(activity, idx) in activities"
-                :key="idx"
+                :key="activity.id"
                 class="relative pl-14 pb-8 last:pb-0 list-item-animated"
                 :style="{ 'animation-delay': (0.35 + idx * 0.05) + 's' }"
               >
                 <div :class="['absolute left-2.5 w-5 h-5 rounded-full flex items-center justify-center', activity.iconBg]">
                   <i :class="[activity.icon, 'text-xs', activity.iconColor, 'icon-vibrant']"></i>
                 </div>
-                <div class="card-animated rounded-xl p-4 ml-2 hover:shadow-md transition-all ripple">
+                <div
+                  @click="goToActivityLink(activity.link)"
+                  class="card-animated rounded-xl p-4 ml-2 hover:shadow-md transition-all ripple cursor-pointer group"
+                >
                   <div class="flex items-center justify-between mb-1">
                     <span :class="['badge text-xs', activity.typeBadge]">{{ activity.type }}</span>
                     <span class="text-xs text-teal-400">{{ activity.time }}</span>
                   </div>
-                  <p class="text-teal-900 font-medium">{{ activity.title }}</p>
+                  <p class="text-teal-900 font-medium group-hover:text-teal-600 transition-colors">{{ activity.title }}</p>
                   <p v-if="activity.description" class="text-sm text-teal-600 mt-1">{{ activity.description }}</p>
                 </div>
               </div>
@@ -1053,6 +1084,7 @@ function getInsightColor(type: string): string {
               <div
                 v-for="(member, idx) in teamMembers"
                 :key="member.id"
+                @click="goToUserProfile(member.id)"
                 class="flex items-center gap-3 p-2 rounded-xl hover:bg-teal-50 transition-colors cursor-pointer list-item-animated ripple"
                 :style="{ 'animation-delay': (0.55 + idx * 0.05) + 's' }"
               >
@@ -1106,16 +1138,17 @@ function getInsightColor(type: string): string {
                 class="flex items-center justify-between p-2 rounded-xl hover:bg-teal-50 transition-colors list-item-animated"
                 :style="{ 'animation-delay': (0.65 + idx * 0.05) + 's' }"
               >
-                <div class="flex items-center gap-3">
+                <div class="flex items-center gap-3 cursor-pointer" @click="goToUserProfile(follower.id)">
                   <div class="w-9 h-9 rounded-full bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center text-white text-xs font-medium">
                     {{ follower.initials }}
                   </div>
                   <div>
-                    <p class="text-sm font-medium text-teal-900">{{ follower.name }}</p>
+                    <p class="text-sm font-medium text-teal-900 hover:text-teal-600 transition-colors">{{ follower.name }}</p>
                     <p class="text-xs text-teal-500">{{ follower.role }}</p>
                   </div>
                 </div>
                 <button
+                  @click.stop
                   :class="[
                     'px-3 py-1 text-xs font-medium rounded-full transition-colors',
                     follower.isFollowing
