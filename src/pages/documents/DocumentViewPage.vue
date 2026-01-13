@@ -894,68 +894,83 @@ function formatVersionDate(date: Date): string {
     </div>
 
     <!-- Document Content -->
-    <div v-else-if="document" class="px-6 py-8 space-y-6">
-      <!-- Back Button -->
-      <button @click="goBack" class="inline-flex items-center gap-2 text-gray-600 hover:text-teal-600 transition-colors group">
-        <i class="fas fa-arrow-left group-hover:-translate-x-1 transition-transform"></i>
-        <span>Back to Documents</span>
-      </button>
+    <div v-else-if="document" class="page-view fade-in">
+      <!-- Hero Header -->
+      <div :class="['relative overflow-hidden rounded-2xl mb-6 bg-gradient-to-br', document.gradientFrom, document.gradientTo]">
+        <!-- Decorative circles -->
+        <div class="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/4"></div>
+        <div class="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/4"></div>
+        <div class="absolute top-1/2 right-1/3 w-32 h-32 bg-white/10 rounded-full"></div>
+
+        <div class="relative z-10 px-8 py-6">
+          <!-- Breadcrumb -->
+          <div class="flex items-center gap-2 text-white/70 text-sm mb-4">
+            <router-link to="/documents" class="hover:text-white transition-colors">Documents</router-link>
+            <i class="fas fa-chevron-right text-xs"></i>
+            <span class="text-white">{{ document.name }}</span>
+          </div>
+
+          <!-- Title and actions row -->
+          <div class="flex items-center justify-between flex-wrap gap-4">
+            <div class="flex items-center gap-4">
+              <button @click="goBack" class="w-10 h-10 rounded-xl bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-all">
+                <i class="fas fa-arrow-left"></i>
+              </button>
+              <div class="w-14 h-14 bg-white rounded-xl shadow-lg flex items-center justify-center">
+                <i :class="[document.icon, document.iconColor, 'text-2xl']"></i>
+              </div>
+              <div>
+                <h1 class="text-2xl md:text-3xl font-bold text-white">{{ document.name }}</h1>
+                <p class="text-white/70">{{ document.type }} • {{ document.size }} • Version {{ document.version }}</p>
+              </div>
+            </div>
+
+            <!-- Action buttons -->
+            <div class="flex items-center gap-3">
+              <button @click="downloadDocument" class="px-4 py-2 bg-white text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-all shadow-sm flex items-center gap-2">
+                <i class="fas fa-download"></i>
+                <span>Download</span>
+              </button>
+              <button @click="shareDocument" class="px-4 py-2 bg-transparent text-white border border-white/30 rounded-xl font-medium hover:bg-white/10 transition-all flex items-center gap-2">
+                <i class="fas fa-share-alt"></i>
+                <span class="hidden sm:inline">Share</span>
+              </button>
+              <BookmarkButton
+                :content-id="document.id.toString()"
+                content-type="document"
+                size="md"
+                variant="icon"
+                class="text-white"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
 
       <!-- Main Content Grid -->
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Left Column - Document Preview -->
         <div class="lg:col-span-2 space-y-6">
-          <!-- Document Header Card -->
-          <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-            <!-- Gradient Header -->
-            <div :class="['h-32 bg-gradient-to-br', document.gradientFrom, document.gradientTo, 'relative']">
-              <div class="absolute inset-0 bg-black/10"></div>
-              <div class="absolute bottom-4 left-6 right-6 flex items-end justify-between">
-                <div class="flex items-center gap-4">
-                  <div class="w-16 h-16 bg-white rounded-xl shadow-lg flex items-center justify-center">
-                    <i :class="[document.icon, document.iconColor, 'text-2xl']"></i>
-                  </div>
-                  <div class="text-white">
-                    <span class="px-2 py-1 bg-white/20 backdrop-blur-sm rounded-full text-xs font-medium">
-                      {{ document.type }}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
+          <!-- Document Description Card -->
+          <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+            <h2 class="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
+              <i class="fas fa-info-circle text-teal-500"></i>
+              About this Document
+            </h2>
+            <p class="text-gray-600 mb-4">{{ document.description }}</p>
 
-            <!-- Document Info -->
-            <div class="p-6">
-              <h1 class="text-2xl font-bold text-gray-900 mb-2">{{ document.name }}</h1>
-              <p class="text-gray-600 mb-6">{{ document.description }}</p>
-
-              <!-- Action Buttons -->
-              <div class="flex flex-wrap gap-3">
-                <button @click="downloadDocument" class="flex-1 sm:flex-none px-6 py-3 bg-teal-500 hover:bg-teal-600 text-white rounded-xl font-medium flex items-center justify-center gap-2 transition-colors shadow-lg shadow-teal-200">
-                  <i class="fas fa-download"></i>
-                  <span>Download</span>
-                </button>
-                <button @click="shareDocument" class="px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-medium flex items-center justify-center gap-2 transition-colors">
-                  <i class="fas fa-share-alt"></i>
-                  <span>Share</span>
-                </button>
-                <button @click="printDocument" class="px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-medium flex items-center justify-center gap-2 transition-colors">
-                  <i class="fas fa-print"></i>
-                  <span>Print</span>
-                </button>
-                <BookmarkButton
-                  :content-id="document.id.toString()"
-                  content-type="document"
-                  size="md"
-                  variant="button"
-                />
-                <SocialShareButtons
-                  :title="document.name"
-                  :description="document.description"
-                  layout="horizontal"
-                  size="sm"
-                />
-              </div>
+            <!-- Secondary Actions -->
+            <div class="flex flex-wrap gap-3">
+              <button @click="printDocument" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-medium flex items-center gap-2 transition-colors">
+                <i class="fas fa-print"></i>
+                <span>Print</span>
+              </button>
+              <SocialShareButtons
+                :title="document.name"
+                :description="document.description"
+                layout="horizontal"
+                size="sm"
+              />
             </div>
           </div>
 
@@ -1537,6 +1552,10 @@ function formatVersionDate(date: Date): string {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+.hero-gradient {
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
 }
 
 /* AI Panel Animations */
