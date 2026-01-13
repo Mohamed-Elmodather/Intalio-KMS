@@ -3919,7 +3919,7 @@ function resumeFeaturedAutoPlay() {
         >
           <div class="ai-rec-header">
             <div class="ai-match-score">
-              <AIConfidenceBar :confidence="rec.matchScore / 100" size="sm" />
+              <AIConfidenceBar :value="rec.matchScore / 100" size="sm" />
               <span class="text-sm font-bold text-teal-600">{{ rec.matchScore }}% Match</span>
             </div>
             <span :class="['ai-priority-badge', rec.priority === 'high' ? 'priority-high' : 'priority-medium']">
@@ -4117,7 +4117,7 @@ function resumeFeaturedAutoPlay() {
                 @click="selectAIPath(path)"
               >
                 <div class="path-confidence">
-                  <AIConfidenceBar :confidence="path.confidence / 100" size="sm" />
+                  <AIConfidenceBar :value="path.confidence / 100" size="sm" />
                   <span class="text-xs font-semibold text-teal-600">{{ path.confidence }}% match</span>
                 </div>
                 <h3 class="path-title">{{ path.title }}</h3>

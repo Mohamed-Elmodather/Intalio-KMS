@@ -441,10 +441,11 @@ function addComment() {
 function extractMentions(text: string): string[] {
   const mentions: string[] = []
   const regex = /@(\w+)/g
-  let match
+  let match: RegExpExecArray | null
   while ((match = regex.exec(text)) !== null) {
+    const matchedName = match[1]
     const collaborator = collection.value.collaborators.find(
-      c => c.name.toLowerCase().includes(match[1].toLowerCase())
+      c => c.name.toLowerCase().includes(matchedName.toLowerCase())
     )
     if (collaborator) {
       mentions.push(collaborator.id)

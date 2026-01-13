@@ -381,7 +381,7 @@ async function translateTranscript(lang: SupportedLanguage) {
   try {
     await new Promise(resolve => setTimeout(resolve, 1500))
 
-    const translations: Record<SupportedLanguage, string> = {
+    const translations: Partial<Record<SupportedLanguage, string>> = {
       ar: 'مرحبا بكم في معاينة مباراة افتتاح كأس آسيا 2027. اليوم نستعرض ما يعد بأن يكون لقاء رائعا بين المملكة العربية السعودية واليابان...',
       fr: 'Bienvenue dans l\'aperçu du match d\'ouverture de la Coupe d\'Asie 2027. Aujourd\'hui, nous examinons ce qui promet d\'être une rencontre incroyable entre l\'Arabie saoudite et le Japon...',
       es: 'Bienvenidos a la previa del partido inaugural de la Copa Asiática 2027. Hoy analizamos lo que promete ser un encuentro increíble entre Arabia Saudita y Japón...',
@@ -391,7 +391,7 @@ async function translateTranscript(lang: SupportedLanguage) {
       en: transcript.value.map(t => t.text).join(' ')
     }
 
-    translatedTranscript.value = translations[lang]
+    translatedTranscript.value = translations[lang] ?? ''
   } finally {
     isLoadingTranslation.value = false
   }
@@ -714,7 +714,7 @@ function copySummary() {
                   </div>
 
                   <div class="flex items-center justify-between text-xs text-gray-400">
-                    <span>{{ (mediaSummary.confidence * 100).toFixed(0) }}% confidence</span>
+                    <span>{{ ((mediaSummary.confidence ?? 0) * 100).toFixed(0) }}% confidence</span>
                     <button @click="copySummary" class="flex items-center gap-1 text-teal-600 hover:text-teal-700">
                       <i class="fas fa-copy"></i>
                       Copy

@@ -686,7 +686,7 @@ async function translateDocument(lang: SupportedLanguage) {
   try {
     await new Promise(resolve => setTimeout(resolve, 1500))
 
-    const translations: Record<SupportedLanguage, Record<number, string>> = {
+    const translations: Partial<Record<SupportedLanguage, Record<number, string>>> = {
       ar: {
         1: 'كأس آسيا 2027 - جدول البطولة الكامل\n\nستقام بطولة كأس آسيا 2027 في المملكة العربية السعودية في الفترة من 10 يناير إلى 10 فبراير 2027. ستشهد البطولة مشاركة 24 منتخباً في 51 مباراة عبر خمسة ملاعب عالمية المستوى.',
         2: 'دليل عمليات الاستاد - كأس آسيا 2027\n\nيوفر هذا الدليل الشامل إرشادات تفصيلية لجميع عمليات الاستاد خلال بطولة كأس آسيا 2027. يجب على جميع مديري الأماكن وأفراد الأمن والموظفين التعرف على هذه الإجراءات.',
@@ -731,7 +731,7 @@ async function translateDocument(lang: SupportedLanguage) {
       }
     }
 
-    const langNames: Record<SupportedLanguage, string> = {
+    const langNames: Partial<Record<SupportedLanguage, string>> = {
       en: 'English',
       ar: 'Arabic',
       fr: 'French',
@@ -1078,7 +1078,7 @@ function formatVersionDate(date: Date): string {
 
                   <!-- Actions -->
                   <div class="flex items-center justify-between text-xs text-gray-400">
-                    <span>{{ (documentSummary.confidence * 100).toFixed(0) }}% confidence</span>
+                    <span>{{ ((documentSummary.confidence ?? 0) * 100).toFixed(0) }}% confidence</span>
                     <button @click="copySummary" class="flex items-center gap-1 text-teal-600 hover:text-teal-700">
                       <i class="fas fa-copy"></i>
                       Copy
@@ -1245,7 +1245,7 @@ function formatVersionDate(date: Date): string {
                   </div>
 
                   <!-- Page Breakdown -->
-                  <div v-if="ocrResult.pages?.length" class="space-y-2">
+                  <div v-if="Array.isArray(ocrResult.pages) && ocrResult.pages.length" class="space-y-2">
                     <p class="text-xs font-semibold text-gray-500 uppercase">Page Breakdown</p>
                     <div class="space-y-1">
                       <div v-for="page in ocrResult.pages" :key="page.pageNumber" class="flex items-center justify-between text-xs bg-gray-50 rounded p-2">

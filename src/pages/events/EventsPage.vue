@@ -18,7 +18,7 @@ const currentDate = ref(new Date())
 const searchQuery = ref('')
 const selectedTypes = ref<string[]>([])
 const selectedFormats = ref<string[]>([])
-const quickFilter = ref<'all' | 'today' | 'week' | 'myevents' | 'virtual' | 'inperson'>('all')
+const quickFilter = ref<'all' | 'today' | 'week' | 'month' | 'custom' | 'myevents' | 'virtual' | 'inperson'>('all')
 const showShareModal = ref(false)
 const selectedEventForShare = ref<Event | null>(null)
 

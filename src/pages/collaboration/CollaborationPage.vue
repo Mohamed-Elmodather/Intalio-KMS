@@ -1128,6 +1128,7 @@ const aiSmartReplies = ref<AISmartReply[]>([])
 interface MeetingSummary {
   title: string
   date: string
+  duration?: string
   participants: string[]
   keyPoints: string[]
   decisions: string[]
@@ -1144,6 +1145,9 @@ interface ConversationSentiment {
   breakdown: { label: string; percentage: number; color: string }[]
   highlights: { type: 'positive' | 'negative' | 'neutral'; message: string; sender: string }[]
   trend: 'improving' | 'stable' | 'declining'
+  emotions?: { name: string; score: number }[]
+  topics?: string[]
+  summary?: string
 }
 
 const conversationSentiment = ref<ConversationSentiment | null>(null)

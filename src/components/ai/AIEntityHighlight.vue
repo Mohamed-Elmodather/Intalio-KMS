@@ -26,6 +26,7 @@ const entityColors: Record<EntityType, { bg: string; text: string; border: strin
   event: { bg: 'bg-teal-100', text: 'text-teal-700', border: 'border-teal-300' },
   product: { bg: 'bg-pink-100', text: 'text-pink-700', border: 'border-pink-300' },
   amount: { bg: 'bg-indigo-100', text: 'text-indigo-700', border: 'border-indigo-300' },
+  money: { bg: 'bg-emerald-100', text: 'text-emerald-700', border: 'border-emerald-300' },
 }
 
 const entityIcons: Record<EntityType, string> = {
@@ -36,6 +37,7 @@ const entityIcons: Record<EntityType, string> = {
   event: 'fas fa-calendar-star',
   product: 'fas fa-box',
   amount: 'fas fa-dollar-sign',
+  money: 'fas fa-money-bill',
 }
 
 interface TextSegment {

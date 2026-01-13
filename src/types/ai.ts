@@ -79,13 +79,19 @@ export interface OCRTextBlock {
   }
 }
 
+export interface OCRPage {
+  pageNumber: number
+  text: string
+  confidence: number
+}
+
 export interface OCRResult {
   text: string
-  blocks: OCRTextBlock[]
+  blocks?: OCRTextBlock[]
   language: string
   confidence: number
   processingTime: number
-  pages?: number
+  pages?: number | OCRPage[]
   wordCount?: number
   characterCount?: number
 }

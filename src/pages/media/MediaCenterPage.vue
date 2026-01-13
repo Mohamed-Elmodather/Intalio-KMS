@@ -586,6 +586,16 @@ function openAddToCollection(media: any) {
   showAddToCollectionModal.value = true
 }
 
+function showDownloadAlert(title: string) {
+  alert('Download: ' + title)
+}
+
+function copyMediaLink(mediaId: number) {
+  if (typeof navigator !== 'undefined' && navigator.clipboard) {
+    navigator.clipboard.writeText(window.location.origin + '/media/' + mediaId)
+  }
+}
+
 function handleAddedToCollection(collectionIds: string[]) {
   if (collectionIds.length > 0) {
     alert(`Added to ${collectionIds.length} collection(s)!`)
@@ -1426,8 +1436,8 @@ onUnmounted(() => {
                     :show-download="true"
                     @add-to-collection="openAddToCollection(media)"
                     @share="shareMedia(media)"
-                    @download="() => alert('Download: ' + media.title)"
-                    @copy-link="() => navigator.clipboard.writeText(window.location.origin + '/media/' + media.id)"
+                    @download="() => showDownloadAlert(media.title)"
+                    @copy-link="() => copyMediaLink(media.id)"
                   />
                 </div>
               </div>
@@ -2256,7 +2266,7 @@ onUnmounted(() => {
                   </div>
 
                   <!-- Watch Progress (if any) -->
-                  <div v-if="media.progress" class="watch-progress z-20">
+                  <div v-if="'progress' in media && media.progress" class="watch-progress z-20">
                     <div class="watch-progress-bar" :style="{ width: media.progress + '%' }"></div>
                   </div>
                 </div>
@@ -2642,7 +2652,7 @@ onUnmounted(() => {
                     <p class="text-sm text-gray-500">{{ selectedMediaForAI.type }} • {{ selectedMediaForAI.category }}</p>
                     <div class="flex items-center gap-2 mt-2">
                       <span class="px-2 py-0.5 bg-teal-100 text-teal-700 text-xs font-medium rounded-full">
-                        {{ (getAIAnalysis(selectedMediaForAI.id)?.categoryConfidence * 100).toFixed(0) }}% confidence
+                        {{ ((getAIAnalysis(selectedMediaForAI.id)?.categoryConfidence ?? 0) * 100).toFixed(0) }}% confidence
                       </span>
                       <span class="text-xs text-gray-400">
                         Processed in {{ getAIAnalysis(selectedMediaForAI.id)?.processingTime }}s
@@ -2740,7 +2750,7 @@ onUnmounted(() => {
                     <i class="fas fa-file-lines text-rose-500"></i>
                     OCR - Extracted Text
                     <span class="text-xs text-gray-400 font-normal">
-                      ({{ (getAIAnalysis(selectedMediaForAI.id)?.ocrConfidence * 100).toFixed(0) }}% confidence)
+                      ({{ ((getAIAnalysis(selectedMediaForAI.id)?.ocrConfidence ?? 0) * 100).toFixed(0) }}% confidence)
                     </span>
                   </h5>
                   <div class="p-3 bg-rose-50 rounded-lg border border-rose-100">

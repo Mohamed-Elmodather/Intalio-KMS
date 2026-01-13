@@ -667,7 +667,7 @@ function navigateToArticle(slug: string) {
                       </div>
                       <div class="flex items-center justify-between text-xs text-gray-500">
                         <span>{{ summaryResult.wordCount }} words</span>
-                        <span>{{ summaryResult.compressionRatio.toFixed(1) }}x compression</span>
+                        <span>{{ summaryResult.compressionRatio?.toFixed(1) ?? 'N/A' }}x compression</span>
                       </div>
                       <div class="flex gap-2">
                         <button @click="copyToClipboard(summaryResult.summary)" class="flex-1 px-3 py-1.5 text-xs bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors">

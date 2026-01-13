@@ -715,6 +715,12 @@ function shareDocument(doc: any) {
   alert(`Share link copied for: ${doc.name}`)
 }
 
+function copyDocumentLink(docId: string) {
+  if (typeof navigator !== 'undefined' && navigator.clipboard) {
+    navigator.clipboard.writeText(window.location.origin + '/documents/' + docId)
+  }
+}
+
 function openAddToCollection(doc: any) {
   selectedItemForCollection.value = {
     id: doc.id,
@@ -1240,7 +1246,7 @@ function getCategoryColor(category: string): string {
                   @add-to-collection="openAddToCollection(doc)"
                   @share="shareDocument(doc)"
                   @download="downloadDocument(doc)"
-                  @copy-link="() => navigator.clipboard.writeText(window.location.origin + '/documents/' + doc.id)"
+                  @copy-link="() => copyDocumentLink(doc.id)"
                 />
               </div>
             </div>
@@ -1316,7 +1322,7 @@ function getCategoryColor(category: string): string {
                   @add-to-collection="openAddToCollection(doc)"
                   @share="shareDocument(doc)"
                   @download="downloadDocument(doc)"
-                  @copy-link="() => navigator.clipboard.writeText(window.location.origin + '/documents/' + doc.id)"
+                  @copy-link="() => copyDocumentLink(doc.id)"
                 />
               </div>
             </div>
@@ -2275,7 +2281,7 @@ function getCategoryColor(category: string): string {
                       @add-to-collection="openAddToCollection(doc)"
                       @share="shareDocument(doc)"
                       @download="downloadDocument(doc)"
-                      @copy-link="() => navigator.clipboard.writeText(window.location.origin + '/documents/' + doc.id)"
+                      @copy-link="() => copyDocumentLink(doc.id)"
                     />
                   </div>
 
@@ -2510,7 +2516,7 @@ function getCategoryColor(category: string): string {
                         </div>
                       </div>
                       <!-- Description -->
-                      <p class="text-xs text-gray-500 truncate">{{ doc.description || 'Official document for AFC Asian Cup 2027 tournament operations' }}</p>
+                      <p class="text-xs text-gray-500 truncate">{{ (doc as any).description || 'Official document for AFC Asian Cup 2027 tournament operations' }}</p>
                       <!-- Tags Row -->
                       <div class="flex items-center gap-2 flex-wrap">
                         <span v-for="tag in doc.tags.slice(0, 3)" :key="tag" class="px-2 py-0.5 bg-gradient-to-r from-gray-100 to-gray-50 text-gray-600 text-[10px] rounded-md font-medium hover:from-teal-100 hover:to-teal-50 hover:text-teal-700 transition-all cursor-pointer border border-gray-100 hover:border-teal-200">
@@ -2538,7 +2544,7 @@ function getCategoryColor(category: string): string {
                     </div>
                     <div class="min-w-0 space-y-0.5">
                       <p class="text-sm font-medium text-gray-800 truncate">{{ doc.author.name }}</p>
-                      <p class="text-[10px] text-gray-500 truncate">{{ doc.author.department || 'Tournament Ops' }}</p>
+                      <p class="text-[10px] text-gray-500 truncate">{{ (doc.author as any).department || 'Tournament Ops' }}</p>
                       <div class="flex items-center gap-1">
                         <i class="fas fa-shield-alt text-teal-500 text-[8px]"></i>
                         <span class="text-[9px] text-teal-600 font-medium">Owner</span>
@@ -2552,7 +2558,7 @@ function getCategoryColor(category: string): string {
                       <div class="w-7 h-7 bg-teal-100 rounded-lg flex items-center justify-center">
                         <i class="fas fa-folder text-teal-500 text-xs"></i>
                       </div>
-                      <span class="text-sm text-teal-700 font-medium truncate">{{ doc.category || 'General' }}</span>
+                      <span class="text-sm text-teal-700 font-medium truncate">{{ (doc as any).category || 'General' }}</span>
                     </div>
                   </div>
 
@@ -2643,7 +2649,7 @@ function getCategoryColor(category: string): string {
                           @add-to-collection="openAddToCollection(doc)"
                           @share="shareDocument(doc)"
                           @download="downloadDocument(doc)"
-                          @copy-link="() => navigator.clipboard.writeText(window.location.origin + '/documents/' + doc.id)"
+                          @copy-link="() => copyDocumentLink(doc.id)"
                         />
                       </template>
                       <template v-else>

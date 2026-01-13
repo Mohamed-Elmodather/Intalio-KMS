@@ -39,7 +39,7 @@ interface Collection {
   id: string
   name: string
   description: string
-  thumbnail: string | null
+  thumbnail: string | null | undefined
   createdAt: string
   updatedAt: string
   author: { id: string; name: string; initials: string; color: string }

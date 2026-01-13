@@ -1059,17 +1059,18 @@ onMounted(() => {
 
   // Add ripple effect to buttons
   document.querySelectorAll('.btn-primary, .btn-secondary, .filter-btn').forEach(btn => {
-    btn.addEventListener('click', function(this: HTMLElement, e: MouseEvent) {
+    btn.addEventListener('click', ((e: MouseEvent) => {
+      const target = e.currentTarget as HTMLElement
       const ripple = document.createElement('span')
       ripple.classList.add('ripple')
-      const rect = this.getBoundingClientRect()
+      const rect = target.getBoundingClientRect()
       const size = Math.max(rect.width, rect.height)
       ripple.style.width = ripple.style.height = size + 'px'
       ripple.style.left = e.clientX - rect.left - size / 2 + 'px'
       ripple.style.top = e.clientY - rect.top - size / 2 + 'px'
-      this.appendChild(ripple)
+      target.appendChild(ripple)
       setTimeout(() => ripple.remove(), 600)
-    })
+    }) as EventListener)
   })
 })
 
@@ -1488,7 +1489,8 @@ onUnmounted(() => {
             </button>
           </div>
           <div class="recently-viewed-scroll scrollbar-elegant">
-            <div v-for="article in recentlyViewedArticles" :key="'recent-' + article.id"
+            <template v-for="article in recentlyViewedArticles" :key="'recent-' + article?.id">
+              <div v-if="article"
                  @click="goToArticle(article.id)"
                  class="recently-viewed-card cursor-pointer group">
               <div class="relative aspect-video rounded-xl overflow-hidden shadow-md">
@@ -1520,6 +1522,7 @@ onUnmounted(() => {
                 </p>
               </div>
             </div>
+            </template>
           </div>
         </section>
       </div>
