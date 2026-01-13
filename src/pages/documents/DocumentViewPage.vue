@@ -14,7 +14,8 @@ import {
   CommentsSection,
   RatingStars,
   SocialShareButtons,
-  BookmarkButton
+  BookmarkButton,
+  AddToCollectionModal
 } from '@/components/common'
 import { useComments } from '@/composables/useComments'
 import { useRatings } from '@/composables/useRatings'
@@ -57,6 +58,9 @@ const showVersionHistory = ref(false)
 
 const isLoading = ref(true)
 const document = ref<any>(null)
+
+// Add to Collection
+const showAddToCollection = ref(false)
 
 // Mock document data - in production, this would come from an API
 const mockDocuments = [
@@ -935,6 +939,10 @@ function formatVersionDate(date: Date): string {
                 <i class="fas fa-share-alt"></i>
                 <span class="hidden sm:inline">Share</span>
               </button>
+              <button @click="showAddToCollection = true" class="px-4 py-2 bg-transparent text-white border border-white/30 rounded-xl font-medium hover:bg-white/10 transition-all flex items-center gap-2" title="Add to Collection">
+                <i class="fas fa-folder-plus"></i>
+                <span class="hidden sm:inline">Collection</span>
+              </button>
               <BookmarkButton
                 :content-id="document.id.toString()"
                 content-type="document"
@@ -1535,6 +1543,17 @@ function formatVersionDate(date: Date): string {
         </div>
       </div>
     </Teleport>
+
+    <!-- Add to Collection Modal -->
+    <AddToCollectionModal
+      v-if="document"
+      :show="showAddToCollection"
+      content-type="document"
+      :content-id="document.id.toString()"
+      :content-title="document.name"
+      @close="showAddToCollection = false"
+      @added="showAddToCollection = false"
+    />
   </div>
 </template>
 

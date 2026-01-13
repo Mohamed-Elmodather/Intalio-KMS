@@ -22,7 +22,8 @@ import {
   SocialShareButtons,
   RelatedContentCarousel,
   AuthorCard,
-  BookmarkButton
+  BookmarkButton,
+  AddToCollectionModal
 } from '@/components/common'
 import { useComments } from '@/composables/useComments'
 import { useRatings } from '@/composables/useRatings'
@@ -35,6 +36,9 @@ const router = useRouter()
 const article = ref<Article | null>(null)
 const isLoading = ref(true)
 const error = ref<string | null>(null)
+
+// Add to Collection
+const showAddToCollection = ref(false)
 
 // Table of Contents
 interface TOCItem {
@@ -443,6 +447,14 @@ function navigateToArticle(slug: string) {
                 size="sm"
               />
               <button
+                @click="showAddToCollection = true"
+                class="px-3 py-2 rounded-lg text-sm font-medium bg-gray-100 text-gray-600 hover:bg-teal-50 hover:text-teal-600 transition-all"
+                title="Add to Collection"
+              >
+                <i class="fas fa-folder-plus mr-1"></i>
+                <span class="hidden sm:inline">Collection</span>
+              </button>
+              <button
                 @click="toggleAIPanel"
                 class="px-3 py-2 rounded-lg text-sm font-medium transition-all"
                 :class="showAIPanel ? 'bg-teal-100 text-teal-700' : 'bg-gray-100 text-gray-600 hover:bg-teal-50 hover:text-teal-600'"
@@ -815,6 +827,18 @@ function navigateToArticle(slug: string) {
         </div>
       </div>
     </template>
+
+    <!-- Add to Collection Modal -->
+    <AddToCollectionModal
+      v-if="article"
+      :show="showAddToCollection"
+      content-type="article"
+      :content-id="article.id || article.slug"
+      :content-title="article.title"
+      :content-thumbnail="article.coverImage"
+      @close="showAddToCollection = false"
+      @added="showAddToCollection = false"
+    />
   </div>
 </template>
 

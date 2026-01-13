@@ -8,7 +8,8 @@ import {
   RatingStars,
   SocialShareButtons,
   RelatedContentCarousel,
-  BookmarkButton
+  BookmarkButton,
+  AddToCollectionModal
 } from '@/components/common'
 import { useComments } from '@/composables/useComments'
 import { useRatings } from '@/composables/useRatings'
@@ -38,6 +39,9 @@ async function handleRating(stars: number) {
 // State
 const isLoading = ref(true)
 const media = ref<any>(null)
+
+// Add to Collection
+const showAddToCollection = ref(false)
 const isPlaying = ref(false)
 const currentTime = ref(0)
 const duration = ref(0)
@@ -817,6 +821,14 @@ function copySummary() {
               variant="button"
               :show-label="true"
             />
+            <button
+              @click="showAddToCollection = true"
+              class="px-4 py-2 bg-gray-100 hover:bg-teal-50 text-gray-700 hover:text-teal-600 rounded-xl font-medium flex items-center gap-2 transition-colors"
+              title="Add to Collection"
+            >
+              <i class="fas fa-folder-plus"></i>
+              <span>Collection</span>
+            </button>
           </div>
         </div>
       </div>
@@ -856,6 +868,18 @@ function copySummary() {
         </button>
       </div>
     </div>
+
+    <!-- Add to Collection Modal -->
+    <AddToCollectionModal
+      v-if="media"
+      :show="showAddToCollection"
+      content-type="media"
+      :content-id="media.id.toString()"
+      :content-title="media.title"
+      :content-thumbnail="media.thumbnail"
+      @close="showAddToCollection = false"
+      @added="showAddToCollection = false"
+    />
   </div>
 </template>
 
