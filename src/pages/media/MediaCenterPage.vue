@@ -158,106 +158,154 @@ const mediaTabs = ref([
 // Categories
 const categories = ref(['Highlights', 'Interviews', 'Behind the Scenes', 'Matches', 'Teams', 'Venues', 'Fans'])
 
-// Media Stats
-const mediaStats = ref({
-  totalVideos: 156,
-  galleries: 42,
-  audio: 38,
-  images: 245
-})
+// Date utility functions
+function formatRelativeDate(dateInput: Date | string): string {
+  const date = typeof dateInput === 'string' ? new Date(dateInput) : dateInput
+  const now = new Date()
+  const diffMs = now.getTime() - date.getTime()
+  const diffMins = Math.floor(diffMs / 60000)
+  const diffHours = Math.floor(diffMs / 3600000)
+  const diffDays = Math.floor(diffMs / 86400000)
+  const diffWeeks = Math.floor(diffDays / 7)
 
-// Watch History (Continue Watching)
-const watchHistory = ref([
+  if (diffMins < 1) return 'Just now'
+  if (diffMins < 60) return `${diffMins} min ago`
+  if (diffHours < 24) return diffHours === 1 ? '1 hour ago' : `${diffHours} hours ago`
+  if (diffDays < 7) return diffDays === 1 ? 'Yesterday' : `${diffDays} days ago`
+  if (diffWeeks < 4) return diffWeeks === 1 ? '1 week ago' : `${diffWeeks} weeks ago`
+  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+}
+
+function isNewContent(dateInput: Date | string, daysThreshold = 7): boolean {
+  const date = typeof dateInput === 'string' ? new Date(dateInput) : dateInput
+  const now = new Date()
+  const diffDays = Math.floor((now.getTime() - date.getTime()) / 86400000)
+  return diffDays <= daysThreshold
+}
+
+function generateDateDaysAgo(days: number): Date {
+  const date = new Date()
+  date.setDate(date.getDate() - days)
+  return date
+}
+
+// Watch History (Continue Watching) - Using actual dates
+const watchHistoryData = [
   {
     id: 1,
-    title: 'CEO Vision 2025: Building the Future',
+    title: 'AFC Asian Cup 2027: Tournament Preview',
     progress: 65,
-    duration: '32:15',
-    timeRemaining: '11 min left',
-    thumbnail: 'https://images.unsplash.com/photo-1560439514-4e9645039924?w=400&h=225&fit=crop',
-    category: 'Leadership',
+    durationSeconds: 1935, // 32:15
+    thumbnail: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=400&h=225&fit=crop',
+    category: 'Tournament',
     type: 'video',
-    author: 'John Smith',
-    lastWatched: '2 hours ago',
-    views: '2.4K'
+    author: 'AFC Media Team',
+    lastWatchedDate: generateDateDaysAgo(0), // Today, 2 hours ago
+    viewCount: 2400
   },
   {
     id: 2,
-    title: 'Q4 Product Roadmap Overview',
+    title: 'Stadium Tour: King Fahd International',
     progress: 30,
-    duration: '18:42',
-    timeRemaining: '13 min left',
-    thumbnail: 'https://images.unsplash.com/photo-1551434678-e076c223a692?w=400&h=225&fit=crop',
-    category: 'Product Updates',
+    durationSeconds: 1122, // 18:42
+    thumbnail: 'https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=400&h=225&fit=crop',
+    category: 'Venues',
     type: 'video',
-    author: 'Sarah Chen',
-    lastWatched: 'Yesterday',
-    views: '1.2K'
+    author: 'Sports Network',
+    lastWatchedDate: generateDateDaysAgo(1), // Yesterday
+    viewCount: 1200
   },
   {
     id: 3,
-    title: 'Security Best Practices 2024',
+    title: 'Top 10 Goals from Qualifiers',
     progress: 80,
-    duration: '15:20',
-    timeRemaining: '3 min left',
-    thumbnail: 'https://images.unsplash.com/photo-1563986768609-322da13575f3?w=400&h=225&fit=crop',
-    category: 'Technical',
+    durationSeconds: 920, // 15:20
+    thumbnail: 'https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?w=400&h=225&fit=crop',
+    category: 'Highlights',
     type: 'video',
-    author: 'David Kim',
-    lastWatched: '3 days ago',
-    views: '890'
+    author: 'AFC Highlights',
+    lastWatchedDate: generateDateDaysAgo(3),
+    viewCount: 890
   },
   {
     id: 4,
-    title: 'Leadership Workshop: Building High-Performing Teams',
+    title: 'Team Japan: Road to 2027',
     progress: 45,
-    duration: '45:00',
-    timeRemaining: '25 min left',
-    thumbnail: 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=400&h=225&fit=crop',
-    category: 'Training',
+    durationSeconds: 2700, // 45:00
+    thumbnail: 'https://images.unsplash.com/photo-1489944440615-453fc2b6a9a9?w=400&h=225&fit=crop',
+    category: 'Teams',
     type: 'video',
-    author: 'Emily Davis',
-    lastWatched: '1 week ago',
-    views: '1.8K'
+    author: 'Sports Documentary',
+    lastWatchedDate: generateDateDaysAgo(7),
+    viewCount: 1800
   },
   {
     id: 5,
-    title: 'Tech Talk: Microservices Architecture Deep Dive',
+    title: 'Opening Ceremony Preparations',
     progress: 12,
-    duration: '38:15',
-    timeRemaining: '34 min left',
-    thumbnail: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=400&h=225&fit=crop',
-    category: 'Technical',
+    durationSeconds: 2295, // 38:15
+    thumbnail: 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?w=400&h=225&fit=crop',
+    category: 'Events',
     type: 'video',
-    author: 'Alex Thompson',
-    lastWatched: '2 weeks ago',
-    views: '956'
+    author: 'Event Coverage',
+    lastWatchedDate: generateDateDaysAgo(14),
+    viewCount: 956
   },
-])
+]
 
-// Category Cards
-const categoryCards = ref([
-  { id: 'training', name: 'Training', icon: 'fas fa-chalkboard-teacher', count: 24, gradient: 'cat-training' },
-  { id: 'product', name: 'Product Updates', icon: 'fas fa-box', count: 18, gradient: 'cat-product' },
-  { id: 'leadership', name: 'Leadership', icon: 'fas fa-users-cog', count: 12, gradient: 'cat-leadership' },
-  { id: 'technical', name: 'Technical', icon: 'fas fa-code', count: 32, gradient: 'cat-technical' },
-  { id: 'culture', name: 'Culture', icon: 'fas fa-heart', count: 8, gradient: 'cat-culture' },
-  { id: 'news', name: 'Company News', icon: 'fas fa-newspaper', count: 15, gradient: 'cat-news' },
-])
+// Computed watch history with formatted values
+const watchHistory = computed(() => {
+  return watchHistoryData.map(item => {
+    const totalSeconds = item.durationSeconds
+    const watchedSeconds = Math.floor(totalSeconds * (item.progress / 100))
+    const remainingSeconds = totalSeconds - watchedSeconds
+    const remainingMinutes = Math.ceil(remainingSeconds / 60)
 
-// Featured Video
-// Featured Videos Carousel
-const featuredVideos = ref([
+    return {
+      ...item,
+      duration: formatDuration(totalSeconds),
+      timeRemaining: `${remainingMinutes} min left`,
+      lastWatched: formatRelativeDate(item.lastWatchedDate),
+      views: formatViewCount(item.viewCount)
+    }
+  })
+})
+
+function formatDuration(seconds: number): string {
+  const mins = Math.floor(seconds / 60)
+  const secs = seconds % 60
+  return `${mins}:${secs.toString().padStart(2, '0')}`
+}
+
+function formatViewCount(count: number): string {
+  if (count >= 1000) {
+    return (count / 1000).toFixed(1).replace(/\.0$/, '') + 'K'
+  }
+  return count.toString()
+}
+
+// Category Cards - Base definitions (counts will be computed)
+const categoryCardDefs = [
+  { id: 'highlights', name: 'Highlights', icon: 'fas fa-star', gradient: 'cat-training', category: 'Highlights' },
+  { id: 'interviews', name: 'Interviews', icon: 'fas fa-microphone', gradient: 'cat-product', category: 'Interviews' },
+  { id: 'behind', name: 'Behind the Scenes', icon: 'fas fa-film', gradient: 'cat-leadership', category: 'Behind the Scenes' },
+  { id: 'teams', name: 'Teams', icon: 'fas fa-users', gradient: 'cat-technical', category: 'Teams' },
+  { id: 'venues', name: 'Venues', icon: 'fas fa-building', gradient: 'cat-culture', category: 'Venues' },
+  { id: 'fans', name: 'Fans', icon: 'fas fa-heart', gradient: 'cat-news', category: 'Fans' },
+]
+
+// Featured Videos Carousel - Using actual dates
+const featuredVideosData = [
   {
     id: 1,
     title: 'AFC Asian Cup 2027: Tournament Preview',
     description: 'Get an exclusive behind-the-scenes look at the preparations for the biggest football event in Asia.',
-    duration: '32:15',
-    views: '24.5K',
+    durationSeconds: 1935,
+    viewCount: 24500,
     thumbnail: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=1200&h=675&fit=crop',
     category: 'Tournament',
     author: 'AFC Media Team',
-    date: '2 days ago',
+    publishedDate: generateDateDaysAgo(2),
     likes: 1250,
     comments: 89
   },
@@ -265,12 +313,12 @@ const featuredVideos = ref([
     id: 2,
     title: 'Opening Ceremony Preparations Unveiled',
     description: 'A sneak peek at the spectacular opening ceremony planned for the tournament.',
-    duration: '18:42',
-    views: '18.2K',
+    durationSeconds: 1122,
+    viewCount: 18200,
     thumbnail: 'https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=1200&h=675&fit=crop',
     category: 'Events',
     author: 'Sports Network',
-    date: '3 days ago',
+    publishedDate: generateDateDaysAgo(3),
     likes: 890,
     comments: 56
   },
@@ -278,12 +326,12 @@ const featuredVideos = ref([
     id: 3,
     title: 'Top 10 Goals from Qualifying Rounds',
     description: 'Relive the most spectacular goals scored during the qualification matches.',
-    duration: '12:30',
-    views: '45.8K',
+    durationSeconds: 750,
+    viewCount: 45800,
     thumbnail: 'https://images.unsplash.com/photo-1551958219-acbc608c6377?w=1200&h=675&fit=crop',
     category: 'Highlights',
     author: 'AFC Media Team',
-    date: '1 week ago',
+    publishedDate: generateDateDaysAgo(7),
     likes: 2340,
     comments: 178
   },
@@ -291,16 +339,26 @@ const featuredVideos = ref([
     id: 4,
     title: 'Meet the Teams: Group Stage Draw Analysis',
     description: 'Expert analysis of the group stage draw and predictions for the tournament.',
-    duration: '28:15',
-    views: '12.1K',
+    durationSeconds: 1695,
+    viewCount: 12100,
     thumbnail: 'https://images.unsplash.com/photo-1489944440615-453fc2b6a9a9?w=1200&h=675&fit=crop',
     category: 'Analysis',
     author: 'Football Experts',
-    date: '5 days ago',
+    publishedDate: generateDateDaysAgo(5),
     likes: 567,
     comments: 42
   }
-])
+]
+
+// Computed featured videos with formatted values
+const featuredVideos = computed(() => {
+  return featuredVideosData.map(item => ({
+    ...item,
+    duration: formatDuration(item.durationSeconds),
+    views: formatViewCount(item.viewCount),
+    date: formatRelativeDate(item.publishedDate)
+  }))
+})
 
 const currentFeaturedIndex = ref(0)
 const featuredVideo = computed(() => featuredVideos.value[currentFeaturedIndex.value])
@@ -343,71 +401,64 @@ function resumeAutoPlay() {
   startAutoPlay()
 }
 
-// Up Next Videos
-const upNextVideos = ref([
-  {
-    id: 2,
-    title: 'Stadium Tour: King Fahd International',
-    duration: '18:42',
-    views: '12.3K',
-    thumbnail: 'https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=400&h=225&fit=crop',
-    category: 'Venues',
-    author: 'Sports Network'
-  },
-  {
-    id: 3,
-    title: 'Top 10 Goals from Qualifiers',
-    duration: '24:30',
-    views: '35.8K',
-    thumbnail: 'https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?w=400&h=225&fit=crop',
-    category: 'Highlights',
-    author: 'AFC Highlights'
-  },
-  {
-    id: 4,
-    title: 'Team Japan: Road to 2027',
-    duration: '15:20',
-    views: '8.9K',
-    thumbnail: 'https://images.unsplash.com/photo-1489944440615-453fc2b6a9a9?w=400&h=225&fit=crop',
-    category: 'Teams',
-    author: 'Sports Documentary'
-  },
-  {
-    id: 5,
-    title: 'Opening Ceremony Preparations',
-    duration: '12:45',
-    views: '6.2K',
-    thumbnail: 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?w=400&h=225&fit=crop',
-    category: 'Events',
-    author: 'Event Coverage'
-  },
-])
+// Up Next Videos - Computed from featured videos (excluding current)
+const upNextVideos = computed(() => {
+  return featuredVideos.value
+    .filter((_, index) => index !== currentFeaturedIndex.value)
+    .slice(0, 4)
+})
 
-// Media Items
-const mediaItems = ref([
-  { id: 5, title: 'Saudi Arabia vs Japan: Opening Match Preview', type: 'video', category: 'Highlights', folderId: 'highlights', duration: '12:45', views: '45.2K', date: '2 days ago', thumbnail: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=400&h=225&fit=crop', isNew: true, hasTranscript: true, author: 'AFC Media', tags: ['Saudi Arabia', 'Japan', 'Group A', 'Preview'], sharedWithMe: true, sharedBy: 'John Smith' },
-  { id: 6, title: 'King Fahd Stadium: Behind the Scenes Tour', type: 'video', category: 'Behind the Scenes', folderId: 'venues', duration: '18:30', views: '32.1K', date: '3 days ago', thumbnail: 'https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=400&h=225&fit=crop', isNew: true, hasTranscript: true, author: 'Venue Team', tags: ['Stadium', 'Riyadh', 'Exclusive'], sharedWithMe: false },
-  { id: 13, title: 'AFC Asian Cup 2027 Official Draw Ceremony', type: 'gallery', category: 'Highlights', folderId: 'ceremonies', photoCount: 48, views: '28.5K', date: '1 day ago', thumbnail: 'https://images.unsplash.com/photo-1459865264687-595d652de67e?w=400&h=225&fit=crop', isNew: true, author: 'AFC Media', tags: ['Draw', 'Official', 'Ceremony'], sharedWithMe: true, sharedBy: 'Sarah Wilson' },
-  { id: 18, title: 'AFC Asian Cup Official Podcast: Episode 1', type: 'audio', category: 'Interviews', folderId: 'audio', duration: '45:30', views: '12.3K', date: '2 days ago', thumbnail: 'https://images.unsplash.com/photo-1478737270239-2f02b77fc618?w=400&h=225&fit=crop', isNew: true, hasTranscript: true, author: 'AFC Media', tags: ['Podcast', 'Official', 'Analysis'], sharedWithMe: false },
-  { id: 19, title: 'King Fahd Stadium Aerial View', type: 'image', category: 'Venues', folderId: 'venues', views: '18.5K', date: '1 day ago', thumbnail: 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?w=400&h=225&fit=crop', isNew: true, author: 'AFC Media', tags: ['Stadium', 'Riyadh', 'Aerial'], sharedWithMe: false },
-  { id: 7, title: 'Coach Interview: Saudi Arabia Tactics Analysis', type: 'video', category: 'Interviews', folderId: 'interviews', duration: '25:15', views: '18.7K', date: '1 week ago', thumbnail: 'https://images.unsplash.com/photo-1551958219-acbc608c6377?w=400&h=225&fit=crop', isNew: false, hasTranscript: true, author: 'Sports Desk', tags: ['Saudi Arabia', 'Coach', 'Tactics'], sharedWithMe: true, sharedBy: 'Mike Johnson' },
-  { id: 20, title: 'Match Day Commentary: Live Analysis', type: 'audio', category: 'Matches', folderId: 'audio', duration: '90:00', views: '8.7K', date: '4 days ago', thumbnail: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=400&h=225&fit=crop', isNew: true, author: 'AFC Radio', tags: ['Commentary', 'Live', 'Analysis'], sharedWithMe: false },
-  { id: 21, title: 'Saudi Arabia Team Photo 2027', type: 'image', category: 'Teams', folderId: 'team-profiles', views: '35.2K', date: '3 days ago', thumbnail: 'https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=400&h=225&fit=crop', isNew: true, author: 'AFC Media', tags: ['Saudi Arabia', 'Team', 'Official'], sharedWithMe: false },
-  { id: 14, title: 'Fan Zone Setup: Riyadh Boulevard', type: 'gallery', category: 'Fans', folderId: 'fan-zone', photoCount: 32, views: '15.3K', date: '3 days ago', thumbnail: 'https://images.unsplash.com/photo-1560272564-c83b66b1ad12?w=400&h=225&fit=crop', isNew: true, author: 'Events Team', tags: ['Fans', 'Riyadh', 'Fan Zone'], sharedWithMe: false },
-  { id: 8, title: 'Top 10 Goals: AFC Asian Cup History', type: 'video', category: 'Highlights', folderId: 'highlights', duration: '15:20', views: '89.4K', date: '1 week ago', thumbnail: 'https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?w=400&h=225&fit=crop', isNew: false, hasTranscript: true, author: 'AFC Media', tags: ['Goals', 'History', 'Top 10'], sharedWithMe: false },
-  { id: 22, title: 'Trophy Unveiling Ceremony', type: 'image', category: 'Highlights', folderId: 'ceremonies', views: '42.1K', date: '1 week ago', thumbnail: 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=400&h=225&fit=crop', isNew: false, author: 'AFC Media', tags: ['Trophy', 'Ceremony', 'Official'], sharedWithMe: true, sharedBy: 'Emily Davis' },
-  { id: 9, title: 'Team Japan: Road to Saudi Arabia 2027', type: 'video', category: 'Teams', folderId: 'team-profiles', duration: '22:10', views: '41.2K', date: '2 weeks ago', thumbnail: 'https://images.unsplash.com/photo-1606925797300-0b35e9d1794e?w=400&h=225&fit=crop', isNew: false, hasTranscript: true, author: 'AFC Media', tags: ['Japan', 'Team', 'Documentary'], sharedWithMe: false },
-  { id: 23, title: 'Pre-Match Analysis Podcast: Group A', type: 'audio', category: 'Matches', folderId: 'audio', duration: '32:15', views: '6.4K', date: '1 week ago', thumbnail: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=400&h=225&fit=crop', isNew: false, author: 'AFC Analysts', tags: ['Podcast', 'Group A', 'Analysis'], sharedWithMe: false },
-  { id: 15, title: 'Volunteer Training Program Launch', type: 'gallery', category: 'Behind the Scenes', folderId: 'photos', photoCount: 65, views: '12.8K', date: '1 week ago', thumbnail: 'https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=400&h=225&fit=crop', isNew: false, author: 'LOC Team', tags: ['Volunteers', 'Training', 'Behind the Scenes'], sharedWithMe: false },
-  { id: 10, title: 'Salem Al-Dawsari: Exclusive Interview', type: 'video', category: 'Interviews', folderId: 'interviews', duration: '18:30', views: '67.3K', date: '2 weeks ago', thumbnail: 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=400&h=225&fit=crop', isNew: false, hasTranscript: false, author: 'Sports Desk', tags: ['Saudi Arabia', 'Player', 'Exclusive'], sharedWithMe: false },
-  { id: 24, title: 'Fans Celebrating at Boulevard', type: 'image', category: 'Fans', folderId: 'fan-zone', views: '28.9K', date: '2 weeks ago', thumbnail: 'https://images.unsplash.com/photo-1459865264687-595d652de67e?w=400&h=225&fit=crop', isNew: false, author: 'Events Team', tags: ['Fans', 'Celebration', 'Riyadh'], sharedWithMe: false },
-  { id: 16, title: 'Stadium Infrastructure Progress Photos', type: 'gallery', category: 'Venues', folderId: 'venues', photoCount: 28, views: '9.5K', date: '2 weeks ago', thumbnail: 'https://images.unsplash.com/photo-1489944440615-453fc2b6a9a9?w=400&h=225&fit=crop', isNew: false, author: 'Venue Operations', tags: ['Stadium', 'Infrastructure', 'Progress'], sharedWithMe: false },
-  { id: 11, title: 'Group Stage Draw Analysis', type: 'video', category: 'Highlights', folderId: 'highlights', duration: '35:00', views: '52.1K', date: '3 weeks ago', thumbnail: 'https://images.unsplash.com/photo-1518091043644-c1d4457512c6?w=400&h=225&fit=crop', isNew: false, hasTranscript: true, author: 'AFC Analysts', tags: ['Draw', 'Analysis', 'Groups'], sharedWithMe: false },
-  { id: 12, title: 'AFC Podcast: Tournament Predictions', type: 'audio', category: 'Interviews', folderId: 'audio', duration: '48:20', views: '8.9K', date: '3 weeks ago', thumbnail: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=400&h=225&fit=crop', isNew: false, hasTranscript: false, author: 'AFC Media', tags: ['Podcast', 'Predictions', 'Analysis'], sharedWithMe: false },
-  { id: 17, title: 'Media Accreditation Workshop', type: 'gallery', category: 'Behind the Scenes', folderId: 'photos', photoCount: 42, views: '6.2K', date: '3 weeks ago', thumbnail: 'https://images.unsplash.com/photo-1504450758481-7338eba7524a?w=400&h=225&fit=crop', isNew: false, author: 'Media Team', tags: ['Media', 'Workshop', 'Behind the Scenes'], sharedWithMe: false },
-  { id: 25, title: 'Player Training Session Highlights', type: 'video', category: 'Teams', folderId: 'player-content', duration: '8:45', views: '22.3K', date: '5 days ago', thumbnail: 'https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?w=400&h=225&fit=crop', isNew: true, hasTranscript: false, author: 'AFC Media', tags: ['Training', 'Players', 'Exclusive'], sharedWithMe: false },
-  { id: 26, title: 'Official Tournament Videos Collection', type: 'video', category: 'Highlights', folderId: 'videos', duration: '25:00', views: '15.8K', date: '1 week ago', thumbnail: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=400&h=225&fit=crop', isNew: false, hasTranscript: true, author: 'AFC Media', tags: ['Official', 'Tournament', 'Collection'], sharedWithMe: false },
-])
+// Media Items Raw Data - with actual dates
+const mediaItemsData = [
+  { id: 5, title: 'Saudi Arabia vs Japan: Opening Match Preview', type: 'video', category: 'Highlights', folderId: 'highlights', duration: '12:45', viewCount: 45200, publishedDate: generateDateDaysAgo(2), thumbnail: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=400&h=225&fit=crop', hasTranscript: true, author: 'AFC Media', tags: ['Saudi Arabia', 'Japan', 'Group A', 'Preview'], sharedWithMe: true, sharedBy: 'John Smith' },
+  { id: 6, title: 'King Fahd Stadium: Behind the Scenes Tour', type: 'video', category: 'Behind the Scenes', folderId: 'venues', duration: '18:30', viewCount: 32100, publishedDate: generateDateDaysAgo(3), thumbnail: 'https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=400&h=225&fit=crop', hasTranscript: true, author: 'Venue Team', tags: ['Stadium', 'Riyadh', 'Exclusive'], sharedWithMe: false },
+  { id: 13, title: 'AFC Asian Cup 2027 Official Draw Ceremony', type: 'gallery', category: 'Highlights', folderId: 'ceremonies', photoCount: 48, viewCount: 28500, publishedDate: generateDateDaysAgo(1), thumbnail: 'https://images.unsplash.com/photo-1459865264687-595d652de67e?w=400&h=225&fit=crop', author: 'AFC Media', tags: ['Draw', 'Official', 'Ceremony'], sharedWithMe: true, sharedBy: 'Sarah Wilson' },
+  { id: 18, title: 'AFC Asian Cup Official Podcast: Episode 1', type: 'audio', category: 'Interviews', folderId: 'audio', duration: '45:30', viewCount: 12300, publishedDate: generateDateDaysAgo(2), thumbnail: 'https://images.unsplash.com/photo-1478737270239-2f02b77fc618?w=400&h=225&fit=crop', hasTranscript: true, author: 'AFC Media', tags: ['Podcast', 'Official', 'Analysis'], sharedWithMe: false },
+  { id: 19, title: 'King Fahd Stadium Aerial View', type: 'image', category: 'Venues', folderId: 'venues', viewCount: 18500, publishedDate: generateDateDaysAgo(1), thumbnail: 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?w=400&h=225&fit=crop', author: 'AFC Media', tags: ['Stadium', 'Riyadh', 'Aerial'], sharedWithMe: false },
+  { id: 7, title: 'Coach Interview: Saudi Arabia Tactics Analysis', type: 'video', category: 'Interviews', folderId: 'interviews', duration: '25:15', viewCount: 18700, publishedDate: generateDateDaysAgo(7), thumbnail: 'https://images.unsplash.com/photo-1551958219-acbc608c6377?w=400&h=225&fit=crop', hasTranscript: true, author: 'Sports Desk', tags: ['Saudi Arabia', 'Coach', 'Tactics'], sharedWithMe: true, sharedBy: 'Mike Johnson' },
+  { id: 20, title: 'Match Day Commentary: Live Analysis', type: 'audio', category: 'Matches', folderId: 'audio', duration: '90:00', viewCount: 8700, publishedDate: generateDateDaysAgo(4), thumbnail: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=400&h=225&fit=crop', author: 'AFC Radio', tags: ['Commentary', 'Live', 'Analysis'], sharedWithMe: false },
+  { id: 21, title: 'Saudi Arabia Team Photo 2027', type: 'image', category: 'Teams', folderId: 'team-profiles', viewCount: 35200, publishedDate: generateDateDaysAgo(3), thumbnail: 'https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=400&h=225&fit=crop', author: 'AFC Media', tags: ['Saudi Arabia', 'Team', 'Official'], sharedWithMe: false },
+  { id: 14, title: 'Fan Zone Setup: Riyadh Boulevard', type: 'gallery', category: 'Fans', folderId: 'fan-zone', photoCount: 32, viewCount: 15300, publishedDate: generateDateDaysAgo(3), thumbnail: 'https://images.unsplash.com/photo-1560272564-c83b66b1ad12?w=400&h=225&fit=crop', author: 'Events Team', tags: ['Fans', 'Riyadh', 'Fan Zone'], sharedWithMe: false },
+  { id: 8, title: 'Top 10 Goals: AFC Asian Cup History', type: 'video', category: 'Highlights', folderId: 'highlights', duration: '15:20', viewCount: 89400, publishedDate: generateDateDaysAgo(7), thumbnail: 'https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?w=400&h=225&fit=crop', hasTranscript: true, author: 'AFC Media', tags: ['Goals', 'History', 'Top 10'], sharedWithMe: false },
+  { id: 22, title: 'Trophy Unveiling Ceremony', type: 'image', category: 'Highlights', folderId: 'ceremonies', viewCount: 42100, publishedDate: generateDateDaysAgo(7), thumbnail: 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=400&h=225&fit=crop', author: 'AFC Media', tags: ['Trophy', 'Ceremony', 'Official'], sharedWithMe: true, sharedBy: 'Emily Davis' },
+  { id: 9, title: 'Team Japan: Road to Saudi Arabia 2027', type: 'video', category: 'Teams', folderId: 'team-profiles', duration: '22:10', viewCount: 41200, publishedDate: generateDateDaysAgo(14), thumbnail: 'https://images.unsplash.com/photo-1606925797300-0b35e9d1794e?w=400&h=225&fit=crop', hasTranscript: true, author: 'AFC Media', tags: ['Japan', 'Team', 'Documentary'], sharedWithMe: false },
+  { id: 23, title: 'Pre-Match Analysis Podcast: Group A', type: 'audio', category: 'Matches', folderId: 'audio', duration: '32:15', viewCount: 6400, publishedDate: generateDateDaysAgo(7), thumbnail: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=400&h=225&fit=crop', author: 'AFC Analysts', tags: ['Podcast', 'Group A', 'Analysis'], sharedWithMe: false },
+  { id: 15, title: 'Volunteer Training Program Launch', type: 'gallery', category: 'Behind the Scenes', folderId: 'photos', photoCount: 65, viewCount: 12800, publishedDate: generateDateDaysAgo(7), thumbnail: 'https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=400&h=225&fit=crop', author: 'LOC Team', tags: ['Volunteers', 'Training', 'Behind the Scenes'], sharedWithMe: false },
+  { id: 10, title: 'Salem Al-Dawsari: Exclusive Interview', type: 'video', category: 'Interviews', folderId: 'interviews', duration: '18:30', viewCount: 67300, publishedDate: generateDateDaysAgo(14), thumbnail: 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=400&h=225&fit=crop', hasTranscript: false, author: 'Sports Desk', tags: ['Saudi Arabia', 'Player', 'Exclusive'], sharedWithMe: false },
+  { id: 24, title: 'Fans Celebrating at Boulevard', type: 'image', category: 'Fans', folderId: 'fan-zone', viewCount: 28900, publishedDate: generateDateDaysAgo(14), thumbnail: 'https://images.unsplash.com/photo-1459865264687-595d652de67e?w=400&h=225&fit=crop', author: 'Events Team', tags: ['Fans', 'Celebration', 'Riyadh'], sharedWithMe: false },
+  { id: 16, title: 'Stadium Infrastructure Progress Photos', type: 'gallery', category: 'Venues', folderId: 'venues', photoCount: 28, viewCount: 9500, publishedDate: generateDateDaysAgo(14), thumbnail: 'https://images.unsplash.com/photo-1489944440615-453fc2b6a9a9?w=400&h=225&fit=crop', author: 'Venue Operations', tags: ['Stadium', 'Infrastructure', 'Progress'], sharedWithMe: false },
+  { id: 11, title: 'Group Stage Draw Analysis', type: 'video', category: 'Highlights', folderId: 'highlights', duration: '35:00', viewCount: 52100, publishedDate: generateDateDaysAgo(21), thumbnail: 'https://images.unsplash.com/photo-1518091043644-c1d4457512c6?w=400&h=225&fit=crop', hasTranscript: true, author: 'AFC Analysts', tags: ['Draw', 'Analysis', 'Groups'], sharedWithMe: false },
+  { id: 12, title: 'AFC Podcast: Tournament Predictions', type: 'audio', category: 'Interviews', folderId: 'audio', duration: '48:20', viewCount: 8900, publishedDate: generateDateDaysAgo(21), thumbnail: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=400&h=225&fit=crop', hasTranscript: false, author: 'AFC Media', tags: ['Podcast', 'Predictions', 'Analysis'], sharedWithMe: false },
+  { id: 17, title: 'Media Accreditation Workshop', type: 'gallery', category: 'Behind the Scenes', folderId: 'photos', photoCount: 42, viewCount: 6200, publishedDate: generateDateDaysAgo(21), thumbnail: 'https://images.unsplash.com/photo-1504450758481-7338eba7524a?w=400&h=225&fit=crop', author: 'Media Team', tags: ['Media', 'Workshop', 'Behind the Scenes'], sharedWithMe: false },
+  { id: 25, title: 'Player Training Session Highlights', type: 'video', category: 'Teams', folderId: 'player-content', duration: '8:45', viewCount: 22300, publishedDate: generateDateDaysAgo(5), thumbnail: 'https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?w=400&h=225&fit=crop', hasTranscript: false, author: 'AFC Media', tags: ['Training', 'Players', 'Exclusive'], sharedWithMe: false },
+  { id: 26, title: 'Official Tournament Videos Collection', type: 'video', category: 'Highlights', folderId: 'videos', duration: '25:00', viewCount: 15800, publishedDate: generateDateDaysAgo(7), thumbnail: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=400&h=225&fit=crop', hasTranscript: true, author: 'AFC Media', tags: ['Official', 'Tournament', 'Collection'], sharedWithMe: false },
+]
+
+// Computed media items with formatted values and computed isNew
+const mediaItems = computed(() => {
+  return mediaItemsData.map(item => ({
+    ...item,
+    views: formatViewCount(item.viewCount),
+    date: formatRelativeDate(item.publishedDate),
+    isNew: isNewContent(item.publishedDate)
+  }))
+})
+
+// Computed Media Stats - derived from mediaItems
+const mediaStats = computed(() => ({
+  totalVideos: mediaItemsData.filter(m => m.type === 'video').length,
+  galleries: mediaItemsData.filter(m => m.type === 'gallery').length,
+  audio: mediaItemsData.filter(m => m.type === 'audio').length,
+  images: mediaItemsData.filter(m => m.type === 'image').length
+}))
+
+// Computed Category Cards with dynamic counts
+const categoryCards = computed(() => {
+  return categoryCardDefs.map(card => ({
+    ...card,
+    count: mediaItemsData.filter(m => m.category === card.category).length
+  }))
+})
 
 // Computed: All available tags from media items
 const allTags = computed(() => {
@@ -1005,36 +1056,41 @@ async function fetchAISearchSuggestions(query: string) {
   try {
     await new Promise(resolve => setTimeout(resolve, 400))
 
-    // Mock AI-powered search suggestions
-    const allSuggestions = [
-      'Saudi Arabia match highlights',
-      'Stadium tour videos',
-      'Opening ceremony preparations',
-      'Team training sessions',
-      'Player interviews',
-      'Behind the scenes content',
-      'Fan zone activities',
-      'Trophy unveiling ceremony',
-      'Group stage draw',
-      'Aerial stadium views',
-      'Official team photos',
-      'Podcast episodes',
-      'Match previews',
-      'Tactical analysis videos'
-    ]
-
+    // Generate AI-powered search suggestions from actual media content
     const q = query.toLowerCase()
-    aiSearchSuggestions.value = allSuggestions
-      .filter(s => s.toLowerCase().includes(q))
-      .slice(0, 5)
 
-    // Add AI-generated suggestions based on context
+    // Get unique suggestions from media titles, categories, tags, and authors
+    const titleSuggestions = mediaItemsData
+      .filter(m => m.title.toLowerCase().includes(q))
+      .map(m => m.title)
+      .slice(0, 3)
+
+    const categorySuggestions = [...new Set(mediaItemsData.map(m => m.category))]
+      .filter(c => c.toLowerCase().includes(q))
+      .map(c => `${c} content`)
+
+    const tagSuggestions = [...new Set(mediaItemsData.flatMap(m => m.tags || []))]
+      .filter(t => t.toLowerCase().includes(q))
+      .map(t => `${t} videos and media`)
+      .slice(0, 2)
+
+    // Combine and dedupe suggestions
+    const allSuggestions = [...new Set([...titleSuggestions, ...categorySuggestions, ...tagSuggestions])]
+    aiSearchSuggestions.value = allSuggestions.slice(0, 5)
+
+    // Add AI-generated context suggestions
     if (q.includes('match') || q.includes('game')) {
       aiSearchSuggestions.value.unshift('AI suggests: Match highlights and replays')
     }
     if (q.includes('team') || q.includes('player')) {
       aiSearchSuggestions.value.unshift('AI suggests: Team profiles and interviews')
     }
+    if (q.includes('stadium') || q.includes('venue')) {
+      aiSearchSuggestions.value.unshift('AI suggests: Stadium tours and aerial views')
+    }
+
+    // Limit to 5 suggestions
+    aiSearchSuggestions.value = aiSearchSuggestions.value.slice(0, 5)
   } finally {
     isLoadingAISuggestions.value = false
   }
