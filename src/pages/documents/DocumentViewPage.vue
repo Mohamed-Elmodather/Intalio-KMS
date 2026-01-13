@@ -56,6 +56,9 @@ interface Version {
 const versions = ref<Version[]>([])
 const showVersionHistory = ref(false)
 
+// Sidebar tabs
+const activeDetailTab = ref<'details' | 'activity' | 'history'>('details')
+
 const isLoading = ref(true)
 const document = ref<any>(null)
 
@@ -1021,17 +1024,27 @@ function formatVersionDate(date: Date): string {
             </h2>
             <p class="text-gray-600 mb-4">{{ document.description }}</p>
 
-            <!-- Secondary Actions -->
-            <div class="flex flex-wrap gap-3">
-              <button @click="printDocument" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-medium flex items-center gap-2 transition-colors">
-                <i class="fas fa-print"></i>
-                <span>Print</span>
-              </button>
-              <SocialShareButtons
-                :title="document.name"
-                :description="document.description"
-                layout="horizontal"
-                size="sm"
+            <!-- Actions & Rating -->
+            <div class="flex items-center justify-between flex-wrap gap-3">
+              <div class="flex items-center gap-3">
+                <button @click="printDocument" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-medium flex items-center gap-2 transition-colors">
+                  <i class="fas fa-print"></i>
+                  <span>Print</span>
+                </button>
+                <SocialShareButtons
+                  :title="document.name"
+                  :description="document.description"
+                  layout="horizontal"
+                  size="sm"
+                />
+              </div>
+              <RatingStars
+                :model-value="rating?.userRating || 0"
+                :average="rating?.average"
+                :count="rating?.count"
+                size="md"
+                :show-count="true"
+                @update:model-value="handleRating"
               />
             </div>
           </div>
@@ -1574,40 +1587,155 @@ function formatVersionDate(date: Date): string {
             </div>
           </div>
 
-          <!-- Document Details -->
-          <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-            <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-              <i class="fas fa-info-circle text-teal-500"></i>
-              Details
-            </h2>
-            <div class="space-y-4">
-              <div class="flex items-center justify-between py-2 border-b border-gray-100">
-                <span class="text-gray-500 text-sm">Size</span>
-                <span class="font-medium text-gray-900">{{ document.size }}</span>
+          <!-- Details / Activity / History Tabs -->
+          <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <!-- Tab Navigation -->
+            <div class="flex border-b border-gray-100">
+              <button
+                @click="activeDetailTab = 'details'"
+                :class="[
+                  'flex-1 px-4 py-3 text-sm font-medium transition-colors flex items-center justify-center gap-2',
+                  activeDetailTab === 'details'
+                    ? 'text-teal-600 border-b-2 border-teal-500 bg-teal-50/50'
+                    : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                ]"
+              >
+                <i class="fas fa-info-circle"></i>
+                Details
+              </button>
+              <button
+                @click="activeDetailTab = 'activity'"
+                :class="[
+                  'flex-1 px-4 py-3 text-sm font-medium transition-colors flex items-center justify-center gap-2',
+                  activeDetailTab === 'activity'
+                    ? 'text-teal-600 border-b-2 border-teal-500 bg-teal-50/50'
+                    : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                ]"
+              >
+                <i class="fas fa-clock"></i>
+                Activity
+              </button>
+              <button
+                @click="activeDetailTab = 'history'"
+                :class="[
+                  'flex-1 px-4 py-3 text-sm font-medium transition-colors flex items-center justify-center gap-2',
+                  activeDetailTab === 'history'
+                    ? 'text-teal-600 border-b-2 border-teal-500 bg-teal-50/50'
+                    : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                ]"
+              >
+                <i class="fas fa-history"></i>
+                History
+              </button>
+            </div>
+
+            <!-- Tab Content -->
+            <div class="p-6">
+              <!-- Details Tab -->
+              <div v-if="activeDetailTab === 'details'" class="space-y-4">
+                <div class="flex items-center justify-between py-2 border-b border-gray-100">
+                  <span class="text-gray-500 text-sm">Size</span>
+                  <span class="font-medium text-gray-900">{{ document.size }}</span>
+                </div>
+                <div class="flex items-center justify-between py-2 border-b border-gray-100">
+                  <span class="text-gray-500 text-sm">Type</span>
+                  <span class="font-medium text-gray-900">{{ document.type }}</span>
+                </div>
+                <div v-if="document.pages" class="flex items-center justify-between py-2 border-b border-gray-100">
+                  <span class="text-gray-500 text-sm">Pages</span>
+                  <span class="font-medium text-gray-900">{{ document.pages }}</span>
+                </div>
+                <div class="flex items-center justify-between py-2 border-b border-gray-100">
+                  <span class="text-gray-500 text-sm">Version</span>
+                  <span class="font-medium text-gray-900">v{{ document.version }}</span>
+                </div>
+                <div class="flex items-center justify-between py-2 border-b border-gray-100">
+                  <span class="text-gray-500 text-sm">Library</span>
+                  <span class="font-medium text-teal-600">{{ document.library }}</span>
+                </div>
+                <div class="flex items-center justify-between py-2 border-b border-gray-100">
+                  <span class="text-gray-500 text-sm">Downloads</span>
+                  <span class="font-medium text-gray-900">{{ document.downloads.toLocaleString() }}</span>
+                </div>
+                <div class="flex items-center justify-between py-2">
+                  <span class="text-gray-500 text-sm">Views</span>
+                  <span class="font-medium text-gray-900">{{ document.views.toLocaleString() }}</span>
+                </div>
               </div>
-              <div class="flex items-center justify-between py-2 border-b border-gray-100">
-                <span class="text-gray-500 text-sm">Type</span>
-                <span class="font-medium text-gray-900">{{ document.type }}</span>
+
+              <!-- Activity Tab -->
+              <div v-else-if="activeDetailTab === 'activity'" class="space-y-3">
+                <div class="flex items-start gap-3">
+                  <div class="w-8 h-8 rounded-lg bg-green-100 flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-plus text-green-600 text-xs"></i>
+                  </div>
+                  <div>
+                    <p class="text-sm font-medium text-gray-900">Created</p>
+                    <p class="text-xs text-gray-500">{{ formatDate(document.createdAt) }}</p>
+                  </div>
+                </div>
+                <div class="flex items-start gap-3">
+                  <div class="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-edit text-blue-600 text-xs"></i>
+                  </div>
+                  <div>
+                    <p class="text-sm font-medium text-gray-900">Last Updated</p>
+                    <p class="text-xs text-gray-500">{{ formatDate(document.updatedAt) }}</p>
+                  </div>
+                </div>
+                <div class="flex items-start gap-3">
+                  <div class="w-8 h-8 rounded-lg bg-purple-100 flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-eye text-purple-600 text-xs"></i>
+                  </div>
+                  <div>
+                    <p class="text-sm font-medium text-gray-900">{{ document.views.toLocaleString() }} Views</p>
+                    <p class="text-xs text-gray-500">Total page views</p>
+                  </div>
+                </div>
+                <div class="flex items-start gap-3">
+                  <div class="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-download text-amber-600 text-xs"></i>
+                  </div>
+                  <div>
+                    <p class="text-sm font-medium text-gray-900">{{ document.downloads.toLocaleString() }} Downloads</p>
+                    <p class="text-xs text-gray-500">Total downloads</p>
+                  </div>
+                </div>
               </div>
-              <div v-if="document.pages" class="flex items-center justify-between py-2 border-b border-gray-100">
-                <span class="text-gray-500 text-sm">Pages</span>
-                <span class="font-medium text-gray-900">{{ document.pages }}</span>
-              </div>
-              <div class="flex items-center justify-between py-2 border-b border-gray-100">
-                <span class="text-gray-500 text-sm">Version</span>
-                <span class="font-medium text-gray-900">v{{ document.version }}</span>
-              </div>
-              <div class="flex items-center justify-between py-2 border-b border-gray-100">
-                <span class="text-gray-500 text-sm">Library</span>
-                <span class="font-medium text-teal-600">{{ document.library }}</span>
-              </div>
-              <div class="flex items-center justify-between py-2 border-b border-gray-100">
-                <span class="text-gray-500 text-sm">Downloads</span>
-                <span class="font-medium text-gray-900">{{ document.downloads.toLocaleString() }}</span>
-              </div>
-              <div class="flex items-center justify-between py-2">
-                <span class="text-gray-500 text-sm">Views</span>
-                <span class="font-medium text-gray-900">{{ document.views.toLocaleString() }}</span>
+
+              <!-- History Tab -->
+              <div v-else-if="activeDetailTab === 'history'">
+                <div class="flex items-center justify-between mb-4">
+                  <span class="text-xs text-gray-500">{{ versions.length }} versions</span>
+                  <button
+                    v-if="versions.length > 3"
+                    @click="showVersionHistory = !showVersionHistory"
+                    class="text-xs text-teal-600 hover:text-teal-700"
+                  >
+                    {{ showVersionHistory ? 'Show Less' : 'Show All' }}
+                  </button>
+                </div>
+
+                <div class="space-y-3">
+                  <div
+                    v-for="(ver, index) in (showVersionHistory ? versions : versions.slice(0, 3))"
+                    :key="ver.id"
+                    class="relative pl-5 pb-3"
+                    :class="{ 'border-l-2 border-gray-200': index < (showVersionHistory ? versions.length : Math.min(versions.length, 3)) - 1 }"
+                  >
+                    <div class="absolute left-0 top-0.5 w-2.5 h-2.5 rounded-full -translate-x-1"
+                         :class="index === 0 ? 'bg-teal-500' : 'bg-gray-300'"></div>
+
+                    <div>
+                      <div class="flex items-center gap-2">
+                        <span class="font-medium text-gray-900 text-sm">v{{ ver.version }}</span>
+                        <span v-if="index === 0" class="px-1.5 py-0.5 bg-teal-100 text-teal-700 text-[10px] rounded-full font-medium">Current</span>
+                      </div>
+                      <p class="text-xs text-gray-600 mt-0.5">{{ ver.changes }}</p>
+                      <p class="text-[10px] text-gray-400 mt-0.5">{{ formatVersionDate(ver.date) }} • {{ ver.author }}</p>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -1643,34 +1771,6 @@ function formatVersionDate(date: Date): string {
               </span>
             </div>
           </div>
-
-          <!-- Dates -->
-          <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-            <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-              <i class="fas fa-clock text-teal-500"></i>
-              Activity
-            </h2>
-            <div class="space-y-3">
-              <div class="flex items-start gap-3">
-                <div class="w-8 h-8 rounded-lg bg-green-100 flex items-center justify-center flex-shrink-0">
-                  <i class="fas fa-plus text-green-600 text-xs"></i>
-                </div>
-                <div>
-                  <p class="text-sm font-medium text-gray-900">Created</p>
-                  <p class="text-xs text-gray-500">{{ formatDate(document.createdAt) }}</p>
-                </div>
-              </div>
-              <div class="flex items-start gap-3">
-                <div class="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0">
-                  <i class="fas fa-edit text-blue-600 text-xs"></i>
-                </div>
-                <div>
-                  <p class="text-sm font-medium text-gray-900">Last Updated</p>
-                  <p class="text-xs text-gray-500">{{ formatDate(document.updatedAt) }}</p>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
 
@@ -1692,70 +1792,6 @@ function formatVersionDate(date: Date): string {
               <p class="text-sm text-gray-500">{{ doc.size }} • {{ doc.type }}</p>
             </div>
           </div>
-        </div>
-      </div>
-
-      <!-- Version History -->
-      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mt-6">
-        <div class="flex items-center justify-between mb-4">
-          <h2 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
-            <i class="fas fa-history text-teal-500"></i>
-            Version History
-          </h2>
-          <button
-            @click="showVersionHistory = !showVersionHistory"
-            class="text-sm text-teal-600 hover:text-teal-700"
-          >
-            {{ showVersionHistory ? 'Hide' : 'Show All' }}
-          </button>
-        </div>
-
-        <div class="space-y-4">
-          <div
-            v-for="(ver, index) in (showVersionHistory ? versions : versions.slice(0, 2))"
-            :key="ver.id"
-            class="relative pl-6 pb-4"
-            :class="{ 'border-l-2 border-gray-200': index < versions.length - 1 }"
-          >
-            <!-- Timeline dot -->
-            <div class="absolute left-0 top-0 w-3 h-3 rounded-full -translate-x-1.5"
-                 :class="index === 0 ? 'bg-teal-500' : 'bg-gray-300'"></div>
-
-            <div class="flex items-start justify-between">
-              <div>
-                <div class="flex items-center gap-2">
-                  <span class="font-semibold text-gray-900">v{{ ver.version }}</span>
-                  <span v-if="index === 0" class="px-2 py-0.5 bg-teal-100 text-teal-700 text-xs rounded-full font-medium">Current</span>
-                </div>
-                <p class="text-sm text-gray-600 mt-1">{{ ver.changes }}</p>
-                <p class="text-xs text-gray-400 mt-1">
-                  {{ ver.author }} • {{ formatVersionDate(ver.date) }} • {{ ver.size }}
-                </p>
-              </div>
-              <button class="text-sm text-teal-600 hover:text-teal-700 flex items-center gap-1">
-                <i class="fas fa-download text-xs"></i>
-                Download
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Rating Section -->
-      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mt-6">
-        <div class="flex items-center justify-between">
-          <div>
-            <h2 class="text-lg font-semibold text-gray-900 mb-1">Rate this Document</h2>
-            <p class="text-sm text-gray-500">Help others find useful documents</p>
-          </div>
-          <RatingStars
-            :model-value="rating?.userRating || 0"
-            :average="rating?.average"
-            :count="rating?.count"
-            size="lg"
-            :show-count="true"
-            @update:model-value="handleRating"
-          />
         </div>
       </div>
 
