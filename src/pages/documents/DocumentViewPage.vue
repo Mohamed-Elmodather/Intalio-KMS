@@ -226,12 +226,48 @@ onMounted(async () => {
     document.value = mockDocuments.find(d => d.id === Number(route.params.id)) || mockDocuments[0]
     isLoading.value = false
 
-    // Load version history
-    versions.value = [
-      { id: '3', version: document.value?.version || '2.1', author: document.value?.author.name || 'Unknown', date: new Date(document.value?.updatedAt || Date.now()), changes: 'Updated tournament schedule with final venue assignments', size: document.value?.size || '4.2 MB' },
-      { id: '2', version: '2.0', author: document.value?.author.name || 'Unknown', date: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), changes: 'Added knockout round schedule', size: '3.8 MB' },
-      { id: '1', version: '1.0', author: document.value?.author.name || 'Unknown', date: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000), changes: 'Initial document upload', size: '2.1 MB' }
-    ]
+    // Load version history dynamically based on document
+    const doc = document.value
+    if (doc) {
+      const currentVersion = parseFloat(doc.version) || 2.1
+      const currentSizeBytes = doc.sizeBytes || 4404019
+
+      // Generate version history based on current version
+      const versionHistory: Version[] = []
+      const versionChanges = [
+        `Updated ${doc.type.toLowerCase()} content with latest revisions`,
+        `Added new sections and formatting improvements`,
+        `Content review and quality updates`,
+        `Initial document upload`
+      ]
+
+      for (let i = 0; i < Math.min(Math.ceil(currentVersion), 4); i++) {
+        const ver = currentVersion - i
+        if (ver <= 0) break
+
+        // Calculate size - each older version is ~15-25% smaller
+        const sizeMultiplier = 1 - (i * 0.15)
+        const versionSizeBytes = Math.floor(currentSizeBytes * sizeMultiplier)
+        const versionSize = versionSizeBytes >= 1048576
+          ? `${(versionSizeBytes / 1048576).toFixed(1)} MB`
+          : `${(versionSizeBytes / 1024).toFixed(0)} KB`
+
+        // Calculate date - each older version is ~7 days older
+        const versionDate = new Date(doc.updatedAt)
+        versionDate.setDate(versionDate.getDate() - (i * 7))
+
+        versionHistory.push({
+          id: String(Math.ceil(currentVersion) - i),
+          version: i === 0 ? doc.version : `${Math.floor(ver)}.0`,
+          author: doc.author.name,
+          date: versionDate,
+          changes: versionChanges[Math.min(i, versionChanges.length - 1)],
+          size: versionSize
+        })
+      }
+
+      versions.value = versionHistory
+    }
 
     // Load comments and ratings
     await Promise.all([
