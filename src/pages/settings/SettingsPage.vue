@@ -32,7 +32,8 @@ const tabs = ref([
   { id: 'appearance', label: 'Appearance', icon: 'fas fa-palette' },
   { id: 'language', label: 'Language', icon: 'fas fa-globe' },
   { id: 'security', label: 'Security', icon: 'fas fa-lock' },
-  { id: 'apps', label: 'Connected Apps', icon: 'fas fa-plug' }
+  { id: 'apps', label: 'Connected Apps', icon: 'fas fa-plug' },
+  { id: 'shortcuts', label: 'Shortcuts', icon: 'fas fa-keyboard' }
 ])
 
 // Account settings
@@ -141,6 +142,49 @@ const connectedApps = ref([
   { id: 2, name: 'Microsoft 365', icon: 'fab fa-microsoft', bg: 'bg-blue-100', color: 'text-blue-600', connectedDate: 'Sep 2024' },
   { id: 3, name: 'Slack', icon: 'fab fa-slack', bg: 'bg-purple-100', color: 'text-purple-600', connectedDate: 'Aug 2024' }
 ])
+
+// Keyboard shortcuts
+const keyboardShortcuts = ref([
+  {
+    category: 'Navigation',
+    shortcuts: [
+      { keys: ['G', 'H'], description: 'Go to Home/Dashboard' },
+      { keys: ['G', 'A'], description: 'Go to Articles' },
+      { keys: ['G', 'D'], description: 'Go to Documents' },
+      { keys: ['G', 'E'], description: 'Go to Events' },
+      { keys: ['G', 'P'], description: 'Go to Profile' },
+      { keys: ['G', 'S'], description: 'Go to Settings' }
+    ]
+  },
+  {
+    category: 'Search & Actions',
+    shortcuts: [
+      { keys: ['/', ''], description: 'Focus search bar' },
+      { keys: ['Ctrl', 'K'], description: 'Open command palette' },
+      { keys: ['N'], description: 'Create new item' },
+      { keys: ['Esc'], description: 'Close modal/dialog' }
+    ]
+  },
+  {
+    category: 'Content',
+    shortcuts: [
+      { keys: ['E'], description: 'Edit current item' },
+      { keys: ['B'], description: 'Bookmark item' },
+      { keys: ['S'], description: 'Share item' },
+      { keys: ['Ctrl', 'Enter'], description: 'Submit/Save form' }
+    ]
+  },
+  {
+    category: 'AI Features',
+    shortcuts: [
+      { keys: ['Ctrl', 'Shift', 'A'], description: 'Open AI Assistant' },
+      { keys: ['Ctrl', 'Shift', 'S'], description: 'AI Summarize selection' },
+      { keys: ['Ctrl', 'Shift', 'T'], description: 'AI Translate selection' }
+    ]
+  }
+])
+
+const shortcutsEnabled = ref(true)
 
 // ==================== AI SETTINGS ====================
 
@@ -329,18 +373,95 @@ function changePassword() {
 </script>
 
 <template>
-  <div class="min-h-screen">
+  <div class="min-h-screen px-6 py-6">
     <!-- Loading State -->
     <div v-if="isLoading" class="flex items-center justify-center min-h-[60vh]">
       <LoadingSpinner size="lg" text="Loading settings..." />
     </div>
 
     <div v-else>
-      <!-- Page Header -->
-      <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-10 fade-in-up">
-        <div>
-          <h1 class="text-3xl font-bold text-teal-900 mb-2">Settings</h1>
-          <p class="text-teal-600">Manage your account preferences and settings</p>
+      <!-- Breadcrumb -->
+      <nav class="flex items-center gap-2 text-sm text-gray-500 mb-6">
+        <router-link to="/" class="hover:text-teal-600 transition-colors">
+          <i class="fas fa-home"></i>
+        </router-link>
+        <i class="fas fa-chevron-right text-xs"></i>
+        <span class="text-gray-900 font-medium">Settings</span>
+      </nav>
+
+      <!-- Enhanced Header with User Card -->
+      <div class="card-animated rounded-2xl overflow-hidden mb-6 fade-in-up">
+        <div class="bg-gradient-to-r from-teal-500 via-teal-600 to-emerald-600 p-6">
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <!-- User Info -->
+            <div class="flex items-center gap-4">
+              <div class="relative">
+                <div class="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center text-white text-2xl font-bold border-2 border-white/30">
+                  {{ currentUser.initials }}
+                </div>
+                <span class="absolute -bottom-1 -right-1 w-5 h-5 bg-green-400 rounded-full border-2 border-white"></span>
+              </div>
+              <div>
+                <h1 class="text-xl font-bold text-white">{{ currentUser.name }}</h1>
+                <p class="text-teal-100">{{ currentUser.role }}</p>
+                <p class="text-teal-200 text-sm">{{ currentUser.email }}</p>
+              </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="flex items-center gap-2">
+              <router-link to="/profile" class="px-4 py-2 bg-white/20 backdrop-blur text-white rounded-xl font-medium text-sm hover:bg-white/30 transition-all flex items-center gap-2">
+                <i class="fas fa-user"></i>
+                View Profile
+              </router-link>
+              <button class="px-4 py-2 bg-white text-teal-600 rounded-xl font-medium text-sm hover:bg-teal-50 transition-all flex items-center gap-2 shadow-lg">
+                <i class="fas fa-download"></i>
+                Export Data
+              </button>
+            </div>
+          </div>
+
+          <!-- Quick Stats -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-6">
+            <div class="bg-white/10 backdrop-blur rounded-xl p-3 text-center">
+              <p class="text-2xl font-bold text-white">89%</p>
+              <p class="text-xs text-teal-100">Profile Complete</p>
+            </div>
+            <div class="bg-white/10 backdrop-blur rounded-xl p-3 text-center">
+              <p class="text-2xl font-bold text-white">12</p>
+              <p class="text-xs text-teal-100">Connected Apps</p>
+            </div>
+            <div class="bg-white/10 backdrop-blur rounded-xl p-3 text-center">
+              <p class="text-2xl font-bold text-white">3</p>
+              <p class="text-xs text-teal-100">Active Sessions</p>
+            </div>
+            <div class="bg-white/10 backdrop-blur rounded-xl p-3 text-center">
+              <p class="text-2xl font-bold text-white flex items-center justify-center gap-1">
+                <i class="fas fa-shield-check text-green-300 text-lg"></i>
+              </p>
+              <p class="text-xs text-teal-100">Security: Strong</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mobile Tab Navigation -->
+      <div class="lg:hidden mb-6 overflow-x-auto hide-scrollbar">
+        <div class="flex gap-2 pb-2">
+          <button
+            v-for="tab in tabs"
+            :key="tab.id"
+            @click="activeTab = tab.id"
+            :class="[
+              'flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium text-sm whitespace-nowrap transition-all',
+              activeTab === tab.id
+                ? 'bg-teal-500 text-white shadow-lg'
+                : 'bg-white text-teal-700 border border-teal-100 hover:border-teal-300'
+            ]"
+          >
+            <i :class="tab.icon"></i>
+            {{ tab.label }}
+          </button>
         </div>
       </div>
 
@@ -951,6 +1072,98 @@ function changePassword() {
               </button>
             </div>
           </div>
+
+          <!-- Keyboard Shortcuts -->
+          <div v-if="activeTab === 'shortcuts'" class="space-y-6">
+            <!-- Shortcuts Header -->
+            <div class="card-animated rounded-2xl overflow-hidden fade-in-up" style="animation-delay: 0.2s;">
+              <div class="p-6 bg-gradient-to-r from-gray-800 to-gray-900">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-4">
+                    <div class="w-14 h-14 bg-white/10 backdrop-blur rounded-2xl flex items-center justify-center">
+                      <i class="fas fa-keyboard text-white text-2xl"></i>
+                    </div>
+                    <div>
+                      <h2 class="text-xl font-semibold text-white">Keyboard Shortcuts</h2>
+                      <p class="text-gray-400">Speed up your workflow with keyboard shortcuts</p>
+                    </div>
+                  </div>
+                  <div class="flex items-center gap-3">
+                    <span class="text-sm text-gray-400">Enable Shortcuts</span>
+                    <label class="toggle">
+                      <input type="checkbox" v-model="shortcutsEnabled">
+                      <span class="toggle-slider"></span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Shortcuts Categories -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div
+                v-for="(category, index) in keyboardShortcuts"
+                :key="category.category"
+                class="card-animated rounded-2xl overflow-hidden fade-in-up"
+                :style="{ animationDelay: `${0.3 + index * 0.1}s` }"
+              >
+                <div class="p-4 border-b border-teal-100 bg-teal-50">
+                  <h3 class="font-semibold text-teal-900">{{ category.category }}</h3>
+                </div>
+                <div class="p-4 space-y-3">
+                  <div
+                    v-for="shortcut in category.shortcuts"
+                    :key="shortcut.description"
+                    class="flex items-center justify-between py-2"
+                  >
+                    <span class="text-sm text-teal-700">{{ shortcut.description }}</span>
+                    <div class="flex items-center gap-1">
+                      <template v-for="(key, keyIndex) in shortcut.keys" :key="keyIndex">
+                        <kbd v-if="key" class="px-2 py-1 bg-gray-100 border border-gray-300 rounded-md text-xs font-mono text-gray-700 shadow-sm">
+                          {{ key }}
+                        </kbd>
+                        <span v-if="key && keyIndex < shortcut.keys.length - 1 && shortcut.keys[keyIndex + 1]" class="text-gray-400 text-xs">+</span>
+                      </template>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Shortcut Tips -->
+            <div class="card-animated rounded-2xl p-6 fade-in-up" style="animation-delay: 0.7s;">
+              <div class="flex items-start gap-4">
+                <div class="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center flex-shrink-0">
+                  <i class="fas fa-lightbulb text-blue-600"></i>
+                </div>
+                <div>
+                  <h4 class="font-medium text-teal-900 mb-2">Pro Tips</h4>
+                  <ul class="space-y-2 text-sm text-teal-600">
+                    <li class="flex items-start gap-2">
+                      <i class="fas fa-check text-teal-500 mt-0.5"></i>
+                      <span>Press <kbd class="px-1.5 py-0.5 bg-gray-100 border border-gray-300 rounded text-xs font-mono">?</kbd> anywhere to see available shortcuts</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                      <i class="fas fa-check text-teal-500 mt-0.5"></i>
+                      <span>Two-key shortcuts (like G + H) should be pressed in sequence, not together</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                      <i class="fas fa-check text-teal-500 mt-0.5"></i>
+                      <span>Shortcuts are disabled when typing in text fields</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <!-- Print Shortcuts Button -->
+            <div class="flex justify-end">
+              <button class="px-4 py-2 bg-teal-100 text-teal-700 rounded-xl font-medium text-sm hover:bg-teal-200 transition-all flex items-center gap-2">
+                <i class="fas fa-print"></i>
+                Print Shortcut Reference
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -1273,5 +1486,15 @@ function changePassword() {
   border-radius: 9999px;
   font-size: 0.75rem;
   font-weight: 500;
+}
+
+/* Hide scrollbar for mobile tabs */
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
 }
 </style>
