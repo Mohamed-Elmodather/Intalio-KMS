@@ -896,7 +896,7 @@ function formatVersionDate(date: Date): string {
     <!-- Document Content -->
     <div v-else-if="document" class="page-view fade-in">
       <!-- Hero Header -->
-      <div :class="['relative overflow-hidden rounded-2xl mb-6 bg-gradient-to-br', document.gradientFrom, document.gradientTo]">
+      <div class="hero-gradient relative overflow-hidden rounded-2xl mb-6">
         <!-- Decorative circles -->
         <div class="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/4"></div>
         <div class="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/4"></div>
@@ -916,7 +916,7 @@ function formatVersionDate(date: Date): string {
               <button @click="goBack" class="w-10 h-10 rounded-xl bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-all">
                 <i class="fas fa-arrow-left"></i>
               </button>
-              <div class="w-14 h-14 bg-white rounded-xl shadow-lg flex items-center justify-center">
+              <div :class="['w-14 h-14 rounded-xl shadow-lg flex items-center justify-center', document.iconBg]">
                 <i :class="[document.icon, document.iconColor, 'text-2xl']"></i>
               </div>
               <div>
