@@ -791,7 +791,7 @@ function getInsightColor(type: string): string {
                   </div>
                   <!-- Month labels -->
                   <div class="flex gap-2 mt-2">
-                    <div v-for="month in ['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D']" :key="month" class="flex-1 text-center text-xs text-gray-500">
+                    <div v-for="month in ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']" :key="month" class="flex-1 text-center text-xs text-gray-500 font-medium">
                       {{ month }}
                     </div>
                   </div>
