@@ -408,8 +408,8 @@ const upNextVideos = computed(() => {
     .slice(0, 4)
 })
 
-// Media Items Raw Data - with actual dates
-const mediaItemsData = [
+// Media Items Raw Data - with actual dates (reactive for mutations)
+const mediaItemsData = ref([
   { id: 5, title: 'Saudi Arabia vs Japan: Opening Match Preview', type: 'video', category: 'Highlights', folderId: 'highlights', duration: '12:45', viewCount: 45200, publishedDate: generateDateDaysAgo(2), thumbnail: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=400&h=225&fit=crop', hasTranscript: true, author: 'AFC Media', tags: ['Saudi Arabia', 'Japan', 'Group A', 'Preview'], sharedWithMe: true, sharedBy: 'John Smith' },
   { id: 6, title: 'King Fahd Stadium: Behind the Scenes Tour', type: 'video', category: 'Behind the Scenes', folderId: 'venues', duration: '18:30', viewCount: 32100, publishedDate: generateDateDaysAgo(3), thumbnail: 'https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=400&h=225&fit=crop', hasTranscript: true, author: 'Venue Team', tags: ['Stadium', 'Riyadh', 'Exclusive'], sharedWithMe: false },
   { id: 13, title: 'AFC Asian Cup 2027 Official Draw Ceremony', type: 'gallery', category: 'Highlights', folderId: 'ceremonies', photoCount: 48, viewCount: 28500, publishedDate: generateDateDaysAgo(1), thumbnail: 'https://images.unsplash.com/photo-1459865264687-595d652de67e?w=400&h=225&fit=crop', author: 'AFC Media', tags: ['Draw', 'Official', 'Ceremony'], sharedWithMe: true, sharedBy: 'Sarah Wilson' },
@@ -432,11 +432,11 @@ const mediaItemsData = [
   { id: 17, title: 'Media Accreditation Workshop', type: 'gallery', category: 'Behind the Scenes', folderId: 'photos', photoCount: 42, viewCount: 6200, publishedDate: generateDateDaysAgo(21), thumbnail: 'https://images.unsplash.com/photo-1504450758481-7338eba7524a?w=400&h=225&fit=crop', author: 'Media Team', tags: ['Media', 'Workshop', 'Behind the Scenes'], sharedWithMe: false },
   { id: 25, title: 'Player Training Session Highlights', type: 'video', category: 'Teams', folderId: 'player-content', duration: '8:45', viewCount: 22300, publishedDate: generateDateDaysAgo(5), thumbnail: 'https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?w=400&h=225&fit=crop', hasTranscript: false, author: 'AFC Media', tags: ['Training', 'Players', 'Exclusive'], sharedWithMe: false },
   { id: 26, title: 'Official Tournament Videos Collection', type: 'video', category: 'Highlights', folderId: 'videos', duration: '25:00', viewCount: 15800, publishedDate: generateDateDaysAgo(7), thumbnail: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=400&h=225&fit=crop', hasTranscript: true, author: 'AFC Media', tags: ['Official', 'Tournament', 'Collection'], sharedWithMe: false },
-]
+])
 
 // Computed media items with formatted values and computed isNew
 const mediaItems = computed(() => {
-  return mediaItemsData.map(item => ({
+  return mediaItemsData.value.map(item => ({
     ...item,
     views: formatViewCount(item.viewCount),
     date: formatRelativeDate(item.publishedDate),
@@ -446,17 +446,17 @@ const mediaItems = computed(() => {
 
 // Computed Media Stats - derived from mediaItems
 const mediaStats = computed(() => ({
-  totalVideos: mediaItemsData.filter(m => m.type === 'video').length,
-  galleries: mediaItemsData.filter(m => m.type === 'gallery').length,
-  audio: mediaItemsData.filter(m => m.type === 'audio').length,
-  images: mediaItemsData.filter(m => m.type === 'image').length
+  totalVideos: mediaItemsData.value.filter(m => m.type === 'video').length,
+  galleries: mediaItemsData.value.filter(m => m.type === 'gallery').length,
+  audio: mediaItemsData.value.filter(m => m.type === 'audio').length,
+  images: mediaItemsData.value.filter(m => m.type === 'image').length
 }))
 
 // Computed Category Cards with dynamic counts
 const categoryCards = computed(() => {
   return categoryCardDefs.map(card => ({
     ...card,
-    count: mediaItemsData.filter(m => m.category === card.category).length
+    count: mediaItemsData.value.filter(m => m.category === card.category).length
   }))
 })
 
@@ -1060,16 +1060,16 @@ async function fetchAISearchSuggestions(query: string) {
     const q = query.toLowerCase()
 
     // Get unique suggestions from media titles, categories, tags, and authors
-    const titleSuggestions = mediaItemsData
+    const titleSuggestions = mediaItemsData.value
       .filter(m => m.title.toLowerCase().includes(q))
       .map(m => m.title)
       .slice(0, 3)
 
-    const categorySuggestions = [...new Set(mediaItemsData.map(m => m.category))]
+    const categorySuggestions = [...new Set(mediaItemsData.value.map(m => m.category))]
       .filter(c => c.toLowerCase().includes(q))
       .map(c => `${c} content`)
 
-    const tagSuggestions = [...new Set(mediaItemsData.flatMap(m => m.tags || []))]
+    const tagSuggestions = [...new Set(mediaItemsData.value.flatMap(m => m.tags || []))]
       .filter(t => t.toLowerCase().includes(q))
       .map(t => `${t} videos and media`)
       .slice(0, 2)
@@ -1188,7 +1188,8 @@ async function bulkAnalyzeMedia() {
 function applyAITags(mediaId: number) {
   const analysis = aiAnalysisResults.value.get(mediaId)
   if (analysis) {
-    const media = mediaItems.value.find(m => m.id === mediaId)
+    // Find in raw data to allow mutation
+    const media = mediaItemsData.value.find(m => m.id === mediaId)
     if (media) {
       media.tags = [...new Set([...(media.tags || []), ...analysis.autoTags])]
       alert(`Applied ${analysis.autoTags.length} AI-suggested tags!`)
