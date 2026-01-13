@@ -131,8 +131,8 @@ const collections = ref<Collection[]>([
     visibility: 'private',
     itemCount: 22,
     items: [
-      { id: 'item-4', contentType: 'document', contentId: 'd-1', addedAt: '2027-01-03T14:00:00Z', addedBy: 'user-1', order: 1, title: 'Saudi Arabia Team Analysis', thumbnail: null },
-      { id: 'item-5', contentType: 'document', contentId: 'd-2', addedAt: '2027-01-03T15:00:00Z', addedBy: 'user-1', order: 2, title: 'Japan Squad Overview', thumbnail: null },
+      { id: 'item-4', contentType: 'document', contentId: 'd-1', addedAt: '2027-01-03T14:00:00Z', addedBy: 'user-1', order: 1, title: 'Saudi Arabia Team Analysis', thumbnail: undefined },
+      { id: 'item-5', contentType: 'document', contentId: 'd-2', addedAt: '2027-01-03T15:00:00Z', addedBy: 'user-1', order: 2, title: 'Japan Squad Overview', thumbnail: undefined },
       { id: 'item-6', contentType: 'article', contentId: 2, addedAt: '2027-01-04T10:00:00Z', addedBy: 'user-1', order: 3, title: 'Group A Preview: Key Players to Watch', thumbnail: 'https://images.unsplash.com/photo-1508098682722-e99c643e7f76?w=200' }
     ],
     collaborators: [
@@ -153,7 +153,7 @@ const collections = ref<Collection[]>([
     items: [
       { id: 'item-7', contentType: 'media', contentId: 'm-1', addedAt: '2026-12-15T09:00:00Z', addedBy: 'user-3', order: 1, title: 'Official Logo Pack', thumbnail: 'https://images.unsplash.com/photo-1560272564-c83b66b1ad12?w=200' },
       { id: 'item-8', contentType: 'media', contentId: 'm-2', addedAt: '2026-12-16T10:00:00Z', addedBy: 'user-3', order: 2, title: 'Stadium Photos Collection', thumbnail: 'https://images.unsplash.com/photo-1577223625816-7546f13df25d?w=200' },
-      { id: 'item-9', contentType: 'document', contentId: 'd-3', addedAt: '2026-12-20T14:00:00Z', addedBy: 'user-3', order: 3, title: 'Brand Guidelines PDF', thumbnail: null }
+      { id: 'item-9', contentType: 'document', contentId: 'd-3', addedAt: '2026-12-20T14:00:00Z', addedBy: 'user-3', order: 3, title: 'Brand Guidelines PDF', thumbnail: undefined }
     ],
     collaborators: [
       { id: 'user-3', name: 'Mohammed Al-Rashid', initials: 'MR', color: '#f59e0b', email: 'mohammed@afc.com', role: 'owner', addedAt: '2026-12-15T09:00:00Z' },
@@ -194,7 +194,7 @@ const collections = ref<Collection[]>([
     visibility: 'private',
     itemCount: 32,
     items: [
-      { id: 'item-12', contentType: 'document', contentId: 'd-4', addedAt: '2026-11-20T10:00:00Z', addedBy: 'user-1', order: 1, title: 'King Fahd Stadium Technical Specs', thumbnail: null },
+      { id: 'item-12', contentType: 'document', contentId: 'd-4', addedAt: '2026-11-20T10:00:00Z', addedBy: 'user-1', order: 1, title: 'King Fahd Stadium Technical Specs', thumbnail: undefined },
       { id: 'item-13', contentType: 'media', contentId: 6, addedAt: '2026-11-25T09:00:00Z', addedBy: 'user-1', order: 2, title: 'King Fahd Stadium: Behind the Scenes Tour', thumbnail: 'https://images.unsplash.com/photo-1577223625816-7546f13df25d?w=200' }
     ],
     collaborators: [
@@ -214,7 +214,7 @@ const collections = ref<Collection[]>([
     itemCount: 18,
     items: [
       { id: 'item-14', contentType: 'media', contentId: 'm-4', addedAt: '2026-12-01T09:00:00Z', addedBy: 'user-4', order: 1, title: 'Welcome & Orientation Video', thumbnail: 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=200' },
-      { id: 'item-15', contentType: 'document', contentId: 'd-5', addedAt: '2026-12-05T10:00:00Z', addedBy: 'user-4', order: 2, title: 'Staff Handbook 2027', thumbnail: null }
+      { id: 'item-15', contentType: 'document', contentId: 'd-5', addedAt: '2026-12-05T10:00:00Z', addedBy: 'user-4', order: 2, title: 'Staff Handbook 2027', thumbnail: undefined }
     ],
     collaborators: [
       { id: 'user-4', name: 'Yuki Tanaka', initials: 'YT', color: '#ef4444', email: 'yuki@afc.com', role: 'owner', addedAt: '2026-12-01T09:00:00Z' },
@@ -361,7 +361,7 @@ function saveNewCollection() {
     id: `col-${Date.now()}`,
     name: newCollectionName.value.trim(),
     description: newCollectionDescription.value.trim(),
-    thumbnail: null,
+    thumbnail: undefined,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     author: { ...currentUser.value },

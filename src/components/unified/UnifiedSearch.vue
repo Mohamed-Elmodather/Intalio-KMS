@@ -285,8 +285,11 @@ function handleKeyDown(event: KeyboardEvent) {
       break
     case 'Enter':
       if (selectedSuggestionIndex.value >= 0) {
-        event.preventDefault()
-        selectSuggestion(visibleSuggestions.value[selectedSuggestionIndex.value])
+        const selectedSuggestion = visibleSuggestions.value[selectedSuggestionIndex.value]
+        if (selectedSuggestion) {
+          event.preventDefault()
+          selectSuggestion(selectedSuggestion)
+        }
       }
       break
     case 'Escape':

@@ -194,7 +194,7 @@ const followUpSuggestions = computed(() => {
   if (messages.value.length === 0) return []
 
   const lastMessage = messages.value[messages.value.length - 1]
-  if (lastMessage.role !== 'assistant') return []
+  if (!lastMessage || lastMessage.role !== 'assistant') return []
 
   return [
     'Tell me more about this',
@@ -410,10 +410,11 @@ async function sendMessage() {
 
   // Analyze attachments if present
   let analysisResults: ContentAnalysis | undefined
-  if (attachments.length > 0) {
+  const firstAttachment = attachments[0]
+  if (attachments.length > 0 && firstAttachment) {
     isAnalyzingContent.value = true
     try {
-      analysisResults = await analyzeAttachedContent(attachments[0])
+      analysisResults = await analyzeAttachedContent(firstAttachment)
     } finally {
       isAnalyzingContent.value = false
     }
@@ -423,8 +424,8 @@ async function sendMessage() {
   setTimeout(() => {
     let responseContent = ''
 
-    if (attachments.length > 0 && analysisResults) {
-      responseContent = `<p>I've analyzed the ${attachments[0].type} "<strong>${attachments[0].title}</strong>" along with your question about "${userQuery}".</p>
+    if (firstAttachment && analysisResults) {
+      responseContent = `<p>I've analyzed the ${firstAttachment.type} "<strong>${firstAttachment.title}</strong>" along with your question about "${userQuery}".</p>
         <div class="ai-analysis-box">
           <p class="font-semibold mb-2"><i class="fas fa-chart-bar mr-2"></i>Content Analysis:</p>
           <p class="mb-2">${analysisResults.summary}</p>

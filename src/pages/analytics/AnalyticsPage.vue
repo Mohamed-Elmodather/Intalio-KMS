@@ -5,6 +5,18 @@ import { AILoadingIndicator, AIConfidenceBar } from '@/components/ai'
 
 const aiStore = useAIServicesStore()
 
+// Helper function to safely get max value from array
+function safeMax(arr: number[] | undefined, fallback = 1): number {
+  if (!arr || arr.length === 0) return fallback
+  return Math.max(...arr)
+}
+
+// Helper function to safely get array value by index
+function safeGet<T>(arr: T[] | undefined, index: number, fallback: T): T {
+  if (!arr || index < 0 || index >= arr.length) return fallback
+  return arr[index] ?? fallback
+}
+
 // State
 const isLoading = ref(false)
 const selectedPeriod = ref('30d')
@@ -212,8 +224,15 @@ function formatNumber(num: number): string {
   return num.toString()
 }
 
-function getColorClasses(color: string) {
-  const colors: Record<string, { bg: string; icon: string; text: string; shadow: string }> = {
+interface ColorClasses {
+  bg: string
+  icon: string
+  text: string
+  shadow: string
+}
+
+function getColorClasses(color: string): ColorClasses {
+  const colors: Record<string, ColorClasses> = {
     teal: { bg: 'from-teal-500 to-teal-600', icon: 'bg-teal-100', text: 'text-teal-600', shadow: 'shadow-teal-200' },
     pink: { bg: 'from-pink-500 to-pink-600', icon: 'bg-pink-100', text: 'text-pink-600', shadow: 'shadow-pink-200' },
     blue: { bg: 'from-blue-500 to-blue-600', icon: 'bg-blue-100', text: 'text-blue-600', shadow: 'shadow-blue-200' },
@@ -224,7 +243,7 @@ function getColorClasses(color: string) {
     red: { bg: 'from-red-500 to-red-600', icon: 'bg-red-100', text: 'text-red-600', shadow: 'shadow-red-200' },
     orange: { bg: 'from-orange-500 to-orange-600', icon: 'bg-orange-100', text: 'text-orange-600', shadow: 'shadow-orange-200' }
   }
-  return colors[color] || colors.teal
+  return colors[color] ?? colors.teal!
 }
 
 function downloadReport(report: any) {
@@ -621,7 +640,7 @@ function getAnomalySeverityColor(severity: string): string {
               v-for="(val, idx) in kpi.sparkline"
               :key="idx"
               :class="['flex-1 rounded-t transition-all group-hover:opacity-100', getColorClasses(kpi.color).text.replace('text-', 'bg-')]"
-              :style="{ height: (val / Math.max(...kpi.sparkline) * 100) + '%', opacity: 0.3 + (idx / kpi.sparkline.length) * 0.7 }"
+              :style="{ height: (val / safeMax(kpi.sparkline) * 100) + '%', opacity: 0.3 + (idx / kpi.sparkline.length) * 0.7 }"
             ></div>
           </div>
         </div>
@@ -645,18 +664,18 @@ function getAnomalySeverityColor(severity: string): string {
           <div class="p-5">
             <!-- Chart Area -->
             <div class="h-56 flex items-end justify-between gap-2 mb-4">
-              <div v-for="(val, idx) in trafficData.datasets[0].data" :key="idx" class="flex-1 flex flex-col items-center">
+              <div v-for="(val, idx) in trafficData.datasets[0]?.data ?? []" :key="idx" class="flex-1 flex flex-col items-center">
                 <div class="w-full flex gap-0.5 items-end justify-center h-44">
                   <div
                     class="w-2/5 bg-teal-500 rounded-t transition-all hover:bg-teal-600"
-                    :style="{ height: (val / Math.max(...trafficData.datasets[0].data) * 100) + '%' }"
+                    :style="{ height: (val / safeMax(trafficData.datasets[0]?.data) * 100) + '%' }"
                   ></div>
                   <div
                     class="w-2/5 bg-gray-300 rounded-t transition-all hover:bg-gray-400"
-                    :style="{ height: (trafficData.datasets[1].data[idx] / Math.max(...trafficData.datasets[0].data) * 100) + '%' }"
+                    :style="{ height: (safeGet(trafficData.datasets[1]?.data, idx, 0) / safeMax(trafficData.datasets[0]?.data) * 100) + '%' }"
                   ></div>
                 </div>
-                <span class="text-[10px] text-gray-400 mt-2">{{ trafficData.labels[idx] }}</span>
+                <span class="text-[10px] text-gray-400 mt-2">{{ safeGet(trafficData.labels, idx, '') }}</span>
               </div>
             </div>
             <!-- Legend -->

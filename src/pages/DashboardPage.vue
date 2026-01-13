@@ -246,7 +246,25 @@ function shareEvent(eventId: number, event: Event) {
 }
 
 // Active Polls
-const activePolls = ref([
+interface PollOption {
+  label: string
+  votes: number
+  color: string
+  flag?: string
+}
+
+interface Poll {
+  id: number
+  question: string
+  icon: string
+  iconBg: string
+  options: PollOption[]
+  totalVotes: number
+  endsIn: string
+  hasVoted: boolean
+}
+
+const activePolls = ref<Poll[]>([
   {
     id: 1,
     question: 'Who will win AFC Asian Cup 2027?',
@@ -1430,7 +1448,7 @@ onUnmounted(() => {
       </div>
 
       <!-- Updates Grid: Featured + Up Next -->
-      <div class="updates-grid">
+      <div v-if="featuredUpdate" class="updates-grid">
         <!-- Featured Article Card with Carousel -->
         <div class="updates-featured" @mouseenter="pauseCarousel" @mouseleave="resumeCarousel">
           <router-link :to="featuredUpdate.link" class="featured-main-card group">

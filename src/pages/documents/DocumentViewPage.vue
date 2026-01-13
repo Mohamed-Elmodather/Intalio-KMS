@@ -154,7 +154,7 @@ const mockDocuments = [
   }
 ]
 
-const documentId = computed(() => Number(route.params.id))
+const documentIdNum = computed(() => Number(route.params.id))
 const isPreviewMode = computed(() => route.query.preview === 'true')
 const isFullscreen = ref(false)
 

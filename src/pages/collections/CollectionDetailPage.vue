@@ -132,7 +132,7 @@ const collection = ref<Collection>({
       order: 4,
       title: 'Tournament Schedule & Fixtures',
       description: 'Complete match schedule with dates, times, and venues for all tournament matches.',
-      thumbnail: null,
+      thumbnail: undefined,
       metadata: { size: '2.4 MB', format: 'PDF' }
     },
     {
@@ -180,7 +180,7 @@ const collection = ref<Collection>({
       order: 8,
       title: 'Media Accreditation Guidelines',
       description: 'Official guidelines for media personnel covering the tournament.',
-      thumbnail: null,
+      thumbnail: undefined,
       metadata: { size: '1.8 MB', format: 'PDF' }
     }
   ],

@@ -4,19 +4,26 @@
 // Entity Recognition (NER)
 // ============================================================================
 
-export type EntityType = 'person' | 'organization' | 'location' | 'date' | 'event' | 'product' | 'amount'
+export type EntityType = 'person' | 'organization' | 'location' | 'date' | 'event' | 'product' | 'amount' | 'money'
 
 export interface Entity {
   text: string
   type: EntityType
   confidence: number
-  startIndex: number
-  endIndex: number
+  // Support both naming conventions
+  startIndex?: number
+  endIndex?: number
+  startOffset?: number
+  endOffset?: number
 }
+
+// Alias for backwards compatibility
+export type NamedEntity = Entity
 
 export interface NERResult {
   entities: Entity[]
   processingTime: number
+  modelVersion?: string
 }
 
 // ============================================================================
@@ -78,6 +85,9 @@ export interface OCRResult {
   language: string
   confidence: number
   processingTime: number
+  pages?: number
+  wordCount?: number
+  characterCount?: number
 }
 
 // ============================================================================
@@ -90,8 +100,9 @@ export interface SummarizationResult {
   summary: string
   keyPoints?: string[]
   wordCount: number
-  compressionRatio: number
+  compressionRatio?: number
   processingTime: number
+  confidence?: number
 }
 
 // ============================================================================

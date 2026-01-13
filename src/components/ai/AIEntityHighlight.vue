@@ -44,22 +44,35 @@ interface TextSegment {
   isEntity: boolean
 }
 
+// Helper to get start position from entity
+function getStartPos(entity: Entity): number {
+  return entity.startIndex ?? entity.startOffset ?? 0
+}
+
+// Helper to get end position from entity
+function getEndPos(entity: Entity): number {
+  return entity.endIndex ?? entity.endOffset ?? 0
+}
+
 const segments = computed<TextSegment[]>(() => {
   if (!props.entities.length) {
     return [{ text: props.text, isEntity: false }]
   }
 
   // Sort entities by start index
-  const sortedEntities = [...props.entities].sort((a, b) => a.startIndex - b.startIndex)
+  const sortedEntities = [...props.entities].sort((a, b) => getStartPos(a) - getStartPos(b))
 
   const result: TextSegment[] = []
   let lastIndex = 0
 
   for (const entity of sortedEntities) {
+    const startPos = getStartPos(entity)
+    const endPos = getEndPos(entity)
+
     // Add text before this entity
-    if (entity.startIndex > lastIndex) {
+    if (startPos > lastIndex) {
       result.push({
-        text: props.text.slice(lastIndex, entity.startIndex),
+        text: props.text.slice(lastIndex, startPos),
         isEntity: false,
       })
     }
@@ -71,7 +84,7 @@ const segments = computed<TextSegment[]>(() => {
       isEntity: true,
     })
 
-    lastIndex = entity.endIndex
+    lastIndex = endPos
   }
 
   // Add remaining text after the last entity

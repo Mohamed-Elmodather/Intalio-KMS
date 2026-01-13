@@ -48,15 +48,23 @@ export function useRatings(contentType: string, contentId: string) {
       // Update user's rating
       const previousRating = rating.value.userRating
 
-      if (previousRating) {
+      if (previousRating !== undefined && previousRating >= 1 && previousRating <= 5) {
         // User is changing their rating
-        rating.value.distribution[previousRating - 1]--
+        const prevIndex = previousRating - 1
+        if (rating.value.distribution[prevIndex] !== undefined) {
+          rating.value.distribution[prevIndex]--
+        }
       } else {
         // New rating
         rating.value.count++
       }
 
-      rating.value.distribution[stars - 1]++
+      if (stars >= 1 && stars <= 5) {
+        const newIndex = stars - 1
+        if (rating.value.distribution[newIndex] !== undefined) {
+          rating.value.distribution[newIndex]++
+        }
+      }
       rating.value.userRating = stars
 
       // Recalculate average
@@ -74,15 +82,18 @@ export function useRatings(contentType: string, contentId: string) {
   }
 
   async function removeRating() {
-    if (!rating.value.userRating) return
+    const currentUserRating = rating.value.userRating
+    if (currentUserRating === undefined) return
 
     isSubmitting.value = true
 
     try {
       await new Promise(resolve => setTimeout(resolve, 300))
 
-      const previousRating = rating.value.userRating
-      rating.value.distribution[previousRating - 1]--
+      const ratingIndex = currentUserRating - 1
+      if (rating.value.distribution[ratingIndex] !== undefined) {
+        rating.value.distribution[ratingIndex]--
+      }
       rating.value.count--
       rating.value.userRating = undefined
 

@@ -44,7 +44,7 @@ function getInitialsColor(initials: string): string {
     'from-green-400 to-green-600'
   ]
   const index = initials.charCodeAt(0) % colors.length
-  return colors[index]
+  return colors[index] ?? 'from-teal-400 to-teal-600'
 }
 </script>
 
