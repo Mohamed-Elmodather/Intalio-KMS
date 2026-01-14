@@ -3264,12 +3264,9 @@ function getInsightTypeColor(type: string) {
   display: flex;
   align-items: center;
   gap: 0.375rem;
-  padding: 0.375rem 0.75rem;
-  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-  border-radius: 0.5rem;
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   font-weight: 600;
-  color: #92400e;
+  color: #6b7280;
 }
 
 .ends-in-badge i {
@@ -3282,21 +3279,20 @@ function getInsightTypeColor(type: string) {
   align-items: center;
   gap: 0.375rem;
   padding: 0.5rem 1rem;
-  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
-  color: white;
-  border: none;
+  background: #f0fdfa;
+  color: #0d9488;
+  border: 1px solid #99f6e4;
   border-radius: 0.5rem;
   font-size: 0.75rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(20, 184, 166, 0.3);
 }
 
 .trending-vote-btn-sm:hover {
-  background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%);
+  background: #ccfbf1;
+  border-color: #5eead4;
   transform: translateX(2px);
-  box-shadow: 0 4px 12px rgba(20, 184, 166, 0.4);
 }
 
 .trending-vote-btn-sm i {
