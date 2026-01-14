@@ -1426,8 +1426,19 @@ function handleEntityClick(entity: { text: string; type: string }) {
     </div>
 
     <!-- Context Panel (Sidebar) -->
-    <Transition name="slide-right">
-      <div v-if="showContextPanel" class="fixed right-0 top-0 h-full w-96 bg-gradient-to-b from-gray-50 to-white shadow-2xl z-40 flex flex-col border-l border-gray-200">
+    <Teleport to="body">
+      <!-- Backdrop -->
+      <Transition name="fade">
+        <div
+          v-if="showContextPanel"
+          class="fixed inset-0 bg-black/30 z-40"
+          @click="showContextPanel = false"
+        ></div>
+      </Transition>
+
+      <!-- Sidebar Panel -->
+      <Transition name="slide-right">
+        <div v-if="showContextPanel" class="fixed right-0 top-0 h-full w-96 bg-gradient-to-b from-gray-50 to-white shadow-2xl z-50 flex flex-col border-l border-gray-200">
         <!-- Header -->
         <div class="p-5 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500">
           <div class="flex items-center justify-between">
@@ -1440,8 +1451,8 @@ function handleEntityClick(entity: { text: string; type: string }) {
                 <p class="text-xs text-white/80">Real-time conversation analysis</p>
               </div>
             </div>
-            <button @click="showContextPanel = false" class="p-2.5 hover:bg-white/20 rounded-xl transition-colors">
-              <i class="fas fa-times text-white"></i>
+            <button @click="showContextPanel = false" class="p-2.5 bg-white/20 hover:bg-white/30 rounded-xl transition-colors" title="Close panel">
+              <i class="fas fa-times text-white text-lg"></i>
             </button>
           </div>
 
@@ -1651,6 +1662,7 @@ function handleEntityClick(entity: { text: string; type: string }) {
         </div>
       </div>
     </Transition>
+    </Teleport>
 
     <!-- Content Browser Modal -->
     <Teleport to="body">
