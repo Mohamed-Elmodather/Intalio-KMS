@@ -529,17 +529,15 @@ function copySummary() {
     </div>
 
     <!-- Media Content -->
-    <template v-else-if="media">
-      <!-- Enhanced Header -->
-      <header class="media-header">
-        <!-- Decorative Background -->
-        <div class="header-decor">
-          <div class="decor-orb decor-orb-1"></div>
-          <div class="decor-orb decor-orb-2"></div>
-          <div class="decor-pattern"></div>
-        </div>
+    <div v-else-if="media" class="page-view fade-in">
+      <!-- Hero Header -->
+      <div class="hero-gradient relative overflow-hidden rounded-2xl mb-6">
+        <!-- Decorative circles -->
+        <div class="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/4"></div>
+        <div class="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/4"></div>
+        <div class="absolute top-1/2 right-1/3 w-32 h-32 bg-white/10 rounded-full"></div>
 
-        <div class="header-content">
+        <div class="relative z-10 px-8 py-6">
           <!-- Navigation Row -->
           <div class="header-nav">
             <button @click="goBack" class="back-btn">
@@ -556,46 +554,45 @@ function copySummary() {
             </div>
           </div>
 
-          <!-- Title Row -->
-          <div class="header-main">
-            <div class="header-left">
-              <div class="header-icon">
-                <i :class="media.type === 'video' ? 'fas fa-video' : 'fas fa-headphones'"></i>
+          <!-- Title and actions row -->
+          <div class="flex items-center justify-between flex-wrap gap-4">
+            <div class="flex items-center gap-4">
+              <div class="w-14 h-14 rounded-xl shadow-lg flex items-center justify-center bg-white/20">
+                <i :class="[media.type === 'video' ? 'fas fa-video' : 'fas fa-headphones', 'text-white text-2xl']"></i>
               </div>
               <div>
-                <h1 class="header-title">{{ media.title }}</h1>
-                <p class="header-subtitle">
-                  <span class="header-badge">{{ media.category }}</span>
-                  <span>{{ media.duration }}</span>
-                  <span>•</span>
-                  <span>{{ media.views }} {{ textConstants.views }}</span>
-                </p>
+                <h1 class="text-2xl md:text-3xl font-bold text-white">{{ media.title }}</h1>
+                <p class="text-white/70">{{ media.category }} • {{ media.duration }} • {{ media.views }} {{ textConstants.views }}</p>
               </div>
             </div>
-            <div class="header-actions">
-              <button @click="handleLike" class="action-btn action-btn-primary">
+
+            <!-- Action buttons -->
+            <div class="flex items-center gap-3">
+              <button @click="handleLike" class="px-4 py-2 bg-white text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-all shadow-sm flex items-center gap-2">
                 <i class="fas fa-heart"></i>
                 <span>{{ textConstants.like }}</span>
               </button>
-              <button class="action-btn">
+              <button class="px-4 py-2 bg-transparent text-white border border-white/30 rounded-xl font-medium hover:bg-white/10 transition-all flex items-center gap-2">
                 <i class="fas fa-download"></i>
                 <span class="hidden sm:inline">{{ textConstants.download }}</span>
+              </button>
+              <button class="px-4 py-2 bg-transparent text-white border border-white/30 rounded-xl font-medium hover:bg-white/10 transition-all flex items-center gap-2">
+                <i class="fas fa-share-alt"></i>
+                <span class="hidden sm:inline">{{ textConstants.share }}</span>
               </button>
               <BookmarkButton
                 :content-id="media.id.toString()"
                 content-type="media"
                 size="md"
                 variant="icon"
-                class="bookmark-btn"
+                class="text-white"
               />
             </div>
           </div>
         </div>
-      </header>
+      </div>
 
-      <!-- Main Content -->
-      <main class="px-6 py-8">
-
+      <!-- Main Content Grid -->
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Main Content -->
         <div class="lg:col-span-2 space-y-6">
@@ -984,8 +981,7 @@ function copySummary() {
           />
         </div>
       </div>
-      </main>
-    </template>
+    </div>
 
     <!-- Not Found -->
     <div v-else class="flex items-center justify-center min-h-[60vh]">
@@ -1015,13 +1011,19 @@ function copySummary() {
 
 <style scoped>
 /* Page Animation */
-.media-player-page {
+.fade-in {
   animation: fadeIn 0.3s ease-out;
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .fade-in-up {
@@ -1040,59 +1042,9 @@ function copySummary() {
   }
 }
 
-/* ========================================
-   Enhanced Header
-   ======================================== */
-.media-header {
-  position: relative;
-  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 50%, #115e59 100%);
-  overflow: hidden;
-}
-
-.header-decor {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-}
-
-.decor-orb {
-  position: absolute;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.1);
-  animation: orbFloat 6s ease-in-out infinite;
-}
-
-.decor-orb-1 {
-  width: 300px;
-  height: 300px;
-  top: -100px;
-  right: -50px;
-}
-
-.decor-orb-2 {
-  width: 200px;
-  height: 200px;
-  bottom: -80px;
-  left: 10%;
-  animation-delay: -3s;
-}
-
-.decor-pattern {
-  position: absolute;
-  inset: 0;
-  background-image: radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px);
-  background-size: 20px 20px;
-}
-
-@keyframes orbFloat {
-  0%, 100% { transform: translateY(0) rotate(0deg); }
-  50% { transform: translateY(-20px) rotate(5deg); }
-}
-
-.header-content {
-  position: relative;
-  z-index: 10;
-  padding: 1.5rem 2rem 2rem;
+/* Hero Gradient Header */
+.hero-gradient {
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
 }
 
 /* Navigation */
@@ -1155,99 +1107,6 @@ function copySummary() {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-/* Header Main */
-.header-main {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1.5rem;
-  flex-wrap: wrap;
-}
-
-.header-left {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.header-icon {
-  width: 56px;
-  height: 56px;
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 1rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.5rem;
-  color: white;
-}
-
-.header-title {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: white;
-  margin: 0;
-  max-width: 500px;
-}
-
-.header-subtitle {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  margin-top: 0.25rem;
-  font-size: 0.875rem;
-  color: rgba(255, 255, 255, 0.8);
-}
-
-.header-badge {
-  padding: 0.25rem 0.75rem;
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 2rem;
-  font-size: 0.75rem;
-  font-weight: 500;
-}
-
-.header-actions {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.action-btn {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.625rem 1.25rem;
-  background: rgba(255, 255, 255, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 0.75rem;
-  color: white;
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.action-btn:hover {
-  background: rgba(255, 255, 255, 0.25);
-}
-
-.action-btn-primary {
-  background: white;
-  color: #0d9488;
-  border: none;
-}
-
-.action-btn-primary:hover {
-  background: #f0fdfa;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.bookmark-btn {
-  color: white !important;
 }
 
 /* ========================================
