@@ -1154,14 +1154,16 @@ function getInsightTypeColor(type: string) {
 
             <!-- Right Side - Action -->
             <div class="trending-action">
-              <div class="ends-in">
-                <i class="fas fa-hourglass-half"></i>
-                <span>{{ poll.endsIn }}</span>
-              </div>
               <button class="trending-vote-btn">
                 <span class="btn-text">{{ textConstants.voteNow }}</span>
                 <i class="fas fa-arrow-right"></i>
               </button>
+            </div>
+
+            <!-- Ends In Badge - Bottom -->
+            <div class="ends-in-bottom">
+              <i class="fas fa-hourglass-half"></i>
+              <span>Ends in {{ poll.endsIn }}</span>
             </div>
           </div>
         </div>
@@ -2928,6 +2930,7 @@ function getInsightTypeColor(type: string) {
   background: white;
   border-radius: 1.25rem;
   padding: 1.5rem;
+  padding-bottom: 3.5rem;
   display: flex;
   align-items: flex-start;
   gap: 1rem;
@@ -3242,6 +3245,34 @@ function getInsightTypeColor(type: string) {
 @keyframes hourglass-flip {
   0%, 100% { transform: rotate(0deg); }
   50% { transform: rotate(180deg); }
+}
+
+/* Ends In Bottom Badge */
+.ends-in-bottom {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1rem;
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border-top: 1px solid rgba(251, 191, 36, 0.3);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #92400e;
+  z-index: 1;
+}
+
+.ends-in-bottom i {
+  font-size: 0.6875rem;
+  animation: hourglass-flip 2s ease-in-out infinite;
+}
+
+.trending-card-enhanced:hover .ends-in-bottom {
+  background: linear-gradient(135deg, #fde68a 0%, #fcd34d 100%);
 }
 
 /* Progress Circle */
