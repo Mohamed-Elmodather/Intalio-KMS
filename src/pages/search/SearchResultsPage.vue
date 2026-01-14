@@ -24,9 +24,15 @@ const textConstants = {
   pageTitle: 'Search',
   searchPlaceholder: 'Search across all content...',
   searchButton: 'Search',
+  searching: 'Searching...',
 
   // Quick filters
   quickFiltersLabel: 'Quick filters:',
+  quickFilterAll: 'All',
+  quickFilterArticles: 'Articles',
+  quickFilterDocuments: 'Documents',
+  quickFilterVideos: 'Videos',
+  quickFilterCourses: 'Courses',
 
   // Filter sidebar
   filters: 'Filters',
@@ -36,6 +42,16 @@ const textConstants = {
   author: 'Author',
   filterByAuthor: 'Filter by author...',
   tags: 'Tags',
+  expandFilters: 'Expand filters',
+  collapseFilters: 'Collapse filters',
+
+  // Content types
+  contentTypeArticles: 'Articles',
+  contentTypeDocuments: 'Documents',
+  contentTypeVideos: 'Videos',
+  contentTypeCourses: 'Courses',
+  contentTypeEvents: 'Events',
+  contentTypePolls: 'Polls',
 
   // Date options
   anyTime: 'Any time',
@@ -72,6 +88,12 @@ const textConstants = {
   share: 'Share',
   preview: 'Preview',
 
+  // Result types
+  typeArticle: 'Article',
+  typeDocument: 'Document',
+  typeVideo: 'Video',
+  typeCourse: 'Course',
+
   // Pagination
   showing: 'Showing',
   of: 'of',
@@ -81,10 +103,47 @@ const textConstants = {
   noResults: 'No results found',
   noResultsDesc: 'Try adjusting your search or filters',
 
+  // Initial state
+  initialStateTitle: 'Start your search',
+  initialStateDesc: 'Enter a search term to find content',
+
   // Intent types
   lookingForInfo: 'Looking for info',
   findingSpecific: 'Finding specific',
-  takingAction: 'Taking action'
+  takingAction: 'Taking action',
+
+  // AI suggestions
+  moreSpecific: 'More specific',
+  popularSearch: 'Popular search',
+
+  // AI insight templates
+  insightTryAdding: 'Try adding',
+  insightForLatest: 'for the latest',
+  insightContent: 'content',
+  insightUsersSearched: 'Users also searched for:',
+  insightFilterBy: 'Filter by',
+  insightForOfficial: 'for official content',
+  insightTutorial: 'tutorial',
+  insightExamples: 'examples',
+  insightBestPractices: 'best practices',
+  insightHowTo: 'how to',
+  insightGuide: 'guide',
+
+  // AI analysis descriptions
+  intentLookingForGuides: 'Looking for learning resources and guides',
+  intentLookingForSpecific: 'Looking for specific content',
+  intentGeneralSearch: 'General information search',
+
+  // AI summary template
+  aiSummaryPrefix: 'Based on your search for',
+  aiSummaryFound: 'I found',
+  aiSummaryRelevantResources: 'relevant resources including articles, documents, and training materials. The most relevant content covers comprehensive guides, tutorials, and best practices related to',
+
+  // Mock data labels
+  authorContentTeam: 'Content Team',
+  authorAdminUser: 'Admin User',
+  authorSystemAdmin: 'System Admin',
+  tagGuide: 'Guide'
 }
 
 // ============================================================================
@@ -184,23 +243,23 @@ const currentPage = ref(1)
 const pageSize = ref(10)
 
 // ============================================================================
-// Filter Data - Dynamic
+// Filter Data - Dynamic (computed from text constants)
 // ============================================================================
 const quickFilters = ref<QuickFilter[]>([
-  { id: 'all', label: 'All', icon: 'fas fa-globe', active: true },
-  { id: 'articles', label: 'Articles', icon: 'fas fa-file-alt', active: false },
-  { id: 'documents', label: 'Documents', icon: 'fas fa-file-pdf', active: false },
-  { id: 'videos', label: 'Videos', icon: 'fas fa-video', active: false },
-  { id: 'courses', label: 'Courses', icon: 'fas fa-graduation-cap', active: false }
+  { id: 'all', label: textConstants.quickFilterAll, icon: 'fas fa-globe', active: true },
+  { id: 'articles', label: textConstants.quickFilterArticles, icon: 'fas fa-file-alt', active: false },
+  { id: 'documents', label: textConstants.quickFilterDocuments, icon: 'fas fa-file-pdf', active: false },
+  { id: 'videos', label: textConstants.quickFilterVideos, icon: 'fas fa-video', active: false },
+  { id: 'courses', label: textConstants.quickFilterCourses, icon: 'fas fa-graduation-cap', active: false }
 ])
 
 const contentTypes = ref<ContentType[]>([
-  { id: 'articles', label: 'Articles', count: 0, checked: true },
-  { id: 'documents', label: 'Documents', count: 0, checked: true },
-  { id: 'videos', label: 'Videos', count: 0, checked: true },
-  { id: 'courses', label: 'Courses', count: 0, checked: false },
-  { id: 'events', label: 'Events', count: 0, checked: false },
-  { id: 'polls', label: 'Polls', count: 0, checked: false }
+  { id: 'articles', label: textConstants.contentTypeArticles, count: 0, checked: true },
+  { id: 'documents', label: textConstants.contentTypeDocuments, count: 0, checked: true },
+  { id: 'videos', label: textConstants.contentTypeVideos, count: 0, checked: true },
+  { id: 'courses', label: textConstants.contentTypeCourses, count: 0, checked: false },
+  { id: 'events', label: textConstants.contentTypeEvents, count: 0, checked: false },
+  { id: 'polls', label: textConstants.contentTypePolls, count: 0, checked: false }
 ])
 
 const dateFilters = computed<DateFilter[]>(() => [
@@ -357,16 +416,16 @@ function generateMockResults(): void {
   // Generate dynamic results based on query
   const mockResults: SearchResult[] = []
   const types = [
-    { type: 'Article', badge: 'badge-blue', icon: 'fas fa-file-alt', bg: 'bg-blue-100', color: 'text-blue-600' },
-    { type: 'Document', badge: 'badge-purple', icon: 'fas fa-file-pdf', bg: 'bg-purple-100', color: 'text-purple-600' },
-    { type: 'Video', badge: 'badge-red', icon: 'fas fa-video', bg: 'bg-red-100', color: 'text-red-600' },
-    { type: 'Course', badge: 'badge-green', icon: 'fas fa-graduation-cap', bg: 'bg-green-100', color: 'text-green-600' }
+    { type: textConstants.typeArticle, badge: 'badge-blue', icon: 'fas fa-file-alt', bg: 'bg-blue-100', color: 'text-blue-600' },
+    { type: textConstants.typeDocument, badge: 'badge-purple', icon: 'fas fa-file-pdf', bg: 'bg-purple-100', color: 'text-purple-600' },
+    { type: textConstants.typeVideo, badge: 'badge-red', icon: 'fas fa-video', bg: 'bg-red-100', color: 'text-red-600' },
+    { type: textConstants.typeCourse, badge: 'badge-green', icon: 'fas fa-graduation-cap', bg: 'bg-green-100', color: 'text-green-600' }
   ]
 
   const authors = [
-    { name: 'Content Team', initials: 'CT', color: '#10B981' },
-    { name: 'Admin User', initials: 'AU', color: '#8B5CF6' },
-    { name: 'System Admin', initials: 'SA', color: '#3B82F6' }
+    { name: textConstants.authorContentTeam, initials: 'CT', color: '#10B981' },
+    { name: textConstants.authorAdminUser, initials: 'AU', color: '#8B5CF6' },
+    { name: textConstants.authorSystemAdmin, initials: 'SA', color: '#3B82F6' }
   ]
 
   // Generate 10-20 results
@@ -392,7 +451,7 @@ function generateMockResults(): void {
       author: author,
       date: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
       views: Math.floor(Math.random() * 2000) + 100,
-      tags: [query.split(' ')[0], typeInfo.type, 'Guide'].filter(Boolean),
+      tags: [query.split(' ')[0], typeInfo.type, textConstants.tagGuide].filter(Boolean),
       isNew: daysAgo < 3
     })
   }
@@ -443,19 +502,19 @@ async function analyzeSearchQuery(query: string): Promise<void> {
       queryIntent.value = {
         type: 'informational',
         confidence: 0.92,
-        description: 'Looking for learning resources and guides'
+        description: textConstants.intentLookingForGuides
       }
     } else if (lowerQuery.includes('find') || lowerQuery.includes('download') || lowerQuery.includes('document')) {
       queryIntent.value = {
         type: 'navigational',
         confidence: 0.88,
-        description: 'Looking for specific content'
+        description: textConstants.intentLookingForSpecific
       }
     } else {
       queryIntent.value = {
         type: 'informational',
         confidence: 0.75,
-        description: 'General information search'
+        description: textConstants.intentGeneralSearch
       }
     }
 
@@ -469,28 +528,28 @@ async function analyzeSearchQuery(query: string): Promise<void> {
 
     // Generate suggestions
     didYouMeanSuggestions.value = [
-      { original: query, suggestion: `${query} guide`, reason: 'More specific' },
-      { original: query, suggestion: `${query} best practices`, reason: 'Popular search' }
+      { original: query, suggestion: `${query} guide`, reason: textConstants.moreSpecific },
+      { original: query, suggestion: `${query} best practices`, reason: textConstants.popularSearch }
     ]
 
     // Generate insights
     aiSearchInsights.value = [
-      { id: '1', type: 'tip', text: `Try adding "2024" for the latest ${query} content`, action: `${query} 2024` },
-      { id: '2', type: 'related', text: `Users also searched for: "${query} tutorial"`, action: `${query} tutorial` },
-      { id: '3', type: 'refine', text: 'Filter by Content Team for official content', action: 'filter:author:Content Team' }
+      { id: '1', type: 'tip', text: `${textConstants.insightTryAdding} "2024" ${textConstants.insightForLatest} ${query} ${textConstants.insightContent}`, action: `${query} 2024` },
+      { id: '2', type: 'related', text: `${textConstants.insightUsersSearched} "${query} ${textConstants.insightTutorial}"`, action: `${query} ${textConstants.insightTutorial}` },
+      { id: '3', type: 'refine', text: `${textConstants.insightFilterBy} ${textConstants.authorContentTeam} ${textConstants.insightForOfficial}`, action: `filter:author:${textConstants.authorContentTeam}` }
     ]
 
     // Related searches
     relatedSearches.value = [
-      `${query} tutorial`,
-      `${query} examples`,
-      `${query} best practices`,
-      `how to ${query}`,
-      `${query} guide`
+      `${query} ${textConstants.insightTutorial}`,
+      `${query} ${textConstants.insightExamples}`,
+      `${query} ${textConstants.insightBestPractices}`,
+      `${textConstants.insightHowTo} ${query}`,
+      `${query} ${textConstants.insightGuide}`
     ]
 
     // AI Summary
-    aiSummary.value = `Based on your search for "${query}", I found ${totalResults.value} relevant resources including articles, documents, and training materials. The most relevant content covers comprehensive guides, tutorials, and best practices related to ${query}.`
+    aiSummary.value = `${textConstants.aiSummaryPrefix} "${query}", ${textConstants.aiSummaryFound} ${totalResults.value} ${textConstants.aiSummaryRelevantResources} ${query}.`
 
   } catch (error) {
     console.error('Query analysis failed:', error)
@@ -623,7 +682,7 @@ function getIntentLabel(type: string): string {
         <button
           @click="isFilterSidebarCollapsed = !isFilterSidebarCollapsed"
           class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-500 transition-colors"
-          :title="isFilterSidebarCollapsed ? 'Expand filters' : 'Collapse filters'"
+          :title="isFilterSidebarCollapsed ? textConstants.expandFilters : textConstants.collapseFilters"
         >
           <i :class="['fas text-xs', isFilterSidebarCollapsed ? 'fa-angles-right' : 'fa-angles-left']"></i>
         </button>
@@ -783,7 +842,7 @@ function getIntentLabel(type: string): string {
           <div v-if="isLoading" class="flex items-center justify-center py-20">
             <div class="text-center">
               <div class="w-12 h-12 border-4 border-teal-200 border-t-teal-500 rounded-full animate-spin mx-auto mb-4"></div>
-              <p class="text-gray-500">Searching...</p>
+              <p class="text-gray-500">{{ textConstants.searching }}</p>
             </div>
           </div>
 
@@ -1088,8 +1147,8 @@ function getIntentLabel(type: string): string {
             <div class="w-20 h-20 rounded-full bg-teal-50 flex items-center justify-center mb-4">
               <i class="fas fa-search text-3xl text-teal-400"></i>
             </div>
-            <h3 class="text-xl font-semibold text-gray-800 mb-2">Start your search</h3>
-            <p class="text-gray-500">Enter a search term to find content</p>
+            <h3 class="text-xl font-semibold text-gray-800 mb-2">{{ textConstants.initialStateTitle }}</h3>
+            <p class="text-gray-500">{{ textConstants.initialStateDesc }}</p>
           </div>
         </div>
       </div>
