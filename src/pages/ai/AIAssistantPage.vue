@@ -1440,37 +1440,35 @@ function handleEntityClick(entity: { text: string; type: string }) {
       <Transition name="slide-right">
         <div v-if="showContextPanel" class="fixed right-0 top-0 h-full w-96 bg-gradient-to-b from-gray-50 to-white shadow-2xl z-50 flex flex-col border-l border-gray-200">
         <!-- Header -->
-        <div class="p-5 bg-gradient-to-r from-teal-500 via-teal-600 to-emerald-600">
+        <div class="p-5 bg-gradient-to-b from-white to-gray-50/80 border-b border-gray-100">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-3">
-              <div class="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                <i class="fas fa-brain text-white text-xl"></i>
+              <div class="w-10 h-10 rounded-xl bg-teal-50 flex items-center justify-center">
+                <i class="fas fa-brain text-teal-500 text-lg"></i>
               </div>
               <div>
-                <h3 class="font-bold text-white text-lg">Context Intelligence</h3>
-                <p class="text-xs text-white/80">Real-time conversation analysis</p>
+                <h3 class="font-semibold text-gray-800">Context Intelligence</h3>
+                <p class="text-xs text-gray-400">Real-time conversation analysis</p>
               </div>
             </div>
-            <button @click="showContextPanel = false" class="p-2.5 bg-white/20 hover:bg-white/30 rounded-xl transition-colors" title="Close panel">
-              <i class="fas fa-times text-white text-lg"></i>
+            <button @click="showContextPanel = false" class="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-400 hover:text-gray-600" title="Close panel">
+              <i class="fas fa-times"></i>
             </button>
           </div>
 
           <!-- Quick Stats -->
-          <div class="flex items-center gap-4 mt-4 pt-4 border-t border-white/20">
-            <div class="flex-1 text-center">
-              <p class="text-2xl font-bold text-white">{{ messages.length }}</p>
-              <p class="text-xs text-white/70">Messages</p>
+          <div class="flex items-center gap-3 mt-4 pt-4 border-t border-gray-100">
+            <div class="flex-1 text-center p-2 bg-teal-50/50 rounded-lg">
+              <p class="text-xl font-semibold text-teal-600">{{ messages.length }}</p>
+              <p class="text-xs text-gray-400">Messages</p>
             </div>
-            <div class="w-px h-8 bg-white/20"></div>
-            <div class="flex-1 text-center">
-              <p class="text-2xl font-bold text-white">{{ conversationContext.entities.length }}</p>
-              <p class="text-xs text-white/70">Entities</p>
+            <div class="flex-1 text-center p-2 bg-teal-50/50 rounded-lg">
+              <p class="text-xl font-semibold text-teal-600">{{ conversationContext.entities.length }}</p>
+              <p class="text-xs text-gray-400">Entities</p>
             </div>
-            <div class="w-px h-8 bg-white/20"></div>
-            <div class="flex-1 text-center">
-              <p class="text-2xl font-bold text-white">{{ conversationContext.topics.length }}</p>
-              <p class="text-xs text-white/70">Topics</p>
+            <div class="flex-1 text-center p-2 bg-teal-50/50 rounded-lg">
+              <p class="text-xl font-semibold text-teal-600">{{ conversationContext.topics.length }}</p>
+              <p class="text-xs text-gray-400">Topics</p>
             </div>
           </div>
         </div>
@@ -1478,54 +1476,54 @@ function handleEntityClick(entity: { text: string; type: string }) {
         <div class="flex-1 overflow-y-auto">
           <!-- Intent Card -->
           <div class="p-4">
-            <div class="bg-gradient-to-r from-teal-500 to-emerald-500 rounded-2xl p-4 text-white shadow-lg">
+            <div class="bg-teal-50/50 rounded-xl p-4 border border-teal-100/50">
               <div class="flex items-center gap-2 mb-2">
-                <i class="fas fa-crosshairs"></i>
-                <span class="text-xs font-semibold uppercase tracking-wider opacity-80">Detected Intent</span>
+                <i class="fas fa-crosshairs text-teal-400"></i>
+                <span class="text-xs font-semibold uppercase tracking-wider text-gray-400">Detected Intent</span>
               </div>
-              <p class="text-lg font-semibold">{{ conversationContext.intent }}</p>
-              <div class="flex items-center gap-2 mt-3 pt-3 border-t border-white/20">
-                <div class="flex-1 bg-white/20 rounded-full h-2">
-                  <div class="bg-white rounded-full h-2 w-4/5"></div>
+              <p class="text-base font-semibold text-gray-700">{{ conversationContext.intent }}</p>
+              <div class="flex items-center gap-2 mt-3 pt-3 border-t border-teal-100/30">
+                <div class="flex-1 bg-teal-100/50 rounded-full h-1.5">
+                  <div class="bg-teal-400 rounded-full h-1.5 w-4/5"></div>
                 </div>
-                <span class="text-xs font-medium">85% confidence</span>
+                <span class="text-xs text-gray-400">85%</span>
               </div>
             </div>
           </div>
 
           <!-- Conversation Sentiment -->
           <div class="px-4 pb-4">
-            <div class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+            <div class="bg-gray-50/30 rounded-xl p-4 border border-gray-100/50">
               <div class="flex items-center justify-between mb-3">
-                <h4 class="text-sm font-semibold text-gray-700 flex items-center gap-2">
-                  <i class="fas fa-heart text-pink-500"></i>
+                <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wider flex items-center gap-2">
+                  <i class="fas fa-heart text-pink-300"></i>
                   Conversation Mood
                 </h4>
-                <span class="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">Positive</span>
+                <span class="px-2 py-0.5 bg-green-50 text-green-500 rounded-full text-xs font-medium">Positive</span>
               </div>
               <div class="flex items-center gap-3">
                 <div class="flex-1">
-                  <div class="flex items-center justify-between text-xs text-gray-500 mb-1">
+                  <div class="flex items-center justify-between text-xs text-gray-400 mb-1">
                     <span>Negative</span>
                     <span>Positive</span>
                   </div>
-                  <div class="h-3 bg-gradient-to-r from-red-200 via-yellow-200 to-green-200 rounded-full relative">
-                    <div class="absolute top-1/2 -translate-y-1/2 w-4 h-4 bg-white border-2 border-green-500 rounded-full shadow-md" style="left: 75%"></div>
+                  <div class="h-2 bg-gradient-to-r from-red-100 via-yellow-100 to-green-100 rounded-full relative">
+                    <div class="absolute top-1/2 -translate-y-1/2 w-3 h-3 bg-white border-2 border-green-400 rounded-full shadow-sm" style="left: 75%"></div>
                   </div>
                 </div>
               </div>
-              <div class="flex items-center justify-center gap-4 mt-3 pt-3 border-t border-gray-100">
+              <div class="flex items-center justify-center gap-6 mt-3 pt-3 border-t border-gray-100/50">
                 <div class="text-center">
-                  <i class="fas fa-smile text-green-500 text-lg"></i>
-                  <p class="text-xs text-gray-500 mt-1">Helpful</p>
+                  <i class="fas fa-smile text-green-300"></i>
+                  <p class="text-xs text-gray-400 mt-1">Helpful</p>
                 </div>
                 <div class="text-center">
-                  <i class="fas fa-lightbulb text-yellow-500 text-lg"></i>
-                  <p class="text-xs text-gray-500 mt-1">Informative</p>
+                  <i class="fas fa-lightbulb text-amber-300"></i>
+                  <p class="text-xs text-gray-400 mt-1">Informative</p>
                 </div>
                 <div class="text-center">
-                  <i class="fas fa-handshake text-blue-500 text-lg"></i>
-                  <p class="text-xs text-gray-500 mt-1">Collaborative</p>
+                  <i class="fas fa-handshake text-blue-300"></i>
+                  <p class="text-xs text-gray-400 mt-1">Collaborative</p>
                 </div>
               </div>
             </div>
@@ -1534,13 +1532,13 @@ function handleEntityClick(entity: { text: string; type: string }) {
           <!-- Active Topics -->
           <div class="px-4 pb-4">
             <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 flex items-center gap-2">
-              <i class="fas fa-hashtag text-teal-500"></i>
+              <i class="fas fa-hashtag text-teal-400"></i>
               Active Topics
             </h4>
             <div class="flex flex-wrap gap-2">
               <button v-for="topic in conversationContext.topics" :key="topic"
-                      class="group px-4 py-2 bg-gradient-to-r from-teal-50 to-emerald-50 hover:from-teal-100 hover:to-emerald-100 border border-teal-200 text-teal-700 rounded-xl text-sm font-medium transition-all hover:shadow-md">
-                <i class="fas fa-tag text-teal-400 mr-2 group-hover:text-teal-600"></i>
+                      class="group px-3 py-1.5 bg-teal-50/50 hover:bg-teal-100/50 border border-teal-100 text-teal-600 rounded-lg text-sm font-medium transition-all hover:shadow-sm">
+                <i class="fas fa-tag text-teal-300 mr-2 group-hover:text-teal-500"></i>
                 {{ topic }}
               </button>
             </div>
@@ -1554,15 +1552,15 @@ function handleEntityClick(entity: { text: string; type: string }) {
             </h4>
             <div class="space-y-2">
               <button v-for="entity in conversationContext.entities" :key="entity.text"
-                      class="w-full flex items-center justify-between p-3 bg-white hover:bg-teal-50 rounded-xl border border-gray-100 hover:border-teal-200 transition-all group">
+                      class="w-full flex items-center justify-between p-3 bg-gray-50/50 hover:bg-teal-50/50 rounded-xl border border-gray-100/50 hover:border-teal-200/50 transition-all group">
                 <div class="flex items-center gap-3">
                   <div :class="[
                     'w-10 h-10 rounded-xl flex items-center justify-center',
-                    entity.type === 'organization' ? 'bg-blue-100 text-blue-600' :
-                    entity.type === 'location' ? 'bg-green-100 text-green-600' :
-                    entity.type === 'person' ? 'bg-orange-100 text-orange-600' :
-                    entity.type === 'event' ? 'bg-pink-100 text-pink-600' :
-                    'bg-gray-100 text-gray-600'
+                    entity.type === 'organization' ? 'bg-blue-50 text-blue-500' :
+                    entity.type === 'location' ? 'bg-green-50 text-green-500' :
+                    entity.type === 'person' ? 'bg-orange-50 text-orange-500' :
+                    entity.type === 'event' ? 'bg-pink-50 text-pink-500' :
+                    'bg-gray-50 text-gray-500'
                   ]">
                     <i :class="[
                       entity.type === 'organization' ? 'fas fa-building' :
@@ -1590,17 +1588,17 @@ function handleEntityClick(entity: { text: string; type: string }) {
           <!-- Key Insights -->
           <div class="px-4 pb-4">
             <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 flex items-center gap-2">
-              <i class="fas fa-lightbulb text-yellow-500"></i>
+              <i class="fas fa-lightbulb text-amber-400"></i>
               Key Insights
             </h4>
-            <div class="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-2xl p-4 border border-yellow-100">
+            <div class="bg-amber-50/30 rounded-2xl p-4 border border-amber-100/50">
               <ul class="space-y-3">
                 <li v-for="(point, idx) in conversationContext.summaryPoints" :key="idx"
                     class="flex items-start gap-3">
-                  <div class="w-6 h-6 rounded-full bg-yellow-200 text-yellow-700 flex items-center justify-center flex-shrink-0 text-xs font-bold">
+                  <div class="w-6 h-6 rounded-full bg-amber-100/70 text-amber-600 flex items-center justify-center flex-shrink-0 text-xs font-bold">
                     {{ idx + 1 }}
                   </div>
-                  <span class="text-sm text-gray-700">{{ point }}</span>
+                  <span class="text-sm text-gray-600">{{ point }}</span>
                 </li>
               </ul>
             </div>
@@ -1609,20 +1607,20 @@ function handleEntityClick(entity: { text: string; type: string }) {
           <!-- Referenced Documents -->
           <div v-if="conversationContext.documentReferences.length > 0" class="px-4 pb-4">
             <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 flex items-center gap-2">
-              <i class="fas fa-folder-open text-amber-500"></i>
+              <i class="fas fa-folder-open text-amber-400"></i>
               Referenced Documents
             </h4>
             <div class="space-y-2">
               <button v-for="doc in conversationContext.documentReferences" :key="doc"
-                      class="w-full flex items-center gap-3 p-3 bg-white hover:bg-amber-50 rounded-xl border border-gray-100 hover:border-amber-200 transition-all group">
-                <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center">
+                      class="w-full flex items-center gap-3 p-3 bg-gray-50/50 hover:bg-amber-50/50 rounded-xl border border-gray-100/50 hover:border-amber-200/50 transition-all group">
+                <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-500 flex items-center justify-center">
                   <i class="fas fa-file-alt"></i>
                 </div>
                 <div class="flex-1 text-left">
-                  <p class="text-sm font-medium text-gray-800">{{ doc }}</p>
+                  <p class="text-sm font-medium text-gray-700">{{ doc }}</p>
                   <p class="text-xs text-gray-400">Click to view document</p>
                 </div>
-                <i class="fas fa-external-link-alt text-gray-300 group-hover:text-amber-500"></i>
+                <i class="fas fa-external-link-alt text-gray-300 group-hover:text-amber-400"></i>
               </button>
             </div>
           </div>
@@ -1630,23 +1628,23 @@ function handleEntityClick(entity: { text: string; type: string }) {
           <!-- AI Suggestions -->
           <div class="px-4 pb-6">
             <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 flex items-center gap-2">
-              <i class="fas fa-magic text-teal-500"></i>
+              <i class="fas fa-magic text-teal-400"></i>
               AI Suggestions
             </h4>
-            <div class="bg-gradient-to-br from-teal-50 to-emerald-50 rounded-2xl p-4 border border-teal-100">
-              <p class="text-sm text-gray-600 mb-3">Based on this conversation, you might want to:</p>
+            <div class="bg-teal-50/30 rounded-2xl p-4 border border-teal-100/50">
+              <p class="text-sm text-gray-500 mb-3">Based on this conversation, you might want to:</p>
               <div class="space-y-2">
-                <button class="w-full flex items-center gap-3 p-2.5 bg-white hover:bg-teal-100 rounded-xl text-left transition-colors group">
-                  <i class="fas fa-file-export text-teal-500"></i>
-                  <span class="text-sm text-gray-700 group-hover:text-teal-700">Export conversation summary</span>
+                <button class="w-full flex items-center gap-3 p-2.5 bg-white/70 hover:bg-teal-50 rounded-xl text-left transition-colors group border border-gray-100/50">
+                  <i class="fas fa-file-export text-teal-400"></i>
+                  <span class="text-sm text-gray-600 group-hover:text-teal-700">Export conversation summary</span>
                 </button>
-                <button class="w-full flex items-center gap-3 p-2.5 bg-white hover:bg-teal-100 rounded-xl text-left transition-colors group">
-                  <i class="fas fa-tasks text-teal-500"></i>
-                  <span class="text-sm text-gray-700 group-hover:text-teal-700">Create action items</span>
+                <button class="w-full flex items-center gap-3 p-2.5 bg-white/70 hover:bg-teal-50 rounded-xl text-left transition-colors group border border-gray-100/50">
+                  <i class="fas fa-tasks text-teal-400"></i>
+                  <span class="text-sm text-gray-600 group-hover:text-teal-700">Create action items</span>
                 </button>
-                <button class="w-full flex items-center gap-3 p-2.5 bg-white hover:bg-teal-100 rounded-xl text-left transition-colors group">
-                  <i class="fas fa-search-plus text-teal-500"></i>
-                  <span class="text-sm text-gray-700 group-hover:text-teal-700">Deep dive into topics</span>
+                <button class="w-full flex items-center gap-3 p-2.5 bg-white/70 hover:bg-teal-50 rounded-xl text-left transition-colors group border border-gray-100/50">
+                  <i class="fas fa-search-plus text-teal-400"></i>
+                  <span class="text-sm text-gray-600 group-hover:text-teal-700">Deep dive into topics</span>
                 </button>
               </div>
             </div>
@@ -1654,8 +1652,8 @@ function handleEntityClick(entity: { text: string; type: string }) {
         </div>
 
         <!-- Footer -->
-        <div class="p-4 border-t border-gray-200 bg-white">
-          <button class="w-full py-3 bg-gradient-to-r from-teal-500 to-emerald-600 hover:from-teal-600 hover:to-emerald-700 text-white rounded-xl font-medium transition-all flex items-center justify-center gap-2 shadow-lg hover:shadow-xl">
+        <div class="p-4 border-t border-gray-100 bg-white">
+          <button class="w-full py-3 bg-teal-50 hover:bg-teal-100 text-teal-700 border border-teal-200 rounded-xl font-medium transition-all flex items-center justify-center gap-2 hover:shadow-md">
             <i class="fas fa-download"></i>
             Export Context Report
           </button>
