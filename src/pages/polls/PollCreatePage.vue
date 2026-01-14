@@ -98,6 +98,29 @@ const textConstants = {
   optionsRequired: 'Please add at least 2 options',
   successTitle: 'Poll Created!',
   successMessage: 'Your poll is now live and ready to collect responses',
+  draftSavedTitle: 'Draft Saved',
+  draftSavedMessage: 'Your poll has been saved as a draft',
+
+  // Breadcrumb
+  polls: 'Polls',
+  createNew: 'Create New',
+
+  // Preview Badges
+  anonymous: 'Anonymous',
+  multiple: 'Multiple',
+
+  // Tips
+  tipsTitle: 'Tips for Great Polls',
+  tip1: 'Keep questions clear and concise',
+  tip2: 'Provide balanced answer options',
+  tip3: 'Avoid leading questions',
+  tip4: 'Set appropriate deadlines',
+  tip5: 'Use anonymous voting for sensitive topics',
+
+  // AI Applied
+  aiAppliedTitle: 'AI Suggestion Applied',
+  aiAppliedMessage: 'Poll question and options have been filled in',
+  failedToCreate: 'Failed to create poll. Please try again.',
 }
 
 const router = useRouter()
@@ -273,7 +296,7 @@ function applySuggestion(suggestion: AIPollSuggestion) {
   options.value = [...suggestion.options]
   selectedCategory.value = suggestion.category
   showAISuggestionsModal.value = false
-  uiStore.showSuccess('AI Suggestion Applied', 'Poll question and options have been filled in')
+  uiStore.showSuccess(textConstants.aiAppliedTitle, textConstants.aiAppliedMessage)
 }
 
 async function createPoll() {
@@ -297,14 +320,14 @@ async function createPoll() {
     router.push({ name: 'Polls' })
   } catch (error) {
     console.error('Failed to create poll:', error)
-    uiStore.showError('Failed to create poll. Please try again.')
+    uiStore.showError(textConstants.failedToCreate)
   } finally {
     isCreating.value = false
   }
 }
 
 function saveDraft() {
-  uiStore.showSuccess('Draft Saved', 'Your poll has been saved as a draft')
+  uiStore.showSuccess(textConstants.draftSavedTitle, textConstants.draftSavedMessage)
 }
 
 function goBack() {
@@ -333,10 +356,10 @@ function goBack() {
           <div class="breadcrumb">
             <router-link to="/polls" class="breadcrumb-link">
               <i class="fas fa-poll"></i>
-              Polls
+              {{ textConstants.polls }}
             </router-link>
             <i class="fas fa-chevron-right breadcrumb-sep"></i>
-            <span class="breadcrumb-current">Create New</span>
+            <span class="breadcrumb-current">{{ textConstants.createNew }}</span>
           </div>
         </div>
 
@@ -680,11 +703,11 @@ function goBack() {
                 <div class="preview-badges">
                   <span v-if="isAnonymous" class="badge-anon">
                     <i class="fas fa-user-secret"></i>
-                    Anonymous
+                    {{ textConstants.anonymous }}
                   </span>
                   <span v-if="allowMultiple" class="badge-multi">
                     <i class="fas fa-check-double"></i>
-                    Multiple
+                    {{ textConstants.multiple }}
                   </span>
                 </div>
               </div>
@@ -714,14 +737,14 @@ function goBack() {
             <div class="tips-card fade-in-up" style="animation-delay: 0.6s">
               <h4 class="tips-title">
                 <i class="fas fa-lightbulb"></i>
-                Tips for Great Polls
+                {{ textConstants.tipsTitle }}
               </h4>
               <ul class="tips-list">
-                <li>Keep questions clear and concise</li>
-                <li>Provide balanced answer options</li>
-                <li>Avoid leading questions</li>
-                <li>Set appropriate deadlines</li>
-                <li>Use anonymous voting for sensitive topics</li>
+                <li>{{ textConstants.tip1 }}</li>
+                <li>{{ textConstants.tip2 }}</li>
+                <li>{{ textConstants.tip3 }}</li>
+                <li>{{ textConstants.tip4 }}</li>
+                <li>{{ textConstants.tip5 }}</li>
               </ul>
             </div>
           </div>
