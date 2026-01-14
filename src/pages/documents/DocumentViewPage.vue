@@ -1153,39 +1153,6 @@ function formatVersionDate(date: Date): string {
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Left Column - Document Preview -->
         <div class="lg:col-span-2 space-y-6">
-          <!-- Document Description Card -->
-          <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-            <h2 class="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
-              <i class="fas fa-info-circle text-teal-500"></i>
-              About this Document
-            </h2>
-            <p class="text-gray-600 mb-4">{{ document.description }}</p>
-
-            <!-- Actions & Rating -->
-            <div class="flex items-center justify-between flex-wrap gap-3">
-              <div class="flex items-center gap-3">
-                <button @click="printDocument" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-medium flex items-center gap-2 transition-colors">
-                  <i class="fas fa-print"></i>
-                  <span>Print</span>
-                </button>
-                <SocialShareButtons
-                  :title="document.name"
-                  :description="document.description"
-                  layout="horizontal"
-                  size="sm"
-                />
-              </div>
-              <RatingStars
-                :model-value="rating?.userRating || 0"
-                :average="rating?.average"
-                :count="rating?.count"
-                size="md"
-                :show-count="true"
-                @update:model-value="handleRating"
-              />
-            </div>
-          </div>
-
           <!-- Document Preview -->
           <div :class="['bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden', isPreviewMode ? 'ring-2 ring-teal-500' : '']">
             <!-- Preview Header/Toolbar -->
@@ -1991,47 +1958,86 @@ function formatVersionDate(date: Date): string {
             </div>
           </div>
 
-          <!-- Author -->
-          <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-            <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-              <i class="fas fa-user text-teal-500"></i>
-              Author
-            </h2>
-            <div class="flex items-center gap-3">
-              <div class="w-12 h-12 rounded-xl flex items-center justify-center text-white font-semibold"
-                   :style="{ backgroundColor: document.author.color }">
-                {{ document.author.initials }}
-              </div>
-              <div>
-                <p class="font-medium text-gray-900">{{ document.author.name }}</p>
-                <p class="text-sm text-gray-500">Uploaded {{ formatShortDate(document.createdAt) }}</p>
-              </div>
+        </div>
+      </div>
+
+      <!-- About this Document - Full Width -->
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mt-6">
+        <h2 class="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
+          <i class="fas fa-info-circle text-teal-500"></i>
+          About this Document
+        </h2>
+        <p class="text-gray-600 mb-4 leading-relaxed">{{ document.description }}</p>
+
+        <!-- Stats Row -->
+        <div class="flex flex-wrap gap-6 mb-4 pb-4 border-b border-gray-100">
+          <div class="flex items-center gap-2 text-sm text-gray-500">
+            <i class="fas fa-eye text-teal-500"></i>
+            <span>{{ document.views?.toLocaleString() }} views</span>
+          </div>
+          <div class="flex items-center gap-2 text-sm text-gray-500">
+            <i class="fas fa-download text-teal-500"></i>
+            <span>{{ document.downloads?.toLocaleString() }} downloads</span>
+          </div>
+          <div class="flex items-center gap-2 text-sm text-gray-500">
+            <i class="fas fa-file text-teal-500"></i>
+            <span>{{ document.type }} • {{ document.size }}</span>
+          </div>
+          <div class="flex items-center gap-2 text-sm text-gray-500">
+            <i class="fas fa-clock text-teal-500"></i>
+            <span>Updated {{ formatShortDate(document.updatedAt) }}</span>
+          </div>
+        </div>
+
+        <!-- Tags -->
+        <div class="flex flex-wrap gap-2 mb-4">
+          <span v-for="tag in document.tags" :key="tag" class="px-3 py-1.5 bg-teal-50 text-teal-700 rounded-full text-sm font-medium">
+            #{{ tag }}
+          </span>
+        </div>
+
+        <!-- Author & Rating -->
+        <div class="flex items-center justify-between flex-wrap gap-4 pt-4 border-t border-gray-100">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold text-sm"
+                 :style="{ backgroundColor: document.author.color }">
+              {{ document.author.initials }}
+            </div>
+            <div>
+              <p class="font-medium text-gray-900">{{ document.author.name }}</p>
+              <p class="text-sm text-gray-500">Document Author</p>
             </div>
           </div>
-
-          <!-- Tags -->
-          <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-            <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-              <i class="fas fa-tags text-teal-500"></i>
-              Tags
-            </h2>
-            <div class="flex flex-wrap gap-2">
-              <span v-for="tag in document.tags" :key="tag"
-                    class="px-3 py-1.5 bg-teal-50 text-teal-700 rounded-full text-sm font-medium hover:bg-teal-100 cursor-pointer transition-colors">
-                #{{ tag }}
-              </span>
-            </div>
+          <div class="flex items-center gap-3">
+            <button @click="printDocument" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-medium flex items-center gap-2 transition-colors">
+              <i class="fas fa-print"></i>
+              <span>Print</span>
+            </button>
+            <SocialShareButtons
+              :title="document.name"
+              :description="document.description"
+              layout="horizontal"
+              size="sm"
+            />
+            <RatingStars
+              :model-value="rating?.userRating || 0"
+              :average="rating?.average"
+              :count="rating?.count"
+              size="md"
+              :show-count="true"
+              @update:model-value="handleRating"
+            />
           </div>
         </div>
       </div>
 
-      <!-- Related Documents -->
+      <!-- Related Documents - Full Width -->
       <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mt-6">
         <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
           <i class="fas fa-folder-open text-teal-500"></i>
           Related Documents
         </h2>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <div v-for="doc in relatedDocuments" :key="doc.id"
                @click="router.push(`/documents/${doc.id}`)"
                class="flex items-center gap-4 p-4 rounded-xl border border-gray-100 hover:border-teal-200 hover:shadow-md cursor-pointer transition-all group">
