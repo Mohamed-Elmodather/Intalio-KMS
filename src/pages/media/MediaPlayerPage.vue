@@ -15,6 +15,63 @@ import { useComments } from '@/composables/useComments'
 import { useRatings } from '@/composables/useRatings'
 import type { SummarizationResult, TranslationResult, SupportedLanguage } from '@/types/ai'
 
+// Text constants for localization
+const textConstants = {
+  // Navigation
+  back: 'Back',
+  mediaCenter: 'Media Center',
+
+  // Loading
+  loadingMedia: 'Loading media...',
+
+  // Player
+  video: 'Video',
+  audio: 'Audio',
+  views: 'views',
+  like: 'Like',
+  share: 'Share',
+  download: 'Download',
+
+  // Media Info
+  aboutThisMedia: 'About this Media',
+  contentCreator: 'Content Creator',
+  relatedMedia: 'Related Media',
+
+  // AI Features
+  aiFeatures: 'AI Features',
+  transcript: 'Transcript',
+  summary: 'Summary',
+  moments: 'Moments',
+  translate: 'Translate',
+  generateTranscript: 'Generate Transcript',
+  generating: 'Generating...',
+  searchTranscript: 'Search transcript...',
+  copyTranscript: 'Copy Transcript',
+  generateSummary: 'Generate Summary',
+  keyPoints: 'Key Points',
+  confidence: 'confidence',
+  copy: 'Copy',
+  detectKeyMoments: 'Detect Key Moments',
+  detecting: 'Detecting...',
+  translateFirst: 'Generate transcript first to enable translation',
+  goToTranscript: 'Go to Transcript',
+  translating: 'Translating...',
+
+  // Rating
+  rateThisVideo: 'Rate this Video',
+  rateThisAudio: 'Rate this Audio',
+  helpOthers: 'Help others discover great content',
+  collection: 'Collection',
+
+  // Share
+  shareThisVideo: 'Share this Video',
+  shareThisAudio: 'Share this Audio',
+
+  // Comments
+  comments: 'Comments',
+  discussion: 'Join the discussion',
+}
+
 const router = useRouter()
 const route = useRoute()
 const aiStore = useAIServicesStore()
@@ -272,6 +329,12 @@ function goToRelated(id: number) {
   router.push({ name: 'MediaPlayer', params: { id: id.toString() } })
 }
 
+function handleLike() {
+  if (media.value) {
+    media.value.likes = (media.value.likes || 0) + 1
+  }
+}
+
 // ============================================================================
 // AI Functions
 // ============================================================================
@@ -456,32 +519,82 @@ function copySummary() {
 </script>
 
 <template>
-  <div class="min-h-screen bg-gray-50/50">
+  <div class="media-player-page min-h-screen bg-gray-50">
     <!-- Loading State -->
     <div v-if="isLoading" class="flex items-center justify-center min-h-[60vh]">
       <div class="text-center">
         <div class="w-12 h-12 border-4 border-teal-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-        <p class="text-gray-500">Loading media...</p>
+        <p class="text-gray-500">{{ textConstants.loadingMedia }}</p>
       </div>
     </div>
 
     <!-- Media Content -->
-    <div v-else-if="media" class="px-6 py-8">
-      <!-- Navigation Row -->
-      <div class="header-nav">
-        <button @click="goBack" class="back-btn">
-          <i class="fas fa-arrow-left"></i>
-          <span>Back</span>
-        </button>
-        <div class="breadcrumb">
-          <router-link to="/media" class="breadcrumb-link">
-            <i class="fas fa-photo-video"></i>
-            Media Center
-          </router-link>
-          <i class="fas fa-chevron-right breadcrumb-sep"></i>
-          <span class="breadcrumb-current">{{ media.title }}</span>
+    <template v-else-if="media">
+      <!-- Enhanced Header -->
+      <header class="media-header">
+        <!-- Decorative Background -->
+        <div class="header-decor">
+          <div class="decor-orb decor-orb-1"></div>
+          <div class="decor-orb decor-orb-2"></div>
+          <div class="decor-pattern"></div>
         </div>
-      </div>
+
+        <div class="header-content">
+          <!-- Navigation Row -->
+          <div class="header-nav">
+            <button @click="goBack" class="back-btn">
+              <i class="fas fa-arrow-left"></i>
+              <span>{{ textConstants.back }}</span>
+            </button>
+            <div class="breadcrumb">
+              <router-link to="/media" class="breadcrumb-link">
+                <i class="fas fa-photo-video"></i>
+                {{ textConstants.mediaCenter }}
+              </router-link>
+              <i class="fas fa-chevron-right breadcrumb-sep"></i>
+              <span class="breadcrumb-current">{{ media.title }}</span>
+            </div>
+          </div>
+
+          <!-- Title Row -->
+          <div class="header-main">
+            <div class="header-left">
+              <div class="header-icon">
+                <i :class="media.type === 'video' ? 'fas fa-video' : 'fas fa-headphones'"></i>
+              </div>
+              <div>
+                <h1 class="header-title">{{ media.title }}</h1>
+                <p class="header-subtitle">
+                  <span class="header-badge">{{ media.category }}</span>
+                  <span>{{ media.duration }}</span>
+                  <span>•</span>
+                  <span>{{ media.views }} {{ textConstants.views }}</span>
+                </p>
+              </div>
+            </div>
+            <div class="header-actions">
+              <button @click="handleLike" class="action-btn action-btn-primary">
+                <i class="fas fa-heart"></i>
+                <span>{{ textConstants.like }}</span>
+              </button>
+              <button class="action-btn">
+                <i class="fas fa-download"></i>
+                <span class="hidden sm:inline">{{ textConstants.download }}</span>
+              </button>
+              <BookmarkButton
+                :content-id="media.id.toString()"
+                content-type="media"
+                size="md"
+                variant="icon"
+                class="bookmark-btn"
+              />
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Main Content -->
+      <main class="px-6 py-8">
 
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Main Content -->
@@ -502,9 +615,9 @@ function copySummary() {
 
               <!-- Media Type Badge -->
               <div class="absolute top-4 left-4">
-                <span class="px-3 py-1.5 bg-teal-500 text-white text-sm font-medium rounded-full flex items-center gap-2">
+                <span class="media-type-badge">
                   <i :class="media.type === 'video' ? 'fas fa-video' : 'fas fa-headphones'"></i>
-                  {{ media.type === 'video' ? 'Video' : 'Audio' }}
+                  {{ media.type === 'video' ? textConstants.video : textConstants.audio }}
                 </span>
               </div>
 
@@ -567,76 +680,70 @@ function copySummary() {
           </div>
 
           <!-- Media Info -->
-          <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-            <div class="flex items-start justify-between mb-4">
-              <div class="flex-1">
-                <h1 class="text-2xl font-bold text-gray-900 mb-2">{{ media.title }}</h1>
-                <div class="flex items-center gap-4 text-sm text-gray-500">
-                  <span class="flex items-center gap-1">
-                    <i class="fas fa-eye"></i>
-                    {{ media.views }} views
-                  </span>
-                  <span class="flex items-center gap-1">
-                    <i class="fas fa-clock"></i>
-                    {{ media.date }}
-                  </span>
-                  <span class="flex items-center gap-1">
-                    <i class="fas fa-heart text-red-400"></i>
-                    {{ media.likes }}
-                  </span>
+          <div class="content-card fade-in-up">
+            <div class="card-header">
+              <i class="fas fa-info-circle"></i>
+              <span>{{ textConstants.aboutThisMedia }}</span>
+            </div>
+            <div class="card-body">
+              <p class="text-gray-600 mb-4 leading-relaxed">{{ media.description }}</p>
+
+              <!-- Stats Row -->
+              <div class="stats-row">
+                <div class="stat-item">
+                  <i class="fas fa-eye"></i>
+                  <span>{{ media.views }} {{ textConstants.views }}</span>
+                </div>
+                <div class="stat-item">
+                  <i class="fas fa-clock"></i>
+                  <span>{{ media.date }}</span>
+                </div>
+                <div class="stat-item">
+                  <i class="fas fa-heart text-red-400"></i>
+                  <span>{{ media.likes }}</span>
                 </div>
               </div>
-              <div class="flex items-center gap-2">
-                <button class="px-4 py-2 bg-teal-500 hover:bg-teal-600 text-white rounded-lg font-medium flex items-center gap-2 transition-colors">
-                  <i class="fas fa-heart"></i>
-                  Like
-                </button>
-                <button class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium flex items-center gap-2 transition-colors">
-                  <i class="fas fa-share-alt"></i>
-                  Share
-                </button>
+
+              <!-- Tags -->
+              <div class="tags-container">
+                <span v-for="tag in media.tags" :key="tag" class="tag">
+                  #{{ tag }}
+                </span>
               </div>
-            </div>
 
-            <p class="text-gray-600 mb-4">{{ media.description }}</p>
-
-            <!-- Tags -->
-            <div class="flex flex-wrap gap-2">
-              <span v-for="tag in media.tags" :key="tag" class="px-3 py-1 bg-teal-50 text-teal-700 rounded-full text-sm font-medium">
-                #{{ tag }}
-              </span>
-            </div>
-
-            <!-- Author -->
-            <div class="flex items-center gap-3 mt-6 pt-6 border-t border-gray-100">
-              <div class="w-12 h-12 bg-gradient-to-br from-teal-400 to-cyan-500 rounded-full flex items-center justify-center text-white font-semibold">
-                {{ media.author.avatar }}
-              </div>
-              <div>
-                <p class="font-semibold text-gray-900">{{ media.author.name }}</p>
-                <p class="text-sm text-gray-500">Content Creator</p>
+              <!-- Author -->
+              <div class="author-section">
+                <div class="author-avatar">
+                  {{ media.author.avatar }}
+                </div>
+                <div>
+                  <p class="author-name">{{ media.author.name }}</p>
+                  <p class="author-role">{{ textConstants.contentCreator }}</p>
+                </div>
               </div>
             </div>
           </div>
 
           <!-- Related Media -->
-          <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-            <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-              <i class="fas fa-play-circle text-teal-500"></i>
-              Related Media
-            </h2>
-            <div class="grid grid-cols-2 gap-4">
-              <div v-for="item in relatedMedia" :key="item.id" @click="goToRelated(item.id)" class="flex gap-3 p-3 rounded-xl hover:bg-gray-50 cursor-pointer transition-colors group">
-                <div class="relative w-32 h-20 rounded-lg overflow-hidden flex-shrink-0">
-                  <img :src="item.thumbnail" :alt="item.title" class="w-full h-full object-cover" />
-                  <div class="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                    <i class="fas fa-play text-white"></i>
+          <div class="content-card fade-in-up" style="animation-delay: 0.1s">
+            <div class="card-header">
+              <i class="fas fa-play-circle"></i>
+              <span>{{ textConstants.relatedMedia }}</span>
+            </div>
+            <div class="card-body">
+              <div class="related-grid">
+                <div v-for="item in relatedMedia" :key="item.id" @click="goToRelated(item.id)" class="related-item group">
+                  <div class="related-thumb">
+                    <img :src="item.thumbnail" :alt="item.title" />
+                    <div class="play-overlay">
+                      <i class="fas fa-play"></i>
+                    </div>
+                    <span class="duration-badge">{{ item.duration }}</span>
                   </div>
-                  <span class="absolute bottom-1 right-1 px-1.5 py-0.5 bg-black/70 text-white text-xs rounded">{{ item.duration }}</span>
-                </div>
-                <div class="flex-1 min-w-0">
-                  <h4 class="font-medium text-gray-900 text-sm line-clamp-2 group-hover:text-teal-600 transition-colors">{{ item.title }}</h4>
-                  <p class="text-xs text-gray-500 mt-1">{{ item.views }} views</p>
+                  <div class="related-info">
+                    <h4 class="related-title">{{ item.title }}</h4>
+                    <p class="related-views">{{ item.views }} {{ textConstants.views }}</p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -646,14 +753,16 @@ function copySummary() {
         <!-- AI Sidebar -->
         <div class="space-y-6">
           <!-- AI Features Panel -->
-          <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden sticky top-6">
+          <div class="ai-panel fade-in-up" style="animation-delay: 0.2s">
             <!-- Panel Header -->
-            <div class="px-6 py-4 bg-gradient-to-r from-teal-500 to-teal-600 text-white flex items-center justify-between">
-              <div class="flex items-center gap-2">
-                <i class="fas fa-wand-magic-sparkles"></i>
-                <span class="font-semibold">AI Features</span>
+            <div class="ai-panel-header">
+              <div class="ai-panel-title">
+                <div class="ai-icon">
+                  <i class="fas fa-wand-magic-sparkles"></i>
+                </div>
+                <span>{{ textConstants.aiFeatures }}</span>
               </div>
-              <button @click="toggleAIPanel" class="text-white/80 hover:text-white">
+              <button @click="toggleAIPanel" class="ai-toggle-btn">
                 <i :class="['fas', showAIPanel ? 'fa-chevron-up' : 'fa-chevron-down']"></i>
               </button>
             </div>
@@ -809,63 +918,74 @@ function copySummary() {
       </div>
 
       <!-- Rating & Engagement Section -->
-      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-        <div class="flex items-center justify-between flex-wrap gap-4">
-          <div>
-            <h3 class="font-semibold text-gray-900 mb-1">Rate this {{ media.type === 'video' ? 'Video' : 'Audio' }}</h3>
-            <p class="text-sm text-gray-500">Help others discover great content</p>
-          </div>
-          <div class="flex items-center gap-4">
-            <RatingStars
-              :model-value="rating?.userRating || 0"
-              :average="rating?.average"
-              :count="rating?.count"
-              size="lg"
-              :show-count="true"
-              @update:model-value="handleRating"
-            />
-            <BookmarkButton
-              :content-id="media.id.toString()"
-              content-type="media"
-              size="md"
-              variant="button"
-              :show-label="true"
-            />
-            <button
-              @click="showAddToCollection = true"
-              class="px-4 py-2 bg-gray-100 hover:bg-teal-50 text-gray-700 hover:text-teal-600 rounded-xl font-medium flex items-center gap-2 transition-colors"
-              title="Add to Collection"
-            >
-              <i class="fas fa-folder-plus"></i>
-              <span>Collection</span>
-            </button>
+      <div class="content-card fade-in-up" style="animation-delay: 0.3s">
+        <div class="card-body">
+          <div class="flex items-center justify-between flex-wrap gap-4">
+            <div>
+              <h3 class="font-semibold text-gray-900 mb-1">{{ media.type === 'video' ? textConstants.rateThisVideo : textConstants.rateThisAudio }}</h3>
+              <p class="text-sm text-gray-500">{{ textConstants.helpOthers }}</p>
+            </div>
+            <div class="flex items-center gap-4">
+              <RatingStars
+                :model-value="rating?.userRating || 0"
+                :average="rating?.average"
+                :count="rating?.count"
+                size="lg"
+                :show-count="true"
+                @update:model-value="handleRating"
+              />
+              <BookmarkButton
+                :content-id="media.id.toString()"
+                content-type="media"
+                size="md"
+                variant="button"
+                :show-label="true"
+              />
+              <button
+                @click="showAddToCollection = true"
+                class="collection-btn"
+                title="Add to Collection"
+              >
+                <i class="fas fa-folder-plus"></i>
+                <span>{{ textConstants.collection }}</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
 
       <!-- Share Section -->
-      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-        <h3 class="font-semibold text-gray-900 mb-4">Share this {{ media.type === 'video' ? 'Video' : 'Audio' }}</h3>
-        <SocialShareButtons
-          :title="media.title"
-          :description="media.description"
-          layout="horizontal"
-          size="lg"
-          :show-labels="true"
-        />
+      <div class="content-card fade-in-up" style="animation-delay: 0.4s">
+        <div class="card-body">
+          <h3 class="font-semibold text-gray-900 mb-4">{{ media.type === 'video' ? textConstants.shareThisVideo : textConstants.shareThisAudio }}</h3>
+          <SocialShareButtons
+            :title="media.title"
+            :description="media.description"
+            layout="horizontal"
+            size="lg"
+            :show-labels="true"
+          />
+        </div>
       </div>
 
       <!-- Comments Section -->
-      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-        <CommentsSection
-          content-type="media"
-          :content-id="media.id.toString()"
-          :comments="comments"
-          :is-loading="commentsLoading"
-          @add-comment="addComment"
-        />
+      <div class="content-card fade-in-up" style="animation-delay: 0.5s">
+        <div class="card-header">
+          <i class="fas fa-comments"></i>
+          <span>{{ textConstants.comments }}</span>
+        </div>
+        <div class="card-body">
+          <CommentsSection
+            content-type="media"
+            :content-id="media.id.toString()"
+            :comments="comments"
+            :is-loading="commentsLoading"
+            @add-comment="addComment"
+          />
+        </div>
       </div>
-    </div>
+      </main>
+    </template>
 
     <!-- Not Found -->
     <div v-else class="flex items-center justify-center min-h-[60vh]">
@@ -894,19 +1014,85 @@ function copySummary() {
 </template>
 
 <style scoped>
-.fade-in {
+/* Page Animation */
+.media-player-page {
   animation: fadeIn 0.3s ease-out;
 }
 
 @keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.fade-in-up {
+  animation: fadeInUp 0.4s ease-out forwards;
+  opacity: 0;
+}
+
+@keyframes fadeInUp {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(20px);
   }
   to {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+/* ========================================
+   Enhanced Header
+   ======================================== */
+.media-header {
+  position: relative;
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 50%, #115e59 100%);
+  overflow: hidden;
+}
+
+.header-decor {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.decor-orb {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  animation: orbFloat 6s ease-in-out infinite;
+}
+
+.decor-orb-1 {
+  width: 300px;
+  height: 300px;
+  top: -100px;
+  right: -50px;
+}
+
+.decor-orb-2 {
+  width: 200px;
+  height: 200px;
+  bottom: -80px;
+  left: 10%;
+  animation-delay: -3s;
+}
+
+.decor-pattern {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+@keyframes orbFloat {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-20px) rotate(5deg); }
+}
+
+.header-content {
+  position: relative;
+  z-index: 10;
+  padding: 1.5rem 2rem 2rem;
 }
 
 /* Navigation */
@@ -922,8 +1108,8 @@ function copySummary() {
   align-items: center;
   gap: 0.5rem;
   padding: 0.5rem 1rem;
-  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
-  border: none;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 0.75rem;
   color: white;
   font-size: 0.875rem;
@@ -933,8 +1119,8 @@ function copySummary() {
 }
 
 .back-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
   transform: translateX(-2px);
-  box-shadow: 0 4px 12px rgba(20, 184, 166, 0.3);
 }
 
 .breadcrumb {
@@ -948,27 +1134,410 @@ function copySummary() {
   display: flex;
   align-items: center;
   gap: 0.375rem;
-  color: #6b7280;
+  color: rgba(255, 255, 255, 0.8);
   text-decoration: none;
   transition: color 0.2s ease;
 }
 
 .breadcrumb-link:hover {
-  color: #14b8a6;
+  color: white;
 }
 
 .breadcrumb-sep {
-  color: #d1d5db;
+  color: rgba(255, 255, 255, 0.4);
   font-size: 0.625rem;
 }
 
 .breadcrumb-current {
-  color: #111827;
+  color: white;
   font-weight: 500;
   max-width: 300px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* Header Main */
+.header-main {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.header-icon {
+  width: 56px;
+  height: 56px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  color: white;
+}
+
+.header-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: white;
+  margin: 0;
+  max-width: 500px;
+}
+
+.header-subtitle {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.25rem;
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.header-badge {
+  padding: 0.25rem 0.75rem;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 2rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.action-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.25rem;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 0.75rem;
+  color: white;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.action-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.action-btn-primary {
+  background: white;
+  color: #0d9488;
+  border: none;
+}
+
+.action-btn-primary:hover {
+  background: #f0fdfa;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.bookmark-btn {
+  color: white !important;
+}
+
+/* ========================================
+   Content Cards
+   ======================================== */
+.content-card {
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e5e7eb;
+  overflow: hidden;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem 1.5rem;
+  background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 100%);
+  border-bottom: 1px solid #99f6e4;
+  font-weight: 600;
+  color: #0f766e;
+}
+
+.card-header i {
+  color: #14b8a6;
+}
+
+.card-body {
+  padding: 1.5rem;
+}
+
+/* Media Type Badge */
+.media-type-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+  color: white;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: 2rem;
+  box-shadow: 0 4px 12px rgba(20, 184, 166, 0.3);
+}
+
+/* Stats Row */
+.stats-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.stat-item i {
+  color: #9ca3af;
+}
+
+/* Tags */
+.tags-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.tag {
+  padding: 0.375rem 0.875rem;
+  background: #f0fdfa;
+  color: #0f766e;
+  border-radius: 2rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.tag:hover {
+  background: #ccfbf1;
+}
+
+/* Author Section */
+.author-section {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #f3f4f6;
+}
+
+.author-avatar {
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, #14b8a6 0%, #06b6d4 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.author-name {
+  font-weight: 600;
+  color: #111827;
+  margin: 0;
+}
+
+.author-role {
+  font-size: 0.8125rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+/* Related Media */
+.related-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.related-item {
+  display: flex;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.related-item:hover {
+  background: #f0fdfa;
+}
+
+.related-thumb {
+  position: relative;
+  width: 120px;
+  height: 72px;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.related-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.play-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.related-item:hover .play-overlay {
+  opacity: 1;
+}
+
+.play-overlay i {
+  color: white;
+  font-size: 1.25rem;
+}
+
+.duration-badge {
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+  padding: 2px 6px;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  font-size: 0.6875rem;
+  border-radius: 4px;
+}
+
+.related-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.related-title {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #111827;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  transition: color 0.2s ease;
+}
+
+.related-item:hover .related-title {
+  color: #0d9488;
+}
+
+.related-views {
+  font-size: 0.75rem;
+  color: #9ca3af;
+  margin: 0.25rem 0 0;
+}
+
+/* Collection Button */
+.collection-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1rem;
+  background: #f3f4f6;
+  border: none;
+  border-radius: 0.75rem;
+  color: #4b5563;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.collection-btn:hover {
+  background: #f0fdfa;
+  color: #0d9488;
+}
+
+/* ========================================
+   AI Panel
+   ======================================== */
+.ai-panel {
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e5e7eb;
+  overflow: hidden;
+  position: sticky;
+  top: 1.5rem;
+}
+
+.ai-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+}
+
+.ai-panel-title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: white;
+  font-weight: 600;
+}
+
+.ai-icon {
+  width: 36px;
+  height: 36px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ai-toggle-btn {
+  width: 32px;
+  height: 32px;
+  background: rgba(255, 255, 255, 0.15);
+  border: none;
+  border-radius: 0.5rem;
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.ai-toggle-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
 }
 
 /* Custom scrollbar for AI panels */
@@ -1002,5 +1571,38 @@ function copySummary() {
 .ai-panel-leave-to {
   opacity: 0;
   max-height: 0;
+}
+
+/* ========================================
+   Responsive
+   ======================================== */
+@media (max-width: 1024px) {
+  .related-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .header-content {
+    padding: 1rem 1.5rem 1.5rem;
+  }
+
+  .header-main {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .header-title {
+    font-size: 1.25rem;
+  }
+
+  .header-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .stats-row {
+    gap: 1rem;
+  }
 }
 </style>
