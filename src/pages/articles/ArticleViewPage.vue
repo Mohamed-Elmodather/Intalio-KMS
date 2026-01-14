@@ -545,11 +545,21 @@ function navigateToArticle(slug: string) {
         <!-- Header Content -->
         <div class="absolute bottom-0 left-0 right-0 px-6 py-8">
           <div>
-            <!-- Back Button -->
-            <button @click="goBack" class="mb-4 px-4 py-2 bg-white/20 backdrop-blur-sm text-white rounded-lg hover:bg-white/30 transition-colors">
-              <i class="fas fa-arrow-left mr-2"></i>
-              Back to Articles
-            </button>
+            <!-- Navigation Row -->
+            <div class="header-nav">
+              <button @click="goBack" class="back-btn">
+                <i class="fas fa-arrow-left"></i>
+                <span>Back</span>
+              </button>
+              <div class="breadcrumb">
+                <router-link to="/articles" class="breadcrumb-link">
+                  <i class="fas fa-newspaper"></i>
+                  Articles
+                </router-link>
+                <i class="fas fa-chevron-right breadcrumb-sep"></i>
+                <span class="breadcrumb-current">{{ article.title }}</span>
+              </div>
+            </div>
 
             <!-- Category & Tags -->
             <div class="flex items-center gap-2 mb-4 flex-wrap">
@@ -1002,6 +1012,69 @@ function navigateToArticle(slug: string) {
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
+}
+
+/* Navigation */
+.header-nav {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.back-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 0.75rem;
+  color: white;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  transition: all 0.2s ease;
+}
+
+.back-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateX(-2px);
+}
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.breadcrumb-link {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.breadcrumb-link:hover {
+  color: white;
+}
+
+.breadcrumb-sep {
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 0.625rem;
+}
+
+.breadcrumb-current {
+  color: white;
+  font-weight: 500;
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .line-clamp-2 {
