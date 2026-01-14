@@ -35,14 +35,6 @@ const textConstants = {
   tabMyPolls: 'My Polls',
   tabCompleted: 'Completed',
 
-  // Categories
-  categoryAll: 'All Polls',
-  categoryHR: 'HR & Culture',
-  categoryProduct: 'Product',
-  categoryTeam: 'Team',
-  categoryFeedback: 'Feedback',
-  categoryCompany: 'Company',
-
   // Sort Options
   sortMostRecent: 'Most Recent',
   sortMostPopular: 'Most Popular',
@@ -163,16 +155,13 @@ const isLoading = ref(false)
 const showQuickPollModal = ref(false)
 const activeTab = ref('active')
 const searchQuery = ref('')
-const selectedCategory = ref('all')
 
 // Toolbar state
 const viewMode = ref<'grid' | 'list'>('grid')
 const sortBy = ref('recent')
 const sortOrder = ref<'asc' | 'desc'>('desc')
-const showCategoryFilter = ref(false)
 const showStatusFilter = ref(false)
 const showSortDropdown = ref(false)
-const selectedCategories = ref<string[]>([])
 const selectedStatuses = ref<string[]>([])
 
 // Sort options - using textConstants
@@ -274,16 +263,6 @@ const tabs = ref([
   { id: 'active', label: textConstants.tabActive, icon: 'fas fa-play-circle', count: 8 },
   { id: 'my-polls', label: textConstants.tabMyPolls, icon: 'fas fa-user', count: 12 },
   { id: 'completed', label: textConstants.tabCompleted, icon: 'fas fa-check-circle', count: 23 }
-])
-
-// Categories - using textConstants
-const categories = ref([
-  { id: 'all', label: textConstants.categoryAll, icon: 'fas fa-th-large', count: 45 },
-  { id: 'hr', label: textConstants.categoryHR, icon: 'fas fa-users', count: 12 },
-  { id: 'product', label: textConstants.categoryProduct, icon: 'fas fa-box', count: 8 },
-  { id: 'team', label: textConstants.categoryTeam, icon: 'fas fa-user-friends', count: 10 },
-  { id: 'feedback', label: textConstants.categoryFeedback, icon: 'fas fa-comment-dots', count: 9 },
-  { id: 'company', label: textConstants.categoryCompany, icon: 'fas fa-building', count: 6 }
 ])
 
 // Featured Poll
@@ -508,9 +487,6 @@ const quickPoll = ref<QuickPoll>({
 // Computed
 const filteredActivePolls = computed(() => {
   let polls = activePolls.value
-  if (selectedCategory.value !== 'all') {
-    polls = polls.filter(p => p.category.toLowerCase() === selectedCategory.value)
-  }
   if (searchQuery.value) {
     const q = searchQuery.value.toLowerCase()
     polls = polls.filter(p => p.question.toLowerCase().includes(q))
@@ -566,19 +542,6 @@ const totalPollsCount = computed(() => {
   if (activeTab.value === 'completed') return completedPolls.value.length
   return 0
 })
-
-function toggleCategory(categoryId: string) {
-  const idx = selectedCategories.value.indexOf(categoryId)
-  if (idx === -1) {
-    selectedCategories.value.push(categoryId)
-  } else {
-    selectedCategories.value.splice(idx, 1)
-  }
-}
-
-function isCategorySelected(categoryId: string): boolean {
-  return selectedCategories.value.includes(categoryId)
-}
 
 function toggleStatus(statusId: string) {
   const idx = selectedStatuses.value.indexOf(statusId)
@@ -1042,22 +1005,6 @@ function getInsightTypeColor(type: string) {
         </div>
       </section>
 
-      <!-- Category Pills -->
-      <section class="mb-10 fade-in-up" style="animation-delay: 0.15s">
-        <div class="category-scroll scrollbar-elegant">
-          <button
-            v-for="cat in categories"
-            :key="cat.id"
-            :class="['category-pill', { active: selectedCategory === cat.id }]"
-            @click="selectedCategory = cat.id"
-          >
-            <i :class="cat.icon"></i>
-            {{ cat.label }}
-            <span v-if="cat.count" class="text-xs opacity-70">({{ cat.count }})</span>
-          </button>
-        </div>
-      </section>
-
       <!-- Trending Polls - Enhanced -->
       <section class="trending-section mb-10 fade-in-up" style="animation-delay: 0.25s">
         <!-- Section Header -->
@@ -1183,70 +1130,6 @@ function getInsightTypeColor(type: string) {
               <button v-if="searchQuery" @click="searchQuery = ''" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
                 <i class="fas fa-times text-xs"></i>
               </button>
-            </div>
-
-            <!-- Category Filter -->
-            <div class="relative">
-              <button
-                @click="showCategoryFilter = !showCategoryFilter"
-                :class="[
-                  'flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border',
-                  selectedCategories.length > 0 ? 'bg-teal-50 border-teal-200 text-teal-700' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
-                ]"
-              >
-                <i class="fas fa-layer-group text-sm"></i>
-                <span>{{ selectedCategories.length > 0 ? `${selectedCategories.length} Categories` : 'Category' }}</span>
-                <i :class="showCategoryFilter ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ml-1"></i>
-              </button>
-
-              <!-- Dropdown Menu -->
-              <div
-                v-if="showCategoryFilter"
-                class="absolute left-0 top-full mt-2 w-64 bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-[100]"
-              >
-                <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Select Categories</div>
-                <div class="max-h-48 overflow-y-auto">
-                  <button
-                    v-for="cat in categories.filter(c => c.id !== 'all')"
-                    :key="cat.id"
-                    @click="toggleCategory(cat.id)"
-                    :class="[
-                      'w-full px-3 py-2 text-left text-sm flex items-center gap-3 transition-colors',
-                      isCategorySelected(cat.id) ? 'bg-teal-50 text-teal-700' : 'text-gray-700 hover:bg-gray-50'
-                    ]"
-                  >
-                    <div :class="[
-                      'w-4 h-4 rounded border-2 flex items-center justify-center transition-all',
-                      isCategorySelected(cat.id) ? 'bg-teal-500 border-teal-500' : 'border-gray-300'
-                    ]">
-                      <i v-if="isCategorySelected(cat.id)" class="fas fa-check text-white text-[8px]"></i>
-                    </div>
-                    <i :class="[cat.icon, 'text-sm text-gray-400']"></i>
-                    <span class="flex-1">{{ cat.label }}</span>
-                    <span class="text-xs text-gray-400">{{ cat.count }}</span>
-                  </button>
-                </div>
-
-                <div class="my-2 border-t border-gray-100"></div>
-
-                <div class="px-3 flex gap-2">
-                  <button
-                    @click="selectedCategories = []; showCategoryFilter = false"
-                    class="flex-1 px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
-                  >
-                    Clear All
-                  </button>
-                  <button
-                    @click="showCategoryFilter = false"
-                    class="flex-1 px-3 py-1.5 text-xs font-medium text-white bg-teal-500 rounded-lg hover:bg-teal-600 transition-colors"
-                  >
-                    Apply
-                  </button>
-                </div>
-              </div>
-
-              <!-- Click outside to close -->
-              <div v-if="showCategoryFilter" @click="showCategoryFilter = false" class="fixed inset-0 z-[99]"></div>
             </div>
 
             <!-- Status Filter -->
@@ -2598,53 +2481,6 @@ function getInsightTypeColor(type: string) {
   margin: 0 auto 1rem;
   color: white;
   font-size: 1.5rem;
-}
-
-/* Category Pills */
-.category-scroll {
-  display: flex;
-  gap: 0.75rem;
-  overflow-x: auto;
-  padding-bottom: 0.5rem;
-  -webkit-overflow-scrolling: touch;
-}
-.category-scroll::-webkit-scrollbar {
-  height: 4px;
-}
-.category-scroll::-webkit-scrollbar-track {
-  background: #f1f5f9;
-  border-radius: 2px;
-}
-.category-scroll::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 2px;
-}
-.category-pill {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.625rem 1rem;
-  border-radius: 2rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  white-space: nowrap;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  border: 1px solid transparent;
-}
-.category-pill.active {
-  background: linear-gradient(135deg, #14b8a6, #0d9488);
-  color: white;
-  box-shadow: 0 4px 15px rgba(20, 184, 166, 0.3);
-}
-.category-pill:not(.active) {
-  background: white;
-  color: #64748b;
-  border-color: #e2e8f0;
-}
-.category-pill:not(.active):hover {
-  border-color: #14b8a6;
-  color: #0d9488;
 }
 
 /* Poll Card Enhanced */
