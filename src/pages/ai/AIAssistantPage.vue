@@ -1849,8 +1849,8 @@ function handleEntityClick(entity: { text: string; type: string }) {
       </Transition>
 
       <!-- Sidebar Panel -->
-      <Transition name="slide-left">
-        <div v-if="showToolsPalette" class="fixed left-0 top-0 h-full w-80 bg-gradient-to-b from-gray-50 to-white shadow-2xl z-50 flex flex-col border-r border-gray-200">
+      <Transition name="slide-right">
+        <div v-if="showToolsPalette" class="fixed right-0 top-0 h-full w-80 bg-gradient-to-b from-gray-50 to-white shadow-2xl z-50 flex flex-col border-l border-gray-200">
           <!-- Header -->
           <div class="p-4 bg-gradient-to-b from-white to-gray-50/80 border-b border-gray-100">
             <div class="flex items-center justify-between mb-3">
