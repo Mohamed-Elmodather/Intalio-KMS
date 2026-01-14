@@ -1129,14 +1129,6 @@ function formatVersionDate(date: Date): string {
                 <i class="fas fa-download"></i>
                 <span>Download</span>
               </button>
-              <button @click="shareDocument" class="px-4 py-2 bg-transparent text-white border border-white/30 rounded-xl font-medium hover:bg-white/10 transition-all flex items-center gap-2">
-                <i class="fas fa-share-alt"></i>
-                <span class="hidden sm:inline">Share</span>
-              </button>
-              <button @click="showAddToCollection = true" class="px-4 py-2 bg-transparent text-white border border-white/30 rounded-xl font-medium hover:bg-white/10 transition-all flex items-center gap-2" title="Add to Collection">
-                <i class="fas fa-folder-plus"></i>
-                <span class="hidden sm:inline">Collection</span>
-              </button>
               <BookmarkButton
                 :content-id="document.id.toString()"
                 content-type="document"
@@ -1144,6 +1136,14 @@ function formatVersionDate(date: Date): string {
                 variant="icon"
                 class="text-white"
               />
+              <button @click="showAddToCollection = true" class="px-4 py-2 bg-transparent text-white border border-white/30 rounded-xl font-medium hover:bg-white/10 transition-all flex items-center gap-2" title="Add to Collection">
+                <i class="fas fa-folder-plus"></i>
+                <span class="hidden sm:inline">Collection</span>
+              </button>
+              <button @click="shareDocument" class="px-4 py-2 bg-transparent text-white border border-white/30 rounded-xl font-medium hover:bg-white/10 transition-all flex items-center gap-2">
+                <i class="fas fa-share-alt"></i>
+                <span class="hidden sm:inline">Share</span>
+              </button>
             </div>
           </div>
         </div>

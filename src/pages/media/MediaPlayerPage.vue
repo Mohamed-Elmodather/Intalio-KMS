@@ -336,6 +336,29 @@ function handleLike() {
   }
 }
 
+function downloadMedia() {
+  if (!media.value) return
+  // Simulate download - in production would trigger actual file download
+  const link = document.createElement('a')
+  link.href = media.value.thumbnail // In production, this would be the actual media URL
+  link.download = `${media.value.title}.${media.value.type === 'video' ? 'mp4' : 'mp3'}`
+  link.click()
+}
+
+function shareMedia() {
+  if (!media.value) return
+  if (navigator.share) {
+    navigator.share({
+      title: media.value.title,
+      text: media.value.description,
+      url: window.location.href
+    })
+  } else {
+    navigator.clipboard.writeText(window.location.href)
+    alert('Link copied to clipboard!')
+  }
+}
+
 // ============================================================================
 // AI Functions
 // ============================================================================
@@ -569,17 +592,9 @@ function copySummary() {
 
             <!-- Action buttons -->
             <div class="flex items-center gap-3">
-              <button @click="handleLike" class="px-4 py-2 bg-white text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-all shadow-sm flex items-center gap-2">
-                <i class="fas fa-heart"></i>
-                <span>{{ textConstants.like }}</span>
-              </button>
-              <button class="px-4 py-2 bg-transparent text-white border border-white/30 rounded-xl font-medium hover:bg-white/10 transition-all flex items-center gap-2">
+              <button @click="downloadMedia" class="px-4 py-2 bg-white text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-all shadow-sm flex items-center gap-2">
                 <i class="fas fa-download"></i>
-                <span class="hidden sm:inline">{{ textConstants.download }}</span>
-              </button>
-              <button class="px-4 py-2 bg-transparent text-white border border-white/30 rounded-xl font-medium hover:bg-white/10 transition-all flex items-center gap-2">
-                <i class="fas fa-share-alt"></i>
-                <span class="hidden sm:inline">{{ textConstants.share }}</span>
+                <span>{{ textConstants.download }}</span>
               </button>
               <BookmarkButton
                 :content-id="media.id.toString()"
@@ -588,6 +603,14 @@ function copySummary() {
                 variant="icon"
                 class="text-white"
               />
+              <button @click="showAddToCollection = true" class="px-4 py-2 bg-transparent text-white border border-white/30 rounded-xl font-medium hover:bg-white/10 transition-all flex items-center gap-2" title="Add to Collection">
+                <i class="fas fa-folder-plus"></i>
+                <span class="hidden sm:inline">{{ textConstants.collection }}</span>
+              </button>
+              <button @click="shareMedia" class="px-4 py-2 bg-transparent text-white border border-white/30 rounded-xl font-medium hover:bg-white/10 transition-all flex items-center gap-2">
+                <i class="fas fa-share-alt"></i>
+                <span class="hidden sm:inline">{{ textConstants.share }}</span>
+              </button>
             </div>
           </div>
         </div>
