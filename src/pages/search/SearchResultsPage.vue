@@ -1,13 +1,95 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
+import { useUIStore } from '@/stores/ui'
 import { useAIServicesStore } from '@/stores/aiServices'
-import { AILoadingIndicator, AISuggestionChip, AIConfidenceBar } from '@/components/ai'
+import { AIVoiceInput } from '@/components/ai'
 
-// Initialize AI store
+// Stores
+const uiStore = useUIStore()
 const aiStore = useAIServicesStore()
+const route = useRoute()
+const router = useRouter()
 
+// Layout state
+const isSidebarCollapsed = computed(() => uiStore.sidebarCollapsed)
+const isFilterSidebarCollapsed = ref(false)
+const showMobileFilters = ref(false)
+
+// ============================================================================
+// Configurable Text Constants
+// ============================================================================
+const textConstants = {
+  // Header
+  pageTitle: 'Search',
+  searchPlaceholder: 'Search across all content...',
+  searchButton: 'Search',
+
+  // Quick filters
+  quickFiltersLabel: 'Quick filters:',
+
+  // Filter sidebar
+  filters: 'Filters',
+  clearAll: 'Clear all',
+  contentType: 'Content Type',
+  dateRange: 'Date Range',
+  author: 'Author',
+  filterByAuthor: 'Filter by author...',
+  tags: 'Tags',
+
+  // Date options
+  anyTime: 'Any time',
+  today: 'Today',
+  pastWeek: 'Past week',
+  pastMonth: 'Past month',
+  pastYear: 'Past year',
+
+  // Results
+  resultsFor: 'results for',
+  searchCompletedIn: 'Search completed in',
+  ms: 'ms',
+  aiAnalyzing: 'AI analyzing...',
+
+  // Sort options
+  mostRelevant: 'Most Relevant',
+  mostRecent: 'Most Recent',
+  mostViewed: 'Most Viewed',
+
+  // AI features
+  didYouMean: 'Did you mean:',
+  aiDetectedEntities: 'AI Detected Entities:',
+  aiSummary: 'AI Summary',
+  showMore: 'Show more',
+  copy: 'Copy',
+  aiSearchInsights: 'AI Search Insights',
+  clickToApply: 'Click to apply',
+  aiRelatedSearches: 'AI Related Searches',
+  basedOnPatterns: 'Based on your search patterns and popular queries',
+
+  // Result card
+  newBadge: 'New',
+  bookmark: 'Bookmark',
+  share: 'Share',
+  preview: 'Preview',
+
+  // Pagination
+  showing: 'Showing',
+  of: 'of',
+  results: 'results',
+
+  // Empty state
+  noResults: 'No results found',
+  noResultsDesc: 'Try adjusting your search or filters',
+
+  // Intent types
+  lookingForInfo: 'Looking for info',
+  findingSpecific: 'Finding specific',
+  takingAction: 'Taking action'
+}
+
+// ============================================================================
+// Types
+// ============================================================================
 interface QuickFilter {
   id: string
   label: string
@@ -63,198 +145,6 @@ interface SearchResult {
   isNew: boolean
 }
 
-const route = useRoute()
-const router = useRouter()
-
-// Loading state
-const isLoading = ref(false)
-
-// Search state
-const searchQuery = ref('employee onboarding')
-const displayQuery = ref('employee onboarding')
-const viewMode = ref<'list' | 'grid'>('list')
-const sortBy = ref('relevance')
-const selectedDate = ref('all')
-const authorFilter = ref('')
-const totalResults = ref(127)
-const searchTime = ref(42)
-const currentPage = ref(1)
-
-// AI Summary
-const aiSummary = ref('Based on your search for "employee onboarding", I found comprehensive resources including the official Onboarding Guide, training modules for new hires, and HR policy documents. The most relevant content covers the 30-60-90 day onboarding process, required documentation, and team integration best practices.')
-
-// Quick Filters
-const quickFilters = ref<QuickFilter[]>([
-  { id: 'articles', label: 'Articles', icon: 'fas fa-file-alt', active: true },
-  { id: 'documents', label: 'Documents', icon: 'fas fa-file-pdf', active: false },
-  { id: 'videos', label: 'Videos', icon: 'fas fa-video', active: false },
-  { id: 'courses', label: 'Courses', icon: 'fas fa-graduation-cap', active: false }
-])
-
-// Content Types
-const contentTypes = ref<ContentType[]>([
-  { id: 'articles', label: 'Articles', count: 45, checked: true },
-  { id: 'documents', label: 'Documents', count: 32, checked: true },
-  { id: 'videos', label: 'Videos', count: 18, checked: true },
-  { id: 'courses', label: 'Courses', count: 12, checked: false },
-  { id: 'events', label: 'Events', count: 8, checked: false },
-  { id: 'polls', label: 'Polls', count: 5, checked: false }
-])
-
-// Date Filters
-const dateFilters = ref<DateFilter[]>([
-  { id: 'all', label: 'Any time' },
-  { id: 'today', label: 'Today' },
-  { id: 'week', label: 'Past week' },
-  { id: 'month', label: 'Past month' },
-  { id: 'year', label: 'Past year' }
-])
-
-// Top Authors
-const topAuthors = ref<Author[]>([
-  { id: 1, name: 'Sarah Chen', initials: 'SC', color: '#8B5CF6', checked: false },
-  { id: 2, name: 'Mike Johnson', initials: 'MJ', color: '#3B82F6', checked: false },
-  { id: 3, name: 'HR Team', initials: 'HR', color: '#10B981', checked: true }
-])
-
-// Popular Tags
-const popularTags = ref<Tag[]>([
-  { id: 1, name: 'Onboarding', active: true },
-  { id: 2, name: 'HR', active: false },
-  { id: 3, name: 'Training', active: false },
-  { id: 4, name: 'Policy', active: false },
-  { id: 5, name: 'New Hire', active: true },
-  { id: 6, name: 'Guide', active: false }
-])
-
-// Search Results
-const results = ref<SearchResult[]>([
-  {
-    id: 1,
-    type: 'Article',
-    typeBadge: 'badge-blue',
-    icon: 'fas fa-file-alt',
-    iconBg: 'bg-blue-100',
-    iconColor: 'text-blue-600',
-    title: 'Complete Employee Onboarding Guide 2024',
-    excerpt: 'A comprehensive guide to employee onboarding best practices, including the 30-60-90 day plan, documentation requirements, and team integration strategies...',
-    author: { name: 'HR Team', initials: 'HR', color: '#10B981' },
-    date: 'Dec 18, 2024',
-    views: 1247,
-    tags: ['Onboarding', 'HR', 'Guide'],
-    isNew: true
-  },
-  {
-    id: 2,
-    type: 'Document',
-    typeBadge: 'badge-purple',
-    icon: 'fas fa-file-pdf',
-    iconBg: 'bg-purple-100',
-    iconColor: 'text-purple-600',
-    title: 'New Employee Onboarding Checklist',
-    excerpt: 'Essential checklist for managers and HR to ensure smooth onboarding of new team members. Includes pre-boarding, first day, and first week tasks...',
-    author: { name: 'Sarah Chen', initials: 'SC', color: '#8B5CF6' },
-    date: 'Dec 15, 2024',
-    views: 856,
-    tags: ['Checklist', 'Onboarding', 'Manager'],
-    isNew: false
-  },
-  {
-    id: 3,
-    type: 'Video',
-    typeBadge: 'badge-red',
-    icon: 'fas fa-video',
-    iconBg: 'bg-red-100',
-    iconColor: 'text-red-600',
-    title: 'Welcome to the Team: Onboarding Video Series',
-    excerpt: 'Video introduction to company culture, values, and expectations for new employees. Part of the mandatory onboarding training program...',
-    author: { name: 'Mike Johnson', initials: 'MJ', color: '#3B82F6' },
-    date: 'Dec 10, 2024',
-    views: 2341,
-    tags: ['Video', 'Training', 'Culture'],
-    isNew: false
-  },
-  {
-    id: 4,
-    type: 'Course',
-    typeBadge: 'badge-green',
-    icon: 'fas fa-graduation-cap',
-    iconBg: 'bg-green-100',
-    iconColor: 'text-green-600',
-    title: 'New Hire Orientation Program',
-    excerpt: 'Complete orientation program covering company policies, benefits, IT systems, and compliance training for all new employees...',
-    author: { name: 'HR Team', initials: 'HR', color: '#10B981' },
-    date: 'Dec 5, 2024',
-    views: 1893,
-    tags: ['Course', 'Orientation', 'Compliance'],
-    isNew: false
-  },
-  {
-    id: 5,
-    type: 'Article',
-    typeBadge: 'badge-blue',
-    icon: 'fas fa-file-alt',
-    iconBg: 'bg-blue-100',
-    iconColor: 'text-blue-600',
-    title: 'Remote Employee Onboarding Best Practices',
-    excerpt: 'Special considerations and best practices for onboarding remote employees, including virtual introductions, equipment setup, and communication tools...',
-    author: { name: 'Sarah Chen', initials: 'SC', color: '#8B5CF6' },
-    date: 'Nov 28, 2024',
-    views: 672,
-    tags: ['Remote', 'Onboarding', 'Virtual'],
-    isNew: false
-  }
-])
-
-// Methods
-function toggleQuickFilter(filter: QuickFilter): void {
-  filter.active = !filter.active
-}
-
-function clearFilters(): void {
-  contentTypes.value.forEach(t => t.checked = true)
-  topAuthors.value.forEach(a => a.checked = false)
-  popularTags.value.forEach(t => t.active = false)
-  selectedDate.value = 'all'
-}
-
-function performSearch(): void {
-  if (searchQuery.value.trim()) {
-    isLoading.value = true
-    displayQuery.value = searchQuery.value
-    // Simulate search delay
-    setTimeout(() => {
-      isLoading.value = false
-    }, 500)
-  }
-}
-
-function highlightText(text: string): string {
-  const query = displayQuery.value.toLowerCase()
-  const words = query.split(' ').filter(w => w.length > 2)
-  let result = text
-  words.forEach(word => {
-    const regex = new RegExp(`(${word})`, 'gi')
-    result = result.replace(regex, '<mark class="bg-yellow-200 text-teal-900 rounded px-0.5">$1</mark>')
-  })
-  return result
-}
-
-function toggleTag(tag: Tag): void {
-  tag.active = !tag.active
-}
-
-// ============================================================================
-// AI Features State & Functions
-// ============================================================================
-
-// AI State
-const showAIPanel = ref(true)
-const isAnalyzingQuery = ref(false)
-const showEntityFilter = ref(false)
-const showDidYouMean = ref(true)
-
-// AI Interfaces
 interface QueryIntent {
   type: 'informational' | 'navigational' | 'transactional'
   confidence: number
@@ -280,61 +170,286 @@ interface AISearchInsight {
   action?: string
 }
 
-// AI Data
-const queryIntent = ref<QueryIntent>({
-  type: 'informational',
-  confidence: 0.92,
-  description: 'Looking for learning resources and guides'
+// ============================================================================
+// Search State
+// ============================================================================
+const isLoading = ref(false)
+const searchQuery = ref('')
+const displayQuery = ref('')
+const viewMode = ref<'list' | 'grid'>('list')
+const sortBy = ref('relevance')
+const selectedDate = ref('all')
+const authorFilter = ref('')
+const currentPage = ref(1)
+const pageSize = ref(10)
+
+// ============================================================================
+// Filter Data - Dynamic
+// ============================================================================
+const quickFilters = ref<QuickFilter[]>([
+  { id: 'all', label: 'All', icon: 'fas fa-globe', active: true },
+  { id: 'articles', label: 'Articles', icon: 'fas fa-file-alt', active: false },
+  { id: 'documents', label: 'Documents', icon: 'fas fa-file-pdf', active: false },
+  { id: 'videos', label: 'Videos', icon: 'fas fa-video', active: false },
+  { id: 'courses', label: 'Courses', icon: 'fas fa-graduation-cap', active: false }
+])
+
+const contentTypes = ref<ContentType[]>([
+  { id: 'articles', label: 'Articles', count: 0, checked: true },
+  { id: 'documents', label: 'Documents', count: 0, checked: true },
+  { id: 'videos', label: 'Videos', count: 0, checked: true },
+  { id: 'courses', label: 'Courses', count: 0, checked: false },
+  { id: 'events', label: 'Events', count: 0, checked: false },
+  { id: 'polls', label: 'Polls', count: 0, checked: false }
+])
+
+const dateFilters = computed<DateFilter[]>(() => [
+  { id: 'all', label: textConstants.anyTime },
+  { id: 'today', label: textConstants.today },
+  { id: 'week', label: textConstants.pastWeek },
+  { id: 'month', label: textConstants.pastMonth },
+  { id: 'year', label: textConstants.pastYear }
+])
+
+const topAuthors = ref<Author[]>([])
+
+const popularTags = ref<Tag[]>([])
+
+// ============================================================================
+// Results Data - Initially empty
+// ============================================================================
+const results = ref<SearchResult[]>([])
+const totalResults = ref(0)
+const searchTime = ref(0)
+
+// Computed pagination
+const totalPages = computed(() => Math.ceil(totalResults.value / pageSize.value))
+const startResult = computed(() => (currentPage.value - 1) * pageSize.value + 1)
+const endResult = computed(() => Math.min(currentPage.value * pageSize.value, totalResults.value))
+
+const paginationPages = computed(() => {
+  const pages: (number | string)[] = []
+  const total = totalPages.value
+  const current = currentPage.value
+
+  if (total <= 7) {
+    for (let i = 1; i <= total; i++) pages.push(i)
+  } else {
+    pages.push(1)
+    if (current > 3) pages.push('...')
+
+    const start = Math.max(2, current - 1)
+    const end = Math.min(total - 1, current + 1)
+
+    for (let i = start; i <= end; i++) pages.push(i)
+
+    if (current < total - 2) pages.push('...')
+    pages.push(total)
+  }
+
+  return pages
 })
 
-const extractedEntities = ref<ExtractedEntity[]>([
-  { text: 'Employee', type: 'topic', confidence: 0.95 },
-  { text: 'Onboarding', type: 'topic', confidence: 0.98 },
-  { text: 'HR Team', type: 'organization', confidence: 0.85 }
-])
+// Active filters count
+const activeFiltersCount = computed(() => {
+  let count = 0
+  if (selectedDate.value !== 'all') count++
+  count += topAuthors.value.filter(a => a.checked).length
+  count += popularTags.value.filter(t => t.active).length
+  count += contentTypes.value.filter(t => !t.checked).length
+  return count
+})
 
-const didYouMeanSuggestions = ref<DidYouMeanSuggestion[]>([
-  { original: 'employee onboarding', suggestion: 'new employee onboarding process', reason: 'More specific results' },
-  { original: 'employee onboarding', suggestion: 'employee onboarding checklist', reason: 'Popular search' }
-])
+// ============================================================================
+// AI Features State
+// ============================================================================
+const showAIPanel = ref(true)
+const isAnalyzingQuery = ref(false)
+const showDidYouMean = ref(true)
 
-const aiSearchInsights = ref<AISearchInsight[]>([
-  { id: '1', type: 'tip', text: 'Try adding "2024" for the latest content', action: 'employee onboarding 2024' },
-  { id: '2', type: 'related', text: 'Users also searched for: "new hire training"', action: 'new hire training' },
-  { id: '3', type: 'refine', text: 'Filter by HR Team for official policies', action: 'filter:author:HR Team' }
-])
+const queryIntent = ref<QueryIntent | null>(null)
+const extractedEntities = ref<ExtractedEntity[]>([])
+const didYouMeanSuggestions = ref<DidYouMeanSuggestion[]>([])
+const aiSearchInsights = ref<AISearchInsight[]>([])
+const relatedSearches = ref<string[]>([])
+const aiSummary = ref('')
 
-const relatedSearches = ref([
-  'new hire orientation',
-  'onboarding checklist template',
-  'first day employee guide',
-  '30-60-90 day plan',
-  'employee handbook'
-])
+// ============================================================================
+// Methods
+// ============================================================================
 
-// AI Functions
-async function analyzeSearchQuery(query: string) {
+// Initialize from route query
+onMounted(() => {
+  const q = route.query.q as string
+  if (q) {
+    searchQuery.value = q
+    performSearch()
+  }
+})
+
+// Watch route changes
+watch(() => route.query.q, (newQuery) => {
+  if (newQuery && newQuery !== searchQuery.value) {
+    searchQuery.value = newQuery as string
+    performSearch()
+  }
+})
+
+function toggleQuickFilter(filter: QuickFilter): void {
+  if (filter.id === 'all') {
+    quickFilters.value.forEach(f => f.active = f.id === 'all')
+  } else {
+    const allFilter = quickFilters.value.find(f => f.id === 'all')
+    if (allFilter) allFilter.active = false
+    filter.active = !filter.active
+
+    // If no filters active, activate 'all'
+    if (!quickFilters.value.some(f => f.active)) {
+      if (allFilter) allFilter.active = true
+    }
+  }
+  performSearch()
+}
+
+function clearFilters(): void {
+  contentTypes.value.forEach(t => t.checked = true)
+  topAuthors.value.forEach(a => a.checked = false)
+  popularTags.value.forEach(t => t.active = false)
+  selectedDate.value = 'all'
+  quickFilters.value.forEach(f => f.active = f.id === 'all')
+  performSearch()
+}
+
+async function performSearch(): Promise<void> {
+  if (!searchQuery.value.trim()) return
+
+  isLoading.value = true
+  displayQuery.value = searchQuery.value
+  currentPage.value = 1
+  showDidYouMean.value = true
+
+  const startTime = performance.now()
+
+  // Update URL
+  router.replace({ query: { q: searchQuery.value } })
+
+  try {
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 600))
+
+    // Generate mock results based on query
+    generateMockResults()
+
+    // Analyze query with AI
+    await analyzeSearchQuery(searchQuery.value)
+
+    searchTime.value = Math.round(performance.now() - startTime)
+  } catch (error) {
+    console.error('Search failed:', error)
+  } finally {
+    isLoading.value = false
+  }
+}
+
+function generateMockResults(): void {
+  const query = searchQuery.value.toLowerCase()
+
+  // Generate dynamic results based on query
+  const mockResults: SearchResult[] = []
+  const types = [
+    { type: 'Article', badge: 'badge-blue', icon: 'fas fa-file-alt', bg: 'bg-blue-100', color: 'text-blue-600' },
+    { type: 'Document', badge: 'badge-purple', icon: 'fas fa-file-pdf', bg: 'bg-purple-100', color: 'text-purple-600' },
+    { type: 'Video', badge: 'badge-red', icon: 'fas fa-video', bg: 'bg-red-100', color: 'text-red-600' },
+    { type: 'Course', badge: 'badge-green', icon: 'fas fa-graduation-cap', bg: 'bg-green-100', color: 'text-green-600' }
+  ]
+
+  const authors = [
+    { name: 'Content Team', initials: 'CT', color: '#10B981' },
+    { name: 'Admin User', initials: 'AU', color: '#8B5CF6' },
+    { name: 'System Admin', initials: 'SA', color: '#3B82F6' }
+  ]
+
+  // Generate 10-20 results
+  const count = Math.floor(Math.random() * 11) + 10
+  const totalCount = Math.floor(Math.random() * 100) + count
+
+  for (let i = 0; i < count; i++) {
+    const typeInfo = types[i % types.length]
+    const author = authors[i % authors.length]
+    const daysAgo = Math.floor(Math.random() * 30)
+    const date = new Date()
+    date.setDate(date.getDate() - daysAgo)
+
+    mockResults.push({
+      id: i + 1,
+      type: typeInfo.type,
+      typeBadge: typeInfo.badge,
+      icon: typeInfo.icon,
+      iconBg: typeInfo.bg,
+      iconColor: typeInfo.color,
+      title: `${query.charAt(0).toUpperCase() + query.slice(1)} - ${typeInfo.type} ${i + 1}`,
+      excerpt: `This is a comprehensive ${typeInfo.type.toLowerCase()} about ${query}. It covers all the essential information and best practices related to ${query}...`,
+      author: author,
+      date: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+      views: Math.floor(Math.random() * 2000) + 100,
+      tags: [query.split(' ')[0], typeInfo.type, 'Guide'].filter(Boolean),
+      isNew: daysAgo < 3
+    })
+  }
+
+  results.value = mockResults
+  totalResults.value = totalCount
+
+  // Update content type counts
+  contentTypes.value.forEach(ct => {
+    ct.count = mockResults.filter(r => r.type.toLowerCase() === ct.id.slice(0, -1) ||
+               (ct.id === 'articles' && r.type === 'Article') ||
+               (ct.id === 'documents' && r.type === 'Document') ||
+               (ct.id === 'videos' && r.type === 'Video') ||
+               (ct.id === 'courses' && r.type === 'Course')).length
+  })
+
+  // Update authors
+  const uniqueAuthors = [...new Set(mockResults.map(r => r.author.name))]
+  topAuthors.value = uniqueAuthors.map((name, idx) => {
+    const authorInfo = authors.find(a => a.name === name) || authors[0]
+    return {
+      id: idx + 1,
+      name: authorInfo.name,
+      initials: authorInfo.initials,
+      color: authorInfo.color,
+      checked: false
+    }
+  })
+
+  // Update tags
+  const allTags = [...new Set(mockResults.flatMap(r => r.tags))]
+  popularTags.value = allTags.slice(0, 8).map((tag, idx) => ({
+    id: idx + 1,
+    name: tag,
+    active: false
+  }))
+}
+
+async function analyzeSearchQuery(query: string): Promise<void> {
   isAnalyzingQuery.value = true
 
   try {
-    await new Promise(resolve => setTimeout(resolve, 500))
+    await new Promise(resolve => setTimeout(resolve, 400))
 
-    // Simulate AI analysis
-    if (query.toLowerCase().includes('onboarding')) {
+    // Detect intent
+    const lowerQuery = query.toLowerCase()
+    if (lowerQuery.includes('how') || lowerQuery.includes('what') || lowerQuery.includes('guide')) {
       queryIntent.value = {
         type: 'informational',
         confidence: 0.92,
         description: 'Looking for learning resources and guides'
       }
-      extractedEntities.value = [
-        { text: 'Employee', type: 'topic', confidence: 0.95 },
-        { text: 'Onboarding', type: 'topic', confidence: 0.98 }
-      ]
-    } else if (query.toLowerCase().includes('policy')) {
+    } else if (lowerQuery.includes('find') || lowerQuery.includes('download') || lowerQuery.includes('document')) {
       queryIntent.value = {
         type: 'navigational',
         confidence: 0.88,
-        description: 'Looking for specific policy documents'
+        description: 'Looking for specific content'
       }
     } else {
       queryIntent.value = {
@@ -343,6 +458,40 @@ async function analyzeSearchQuery(query: string) {
         description: 'General information search'
       }
     }
+
+    // Extract entities
+    const words = query.split(' ').filter(w => w.length > 2)
+    extractedEntities.value = words.slice(0, 3).map(word => ({
+      text: word.charAt(0).toUpperCase() + word.slice(1),
+      type: 'topic' as const,
+      confidence: 0.85 + Math.random() * 0.15
+    }))
+
+    // Generate suggestions
+    didYouMeanSuggestions.value = [
+      { original: query, suggestion: `${query} guide`, reason: 'More specific' },
+      { original: query, suggestion: `${query} best practices`, reason: 'Popular search' }
+    ]
+
+    // Generate insights
+    aiSearchInsights.value = [
+      { id: '1', type: 'tip', text: `Try adding "2024" for the latest ${query} content`, action: `${query} 2024` },
+      { id: '2', type: 'related', text: `Users also searched for: "${query} tutorial"`, action: `${query} tutorial` },
+      { id: '3', type: 'refine', text: 'Filter by Content Team for official content', action: 'filter:author:Content Team' }
+    ]
+
+    // Related searches
+    relatedSearches.value = [
+      `${query} tutorial`,
+      `${query} examples`,
+      `${query} best practices`,
+      `how to ${query}`,
+      `${query} guide`
+    ]
+
+    // AI Summary
+    aiSummary.value = `Based on your search for "${query}", I found ${totalResults.value} relevant resources including articles, documents, and training materials. The most relevant content covers comprehensive guides, tutorials, and best practices related to ${query}.`
+
   } catch (error) {
     console.error('Query analysis failed:', error)
   } finally {
@@ -350,23 +499,36 @@ async function analyzeSearchQuery(query: string) {
   }
 }
 
-function applyDidYouMean(suggestion: string) {
+function highlightText(text: string): string {
+  if (!displayQuery.value) return text
+  const words = displayQuery.value.toLowerCase().split(' ').filter(w => w.length > 2)
+  let result = text
+  words.forEach(word => {
+    const regex = new RegExp(`(${word})`, 'gi')
+    result = result.replace(regex, '<mark class="bg-yellow-200 text-gray-900 rounded px-0.5">$1</mark>')
+  })
+  return result
+}
+
+function toggleTag(tag: Tag): void {
+  tag.active = !tag.active
+  performSearch()
+}
+
+function applyDidYouMean(suggestion: string): void {
   searchQuery.value = suggestion
   performSearch()
   showDidYouMean.value = false
 }
 
-function applyEntityFilter(entity: ExtractedEntity) {
-  // Add entity to search query or filter
-  const filterQuery = `${searchQuery.value} ${entity.text}`
-  searchQuery.value = filterQuery
+function applyEntityFilter(entity: ExtractedEntity): void {
+  searchQuery.value = `${searchQuery.value} ${entity.text}`
   performSearch()
 }
 
-function applySearchInsight(insight: AISearchInsight) {
+function applySearchInsight(insight: AISearchInsight): void {
   if (insight.action) {
     if (insight.action.startsWith('filter:')) {
-      // Handle filter action
       const [, filterType, filterValue] = insight.action.split(':')
       console.log('Apply filter:', filterType, filterValue)
     } else {
@@ -376,443 +538,573 @@ function applySearchInsight(insight: AISearchInsight) {
   }
 }
 
-function getEntityTypeColor(type: string) {
-  switch (type) {
-    case 'person': return 'bg-blue-100 text-blue-700'
-    case 'organization': return 'bg-purple-100 text-purple-700'
-    case 'topic': return 'bg-teal-100 text-teal-700'
-    case 'date': return 'bg-amber-100 text-amber-700'
-    case 'location': return 'bg-green-100 text-green-700'
-    default: return 'bg-gray-100 text-gray-700'
+function goToPage(page: number | string): void {
+  if (typeof page === 'number' && page >= 1 && page <= totalPages.value) {
+    currentPage.value = page
+    // Scroll to top of results
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 }
 
-function getEntityTypeIcon(type: string) {
-  switch (type) {
-    case 'person': return 'fas fa-user'
-    case 'organization': return 'fas fa-building'
-    case 'topic': return 'fas fa-tag'
-    case 'date': return 'fas fa-calendar'
-    case 'location': return 'fas fa-map-marker-alt'
-    default: return 'fas fa-circle'
+function handleVoiceTranscript(text: string, isFinal: boolean): void {
+  searchQuery.value = text
+  if (isFinal) {
+    performSearch()
   }
 }
 
-function getIntentTypeColor(type: string) {
-  switch (type) {
-    case 'informational': return 'bg-blue-100 text-blue-700'
-    case 'navigational': return 'bg-purple-100 text-purple-700'
-    case 'transactional': return 'bg-green-100 text-green-700'
-    default: return 'bg-gray-100 text-gray-700'
-  }
+function copyAISummary(): void {
+  navigator.clipboard.writeText(aiSummary.value)
 }
 
-// Enhanced search with AI
-function performAISearch(): void {
-  if (searchQuery.value.trim()) {
-    isLoading.value = true
-    displayQuery.value = searchQuery.value
-    analyzeSearchQuery(searchQuery.value)
-    showDidYouMean.value = true
-
-    setTimeout(() => {
-      isLoading.value = false
-    }, 800)
+// Helper functions
+function getEntityTypeColor(type: string): string {
+  const colors: Record<string, string> = {
+    person: 'bg-blue-100 text-blue-700',
+    organization: 'bg-purple-100 text-purple-700',
+    topic: 'bg-teal-100 text-teal-700',
+    date: 'bg-amber-100 text-amber-700',
+    location: 'bg-green-100 text-green-700'
   }
+  return colors[type] || 'bg-gray-100 text-gray-700'
+}
+
+function getEntityTypeIcon(type: string): string {
+  const icons: Record<string, string> = {
+    person: 'fas fa-user',
+    organization: 'fas fa-building',
+    topic: 'fas fa-tag',
+    date: 'fas fa-calendar',
+    location: 'fas fa-map-marker-alt'
+  }
+  return icons[type] || 'fas fa-circle'
+}
+
+function getIntentTypeColor(type: string): string {
+  const colors: Record<string, string> = {
+    informational: 'bg-blue-100 text-blue-700',
+    navigational: 'bg-purple-100 text-purple-700',
+    transactional: 'bg-green-100 text-green-700'
+  }
+  return colors[type] || 'bg-gray-100 text-gray-700'
+}
+
+function getIntentLabel(type: string): string {
+  const labels: Record<string, string> = {
+    informational: textConstants.lookingForInfo,
+    navigational: textConstants.findingSpecific,
+    transactional: textConstants.takingAction
+  }
+  return labels[type] || type
 }
 </script>
 
 <template>
-  <div class="space-y-6">
-    <!-- Loading Overlay -->
-    <div v-if="isLoading" class="fixed inset-0 bg-white/50 backdrop-blur-sm z-50 flex items-center justify-center">
-      <LoadingSpinner size="lg" text="Searching..." />
-    </div>
-
-    <!-- Search Header -->
-    <div class="card-animated fade-in-up rounded-2xl p-6 mb-10" style="animation-delay: 0.1s;">
-      <div class="max-w-3xl mx-auto">
-        <div class="input-group">
-          <i class="input-icon icon-vibrant fas fa-search text-lg"></i>
-          <input
-            type="text"
-            v-model="searchQuery"
-            @keydown.enter="performSearch"
-            placeholder="Search across all content..."
-            class="input text-lg py-4 pl-12"
-          >
-          <button
-            @click="performSearch"
-            class="absolute right-2 top-1/2 -translate-y-1/2 btn-vibrant ripple"
-          >
-            Search
-          </button>
+  <div
+    class="fixed right-0 bottom-0 top-[64px] flex overflow-hidden bg-gradient-to-br from-gray-50 via-white to-teal-50/20 transition-all duration-300"
+    :class="isSidebarCollapsed ? 'left-20' : 'left-64'"
+  >
+    <!-- Filter Sidebar -->
+    <aside
+      :class="[
+        'border-r border-gray-200 bg-white flex-shrink-0 flex flex-col h-full transition-all duration-300',
+        isFilterSidebarCollapsed ? 'w-14' : 'w-72'
+      ]"
+    >
+      <!-- Sidebar Header -->
+      <div class="p-3 flex items-center border-b border-gray-100" :class="isFilterSidebarCollapsed ? 'justify-center' : 'justify-between'">
+        <div v-if="!isFilterSidebarCollapsed" class="flex items-center gap-2">
+          <i class="fas fa-filter text-teal-500"></i>
+          <span class="text-sm font-medium text-gray-700">{{ textConstants.filters }}</span>
+          <span v-if="activeFiltersCount > 0" class="px-1.5 py-0.5 bg-teal-500 text-white text-xs rounded-full">
+            {{ activeFiltersCount }}
+          </span>
         </div>
-        <div class="flex flex-wrap items-center gap-2 mt-4">
-          <span class="text-sm text-teal-500">Quick filters:</span>
-          <button
-            v-for="filter in quickFilters"
-            :key="filter.id"
-            @click="toggleQuickFilter(filter)"
-            :class="['px-3 py-1.5 rounded-full text-sm transition-all ripple',
-                     filter.active ? 'bg-teal-500 text-white' : 'bg-teal-50 text-teal-700 hover:bg-teal-100']"
-          >
-            <i :class="[filter.icon, 'icon-soft mr-1.5']"></i>{{ filter.label }}
-          </button>
-        </div>
+        <button
+          @click="isFilterSidebarCollapsed = !isFilterSidebarCollapsed"
+          class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-500 transition-colors"
+          :title="isFilterSidebarCollapsed ? 'Expand filters' : 'Collapse filters'"
+        >
+          <i :class="['fas text-xs', isFilterSidebarCollapsed ? 'fa-angles-right' : 'fa-angles-left']"></i>
+        </button>
+      </div>
 
-        <!-- AI: Did You Mean Suggestions -->
-        <div v-if="showDidYouMean && didYouMeanSuggestions.length > 0" class="mt-4 p-3 bg-amber-50 rounded-xl border border-amber-200">
-          <div class="flex items-center gap-2 mb-2">
-            <i class="fas fa-lightbulb text-amber-500"></i>
-            <span class="text-sm font-medium text-amber-700">Did you mean:</span>
+      <!-- Clear Filters -->
+      <div v-if="!isFilterSidebarCollapsed && activeFiltersCount > 0" class="px-4 py-2 border-b border-gray-100">
+        <button @click="clearFilters" class="text-sm text-teal-600 hover:text-teal-800 font-medium">
+          <i class="fas fa-times mr-1"></i>{{ textConstants.clearAll }}
+        </button>
+      </div>
+
+      <!-- Filter Content -->
+      <div class="flex-1 overflow-y-auto" v-if="!isFilterSidebarCollapsed">
+        <!-- Content Type -->
+        <div class="p-4 border-b border-gray-100">
+          <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">{{ textConstants.contentType }}</h4>
+          <div class="space-y-2">
+            <label
+              v-for="type in contentTypes"
+              :key="type.id"
+              class="flex items-center gap-3 cursor-pointer group"
+            >
+              <input type="checkbox" v-model="type.checked" @change="performSearch" class="w-4 h-4 rounded border-gray-300 text-teal-500 focus:ring-teal-500">
+              <span class="text-sm text-gray-700 group-hover:text-gray-900">{{ type.label }}</span>
+              <span class="ml-auto text-xs text-gray-400">({{ type.count }})</span>
+            </label>
           </div>
+        </div>
+
+        <!-- Date Range -->
+        <div class="p-4 border-b border-gray-100">
+          <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">{{ textConstants.dateRange }}</h4>
+          <div class="space-y-2">
+            <label
+              v-for="date in dateFilters"
+              :key="date.id"
+              class="flex items-center gap-3 cursor-pointer group"
+            >
+              <input type="radio" v-model="selectedDate" :value="date.id" @change="performSearch" class="w-4 h-4 border-gray-300 text-teal-500 focus:ring-teal-500">
+              <span class="text-sm text-gray-700 group-hover:text-gray-900">{{ date.label }}</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Author -->
+        <div v-if="topAuthors.length > 0" class="p-4 border-b border-gray-100">
+          <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">{{ textConstants.author }}</h4>
+          <div class="space-y-2">
+            <label
+              v-for="author in topAuthors"
+              :key="author.id"
+              class="flex items-center gap-2 cursor-pointer p-1.5 rounded-lg hover:bg-gray-50 group"
+            >
+              <input type="checkbox" v-model="author.checked" @change="performSearch" class="w-4 h-4 rounded border-gray-300 text-teal-500 focus:ring-teal-500">
+              <div
+                class="w-6 h-6 rounded-full flex items-center justify-center text-white text-xs font-medium"
+                :style="{ backgroundColor: author.color }"
+              >
+                {{ author.initials }}
+              </div>
+              <span class="text-sm text-gray-700 group-hover:text-gray-900">{{ author.name }}</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Tags -->
+        <div v-if="popularTags.length > 0" class="p-4">
+          <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">{{ textConstants.tags }}</h4>
           <div class="flex flex-wrap gap-2">
             <button
-              v-for="suggestion in didYouMeanSuggestions"
-              :key="suggestion.suggestion"
-              @click="applyDidYouMean(suggestion.suggestion)"
-              class="px-3 py-1.5 bg-white border border-amber-300 rounded-lg text-sm text-amber-800 hover:bg-amber-100 transition-colors flex items-center gap-2"
+              v-for="tag in popularTags"
+              :key="tag.id"
+              @click="toggleTag(tag)"
+              :class="[
+                'px-2.5 py-1 rounded-full text-xs font-medium transition-all',
+                tag.active
+                  ? 'bg-teal-500 text-white'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              ]"
             >
-              <span class="font-medium">{{ suggestion.suggestion }}</span>
-              <span class="text-xs text-amber-600">({{ suggestion.reason }})</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- AI: Extracted Entities Filter -->
-        <div v-if="extractedEntities.length > 0" class="mt-4">
-          <div class="flex items-center gap-2 mb-2">
-            <i class="fas fa-wand-magic-sparkles text-teal-500"></i>
-            <span class="text-sm font-medium text-gray-700">AI Detected Entities:</span>
-          </div>
-          <div class="flex flex-wrap gap-2">
-            <button
-              v-for="entity in extractedEntities"
-              :key="entity.text"
-              @click="applyEntityFilter(entity)"
-              :class="['px-3 py-1.5 rounded-lg text-sm font-medium transition-all flex items-center gap-2 hover:shadow-md', getEntityTypeColor(entity.type)]"
-            >
-              <i :class="getEntityTypeIcon(entity.type)"></i>
-              <span>{{ entity.text }}</span>
-              <span class="text-xs opacity-75">{{ Math.round(entity.confidence * 100) }}%</span>
+              {{ tag.name }}
             </button>
           </div>
         </div>
       </div>
-    </div>
 
-    <div class="flex gap-6">
-      <!-- Filters Sidebar -->
-      <aside class="w-64 flex-shrink-0 hidden lg:block">
-        <div class="card-animated fade-in-up rounded-2xl p-5 sticky top-24" style="animation-delay: 0.2s;">
-          <div class="flex items-center justify-between mb-4">
-            <h3 class="font-semibold text-teal-900">Filters</h3>
-            <button @click="clearFilters" class="text-sm text-teal-500 hover:text-teal-700 ripple">Clear all</button>
-          </div>
+      <!-- Collapsed state icons -->
+      <div v-if="isFilterSidebarCollapsed" class="flex-1 flex flex-col items-center pt-4 gap-3">
+        <button
+          v-for="type in contentTypes.slice(0, 4)"
+          :key="type.id"
+          class="w-10 h-10 rounded-lg flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors"
+          :class="type.checked ? 'bg-teal-50 text-teal-600' : ''"
+          :title="type.label"
+        >
+          <i :class="[
+            type.id === 'articles' ? 'fas fa-file-alt' :
+            type.id === 'documents' ? 'fas fa-file-pdf' :
+            type.id === 'videos' ? 'fas fa-video' :
+            'fas fa-graduation-cap'
+          ]"></i>
+        </button>
+      </div>
+    </aside>
 
-          <!-- Content Type -->
-          <div class="mb-6">
-            <h4 class="text-sm font-medium text-teal-700 mb-3">Content Type</h4>
-            <div class="space-y-2">
-              <label
-                v-for="type in contentTypes"
-                :key="type.id"
-                class="flex items-center gap-3 cursor-pointer"
-              >
-                <input type="checkbox" v-model="type.checked" class="checkbox">
-                <span class="text-sm text-teal-700">{{ type.label }}</span>
-                <span class="ml-auto text-xs text-teal-400">({{ type.count }})</span>
-              </label>
-            </div>
-          </div>
-
-          <!-- Date Range -->
-          <div class="mb-6">
-            <h4 class="text-sm font-medium text-teal-700 mb-3">Date</h4>
-            <div class="space-y-2">
-              <label
-                v-for="date in dateFilters"
-                :key="date.id"
-                class="flex items-center gap-3 cursor-pointer"
-              >
-                <input type="radio" v-model="selectedDate" :value="date.id" class="radio">
-                <span class="text-sm text-teal-700">{{ date.label }}</span>
-              </label>
-            </div>
-          </div>
-
-          <!-- Author -->
-          <div class="mb-6">
-            <h4 class="text-sm font-medium text-teal-700 mb-3">Author</h4>
+    <!-- Main Content -->
+    <div class="flex-1 flex flex-col h-full overflow-hidden">
+      <!-- Search Header -->
+      <div class="flex-shrink-0 p-4 border-b border-gray-200 bg-white">
+        <div class="max-w-4xl mx-auto">
+          <!-- Search Input -->
+          <div class="relative">
+            <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
             <input
               type="text"
-              v-model="authorFilter"
-              placeholder="Filter by author..."
-              class="input text-sm"
+              v-model="searchQuery"
+              @keydown.enter="performSearch"
+              :placeholder="textConstants.searchPlaceholder"
+              class="w-full pl-12 pr-32 py-3.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-800 placeholder-gray-400 focus:outline-none focus:border-teal-400 focus:ring-2 focus:ring-teal-500/20 transition-all"
             >
-            <div class="mt-2 space-y-1">
-              <label
-                v-for="author in topAuthors"
-                :key="author.id"
-                class="flex items-center gap-2 cursor-pointer p-1.5 rounded-lg hover:bg-teal-50"
-              >
-                <input type="checkbox" v-model="author.checked" class="checkbox">
-                <div
-                  class="w-6 h-6 rounded-full flex items-center justify-center text-white text-xs"
-                  :style="{ backgroundColor: author.color }"
-                >
-                  {{ author.initials }}
-                </div>
-                <span class="text-sm text-teal-700">{{ author.name }}</span>
-              </label>
-            </div>
-          </div>
-
-          <!-- Tags -->
-          <div>
-            <h4 class="text-sm font-medium text-teal-700 mb-3">Tags</h4>
-            <div class="flex flex-wrap gap-2">
+            <div class="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
+              <AIVoiceInput @transcript="handleVoiceTranscript" class="inline-flex" />
               <button
-                v-for="tag in popularTags"
-                :key="tag.id"
-                @click="toggleTag(tag)"
-                :class="['px-2.5 py-1 rounded-full text-xs transition-all ripple',
-                         tag.active ? 'bg-teal-500 text-white' : 'bg-teal-50 text-teal-600 hover:bg-teal-100']"
+                @click="performSearch"
+                class="px-4 py-2 bg-teal-500 hover:bg-teal-600 text-white rounded-lg font-medium transition-colors"
               >
-                {{ tag.name }}
+                {{ textConstants.searchButton }}
               </button>
             </div>
           </div>
-        </div>
-      </aside>
 
-      <!-- Results -->
-      <div class="flex-1">
-        <!-- Results Header -->
-        <div class="flex items-center justify-between mb-4">
-          <div>
-            <div class="flex items-center gap-3 mb-1">
-              <p class="text-teal-600">
-                <span class="font-semibold text-teal-900">{{ totalResults }}</span> results for
-                "<span class="font-medium text-teal-800">{{ displayQuery }}</span>"
-              </p>
-              <!-- AI Query Intent Badge -->
-              <span v-if="queryIntent" :class="['px-2.5 py-1 rounded-full text-xs font-medium flex items-center gap-1.5', getIntentTypeColor(queryIntent.type)]">
-                <i class="fas fa-brain"></i>
-                {{ queryIntent.type === 'informational' ? 'Looking for info' : queryIntent.type === 'navigational' ? 'Finding specific' : 'Taking action' }}
-                <span class="opacity-75">({{ Math.round(queryIntent.confidence * 100) }}%)</span>
-              </span>
-            </div>
-            <p class="text-sm text-teal-500">
-              Search completed in {{ searchTime }}ms
-              <span v-if="isAnalyzingQuery" class="ml-2 text-teal-600">
-                <i class="fas fa-circle-notch fa-spin"></i> AI analyzing...
-              </span>
-            </p>
-          </div>
-          <div class="flex items-center gap-3">
-            <select v-model="sortBy" class="input text-sm py-2">
-              <option value="relevance">Most Relevant</option>
-              <option value="date">Most Recent</option>
-              <option value="views">Most Viewed</option>
-            </select>
-            <div class="flex border border-teal-200 rounded-lg overflow-hidden">
-              <button
-                @click="viewMode = 'list'"
-                :class="['p-2 ripple', viewMode === 'list' ? 'bg-teal-500 text-white' : 'bg-white text-teal-600 hover:bg-teal-50']"
-              >
-                <i class="fas fa-list icon-soft"></i>
-              </button>
-              <button
-                @click="viewMode = 'grid'"
-                :class="['p-2 ripple', viewMode === 'grid' ? 'bg-teal-500 text-white' : 'bg-white text-teal-600 hover:bg-teal-50']"
-              >
-                <i class="fas fa-th icon-soft"></i>
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- AI Summary -->
-        <div class="card-animated fade-in-up rounded-2xl p-5 mb-10 border-l-4 border-teal-500" style="animation-delay: 0.3s;">
-          <div class="flex items-start gap-4">
-            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center flex-shrink-0">
-              <i class="fas fa-robot text-white icon-vibrant"></i>
-            </div>
-            <div class="flex-1">
-              <h3 class="font-semibold text-teal-900 mb-2">AI Summary</h3>
-              <p class="text-teal-700 text-sm leading-relaxed">{{ aiSummary }}</p>
-              <div class="flex items-center gap-4 mt-3">
-                <button class="text-sm text-teal-600 hover:text-teal-800 ripple">
-                  <i class="fas fa-expand-alt mr-1 icon-soft"></i>Show more
-                </button>
-                <button class="text-sm text-teal-500 hover:text-teal-700 ripple">
-                  <i class="fas fa-copy mr-1 icon-soft"></i>Copy
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- AI Search Insights Panel -->
-        <div v-if="showAIPanel && aiSearchInsights.length > 0" class="card-animated fade-in-up rounded-2xl p-5 mb-6" style="animation-delay: 0.35s;">
-          <div class="flex items-center justify-between mb-3">
-            <div class="flex items-center gap-2">
-              <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-teal-400 to-emerald-500 flex items-center justify-center">
-                <i class="fas fa-wand-magic-sparkles text-white text-sm"></i>
-              </div>
-              <h4 class="font-semibold text-gray-900">AI Search Insights</h4>
-            </div>
-            <button @click="showAIPanel = false" class="p-1.5 hover:bg-gray-100 rounded-lg transition-colors">
-              <i class="fas fa-times text-gray-400 text-sm"></i>
-            </button>
-          </div>
-          <div class="space-y-2">
+          <!-- Quick Filters -->
+          <div class="flex flex-wrap items-center gap-2 mt-3">
+            <span class="text-sm text-gray-500">{{ textConstants.quickFiltersLabel }}</span>
             <button
-              v-for="insight in aiSearchInsights"
-              :key="insight.id"
-              @click="applySearchInsight(insight)"
-              :class="['w-full p-3 rounded-xl text-left transition-all flex items-start gap-3 group',
-                       insight.type === 'tip' ? 'bg-amber-50 hover:bg-amber-100' :
-                       insight.type === 'related' ? 'bg-blue-50 hover:bg-blue-100' : 'bg-purple-50 hover:bg-purple-100']"
+              v-for="filter in quickFilters"
+              :key="filter.id"
+              @click="toggleQuickFilter(filter)"
+              :class="[
+                'px-3 py-1.5 rounded-full text-sm font-medium transition-all',
+                filter.active
+                  ? 'bg-teal-500 text-white'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              ]"
             >
-              <div :class="['w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0',
-                            insight.type === 'tip' ? 'bg-amber-200' :
-                            insight.type === 'related' ? 'bg-blue-200' : 'bg-purple-200']">
-                <i :class="['text-sm',
-                            insight.type === 'tip' ? 'fas fa-lightbulb text-amber-700' :
-                            insight.type === 'related' ? 'fas fa-search-plus text-blue-700' : 'fas fa-filter text-purple-700']"></i>
-              </div>
-              <div class="flex-1">
-                <p :class="['text-sm font-medium',
-                            insight.type === 'tip' ? 'text-amber-800' :
-                            insight.type === 'related' ? 'text-blue-800' : 'text-purple-800']">
-                  {{ insight.text }}
-                </p>
-                <span v-if="insight.action" :class="['text-xs mt-0.5 inline-block',
-                              insight.type === 'tip' ? 'text-amber-600' :
-                              insight.type === 'related' ? 'text-blue-600' : 'text-purple-600']">
-                  Click to apply →
-                </span>
-              </div>
+              <i :class="[filter.icon, 'mr-1.5']"></i>{{ filter.label }}
             </button>
           </div>
         </div>
+      </div>
 
-        <!-- Results List -->
-        <div :class="viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 gap-4' : 'space-y-4'">
-          <div
-            v-for="(result, index) in results"
-            :key="result.id"
-            class="list-item-animated card-animated fade-in-up rounded-xl p-5 hover:shadow-lg transition-all cursor-pointer group ripple"
-            :style="{ animationDelay: (0.4 + index * 0.1) + 's' }"
-          >
-            <div class="flex items-start gap-4">
-              <div :class="['w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0', result.iconBg]">
-                <i :class="[result.icon, result.iconColor, 'text-xl icon-vibrant']"></i>
-              </div>
-              <div class="flex-1 min-w-0">
-                <div class="flex items-center gap-2 mb-1">
-                  <span :class="['badge', result.typeBadge]">{{ result.type }}</span>
-                  <span v-if="result.isNew" class="badge badge-green">New</span>
-                </div>
-                <h3
-                  class="font-semibold text-teal-900 group-hover:text-teal-700 mb-2"
-                  v-html="highlightText(result.title)"
-                ></h3>
-                <p
-                  class="text-sm text-teal-600 line-clamp-2"
-                  v-html="highlightText(result.excerpt)"
-                ></p>
+      <!-- Results Area -->
+      <div class="flex-1 overflow-y-auto p-6">
+        <div class="max-w-4xl mx-auto">
+          <!-- Loading State -->
+          <div v-if="isLoading" class="flex items-center justify-center py-20">
+            <div class="text-center">
+              <div class="w-12 h-12 border-4 border-teal-200 border-t-teal-500 rounded-full animate-spin mx-auto mb-4"></div>
+              <p class="text-gray-500">Searching...</p>
+            </div>
+          </div>
 
-                <div class="flex items-center gap-4 mt-3">
-                  <div class="flex items-center gap-2">
-                    <div
-                      class="w-6 h-6 rounded-full flex items-center justify-center text-white text-xs"
-                      :style="{ backgroundColor: result.author.color }"
-                    >
-                      {{ result.author.initials }}
-                    </div>
-                    <span class="text-sm text-teal-500">{{ result.author.name }}</span>
-                  </div>
-                  <span class="text-sm text-teal-400">{{ result.date }}</span>
-                  <span class="text-sm text-teal-400">
-                    <i class="fas fa-eye mr-1 icon-soft"></i>{{ result.views }}
-                  </span>
-                </div>
-
-                <!-- Tags -->
-                <div class="flex flex-wrap gap-2 mt-3">
+          <!-- Results -->
+          <template v-else-if="results.length > 0">
+            <!-- Results Header -->
+            <div class="flex items-center justify-between mb-4">
+              <div>
+                <div class="flex items-center gap-3 flex-wrap">
+                  <p class="text-gray-600">
+                    <span class="font-semibold text-gray-900">{{ totalResults }}</span> {{ textConstants.resultsFor }}
+                    "<span class="font-medium text-teal-700">{{ displayQuery }}</span>"
+                  </p>
                   <span
-                    v-for="tag in result.tags"
-                    :key="tag"
-                    class="px-2 py-0.5 bg-teal-50 rounded-full text-xs text-teal-600"
+                    v-if="queryIntent"
+                    :class="['px-2.5 py-1 rounded-full text-xs font-medium flex items-center gap-1.5', getIntentTypeColor(queryIntent.type)]"
                   >
-                    {{ tag }}
+                    <i class="fas fa-brain"></i>
+                    {{ getIntentLabel(queryIntent.type) }}
+                    <span class="opacity-75">({{ Math.round(queryIntent.confidence * 100) }}%)</span>
                   </span>
                 </div>
+                <p class="text-sm text-gray-400 mt-0.5">
+                  {{ textConstants.searchCompletedIn }} {{ searchTime }}{{ textConstants.ms }}
+                  <span v-if="isAnalyzingQuery" class="ml-2 text-teal-600">
+                    <i class="fas fa-circle-notch fa-spin"></i> {{ textConstants.aiAnalyzing }}
+                  </span>
+                </p>
               </div>
+              <div class="flex items-center gap-3">
+                <select v-model="sortBy" class="px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-teal-400">
+                  <option value="relevance">{{ textConstants.mostRelevant }}</option>
+                  <option value="date">{{ textConstants.mostRecent }}</option>
+                  <option value="views">{{ textConstants.mostViewed }}</option>
+                </select>
+                <div class="flex border border-gray-200 rounded-lg overflow-hidden">
+                  <button
+                    @click="viewMode = 'list'"
+                    :class="['p-2', viewMode === 'list' ? 'bg-teal-500 text-white' : 'bg-white text-gray-600 hover:bg-gray-50']"
+                  >
+                    <i class="fas fa-list"></i>
+                  </button>
+                  <button
+                    @click="viewMode = 'grid'"
+                    :class="['p-2', viewMode === 'grid' ? 'bg-teal-500 text-white' : 'bg-white text-gray-600 hover:bg-gray-50']"
+                  >
+                    <i class="fas fa-th"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
 
-              <div class="flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                <button class="p-2 rounded-lg hover:bg-teal-100 text-teal-500 ripple" title="Bookmark">
-                  <i class="fas fa-bookmark icon-soft"></i>
-                </button>
-                <button class="p-2 rounded-lg hover:bg-teal-100 text-teal-500 ripple" title="Share">
-                  <i class="fas fa-share-alt icon-soft"></i>
+            <!-- Did You Mean -->
+            <div v-if="showDidYouMean && didYouMeanSuggestions.length > 0" class="mb-4 p-3 bg-amber-50 rounded-xl border border-amber-200">
+              <div class="flex items-center gap-2 mb-2">
+                <i class="fas fa-lightbulb text-amber-500"></i>
+                <span class="text-sm font-medium text-amber-700">{{ textConstants.didYouMean }}</span>
+              </div>
+              <div class="flex flex-wrap gap-2">
+                <button
+                  v-for="suggestion in didYouMeanSuggestions"
+                  :key="suggestion.suggestion"
+                  @click="applyDidYouMean(suggestion.suggestion)"
+                  class="px-3 py-1.5 bg-white border border-amber-300 rounded-lg text-sm text-amber-800 hover:bg-amber-100 transition-colors"
+                >
+                  <span class="font-medium">{{ suggestion.suggestion }}</span>
+                  <span class="text-xs text-amber-600 ml-1">({{ suggestion.reason }})</span>
                 </button>
               </div>
             </div>
-          </div>
-        </div>
 
-        <!-- Pagination -->
-        <div class="flex items-center justify-between mt-8 fade-in-up" style="animation-delay: 0.9s;">
-          <p class="text-sm text-teal-500">Showing 1-10 of {{ totalResults }} results</p>
-          <div class="flex items-center gap-2">
-            <button
-              class="p-2 rounded-lg border border-teal-200 text-teal-500 hover:bg-teal-50 disabled:opacity-50 ripple"
-              disabled
-            >
-              <i class="fas fa-chevron-left icon-soft"></i>
-            </button>
-            <button class="w-10 h-10 rounded-lg bg-teal-500 text-white font-medium ripple">1</button>
-            <button class="w-10 h-10 rounded-lg border border-teal-200 text-teal-600 hover:bg-teal-50 font-medium ripple">2</button>
-            <button class="w-10 h-10 rounded-lg border border-teal-200 text-teal-600 hover:bg-teal-50 font-medium ripple">3</button>
-            <span class="text-teal-400">...</span>
-            <button class="w-10 h-10 rounded-lg border border-teal-200 text-teal-600 hover:bg-teal-50 font-medium ripple">12</button>
-            <button class="p-2 rounded-lg border border-teal-200 text-teal-600 hover:bg-teal-50 ripple">
-              <i class="fas fa-chevron-right icon-soft"></i>
-            </button>
-          </div>
-        </div>
-
-        <!-- AI Related Searches -->
-        <div class="mt-8 card-animated fade-in-up rounded-2xl p-5" style="animation-delay: 1s;">
-          <div class="flex items-center gap-2 mb-4">
-            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-teal-400 to-emerald-500 flex items-center justify-center">
-              <i class="fas fa-wand-magic-sparkles text-white text-sm"></i>
+            <!-- Extracted Entities -->
+            <div v-if="extractedEntities.length > 0" class="mb-4">
+              <div class="flex items-center gap-2 mb-2">
+                <i class="fas fa-wand-magic-sparkles text-teal-500"></i>
+                <span class="text-sm font-medium text-gray-700">{{ textConstants.aiDetectedEntities }}</span>
+              </div>
+              <div class="flex flex-wrap gap-2">
+                <button
+                  v-for="entity in extractedEntities"
+                  :key="entity.text"
+                  @click="applyEntityFilter(entity)"
+                  :class="['px-3 py-1.5 rounded-lg text-sm font-medium transition-all flex items-center gap-2 hover:shadow-md', getEntityTypeColor(entity.type)]"
+                >
+                  <i :class="getEntityTypeIcon(entity.type)"></i>
+                  <span>{{ entity.text }}</span>
+                  <span class="text-xs opacity-75">{{ Math.round(entity.confidence * 100) }}%</span>
+                </button>
+              </div>
             </div>
-            <h4 class="font-semibold text-gray-900">AI Related Searches</h4>
+
+            <!-- AI Summary -->
+            <div v-if="aiSummary" class="mb-6 p-5 bg-white rounded-2xl border border-gray-200 shadow-sm">
+              <div class="flex items-start gap-4">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center flex-shrink-0">
+                  <i class="fas fa-robot text-white"></i>
+                </div>
+                <div class="flex-1">
+                  <h3 class="font-semibold text-gray-900 mb-2">{{ textConstants.aiSummary }}</h3>
+                  <p class="text-gray-600 text-sm leading-relaxed">{{ aiSummary }}</p>
+                  <div class="flex items-center gap-4 mt-3">
+                    <button class="text-sm text-teal-600 hover:text-teal-800">
+                      <i class="fas fa-expand-alt mr-1"></i>{{ textConstants.showMore }}
+                    </button>
+                    <button @click="copyAISummary" class="text-sm text-gray-500 hover:text-gray-700">
+                      <i class="fas fa-copy mr-1"></i>{{ textConstants.copy }}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- AI Search Insights -->
+            <div v-if="showAIPanel && aiSearchInsights.length > 0" class="mb-6 p-4 bg-white rounded-2xl border border-gray-200 shadow-sm">
+              <div class="flex items-center justify-between mb-3">
+                <div class="flex items-center gap-2">
+                  <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-teal-400 to-emerald-500 flex items-center justify-center">
+                    <i class="fas fa-wand-magic-sparkles text-white text-sm"></i>
+                  </div>
+                  <h4 class="font-semibold text-gray-900">{{ textConstants.aiSearchInsights }}</h4>
+                </div>
+                <button @click="showAIPanel = false" class="p-1.5 hover:bg-gray-100 rounded-lg transition-colors">
+                  <i class="fas fa-times text-gray-400 text-sm"></i>
+                </button>
+              </div>
+              <div class="space-y-2">
+                <button
+                  v-for="insight in aiSearchInsights"
+                  :key="insight.id"
+                  @click="applySearchInsight(insight)"
+                  :class="[
+                    'w-full p-3 rounded-xl text-left transition-all flex items-start gap-3 group',
+                    insight.type === 'tip' ? 'bg-amber-50 hover:bg-amber-100' :
+                    insight.type === 'related' ? 'bg-blue-50 hover:bg-blue-100' : 'bg-purple-50 hover:bg-purple-100'
+                  ]"
+                >
+                  <div :class="[
+                    'w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0',
+                    insight.type === 'tip' ? 'bg-amber-200' :
+                    insight.type === 'related' ? 'bg-blue-200' : 'bg-purple-200'
+                  ]">
+                    <i :class="[
+                      'text-sm',
+                      insight.type === 'tip' ? 'fas fa-lightbulb text-amber-700' :
+                      insight.type === 'related' ? 'fas fa-search-plus text-blue-700' : 'fas fa-filter text-purple-700'
+                    ]"></i>
+                  </div>
+                  <div class="flex-1">
+                    <p :class="[
+                      'text-sm font-medium',
+                      insight.type === 'tip' ? 'text-amber-800' :
+                      insight.type === 'related' ? 'text-blue-800' : 'text-purple-800'
+                    ]">
+                      {{ insight.text }}
+                    </p>
+                    <span v-if="insight.action" :class="[
+                      'text-xs mt-0.5 inline-block',
+                      insight.type === 'tip' ? 'text-amber-600' :
+                      insight.type === 'related' ? 'text-blue-600' : 'text-purple-600'
+                    ]">
+                      {{ textConstants.clickToApply }} →
+                    </span>
+                  </div>
+                </button>
+              </div>
+            </div>
+
+            <!-- Results List -->
+            <div :class="viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 gap-4' : 'space-y-4'">
+              <div
+                v-for="result in results"
+                :key="result.id"
+                class="bg-white rounded-xl p-5 border border-gray-200 hover:border-teal-300 hover:shadow-lg transition-all cursor-pointer group"
+              >
+                <div class="flex items-start gap-4">
+                  <div :class="['w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0', result.iconBg]">
+                    <i :class="[result.icon, result.iconColor, 'text-xl']"></i>
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-2 mb-1">
+                      <span :class="['px-2 py-0.5 rounded text-xs font-medium', result.typeBadge]">{{ result.type }}</span>
+                      <span v-if="result.isNew" class="px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-700">{{ textConstants.newBadge }}</span>
+                    </div>
+                    <h3 class="font-semibold text-gray-900 group-hover:text-teal-700 mb-2" v-html="highlightText(result.title)"></h3>
+                    <p class="text-sm text-gray-600 line-clamp-2" v-html="highlightText(result.excerpt)"></p>
+
+                    <div class="flex items-center gap-4 mt-3">
+                      <div class="flex items-center gap-2">
+                        <div
+                          class="w-6 h-6 rounded-full flex items-center justify-center text-white text-xs font-medium"
+                          :style="{ backgroundColor: result.author.color }"
+                        >
+                          {{ result.author.initials }}
+                        </div>
+                        <span class="text-sm text-gray-500">{{ result.author.name }}</span>
+                      </div>
+                      <span class="text-sm text-gray-400">{{ result.date }}</span>
+                      <span class="text-sm text-gray-400">
+                        <i class="fas fa-eye mr-1"></i>{{ result.views.toLocaleString() }}
+                      </span>
+                    </div>
+
+                    <!-- Tags -->
+                    <div class="flex flex-wrap gap-2 mt-3">
+                      <span
+                        v-for="tag in result.tags"
+                        :key="tag"
+                        class="px-2 py-0.5 bg-gray-100 rounded-full text-xs text-gray-600"
+                      >
+                        {{ tag }}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div class="flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button class="p-2 rounded-lg hover:bg-teal-100 text-gray-400 hover:text-teal-600" :title="textConstants.bookmark">
+                      <i class="fas fa-bookmark"></i>
+                    </button>
+                    <button class="p-2 rounded-lg hover:bg-teal-100 text-gray-400 hover:text-teal-600" :title="textConstants.share">
+                      <i class="fas fa-share-alt"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Pagination -->
+            <div v-if="totalPages > 1" class="flex items-center justify-between mt-8">
+              <p class="text-sm text-gray-500">
+                {{ textConstants.showing }} {{ startResult }}-{{ endResult }} {{ textConstants.of }} {{ totalResults }} {{ textConstants.results }}
+              </p>
+              <div class="flex items-center gap-2">
+                <button
+                  @click="goToPage(currentPage - 1)"
+                  :disabled="currentPage === 1"
+                  class="p-2 rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <i class="fas fa-chevron-left"></i>
+                </button>
+                <template v-for="page in paginationPages" :key="page">
+                  <span v-if="page === '...'" class="text-gray-400 px-2">...</span>
+                  <button
+                    v-else
+                    @click="goToPage(page)"
+                    :class="[
+                      'w-10 h-10 rounded-lg font-medium',
+                      currentPage === page
+                        ? 'bg-teal-500 text-white'
+                        : 'border border-gray-200 text-gray-600 hover:bg-gray-50'
+                    ]"
+                  >
+                    {{ page }}
+                  </button>
+                </template>
+                <button
+                  @click="goToPage(currentPage + 1)"
+                  :disabled="currentPage === totalPages"
+                  class="p-2 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <i class="fas fa-chevron-right"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Related Searches -->
+            <div v-if="relatedSearches.length > 0" class="mt-8 p-5 bg-white rounded-2xl border border-gray-200 shadow-sm">
+              <div class="flex items-center gap-2 mb-4">
+                <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-teal-400 to-emerald-500 flex items-center justify-center">
+                  <i class="fas fa-wand-magic-sparkles text-white text-sm"></i>
+                </div>
+                <h4 class="font-semibold text-gray-900">{{ textConstants.aiRelatedSearches }}</h4>
+              </div>
+              <div class="flex flex-wrap gap-2">
+                <button
+                  v-for="search in relatedSearches"
+                  :key="search"
+                  @click="searchQuery = search; performSearch()"
+                  class="px-4 py-2 bg-gradient-to-r from-teal-50 to-emerald-50 border border-teal-200 rounded-xl text-sm font-medium text-teal-700 hover:from-teal-100 hover:to-emerald-100 hover:border-teal-300 transition-all flex items-center gap-2"
+                >
+                  <i class="fas fa-search text-teal-500 text-xs"></i>
+                  {{ search }}
+                </button>
+              </div>
+              <p class="text-xs text-gray-500 mt-3">
+                <i class="fas fa-info-circle mr-1"></i>
+                {{ textConstants.basedOnPatterns }}
+              </p>
+            </div>
+          </template>
+
+          <!-- Empty State -->
+          <div v-else-if="displayQuery" class="flex flex-col items-center justify-center py-20 text-center">
+            <div class="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center mb-4">
+              <i class="fas fa-search text-3xl text-gray-400"></i>
+            </div>
+            <h3 class="text-xl font-semibold text-gray-800 mb-2">{{ textConstants.noResults }}</h3>
+            <p class="text-gray-500">{{ textConstants.noResultsDesc }}</p>
           </div>
-          <div class="flex flex-wrap gap-2">
-            <button
-              v-for="search in relatedSearches"
-              :key="search"
-              @click="searchQuery = search; performAISearch()"
-              class="px-4 py-2 bg-gradient-to-r from-teal-50 to-emerald-50 border border-teal-200 rounded-xl text-sm font-medium text-teal-700 hover:from-teal-100 hover:to-emerald-100 hover:border-teal-300 transition-all flex items-center gap-2"
-            >
-              <i class="fas fa-search text-teal-500 text-xs"></i>
-              {{ search }}
-            </button>
+
+          <!-- Initial State -->
+          <div v-else class="flex flex-col items-center justify-center py-20 text-center">
+            <div class="w-20 h-20 rounded-full bg-teal-50 flex items-center justify-center mb-4">
+              <i class="fas fa-search text-3xl text-teal-400"></i>
+            </div>
+            <h3 class="text-xl font-semibold text-gray-800 mb-2">Start your search</h3>
+            <p class="text-gray-500">Enter a search term to find content</p>
           </div>
-          <p class="text-xs text-gray-500 mt-3">
-            <i class="fas fa-info-circle mr-1"></i>
-            Based on your search patterns and popular queries
-          </p>
         </div>
       </div>
     </div>
+
+    <!-- Mobile Filter Toggle -->
+    <button
+      @click="showMobileFilters = !showMobileFilters"
+      class="fixed bottom-6 right-6 lg:hidden w-14 h-14 bg-teal-500 text-white rounded-full shadow-lg flex items-center justify-center z-50"
+    >
+      <i class="fas fa-filter"></i>
+      <span v-if="activeFiltersCount > 0" class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
+        {{ activeFiltersCount }}
+      </span>
+    </button>
   </div>
 </template>
 
@@ -824,63 +1116,38 @@ function performAISearch(): void {
   overflow: hidden;
 }
 
-/* Input group positioning */
-.input-group {
-  position: relative;
+/* Badge styles */
+.badge-blue {
+  @apply bg-blue-100 text-blue-700;
 }
 
-.input-group .input-icon {
-  position: absolute;
-  left: 1rem;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 10;
+.badge-purple {
+  @apply bg-purple-100 text-purple-700;
 }
 
-.input-group .input {
-  width: 100%;
-  padding-right: 6rem;
+.badge-red {
+  @apply bg-red-100 text-red-700;
 }
 
-/* AI Feature Animations */
-@keyframes ai-pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.7; }
+.badge-green {
+  @apply bg-green-100 text-green-700;
 }
 
-@keyframes ai-shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
+/* Custom scrollbar */
+.overflow-y-auto::-webkit-scrollbar {
+  width: 6px;
 }
 
-.ai-analyzing {
-  animation: ai-pulse 1.5s ease-in-out infinite;
+.overflow-y-auto::-webkit-scrollbar-track {
+  background: transparent;
 }
 
-.ai-shimmer {
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(20, 184, 166, 0.1) 50%,
-    transparent 100%
-  );
-  background-size: 200% 100%;
-  animation: ai-shimmer 2s infinite;
+.overflow-y-auto::-webkit-scrollbar-thumb {
+  background: #e5e7eb;
+  border-radius: 3px;
 }
 
-/* Entity chip hover effects */
-.entity-chip:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(20, 184, 166, 0.2);
-}
-
-/* AI insight card hover */
-.ai-insight-card:hover {
-  transform: translateX(4px);
-}
-
-/* Related search button hover */
-.related-search-btn:hover {
-  transform: scale(1.02);
+.overflow-y-auto::-webkit-scrollbar-thumb:hover {
+  background: #d1d5db;
 }
 </style>
