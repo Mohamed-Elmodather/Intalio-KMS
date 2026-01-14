@@ -214,6 +214,164 @@ const showWorkflowBuilder = ref(false)
 const showToolsToolbar = ref(true)
 const toolsSearchQuery = ref('')
 
+// Sidebar Tools Configuration
+interface SidebarTool {
+  id: AIOperationType
+  name: string
+  description: string
+  icon: string
+  category: 'analysis' | 'content' | 'extraction' | 'search'
+  color: string
+  bgColor: string
+  hoverBg: string
+  options?: { value: string; label: string; icon: string }[]
+}
+
+const sidebarTools: SidebarTool[] = [
+  {
+    id: 'extract-entities',
+    name: 'Entity Recognition',
+    description: 'Extract people, places, dates',
+    icon: 'fas fa-tags',
+    category: 'analysis',
+    color: 'text-blue-500',
+    bgColor: 'bg-blue-50',
+    hoverBg: 'group-hover:bg-blue-100'
+  },
+  {
+    id: 'analyze-sentiment',
+    name: 'Sentiment Analysis',
+    description: 'Analyze emotional tone',
+    icon: 'fas fa-smile',
+    category: 'analysis',
+    color: 'text-pink-500',
+    bgColor: 'bg-pink-50',
+    hoverBg: 'group-hover:bg-pink-100'
+  },
+  {
+    id: 'classify',
+    name: 'Classify Content',
+    description: 'Categorize with confidence',
+    icon: 'fas fa-folder-tree',
+    category: 'analysis',
+    color: 'text-purple-500',
+    bgColor: 'bg-purple-50',
+    hoverBg: 'group-hover:bg-purple-100'
+  },
+  {
+    id: 'summarize',
+    name: 'Summarize',
+    description: 'Generate concise summaries',
+    icon: 'fas fa-compress-alt',
+    category: 'content',
+    color: 'text-teal-500',
+    bgColor: 'bg-teal-50',
+    hoverBg: 'hover:bg-teal-100',
+    options: [
+      { value: 'brief', label: 'Brief', icon: 'fas fa-minus' },
+      { value: 'detailed', label: 'Detailed', icon: 'fas fa-align-left' },
+      { value: 'bullet', label: 'Bullets', icon: 'fas fa-list-ul' }
+    ]
+  },
+  {
+    id: 'translate',
+    name: 'Translate',
+    description: 'Translate to multiple languages',
+    icon: 'fas fa-language',
+    category: 'content',
+    color: 'text-green-500',
+    bgColor: 'bg-green-50',
+    hoverBg: 'hover:bg-green-100',
+    options: [
+      { value: 'ar', label: 'Arabic', icon: '🇸🇦' },
+      { value: 'en', label: 'English', icon: '🇺🇸' },
+      { value: 'fr', label: 'French', icon: '🇫🇷' },
+      { value: 'es', label: 'Spanish', icon: '🇪🇸' },
+      { value: 'de', label: 'German', icon: '🇩🇪' },
+      { value: 'zh', label: 'Chinese', icon: '🇨🇳' }
+    ]
+  },
+  {
+    id: 'generate-title',
+    name: 'Generate Titles',
+    description: 'Create title suggestions',
+    icon: 'fas fa-heading',
+    category: 'content',
+    color: 'text-indigo-500',
+    bgColor: 'bg-indigo-50',
+    hoverBg: 'hover:bg-indigo-100',
+    options: [
+      { value: 'formal', label: 'Formal', icon: 'fas fa-briefcase' },
+      { value: 'casual', label: 'Casual', icon: 'fas fa-smile' },
+      { value: 'seo', label: 'SEO', icon: 'fas fa-search' },
+      { value: 'creative', label: 'Creative', icon: 'fas fa-lightbulb' }
+    ]
+  },
+  {
+    id: 'ocr',
+    name: 'OCR - Extract Text',
+    description: 'Extract text from images',
+    icon: 'fas fa-file-image',
+    category: 'extraction',
+    color: 'text-amber-500',
+    bgColor: 'bg-amber-50',
+    hoverBg: 'group-hover:bg-amber-100'
+  },
+  {
+    id: 'auto-tag',
+    name: 'Auto-Tag',
+    description: 'Generate relevant tags',
+    icon: 'fas fa-hashtag',
+    category: 'extraction',
+    color: 'text-cyan-500',
+    bgColor: 'bg-cyan-50',
+    hoverBg: 'group-hover:bg-cyan-100'
+  },
+  {
+    id: 'smart-search',
+    name: 'Smart Search',
+    description: 'AI-powered intent detection',
+    icon: 'fas fa-search',
+    category: 'search',
+    color: 'text-orange-500',
+    bgColor: 'bg-orange-50',
+    hoverBg: 'group-hover:bg-orange-100'
+  }
+]
+
+const sidebarCategories = {
+  analysis: { label: 'Analysis', icon: 'fas fa-chart-bar', iconColor: 'text-blue-400' },
+  content: { label: 'Content', icon: 'fas fa-file-alt', iconColor: 'text-teal-400' },
+  extraction: { label: 'Extraction', icon: 'fas fa-magic', iconColor: 'text-amber-400' },
+  search: { label: 'Search & Discovery', icon: 'fas fa-compass', iconColor: 'text-orange-400' }
+}
+
+// Filter tools based on search query
+const filteredSidebarTools = computed(() => {
+  if (!toolsSearchQuery.value) return sidebarTools
+
+  const query = toolsSearchQuery.value.toLowerCase()
+  return sidebarTools.filter(tool =>
+    tool.name.toLowerCase().includes(query) ||
+    tool.description.toLowerCase().includes(query) ||
+    tool.category.toLowerCase().includes(query)
+  )
+})
+
+// Group tools by category
+const groupedSidebarTools = computed(() => {
+  const groups: Record<string, SidebarTool[]> = {}
+
+  for (const tool of filteredSidebarTools.value) {
+    if (!groups[tool.category]) {
+      groups[tool.category] = []
+    }
+    groups[tool.category].push(tool)
+  }
+
+  return groups
+})
+
 // Current AI Operation
 const currentOperation = ref<{
   type: AIOperationType
@@ -1881,251 +2039,74 @@ function handleEntityClick(entity: { text: string; type: string }) {
 
           <!-- Tools List -->
           <div class="flex-1 overflow-y-auto p-3">
-            <!-- Analysis Category -->
-            <div class="mb-4">
-              <h4 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 px-2 flex items-center gap-2">
-                <i class="fas fa-chart-bar text-blue-400"></i>
-                Analysis
-              </h4>
-              <div class="space-y-1">
-                <button
-                  @click="selectToolFromSidebar({ id: 'extract-entities', name: 'Entity Recognition' })"
-                  class="w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-teal-50/50 transition-colors group"
-                >
-                  <div class="w-9 h-9 rounded-lg bg-blue-50 text-blue-500 flex items-center justify-center group-hover:bg-blue-100">
-                    <i class="fas fa-tags"></i>
-                  </div>
-                  <div class="flex-1 text-left">
-                    <p class="text-sm font-medium text-gray-700">Entity Recognition</p>
-                    <p class="text-xs text-gray-400">Extract people, places, dates</p>
-                  </div>
-                </button>
-                <button
-                  @click="selectToolFromSidebar({ id: 'analyze-sentiment', name: 'Sentiment Analysis' })"
-                  class="w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-teal-50/50 transition-colors group"
-                >
-                  <div class="w-9 h-9 rounded-lg bg-pink-50 text-pink-500 flex items-center justify-center group-hover:bg-pink-100">
-                    <i class="fas fa-smile"></i>
-                  </div>
-                  <div class="flex-1 text-left">
-                    <p class="text-sm font-medium text-gray-700">Sentiment Analysis</p>
-                    <p class="text-xs text-gray-400">Analyze emotional tone</p>
-                  </div>
-                </button>
-                <button
-                  @click="selectToolFromSidebar({ id: 'classify', name: 'Classify Content' })"
-                  class="w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-teal-50/50 transition-colors group"
-                >
-                  <div class="w-9 h-9 rounded-lg bg-purple-50 text-purple-500 flex items-center justify-center group-hover:bg-purple-100">
-                    <i class="fas fa-folder-tree"></i>
-                  </div>
-                  <div class="flex-1 text-left">
-                    <p class="text-sm font-medium text-gray-700">Classify Content</p>
-                    <p class="text-xs text-gray-400">Categorize with confidence</p>
-                  </div>
-                </button>
-              </div>
-            </div>
+            <!-- Dynamic Categories -->
+            <template v-for="(categoryKey) in Object.keys(sidebarCategories)" :key="categoryKey">
+              <div v-if="groupedSidebarTools[categoryKey]?.length" class="mb-4">
+                <h4 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 px-2 flex items-center gap-2">
+                  <i :class="[sidebarCategories[categoryKey as keyof typeof sidebarCategories].icon, sidebarCategories[categoryKey as keyof typeof sidebarCategories].iconColor]"></i>
+                  {{ sidebarCategories[categoryKey as keyof typeof sidebarCategories].label }}
+                </h4>
+                <div class="space-y-1">
+                  <template v-for="tool in groupedSidebarTools[categoryKey]" :key="tool.id">
+                    <!-- Tool with options -->
+                    <div v-if="tool.options" class="rounded-xl overflow-hidden">
+                      <div :class="['flex items-center gap-3 p-2.5', tool.bgColor + '/30']">
+                        <div :class="['w-9 h-9 rounded-lg flex items-center justify-center', tool.bgColor, tool.color]">
+                          <i :class="tool.icon"></i>
+                        </div>
+                        <div class="flex-1 text-left">
+                          <p class="text-sm font-medium text-gray-700">{{ tool.name }}</p>
+                          <p class="text-xs text-gray-400">{{ tool.description }}</p>
+                        </div>
+                      </div>
+                      <div :class="[
+                        'gap-1 px-2 pb-2 pt-1',
+                        tool.bgColor + '/30',
+                        tool.id === 'translate' ? 'grid grid-cols-3' : tool.id === 'generate-title' ? 'grid grid-cols-2' : 'flex'
+                      ]">
+                        <button
+                          v-for="option in tool.options"
+                          :key="option.value"
+                          @click="selectToolFromSidebar({ id: tool.id, name: tool.name }, option.value)"
+                          :class="[
+                            'px-2 py-1.5 text-xs font-medium bg-white text-gray-600 rounded-lg transition-colors flex items-center justify-center gap-1',
+                            tool.hoverBg,
+                            tool.id !== 'translate' && tool.id !== 'generate-title' ? 'flex-1' : ''
+                          ]"
+                        >
+                          <span v-if="!option.icon.startsWith('fas')">{{ option.icon }}</span>
+                          <i v-else :class="[option.icon, 'text-[10px]']"></i>
+                          {{ option.label }}
+                        </button>
+                      </div>
+                    </div>
 
-            <!-- Content Category -->
-            <div class="mb-4">
-              <h4 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 px-2 flex items-center gap-2">
-                <i class="fas fa-file-alt text-teal-400"></i>
-                Content
-              </h4>
-              <div class="space-y-1">
-                <!-- Summarize with options -->
-                <div class="rounded-xl overflow-hidden">
-                  <div class="flex items-center gap-3 p-2.5 bg-teal-50/30">
-                    <div class="w-9 h-9 rounded-lg bg-teal-50 text-teal-500 flex items-center justify-center">
-                      <i class="fas fa-compress-alt"></i>
-                    </div>
-                    <div class="flex-1 text-left">
-                      <p class="text-sm font-medium text-gray-700">Summarize</p>
-                      <p class="text-xs text-gray-400">Choose a style</p>
-                    </div>
-                  </div>
-                  <div class="flex gap-1 px-2 pb-2 pt-1 bg-teal-50/30">
+                    <!-- Tool without options -->
                     <button
-                      @click="selectToolFromSidebar({ id: 'summarize', name: 'Summarize' }, 'brief')"
-                      class="flex-1 px-2 py-1.5 text-xs font-medium bg-white hover:bg-teal-100 text-gray-600 hover:text-teal-700 rounded-lg transition-colors flex items-center justify-center gap-1"
+                      v-else
+                      @click="selectToolFromSidebar({ id: tool.id, name: tool.name })"
+                      class="w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-teal-50/50 transition-colors group"
                     >
-                      <i class="fas fa-minus text-[10px]"></i>
-                      Brief
+                      <div :class="['w-9 h-9 rounded-lg flex items-center justify-center', tool.bgColor, tool.color, tool.hoverBg]">
+                        <i :class="tool.icon"></i>
+                      </div>
+                      <div class="flex-1 text-left">
+                        <p class="text-sm font-medium text-gray-700">{{ tool.name }}</p>
+                        <p class="text-xs text-gray-400">{{ tool.description }}</p>
+                      </div>
                     </button>
-                    <button
-                      @click="selectToolFromSidebar({ id: 'summarize', name: 'Summarize' }, 'detailed')"
-                      class="flex-1 px-2 py-1.5 text-xs font-medium bg-white hover:bg-teal-100 text-gray-600 hover:text-teal-700 rounded-lg transition-colors flex items-center justify-center gap-1"
-                    >
-                      <i class="fas fa-align-left text-[10px]"></i>
-                      Detailed
-                    </button>
-                    <button
-                      @click="selectToolFromSidebar({ id: 'summarize', name: 'Summarize' }, 'bullet')"
-                      class="flex-1 px-2 py-1.5 text-xs font-medium bg-white hover:bg-teal-100 text-gray-600 hover:text-teal-700 rounded-lg transition-colors flex items-center justify-center gap-1"
-                    >
-                      <i class="fas fa-list-ul text-[10px]"></i>
-                      Bullets
-                    </button>
-                  </div>
-                </div>
-
-                <!-- Translate with options -->
-                <div class="rounded-xl overflow-hidden">
-                  <div class="flex items-center gap-3 p-2.5 bg-green-50/30">
-                    <div class="w-9 h-9 rounded-lg bg-green-50 text-green-500 flex items-center justify-center">
-                      <i class="fas fa-language"></i>
-                    </div>
-                    <div class="flex-1 text-left">
-                      <p class="text-sm font-medium text-gray-700">Translate</p>
-                      <p class="text-xs text-gray-400">Select target language</p>
-                    </div>
-                  </div>
-                  <div class="grid grid-cols-3 gap-1 px-2 pb-2 pt-1 bg-green-50/30">
-                    <button
-                      @click="selectToolFromSidebar({ id: 'translate', name: 'Translate' }, 'ar')"
-                      class="px-2 py-1.5 text-xs font-medium bg-white hover:bg-green-100 text-gray-600 hover:text-green-700 rounded-lg transition-colors flex items-center justify-center gap-1"
-                    >
-                      <span>🇸🇦</span>
-                      Arabic
-                    </button>
-                    <button
-                      @click="selectToolFromSidebar({ id: 'translate', name: 'Translate' }, 'en')"
-                      class="px-2 py-1.5 text-xs font-medium bg-white hover:bg-green-100 text-gray-600 hover:text-green-700 rounded-lg transition-colors flex items-center justify-center gap-1"
-                    >
-                      <span>🇺🇸</span>
-                      English
-                    </button>
-                    <button
-                      @click="selectToolFromSidebar({ id: 'translate', name: 'Translate' }, 'fr')"
-                      class="px-2 py-1.5 text-xs font-medium bg-white hover:bg-green-100 text-gray-600 hover:text-green-700 rounded-lg transition-colors flex items-center justify-center gap-1"
-                    >
-                      <span>🇫🇷</span>
-                      French
-                    </button>
-                    <button
-                      @click="selectToolFromSidebar({ id: 'translate', name: 'Translate' }, 'es')"
-                      class="px-2 py-1.5 text-xs font-medium bg-white hover:bg-green-100 text-gray-600 hover:text-green-700 rounded-lg transition-colors flex items-center justify-center gap-1"
-                    >
-                      <span>🇪🇸</span>
-                      Spanish
-                    </button>
-                    <button
-                      @click="selectToolFromSidebar({ id: 'translate', name: 'Translate' }, 'de')"
-                      class="px-2 py-1.5 text-xs font-medium bg-white hover:bg-green-100 text-gray-600 hover:text-green-700 rounded-lg transition-colors flex items-center justify-center gap-1"
-                    >
-                      <span>🇩🇪</span>
-                      German
-                    </button>
-                    <button
-                      @click="selectToolFromSidebar({ id: 'translate', name: 'Translate' }, 'zh')"
-                      class="px-2 py-1.5 text-xs font-medium bg-white hover:bg-green-100 text-gray-600 hover:text-green-700 rounded-lg transition-colors flex items-center justify-center gap-1"
-                    >
-                      <span>🇨🇳</span>
-                      Chinese
-                    </button>
-                  </div>
-                </div>
-
-                <!-- Generate Titles with options -->
-                <div class="rounded-xl overflow-hidden">
-                  <div class="flex items-center gap-3 p-2.5 bg-indigo-50/30">
-                    <div class="w-9 h-9 rounded-lg bg-indigo-50 text-indigo-500 flex items-center justify-center">
-                      <i class="fas fa-heading"></i>
-                    </div>
-                    <div class="flex-1 text-left">
-                      <p class="text-sm font-medium text-gray-700">Generate Titles</p>
-                      <p class="text-xs text-gray-400">Choose title style</p>
-                    </div>
-                  </div>
-                  <div class="grid grid-cols-2 gap-1 px-2 pb-2 pt-1 bg-indigo-50/30">
-                    <button
-                      @click="selectToolFromSidebar({ id: 'generate-title', name: 'Generate Titles' }, 'formal')"
-                      class="px-2 py-1.5 text-xs font-medium bg-white hover:bg-indigo-100 text-gray-600 hover:text-indigo-700 rounded-lg transition-colors flex items-center justify-center gap-1"
-                    >
-                      <i class="fas fa-briefcase text-[10px]"></i>
-                      Formal
-                    </button>
-                    <button
-                      @click="selectToolFromSidebar({ id: 'generate-title', name: 'Generate Titles' }, 'casual')"
-                      class="px-2 py-1.5 text-xs font-medium bg-white hover:bg-indigo-100 text-gray-600 hover:text-indigo-700 rounded-lg transition-colors flex items-center justify-center gap-1"
-                    >
-                      <i class="fas fa-smile text-[10px]"></i>
-                      Casual
-                    </button>
-                    <button
-                      @click="selectToolFromSidebar({ id: 'generate-title', name: 'Generate Titles' }, 'seo')"
-                      class="px-2 py-1.5 text-xs font-medium bg-white hover:bg-indigo-100 text-gray-600 hover:text-indigo-700 rounded-lg transition-colors flex items-center justify-center gap-1"
-                    >
-                      <i class="fas fa-search text-[10px]"></i>
-                      SEO
-                    </button>
-                    <button
-                      @click="selectToolFromSidebar({ id: 'generate-title', name: 'Generate Titles' }, 'creative')"
-                      class="px-2 py-1.5 text-xs font-medium bg-white hover:bg-indigo-100 text-gray-600 hover:text-indigo-700 rounded-lg transition-colors flex items-center justify-center gap-1"
-                    >
-                      <i class="fas fa-lightbulb text-[10px]"></i>
-                      Creative
-                    </button>
-                  </div>
+                  </template>
                 </div>
               </div>
-            </div>
+            </template>
 
-            <!-- Extraction Category -->
-            <div class="mb-4">
-              <h4 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 px-2 flex items-center gap-2">
-                <i class="fas fa-magic text-amber-400"></i>
-                Extraction
-              </h4>
-              <div class="space-y-1">
-                <button
-                  @click="selectToolFromSidebar({ id: 'ocr', name: 'OCR - Extract Text' })"
-                  class="w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-teal-50/50 transition-colors group"
-                >
-                  <div class="w-9 h-9 rounded-lg bg-amber-50 text-amber-500 flex items-center justify-center group-hover:bg-amber-100">
-                    <i class="fas fa-file-image"></i>
-                  </div>
-                  <div class="flex-1 text-left">
-                    <p class="text-sm font-medium text-gray-700">OCR - Extract Text</p>
-                    <p class="text-xs text-gray-400">Extract text from images</p>
-                  </div>
-                </button>
-                <button
-                  @click="selectToolFromSidebar({ id: 'auto-tag', name: 'Auto-Tag' })"
-                  class="w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-teal-50/50 transition-colors group"
-                >
-                  <div class="w-9 h-9 rounded-lg bg-cyan-50 text-cyan-500 flex items-center justify-center group-hover:bg-cyan-100">
-                    <i class="fas fa-hashtag"></i>
-                  </div>
-                  <div class="flex-1 text-left">
-                    <p class="text-sm font-medium text-gray-700">Auto-Tag</p>
-                    <p class="text-xs text-gray-400">Generate relevant tags</p>
-                  </div>
-                </button>
+            <!-- No Results -->
+            <div v-if="filteredSidebarTools.length === 0" class="py-8 text-center">
+              <div class="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-3">
+                <i class="fas fa-search text-gray-400"></i>
               </div>
-            </div>
-
-            <!-- Search Category -->
-            <div class="mb-4">
-              <h4 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 px-2 flex items-center gap-2">
-                <i class="fas fa-compass text-orange-400"></i>
-                Search & Discovery
-              </h4>
-              <div class="space-y-1">
-                <button
-                  @click="selectToolFromSidebar({ id: 'smart-search', name: 'Smart Search' })"
-                  class="w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-teal-50/50 transition-colors group"
-                >
-                  <div class="w-9 h-9 rounded-lg bg-orange-50 text-orange-500 flex items-center justify-center group-hover:bg-orange-100">
-                    <i class="fas fa-search"></i>
-                  </div>
-                  <div class="flex-1 text-left">
-                    <p class="text-sm font-medium text-gray-700">Smart Search</p>
-                    <p class="text-xs text-gray-400">AI-powered intent detection</p>
-                  </div>
-                </button>
-              </div>
+              <p class="text-sm text-gray-500">No tools found</p>
+              <p class="text-xs text-gray-400 mt-1">Try a different search term</p>
             </div>
           </div>
 
