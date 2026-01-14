@@ -277,10 +277,21 @@ function getInitialsColor(initials: string): string {
         <img :src="event.coverImage" :alt="event.title" class="w-full h-full object-cover">
         <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
 
-        <!-- Back Button -->
-        <button @click="goBack" class="absolute top-4 left-4 px-4 py-2 bg-white/20 backdrop-blur-sm text-white rounded-lg hover:bg-white/30 transition-colors">
-          <i class="fas fa-arrow-left mr-2"></i>Back to Events
-        </button>
+        <!-- Navigation Row -->
+        <div class="header-nav">
+          <button @click="goBack" class="back-btn">
+            <i class="fas fa-arrow-left"></i>
+            <span>Back</span>
+          </button>
+          <div class="breadcrumb">
+            <router-link to="/events" class="breadcrumb-link">
+              <i class="fas fa-calendar-alt"></i>
+              Events
+            </router-link>
+            <i class="fas fa-chevron-right breadcrumb-sep"></i>
+            <span class="breadcrumb-current">{{ event.title }}</span>
+          </div>
+        </div>
 
         <!-- Date Badge -->
         <div class="absolute top-4 right-4 bg-white rounded-xl shadow-lg p-3 text-center min-w-[80px]">
@@ -647,5 +658,71 @@ function getInitialsColor(initials: string): string {
 
 .prose p {
   margin-bottom: 1rem;
+}
+
+/* Navigation */
+.header-nav {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  z-index: 10;
+}
+
+.back-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 0.75rem;
+  color: white;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  transition: all 0.2s ease;
+}
+
+.back-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateX(-2px);
+}
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.breadcrumb-link {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.breadcrumb-link:hover {
+  color: white;
+}
+
+.breadcrumb-sep {
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 0.625rem;
+}
+
+.breadcrumb-current {
+  color: white;
+  font-weight: 500;
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 </style>
