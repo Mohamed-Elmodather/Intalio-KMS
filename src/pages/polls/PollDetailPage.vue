@@ -4,7 +4,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useComments } from '@/composables/useComments'
 import { useRelatedContent } from '@/composables/useRelatedContent'
 import { useSharing } from '@/composables/useSharing'
-import { CommentsSection, SocialShareButtons, RelatedContentCarousel, AuthorCard, BookmarkButton } from '@/components/common'
+import { CommentsSection, SocialShareButtons, RelatedContentCarousel, AuthorCard, BookmarkButton, AddToCollectionModal } from '@/components/common'
 import type { Author } from '@/types/detail-pages'
 
 // Text constants for localization
@@ -71,6 +71,11 @@ const textConstants = {
   // Tags
   tags: 'Tags',
 
+  // Header Actions
+  download: 'Export',
+  collection: 'Collection',
+  share: 'Share',
+
   // Share
   sharePoll: 'Share this Poll',
   copyLink: 'Copy Link',
@@ -135,6 +140,7 @@ const isVoting = ref(false)
 const selectedOption = ref<string | null>(null)
 const showShareModal = ref(false)
 const showAnalytics = ref(false)
+const showAddToCollection = ref(false)
 
 // Comments
 const {
@@ -362,6 +368,44 @@ function goBack() {
   router.back()
 }
 
+function exportPoll() {
+  if (!poll.value) return
+
+  // Create CSV content for poll results
+  const headers = ['Option', 'Votes', 'Percentage']
+  const rows = poll.value.options.map(opt => [opt.text, opt.votes, `${opt.percentage}%`])
+
+  const csvContent = [
+    `Poll: ${poll.value.question}`,
+    `Total Votes: ${poll.value.totalVotes}`,
+    `Status: ${poll.value.status}`,
+    '',
+    headers.join(','),
+    ...rows.map(row => row.join(','))
+  ].join('\n')
+
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+  const link = document.createElement('a')
+  link.href = URL.createObjectURL(blob)
+  link.download = `poll-${poll.value.id}-results.csv`
+  link.click()
+  URL.revokeObjectURL(link.href)
+}
+
+function sharePoll() {
+  if (!poll.value) return
+  if (navigator.share) {
+    navigator.share({
+      title: poll.value.question,
+      text: poll.value.description,
+      url: window.location.href
+    })
+  } else {
+    navigator.clipboard.writeText(window.location.href)
+    alert(textConstants.linkCopied)
+  }
+}
+
 // Initialize
 onMounted(() => {
   loadPoll()
@@ -465,22 +509,37 @@ watch(() => route.params.id, () => {
 
             <!-- Header Actions -->
             <div class="header-actions">
+              <button
+                @click="exportPoll"
+                class="px-4 py-2 bg-transparent text-white border border-white/30 rounded-xl font-medium hover:bg-white/10 transition-all flex items-center gap-2"
+                title="Export Poll Results"
+              >
+                <i class="fas fa-download"></i>
+                <span class="hidden sm:inline">{{ textConstants.download }}</span>
+              </button>
+              <button
+                @click="showAddToCollection = true"
+                class="px-4 py-2 bg-transparent text-white border border-white/30 rounded-xl font-medium hover:bg-white/10 transition-all flex items-center gap-2"
+                title="Add to Collection"
+              >
+                <i class="fas fa-folder-plus"></i>
+                <span class="hidden sm:inline">{{ textConstants.collection }}</span>
+              </button>
+              <button
+                @click="sharePoll"
+                class="px-4 py-2 bg-transparent text-white border border-white/30 rounded-xl font-medium hover:bg-white/10 transition-all flex items-center gap-2"
+                title="Share Poll"
+              >
+                <i class="fas fa-share-alt"></i>
+                <span class="hidden sm:inline">{{ textConstants.share }}</span>
+              </button>
               <BookmarkButton
                 :content-id="poll.id"
                 content-type="poll"
-                size="sm"
-                class="action-btn"
+                size="md"
+                variant="icon"
+                class="text-white"
               />
-              <button
-                @click="showShareModal = true"
-                class="action-btn"
-                title="Share"
-              >
-                <i class="fas fa-share-alt"></i>
-              </button>
-              <button class="action-btn" title="More options">
-                <i class="fas fa-ellipsis-v"></i>
-              </button>
             </div>
           </div>
         </div>
@@ -858,6 +917,16 @@ watch(() => route.params.id, () => {
         </div>
       </div>
     </Teleport>
+
+    <!-- Add to Collection Modal -->
+    <AddToCollectionModal
+      v-if="poll"
+      :show="showAddToCollection"
+      :content-id="poll.id"
+      content-type="poll"
+      :content-title="poll.question"
+      @close="showAddToCollection = false"
+    />
   </div>
 </template>
 
@@ -1145,26 +1214,9 @@ watch(() => route.params.id, () => {
 /* Header Actions */
 .header-actions {
   display: flex;
-  gap: 0.5rem;
-}
-
-.action-btn {
-  width: 40px;
-  height: 40px;
-  display: flex;
   align-items: center;
-  justify-content: center;
-  background: rgba(255, 255, 255, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 0.75rem;
-  color: white;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.action-btn:hover {
-  background: rgba(255, 255, 255, 0.25);
-  transform: translateY(-2px);
+  gap: 0.75rem;
+  flex-shrink: 0;
 }
 
 /* Poll Options Animation */
@@ -1220,9 +1272,9 @@ watch(() => route.params.id, () => {
   }
 
   .header-actions {
-    position: absolute;
-    top: 1rem;
-    right: 1.5rem;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    margin-top: 1rem;
   }
 
   .poll-title {

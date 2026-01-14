@@ -12,7 +12,7 @@ interface Collection {
 
 interface Props {
   show: boolean
-  contentType: 'article' | 'document' | 'media'
+  contentType: 'article' | 'document' | 'media' | 'poll'
   contentId: string | number
   contentTitle: string
   contentThumbnail?: string
