@@ -5,6 +5,7 @@ import { useAIServicesStore } from '@/stores/aiServices'
 import { useComparisonStore } from '@/stores/comparison'
 import { useAIWorkflowsStore } from '@/stores/aiWorkflows'
 import { useAIPreferencesStore } from '@/stores/aiPreferences'
+import { useUIStore } from '@/stores/ui'
 import {
   AILoadingIndicator,
   AIMessageContent,
@@ -23,6 +24,10 @@ const aiStore = useAIServicesStore()
 const comparisonStore = useComparisonStore()
 const workflowsStore = useAIWorkflowsStore()
 const preferencesStore = useAIPreferencesStore()
+const uiStore = useUIStore()
+
+// Sidebar state from main layout
+const isSidebarCollapsed = computed(() => uiStore.sidebarCollapsed)
 
 // Keyboard shortcuts
 function handleKeyboard(e: KeyboardEvent) {
@@ -1163,16 +1168,16 @@ function handleEntityClick(entity: { text: string; type: string }) {
 </script>
 
 <template>
-  <div class="flex min-h-[calc(100vh-80px)]">
+  <div class="fixed right-0 bottom-0 top-[64px] flex overflow-hidden bg-gradient-to-br from-teal-50/30 via-white to-emerald-50/20 transition-all duration-300" :class="isSidebarCollapsed ? 'left-20' : 'left-64'">
     <!-- Conversation History Sidebar -->
     <aside
       :class="[
-        'border-r border-teal-100 bg-white/50 flex-shrink-0 flex flex-col h-[calc(100vh-80px)] card-animated fade-in-up transition-all duration-300',
+        'border-r border-teal-100 bg-white flex-shrink-0 flex flex-col h-full transition-all duration-300',
         isHistorySidebarCollapsed ? 'w-16' : 'w-80'
       ]"
     >
       <!-- Collapse Toggle Button -->
-      <div class="p-2 border-b border-teal-100 flex items-center" :class="isHistorySidebarCollapsed ? 'justify-center' : 'justify-between'">
+      <div class="p-3 border-b border-teal-100 flex items-center" :class="isHistorySidebarCollapsed ? 'justify-center' : 'justify-between'">
         <span v-if="!isHistorySidebarCollapsed" class="text-sm font-semibold text-teal-700 px-2">History</span>
         <button
           @click="isHistorySidebarCollapsed = !isHistorySidebarCollapsed"
@@ -1309,9 +1314,9 @@ function handleEntityClick(entity: { text: string; type: string }) {
     </aside>
 
     <!-- Main Chat Area -->
-    <div class="flex-1 flex flex-col h-[calc(100vh-80px)]">
+    <div class="flex-1 flex flex-col h-full overflow-hidden">
       <!-- Chat Header -->
-      <div class="p-4 border-b border-teal-100 bg-white/50 flex items-center justify-between card-animated fade-in-up">
+      <div class="flex-shrink-0 p-4 border-b border-teal-100 bg-white/80 backdrop-blur-sm flex items-center justify-between">
         <div class="flex items-center gap-3">
           <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center ai-glow">
             <i class="fas fa-robot text-white text-lg icon-vibrant"></i>
@@ -1366,7 +1371,7 @@ function handleEntityClick(entity: { text: string; type: string }) {
       </div>
 
       <!-- Messages Area -->
-      <div class="flex-1 overflow-y-auto p-6 scrollbar-thin">
+      <div class="flex-1 min-h-0 overflow-y-auto p-6 scrollbar-thin">
         <!-- Welcome State -->
         <div v-if="messages.length === 0" class="h-full flex flex-col items-center justify-center text-center fade-in-up">
           <div class="w-20 h-20 rounded-2xl bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center mb-10 shadow-xl ai-glow">
@@ -1491,7 +1496,7 @@ function handleEntityClick(entity: { text: string; type: string }) {
       </div>
 
       <!-- Input Area -->
-      <div class="p-4 border-t border-teal-100 bg-white/50 card-animated">
+      <div class="flex-shrink-0 p-4 border-t border-teal-100 bg-white/80 backdrop-blur-sm">
         <div class="max-w-4xl mx-auto">
           <!-- Current Operation Progress -->
           <Transition name="fade">
