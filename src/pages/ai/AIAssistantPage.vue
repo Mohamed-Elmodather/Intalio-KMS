@@ -1533,54 +1533,145 @@ function handleEntityClick(entity: { text: string; type: string }) {
       </div>
     </div>
 
-    <!-- Settings Modal -->
-    <div v-if="showSettings" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div class="glass-card rounded-2xl w-full max-w-md card-animated fade-in-up">
-        <div class="p-5 border-b border-teal-100 flex items-center justify-between">
-          <h2 class="text-xl font-semibold text-teal-900">AI Settings</h2>
-          <button @click="showSettings = false" class="p-2 rounded-lg hover:bg-teal-100 text-teal-500 ripple">
-            <i class="fas fa-times icon-soft"></i>
-          </button>
+    <!-- Settings Sidebar -->
+    <Teleport to="body">
+      <!-- Backdrop -->
+      <Transition name="fade">
+        <div
+          v-if="showSettings"
+          class="fixed inset-0 bg-black/30 z-40"
+          @click="showSettings = false"
+        ></div>
+      </Transition>
+
+      <!-- Sidebar Panel -->
+      <Transition name="slide-right">
+        <div v-if="showSettings" class="fixed right-0 top-0 h-full w-80 bg-gradient-to-b from-gray-50 to-white shadow-2xl z-50 flex flex-col border-l border-gray-200">
+          <!-- Header -->
+          <div class="p-4 bg-gradient-to-b from-white to-gray-50/80 border-b border-gray-100">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl bg-teal-50 flex items-center justify-center">
+                  <i class="fas fa-cog text-teal-500"></i>
+                </div>
+                <div>
+                  <h3 class="font-semibold text-gray-800">AI Settings</h3>
+                  <p class="text-xs text-gray-400">Customize AI behavior</p>
+                </div>
+              </div>
+              <button @click="showSettings = false" class="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-400 hover:text-gray-600" title="Close">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Settings Content -->
+          <div class="flex-1 overflow-y-auto p-4 space-y-5">
+            <!-- Response Style -->
+            <div class="bg-white rounded-xl p-4 border border-gray-100">
+              <div class="flex items-center gap-2 mb-3">
+                <i class="fas fa-comment-alt text-teal-500"></i>
+                <label class="text-sm font-medium text-gray-700">Response Style</label>
+              </div>
+              <div class="space-y-2">
+                <label class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors">
+                  <input type="radio" v-model="settings.style" value="concise" class="w-4 h-4 text-teal-500">
+                  <div>
+                    <p class="text-sm font-medium text-gray-700">Concise</p>
+                    <p class="text-xs text-gray-400">Brief, to-the-point responses</p>
+                  </div>
+                </label>
+                <label class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors">
+                  <input type="radio" v-model="settings.style" value="detailed" class="w-4 h-4 text-teal-500">
+                  <div>
+                    <p class="text-sm font-medium text-gray-700">Detailed</p>
+                    <p class="text-xs text-gray-400">Comprehensive explanations</p>
+                  </div>
+                </label>
+                <label class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors">
+                  <input type="radio" v-model="settings.style" value="conversational" class="w-4 h-4 text-teal-500">
+                  <div>
+                    <p class="text-sm font-medium text-gray-700">Conversational</p>
+                    <p class="text-xs text-gray-400">Friendly, natural dialogue</p>
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            <!-- Language -->
+            <div class="bg-white rounded-xl p-4 border border-gray-100">
+              <div class="flex items-center gap-2 mb-3">
+                <i class="fas fa-globe text-green-500"></i>
+                <label class="text-sm font-medium text-gray-700">Language</label>
+              </div>
+              <div class="grid grid-cols-2 gap-2">
+                <label class="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors border" :class="settings.language === 'en' ? 'border-teal-300 bg-teal-50' : 'border-transparent'">
+                  <input type="radio" v-model="settings.language" value="en" class="hidden">
+                  <span>🇺🇸</span>
+                  <span class="text-sm text-gray-700">English</span>
+                </label>
+                <label class="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors border" :class="settings.language === 'ar' ? 'border-teal-300 bg-teal-50' : 'border-transparent'">
+                  <input type="radio" v-model="settings.language" value="ar" class="hidden">
+                  <span>🇸🇦</span>
+                  <span class="text-sm text-gray-700">Arabic</span>
+                </label>
+                <label class="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors border" :class="settings.language === 'fr' ? 'border-teal-300 bg-teal-50' : 'border-transparent'">
+                  <input type="radio" v-model="settings.language" value="fr" class="hidden">
+                  <span>🇫🇷</span>
+                  <span class="text-sm text-gray-700">French</span>
+                </label>
+                <label class="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors border" :class="settings.language === 'es' ? 'border-teal-300 bg-teal-50' : 'border-transparent'">
+                  <input type="radio" v-model="settings.language" value="es" class="hidden">
+                  <span>🇪🇸</span>
+                  <span class="text-sm text-gray-700">Spanish</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Toggles -->
+            <div class="bg-white rounded-xl p-4 border border-gray-100 space-y-4">
+              <div class="flex items-center gap-2 mb-1">
+                <i class="fas fa-sliders-h text-purple-500"></i>
+                <span class="text-sm font-medium text-gray-700">Preferences</span>
+              </div>
+
+              <div class="flex items-center justify-between py-2">
+                <div class="flex items-center gap-2">
+                  <i class="fas fa-link text-gray-400 text-sm"></i>
+                  <span class="text-sm text-gray-700">Include source references</span>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                  <input type="checkbox" v-model="settings.showSources" class="sr-only peer">
+                  <div class="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-teal-500"></div>
+                </label>
+              </div>
+
+              <div class="flex items-center justify-between py-2">
+                <div class="flex items-center gap-2">
+                  <i class="fas fa-history text-gray-400 text-sm"></i>
+                  <span class="text-sm text-gray-700">Save conversation history</span>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                  <input type="checkbox" v-model="settings.saveHistory" class="sr-only peer">
+                  <div class="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-teal-500"></div>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Footer -->
+          <div class="p-4 border-t border-gray-100 bg-white">
+            <button
+              @click="saveSettings"
+              class="w-full py-2.5 bg-teal-500 hover:bg-teal-600 text-white font-medium rounded-xl transition-colors flex items-center justify-center gap-2"
+            >
+              <i class="fas fa-check"></i>
+              Save Settings
+            </button>
+          </div>
         </div>
-        <div class="p-6 space-y-5">
-          <div>
-            <label class="block text-sm font-medium text-teal-700 mb-2">Response Style</label>
-            <select v-model="settings.style" class="input">
-              <option value="concise">Concise</option>
-              <option value="detailed">Detailed</option>
-              <option value="conversational">Conversational</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-teal-700 mb-2">Language</label>
-            <select v-model="settings.language" class="input">
-              <option value="en">English</option>
-              <option value="ar">Arabic</option>
-              <option value="fr">French</option>
-              <option value="es">Spanish</option>
-            </select>
-          </div>
-          <div class="flex items-center justify-between">
-            <span class="text-sm text-teal-700">Include source references</span>
-            <label class="toggle">
-              <input type="checkbox" v-model="settings.showSources">
-              <span class="toggle-slider"></span>
-            </label>
-          </div>
-          <div class="flex items-center justify-between">
-            <span class="text-sm text-teal-700">Save conversation history</span>
-            <label class="toggle">
-              <input type="checkbox" v-model="settings.saveHistory">
-              <span class="toggle-slider"></span>
-            </label>
-          </div>
-        </div>
-        <div class="p-5 border-t border-teal-100 flex justify-end gap-3">
-          <button @click="showSettings = false" class="btn btn-secondary ripple">Cancel</button>
-          <button @click="saveSettings" class="btn btn-vibrant ripple">Save Settings</button>
-        </div>
-      </div>
-    </div>
+      </Transition>
+    </Teleport>
 
     <!-- Context Panel (Sidebar) -->
     <Teleport to="body">
