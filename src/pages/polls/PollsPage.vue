@@ -11,6 +11,153 @@ const router = useRouter()
 // Initialize AI store
 const aiStore = useAIServicesStore()
 
+// ============================================================================
+// Configurable Text Constants
+// ============================================================================
+const textConstants = {
+  // Hero Section
+  appBadge: 'AFC Asian Cup 2027',
+  pageTitle: 'Polls & Surveys',
+  pageDescription: 'Gather feedback and insights from your team. Create polls, collect responses, and analyze results.',
+  createNewPoll: 'Create New Poll',
+  quickPoll: 'Quick Poll',
+  aiInsights: 'AI Insights',
+  patternAnalysis: 'Pattern Analysis',
+
+  // Stats Labels
+  activePolls: 'Active Polls',
+  responsesLabel: 'Responses',
+  createdLabel: 'Created',
+  participationLabel: 'Participation',
+
+  // Tabs
+  tabActive: 'Active',
+  tabMyPolls: 'My Polls',
+  tabCompleted: 'Completed',
+
+  // Categories
+  categoryAll: 'All Polls',
+  categoryHR: 'HR & Culture',
+  categoryProduct: 'Product',
+  categoryTeam: 'Team',
+  categoryFeedback: 'Feedback',
+  categoryCompany: 'Company',
+
+  // Sort Options
+  sortMostRecent: 'Most Recent',
+  sortMostPopular: 'Most Popular',
+  sortMostVotes: 'Most Votes',
+  sortEndingSoon: 'Ending Soon',
+  sortNameAZ: 'Name (A-Z)',
+  sortBy: 'Sort By',
+
+  // Status Options
+  statusActive: 'Active',
+  statusDraft: 'Draft',
+  statusScheduled: 'Scheduled',
+  statusCompleted: 'Completed',
+
+  // Featured Poll
+  featuredPoll: 'Featured Poll',
+  anonymous: 'Anonymous',
+  live: 'Live',
+  responses: 'responses',
+  daysLeft: 'days left',
+  createdBy: 'created by',
+  castYourVote: 'Cast Your Vote',
+  voted: 'Voted',
+  selectAnOption: 'Select an option',
+  submitVote: 'Submit Vote',
+  voteRecorded: 'Your vote has been recorded',
+
+  // Trending Section
+  trendingNow: 'Trending Now',
+  trendingSubtitle: 'Most popular polls this week',
+  viewAll: 'View All',
+  voteNow: 'Vote Now',
+
+  // All Polls Section
+  allPolls: 'All Polls',
+  polls: 'polls',
+  createPoll: 'Create Poll',
+  searchPolls: 'Search polls...',
+  category: 'Category',
+  categories: 'Categories',
+  status: 'Status',
+  selectCategories: 'Select Categories',
+  filterByStatus: 'Filter by Status',
+  clearAll: 'Clear All',
+  apply: 'Apply',
+  gridView: 'Grid view',
+  listView: 'List view',
+  ascendingOrder: 'Ascending order - Click for descending',
+  descendingOrder: 'Descending order - Click for ascending',
+
+  // Poll Cards
+  by: 'By',
+  leading: 'Leading',
+  vote: 'Vote',
+  results: 'Results',
+
+  // My Polls Section
+  yourPolls: 'Your Polls',
+  filter: 'Filter',
+
+  // Completed Polls
+  completed: 'Completed',
+  ended: 'Ended',
+  winner: 'Winner',
+  totalVotes: 'total votes',
+  analytics: 'Analytics',
+  export: 'Export',
+
+  // Quick Poll Modal
+  quickPollTitle: 'Quick Poll',
+  question: 'Question',
+  questionPlaceholder: 'What would you like to ask?',
+  options: 'Options',
+  optionPlaceholder: 'Option',
+  addOption: 'Add Option',
+  anonymousVoting: 'Anonymous voting',
+  cancel: 'Cancel',
+
+  // AI Insights Modal
+  aiPollInsights: 'AI Poll Insights',
+  smartAnalytics: 'Smart analytics and predictions',
+  analyzingPollData: 'Analyzing poll data...',
+  aiAnalysisComplete: 'AI Analysis Complete',
+  basedOn: 'Based on',
+  responsesAcross: 'responses across',
+  activeLabel: 'active polls',
+  confidence: 'Confidence',
+  refresh: 'Refresh',
+  close: 'Close',
+
+  // Sentiment Analysis Modal
+  sentimentAnalysis: 'Sentiment Analysis',
+  understandVoterSentiment: 'Understand voter sentiment',
+  analyzingSentiment: 'Analyzing sentiment...',
+  sentiment: 'Sentiment',
+  confidenceScore: 'confidence score',
+  optionSentimentBreakdown: 'Option Sentiment Breakdown',
+  summary: 'Summary',
+  recommendations: 'Recommendations',
+
+  // Pattern Analysis Modal
+  responsePatternAnalysis: 'Response Pattern Analysis',
+  analyzingPatterns: 'Analyzing patterns...',
+  detectedPatterns: 'Detected Patterns',
+  keyInsights: 'Key Insights',
+
+  // Loading & Empty States
+  loadingPolls: 'Loading polls...',
+  noPollsFound: 'No polls found',
+  noPollsDescription: 'Create your first poll to get started',
+
+  // Alert Messages
+  pollCreatedSuccess: 'Poll created successfully!'
+}
+
 // State
 const isLoading = ref(false)
 const showQuickPollModal = ref(false)
@@ -28,21 +175,21 @@ const showSortDropdown = ref(false)
 const selectedCategories = ref<string[]>([])
 const selectedStatuses = ref<string[]>([])
 
-// Sort options
+// Sort options - using textConstants
 const sortOptions = [
-  { value: 'recent', label: 'Most Recent', icon: 'fas fa-clock' },
-  { value: 'popular', label: 'Most Popular', icon: 'fas fa-fire' },
-  { value: 'votes', label: 'Most Votes', icon: 'fas fa-users' },
-  { value: 'ending', label: 'Ending Soon', icon: 'fas fa-hourglass-end' },
-  { value: 'name', label: 'Name (A-Z)', icon: 'fas fa-font' }
+  { value: 'recent', label: textConstants.sortMostRecent, icon: 'fas fa-clock' },
+  { value: 'popular', label: textConstants.sortMostPopular, icon: 'fas fa-fire' },
+  { value: 'votes', label: textConstants.sortMostVotes, icon: 'fas fa-users' },
+  { value: 'ending', label: textConstants.sortEndingSoon, icon: 'fas fa-hourglass-end' },
+  { value: 'name', label: textConstants.sortNameAZ, icon: 'fas fa-font' }
 ]
 
-// Status filter options
+// Status filter options - using textConstants
 const statusOptions = [
-  { id: 'active', label: 'Active', icon: 'fas fa-play-circle', color: 'text-green-500' },
-  { id: 'draft', label: 'Draft', icon: 'fas fa-file-alt', color: 'text-gray-500' },
-  { id: 'scheduled', label: 'Scheduled', icon: 'fas fa-calendar-alt', color: 'text-blue-500' },
-  { id: 'completed', label: 'Completed', icon: 'fas fa-check-circle', color: 'text-purple-500' }
+  { id: 'active', label: textConstants.statusActive, icon: 'fas fa-play-circle', color: 'text-green-500' },
+  { id: 'draft', label: textConstants.statusDraft, icon: 'fas fa-file-alt', color: 'text-gray-500' },
+  { id: 'scheduled', label: textConstants.statusScheduled, icon: 'fas fa-calendar-alt', color: 'text-blue-500' },
+  { id: 'completed', label: textConstants.statusCompleted, icon: 'fas fa-check-circle', color: 'text-purple-500' }
 ]
 
 // Interfaces
@@ -122,20 +269,21 @@ const stats = ref({
 })
 
 // Tabs
+// Tabs - using textConstants
 const tabs = ref([
-  { id: 'active', label: 'Active', icon: 'fas fa-play-circle', count: 8 },
-  { id: 'my-polls', label: 'My Polls', icon: 'fas fa-user', count: 12 },
-  { id: 'completed', label: 'Completed', icon: 'fas fa-check-circle', count: 23 }
+  { id: 'active', label: textConstants.tabActive, icon: 'fas fa-play-circle', count: 8 },
+  { id: 'my-polls', label: textConstants.tabMyPolls, icon: 'fas fa-user', count: 12 },
+  { id: 'completed', label: textConstants.tabCompleted, icon: 'fas fa-check-circle', count: 23 }
 ])
 
-// Categories
+// Categories - using textConstants
 const categories = ref([
-  { id: 'all', label: 'All Polls', icon: 'fas fa-th-large', count: 45 },
-  { id: 'hr', label: 'HR & Culture', icon: 'fas fa-users', count: 12 },
-  { id: 'product', label: 'Product', icon: 'fas fa-box', count: 8 },
-  { id: 'team', label: 'Team', icon: 'fas fa-user-friends', count: 10 },
-  { id: 'feedback', label: 'Feedback', icon: 'fas fa-comment-dots', count: 9 },
-  { id: 'company', label: 'Company', icon: 'fas fa-building', count: 6 }
+  { id: 'all', label: textConstants.categoryAll, icon: 'fas fa-th-large', count: 45 },
+  { id: 'hr', label: textConstants.categoryHR, icon: 'fas fa-users', count: 12 },
+  { id: 'product', label: textConstants.categoryProduct, icon: 'fas fa-box', count: 8 },
+  { id: 'team', label: textConstants.categoryTeam, icon: 'fas fa-user-friends', count: 10 },
+  { id: 'feedback', label: textConstants.categoryFeedback, icon: 'fas fa-comment-dots', count: 9 },
+  { id: 'company', label: textConstants.categoryCompany, icon: 'fas fa-building', count: 6 }
 ])
 
 // Featured Poll
@@ -398,7 +546,7 @@ function removeQuickPollOption(idx: number) {
 
 function createQuickPoll() {
   // Simulate poll creation
-  alert('Poll created successfully!')
+  alert(textConstants.pollCreatedSuccess)
   showQuickPollModal.value = false
   quickPoll.value = { question: '', options: ['', ''], anonymous: false }
 }
@@ -694,59 +842,59 @@ function getInsightTypeColor(type: string) {
               <i class="fas fa-poll"></i>
             </div>
             <p class="stat-value-mini">{{ stats.active }}</p>
-            <p class="stat-label-mini">Active Polls</p>
+            <p class="stat-label-mini">{{ textConstants.activePolls }}</p>
           </div>
           <div class="stat-card-square">
             <div class="stat-icon-box">
               <i class="fas fa-vote-yea"></i>
             </div>
             <p class="stat-value-mini">{{ stats.responses.toLocaleString() }}</p>
-            <p class="stat-label-mini">Responses</p>
+            <p class="stat-label-mini">{{ textConstants.responsesLabel }}</p>
           </div>
           <div class="stat-card-square">
             <div class="stat-icon-box">
               <i class="fas fa-chart-pie"></i>
             </div>
             <p class="stat-value-mini">{{ stats.created }}</p>
-            <p class="stat-label-mini">Created</p>
+            <p class="stat-label-mini">{{ textConstants.createdLabel }}</p>
           </div>
           <div class="stat-card-square">
             <div class="stat-icon-box">
               <i class="fas fa-users"></i>
             </div>
             <p class="stat-value-mini">{{ stats.participation }}%</p>
-            <p class="stat-label-mini">Participation</p>
+            <p class="stat-label-mini">{{ textConstants.participationLabel }}</p>
           </div>
         </div>
 
         <div class="relative px-8 py-8">
           <div class="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-white text-xs font-semibold inline-flex items-center gap-2 mb-4">
             <i class="fas fa-poll"></i>
-            AFC Asian Cup 2027
+            {{ textConstants.appBadge }}
           </div>
 
-          <h1 class="text-3xl font-bold text-white mb-2">Polls & Surveys</h1>
-          <p class="text-teal-100 max-w-lg">Gather feedback and insights from your team. Create polls, collect responses, and analyze results.</p>
+          <h1 class="text-3xl font-bold text-white mb-2">{{ textConstants.pageTitle }}</h1>
+          <p class="text-teal-100 max-w-lg">{{ textConstants.pageDescription }}</p>
 
           <div class="flex flex-wrap gap-3 mt-6">
             <button @click="goToCreatePoll" class="px-5 py-2.5 bg-white text-teal-600 rounded-xl font-semibold text-sm flex items-center gap-2 hover:bg-teal-50 transition-all shadow-lg">
               <i class="fas fa-plus"></i>
-              Create New Poll
+              {{ textConstants.createNewPoll }}
             </button>
             <button @click="showQuickPollModal = true" class="px-5 py-2.5 bg-white/20 backdrop-blur-sm border border-white/30 text-white rounded-xl font-semibold text-sm hover:bg-white/30 transition-all flex items-center gap-2">
               <i class="fas fa-bolt"></i>
-              Quick Poll
+              {{ textConstants.quickPoll }}
             </button>
             <!-- AI Action Buttons -->
             <button @click="fetchAIInsights"
                     class="px-5 py-2.5 bg-gradient-to-r from-teal-500/20 to-emerald-500/20 backdrop-blur-sm text-white rounded-xl font-semibold text-sm flex items-center gap-2 hover:from-teal-500/30 hover:to-emerald-500/30 transition-all border border-white/20">
               <i class="fas fa-wand-magic-sparkles"></i>
-              AI Insights
+              {{ textConstants.aiInsights }}
             </button>
             <button @click="analyzeResponsePatterns"
                     class="px-5 py-2.5 bg-white/10 backdrop-blur-sm text-white rounded-xl font-semibold text-sm flex items-center gap-2 hover:bg-white/20 transition-all border border-white/20">
               <i class="fas fa-chart-bar"></i>
-              Pattern Analysis
+              {{ textConstants.patternAnalysis }}
             </button>
           </div>
         </div>
@@ -775,15 +923,15 @@ function getInsightTypeColor(type: string) {
                 <span class="badge-icon-glow">
                   <i class="fas fa-star"></i>
                 </span>
-                <span>Featured Poll</span>
+                <span>{{ textConstants.featuredPoll }}</span>
               </span>
               <span v-if="featuredPoll.anonymous" class="featured-badge-premium secondary">
                 <i class="fas fa-user-secret"></i>
-                <span>Anonymous</span>
+                <span>{{ textConstants.anonymous }}</span>
               </span>
               <span class="featured-badge-premium live">
                 <span class="live-dot"></span>
-                <span>Live</span>
+                <span>{{ textConstants.live }}</span>
               </span>
             </div>
 
@@ -799,7 +947,7 @@ function getInsightTypeColor(type: string) {
                 </div>
                 <div class="featured-stat-content">
                   <span class="featured-stat-value">{{ featuredPoll.totalVotes.toLocaleString() }}</span>
-                  <span class="featured-stat-label">responses</span>
+                  <span class="featured-stat-label">{{ textConstants.responses }}</span>
                 </div>
               </div>
               <div class="featured-stat">
@@ -808,7 +956,7 @@ function getInsightTypeColor(type: string) {
                 </div>
                 <div class="featured-stat-content">
                   <span class="featured-stat-value countdown">3</span>
-                  <span class="featured-stat-label">days left</span>
+                  <span class="featured-stat-label">{{ textConstants.daysLeft }}</span>
                 </div>
               </div>
               <div class="featured-stat">
@@ -817,7 +965,7 @@ function getInsightTypeColor(type: string) {
                 </div>
                 <div class="featured-stat-content">
                   <span class="featured-stat-value">{{ featuredPoll.author }}</span>
-                  <span class="featured-stat-label">created by</span>
+                  <span class="featured-stat-label">{{ textConstants.createdBy }}</span>
                 </div>
               </div>
             </div>
@@ -827,10 +975,10 @@ function getInsightTypeColor(type: string) {
           <div class="featured-poll-right">
             <div class="voting-card">
               <div class="voting-header">
-                <span class="voting-title">Cast Your Vote</span>
+                <span class="voting-title">{{ textConstants.castYourVote }}</span>
                 <span class="voting-progress">
                   <i class="fas fa-chart-pie"></i>
-                  {{ featuredPoll.hasVoted ? 'Voted' : 'Select an option' }}
+                  {{ featuredPoll.hasVoted ? textConstants.voted : textConstants.selectAnOption }}
                 </span>
               </div>
 
@@ -878,7 +1026,7 @@ function getInsightTypeColor(type: string) {
                 <span class="btn-bg"></span>
                 <span class="btn-content">
                   <i class="fas fa-paper-plane"></i>
-                  <span>Submit Vote</span>
+                  <span>{{ textConstants.submitVote }}</span>
                 </span>
               </button>
 
@@ -887,7 +1035,7 @@ function getInsightTypeColor(type: string) {
                 <div class="confirmed-icon">
                   <i class="fas fa-check-circle"></i>
                 </div>
-                <span>Your vote has been recorded</span>
+                <span>{{ textConstants.voteRecorded }}</span>
               </div>
             </div>
           </div>
@@ -920,12 +1068,12 @@ function getInsightTypeColor(type: string) {
               <div class="fire-glow"></div>
             </div>
             <div>
-              <h2 class="trending-main-title">Trending Now</h2>
-              <p class="trending-subtitle">Most popular polls this week</p>
+              <h2 class="trending-main-title">{{ textConstants.trendingNow }}</h2>
+              <p class="trending-subtitle">{{ textConstants.trendingSubtitle }}</p>
             </div>
           </div>
           <a href="#" class="trending-view-all">
-            View All
+            {{ textConstants.viewAll }}
             <i class="fas fa-arrow-right"></i>
           </a>
         </div>
@@ -964,7 +1112,7 @@ function getInsightTypeColor(type: string) {
 
             <!-- Vote Now Button -->
             <button class="trending-vote-btn">
-              <span class="btn-text">Vote Now</span>
+              <span class="btn-text">{{ textConstants.voteNow }}</span>
               <i class="fas fa-arrow-right"></i>
             </button>
           </div>
@@ -981,19 +1129,19 @@ function getInsightTypeColor(type: string) {
                 <i class="fas fa-poll text-white text-sm"></i>
               </div>
               <div>
-                <span class="block">All Polls</span>
-                <span class="text-xs font-medium text-gray-500">{{ totalPollsCount }} polls • {{ stats.participation }}% participation</span>
+                <span class="block">{{ textConstants.allPolls }}</span>
+                <span class="text-xs font-medium text-gray-500">{{ totalPollsCount }} {{ textConstants.polls }} • {{ stats.participation }}% {{ textConstants.participationLabel.toLowerCase() }}</span>
               </div>
             </h2>
             <div class="flex items-center gap-2">
               <!-- Primary Actions -->
               <button @click="goToCreatePoll" class="px-4 py-2 bg-gradient-to-r from-teal-500 to-teal-600 text-white rounded-lg text-sm font-medium hover:from-teal-600 hover:to-teal-700 transition-all flex items-center gap-2 shadow-sm shadow-teal-200">
                 <i class="fas fa-plus"></i>
-                Create Poll
+                {{ textConstants.createPoll }}
               </button>
               <button @click="showQuickPollModal = true" class="px-3 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 hover:border-gray-300 transition-all flex items-center gap-2">
                 <i class="fas fa-bolt text-amber-500"></i>
-                Quick Poll
+                {{ textConstants.quickPoll }}
               </button>
 
               <!-- Divider -->
@@ -1029,7 +1177,7 @@ function getInsightTypeColor(type: string) {
               <input
                 v-model="searchQuery"
                 type="text"
-                placeholder="Search polls..."
+                :placeholder="textConstants.searchPolls"
                 class="w-full pl-9 pr-4 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all"
               >
               <button v-if="searchQuery" @click="searchQuery = ''" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
@@ -1246,7 +1394,7 @@ function getInsightTypeColor(type: string) {
               </span>
               <div class="flex items-center gap-2">
                 <span v-if="poll.anonymous" class="anonymous-badge">
-                  <i class="fas fa-user-secret"></i> Anonymous
+                  <i class="fas fa-user-secret"></i> {{ textConstants.anonymous }}
                 </span>
                 <span :class="['deadline-badge', poll.urgencyClass]">
                   <i class="fas fa-clock"></i> {{ poll.endsIn }}
@@ -1274,7 +1422,7 @@ function getInsightTypeColor(type: string) {
                   <span class="text-sm text-gray-700">
                     {{ option.label }}
                     <span v-if="option.isWinner" class="winner-badge">
-                      <i class="fas fa-trophy"></i> Leading
+                      <i class="fas fa-trophy"></i> {{ textConstants.leading }}
                     </span>
                   </span>
                   <span class="text-sm font-semibold text-gray-600">{{ option.percentage }}%</span>
@@ -1306,8 +1454,8 @@ function getInsightTypeColor(type: string) {
                 <span class="value" style="font-size: 0.5rem;">{{ poll.responseRate }}%</span>
               </div>
             </div>
-            <button v-if="!poll.hasVoted" class="btn-vibrant btn-sm ripple-effect">Vote</button>
-            <button v-else class="btn btn-secondary btn-sm ripple-effect">Results</button>
+            <button v-if="!poll.hasVoted" class="btn-vibrant btn-sm ripple-effect">{{ textConstants.vote }}</button>
+            <button v-else class="btn btn-secondary btn-sm ripple-effect">{{ textConstants.results }}</button>
           </div>
         </div>
       </div>
@@ -1315,10 +1463,10 @@ function getInsightTypeColor(type: string) {
       <!-- My Polls -->
       <div v-if="activeTab === 'my-polls'" class="mt-6 my-polls-card fade-in-up" style="animation-delay: 0.35s">
         <div class="p-4 border-b border-gray-100 flex items-center justify-between">
-          <h3 class="font-semibold text-gray-900">Your Polls</h3>
+          <h3 class="font-semibold text-gray-900">{{ textConstants.yourPolls }}</h3>
           <div class="flex items-center gap-2">
             <button class="px-3 py-1.5 text-sm bg-gray-100 rounded-lg hover:bg-gray-200 transition-all">
-              <i class="fas fa-filter mr-1"></i> Filter
+              <i class="fas fa-filter mr-1"></i> {{ textConstants.filter }}
             </button>
           </div>
         </div>
@@ -1342,7 +1490,7 @@ function getInsightTypeColor(type: string) {
               <span :class="['status-pill', poll.statusClass]">{{ poll.status }}</span>
               <div class="text-center" style="min-width: 60px;">
                 <p class="font-semibold text-gray-900">{{ poll.responses }}</p>
-                <p class="text-xs text-gray-500">responses</p>
+                <p class="text-xs text-gray-500">{{ textConstants.responses }}</p>
               </div>
               <div class="flex items-center gap-1">
                 <button class="p-2 rounded-lg hover:bg-teal-50 text-gray-500 hover:text-teal-600 transition-all">
@@ -1373,8 +1521,8 @@ function getInsightTypeColor(type: string) {
         >
           <div class="completed-poll-header">
             <div class="flex items-center justify-between mb-2">
-              <span class="badge badge-secondary">Completed</span>
-              <span class="text-xs text-gray-500"><i class="far fa-calendar-check mr-1"></i>Ended {{ poll.endedDate }}</span>
+              <span class="badge badge-secondary">{{ textConstants.completed }}</span>
+              <span class="text-xs text-gray-500"><i class="far fa-calendar-check mr-1"></i>{{ textConstants.ended }} {{ poll.endedDate }}</span>
             </div>
             <h3 class="font-semibold text-gray-900">{{ poll.question }}</h3>
           </div>
@@ -1393,7 +1541,7 @@ function getInsightTypeColor(type: string) {
                 <span class="text-sm text-gray-700">
                   {{ option.label }}
                   <span v-if="idx === 0" class="winner-badge">
-                    <i class="fas fa-trophy"></i> Winner
+                    <i class="fas fa-trophy"></i> {{ textConstants.winner }}
                   </span>
                 </span>
                 <span class="text-sm font-semibold text-gray-600">{{ option.percentage }}%</span>
@@ -1401,13 +1549,13 @@ function getInsightTypeColor(type: string) {
             </div>
           </div>
           <div class="p-4 flex items-center justify-between border-t border-gray-100">
-            <span class="text-sm text-gray-500"><i class="fas fa-users mr-1"></i> {{ poll.totalVotes }} total votes</span>
+            <span class="text-sm text-gray-500"><i class="fas fa-users mr-1"></i> {{ poll.totalVotes }} {{ textConstants.totalVotes }}</span>
             <div class="flex items-center gap-2">
               <button class="btn btn-secondary btn-sm ripple-effect">
-                <i class="fas fa-chart-bar mr-1"></i> Analytics
+                <i class="fas fa-chart-bar mr-1"></i> {{ textConstants.analytics }}
               </button>
               <button class="btn btn-secondary btn-sm ripple-effect">
-                <i class="fas fa-download mr-1"></i> Export
+                <i class="fas fa-download mr-1"></i> {{ textConstants.export }}
               </button>
             </div>
           </div>
@@ -1421,7 +1569,7 @@ function getInsightTypeColor(type: string) {
       <div v-if="showQuickPollModal" class="modal-overlay" @click.self="showQuickPollModal = false">
         <div class="modal-content" style="max-width: 500px;">
           <div class="modal-header">
-            <h3 class="section-title-polls"><i class="fas fa-bolt"></i>Quick Poll</h3>
+            <h3 class="section-title-polls"><i class="fas fa-bolt"></i>{{ textConstants.quickPollTitle }}</h3>
             <button class="modal-close" @click="showQuickPollModal = false">
               <i class="fas fa-times"></i>
             </button>
