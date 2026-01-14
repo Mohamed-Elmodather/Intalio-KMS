@@ -678,70 +678,78 @@ function copySummary() {
           </div>
 
           <!-- Media Info -->
-          <div class="content-card fade-in-up">
-            <div class="card-header">
-              <i class="fas fa-info-circle"></i>
-              <span>{{ textConstants.aboutThisMedia }}</span>
+          <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+            <h2 class="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
+              <i class="fas fa-info-circle text-teal-500"></i>
+              {{ textConstants.aboutThisMedia }}
+            </h2>
+            <p class="text-gray-600 mb-4 leading-relaxed">{{ media.description }}</p>
+
+            <!-- Stats Row -->
+            <div class="flex flex-wrap gap-6 mb-4 pb-4 border-b border-gray-100">
+              <div class="flex items-center gap-2 text-sm text-gray-500">
+                <i class="fas fa-eye text-teal-500"></i>
+                <span>{{ media.views }} {{ textConstants.views }}</span>
+              </div>
+              <div class="flex items-center gap-2 text-sm text-gray-500">
+                <i class="fas fa-clock text-teal-500"></i>
+                <span>{{ media.date }}</span>
+              </div>
+              <div class="flex items-center gap-2 text-sm text-gray-500">
+                <i class="fas fa-heart text-red-400"></i>
+                <span>{{ media.likes }} likes</span>
+              </div>
             </div>
-            <div class="card-body">
-              <p class="text-gray-600 mb-4 leading-relaxed">{{ media.description }}</p>
 
-              <!-- Stats Row -->
-              <div class="stats-row">
-                <div class="stat-item">
-                  <i class="fas fa-eye"></i>
-                  <span>{{ media.views }} {{ textConstants.views }}</span>
-                </div>
-                <div class="stat-item">
-                  <i class="fas fa-clock"></i>
-                  <span>{{ media.date }}</span>
-                </div>
-                <div class="stat-item">
-                  <i class="fas fa-heart text-red-400"></i>
-                  <span>{{ media.likes }}</span>
-                </div>
-              </div>
+            <!-- Tags -->
+            <div class="flex flex-wrap gap-2 mb-4">
+              <span v-for="tag in media.tags" :key="tag" class="px-3 py-1.5 bg-teal-50 text-teal-700 rounded-full text-sm font-medium">
+                #{{ tag }}
+              </span>
+            </div>
 
-              <!-- Tags -->
-              <div class="tags-container">
-                <span v-for="tag in media.tags" :key="tag" class="tag">
-                  #{{ tag }}
-                </span>
-              </div>
-
-              <!-- Author -->
-              <div class="author-section">
-                <div class="author-avatar">
+            <!-- Author & Rating -->
+            <div class="flex items-center justify-between flex-wrap gap-4 pt-4 border-t border-gray-100">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center text-white font-semibold text-sm">
                   {{ media.author.avatar }}
                 </div>
                 <div>
-                  <p class="author-name">{{ media.author.name }}</p>
-                  <p class="author-role">{{ textConstants.contentCreator }}</p>
+                  <p class="font-medium text-gray-900">{{ media.author.name }}</p>
+                  <p class="text-sm text-gray-500">{{ textConstants.contentCreator }}</p>
                 </div>
               </div>
+              <RatingStars
+                :model-value="rating?.userRating || 0"
+                :average="rating?.average"
+                :count="rating?.count"
+                size="md"
+                :show-count="true"
+                @update:model-value="handleRating"
+              />
             </div>
           </div>
 
           <!-- Related Media -->
-          <div class="content-card fade-in-up" style="animation-delay: 0.1s">
-            <div class="card-header">
-              <i class="fas fa-play-circle"></i>
-              <span>{{ textConstants.relatedMedia }}</span>
-            </div>
-            <div class="card-body">
-              <div class="related-grid">
-                <div v-for="item in relatedMedia" :key="item.id" @click="goToRelated(item.id)" class="related-item group">
-                  <div class="related-thumb">
-                    <img :src="item.thumbnail" :alt="item.title" />
-                    <div class="play-overlay">
-                      <i class="fas fa-play"></i>
+          <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+            <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+              <i class="fas fa-play-circle text-teal-500"></i>
+              {{ textConstants.relatedMedia }}
+            </h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div v-for="item in relatedMedia" :key="item.id" @click="goToRelated(item.id)" class="group cursor-pointer rounded-xl overflow-hidden border border-gray-100 hover:border-teal-200 hover:shadow-md transition-all">
+                <div class="relative aspect-video">
+                  <img :src="item.thumbnail" :alt="item.title" class="w-full h-full object-cover" />
+                  <div class="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors flex items-center justify-center">
+                    <div class="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                      <i class="fas fa-play text-white ml-1"></i>
                     </div>
-                    <span class="duration-badge">{{ item.duration }}</span>
                   </div>
-                  <div class="related-info">
-                    <h4 class="related-title">{{ item.title }}</h4>
-                    <p class="related-views">{{ item.views }} {{ textConstants.views }}</p>
-                  </div>
+                  <span class="absolute bottom-2 right-2 px-2 py-0.5 bg-black/70 text-white text-xs rounded">{{ item.duration }}</span>
+                </div>
+                <div class="p-3">
+                  <h4 class="font-medium text-gray-900 text-sm line-clamp-2 group-hover:text-teal-600 transition-colors">{{ item.title }}</h4>
+                  <p class="text-xs text-gray-500 mt-1">{{ item.views }} {{ textConstants.views }}</p>
                 </div>
               </div>
             </div>
@@ -941,72 +949,44 @@ function copySummary() {
         </div>
       </div>
 
-      <!-- Rating & Engagement Section -->
-      <div class="content-card fade-in-up" style="animation-delay: 0.3s">
-        <div class="card-body">
-          <div class="flex items-center justify-between flex-wrap gap-4">
-            <div>
-              <h3 class="font-semibold text-gray-900 mb-1">{{ media.type === 'video' ? textConstants.rateThisVideo : textConstants.rateThisAudio }}</h3>
-              <p class="text-sm text-gray-500">{{ textConstants.helpOthers }}</p>
-            </div>
-            <div class="flex items-center gap-4">
-              <RatingStars
-                :model-value="rating?.userRating || 0"
-                :average="rating?.average"
-                :count="rating?.count"
-                size="lg"
-                :show-count="true"
-                @update:model-value="handleRating"
-              />
-              <BookmarkButton
-                :content-id="media.id.toString()"
-                content-type="media"
-                size="md"
-                variant="button"
-                :show-label="true"
-              />
-              <button
-                @click="showAddToCollection = true"
-                class="collection-btn"
-                title="Add to Collection"
-              >
-                <i class="fas fa-folder-plus"></i>
-                <span>{{ textConstants.collection }}</span>
-              </button>
-            </div>
+      <!-- Engagement & Share Section -->
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mt-6">
+        <div class="flex items-center justify-between flex-wrap gap-4">
+          <div class="flex items-center gap-3">
+            <BookmarkButton
+              :content-id="media.id.toString()"
+              content-type="media"
+              size="md"
+              variant="button"
+              :show-label="true"
+            />
+            <button
+              @click="showAddToCollection = true"
+              class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-medium flex items-center gap-2 transition-colors"
+              title="Add to Collection"
+            >
+              <i class="fas fa-folder-plus"></i>
+              <span>{{ textConstants.collection }}</span>
+            </button>
           </div>
-        </div>
-      </div>
-
-      <!-- Share Section -->
-      <div class="content-card fade-in-up" style="animation-delay: 0.4s">
-        <div class="card-body">
-          <h3 class="font-semibold text-gray-900 mb-4">{{ media.type === 'video' ? textConstants.shareThisVideo : textConstants.shareThisAudio }}</h3>
           <SocialShareButtons
             :title="media.title"
             :description="media.description"
             layout="horizontal"
-            size="lg"
-            :show-labels="true"
+            size="sm"
           />
         </div>
       </div>
 
       <!-- Comments Section -->
-      <div class="content-card fade-in-up" style="animation-delay: 0.5s">
-        <div class="card-header">
-          <i class="fas fa-comments"></i>
-          <span>{{ textConstants.comments }}</span>
-        </div>
-        <div class="card-body">
-          <CommentsSection
-            content-type="media"
-            :content-id="media.id.toString()"
-            :comments="comments"
-            :is-loading="commentsLoading"
-            @add-comment="addComment"
-          />
-        </div>
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mt-6">
+        <CommentsSection
+          content-type="media"
+          :content-id="media.id.toString()"
+          :comments="comments"
+          :is-loading="commentsLoading"
+          @add-comment="addComment"
+        />
       </div>
     </div>
 
@@ -1137,36 +1117,8 @@ function copySummary() {
 }
 
 /* ========================================
-   Content Cards
+   Media Type Badge
    ======================================== */
-.content-card {
-  background: white;
-  border-radius: 1rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  border: 1px solid #e5e7eb;
-  overflow: hidden;
-}
-
-.card-header {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 1rem 1.5rem;
-  background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 100%);
-  border-bottom: 1px solid #99f6e4;
-  font-weight: 600;
-  color: #0f766e;
-}
-
-.card-header i {
-  color: #14b8a6;
-}
-
-.card-body {
-  padding: 1.5rem;
-}
-
-/* Media Type Badge */
 .media-type-badge {
   display: flex;
   align-items: center;
@@ -1178,198 +1130,6 @@ function copySummary() {
   font-weight: 500;
   border-radius: 2rem;
   box-shadow: 0 4px 12px rgba(20, 184, 166, 0.3);
-}
-
-/* Stats Row */
-.stats-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1.5rem;
-  margin-bottom: 1rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid #f3f4f6;
-}
-
-.stat-item {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.875rem;
-  color: #6b7280;
-}
-
-.stat-item i {
-  color: #9ca3af;
-}
-
-/* Tags */
-.tags-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-bottom: 1.5rem;
-}
-
-.tag {
-  padding: 0.375rem 0.875rem;
-  background: #f0fdfa;
-  color: #0f766e;
-  border-radius: 2rem;
-  font-size: 0.8125rem;
-  font-weight: 500;
-  transition: all 0.2s ease;
-}
-
-.tag:hover {
-  background: #ccfbf1;
-}
-
-/* Author Section */
-.author-section {
-  display: flex;
-  align-items: center;
-  gap: 0.875rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid #f3f4f6;
-}
-
-.author-avatar {
-  width: 48px;
-  height: 48px;
-  background: linear-gradient(135deg, #14b8a6 0%, #06b6d4 100%);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-weight: 600;
-  font-size: 1rem;
-}
-
-.author-name {
-  font-weight: 600;
-  color: #111827;
-  margin: 0;
-}
-
-.author-role {
-  font-size: 0.8125rem;
-  color: #6b7280;
-  margin: 0;
-}
-
-/* Related Media */
-.related-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1rem;
-}
-
-.related-item {
-  display: flex;
-  gap: 0.75rem;
-  padding: 0.75rem;
-  border-radius: 0.75rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.related-item:hover {
-  background: #f0fdfa;
-}
-
-.related-thumb {
-  position: relative;
-  width: 120px;
-  height: 72px;
-  border-radius: 0.5rem;
-  overflow: hidden;
-  flex-shrink: 0;
-}
-
-.related-thumb img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.play-overlay {
-  position: absolute;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.4);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  transition: opacity 0.2s ease;
-}
-
-.related-item:hover .play-overlay {
-  opacity: 1;
-}
-
-.play-overlay i {
-  color: white;
-  font-size: 1.25rem;
-}
-
-.duration-badge {
-  position: absolute;
-  bottom: 4px;
-  right: 4px;
-  padding: 2px 6px;
-  background: rgba(0, 0, 0, 0.8);
-  color: white;
-  font-size: 0.6875rem;
-  border-radius: 4px;
-}
-
-.related-info {
-  flex: 1;
-  min-width: 0;
-}
-
-.related-title {
-  font-size: 0.8125rem;
-  font-weight: 500;
-  color: #111827;
-  margin: 0;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  transition: color 0.2s ease;
-}
-
-.related-item:hover .related-title {
-  color: #0d9488;
-}
-
-.related-views {
-  font-size: 0.75rem;
-  color: #9ca3af;
-  margin: 0.25rem 0 0;
-}
-
-/* Collection Button */
-.collection-btn {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.625rem 1rem;
-  background: #f3f4f6;
-  border: none;
-  border-radius: 0.75rem;
-  color: #4b5563;
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.collection-btn:hover {
-  background: #f0fdfa;
-  color: #0d9488;
 }
 
 /* ========================================
@@ -1413,33 +1173,11 @@ function copySummary() {
 /* ========================================
    Responsive
    ======================================== */
-@media (max-width: 1024px) {
-  .related-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
 @media (max-width: 768px) {
-  .header-content {
-    padding: 1rem 1.5rem 1.5rem;
-  }
-
-  .header-main {
+  .header-nav {
     flex-direction: column;
     align-items: flex-start;
-  }
-
-  .header-title {
-    font-size: 1.25rem;
-  }
-
-  .header-actions {
-    width: 100%;
-    justify-content: flex-start;
-  }
-
-  .stats-row {
-    gap: 1rem;
+    gap: 0.5rem;
   }
 }
 </style>
