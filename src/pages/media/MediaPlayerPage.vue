@@ -677,83 +677,6 @@ function copySummary() {
             </div>
           </div>
 
-          <!-- Media Info -->
-          <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-            <h2 class="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
-              <i class="fas fa-info-circle text-teal-500"></i>
-              {{ textConstants.aboutThisMedia }}
-            </h2>
-            <p class="text-gray-600 mb-4 leading-relaxed">{{ media.description }}</p>
-
-            <!-- Stats Row -->
-            <div class="flex flex-wrap gap-6 mb-4 pb-4 border-b border-gray-100">
-              <div class="flex items-center gap-2 text-sm text-gray-500">
-                <i class="fas fa-eye text-teal-500"></i>
-                <span>{{ media.views }} {{ textConstants.views }}</span>
-              </div>
-              <div class="flex items-center gap-2 text-sm text-gray-500">
-                <i class="fas fa-clock text-teal-500"></i>
-                <span>{{ media.date }}</span>
-              </div>
-              <div class="flex items-center gap-2 text-sm text-gray-500">
-                <i class="fas fa-heart text-red-400"></i>
-                <span>{{ media.likes }} likes</span>
-              </div>
-            </div>
-
-            <!-- Tags -->
-            <div class="flex flex-wrap gap-2 mb-4">
-              <span v-for="tag in media.tags" :key="tag" class="px-3 py-1.5 bg-teal-50 text-teal-700 rounded-full text-sm font-medium">
-                #{{ tag }}
-              </span>
-            </div>
-
-            <!-- Author & Rating -->
-            <div class="flex items-center justify-between flex-wrap gap-4 pt-4 border-t border-gray-100">
-              <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center text-white font-semibold text-sm">
-                  {{ media.author.avatar }}
-                </div>
-                <div>
-                  <p class="font-medium text-gray-900">{{ media.author.name }}</p>
-                  <p class="text-sm text-gray-500">{{ textConstants.contentCreator }}</p>
-                </div>
-              </div>
-              <RatingStars
-                :model-value="rating?.userRating || 0"
-                :average="rating?.average"
-                :count="rating?.count"
-                size="md"
-                :show-count="true"
-                @update:model-value="handleRating"
-              />
-            </div>
-          </div>
-
-          <!-- Related Media -->
-          <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-            <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-              <i class="fas fa-play-circle text-teal-500"></i>
-              {{ textConstants.relatedMedia }}
-            </h2>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div v-for="item in relatedMedia" :key="item.id" @click="goToRelated(item.id)" class="group cursor-pointer rounded-xl overflow-hidden border border-gray-100 hover:border-teal-200 hover:shadow-md transition-all">
-                <div class="relative aspect-video">
-                  <img :src="item.thumbnail" :alt="item.title" class="w-full h-full object-cover" />
-                  <div class="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors flex items-center justify-center">
-                    <div class="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                      <i class="fas fa-play text-white ml-1"></i>
-                    </div>
-                  </div>
-                  <span class="absolute bottom-2 right-2 px-2 py-0.5 bg-black/70 text-white text-xs rounded">{{ item.duration }}</span>
-                </div>
-                <div class="p-3">
-                  <h4 class="font-medium text-gray-900 text-sm line-clamp-2 group-hover:text-teal-600 transition-colors">{{ item.title }}</h4>
-                  <p class="text-xs text-gray-500 mt-1">{{ item.views }} {{ textConstants.views }}</p>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
 
         <!-- AI Sidebar -->
@@ -944,6 +867,84 @@ function copySummary() {
                   </div>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- About this Media - Full Width -->
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mt-6">
+        <h2 class="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
+          <i class="fas fa-info-circle text-teal-500"></i>
+          {{ textConstants.aboutThisMedia }}
+        </h2>
+        <p class="text-gray-600 mb-4 leading-relaxed">{{ media.description }}</p>
+
+        <!-- Stats Row -->
+        <div class="flex flex-wrap gap-6 mb-4 pb-4 border-b border-gray-100">
+          <div class="flex items-center gap-2 text-sm text-gray-500">
+            <i class="fas fa-eye text-teal-500"></i>
+            <span>{{ media.views }} {{ textConstants.views }}</span>
+          </div>
+          <div class="flex items-center gap-2 text-sm text-gray-500">
+            <i class="fas fa-clock text-teal-500"></i>
+            <span>{{ media.date }}</span>
+          </div>
+          <div class="flex items-center gap-2 text-sm text-gray-500">
+            <i class="fas fa-heart text-red-400"></i>
+            <span>{{ media.likes }} likes</span>
+          </div>
+        </div>
+
+        <!-- Tags -->
+        <div class="flex flex-wrap gap-2 mb-4">
+          <span v-for="tag in media.tags" :key="tag" class="px-3 py-1.5 bg-teal-50 text-teal-700 rounded-full text-sm font-medium">
+            #{{ tag }}
+          </span>
+        </div>
+
+        <!-- Author & Rating -->
+        <div class="flex items-center justify-between flex-wrap gap-4 pt-4 border-t border-gray-100">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center text-white font-semibold text-sm">
+              {{ media.author.avatar }}
+            </div>
+            <div>
+              <p class="font-medium text-gray-900">{{ media.author.name }}</p>
+              <p class="text-sm text-gray-500">{{ textConstants.contentCreator }}</p>
+            </div>
+          </div>
+          <RatingStars
+            :model-value="rating?.userRating || 0"
+            :average="rating?.average"
+            :count="rating?.count"
+            size="md"
+            :show-count="true"
+            @update:model-value="handleRating"
+          />
+        </div>
+      </div>
+
+      <!-- Related Media - Full Width -->
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mt-6">
+        <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+          <i class="fas fa-play-circle text-teal-500"></i>
+          {{ textConstants.relatedMedia }}
+        </h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div v-for="item in relatedMedia" :key="item.id" @click="goToRelated(item.id)" class="group cursor-pointer rounded-xl overflow-hidden border border-gray-100 hover:border-teal-200 hover:shadow-md transition-all">
+            <div class="relative aspect-video">
+              <img :src="item.thumbnail" :alt="item.title" class="w-full h-full object-cover" />
+              <div class="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors flex items-center justify-center">
+                <div class="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                  <i class="fas fa-play text-white ml-1"></i>
+                </div>
+              </div>
+              <span class="absolute bottom-2 right-2 px-2 py-0.5 bg-black/70 text-white text-xs rounded">{{ item.duration }}</span>
+            </div>
+            <div class="p-3">
+              <h4 class="font-medium text-gray-900 text-sm line-clamp-2 group-hover:text-teal-600 transition-colors">{{ item.title }}</h4>
+              <p class="text-xs text-gray-500 mt-1">{{ item.views }} {{ textConstants.views }}</p>
             </div>
           </div>
         </div>
