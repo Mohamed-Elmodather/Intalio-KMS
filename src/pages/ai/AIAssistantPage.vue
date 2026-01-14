@@ -1534,67 +1534,89 @@ function handleEntityClick(entity: { text: string; type: string }) {
             </button>
           </div>
 
-          <div class="flex items-end gap-3">
-            <div class="flex-1 relative">
+          <div class="chat-input-container flex items-end gap-3">
+            <div class="flex-1 relative group">
               <!-- Slash Command Suggestions -->
               <Transition name="fade-up">
                 <div v-if="showCommandSuggestions && commandSuggestions.length > 0"
-                     class="absolute bottom-full left-0 right-0 mb-2 bg-white rounded-xl shadow-xl border border-gray-200 overflow-hidden z-10">
-                  <div class="p-2 border-b border-gray-100">
-                    <span class="text-xs font-medium text-gray-500">Slash Commands</span>
+                     class="absolute bottom-full left-0 right-0 mb-2 bg-white/95 backdrop-blur-lg rounded-2xl shadow-2xl border border-gray-200/50 overflow-hidden z-10">
+                  <div class="p-3 border-b border-gray-100 bg-gradient-to-r from-teal-50/50 to-transparent">
+                    <span class="text-xs font-semibold text-teal-600 uppercase tracking-wider">Slash Commands</span>
                   </div>
-                  <div class="max-h-48 overflow-y-auto">
+                  <div class="max-h-56 overflow-y-auto p-1">
                     <button v-for="cmd in commandSuggestions" :key="cmd.command"
                             @click="handleCommandSelect(cmd)"
-                            class="w-full px-3 py-2 text-left hover:bg-teal-50 flex items-center gap-3 transition-colors">
-                      <div class="w-8 h-8 rounded-lg bg-teal-100 text-teal-600 flex items-center justify-center">
+                            class="w-full px-3 py-2.5 text-left hover:bg-gradient-to-r hover:from-teal-50 hover:to-transparent rounded-xl flex items-center gap-3 transition-all duration-200 group/cmd">
+                      <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-400 to-teal-600 text-white flex items-center justify-center shadow-md group-hover/cmd:scale-110 transition-transform duration-200">
                         <i :class="cmd.icon || 'fas fa-terminal'"></i>
                       </div>
-                      <div>
-                        <p class="text-sm font-medium text-gray-900">{{ cmd.command }}</p>
+                      <div class="flex-1">
+                        <p class="text-sm font-semibold text-gray-800">{{ cmd.command }}</p>
                         <p class="text-xs text-gray-500">{{ cmd.description }}</p>
                       </div>
+                      <i class="fas fa-chevron-right text-gray-300 group-hover/cmd:text-teal-500 group-hover/cmd:translate-x-1 transition-all duration-200"></i>
                     </button>
                   </div>
                 </div>
               </Transition>
 
-              <textarea v-model="inputMessage"
-                        @keydown.enter.exact.prevent="sendMessage"
-                        @keydown.shift.enter="() => {}"
-                        placeholder="Ask me anything... Type / for commands, or attach documents"
-                        rows="1"
-                        class="input resize-none pr-28 min-h-[48px] max-h-32"
-                        :style="{ height: inputHeight }"></textarea>
-              <div class="absolute right-2 bottom-2 flex items-center gap-1">
-                <button @click="openContentBrowser"
-                        class="p-2 rounded-lg hover:bg-teal-100 text-teal-500 ripple relative"
-                        title="Attach platform content">
-                  <i class="fas fa-paperclip icon-soft"></i>
-                  <span v-if="pendingAttachments.length > 0"
-                        class="absolute -top-1 -right-1 w-4 h-4 bg-teal-500 text-white text-xs rounded-full flex items-center justify-center">
-                    {{ pendingAttachments.length }}
-                  </span>
-                </button>
-                <!-- Voice Input -->
-                <AIVoiceInput
-                  v-if="isVoiceSupported"
-                  @transcript="handleVoiceTranscript"
-                  class="inline-flex"
-                />
-                <button v-else
-                        class="p-2 rounded-lg text-gray-300 cursor-not-allowed"
-                        title="Voice input not supported"
-                        disabled>
-                  <i class="fas fa-microphone icon-soft"></i>
-                </button>
+              <!-- Main Input Container -->
+              <div class="chat-input-wrapper relative bg-white rounded-2xl shadow-lg border border-gray-200/80
+                          hover:shadow-xl hover:border-teal-300/50
+                          focus-within:shadow-xl focus-within:border-teal-400 focus-within:ring-4 focus-within:ring-teal-500/10
+                          transition-all duration-300 ease-out overflow-hidden">
+                <!-- Gradient accent bar -->
+                <div class="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-teal-400 via-teal-500 to-emerald-500 opacity-0 group-focus-within:opacity-100 transition-opacity duration-300"></div>
+
+                <textarea v-model="inputMessage"
+                          @keydown.enter.exact.prevent="sendMessage"
+                          @keydown.shift.enter="() => {}"
+                          placeholder="Ask me anything... Type / for commands"
+                          rows="1"
+                          class="chat-textarea w-full px-4 py-4 pr-32 resize-none min-h-[56px] max-h-40
+                                 bg-transparent text-gray-800 placeholder-gray-400
+                                 focus:outline-none text-[15px] leading-relaxed"
+                          :style="{ height: inputHeight }"></textarea>
+
+                <!-- Action buttons inside input -->
+                <div class="absolute right-2 bottom-2 flex items-center gap-1 bg-white/80 backdrop-blur-sm rounded-xl p-1">
+                  <button @click="openContentBrowser"
+                          class="chat-action-btn p-2.5 rounded-xl hover:bg-teal-50 text-gray-400 hover:text-teal-500 transition-all duration-200 relative"
+                          title="Attach platform content">
+                    <i class="fas fa-paperclip"></i>
+                    <span v-if="pendingAttachments.length > 0"
+                          class="absolute -top-1 -right-1 w-5 h-5 bg-gradient-to-br from-teal-400 to-teal-600 text-white text-[10px] font-bold rounded-full flex items-center justify-center shadow-md animate-pulse">
+                      {{ pendingAttachments.length }}
+                    </span>
+                  </button>
+                  <!-- Voice Input -->
+                  <AIVoiceInput
+                    v-if="isVoiceSupported"
+                    @transcript="handleVoiceTranscript"
+                    class="inline-flex"
+                  />
+                  <button v-else
+                          class="p-2.5 rounded-xl text-gray-300 cursor-not-allowed"
+                          title="Voice input not supported"
+                          disabled>
+                    <i class="fas fa-microphone"></i>
+                  </button>
+                </div>
               </div>
             </div>
+
+            <!-- Send Button -->
             <button @click="sendMessage"
                     :disabled="!inputMessage.trim() || isTyping"
-                    :class="['btn btn-vibrant btn-icon h-12 w-12 ripple',
-                             (!inputMessage.trim() || isTyping) ? 'opacity-50 cursor-not-allowed' : '']">
-              <i class="fas fa-paper-plane icon-vibrant"></i>
+                    :class="[
+                      'send-button relative h-14 w-14 rounded-2xl flex items-center justify-center transition-all duration-300 overflow-hidden',
+                      (!inputMessage.trim() || isTyping)
+                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                        : 'bg-gradient-to-br from-teal-400 to-teal-600 text-white shadow-lg hover:shadow-xl hover:scale-105 active:scale-95'
+                    ]">
+              <i :class="['fas fa-paper-plane text-lg transition-transform duration-300', inputMessage.trim() && !isTyping ? 'group-hover:translate-x-0.5 group-hover:-translate-y-0.5' : '']"></i>
+              <!-- Ripple effect background -->
+              <div v-if="inputMessage.trim() && !isTyping" class="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300"></div>
             </button>
           </div>
 
@@ -2472,5 +2494,81 @@ function handleEntityClick(entity: { text: string; type: string }) {
 
 .search-container:focus-within kbd {
   opacity: 0;
+}
+
+/* Chat Input Container Styles */
+.chat-input-container {
+  position: relative;
+}
+
+.chat-input-wrapper {
+  background: linear-gradient(to bottom, rgba(255,255,255,0.95), rgba(255,255,255,1));
+}
+
+.chat-textarea {
+  font-family: inherit;
+  line-height: 1.6;
+}
+
+.chat-textarea::placeholder {
+  transition: all 0.3s ease;
+}
+
+.chat-textarea:focus::placeholder {
+  opacity: 0.5;
+  transform: translateX(8px);
+}
+
+/* Chat action buttons */
+.chat-action-btn {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.chat-action-btn:hover {
+  transform: scale(1.1);
+}
+
+.chat-action-btn:active {
+  transform: scale(0.95);
+}
+
+/* Send button animations */
+.send-button {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.send-button:not(:disabled):hover {
+  box-shadow: 0 10px 40px -10px rgba(20, 184, 166, 0.5);
+}
+
+.send-button:not(:disabled):active {
+  transform: scale(0.92);
+}
+
+.send-button i {
+  transition: transform 0.3s ease;
+}
+
+.send-button:not(:disabled):hover i {
+  transform: translate(2px, -2px);
+}
+
+/* Slash command dropdown animation */
+.chat-input-container .fade-up-enter-active {
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.chat-input-container .fade-up-leave-active {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.chat-input-container .fade-up-enter-from {
+  opacity: 0;
+  transform: translateY(10px) scale(0.98);
+}
+
+.chat-input-container .fade-up-leave-to {
+  opacity: 0;
+  transform: translateY(5px) scale(0.98);
 }
 </style>
