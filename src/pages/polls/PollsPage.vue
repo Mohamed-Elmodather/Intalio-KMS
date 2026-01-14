@@ -576,6 +576,26 @@ function submitVote(pollId: number) {
   poll.hasVoted = true
 }
 
+function openTrendingPoll(pollId: number) {
+  // Find the trending poll and scroll to active polls section or show details
+  const trendingPoll = trendingPolls.value.find(p => p.id === pollId)
+  if (trendingPoll) {
+    // Switch to active tab and search for the poll
+    activeTab.value = 'active'
+    searchQuery.value = trendingPoll.question.substring(0, 20)
+    // Scroll to the polls section
+    scrollToAllPolls()
+  }
+}
+
+function scrollToAllPolls() {
+  activeTab.value = 'active'
+  const pollsSection = document.querySelector('.bg-white.rounded-xl.border')
+  if (pollsSection) {
+    pollsSection.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+}
+
 function addQuickPollOption() {
   if (quickPoll.value.options.length < 5) {
     quickPoll.value.options.push('')
@@ -1088,7 +1108,7 @@ function getInsightTypeColor(type: string) {
               <p class="trending-subtitle">{{ textConstants.trendingSubtitle }}</p>
             </div>
           </div>
-          <a href="#" class="trending-view-all">
+          <a href="#" class="trending-view-all" @click.prevent="scrollToAllPolls">
             {{ textConstants.viewAll }}
             <i class="fas fa-arrow-right"></i>
           </a>
@@ -1100,6 +1120,7 @@ function getInsightTypeColor(type: string) {
             v-for="(poll, index) in trendingPolls"
             :key="poll.id"
             :class="['trending-card-enhanced', { 'top-three': index < 3, 'is-hot': poll.isHot }]"
+            @click="openTrendingPoll(poll.id)"
           >
             <!-- Hot Badge -->
             <div v-if="poll.isHot" class="hot-badge">
@@ -1158,7 +1179,7 @@ function getInsightTypeColor(type: string) {
                 <i class="fas fa-hourglass-half"></i>
                 <span>Ends in {{ poll.endsIn }}</span>
               </div>
-              <button class="trending-vote-btn-sm">
+              <button class="trending-vote-btn-sm" @click.stop="openTrendingPoll(poll.id)">
                 <span>{{ textConstants.voteNow }}</span>
                 <i class="fas fa-arrow-right"></i>
               </button>
