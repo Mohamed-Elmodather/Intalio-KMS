@@ -313,6 +313,182 @@ const mockMedia: Media[] = [
     ],
     author: { name: 'AFC Events', avatar: 'AE' },
     tags: ['Draw', 'Ceremony', 'Official', 'Groups']
+  },
+  // Additional galleries matching MediaCenterPage
+  {
+    id: 13,
+    title: 'AFC Asian Cup 2027 Official Draw Ceremony',
+    description: 'Complete photo gallery from the official draw ceremony featuring representatives from all 24 qualified nations.',
+    type: 'gallery' as const,
+    category: 'Highlights',
+    views: '28.5K',
+    likes: 1240,
+    date: '1 day ago',
+    thumbnail: 'https://images.unsplash.com/photo-1459865264687-595d652de67e?w=1200&h=800&fit=crop',
+    photoCount: 48,
+    images: [
+      { id: 1, url: 'https://images.unsplash.com/photo-1459865264687-595d652de67e?w=1920&h=1280&fit=crop', thumbnail: 'https://images.unsplash.com/photo-1459865264687-595d652de67e?w=400&h=300&fit=crop', caption: 'Draw ceremony opening' },
+      { id: 2, url: 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?w=1920&h=1280&fit=crop', thumbnail: 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?w=400&h=300&fit=crop', caption: 'Officials on stage' },
+      { id: 3, url: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=1920&h=1280&fit=crop', thumbnail: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=400&h=300&fit=crop', caption: 'Group announcements' },
+      { id: 4, url: 'https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?w=1920&h=1280&fit=crop', thumbnail: 'https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?w=400&h=300&fit=crop', caption: 'Audience reaction' }
+    ],
+    author: { name: 'AFC Media', avatar: 'AM' },
+    tags: ['Draw', 'Official', 'Ceremony']
+  },
+  {
+    id: 14,
+    title: 'Fan Zone Setup: Riyadh Boulevard',
+    description: 'Behind the scenes look at the spectacular fan zone being prepared at Riyadh Boulevard for AFC Asian Cup 2027.',
+    type: 'gallery' as const,
+    category: 'Fans',
+    views: '15.3K',
+    likes: 678,
+    date: '3 days ago',
+    thumbnail: 'https://images.unsplash.com/photo-1560272564-c83b66b1ad12?w=1200&h=800&fit=crop',
+    photoCount: 32,
+    images: [
+      { id: 1, url: 'https://images.unsplash.com/photo-1560272564-c83b66b1ad12?w=1920&h=1280&fit=crop', thumbnail: 'https://images.unsplash.com/photo-1560272564-c83b66b1ad12?w=400&h=300&fit=crop', caption: 'Fan zone entrance' },
+      { id: 2, url: 'https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=1920&h=1280&fit=crop', thumbnail: 'https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=400&h=300&fit=crop', caption: 'Stage setup' },
+      { id: 3, url: 'https://images.unsplash.com/photo-1606925797300-0b35e9d1794e?w=1920&h=1280&fit=crop', thumbnail: 'https://images.unsplash.com/photo-1606925797300-0b35e9d1794e?w=400&h=300&fit=crop', caption: 'Seating area' }
+    ],
+    author: { name: 'Events Team', avatar: 'ET' },
+    tags: ['Fans', 'Riyadh', 'Fan Zone']
+  },
+  {
+    id: 15,
+    title: 'Volunteer Training Program Launch',
+    description: 'Photos from the launch of the volunteer training program for AFC Asian Cup 2027.',
+    type: 'gallery' as const,
+    category: 'Behind the Scenes',
+    views: '12.8K',
+    likes: 456,
+    date: '1 week ago',
+    thumbnail: 'https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=1200&h=800&fit=crop',
+    photoCount: 65,
+    images: [
+      { id: 1, url: 'https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=1920&h=1280&fit=crop', thumbnail: 'https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=400&h=300&fit=crop', caption: 'Training session' },
+      { id: 2, url: 'https://images.unsplash.com/photo-1504450758481-7338eba7524a?w=1920&h=1280&fit=crop', thumbnail: 'https://images.unsplash.com/photo-1504450758481-7338eba7524a?w=400&h=300&fit=crop', caption: 'Group activities' }
+    ],
+    author: { name: 'LOC Team', avatar: 'LT' },
+    tags: ['Volunteers', 'Training', 'Behind the Scenes']
+  },
+  {
+    id: 16,
+    title: 'Stadium Infrastructure Progress Photos',
+    description: 'Latest progress photos showing the stadium infrastructure preparations for AFC Asian Cup 2027.',
+    type: 'gallery' as const,
+    category: 'Venues',
+    views: '9.5K',
+    likes: 345,
+    date: '2 weeks ago',
+    thumbnail: 'https://images.unsplash.com/photo-1489944440615-453fc2b6a9a9?w=1200&h=800&fit=crop',
+    photoCount: 28,
+    images: [
+      { id: 1, url: 'https://images.unsplash.com/photo-1489944440615-453fc2b6a9a9?w=1920&h=1280&fit=crop', thumbnail: 'https://images.unsplash.com/photo-1489944440615-453fc2b6a9a9?w=400&h=300&fit=crop', caption: 'Stadium overview' },
+      { id: 2, url: 'https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=1920&h=1280&fit=crop', thumbnail: 'https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=400&h=300&fit=crop', caption: 'Construction progress' }
+    ],
+    author: { name: 'Venue Operations', avatar: 'VO' },
+    tags: ['Stadium', 'Infrastructure', 'Progress']
+  },
+  {
+    id: 17,
+    title: 'Media Accreditation Workshop',
+    description: 'Photos from the media accreditation workshop for journalists covering AFC Asian Cup 2027.',
+    type: 'gallery' as const,
+    category: 'Behind the Scenes',
+    views: '6.2K',
+    likes: 234,
+    date: '3 weeks ago',
+    thumbnail: 'https://images.unsplash.com/photo-1504450758481-7338eba7524a?w=1200&h=800&fit=crop',
+    photoCount: 42,
+    images: [
+      { id: 1, url: 'https://images.unsplash.com/photo-1504450758481-7338eba7524a?w=1920&h=1280&fit=crop', thumbnail: 'https://images.unsplash.com/photo-1504450758481-7338eba7524a?w=400&h=300&fit=crop', caption: 'Workshop opening' },
+      { id: 2, url: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=1920&h=1280&fit=crop', thumbnail: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=400&h=300&fit=crop', caption: 'Credential collection' }
+    ],
+    author: { name: 'Media Team', avatar: 'MT' },
+    tags: ['Media', 'Workshop', 'Behind the Scenes']
+  },
+  // Additional images matching MediaCenterPage
+  {
+    id: 21,
+    title: 'Saudi Arabia Team Photo 2027',
+    description: 'Official team photo of the Saudi Arabia national football team for AFC Asian Cup 2027.',
+    type: 'image' as const,
+    category: 'Teams',
+    views: '35.2K',
+    likes: 1890,
+    date: '3 days ago',
+    thumbnail: 'https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=1200&h=800&fit=crop',
+    fullSizeUrl: 'https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=4000&h=2667&fit=crop',
+    width: 4000,
+    height: 2667,
+    author: { name: 'AFC Media', avatar: 'AM' },
+    tags: ['Saudi Arabia', 'Team', 'Official']
+  },
+  {
+    id: 22,
+    title: 'Trophy Unveiling Ceremony',
+    description: 'The official AFC Asian Cup trophy unveiled at a special ceremony in Riyadh.',
+    type: 'image' as const,
+    category: 'Highlights',
+    views: '42.1K',
+    likes: 2340,
+    date: '1 week ago',
+    thumbnail: 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=1200&h=800&fit=crop',
+    fullSizeUrl: 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=4000&h=2667&fit=crop',
+    width: 4000,
+    height: 2667,
+    author: { name: 'AFC Media', avatar: 'AM' },
+    tags: ['Trophy', 'Ceremony', 'Official']
+  },
+  {
+    id: 24,
+    title: 'Fans Celebrating at Boulevard',
+    description: 'Football fans celebrating at Riyadh Boulevard during AFC Asian Cup festivities.',
+    type: 'image' as const,
+    category: 'Fans',
+    views: '28.9K',
+    likes: 1567,
+    date: '2 weeks ago',
+    thumbnail: 'https://images.unsplash.com/photo-1459865264687-595d652de67e?w=1200&h=800&fit=crop',
+    fullSizeUrl: 'https://images.unsplash.com/photo-1459865264687-595d652de67e?w=4000&h=2667&fit=crop',
+    width: 4000,
+    height: 2667,
+    author: { name: 'Events Team', avatar: 'ET' },
+    tags: ['Fans', 'Celebration', 'Riyadh']
+  },
+  // Additional audio matching MediaCenterPage
+  {
+    id: 12,
+    title: 'AFC Podcast: Tournament Predictions',
+    description: 'Expert predictions and analysis for AFC Asian Cup 2027 from our panel of football analysts.',
+    type: 'audio' as const,
+    category: 'Interviews',
+    duration: '48:20',
+    durationSeconds: 2900,
+    views: '8.9K',
+    likes: 456,
+    date: '3 weeks ago',
+    thumbnail: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=1200&h=675&fit=crop',
+    author: { name: 'AFC Media', avatar: 'AM' },
+    tags: ['Podcast', 'Predictions', 'Analysis'],
+    hasTranscript: false
+  },
+  {
+    id: 23,
+    title: 'Pre-Match Analysis Podcast: Group A',
+    description: 'In-depth analysis of Group A teams and their chances in AFC Asian Cup 2027.',
+    type: 'audio' as const,
+    category: 'Matches',
+    duration: '32:15',
+    durationSeconds: 1935,
+    views: '6.4K',
+    likes: 345,
+    date: '1 week ago',
+    thumbnail: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=1200&h=675&fit=crop',
+    author: { name: 'AFC Analysts', avatar: 'AA' },
+    tags: ['Podcast', 'Group A', 'Analysis'],
+    hasTranscript: false
   }
 ]
 
