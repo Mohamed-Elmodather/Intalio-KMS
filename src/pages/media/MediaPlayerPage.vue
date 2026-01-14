@@ -592,9 +592,9 @@ function copySummary() {
 
             <!-- Action buttons -->
             <div class="flex items-center gap-3">
-              <button @click="downloadMedia" class="px-4 py-2 bg-white text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-all shadow-sm flex items-center gap-2">
+              <button @click="downloadMedia" class="px-4 py-2 bg-transparent text-white border border-white/30 rounded-xl font-medium hover:bg-white/10 transition-all flex items-center gap-2">
                 <i class="fas fa-download"></i>
-                <span>{{ textConstants.download }}</span>
+                <span class="hidden sm:inline">{{ textConstants.download }}</span>
               </button>
               <BookmarkButton
                 :content-id="media.id.toString()"

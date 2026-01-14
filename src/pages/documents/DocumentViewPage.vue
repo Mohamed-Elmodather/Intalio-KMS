@@ -1125,9 +1125,9 @@ function formatVersionDate(date: Date): string {
 
             <!-- Action buttons -->
             <div class="flex items-center gap-3">
-              <button @click="downloadDocument" class="px-4 py-2 bg-white text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-all shadow-sm flex items-center gap-2">
+              <button @click="downloadDocument" class="px-4 py-2 bg-transparent text-white border border-white/30 rounded-xl font-medium hover:bg-white/10 transition-all flex items-center gap-2">
                 <i class="fas fa-download"></i>
-                <span>Download</span>
+                <span class="hidden sm:inline">Download</span>
               </button>
               <BookmarkButton
                 :content-id="document.id.toString()"
