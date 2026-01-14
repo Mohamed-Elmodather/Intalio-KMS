@@ -596,13 +596,6 @@ function copySummary() {
                 <i class="fas fa-download"></i>
                 <span class="hidden sm:inline">{{ textConstants.download }}</span>
               </button>
-              <BookmarkButton
-                :content-id="media.id.toString()"
-                content-type="media"
-                size="md"
-                variant="icon"
-                class="text-white"
-              />
               <button @click="showAddToCollection = true" class="px-4 py-2 bg-transparent text-white border border-white/30 rounded-xl font-medium hover:bg-white/10 transition-all flex items-center gap-2" title="Add to Collection">
                 <i class="fas fa-folder-plus"></i>
                 <span class="hidden sm:inline">{{ textConstants.collection }}</span>
@@ -611,6 +604,13 @@ function copySummary() {
                 <i class="fas fa-share-alt"></i>
                 <span class="hidden sm:inline">{{ textConstants.share }}</span>
               </button>
+              <BookmarkButton
+                :content-id="media.id.toString()"
+                content-type="media"
+                size="md"
+                variant="icon"
+                class="text-white"
+              />
             </div>
           </div>
         </div>
