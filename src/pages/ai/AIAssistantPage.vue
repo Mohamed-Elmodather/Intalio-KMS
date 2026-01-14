@@ -78,6 +78,7 @@ interface Chat {
   id: number
   title: string
   preview: string
+  timestamp?: Date
   context?: ConversationContext
 }
 
@@ -176,36 +177,135 @@ const settings = ref<Settings>({
 
 const messages = ref<Message[]>([])
 
-// Mock data for conversation history
-const todayChats = ref<Chat[]>([
-  { id: 1, title: 'Company Policy Questions', preview: 'What is the remote work policy?' },
-  { id: 2, title: 'Document Summary', preview: 'Summarize the Q4 report...' }
+// ============================================================================
+// Configurable Text Constants - All UI text in one place for easy localization
+// ============================================================================
+const textConstants = {
+  // Header
+  appTitle: 'Intalio AI Assistant',
+  appSubtitle: 'Powered by advanced AI',
+
+  // Buttons & Actions
+  tools: 'Tools',
+  workflows: 'Workflows',
+  newChat: 'New Chat',
+  saveSettings: 'Save Settings',
+  addMore: 'Add more',
+
+  // History Sidebar
+  chats: 'Chats',
+  today: 'Today',
+  yesterday: 'Yesterday',
+  previous7Days: 'Previous 7 Days',
+  noConversationsYet: 'No conversations yet',
+  searchPlaceholder: 'Search...',
+  expand: 'Expand',
+  collapse: 'Collapse',
+
+  // Welcome Screen
+  welcomeTitle: 'How can I help you?',
+  welcomeSubtitle: 'Ask me anything or try one of these suggestions',
+
+  // Input Area
+  inputPlaceholder: 'Ask me anything... Type / for commands',
+  slashCommands: 'Slash Commands',
+  suggestedFollowUps: 'Suggested follow-ups:',
+  attachPlatformContent: 'Attach platform content',
+  voiceInputNotSupported: 'Voice input not supported',
+
+  // Messages
+  sources: 'Sources',
+  analyzingContent: 'Analyzing content...',
+
+  // Disclaimers
+  aiDisclaimer: 'AI can make mistakes. Consider checking important information.',
+
+  // Settings Panel
+  settingsTitle: 'AI Settings',
+  settingsSubtitle: 'Customize AI behavior',
+  responseStyle: 'Response Style',
+  language: 'Language',
+  preferences: 'Preferences',
+  concise: 'Concise',
+  conciseDesc: 'Brief, to-the-point responses',
+  detailed: 'Detailed',
+  detailedDesc: 'Comprehensive explanations',
+  conversational: 'Conversational',
+  conversationalDesc: 'Friendly, natural dialogue',
+  includeSourceReferences: 'Include source references',
+  saveConversationHistory: 'Save conversation history',
+
+  // Context Panel
+  contextIntelligence: 'Context Intelligence',
+  contextSubtitle: 'Real-time conversation analysis',
+  messages: 'Messages',
+  entities: 'Entities',
+  topics: 'Topics',
+  detectedIntent: 'Detected Intent',
+  conversationMood: 'Conversation Mood',
+  positive: 'Positive',
+  negative: 'Negative',
+  helpful: 'Helpful',
+  informative: 'Informative',
+  collaborative: 'Collaborative',
+  activeTopics: 'Active Topics',
+  recognizedEntities: 'Recognized Entities',
+  keyInsights: 'Key Insights',
+  referencedDocuments: 'Referenced Documents'
+}
+
+// Chat history - stored conversations (empty by default, populated from store/API)
+const chatHistory = ref<Chat[]>([])
+
+// Computed chat history grouped by date
+const todayChats = computed(() => {
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  return chatHistory.value.filter(chat => {
+    const chatDate = chat.timestamp ? new Date(chat.timestamp) : new Date()
+    chatDate.setHours(0, 0, 0, 0)
+    return chatDate.getTime() === today.getTime()
+  })
+})
+
+const yesterdayChats = computed(() => {
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  const yesterday = new Date(today)
+  yesterday.setDate(yesterday.getDate() - 1)
+  return chatHistory.value.filter(chat => {
+    const chatDate = chat.timestamp ? new Date(chat.timestamp) : new Date()
+    chatDate.setHours(0, 0, 0, 0)
+    return chatDate.getTime() === yesterday.getTime()
+  })
+})
+
+const olderChats = computed(() => {
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  const yesterday = new Date(today)
+  yesterday.setDate(yesterday.getDate() - 1)
+  return chatHistory.value.filter(chat => {
+    const chatDate = chat.timestamp ? new Date(chat.timestamp) : new Date()
+    chatDate.setHours(0, 0, 0, 0)
+    return chatDate.getTime() < yesterday.getTime()
+  })
+})
+
+// Suggested prompts - configurable
+const suggestedPrompts = computed<SuggestedPrompt[]>(() => [
+  { title: 'Search documents', text: 'Search documents', icon: 'fas fa-search', iconBg: 'bg-blue-100', iconColor: 'text-blue-600' },
+  { title: 'Summarize content', text: 'Summarize content', icon: 'fas fa-compress-alt', iconBg: 'bg-purple-100', iconColor: 'text-purple-600' },
+  { title: 'Translate text', text: 'Translate text', icon: 'fas fa-language', iconBg: 'bg-green-100', iconColor: 'text-green-600' },
+  { title: 'Analyze data', text: 'Analyze data', icon: 'fas fa-chart-bar', iconBg: 'bg-orange-100', iconColor: 'text-orange-600' }
 ])
 
-const yesterdayChats = ref<Chat[]>([
-  { id: 3, title: 'Training Resources', preview: 'Find training materials for new hires' },
-  { id: 4, title: 'Meeting Notes Help', preview: 'Help me format meeting notes' }
-])
-
-const olderChats = ref<Chat[]>([
-  { id: 5, title: 'Project Planning', preview: 'Create a project timeline' },
-  { id: 6, title: 'Benefits Information', preview: 'Explain health insurance options' }
-])
-
-const suggestedPrompts = ref<SuggestedPrompt[]>([
-  { title: 'Search Knowledge Base', text: 'Find articles about employee onboarding', icon: 'fas fa-search', iconBg: 'bg-blue-100', iconColor: 'text-blue-600' },
-  { title: 'Summarize Document', text: 'Summarize the latest quarterly report', icon: 'fas fa-file-alt', iconBg: 'bg-purple-100', iconColor: 'text-purple-600' },
-  { title: 'Policy Questions', text: 'What is the company travel policy?', icon: 'fas fa-book', iconBg: 'bg-green-100', iconColor: 'text-green-600' },
-  { title: 'Help with Tasks', text: 'Help me write a project proposal', icon: 'fas fa-tasks', iconBg: 'bg-orange-100', iconColor: 'text-orange-600' }
-])
-
-const quickActions = ref<QuickAction[]>([
-  { id: 'search', label: 'Search docs', icon: 'fas fa-search' },
+// Quick actions for input area
+const quickActions = computed<QuickAction[]>(() => [
+  { id: 'search', label: 'Search', icon: 'fas fa-search' },
   { id: 'summarize', label: 'Summarize', icon: 'fas fa-compress-alt' },
   { id: 'translate', label: 'Translate', icon: 'fas fa-language' },
-  { id: 'write', label: 'Help write', icon: 'fas fa-pen' },
-  { id: 'analyze', label: 'Analyze content', icon: 'fas fa-chart-bar' },
-  { id: 'compare', label: 'Compare docs', icon: 'fas fa-columns' }
+  { id: 'analyze', label: 'Analyze', icon: 'fas fa-chart-bar' }
 ])
 
 // ============================================================================
@@ -419,19 +519,48 @@ const isAnalyzingContent = ref(false)
 const isGeneratingSummary = ref(false)
 const showAttachmentMenu = ref(false)
 
-// Conversation Context
-const conversationContext = ref<ConversationContext>({
-  topics: ['AFC Asian Cup 2027', 'Tournament Management'],
-  entities: [
-    { text: 'AFC', type: 'organization', count: 3 },
-    { text: 'Saudi Arabia', type: 'location', count: 2 }
-  ],
-  intent: 'Information seeking',
-  summaryPoints: [
-    'User is exploring tournament management features',
-    'Interest in document and policy information'
-  ],
-  documentReferences: ['Tournament Handbook', 'Venue Guidelines']
+// Conversation Context - computed from messages
+const conversationContext = computed<ConversationContext>(() => {
+  const userMessages = messages.value.filter(m => m.role === 'user')
+  const allContent = userMessages.map(m => m.content).join(' ').toLowerCase()
+
+  // Extract topics from message content
+  const topicKeywords = ['document', 'policy', 'report', 'data', 'analysis', 'summary', 'search', 'translate']
+  const foundTopics = topicKeywords.filter(t => allContent.includes(t))
+    .map(t => t.charAt(0).toUpperCase() + t.slice(1))
+
+  // Extract potential entities (simple extraction)
+  const entities: { text: string; type: string; count: number }[] = []
+
+  // Determine intent based on last message
+  const lastUserMessage = userMessages[userMessages.length - 1]
+  let intent = 'General inquiry'
+  if (lastUserMessage) {
+    const content = lastUserMessage.content.toLowerCase()
+    if (content.includes('search') || content.includes('find')) intent = 'Search'
+    else if (content.includes('summarize') || content.includes('summary')) intent = 'Summarization'
+    else if (content.includes('translate')) intent = 'Translation'
+    else if (content.includes('analyze') || content.includes('analysis')) intent = 'Analysis'
+    else if (content.includes('help') || content.includes('how')) intent = 'Help request'
+  }
+
+  // Generate summary points from recent messages
+  const summaryPoints = userMessages.slice(-3).map(m =>
+    m.content.length > 50 ? m.content.substring(0, 50) + '...' : m.content
+  )
+
+  // Get document references from attachments
+  const documentReferences = messages.value
+    .filter(m => m.attachments && m.attachments.length > 0)
+    .flatMap(m => m.attachments?.map(a => a.title) || [])
+
+  return {
+    topics: foundTopics.length > 0 ? foundTopics : ['General'],
+    entities,
+    intent,
+    summaryPoints,
+    documentReferences
+  }
 })
 
 // Attached content for current message
@@ -457,19 +586,30 @@ const mockPlatformContent: PlatformContent[] = [
   { id: '8', type: 'event', title: 'Opening Ceremony Planning', excerpt: 'Details about the tournament opening event...', icon: 'fas fa-calendar', iconBg: 'bg-amber-100' }
 ]
 
-// Smart follow-up suggestions based on context
+// Dynamic follow-up suggestions based on conversation context
 const followUpSuggestions = computed(() => {
   if (messages.value.length === 0) return []
 
   const lastMessage = messages.value[messages.value.length - 1]
   if (!lastMessage || lastMessage.role !== 'assistant') return []
 
-  return [
-    'Tell me more about this',
-    'Can you provide examples?',
-    'What are the related policies?',
-    'Summarize the key points'
-  ]
+  const suggestions: string[] = []
+  const intent = conversationContext.value.intent
+
+  // Add context-aware suggestions based on intent
+  if (intent === 'Search') {
+    suggestions.push('Show more results', 'Refine search')
+  } else if (intent === 'Summarization') {
+    suggestions.push('Make it shorter', 'Add more details')
+  } else if (intent === 'Translation') {
+    suggestions.push('Translate to another language', 'Explain translation')
+  } else if (intent === 'Analysis') {
+    suggestions.push('Explain further', 'Show data breakdown')
+  } else {
+    suggestions.push('Tell me more', 'Give an example')
+  }
+
+  return suggestions.slice(0, 3)
 })
 
 // ============================================================================
@@ -670,12 +810,14 @@ async function sendMessage() {
         content: userQuery,
         timestamp: new Date()
       })
-      // Add AI response
-      messages.value.push({
-        role: 'assistant',
-        content: result,
-        timestamp: new Date()
-      })
+      // Add AI response only if result is a string (not true - which means message was already added)
+      if (typeof result === 'string') {
+        messages.value.push({
+          role: 'assistant',
+          content: result,
+          timestamp: new Date()
+        })
+      }
     }
     inputMessage.value = ''
     pendingAttachments.value = []
@@ -715,19 +857,23 @@ async function sendMessage() {
         timestamp: new Date()
       })
 
-      // Generate response based on operation
-      const operationResponses: Record<AIOperationType, string> = {
-        'summarize': `<p><strong>Summary:</strong></p><p>This is a concise summary of the provided content.</p>`,
-        'translate': `<p><strong>Translation:</strong></p><p>Translated content appears here.</p>`,
-        'extract-entities': `<p><strong>Entities Found:</strong></p><ul><li>Organization: AFC</li><li>Event: Asian Cup 2027</li><li>Location: Saudi Arabia</li></ul>`,
-        'analyze-sentiment': `<p><strong>Sentiment Analysis:</strong></p><p>Overall: <span class="text-green-600 font-medium">Positive (85%)</span></p>`,
-        'classify': `<p><strong>Classification:</strong></p><p>Category: <span class="font-medium">Sports/Tournament</span> (92% confidence)</p>`,
-        'ocr': `<p><strong>Extracted Text:</strong></p><p>Text extracted from the document...</p>`,
-        'generate-title': `<p><strong>Suggested Titles:</strong></p><ol><li>Comprehensive Guide</li><li>Complete Overview</li><li>Essential Information</li></ol>`,
-        'auto-tag': `<p><strong>Suggested Tags:</strong></p><p><span class="px-2 py-1 bg-teal-100 text-teal-700 rounded mr-1">tournament</span><span class="px-2 py-1 bg-blue-100 text-blue-700 rounded mr-1">football</span><span class="px-2 py-1 bg-purple-100 text-purple-700 rounded">asia</span></p>`,
-        'smart-search': `<p><strong>Search Results:</strong></p><ul><li>Result 1 - Relevant document</li><li>Result 2 - Related content</li></ul>`,
-        'chat': '<p>Response to your message.</p>'
+      // Generate response based on operation and user query
+      const generateOperationResponse = (op: AIOperationType, query: string): string => {
+        const responses: Record<AIOperationType, string> = {
+          'summarize': `<p><strong>Summary of "${query}":</strong></p><p>Here is a concise summary of the content you requested.</p>`,
+          'translate': `<p><strong>Translation:</strong></p><p>Translation of "${query}" completed.</p>`,
+          'extract-entities': `<p><strong>Entities found in "${query}":</strong></p><ul><li>Processing entities...</li></ul>`,
+          'analyze-sentiment': `<p><strong>Sentiment Analysis for "${query}":</strong></p><p>Analysis complete.</p>`,
+          'classify': `<p><strong>Classification of "${query}":</strong></p><p>Content categorized.</p>`,
+          'ocr': `<p><strong>Text extracted:</strong></p><p>OCR processing complete for your content.</p>`,
+          'generate-title': `<p><strong>Title suggestions for "${query}":</strong></p><ol><li>Option 1</li><li>Option 2</li><li>Option 3</li></ol>`,
+          'auto-tag': `<p><strong>Tags for "${query}":</strong></p><p>Tags generated based on content.</p>`,
+          'smart-search': `<p><strong>Search results for "${query}":</strong></p><ul><li>Searching...</li></ul>`,
+          'chat': `<p>Processing your request: "${query}"</p>`
+        }
+        return responses[op] || `<p>Operation "${op}" completed for: ${query}</p>`
       }
+      const operationResponse = generateOperationResponse(operation, userQuery)
 
       currentOperation.value = {
         type: operation,
@@ -737,7 +883,7 @@ async function sendMessage() {
 
       messages.value.push({
         role: 'assistant',
-        content: operationResponses[operation] || '<p>Operation completed.</p>',
+        content: operationResponse,
         timestamp: new Date()
       })
 
@@ -795,23 +941,25 @@ async function sendMessage() {
         </div>
         <p>Is there anything specific about this document you'd like me to elaborate on?</p>`
     } else {
-      responseContent = `<p>Thank you for your question about "${userQuery}".</p>
-        <p>Based on my analysis of the knowledge base, here's what I found:</p>
+      responseContent = `<p>I understand you're asking about "${userQuery}".</p>
+        <p>Here's what I can help you with:</p>
         <ul>
-          <li>The relevant policy documentation indicates comprehensive guidelines are available</li>
-          <li>According to recent updates, procedures have been streamlined</li>
-          <li>Best practices suggest following the official handbook</li>
+          <li>I can search for relevant documents and information</li>
+          <li>I can summarize content for you</li>
+          <li>I can help analyze or translate text</li>
         </ul>
-        <p>Is there anything specific you'd like me to clarify?</p>`
+        <p>Would you like me to perform any of these actions?</p>`
     }
+
+    // Only add sources if we have actual references
+    const sources = pendingAttachments.value.length > 0
+      ? pendingAttachments.value.map(a => ({ title: a.title, icon: a.icon, url: '#' }))
+      : undefined
 
     messages.value.push({
       role: 'assistant',
       content: responseContent,
-      sources: [
-        { title: 'Knowledge Base Article', icon: 'fas fa-file-alt', url: '#' },
-        { title: 'Policy Document', icon: 'fas fa-book', url: '#' }
-      ],
+      sources,
       analysis: analysisResults,
       timestamp: new Date()
     })
@@ -1178,11 +1326,11 @@ function handleEntityClick(entity: { text: string; type: string }) {
     >
       <!-- Header -->
       <div class="p-3 flex items-center" :class="isHistorySidebarCollapsed ? 'justify-center' : 'justify-between'">
-        <span v-if="!isHistorySidebarCollapsed" class="text-sm font-medium text-gray-700">Chats</span>
+        <span v-if="!isHistorySidebarCollapsed" class="text-sm font-medium text-gray-700">{{ textConstants.chats }}</span>
         <button
           @click="isHistorySidebarCollapsed = !isHistorySidebarCollapsed"
           class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-200 text-gray-500 transition-colors"
-          :title="isHistorySidebarCollapsed ? 'Expand' : 'Collapse'"
+          :title="isHistorySidebarCollapsed ? textConstants.expand : textConstants.collapse"
         >
           <i :class="['fas text-xs', isHistorySidebarCollapsed ? 'fa-angles-right' : 'fa-angles-left']"></i>
         </button>
@@ -1198,10 +1346,10 @@ function handleEntityClick(entity: { text: string; type: string }) {
               ? 'w-10 h-10 bg-teal-500 hover:bg-teal-600 text-white'
               : 'w-full py-2.5 bg-teal-500 hover:bg-teal-600 text-white'
           ]"
-          :title="isHistorySidebarCollapsed ? 'New Chat' : ''"
+          :title="isHistorySidebarCollapsed ? textConstants.newChat : ''"
         >
           <i class="fas fa-plus text-sm"></i>
-          <span v-if="!isHistorySidebarCollapsed" class="text-sm">New Chat</span>
+          <span v-if="!isHistorySidebarCollapsed" class="text-sm">{{ textConstants.newChat }}</span>
         </button>
       </div>
 
@@ -1212,7 +1360,7 @@ function handleEntityClick(entity: { text: string; type: string }) {
           <input
             type="text"
             v-model="searchHistory"
-            placeholder="Search..."
+            :placeholder="textConstants.searchPlaceholder"
             class="w-full pl-9 pr-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-teal-400 focus:ring-1 focus:ring-teal-400"
           />
         </div>
@@ -1223,7 +1371,7 @@ function handleEntityClick(entity: { text: string; type: string }) {
         <!-- Today Section -->
         <div v-if="todayChats.length > 0">
           <div v-if="!isHistorySidebarCollapsed" class="px-3 py-2">
-            <span class="text-xs font-medium text-gray-400 uppercase">Today</span>
+            <span class="text-xs font-medium text-gray-400 uppercase">{{ textConstants.today }}</span>
           </div>
           <div v-for="chat in todayChats" :key="chat.id"
                @click="selectChat(chat)"
@@ -1252,7 +1400,7 @@ function handleEntityClick(entity: { text: string; type: string }) {
         <!-- Yesterday Section -->
         <div v-if="yesterdayChats.length > 0">
           <div v-if="!isHistorySidebarCollapsed" class="px-3 py-2 mt-2">
-            <span class="text-xs font-medium text-gray-400 uppercase">Yesterday</span>
+            <span class="text-xs font-medium text-gray-400 uppercase">{{ textConstants.yesterday }}</span>
           </div>
           <div v-else class="mx-2 my-2 h-px bg-gray-200"></div>
           <div v-for="chat in yesterdayChats" :key="chat.id"
@@ -1282,7 +1430,7 @@ function handleEntityClick(entity: { text: string; type: string }) {
         <!-- Older Section -->
         <div v-if="olderChats.length > 0">
           <div v-if="!isHistorySidebarCollapsed" class="px-3 py-2 mt-2">
-            <span class="text-xs font-medium text-gray-400 uppercase">Previous 7 Days</span>
+            <span class="text-xs font-medium text-gray-400 uppercase">{{ textConstants.previous7Days }}</span>
           </div>
           <div v-else class="mx-2 my-2 h-px bg-gray-200"></div>
           <div v-for="chat in olderChats" :key="chat.id"
@@ -1314,7 +1462,7 @@ function handleEntityClick(entity: { text: string; type: string }) {
              class="px-3 py-8 text-center">
           <div v-if="!isHistorySidebarCollapsed">
             <i class="fas fa-comments text-2xl text-gray-300 mb-2"></i>
-            <p class="text-sm text-gray-400">No conversations yet</p>
+            <p class="text-sm text-gray-400">{{ textConstants.noConversationsYet }}</p>
           </div>
         </div>
       </div>
@@ -1329,8 +1477,8 @@ function handleEntityClick(entity: { text: string; type: string }) {
             <i class="fas fa-robot text-white text-lg icon-vibrant"></i>
           </div>
           <div>
-            <h1 class="font-semibold text-teal-900">Intalio AI Assistant</h1>
-            <p class="text-xs text-teal-500">Powered by advanced AI • Multi-turn context enabled</p>
+            <h1 class="font-semibold text-teal-900">{{ textConstants.appTitle }}</h1>
+            <p class="text-xs text-teal-500">{{ textConstants.appSubtitle }}</p>
           </div>
         </div>
         <div class="flex items-center gap-2">
@@ -1339,7 +1487,7 @@ function handleEntityClick(entity: { text: string; type: string }) {
                   class="px-3 py-1.5 rounded-lg bg-teal-50 hover:bg-teal-100 text-teal-700 text-sm font-medium flex items-center gap-2 transition-colors ripple"
                   title="AI Tools (Ctrl+K)">
             <i class="fas fa-wand-magic-sparkles"></i>
-            <span class="hidden sm:inline">Tools</span>
+            <span class="hidden sm:inline">{{ textConstants.tools }}</span>
             <kbd class="hidden md:inline px-1.5 py-0.5 bg-white rounded text-xs text-gray-500 border border-gray-200">⌘K</kbd>
           </button>
           <!-- Workflows -->
@@ -1347,7 +1495,7 @@ function handleEntityClick(entity: { text: string; type: string }) {
                   class="px-3 py-1.5 rounded-lg bg-purple-50 hover:bg-purple-100 text-purple-700 text-sm font-medium flex items-center gap-2 transition-colors ripple"
                   title="AI Workflows">
             <i class="fas fa-stream"></i>
-            <span class="hidden sm:inline">Workflows</span>
+            <span class="hidden sm:inline">{{ textConstants.workflows }}</span>
           </button>
           <div class="w-px h-6 bg-teal-200"></div>
           <!-- Context Panel Toggle -->
@@ -1381,8 +1529,8 @@ function handleEntityClick(entity: { text: string; type: string }) {
       <div class="flex-1 min-h-0 overflow-y-auto p-6 scrollbar-thin">
         <!-- Welcome State -->
         <div v-if="messages.length === 0" class="h-full flex flex-col items-center justify-center text-center">
-          <h2 class="text-xl font-semibold text-gray-800 mb-1">How can I help you?</h2>
-          <p class="text-gray-500 text-sm mb-8 max-w-sm">Ask me anything or try one of these suggestions</p>
+          <h2 class="text-xl font-semibold text-gray-800 mb-1">{{ textConstants.welcomeTitle }}</h2>
+          <p class="text-gray-500 text-sm mb-8 max-w-sm">{{ textConstants.welcomeSubtitle }}</p>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-2 max-w-xl w-full px-4">
             <button
@@ -1435,7 +1583,7 @@ function handleEntityClick(entity: { text: string; type: string }) {
 
                   <!-- Sources/References -->
                   <div v-if="msg.sources && msg.sources.length" class="mt-4 pt-4 border-t border-teal-100">
-                    <p class="text-xs font-semibold text-teal-500 uppercase mb-2">Sources</p>
+                    <p class="text-xs font-semibold text-teal-500 uppercase mb-2">{{ textConstants.sources }}</p>
                     <div class="flex flex-wrap gap-2">
                       <a v-for="(source, sidx) in msg.sources" :key="sidx"
                          :href="source.url"
@@ -1479,7 +1627,7 @@ function handleEntityClick(entity: { text: string; type: string }) {
                   <div class="w-2 h-2 bg-teal-400 rounded-full animate-bounce" style="animation-delay: 300ms"></div>
                 </div>
                 <span v-if="isAnalyzingContent" class="text-xs text-teal-600 ml-2">
-                  <i class="fas fa-chart-bar mr-1"></i>Analyzing content...
+                  <i class="fas fa-chart-bar mr-1"></i>{{ textConstants.analyzingContent }}
                 </span>
               </div>
             </div>
@@ -1487,7 +1635,7 @@ function handleEntityClick(entity: { text: string; type: string }) {
 
           <!-- Follow-up Suggestions -->
           <div v-if="followUpSuggestions.length > 0 && !isTyping" class="flex flex-wrap gap-2 mt-4 fade-in-up">
-            <span class="text-xs text-gray-500 mr-2">Suggested follow-ups:</span>
+            <span class="text-xs text-gray-500 mr-2">{{ textConstants.suggestedFollowUps }}</span>
             <button v-for="suggestion in followUpSuggestions" :key="suggestion"
                     @click="useFollowUp(suggestion)"
                     class="px-3 py-1.5 bg-gradient-to-r from-teal-50 to-emerald-50 border border-teal-200 rounded-full text-sm text-teal-700 hover:from-teal-100 hover:to-emerald-100 transition-all">
@@ -1542,7 +1690,7 @@ function handleEntityClick(entity: { text: string; type: string }) {
             <button @click="openContentBrowser"
                     class="inline-flex items-center gap-2 px-3 py-2 border-2 border-dashed border-teal-300 rounded-lg text-sm text-teal-600 hover:bg-teal-100 transition-colors">
               <i class="fas fa-plus"></i>
-              Add more
+              {{ textConstants.addMore }}
             </button>
           </div>
 
@@ -1553,7 +1701,7 @@ function handleEntityClick(entity: { text: string; type: string }) {
                 <div v-if="showCommandSuggestions && commandSuggestions.length > 0"
                      class="absolute bottom-full left-0 right-0 mb-2 bg-white/95 backdrop-blur-lg rounded-2xl shadow-2xl border border-gray-200/50 overflow-hidden z-10">
                   <div class="p-3 border-b border-gray-100 bg-gradient-to-r from-teal-50/50 to-transparent">
-                    <span class="text-xs font-semibold text-teal-600 uppercase tracking-wider">Slash Commands</span>
+                    <span class="text-xs font-semibold text-teal-600 uppercase tracking-wider">{{ textConstants.slashCommands }}</span>
                   </div>
                   <div class="max-h-56 overflow-y-auto p-1">
                     <button v-for="cmd in commandSuggestions" :key="cmd.command"
@@ -1583,7 +1731,7 @@ function handleEntityClick(entity: { text: string; type: string }) {
                 <textarea v-model="inputMessage"
                           @keydown.enter.exact.prevent="sendMessage"
                           @keydown.shift.enter="() => {}"
-                          placeholder="Ask me anything... Type / for commands"
+                          :placeholder="textConstants.inputPlaceholder"
                           rows="1"
                           class="chat-textarea w-full px-4 py-4 pr-32 resize-none min-h-[56px] max-h-40
                                  bg-transparent text-gray-800 placeholder-gray-400
@@ -1594,7 +1742,7 @@ function handleEntityClick(entity: { text: string; type: string }) {
                 <div class="absolute right-2 bottom-2 flex items-center gap-1 bg-white/80 backdrop-blur-sm rounded-xl p-1">
                   <button @click="openContentBrowser"
                           class="chat-action-btn p-2.5 rounded-xl hover:bg-teal-50 text-gray-400 hover:text-teal-500 transition-all duration-200 relative"
-                          title="Attach platform content">
+                          :title="textConstants.attachPlatformContent">
                     <i class="fas fa-paperclip"></i>
                     <span v-if="pendingAttachments.length > 0"
                           class="absolute -top-1 -right-1 w-5 h-5 bg-gradient-to-br from-teal-400 to-teal-600 text-white text-[10px] font-bold rounded-full flex items-center justify-center shadow-md animate-pulse">
@@ -1609,7 +1757,7 @@ function handleEntityClick(entity: { text: string; type: string }) {
                   />
                   <button v-else
                           class="p-2.5 rounded-xl text-gray-300 cursor-not-allowed"
-                          title="Voice input not supported"
+                          :title="textConstants.voiceInputNotSupported"
                           disabled>
                     <i class="fas fa-microphone"></i>
                   </button>
@@ -1633,7 +1781,7 @@ function handleEntityClick(entity: { text: string; type: string }) {
           </div>
 
           <p class="text-xs text-teal-400 text-center mt-3">
-            AI can make mistakes. Consider checking important information. • Type <kbd class="px-1 bg-teal-100 rounded">/</kbd> for commands • <kbd class="px-1 bg-teal-100 rounded">Ctrl+K</kbd> for tools
+            {{ textConstants.aiDisclaimer }}
           </p>
         </div>
       </div>
@@ -1661,8 +1809,8 @@ function handleEntityClick(entity: { text: string; type: string }) {
                   <i class="fas fa-cog text-teal-500"></i>
                 </div>
                 <div>
-                  <h3 class="font-semibold text-gray-800">AI Settings</h3>
-                  <p class="text-xs text-gray-400">Customize AI behavior</p>
+                  <h3 class="font-semibold text-gray-800">{{ textConstants.settingsTitle }}</h3>
+                  <p class="text-xs text-gray-400">{{ textConstants.settingsSubtitle }}</p>
                 </div>
               </div>
               <button @click="showSettings = false" class="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-400 hover:text-gray-600" title="Close">
@@ -1677,28 +1825,28 @@ function handleEntityClick(entity: { text: string; type: string }) {
             <div class="bg-white rounded-xl p-4 border border-gray-100">
               <div class="flex items-center gap-2 mb-3">
                 <i class="fas fa-comment-alt text-teal-500"></i>
-                <label class="text-sm font-medium text-gray-700">Response Style</label>
+                <label class="text-sm font-medium text-gray-700">{{ textConstants.responseStyle }}</label>
               </div>
               <div class="space-y-2">
                 <label class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors">
                   <input type="radio" v-model="settings.style" value="concise" class="w-4 h-4 text-teal-500">
                   <div>
-                    <p class="text-sm font-medium text-gray-700">Concise</p>
-                    <p class="text-xs text-gray-400">Brief, to-the-point responses</p>
+                    <p class="text-sm font-medium text-gray-700">{{ textConstants.concise }}</p>
+                    <p class="text-xs text-gray-400">{{ textConstants.conciseDesc }}</p>
                   </div>
                 </label>
                 <label class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors">
                   <input type="radio" v-model="settings.style" value="detailed" class="w-4 h-4 text-teal-500">
                   <div>
-                    <p class="text-sm font-medium text-gray-700">Detailed</p>
-                    <p class="text-xs text-gray-400">Comprehensive explanations</p>
+                    <p class="text-sm font-medium text-gray-700">{{ textConstants.detailed }}</p>
+                    <p class="text-xs text-gray-400">{{ textConstants.detailedDesc }}</p>
                   </div>
                 </label>
                 <label class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors">
                   <input type="radio" v-model="settings.style" value="conversational" class="w-4 h-4 text-teal-500">
                   <div>
-                    <p class="text-sm font-medium text-gray-700">Conversational</p>
-                    <p class="text-xs text-gray-400">Friendly, natural dialogue</p>
+                    <p class="text-sm font-medium text-gray-700">{{ textConstants.conversational }}</p>
+                    <p class="text-xs text-gray-400">{{ textConstants.conversationalDesc }}</p>
                   </div>
                 </label>
               </div>
@@ -1708,7 +1856,7 @@ function handleEntityClick(entity: { text: string; type: string }) {
             <div class="bg-white rounded-xl p-4 border border-gray-100">
               <div class="flex items-center gap-2 mb-3">
                 <i class="fas fa-globe text-green-500"></i>
-                <label class="text-sm font-medium text-gray-700">Language</label>
+                <label class="text-sm font-medium text-gray-700">{{ textConstants.language }}</label>
               </div>
               <div class="grid grid-cols-2 gap-2">
                 <label class="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors border" :class="settings.language === 'en' ? 'border-teal-300 bg-teal-50' : 'border-transparent'">
@@ -1738,13 +1886,13 @@ function handleEntityClick(entity: { text: string; type: string }) {
             <div class="bg-white rounded-xl p-4 border border-gray-100 space-y-4">
               <div class="flex items-center gap-2 mb-1">
                 <i class="fas fa-sliders-h text-purple-500"></i>
-                <span class="text-sm font-medium text-gray-700">Preferences</span>
+                <span class="text-sm font-medium text-gray-700">{{ textConstants.preferences }}</span>
               </div>
 
               <div class="flex items-center justify-between py-2">
                 <div class="flex items-center gap-2">
                   <i class="fas fa-link text-gray-400 text-sm"></i>
-                  <span class="text-sm text-gray-700">Include source references</span>
+                  <span class="text-sm text-gray-700">{{ textConstants.includeSourceReferences }}</span>
                 </div>
                 <label class="relative inline-flex items-center cursor-pointer">
                   <input type="checkbox" v-model="settings.showSources" class="sr-only peer">
@@ -1755,7 +1903,7 @@ function handleEntityClick(entity: { text: string; type: string }) {
               <div class="flex items-center justify-between py-2">
                 <div class="flex items-center gap-2">
                   <i class="fas fa-history text-gray-400 text-sm"></i>
-                  <span class="text-sm text-gray-700">Save conversation history</span>
+                  <span class="text-sm text-gray-700">{{ textConstants.saveConversationHistory }}</span>
                 </div>
                 <label class="relative inline-flex items-center cursor-pointer">
                   <input type="checkbox" v-model="settings.saveHistory" class="sr-only peer">
@@ -1772,7 +1920,7 @@ function handleEntityClick(entity: { text: string; type: string }) {
               class="w-full py-2.5 bg-teal-500 hover:bg-teal-600 text-white font-medium rounded-xl transition-colors flex items-center justify-center gap-2"
             >
               <i class="fas fa-check"></i>
-              Save Settings
+              {{ textConstants.saveSettings }}
             </button>
           </div>
         </div>
@@ -1801,8 +1949,8 @@ function handleEntityClick(entity: { text: string; type: string }) {
                 <i class="fas fa-brain text-teal-500 text-lg"></i>
               </div>
               <div>
-                <h3 class="font-semibold text-gray-800">Context Intelligence</h3>
-                <p class="text-xs text-gray-400">Real-time conversation analysis</p>
+                <h3 class="font-semibold text-gray-800">{{ textConstants.contextIntelligence }}</h3>
+                <p class="text-xs text-gray-400">{{ textConstants.contextSubtitle }}</p>
               </div>
             </div>
             <button @click="showContextPanel = false" class="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-400 hover:text-gray-600" title="Close panel">
@@ -1814,15 +1962,15 @@ function handleEntityClick(entity: { text: string; type: string }) {
           <div class="flex items-center gap-3 mt-4 pt-4 border-t border-gray-100">
             <div class="flex-1 text-center p-2 bg-teal-50/50 rounded-lg">
               <p class="text-xl font-semibold text-teal-600">{{ messages.length }}</p>
-              <p class="text-xs text-gray-400">Messages</p>
+              <p class="text-xs text-gray-400">{{ textConstants.messages }}</p>
             </div>
             <div class="flex-1 text-center p-2 bg-teal-50/50 rounded-lg">
               <p class="text-xl font-semibold text-teal-600">{{ conversationContext.entities.length }}</p>
-              <p class="text-xs text-gray-400">Entities</p>
+              <p class="text-xs text-gray-400">{{ textConstants.entities }}</p>
             </div>
             <div class="flex-1 text-center p-2 bg-teal-50/50 rounded-lg">
               <p class="text-xl font-semibold text-teal-600">{{ conversationContext.topics.length }}</p>
-              <p class="text-xs text-gray-400">Topics</p>
+              <p class="text-xs text-gray-400">{{ textConstants.topics }}</p>
             </div>
           </div>
         </div>
@@ -1833,7 +1981,7 @@ function handleEntityClick(entity: { text: string; type: string }) {
             <div class="bg-teal-50/50 rounded-xl p-4 border border-teal-100/50">
               <div class="flex items-center gap-2 mb-2">
                 <i class="fas fa-crosshairs text-teal-400"></i>
-                <span class="text-xs font-semibold uppercase tracking-wider text-gray-400">Detected Intent</span>
+                <span class="text-xs font-semibold uppercase tracking-wider text-gray-400">{{ textConstants.detectedIntent }}</span>
               </div>
               <p class="text-base font-semibold text-gray-700">{{ conversationContext.intent }}</p>
               <div class="flex items-center gap-2 mt-3 pt-3 border-t border-teal-100/30">
@@ -1851,15 +1999,15 @@ function handleEntityClick(entity: { text: string; type: string }) {
               <div class="flex items-center justify-between mb-3">
                 <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wider flex items-center gap-2">
                   <i class="fas fa-heart text-pink-300"></i>
-                  Conversation Mood
+                  {{ textConstants.conversationMood }}
                 </h4>
-                <span class="px-2 py-0.5 bg-green-50 text-green-500 rounded-full text-xs font-medium">Positive</span>
+                <span class="px-2 py-0.5 bg-green-50 text-green-500 rounded-full text-xs font-medium">{{ textConstants.positive }}</span>
               </div>
               <div class="flex items-center gap-3">
                 <div class="flex-1">
                   <div class="flex items-center justify-between text-xs text-gray-400 mb-1">
-                    <span>Negative</span>
-                    <span>Positive</span>
+                    <span>{{ textConstants.negative }}</span>
+                    <span>{{ textConstants.positive }}</span>
                   </div>
                   <div class="h-2 bg-gradient-to-r from-red-100 via-yellow-100 to-green-100 rounded-full relative">
                     <div class="absolute top-1/2 -translate-y-1/2 w-3 h-3 bg-white border-2 border-green-400 rounded-full shadow-sm" style="left: 75%"></div>
@@ -1869,15 +2017,15 @@ function handleEntityClick(entity: { text: string; type: string }) {
               <div class="flex items-center justify-center gap-6 mt-3 pt-3 border-t border-gray-100/50">
                 <div class="text-center">
                   <i class="fas fa-smile text-green-300"></i>
-                  <p class="text-xs text-gray-400 mt-1">Helpful</p>
+                  <p class="text-xs text-gray-400 mt-1">{{ textConstants.helpful }}</p>
                 </div>
                 <div class="text-center">
                   <i class="fas fa-lightbulb text-amber-300"></i>
-                  <p class="text-xs text-gray-400 mt-1">Informative</p>
+                  <p class="text-xs text-gray-400 mt-1">{{ textConstants.informative }}</p>
                 </div>
                 <div class="text-center">
                   <i class="fas fa-handshake text-blue-300"></i>
-                  <p class="text-xs text-gray-400 mt-1">Collaborative</p>
+                  <p class="text-xs text-gray-400 mt-1">{{ textConstants.collaborative }}</p>
                 </div>
               </div>
             </div>
@@ -1887,7 +2035,7 @@ function handleEntityClick(entity: { text: string; type: string }) {
           <div class="px-4 pb-4">
             <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 flex items-center gap-2">
               <i class="fas fa-hashtag text-teal-400"></i>
-              Active Topics
+              {{ textConstants.activeTopics }}
             </h4>
             <div class="flex flex-wrap gap-2">
               <button v-for="topic in conversationContext.topics" :key="topic"
@@ -1902,7 +2050,7 @@ function handleEntityClick(entity: { text: string; type: string }) {
           <div class="px-4 pb-4">
             <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 flex items-center gap-2">
               <i class="fas fa-cube text-teal-500"></i>
-              Recognized Entities
+              {{ textConstants.recognizedEntities }}
             </h4>
             <div class="space-y-2">
               <button v-for="entity in conversationContext.entities" :key="entity.text"
@@ -1943,7 +2091,7 @@ function handleEntityClick(entity: { text: string; type: string }) {
           <div class="px-4 pb-4">
             <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 flex items-center gap-2">
               <i class="fas fa-lightbulb text-amber-400"></i>
-              Key Insights
+              {{ textConstants.keyInsights }}
             </h4>
             <div class="bg-amber-50/30 rounded-2xl p-4 border border-amber-100/50">
               <ul class="space-y-3">
@@ -1962,7 +2110,7 @@ function handleEntityClick(entity: { text: string; type: string }) {
           <div v-if="conversationContext.documentReferences.length > 0" class="px-4 pb-4">
             <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 flex items-center gap-2">
               <i class="fas fa-folder-open text-amber-400"></i>
-              Referenced Documents
+              {{ textConstants.referencedDocuments }}
             </h4>
             <div class="space-y-2">
               <button v-for="doc in conversationContext.documentReferences" :key="doc"
