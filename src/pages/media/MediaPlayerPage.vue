@@ -467,11 +467,21 @@ function copySummary() {
 
     <!-- Media Content -->
     <div v-else-if="media" class="px-6 py-8">
-      <!-- Back Button -->
-      <button @click="goBack" class="inline-flex items-center gap-2 text-gray-600 hover:text-teal-600 transition-colors group mb-6">
-        <i class="fas fa-arrow-left group-hover:-translate-x-1 transition-transform"></i>
-        <span>Back to Media Center</span>
-      </button>
+      <!-- Navigation Row -->
+      <div class="header-nav">
+        <button @click="goBack" class="back-btn">
+          <i class="fas fa-arrow-left"></i>
+          <span>Back</span>
+        </button>
+        <div class="breadcrumb">
+          <router-link to="/media" class="breadcrumb-link">
+            <i class="fas fa-photo-video"></i>
+            Media Center
+          </router-link>
+          <i class="fas fa-chevron-right breadcrumb-sep"></i>
+          <span class="breadcrumb-current">{{ media.title }}</span>
+        </div>
+      </div>
 
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Main Content -->
@@ -897,6 +907,68 @@ function copySummary() {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+/* Navigation */
+.header-nav {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.back-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+  border: none;
+  border-radius: 0.75rem;
+  color: white;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.back-btn:hover {
+  transform: translateX(-2px);
+  box-shadow: 0 4px 12px rgba(20, 184, 166, 0.3);
+}
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.breadcrumb-link {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  color: #6b7280;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.breadcrumb-link:hover {
+  color: #14b8a6;
+}
+
+.breadcrumb-sep {
+  color: #d1d5db;
+  font-size: 0.625rem;
+}
+
+.breadcrumb-current {
+  color: #111827;
+  font-weight: 500;
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* Custom scrollbar for AI panels */
