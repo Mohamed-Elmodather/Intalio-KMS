@@ -1440,7 +1440,7 @@ function handleEntityClick(entity: { text: string; type: string }) {
       <Transition name="slide-right">
         <div v-if="showContextPanel" class="fixed right-0 top-0 h-full w-96 bg-gradient-to-b from-gray-50 to-white shadow-2xl z-50 flex flex-col border-l border-gray-200">
         <!-- Header -->
-        <div class="p-5 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500">
+        <div class="p-5 bg-gradient-to-r from-teal-500 via-teal-600 to-emerald-600">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-3">
               <div class="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
@@ -1534,13 +1534,13 @@ function handleEntityClick(entity: { text: string; type: string }) {
           <!-- Active Topics -->
           <div class="px-4 pb-4">
             <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 flex items-center gap-2">
-              <i class="fas fa-hashtag text-blue-500"></i>
+              <i class="fas fa-hashtag text-teal-500"></i>
               Active Topics
             </h4>
             <div class="flex flex-wrap gap-2">
               <button v-for="topic in conversationContext.topics" :key="topic"
-                      class="group px-4 py-2 bg-gradient-to-r from-blue-50 to-indigo-50 hover:from-blue-100 hover:to-indigo-100 border border-blue-200 text-blue-700 rounded-xl text-sm font-medium transition-all hover:shadow-md">
-                <i class="fas fa-tag text-blue-400 mr-2 group-hover:text-blue-600"></i>
+                      class="group px-4 py-2 bg-gradient-to-r from-teal-50 to-emerald-50 hover:from-teal-100 hover:to-emerald-100 border border-teal-200 text-teal-700 rounded-xl text-sm font-medium transition-all hover:shadow-md">
+                <i class="fas fa-tag text-teal-400 mr-2 group-hover:text-teal-600"></i>
                 {{ topic }}
               </button>
             </div>
@@ -1549,12 +1549,12 @@ function handleEntityClick(entity: { text: string; type: string }) {
           <!-- Recognized Entities -->
           <div class="px-4 pb-4">
             <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 flex items-center gap-2">
-              <i class="fas fa-cube text-purple-500"></i>
+              <i class="fas fa-cube text-teal-500"></i>
               Recognized Entities
             </h4>
             <div class="space-y-2">
               <button v-for="entity in conversationContext.entities" :key="entity.text"
-                      class="w-full flex items-center justify-between p-3 bg-white hover:bg-purple-50 rounded-xl border border-gray-100 hover:border-purple-200 transition-all group">
+                      class="w-full flex items-center justify-between p-3 bg-white hover:bg-teal-50 rounded-xl border border-gray-100 hover:border-teal-200 transition-all group">
                 <div class="flex items-center gap-3">
                   <div :class="[
                     'w-10 h-10 rounded-xl flex items-center justify-center',
@@ -1578,10 +1578,10 @@ function handleEntityClick(entity: { text: string; type: string }) {
                   </div>
                 </div>
                 <div class="flex items-center gap-2">
-                  <span class="px-2 py-1 bg-gray-100 group-hover:bg-purple-100 rounded-lg text-xs font-medium text-gray-600 group-hover:text-purple-700">
+                  <span class="px-2 py-1 bg-gray-100 group-hover:bg-teal-100 rounded-lg text-xs font-medium text-gray-600 group-hover:text-teal-700">
                     {{ entity.count }}x
                   </span>
-                  <i class="fas fa-search text-gray-300 group-hover:text-purple-500"></i>
+                  <i class="fas fa-search text-gray-300 group-hover:text-teal-500"></i>
                 </div>
               </button>
             </div>
@@ -1630,23 +1630,23 @@ function handleEntityClick(entity: { text: string; type: string }) {
           <!-- AI Suggestions -->
           <div class="px-4 pb-6">
             <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 flex items-center gap-2">
-              <i class="fas fa-magic text-indigo-500"></i>
+              <i class="fas fa-magic text-teal-500"></i>
               AI Suggestions
             </h4>
-            <div class="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-2xl p-4 border border-indigo-100">
+            <div class="bg-gradient-to-br from-teal-50 to-emerald-50 rounded-2xl p-4 border border-teal-100">
               <p class="text-sm text-gray-600 mb-3">Based on this conversation, you might want to:</p>
               <div class="space-y-2">
-                <button class="w-full flex items-center gap-3 p-2.5 bg-white hover:bg-indigo-100 rounded-xl text-left transition-colors group">
-                  <i class="fas fa-file-export text-indigo-500"></i>
-                  <span class="text-sm text-gray-700 group-hover:text-indigo-700">Export conversation summary</span>
+                <button class="w-full flex items-center gap-3 p-2.5 bg-white hover:bg-teal-100 rounded-xl text-left transition-colors group">
+                  <i class="fas fa-file-export text-teal-500"></i>
+                  <span class="text-sm text-gray-700 group-hover:text-teal-700">Export conversation summary</span>
                 </button>
-                <button class="w-full flex items-center gap-3 p-2.5 bg-white hover:bg-indigo-100 rounded-xl text-left transition-colors group">
-                  <i class="fas fa-tasks text-indigo-500"></i>
-                  <span class="text-sm text-gray-700 group-hover:text-indigo-700">Create action items</span>
+                <button class="w-full flex items-center gap-3 p-2.5 bg-white hover:bg-teal-100 rounded-xl text-left transition-colors group">
+                  <i class="fas fa-tasks text-teal-500"></i>
+                  <span class="text-sm text-gray-700 group-hover:text-teal-700">Create action items</span>
                 </button>
-                <button class="w-full flex items-center gap-3 p-2.5 bg-white hover:bg-indigo-100 rounded-xl text-left transition-colors group">
-                  <i class="fas fa-search-plus text-indigo-500"></i>
-                  <span class="text-sm text-gray-700 group-hover:text-indigo-700">Deep dive into topics</span>
+                <button class="w-full flex items-center gap-3 p-2.5 bg-white hover:bg-teal-100 rounded-xl text-left transition-colors group">
+                  <i class="fas fa-search-plus text-teal-500"></i>
+                  <span class="text-sm text-gray-700 group-hover:text-teal-700">Deep dive into topics</span>
                 </button>
               </div>
             </div>
@@ -1655,7 +1655,7 @@ function handleEntityClick(entity: { text: string; type: string }) {
 
         <!-- Footer -->
         <div class="p-4 border-t border-gray-200 bg-white">
-          <button class="w-full py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-xl font-medium transition-all flex items-center justify-center gap-2 shadow-lg hover:shadow-xl">
+          <button class="w-full py-3 bg-gradient-to-r from-teal-500 to-emerald-600 hover:from-teal-600 hover:to-emerald-700 text-white rounded-xl font-medium transition-all flex items-center justify-center gap-2 shadow-lg hover:shadow-xl">
             <i class="fas fa-download"></i>
             Export Context Report
           </button>
