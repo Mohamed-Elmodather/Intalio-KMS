@@ -1095,19 +1095,25 @@ function formatVersionDate(date: Date): string {
         <div class="absolute top-1/2 right-1/3 w-32 h-32 bg-white/10 rounded-full"></div>
 
         <div class="relative z-10 px-8 py-6">
-          <!-- Breadcrumb -->
-          <div class="flex items-center gap-2 text-white/70 text-sm mb-4">
-            <router-link to="/documents" class="hover:text-white transition-colors">Documents</router-link>
-            <i class="fas fa-chevron-right text-xs"></i>
-            <span class="text-white">{{ document.name }}</span>
+          <!-- Navigation Row -->
+          <div class="header-nav">
+            <button @click="goBack" class="back-btn">
+              <i class="fas fa-arrow-left"></i>
+              <span>Back</span>
+            </button>
+            <div class="breadcrumb">
+              <router-link to="/documents" class="breadcrumb-link">
+                <i class="fas fa-folder-open"></i>
+                Documents
+              </router-link>
+              <i class="fas fa-chevron-right breadcrumb-sep"></i>
+              <span class="breadcrumb-current">{{ document.name }}</span>
+            </div>
           </div>
 
           <!-- Title and actions row -->
           <div class="flex items-center justify-between flex-wrap gap-4">
             <div class="flex items-center gap-4">
-              <button @click="goBack" class="w-10 h-10 rounded-xl bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-all">
-                <i class="fas fa-arrow-left"></i>
-              </button>
               <div :class="['w-14 h-14 rounded-xl shadow-lg flex items-center justify-center', document.iconBg]">
                 <i :class="[document.icon, document.iconColor, 'text-2xl']"></i>
               </div>
@@ -2340,6 +2346,68 @@ function formatVersionDate(date: Date): string {
 
 .hero-gradient {
   background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+}
+
+/* Navigation */
+.header-nav {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.back-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 0.75rem;
+  color: white;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.back-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateX(-2px);
+}
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.breadcrumb-link {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.breadcrumb-link:hover {
+  color: white;
+}
+
+.breadcrumb-sep {
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 0.625rem;
+}
+
+.breadcrumb-current {
+  color: white;
+  font-weight: 500;
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* Thumbnail Sidebar Slide */
