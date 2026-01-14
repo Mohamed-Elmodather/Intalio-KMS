@@ -508,6 +508,69 @@ function selectOption(pollId: number, optionIdx: number) {
   }
 }
 
+function submitFeaturedVote() {
+  if (featuredPoll.value.selectedOption === null || featuredPoll.value.hasVoted) return
+
+  const selectedIdx = featuredPoll.value.selectedOption
+  const options = featuredPoll.value.options
+
+  // Simulate vote impact on percentages (small adjustment since total is high)
+  const adjustment = Math.max(1, Math.round(100 / featuredPoll.value.totalVotes))
+  options.forEach((opt, idx) => {
+    if (idx === selectedIdx) {
+      opt.percentage = Math.min(99, opt.percentage + adjustment)
+    }
+  })
+
+  // Normalize percentages to ensure they sum close to 100
+  const total = options.reduce((sum, opt) => sum + opt.percentage, 0)
+  if (total > 100) {
+    const excess = total - 100
+    const otherOptions = options.filter((_, idx) => idx !== selectedIdx)
+    otherOptions.forEach(opt => {
+      opt.percentage = Math.max(1, opt.percentage - Math.ceil(excess / otherOptions.length))
+    })
+  }
+
+  // Update total votes
+  featuredPoll.value.totalVotes++
+
+  // Mark as voted
+  featuredPoll.value.hasVoted = true
+}
+
+function submitVote(pollId: number) {
+  const poll = activePolls.value.find(p => p.id === pollId)
+  if (!poll || poll.selectedOption === null || poll.selectedOption === undefined || poll.hasVoted) return
+
+  const selectedIdx = poll.selectedOption
+  const options = poll.options
+
+  // Simulate vote impact on percentages
+  const adjustment = Math.max(1, Math.round(100 / poll.totalVotes))
+  options.forEach((opt, idx) => {
+    if (idx === selectedIdx) {
+      opt.percentage = Math.min(99, opt.percentage + adjustment)
+    }
+  })
+
+  // Normalize percentages
+  const total = options.reduce((sum, opt) => sum + opt.percentage, 0)
+  if (total > 100) {
+    const excess = total - 100
+    const otherOptions = options.filter((_, idx) => idx !== selectedIdx)
+    otherOptions.forEach(opt => {
+      opt.percentage = Math.max(1, opt.percentage - Math.ceil(excess / otherOptions.length))
+    })
+  }
+
+  // Update total votes
+  poll.totalVotes++
+
+  // Mark as voted
+  poll.hasVoted = true
+}
+
 function addQuickPollOption() {
   if (quickPoll.value.options.length < 5) {
     quickPoll.value.options.push('')
@@ -985,6 +1048,7 @@ function getInsightTypeColor(type: string) {
                 v-if="!featuredPoll.hasVoted"
                 :disabled="featuredPoll.selectedOption === null"
                 class="voting-submit-btn"
+                @click="submitFeaturedVote"
               >
                 <span class="btn-bg"></span>
                 <span class="btn-content">
@@ -1337,7 +1401,12 @@ function getInsightTypeColor(type: string) {
                 <span class="value" style="font-size: 0.5rem;">{{ poll.responseRate }}%</span>
               </div>
             </div>
-            <button v-if="!poll.hasVoted" class="btn-vibrant btn-sm ripple-effect">{{ textConstants.vote }}</button>
+            <button
+              v-if="!poll.hasVoted"
+              class="btn-vibrant btn-sm ripple-effect"
+              :disabled="poll.selectedOption === undefined"
+              @click="submitVote(poll.id)"
+            >{{ textConstants.vote }}</button>
             <button v-else class="btn btn-secondary btn-sm ripple-effect">{{ textConstants.results }}</button>
           </div>
         </div>
