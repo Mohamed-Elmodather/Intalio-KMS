@@ -1380,27 +1380,22 @@ function handleEntityClick(entity: { text: string; type: string }) {
       <!-- Messages Area -->
       <div class="flex-1 min-h-0 overflow-y-auto p-6 scrollbar-thin">
         <!-- Welcome State -->
-        <div v-if="messages.length === 0" class="h-full flex flex-col items-center justify-center text-center fade-in-up">
-          <div class="w-20 h-20 rounded-2xl bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center mb-10 shadow-xl ai-glow">
-            <i class="fas fa-robot text-white text-3xl icon-vibrant"></i>
-          </div>
-          <h2 class="text-2xl font-bold text-teal-900 mb-2">How can I help you today?</h2>
-          <p class="text-teal-600 mb-10 max-w-md typing-cursor">I can help you find information, answer questions about company policies, summarize documents, and much more.</p>
+        <div v-if="messages.length === 0" class="h-full flex flex-col items-center justify-center text-center">
+          <h2 class="text-xl font-semibold text-gray-800 mb-1">How can I help you?</h2>
+          <p class="text-gray-500 text-sm mb-8 max-w-sm">Ask me anything or try one of these suggestions</p>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl w-full">
-            <div v-for="(prompt, idx) in suggestedPrompts" :key="idx"
-                 @click="usePrompt(prompt.text)"
-                 class="p-4 rounded-xl bg-white/60 hover:bg-white hover:shadow-lg border border-teal-100 cursor-pointer transition-all text-left group card-animated ripple">
-              <div class="flex items-start gap-3">
-                <div :class="['w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0', prompt.iconBg]">
-                  <i :class="[prompt.icon, prompt.iconColor, 'icon-soft']"></i>
-                </div>
-                <div>
-                  <p class="font-medium text-teal-900 group-hover:text-teal-700">{{ prompt.title }}</p>
-                  <p class="text-sm text-teal-500">{{ prompt.text }}</p>
-                </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-2 max-w-xl w-full px-4">
+            <button
+              v-for="(prompt, idx) in suggestedPrompts"
+              :key="idx"
+              @click="usePrompt(prompt.text)"
+              class="p-3 rounded-lg bg-white border border-gray-200 hover:border-teal-300 hover:bg-teal-50 cursor-pointer transition-all text-left group"
+            >
+              <div class="flex items-center gap-3">
+                <i :class="[prompt.icon, 'text-gray-400 group-hover:text-teal-500']"></i>
+                <span class="text-sm text-gray-700 group-hover:text-gray-900">{{ prompt.title }}</span>
               </div>
-            </div>
+            </button>
           </div>
         </div>
 
