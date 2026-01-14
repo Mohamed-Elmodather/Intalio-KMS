@@ -72,11 +72,43 @@ const textConstants = {
   // AI
   aiSuggest: 'AI Suggest',
   aiGenerate: 'AI Generate Poll',
-  aiSuggestionsTitle: 'AI Poll Suggestions',
-  aiSuggestionsSubtitle: 'Choose a template or let AI generate a custom poll',
+  aiSuggestionsTitle: 'AI Poll Generator',
+  aiSuggestionsSubtitle: 'Generate polls from templates, topics, or your content',
   refresh: 'Refresh',
   generating: 'Generating suggestions...',
+  generatingFromTopic: 'Analyzing topic and generating polls...',
+  generatingFromContent: 'Analyzing content and extracting poll ideas...',
   noSuggestions: 'No suggestions available. Try a different category.',
+
+  // AI Generation Modes
+  modeTemplates: 'Templates',
+  modeFromTopic: 'From Topic',
+  modeFromContent: 'From Content',
+  templatesDesc: 'Choose from pre-built poll templates',
+  topicDesc: 'Enter a topic and AI will generate relevant polls',
+  contentDesc: 'Paste content and AI will extract poll questions',
+
+  // Topic Input
+  topicLabel: 'What topic would you like to create a poll about?',
+  topicPlaceholder: 'e.g., Remote work policies, Team productivity, Product feedback...',
+  topicHint: 'Be specific for better results. Include context like your industry or team.',
+  generateFromTopic: 'Generate Polls',
+
+  // Content Input
+  contentLabel: 'Paste your content below',
+  contentPlaceholder: 'Paste an article, meeting notes, document excerpt, or any text content here...\n\nThe AI will analyze the content and suggest relevant poll questions based on key topics, decisions, or feedback opportunities identified.',
+  contentHint: 'Works best with 100-2000 words. Supports articles, meeting notes, documents, etc.',
+  generateFromContent: 'Analyze & Generate',
+  contentCharCount: 'characters',
+
+  // AI Results
+  aiResultsTitle: 'Generated Poll Suggestions',
+  aiResultsFromTopic: 'Based on your topic',
+  aiResultsFromContent: 'Extracted from your content',
+  noTopicEntered: 'Please enter a topic to generate poll suggestions.',
+  noContentEntered: 'Please paste some content to analyze.',
+  topicTooShort: 'Please enter a more descriptive topic (at least 10 characters).',
+  contentTooShort: 'Please provide more content (at least 50 characters).',
 
   // Categories
   catGeneral: 'General',
@@ -148,6 +180,10 @@ const showAISuggestionsModal = ref(false)
 const isGeneratingSuggestions = ref(false)
 const aiSuggestions = ref<AIPollSuggestion[]>([])
 const aiSelectedCategory = ref('general')
+const aiGenerationMode = ref<'templates' | 'topic' | 'content'>('templates')
+const aiTopicInput = ref('')
+const aiContentInput = ref('')
+const aiGenerationSource = ref<string | null>(null) // tracks what generated the current suggestions
 
 // UI State
 const currentStep = ref(1)
@@ -160,7 +196,16 @@ interface AIPollSuggestion {
   options: string[]
   category: string
   purpose: string
+  confidence?: number // AI confidence score
+  sourceHighlight?: string // relevant excerpt from content
 }
+
+// AI Generation Modes
+const aiModes = [
+  { id: 'templates', label: textConstants.modeTemplates, icon: 'fas fa-th-large', desc: textConstants.templatesDesc },
+  { id: 'topic', label: textConstants.modeFromTopic, icon: 'fas fa-lightbulb', desc: textConstants.topicDesc },
+  { id: 'content', label: textConstants.modeFromContent, icon: 'fas fa-file-alt', desc: textConstants.contentDesc },
+]
 
 // Categories
 const categories = [
@@ -190,7 +235,7 @@ const aiCategories = [
   { id: 'hr', label: 'HR & Culture', icon: 'fas fa-building' }
 ]
 
-// Mock AI Suggestions
+// Mock AI Suggestions - Templates
 const mockAISuggestions: Record<string, AIPollSuggestion[]> = {
   general: [
     { id: '1', question: 'What day works best for team meetings?', options: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'], category: 'general', purpose: 'Optimize scheduling' },
@@ -215,6 +260,197 @@ const mockAISuggestions: Record<string, AIPollSuggestion[]> = {
     { id: '9', question: 'What benefit would you value most?', options: ['Health insurance', 'Remote work', 'Learning budget', 'Extra PTO', 'Wellness programs'], category: 'hr', purpose: 'Improve benefits' },
     { id: '10', question: 'How would you rate the onboarding experience?', options: ['Excellent', 'Good', 'Average', 'Needs improvement', 'Poor'], category: 'hr', purpose: 'Evaluate onboarding' }
   ]
+}
+
+// Topic-based AI Suggestions - Maps keywords to relevant polls
+const topicPollTemplates: Record<string, AIPollSuggestion[]> = {
+  remote: [
+    { id: 't1', question: 'How many days per week would you prefer to work remotely?', options: ['0 days (fully in-office)', '1-2 days', '3-4 days', '5 days (fully remote)'], category: 'hr', purpose: 'Set remote policy', confidence: 95 },
+    { id: 't2', question: 'What is your biggest challenge when working remotely?', options: ['Communication', 'Work-life balance', 'Distractions at home', 'Feeling isolated', 'Technical issues'], category: 'hr', purpose: 'Identify challenges', confidence: 88 },
+    { id: 't3', question: 'Which tool is most essential for your remote work?', options: ['Video conferencing', 'Chat platforms', 'Project management', 'Cloud storage', 'VPN/Security tools'], category: 'general', purpose: 'Prioritize tools', confidence: 82 }
+  ],
+  productivity: [
+    { id: 'p1', question: 'What time of day are you most productive?', options: ['Early morning (6-9 AM)', 'Late morning (9-12 PM)', 'Afternoon (12-5 PM)', 'Evening (5-8 PM)', 'Night (after 8 PM)'], category: 'general', purpose: 'Optimize schedules', confidence: 91 },
+    { id: 'p2', question: 'What most affects your productivity at work?', options: ['Too many meetings', 'Unclear priorities', 'Distractions/interruptions', 'Lack of resources', 'Poor communication'], category: 'feedback', purpose: 'Remove blockers', confidence: 87 },
+    { id: 'p3', question: 'How would you rate your current workload?', options: ['Too light', 'Just right', 'Slightly heavy', 'Very heavy', 'Overwhelming'], category: 'hr', purpose: 'Balance workload', confidence: 84 }
+  ],
+  feedback: [
+    { id: 'f1', question: 'How satisfied are you with the feedback you receive from your manager?', options: ['Very satisfied', 'Satisfied', 'Neutral', 'Dissatisfied', 'Very dissatisfied'], category: 'feedback', purpose: 'Improve feedback', confidence: 93 },
+    { id: 'f2', question: 'How often would you like to receive performance feedback?', options: ['Weekly', 'Bi-weekly', 'Monthly', 'Quarterly', 'Only during reviews'], category: 'feedback', purpose: 'Set frequency', confidence: 89 },
+    { id: 'f3', question: 'What type of feedback is most valuable to you?', options: ['Verbal praise', 'Written feedback', '360-degree reviews', 'One-on-one discussions', 'Team retrospectives'], category: 'feedback', purpose: 'Customize approach', confidence: 85 }
+  ],
+  training: [
+    { id: 'tr1', question: 'Which skill would you most like to develop?', options: ['Technical skills', 'Leadership', 'Communication', 'Project management', 'Industry knowledge'], category: 'hr', purpose: 'Plan training', confidence: 92 },
+    { id: 'tr2', question: 'What is your preferred learning format?', options: ['Online self-paced', 'Live workshops', 'One-on-one mentoring', 'Video tutorials', 'Books/documentation'], category: 'hr', purpose: 'Design programs', confidence: 88 },
+    { id: 'tr3', question: 'How much time can you dedicate to learning per week?', options: ['Less than 1 hour', '1-2 hours', '3-4 hours', '5+ hours', 'Varies weekly'], category: 'hr', purpose: 'Schedule training', confidence: 81 }
+  ],
+  events: [
+    { id: 'e1', question: 'What type of company event interests you most?', options: ['Team building activities', 'Professional workshops', 'Social gatherings', 'Volunteer opportunities', 'Sports/wellness events'], category: 'events', purpose: 'Plan events', confidence: 94 },
+    { id: 'e2', question: 'What is your preferred day for company events?', options: ['Monday', 'Wednesday', 'Friday', 'Weekend', 'No preference'], category: 'events', purpose: 'Schedule events', confidence: 86 },
+    { id: 'e3', question: 'How often should we organize team events?', options: ['Weekly', 'Monthly', 'Quarterly', 'Twice a year', 'Annually'], category: 'events', purpose: 'Set frequency', confidence: 83 }
+  ],
+  product: [
+    { id: 'pd1', question: 'Which aspect of our product needs the most improvement?', options: ['User interface', 'Performance/speed', 'New features', 'Documentation', 'Mobile experience'], category: 'product', purpose: 'Prioritize development', confidence: 90 },
+    { id: 'pd2', question: 'How would you rate the overall quality of our product?', options: ['Excellent', 'Good', 'Average', 'Below average', 'Poor'], category: 'product', purpose: 'Measure quality', confidence: 87 },
+    { id: 'pd3', question: 'What feature would you most like us to add?', options: ['Better reporting', 'Mobile app', 'Third-party integrations', 'AI/automation', 'Collaboration tools'], category: 'product', purpose: 'Guide roadmap', confidence: 85 }
+  ],
+  communication: [
+    { id: 'c1', question: 'How effective is internal communication in our organization?', options: ['Very effective', 'Effective', 'Neutral', 'Ineffective', 'Very ineffective'], category: 'feedback', purpose: 'Improve communication', confidence: 91 },
+    { id: 'c2', question: 'Which communication channel do you prefer for team updates?', options: ['Email', 'Slack/Teams', 'Meetings', 'Newsletter', 'Intranet'], category: 'general', purpose: 'Optimize channels', confidence: 88 },
+    { id: 'c3', question: 'How often should leadership share company updates?', options: ['Weekly', 'Bi-weekly', 'Monthly', 'Quarterly', 'When necessary'], category: 'general', purpose: 'Set expectations', confidence: 84 }
+  ],
+  meeting: [
+    { id: 'm1', question: 'How much time do you spend in meetings per week?', options: ['Less than 5 hours', '5-10 hours', '10-15 hours', '15-20 hours', 'More than 20 hours'], category: 'general', purpose: 'Optimize time', confidence: 89 },
+    { id: 'm2', question: 'What would make meetings more productive?', options: ['Clear agendas', 'Shorter duration', 'Fewer attendees', 'Better follow-up', 'More breaks'], category: 'feedback', purpose: 'Improve meetings', confidence: 86 },
+    { id: 'm3', question: 'Which meeting type do you find most valuable?', options: ['One-on-ones', 'Team standups', 'Brainstorming sessions', 'Status updates', 'Planning meetings'], category: 'general', purpose: 'Prioritize formats', confidence: 82 }
+  ]
+}
+
+// Function to generate polls from a topic
+function generatePollsFromTopic(topic: string): AIPollSuggestion[] {
+  const lowerTopic = topic.toLowerCase()
+  const results: AIPollSuggestion[] = []
+
+  // Search for matching templates based on keywords
+  for (const [keyword, templates] of Object.entries(topicPollTemplates)) {
+    if (lowerTopic.includes(keyword) || keyword.includes(lowerTopic.slice(0, 4))) {
+      results.push(...templates)
+    }
+  }
+
+  // If no direct matches, generate generic polls based on the topic
+  if (results.length === 0) {
+    return [
+      {
+        id: 'gen1',
+        question: `What aspect of "${topic}" is most important to you?`,
+        options: ['Quality', 'Speed', 'Cost', 'Innovation', 'Support'],
+        category: 'general',
+        purpose: 'Identify priorities',
+        confidence: 75
+      },
+      {
+        id: 'gen2',
+        question: `How satisfied are you with our current approach to ${topic}?`,
+        options: ['Very satisfied', 'Satisfied', 'Neutral', 'Dissatisfied', 'Very dissatisfied'],
+        category: 'feedback',
+        purpose: 'Measure satisfaction',
+        confidence: 72
+      },
+      {
+        id: 'gen3',
+        question: `What should be our top priority regarding ${topic}?`,
+        options: ['Improve existing process', 'Explore new options', 'Increase resources', 'Get more training', 'Gather more feedback'],
+        category: 'general',
+        purpose: 'Set direction',
+        confidence: 68
+      }
+    ]
+  }
+
+  // Return unique results (max 5)
+  const uniqueResults = results.filter((poll, index, self) =>
+    index === self.findIndex(p => p.id === poll.id)
+  )
+  return uniqueResults.slice(0, 5)
+}
+
+// Function to analyze content and generate polls
+function generatePollsFromContent(content: string): AIPollSuggestion[] {
+  const lowerContent = content.toLowerCase()
+  const results: AIPollSuggestion[] = []
+
+  // Extract key topics from content
+  const topicKeywords = ['meeting', 'remote', 'work', 'team', 'project', 'deadline', 'feedback',
+    'performance', 'training', 'event', 'product', 'feature', 'communication', 'budget',
+    'schedule', 'productivity', 'collaboration', 'policy', 'decision', 'strategy']
+
+  const foundTopics: string[] = []
+  for (const keyword of topicKeywords) {
+    if (lowerContent.includes(keyword)) {
+      foundTopics.push(keyword)
+    }
+  }
+
+  // Generate polls based on found topics
+  for (const topic of foundTopics.slice(0, 3)) { // Limit to first 3 topics
+    const topicPolls = topicPollTemplates[topic]
+    if (topicPolls) {
+      // Add first poll from each topic and include source highlight
+      const poll = { ...topicPolls[0] }
+
+      // Find a relevant sentence from the content
+      const sentences = content.split(/[.!?]+/).filter(s => s.trim())
+      const relevantSentence = sentences.find(s => s.toLowerCase().includes(topic))
+      if (relevantSentence) {
+        poll.sourceHighlight = relevantSentence.trim().slice(0, 100) + (relevantSentence.length > 100 ? '...' : '')
+      }
+      results.push(poll)
+    }
+  }
+
+  // If specific topics found, also generate content-specific polls
+  if (lowerContent.includes('decision') || lowerContent.includes('choose') || lowerContent.includes('option')) {
+    results.push({
+      id: 'content1',
+      question: 'Which option should we proceed with based on the discussion?',
+      options: ['Option A - Conservative approach', 'Option B - Balanced approach', 'Option C - Aggressive approach', 'Need more information', 'Postpone decision'],
+      category: 'general',
+      purpose: 'Make decision',
+      confidence: 85,
+      sourceHighlight: 'Multiple options or decisions mentioned in content'
+    })
+  }
+
+  if (lowerContent.includes('feedback') || lowerContent.includes('opinion') || lowerContent.includes('think')) {
+    results.push({
+      id: 'content2',
+      question: 'How do you feel about the points raised in this discussion?',
+      options: ['Strongly agree', 'Agree', 'Neutral', 'Disagree', 'Strongly disagree'],
+      category: 'feedback',
+      purpose: 'Gather opinions',
+      confidence: 82,
+      sourceHighlight: 'Feedback or opinions requested in content'
+    })
+  }
+
+  if (lowerContent.includes('priority') || lowerContent.includes('important') || lowerContent.includes('focus')) {
+    results.push({
+      id: 'content3',
+      question: 'What should be our top priority based on this content?',
+      options: ['Short-term wins', 'Long-term strategy', 'Resource optimization', 'Team development', 'Customer satisfaction'],
+      category: 'general',
+      purpose: 'Set priorities',
+      confidence: 79,
+      sourceHighlight: 'Priority setting mentioned in content'
+    })
+  }
+
+  // Fallback if no patterns matched
+  if (results.length === 0) {
+    return [
+      {
+        id: 'fallback1',
+        question: 'How relevant is this content to your daily work?',
+        options: ['Very relevant', 'Somewhat relevant', 'Neutral', 'Not very relevant', 'Not relevant at all'],
+        category: 'feedback',
+        purpose: 'Assess relevance',
+        confidence: 65,
+        sourceHighlight: 'General content analysis'
+      },
+      {
+        id: 'fallback2',
+        question: 'What action should we take based on this content?',
+        options: ['Discuss further', 'Implement changes', 'Gather more data', 'Share with team', 'Archive for reference'],
+        category: 'general',
+        purpose: 'Determine next steps',
+        confidence: 60,
+        sourceHighlight: 'Action items extracted from content'
+      }
+    ]
+  }
+
+  return results.slice(0, 5)
 }
 
 // Computed
@@ -272,6 +508,15 @@ function removeOption(index: number) {
   }
 }
 
+// Open AI modal and reset to template mode
+function openAIModal() {
+  showAISuggestionsModal.value = true
+  aiGenerationMode.value = 'templates'
+  aiGenerationSource.value = null
+  aiSuggestions.value = []
+}
+
+// Generate poll suggestions based on current mode
 async function generatePollSuggestions() {
   isGeneratingSuggestions.value = true
   showAISuggestionsModal.value = true
@@ -279,6 +524,7 @@ async function generatePollSuggestions() {
   try {
     await new Promise(resolve => setTimeout(resolve, 1200))
     aiSuggestions.value = mockAISuggestions[aiSelectedCategory.value] || mockAISuggestions.general
+    aiGenerationSource.value = 'templates'
   } catch (error) {
     console.error('Failed to generate suggestions:', error)
   } finally {
@@ -286,10 +532,74 @@ async function generatePollSuggestions() {
   }
 }
 
+// Generate polls from a topic
+async function generateFromTopic() {
+  if (aiTopicInput.value.trim().length < 10) {
+    uiStore.showError(textConstants.topicTooShort)
+    return
+  }
+
+  isGeneratingSuggestions.value = true
+  aiGenerationSource.value = 'topic'
+
+  try {
+    // Simulate AI processing time
+    await new Promise(resolve => setTimeout(resolve, 1500))
+    aiSuggestions.value = generatePollsFromTopic(aiTopicInput.value)
+  } catch (error) {
+    console.error('Failed to generate from topic:', error)
+  } finally {
+    isGeneratingSuggestions.value = false
+  }
+}
+
+// Generate polls from pasted content
+async function generateFromContent() {
+  if (aiContentInput.value.trim().length < 50) {
+    uiStore.showError(textConstants.contentTooShort)
+    return
+  }
+
+  isGeneratingSuggestions.value = true
+  aiGenerationSource.value = 'content'
+
+  try {
+    // Simulate AI processing time (longer for content analysis)
+    await new Promise(resolve => setTimeout(resolve, 2000))
+    aiSuggestions.value = generatePollsFromContent(aiContentInput.value)
+  } catch (error) {
+    console.error('Failed to generate from content:', error)
+  } finally {
+    isGeneratingSuggestions.value = false
+  }
+}
+
+// Switch AI generation mode
+function setAIMode(mode: 'templates' | 'topic' | 'content') {
+  aiGenerationMode.value = mode
+  aiSuggestions.value = []
+  aiGenerationSource.value = null
+}
+
 function selectAICategory(categoryId: string) {
   aiSelectedCategory.value = categoryId
   generatePollSuggestions()
 }
+
+// Get character count for content input
+const contentCharacterCount = computed(() => aiContentInput.value.length)
+
+// Get loading message based on mode
+const generatingMessage = computed(() => {
+  switch (aiGenerationMode.value) {
+    case 'topic':
+      return textConstants.generatingFromTopic
+    case 'content':
+      return textConstants.generatingFromContent
+    default:
+      return textConstants.generating
+  }
+})
 
 function applySuggestion(suggestion: AIPollSuggestion) {
   question.value = suggestion.question
@@ -376,7 +686,7 @@ function goBack() {
           </div>
 
           <button
-            @click="generatePollSuggestions"
+            @click="openAIModal"
             class="ai-generate-btn"
           >
             <span class="btn-glow"></span>
@@ -416,7 +726,7 @@ function goBack() {
                       class="form-input-enhanced"
                     >
                     <button
-                      @click="generatePollSuggestions"
+                      @click="openAIModal"
                       class="input-ai-btn"
                       title="AI Suggest"
                     >
@@ -755,7 +1065,7 @@ function goBack() {
     <!-- AI Poll Suggestions Modal -->
     <Teleport to="body">
       <div v-if="showAISuggestionsModal" class="modal-overlay">
-        <div class="ai-modal">
+        <div class="ai-modal ai-modal-enhanced">
           <div class="ai-modal-header">
             <div class="ai-modal-title-group">
               <div class="ai-modal-icon">
@@ -771,53 +1081,203 @@ function goBack() {
             </button>
           </div>
 
-          <!-- Category Tabs -->
-          <div class="ai-modal-tabs">
+          <!-- Generation Mode Tabs -->
+          <div class="ai-mode-tabs">
             <button
-              v-for="cat in aiCategories"
-              :key="cat.id"
-              @click="selectAICategory(cat.id)"
-              :class="['ai-tab', { active: aiSelectedCategory === cat.id }]"
+              v-for="mode in aiModes"
+              :key="mode.id"
+              @click="setAIMode(mode.id as 'templates' | 'topic' | 'content')"
+              :class="['ai-mode-tab', { active: aiGenerationMode === mode.id }]"
             >
-              <i :class="cat.icon"></i>
-              {{ cat.label }}
+              <i :class="mode.icon"></i>
+              <span class="mode-label">{{ mode.label }}</span>
+              <span class="mode-desc">{{ mode.desc }}</span>
             </button>
           </div>
 
           <div class="ai-modal-body">
-            <AILoadingIndicator v-if="isGeneratingSuggestions" :message="textConstants.generating" />
+            <!-- Templates Mode -->
+            <div v-if="aiGenerationMode === 'templates'" class="mode-content">
+              <!-- Category Tabs -->
+              <div class="ai-category-tabs">
+                <button
+                  v-for="cat in aiCategories"
+                  :key="cat.id"
+                  @click="selectAICategory(cat.id)"
+                  :class="['ai-tab', { active: aiSelectedCategory === cat.id }]"
+                >
+                  <i :class="cat.icon"></i>
+                  {{ cat.label }}
+                </button>
+              </div>
 
-            <div v-else-if="aiSuggestions.length > 0" class="ai-suggestions-list">
-              <div
-                v-for="suggestion in aiSuggestions"
-                :key="suggestion.id"
-                class="ai-suggestion-card"
-                @click="applySuggestion(suggestion)"
-              >
-                <div class="suggestion-header">
-                  <h4 class="suggestion-question">{{ suggestion.question }}</h4>
-                  <span class="suggestion-purpose">{{ suggestion.purpose }}</span>
+              <AILoadingIndicator v-if="isGeneratingSuggestions" :message="generatingMessage" />
+
+              <div v-else-if="aiSuggestions.length > 0" class="ai-suggestions-list">
+                <div
+                  v-for="suggestion in aiSuggestions"
+                  :key="suggestion.id"
+                  class="ai-suggestion-card"
+                  @click="applySuggestion(suggestion)"
+                >
+                  <div class="suggestion-header">
+                    <h4 class="suggestion-question">{{ suggestion.question }}</h4>
+                    <span class="suggestion-purpose">{{ suggestion.purpose }}</span>
+                  </div>
+                  <div class="suggestion-options">
+                    <span
+                      v-for="(opt, idx) in suggestion.options"
+                      :key="idx"
+                      class="suggestion-option"
+                    >
+                      {{ opt }}
+                    </span>
+                  </div>
                 </div>
-                <div class="suggestion-options">
-                  <span
-                    v-for="(opt, idx) in suggestion.options"
-                    :key="idx"
-                    class="suggestion-option"
+              </div>
+
+              <div v-else class="ai-empty-state">
+                <i class="fas fa-poll"></i>
+                <p>{{ textConstants.noSuggestions }}</p>
+              </div>
+            </div>
+
+            <!-- Topic Mode -->
+            <div v-else-if="aiGenerationMode === 'topic'" class="mode-content">
+              <div class="topic-input-section">
+                <label class="input-label">{{ textConstants.topicLabel }}</label>
+                <div class="topic-input-wrapper">
+                  <i class="fas fa-lightbulb topic-icon"></i>
+                  <input
+                    v-model="aiTopicInput"
+                    type="text"
+                    :placeholder="textConstants.topicPlaceholder"
+                    class="topic-input"
+                    @keyup.enter="generateFromTopic"
                   >
-                    {{ opt }}
-                  </span>
+                </div>
+                <p class="input-hint">{{ textConstants.topicHint }}</p>
+                <button
+                  @click="generateFromTopic"
+                  :disabled="aiTopicInput.trim().length < 10 || isGeneratingSuggestions"
+                  class="generate-btn"
+                >
+                  <i v-if="isGeneratingSuggestions" class="fas fa-spinner fa-spin"></i>
+                  <i v-else class="fas fa-wand-magic-sparkles"></i>
+                  {{ textConstants.generateFromTopic }}
+                </button>
+              </div>
+
+              <AILoadingIndicator v-if="isGeneratingSuggestions" :message="generatingMessage" />
+
+              <div v-else-if="aiSuggestions.length > 0" class="ai-suggestions-list">
+                <div class="results-header">
+                  <span class="results-label">{{ textConstants.aiResultsTitle }}</span>
+                  <span class="results-source">{{ textConstants.aiResultsFromTopic }}: "{{ aiTopicInput }}"</span>
+                </div>
+                <div
+                  v-for="suggestion in aiSuggestions"
+                  :key="suggestion.id"
+                  class="ai-suggestion-card"
+                  @click="applySuggestion(suggestion)"
+                >
+                  <div class="suggestion-header">
+                    <h4 class="suggestion-question">{{ suggestion.question }}</h4>
+                    <div class="suggestion-meta">
+                      <span class="suggestion-purpose">{{ suggestion.purpose }}</span>
+                      <span v-if="suggestion.confidence" class="suggestion-confidence">
+                        <i class="fas fa-robot"></i>
+                        {{ suggestion.confidence }}%
+                      </span>
+                    </div>
+                  </div>
+                  <div class="suggestion-options">
+                    <span
+                      v-for="(opt, idx) in suggestion.options"
+                      :key="idx"
+                      class="suggestion-option"
+                    >
+                      {{ opt }}
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
 
-            <div v-else class="ai-empty-state">
-              <i class="fas fa-poll"></i>
-              <p>{{ textConstants.noSuggestions }}</p>
+            <!-- Content Mode -->
+            <div v-else-if="aiGenerationMode === 'content'" class="mode-content">
+              <div class="content-input-section">
+                <label class="input-label">{{ textConstants.contentLabel }}</label>
+                <div class="content-input-wrapper">
+                  <textarea
+                    v-model="aiContentInput"
+                    :placeholder="textConstants.contentPlaceholder"
+                    class="content-input"
+                    rows="6"
+                  ></textarea>
+                  <div class="content-footer">
+                    <span class="char-count">{{ contentCharacterCount }} {{ textConstants.contentCharCount }}</span>
+                  </div>
+                </div>
+                <p class="input-hint">{{ textConstants.contentHint }}</p>
+                <button
+                  @click="generateFromContent"
+                  :disabled="aiContentInput.trim().length < 50 || isGeneratingSuggestions"
+                  class="generate-btn"
+                >
+                  <i v-if="isGeneratingSuggestions" class="fas fa-spinner fa-spin"></i>
+                  <i v-else class="fas fa-file-alt"></i>
+                  {{ textConstants.generateFromContent }}
+                </button>
+              </div>
+
+              <AILoadingIndicator v-if="isGeneratingSuggestions" :message="generatingMessage" />
+
+              <div v-else-if="aiSuggestions.length > 0" class="ai-suggestions-list">
+                <div class="results-header">
+                  <span class="results-label">{{ textConstants.aiResultsTitle }}</span>
+                  <span class="results-source">{{ textConstants.aiResultsFromContent }}</span>
+                </div>
+                <div
+                  v-for="suggestion in aiSuggestions"
+                  :key="suggestion.id"
+                  class="ai-suggestion-card"
+                  @click="applySuggestion(suggestion)"
+                >
+                  <div class="suggestion-header">
+                    <h4 class="suggestion-question">{{ suggestion.question }}</h4>
+                    <div class="suggestion-meta">
+                      <span class="suggestion-purpose">{{ suggestion.purpose }}</span>
+                      <span v-if="suggestion.confidence" class="suggestion-confidence">
+                        <i class="fas fa-robot"></i>
+                        {{ suggestion.confidence }}%
+                      </span>
+                    </div>
+                  </div>
+                  <div v-if="suggestion.sourceHighlight" class="source-highlight">
+                    <i class="fas fa-quote-left"></i>
+                    <span>{{ suggestion.sourceHighlight }}</span>
+                  </div>
+                  <div class="suggestion-options">
+                    <span
+                      v-for="(opt, idx) in suggestion.options"
+                      :key="idx"
+                      class="suggestion-option"
+                    >
+                      {{ opt }}
+                    </span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
           <div class="ai-modal-footer">
-            <button @click="generatePollSuggestions" class="btn-refresh">
+            <button
+              v-if="aiGenerationMode === 'templates' && !isGeneratingSuggestions"
+              @click="generatePollSuggestions"
+              class="btn-refresh"
+            >
               <i class="fas fa-rotate"></i>
               {{ textConstants.refresh }}
             </button>
@@ -1946,6 +2406,271 @@ function goBack() {
   background: #e5e7eb;
 }
 
+/* Enhanced AI Modal */
+.ai-modal-enhanced {
+  max-width: 800px;
+  max-height: 90vh;
+}
+
+/* AI Mode Tabs */
+.ai-mode-tabs {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #e5e7eb;
+  background: #f9fafb;
+}
+
+.ai-mode-tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 1rem;
+  background: white;
+  border: 2px solid #e5e7eb;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.ai-mode-tab:hover {
+  border-color: #14b8a6;
+}
+
+.ai-mode-tab.active {
+  border-color: #14b8a6;
+  background: #f0fdfa;
+}
+
+.ai-mode-tab i {
+  font-size: 1.25rem;
+  color: #6b7280;
+}
+
+.ai-mode-tab.active i {
+  color: #14b8a6;
+}
+
+.ai-mode-tab .mode-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.ai-mode-tab .mode-desc {
+  font-size: 0.6875rem;
+  color: #6b7280;
+  text-align: center;
+}
+
+/* Category Tabs in Modal */
+.ai-category-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #e5e7eb;
+  overflow-x: auto;
+}
+
+/* Mode Content */
+.mode-content {
+  animation: fadeIn 0.3s ease;
+}
+
+/* Topic Input Section */
+.topic-input-section {
+  margin-bottom: 1.5rem;
+}
+
+.input-label {
+  display: block;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 0.75rem;
+}
+
+.topic-input-wrapper {
+  position: relative;
+}
+
+.topic-icon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.125rem;
+  color: #f59e0b;
+}
+
+.topic-input {
+  width: 100%;
+  padding: 1rem 1rem 1rem 3rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 0.75rem;
+  font-size: 1rem;
+  color: #111827;
+  transition: all 0.2s ease;
+}
+
+.topic-input:focus {
+  outline: none;
+  border-color: #14b8a6;
+  box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.1);
+}
+
+.topic-input::placeholder {
+  color: #9ca3af;
+}
+
+.input-hint {
+  margin-top: 0.5rem;
+  font-size: 0.8125rem;
+  color: #6b7280;
+}
+
+/* Content Input Section */
+.content-input-section {
+  margin-bottom: 1.5rem;
+}
+
+.content-input-wrapper {
+  position: relative;
+}
+
+.content-input {
+  width: 100%;
+  padding: 1rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 0.75rem;
+  font-size: 0.9375rem;
+  color: #111827;
+  line-height: 1.6;
+  resize: vertical;
+  min-height: 150px;
+  transition: all 0.2s ease;
+}
+
+.content-input:focus {
+  outline: none;
+  border-color: #14b8a6;
+  box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.1);
+}
+
+.content-input::placeholder {
+  color: #9ca3af;
+}
+
+.content-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 0.5rem;
+}
+
+.char-count {
+  font-size: 0.75rem;
+  color: #9ca3af;
+}
+
+/* Generate Button */
+.generate-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  margin-top: 1rem;
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+  border: none;
+  border-radius: 0.75rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.generate-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(20, 184, 166, 0.3);
+}
+
+.generate-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Results Header */
+.results-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 100%);
+  border-radius: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.results-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #0f766e;
+}
+
+.results-source {
+  font-size: 0.75rem;
+  color: #14b8a6;
+  font-style: italic;
+}
+
+/* Suggestion Meta */
+.suggestion-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.suggestion-confidence {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  background: #dbeafe;
+  border-radius: 2rem;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  color: #1d4ed8;
+}
+
+/* Source Highlight */
+.source-highlight {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0.625rem 0.875rem;
+  margin-bottom: 0.75rem;
+  background: #fffbeb;
+  border-radius: 0.5rem;
+  border-left: 3px solid #f59e0b;
+}
+
+.source-highlight i {
+  color: #f59e0b;
+  font-size: 0.75rem;
+  margin-top: 0.125rem;
+  flex-shrink: 0;
+}
+
+.source-highlight span {
+  font-size: 0.8125rem;
+  color: #78350f;
+  font-style: italic;
+  line-height: 1.4;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .header-content {
@@ -1977,6 +2702,28 @@ function goBack() {
 
   .action-buttons-mobile {
     flex-direction: column;
+  }
+
+  .ai-mode-tabs {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+
+  .ai-mode-tab {
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+  }
+
+  .ai-mode-tab .mode-desc {
+    display: none;
+  }
+
+  .results-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
   }
 }
 </style>
