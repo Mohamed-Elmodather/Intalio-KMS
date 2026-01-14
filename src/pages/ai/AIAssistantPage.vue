@@ -212,6 +212,7 @@ const quickActions = ref<QuickAction[]>([
 const showToolsPalette = ref(false)
 const showWorkflowBuilder = ref(false)
 const showToolsToolbar = ref(true)
+const toolsSearchQuery = ref('')
 
 // Current AI Operation
 const currentOperation = ref<{
@@ -749,6 +750,13 @@ function handleToolSelect(tool: { id: AIOperationType; name: string }) {
   }
 
   inputMessage.value = toolPrefixes[tool.id] || ''
+}
+
+// Handle AI tool selection from sidebar
+function selectToolFromSidebar(tool: { id: AIOperationType; name: string }) {
+  showToolsPalette.value = false
+  toolsSearchQuery.value = ''
+  handleToolSelect(tool)
 }
 
 // Handle AI tool selection from toolbar
@@ -1829,11 +1837,208 @@ function handleEntityClick(entity: { text: string; type: string }) {
       </div>
     </Teleport>
 
-    <!-- AI Tools Palette Modal -->
-    <AIToolsPalette
-      v-model="showToolsPalette"
-      @select="handleToolSelect"
-    />
+    <!-- AI Tools Sidebar -->
+    <Teleport to="body">
+      <!-- Backdrop -->
+      <Transition name="fade">
+        <div
+          v-if="showToolsPalette"
+          class="fixed inset-0 bg-black/30 z-40"
+          @click="showToolsPalette = false"
+        ></div>
+      </Transition>
+
+      <!-- Sidebar Panel -->
+      <Transition name="slide-left">
+        <div v-if="showToolsPalette" class="fixed left-0 top-0 h-full w-80 bg-gradient-to-b from-gray-50 to-white shadow-2xl z-50 flex flex-col border-r border-gray-200">
+          <!-- Header -->
+          <div class="p-4 bg-gradient-to-b from-white to-gray-50/80 border-b border-gray-100">
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl bg-teal-50 flex items-center justify-center">
+                  <i class="fas fa-wand-magic-sparkles text-teal-500"></i>
+                </div>
+                <div>
+                  <h3 class="font-semibold text-gray-800">AI Tools</h3>
+                  <p class="text-xs text-gray-400">Select a tool to use</p>
+                </div>
+              </div>
+              <button @click="showToolsPalette = false" class="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-400 hover:text-gray-600" title="Close">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+            <!-- Search -->
+            <div class="relative">
+              <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-300"></i>
+              <input
+                v-model="toolsSearchQuery"
+                type="text"
+                placeholder="Search tools..."
+                class="w-full pl-9 pr-3 py-2 bg-gray-50 border border-gray-100 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-300"
+              />
+            </div>
+          </div>
+
+          <!-- Tools List -->
+          <div class="flex-1 overflow-y-auto p-3">
+            <!-- Analysis Category -->
+            <div class="mb-4">
+              <h4 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 px-2 flex items-center gap-2">
+                <i class="fas fa-chart-bar text-blue-400"></i>
+                Analysis
+              </h4>
+              <div class="space-y-1">
+                <button
+                  @click="selectToolFromSidebar({ id: 'extract-entities', name: 'Entity Recognition' })"
+                  class="w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-teal-50/50 transition-colors group"
+                >
+                  <div class="w-9 h-9 rounded-lg bg-blue-50 text-blue-500 flex items-center justify-center group-hover:bg-blue-100">
+                    <i class="fas fa-tags"></i>
+                  </div>
+                  <div class="flex-1 text-left">
+                    <p class="text-sm font-medium text-gray-700">Entity Recognition</p>
+                    <p class="text-xs text-gray-400">Extract people, places, dates</p>
+                  </div>
+                </button>
+                <button
+                  @click="selectToolFromSidebar({ id: 'analyze-sentiment', name: 'Sentiment Analysis' })"
+                  class="w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-teal-50/50 transition-colors group"
+                >
+                  <div class="w-9 h-9 rounded-lg bg-pink-50 text-pink-500 flex items-center justify-center group-hover:bg-pink-100">
+                    <i class="fas fa-smile"></i>
+                  </div>
+                  <div class="flex-1 text-left">
+                    <p class="text-sm font-medium text-gray-700">Sentiment Analysis</p>
+                    <p class="text-xs text-gray-400">Analyze emotional tone</p>
+                  </div>
+                </button>
+                <button
+                  @click="selectToolFromSidebar({ id: 'classify', name: 'Classify Content' })"
+                  class="w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-teal-50/50 transition-colors group"
+                >
+                  <div class="w-9 h-9 rounded-lg bg-purple-50 text-purple-500 flex items-center justify-center group-hover:bg-purple-100">
+                    <i class="fas fa-folder-tree"></i>
+                  </div>
+                  <div class="flex-1 text-left">
+                    <p class="text-sm font-medium text-gray-700">Classify Content</p>
+                    <p class="text-xs text-gray-400">Categorize with confidence</p>
+                  </div>
+                </button>
+              </div>
+            </div>
+
+            <!-- Content Category -->
+            <div class="mb-4">
+              <h4 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 px-2 flex items-center gap-2">
+                <i class="fas fa-file-alt text-teal-400"></i>
+                Content
+              </h4>
+              <div class="space-y-1">
+                <button
+                  @click="selectToolFromSidebar({ id: 'summarize', name: 'Summarize' })"
+                  class="w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-teal-50/50 transition-colors group"
+                >
+                  <div class="w-9 h-9 rounded-lg bg-teal-50 text-teal-500 flex items-center justify-center group-hover:bg-teal-100">
+                    <i class="fas fa-compress-alt"></i>
+                  </div>
+                  <div class="flex-1 text-left">
+                    <p class="text-sm font-medium text-gray-700">Summarize</p>
+                    <p class="text-xs text-gray-400">Generate concise summaries</p>
+                  </div>
+                </button>
+                <button
+                  @click="selectToolFromSidebar({ id: 'translate', name: 'Translate' })"
+                  class="w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-teal-50/50 transition-colors group"
+                >
+                  <div class="w-9 h-9 rounded-lg bg-green-50 text-green-500 flex items-center justify-center group-hover:bg-green-100">
+                    <i class="fas fa-language"></i>
+                  </div>
+                  <div class="flex-1 text-left">
+                    <p class="text-sm font-medium text-gray-700">Translate</p>
+                    <p class="text-xs text-gray-400">Translate to 16+ languages</p>
+                  </div>
+                </button>
+                <button
+                  @click="selectToolFromSidebar({ id: 'generate-title', name: 'Generate Titles' })"
+                  class="w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-teal-50/50 transition-colors group"
+                >
+                  <div class="w-9 h-9 rounded-lg bg-indigo-50 text-indigo-500 flex items-center justify-center group-hover:bg-indigo-100">
+                    <i class="fas fa-heading"></i>
+                  </div>
+                  <div class="flex-1 text-left">
+                    <p class="text-sm font-medium text-gray-700">Generate Titles</p>
+                    <p class="text-xs text-gray-400">Create title suggestions</p>
+                  </div>
+                </button>
+              </div>
+            </div>
+
+            <!-- Extraction Category -->
+            <div class="mb-4">
+              <h4 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 px-2 flex items-center gap-2">
+                <i class="fas fa-magic text-amber-400"></i>
+                Extraction
+              </h4>
+              <div class="space-y-1">
+                <button
+                  @click="selectToolFromSidebar({ id: 'ocr', name: 'OCR - Extract Text' })"
+                  class="w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-teal-50/50 transition-colors group"
+                >
+                  <div class="w-9 h-9 rounded-lg bg-amber-50 text-amber-500 flex items-center justify-center group-hover:bg-amber-100">
+                    <i class="fas fa-file-image"></i>
+                  </div>
+                  <div class="flex-1 text-left">
+                    <p class="text-sm font-medium text-gray-700">OCR - Extract Text</p>
+                    <p class="text-xs text-gray-400">Extract text from images</p>
+                  </div>
+                </button>
+                <button
+                  @click="selectToolFromSidebar({ id: 'auto-tag', name: 'Auto-Tag' })"
+                  class="w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-teal-50/50 transition-colors group"
+                >
+                  <div class="w-9 h-9 rounded-lg bg-cyan-50 text-cyan-500 flex items-center justify-center group-hover:bg-cyan-100">
+                    <i class="fas fa-hashtag"></i>
+                  </div>
+                  <div class="flex-1 text-left">
+                    <p class="text-sm font-medium text-gray-700">Auto-Tag</p>
+                    <p class="text-xs text-gray-400">Generate relevant tags</p>
+                  </div>
+                </button>
+              </div>
+            </div>
+
+            <!-- Search Category -->
+            <div class="mb-4">
+              <h4 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 px-2 flex items-center gap-2">
+                <i class="fas fa-compass text-orange-400"></i>
+                Search & Discovery
+              </h4>
+              <div class="space-y-1">
+                <button
+                  @click="selectToolFromSidebar({ id: 'smart-search', name: 'Smart Search' })"
+                  class="w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-teal-50/50 transition-colors group"
+                >
+                  <div class="w-9 h-9 rounded-lg bg-orange-50 text-orange-500 flex items-center justify-center group-hover:bg-orange-100">
+                    <i class="fas fa-search"></i>
+                  </div>
+                  <div class="flex-1 text-left">
+                    <p class="text-sm font-medium text-gray-700">Smart Search</p>
+                    <p class="text-xs text-gray-400">AI-powered intent detection</p>
+                  </div>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Footer -->
+          <div class="p-3 border-t border-gray-100 bg-white">
+            <p class="text-xs text-gray-400 text-center">
+              Press <kbd class="px-1.5 py-0.5 bg-gray-100 rounded text-gray-500">Ctrl+K</kbd> to toggle
+            </p>
+          </div>
+        </div>
+      </Transition>
+    </Teleport>
 
     <!-- AI Workflow Builder Modal -->
     <AIWorkflowBuilder
@@ -1970,5 +2175,17 @@ function handleEntityClick(entity: { text: string; type: string }) {
 .fade-up-leave-to {
   opacity: 0;
   transform: translateY(10px);
+}
+
+/* Slide Left Animation (for left sidebar) */
+.slide-left-enter-active,
+.slide-left-leave-active {
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.slide-left-enter-from,
+.slide-left-leave-to {
+  transform: translateX(-100%);
+  opacity: 0;
 }
 </style>
