@@ -207,6 +207,11 @@ interface TrendingPoll {
   totalVotes: number
   weeklyGrowth: number
   responseRate: number
+  category: string
+  categoryIcon: string
+  timeAgo: string
+  isHot: boolean
+  endsIn: string
 }
 
 interface ActivePoll {
@@ -286,12 +291,12 @@ const featuredPoll = ref<FeaturedPoll>({
 
 // Trending Polls
 const trendingPolls = ref<TrendingPoll[]>([
-  { id: 1, question: 'Should we adopt a 4-day work week?', totalVotes: 892, weeklyGrowth: 156, responseRate: 94 },
-  { id: 2, question: 'Best team building activity for winter?', totalVotes: 567, weeklyGrowth: 89, responseRate: 78 },
-  { id: 3, question: 'New office location preferences', totalVotes: 445, weeklyGrowth: 67, responseRate: 65 },
-  { id: 4, question: 'Preferred lunch vendors for catering', totalVotes: 334, weeklyGrowth: 45, responseRate: 72 },
-  { id: 5, question: 'Training topics for next quarter', totalVotes: 289, weeklyGrowth: 34, responseRate: 58 },
-  { id: 6, question: 'Company swag preferences', totalVotes: 256, weeklyGrowth: 28, responseRate: 62 }
+  { id: 1, question: 'Should we adopt a 4-day work week?', totalVotes: 892, weeklyGrowth: 156, responseRate: 94, category: 'HR', categoryIcon: 'fas fa-users', timeAgo: '2h ago', isHot: true, endsIn: '2 days' },
+  { id: 2, question: 'Best team building activity for winter?', totalVotes: 567, weeklyGrowth: 89, responseRate: 78, category: 'Team', categoryIcon: 'fas fa-user-friends', timeAgo: '5h ago', isHot: true, endsIn: '3 days' },
+  { id: 3, question: 'New office location preferences', totalVotes: 445, weeklyGrowth: 67, responseRate: 65, category: 'Company', categoryIcon: 'fas fa-building', timeAgo: '1d ago', isHot: false, endsIn: '5 days' },
+  { id: 4, question: 'Preferred lunch vendors for catering', totalVotes: 334, weeklyGrowth: 45, responseRate: 72, category: 'Feedback', categoryIcon: 'fas fa-utensils', timeAgo: '2d ago', isHot: false, endsIn: '1 week' },
+  { id: 5, question: 'Training topics for next quarter', totalVotes: 289, weeklyGrowth: 34, responseRate: 58, category: 'Learning', categoryIcon: 'fas fa-graduation-cap', timeAgo: '3d ago', isHot: false, endsIn: '4 days' },
+  { id: 6, question: 'Company swag preferences', totalVotes: 256, weeklyGrowth: 28, responseRate: 62, category: 'Fun', categoryIcon: 'fas fa-gift', timeAgo: '4d ago', isHot: false, endsIn: '6 days' }
 ])
 
 // Active Polls
@@ -1094,8 +1099,14 @@ function getInsightTypeColor(type: string) {
           <div
             v-for="(poll, index) in trendingPolls"
             :key="poll.id"
-            :class="['trending-card-enhanced', { 'top-three': index < 3 }]"
+            :class="['trending-card-enhanced', { 'top-three': index < 3, 'is-hot': poll.isHot }]"
           >
+            <!-- Hot Badge -->
+            <div v-if="poll.isHot" class="hot-badge">
+              <i class="fas fa-fire-flame-curved"></i>
+              <span>HOT</span>
+            </div>
+
             <!-- Rank Badge -->
             <div :class="['rank-badge', `rank-${index + 1}`]">
               <span v-if="index < 3" class="rank-icon">
@@ -1106,26 +1117,52 @@ function getInsightTypeColor(type: string) {
 
             <!-- Card Content -->
             <div class="trending-card-content">
+              <!-- Category & Time -->
+              <div class="trending-meta">
+                <span class="trending-category">
+                  <i :class="poll.categoryIcon"></i>
+                  {{ poll.category }}
+                </span>
+                <span class="trending-time">
+                  <i class="fas fa-clock"></i>
+                  {{ poll.timeAgo }}
+                </span>
+              </div>
+
               <h4 class="trending-question">{{ poll.question }}</h4>
 
               <!-- Stats Row -->
               <div class="trending-stats">
                 <div class="trending-stat">
                   <i class="fas fa-users"></i>
-                  <span>{{ poll.totalVotes.toLocaleString() }}</span>
+                  <span>{{ poll.totalVotes.toLocaleString() }} votes</span>
                 </div>
                 <div class="trending-stat growth">
                   <i class="fas fa-arrow-trend-up"></i>
                   <span>+{{ poll.weeklyGrowth }}%</span>
                 </div>
               </div>
+
+              <!-- Progress Bar -->
+              <div class="trending-progress-bar">
+                <div class="progress-track">
+                  <div class="progress-fill" :style="{ width: poll.responseRate + '%' }"></div>
+                </div>
+                <span class="progress-label">{{ poll.responseRate }}% response rate</span>
+              </div>
             </div>
 
-            <!-- Vote Now Button -->
-            <button class="trending-vote-btn">
-              <span class="btn-text">{{ textConstants.voteNow }}</span>
-              <i class="fas fa-arrow-right"></i>
-            </button>
+            <!-- Right Side - Action -->
+            <div class="trending-action">
+              <div class="ends-in">
+                <i class="fas fa-hourglass-half"></i>
+                <span>{{ poll.endsIn }}</span>
+              </div>
+              <button class="trending-vote-btn">
+                <span class="btn-text">{{ textConstants.voteNow }}</span>
+                <i class="fas fa-arrow-right"></i>
+              </button>
+            </div>
           </div>
         </div>
       </section>
@@ -2890,9 +2927,9 @@ function getInsightTypeColor(type: string) {
   position: relative;
   background: white;
   border-radius: 1.25rem;
-  padding: 1.25rem;
+  padding: 1.5rem;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 1rem;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
   border: 1px solid rgba(0, 0, 0, 0.04);
@@ -3053,6 +3090,158 @@ function getInsightTypeColor(type: string) {
 @keyframes trend-up {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-2px); }
+}
+
+/* Hot Badge */
+.hot-badge {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+  border-radius: 0.5rem;
+  font-size: 0.625rem;
+  font-weight: 700;
+  color: white;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 8px rgba(249, 115, 22, 0.4);
+  animation: hot-pulse 2s ease-in-out infinite;
+  z-index: 2;
+}
+
+.hot-badge i {
+  font-size: 0.625rem;
+  animation: flame-dance 0.5s ease-in-out infinite;
+}
+
+@keyframes hot-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+@keyframes flame-dance {
+  0%, 100% { transform: rotate(-5deg); }
+  50% { transform: rotate(5deg); }
+}
+
+.trending-card-enhanced.is-hot {
+  border-color: rgba(249, 115, 22, 0.2);
+}
+
+.trending-card-enhanced.is-hot::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #f97316, #ea580c, #f97316);
+  background-size: 200% 100%;
+  animation: hot-gradient 2s linear infinite;
+}
+
+@keyframes hot-gradient {
+  0% { background-position: 0% 0%; }
+  100% { background-position: 200% 0%; }
+}
+
+/* Trending Meta */
+.trending-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.trending-category {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.625rem;
+  background: #f0fdfa;
+  border-radius: 0.5rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: #0d9488;
+}
+
+.trending-category i {
+  font-size: 0.625rem;
+}
+
+.trending-time {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.6875rem;
+  color: #9ca3af;
+}
+
+.trending-time i {
+  font-size: 0.5rem;
+}
+
+/* Trending Progress Bar */
+.trending-progress-bar {
+  margin-top: 0.75rem;
+}
+
+.progress-track {
+  width: 100%;
+  height: 4px;
+  background: #e5e7eb;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #14b8a6, #0d9488);
+  border-radius: 2px;
+  transition: width 0.5s ease;
+}
+
+.progress-label {
+  display: block;
+  margin-top: 0.375rem;
+  font-size: 0.6875rem;
+  color: #9ca3af;
+}
+
+/* Trending Action */
+.trending-action {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.75rem;
+  flex-shrink: 0;
+  z-index: 1;
+}
+
+.ends-in {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.375rem 0.625rem;
+  background: #fef3c7;
+  border-radius: 0.5rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: #92400e;
+}
+
+.ends-in i {
+  font-size: 0.625rem;
+  animation: hourglass-flip 2s ease-in-out infinite;
+}
+
+@keyframes hourglass-flip {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(180deg); }
 }
 
 /* Progress Circle */
