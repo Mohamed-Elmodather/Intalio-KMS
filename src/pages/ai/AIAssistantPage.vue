@@ -753,10 +753,10 @@ function handleToolSelect(tool: { id: AIOperationType; name: string }) {
 }
 
 // Handle AI tool selection from sidebar
-function selectToolFromSidebar(tool: { id: AIOperationType; name: string }) {
+function selectToolFromSidebar(tool: { id: AIOperationType; name: string }, option?: string) {
   showToolsPalette.value = false
   toolsSearchQuery.value = ''
-  handleToolSelect(tool)
+  handleToolbarClick(tool.id, option)
 }
 
 // Handle AI tool selection from toolbar
@@ -1934,42 +1934,141 @@ function handleEntityClick(entity: { text: string; type: string }) {
                 Content
               </h4>
               <div class="space-y-1">
-                <button
-                  @click="selectToolFromSidebar({ id: 'summarize', name: 'Summarize' })"
-                  class="w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-teal-50/50 transition-colors group"
-                >
-                  <div class="w-9 h-9 rounded-lg bg-teal-50 text-teal-500 flex items-center justify-center group-hover:bg-teal-100">
-                    <i class="fas fa-compress-alt"></i>
+                <!-- Summarize with options -->
+                <div class="rounded-xl overflow-hidden">
+                  <div class="flex items-center gap-3 p-2.5 bg-teal-50/30">
+                    <div class="w-9 h-9 rounded-lg bg-teal-50 text-teal-500 flex items-center justify-center">
+                      <i class="fas fa-compress-alt"></i>
+                    </div>
+                    <div class="flex-1 text-left">
+                      <p class="text-sm font-medium text-gray-700">Summarize</p>
+                      <p class="text-xs text-gray-400">Choose a style</p>
+                    </div>
                   </div>
-                  <div class="flex-1 text-left">
-                    <p class="text-sm font-medium text-gray-700">Summarize</p>
-                    <p class="text-xs text-gray-400">Generate concise summaries</p>
+                  <div class="flex gap-1 px-2 pb-2 pt-1 bg-teal-50/30">
+                    <button
+                      @click="selectToolFromSidebar({ id: 'summarize', name: 'Summarize' }, 'brief')"
+                      class="flex-1 px-2 py-1.5 text-xs font-medium bg-white hover:bg-teal-100 text-gray-600 hover:text-teal-700 rounded-lg transition-colors flex items-center justify-center gap-1"
+                    >
+                      <i class="fas fa-minus text-[10px]"></i>
+                      Brief
+                    </button>
+                    <button
+                      @click="selectToolFromSidebar({ id: 'summarize', name: 'Summarize' }, 'detailed')"
+                      class="flex-1 px-2 py-1.5 text-xs font-medium bg-white hover:bg-teal-100 text-gray-600 hover:text-teal-700 rounded-lg transition-colors flex items-center justify-center gap-1"
+                    >
+                      <i class="fas fa-align-left text-[10px]"></i>
+                      Detailed
+                    </button>
+                    <button
+                      @click="selectToolFromSidebar({ id: 'summarize', name: 'Summarize' }, 'bullet')"
+                      class="flex-1 px-2 py-1.5 text-xs font-medium bg-white hover:bg-teal-100 text-gray-600 hover:text-teal-700 rounded-lg transition-colors flex items-center justify-center gap-1"
+                    >
+                      <i class="fas fa-list-ul text-[10px]"></i>
+                      Bullets
+                    </button>
                   </div>
-                </button>
-                <button
-                  @click="selectToolFromSidebar({ id: 'translate', name: 'Translate' })"
-                  class="w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-teal-50/50 transition-colors group"
-                >
-                  <div class="w-9 h-9 rounded-lg bg-green-50 text-green-500 flex items-center justify-center group-hover:bg-green-100">
-                    <i class="fas fa-language"></i>
+                </div>
+
+                <!-- Translate with options -->
+                <div class="rounded-xl overflow-hidden">
+                  <div class="flex items-center gap-3 p-2.5 bg-green-50/30">
+                    <div class="w-9 h-9 rounded-lg bg-green-50 text-green-500 flex items-center justify-center">
+                      <i class="fas fa-language"></i>
+                    </div>
+                    <div class="flex-1 text-left">
+                      <p class="text-sm font-medium text-gray-700">Translate</p>
+                      <p class="text-xs text-gray-400">Select target language</p>
+                    </div>
                   </div>
-                  <div class="flex-1 text-left">
-                    <p class="text-sm font-medium text-gray-700">Translate</p>
-                    <p class="text-xs text-gray-400">Translate to 16+ languages</p>
+                  <div class="grid grid-cols-3 gap-1 px-2 pb-2 pt-1 bg-green-50/30">
+                    <button
+                      @click="selectToolFromSidebar({ id: 'translate', name: 'Translate' }, 'ar')"
+                      class="px-2 py-1.5 text-xs font-medium bg-white hover:bg-green-100 text-gray-600 hover:text-green-700 rounded-lg transition-colors flex items-center justify-center gap-1"
+                    >
+                      <span>🇸🇦</span>
+                      Arabic
+                    </button>
+                    <button
+                      @click="selectToolFromSidebar({ id: 'translate', name: 'Translate' }, 'en')"
+                      class="px-2 py-1.5 text-xs font-medium bg-white hover:bg-green-100 text-gray-600 hover:text-green-700 rounded-lg transition-colors flex items-center justify-center gap-1"
+                    >
+                      <span>🇺🇸</span>
+                      English
+                    </button>
+                    <button
+                      @click="selectToolFromSidebar({ id: 'translate', name: 'Translate' }, 'fr')"
+                      class="px-2 py-1.5 text-xs font-medium bg-white hover:bg-green-100 text-gray-600 hover:text-green-700 rounded-lg transition-colors flex items-center justify-center gap-1"
+                    >
+                      <span>🇫🇷</span>
+                      French
+                    </button>
+                    <button
+                      @click="selectToolFromSidebar({ id: 'translate', name: 'Translate' }, 'es')"
+                      class="px-2 py-1.5 text-xs font-medium bg-white hover:bg-green-100 text-gray-600 hover:text-green-700 rounded-lg transition-colors flex items-center justify-center gap-1"
+                    >
+                      <span>🇪🇸</span>
+                      Spanish
+                    </button>
+                    <button
+                      @click="selectToolFromSidebar({ id: 'translate', name: 'Translate' }, 'de')"
+                      class="px-2 py-1.5 text-xs font-medium bg-white hover:bg-green-100 text-gray-600 hover:text-green-700 rounded-lg transition-colors flex items-center justify-center gap-1"
+                    >
+                      <span>🇩🇪</span>
+                      German
+                    </button>
+                    <button
+                      @click="selectToolFromSidebar({ id: 'translate', name: 'Translate' }, 'zh')"
+                      class="px-2 py-1.5 text-xs font-medium bg-white hover:bg-green-100 text-gray-600 hover:text-green-700 rounded-lg transition-colors flex items-center justify-center gap-1"
+                    >
+                      <span>🇨🇳</span>
+                      Chinese
+                    </button>
                   </div>
-                </button>
-                <button
-                  @click="selectToolFromSidebar({ id: 'generate-title', name: 'Generate Titles' })"
-                  class="w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-teal-50/50 transition-colors group"
-                >
-                  <div class="w-9 h-9 rounded-lg bg-indigo-50 text-indigo-500 flex items-center justify-center group-hover:bg-indigo-100">
-                    <i class="fas fa-heading"></i>
+                </div>
+
+                <!-- Generate Titles with options -->
+                <div class="rounded-xl overflow-hidden">
+                  <div class="flex items-center gap-3 p-2.5 bg-indigo-50/30">
+                    <div class="w-9 h-9 rounded-lg bg-indigo-50 text-indigo-500 flex items-center justify-center">
+                      <i class="fas fa-heading"></i>
+                    </div>
+                    <div class="flex-1 text-left">
+                      <p class="text-sm font-medium text-gray-700">Generate Titles</p>
+                      <p class="text-xs text-gray-400">Choose title style</p>
+                    </div>
                   </div>
-                  <div class="flex-1 text-left">
-                    <p class="text-sm font-medium text-gray-700">Generate Titles</p>
-                    <p class="text-xs text-gray-400">Create title suggestions</p>
+                  <div class="grid grid-cols-2 gap-1 px-2 pb-2 pt-1 bg-indigo-50/30">
+                    <button
+                      @click="selectToolFromSidebar({ id: 'generate-title', name: 'Generate Titles' }, 'formal')"
+                      class="px-2 py-1.5 text-xs font-medium bg-white hover:bg-indigo-100 text-gray-600 hover:text-indigo-700 rounded-lg transition-colors flex items-center justify-center gap-1"
+                    >
+                      <i class="fas fa-briefcase text-[10px]"></i>
+                      Formal
+                    </button>
+                    <button
+                      @click="selectToolFromSidebar({ id: 'generate-title', name: 'Generate Titles' }, 'casual')"
+                      class="px-2 py-1.5 text-xs font-medium bg-white hover:bg-indigo-100 text-gray-600 hover:text-indigo-700 rounded-lg transition-colors flex items-center justify-center gap-1"
+                    >
+                      <i class="fas fa-smile text-[10px]"></i>
+                      Casual
+                    </button>
+                    <button
+                      @click="selectToolFromSidebar({ id: 'generate-title', name: 'Generate Titles' }, 'seo')"
+                      class="px-2 py-1.5 text-xs font-medium bg-white hover:bg-indigo-100 text-gray-600 hover:text-indigo-700 rounded-lg transition-colors flex items-center justify-center gap-1"
+                    >
+                      <i class="fas fa-search text-[10px]"></i>
+                      SEO
+                    </button>
+                    <button
+                      @click="selectToolFromSidebar({ id: 'generate-title', name: 'Generate Titles' }, 'creative')"
+                      class="px-2 py-1.5 text-xs font-medium bg-white hover:bg-indigo-100 text-gray-600 hover:text-indigo-700 rounded-lg transition-colors flex items-center justify-center gap-1"
+                    >
+                      <i class="fas fa-lightbulb text-[10px]"></i>
+                      Creative
+                    </button>
                   </div>
-                </button>
+                </div>
               </div>
             </div>
 
