@@ -1199,10 +1199,36 @@ function handleEntityClick(entity: { text: string; type: string }) {
       </div>
 
       <!-- Search (hidden when collapsed) -->
-      <div v-if="!isHistorySidebarCollapsed" class="p-4">
-        <div class="input-group">
-          <i class="input-icon fas fa-search"></i>
-          <input type="text" v-model="searchHistory" placeholder="Search conversations..." class="input text-sm">
+      <div v-if="!isHistorySidebarCollapsed" class="px-3 pb-3">
+        <div class="search-container group relative">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <i class="fas fa-search text-gray-400 group-focus-within:text-teal-500 transition-colors duration-200"></i>
+          </div>
+          <input
+            type="text"
+            v-model="searchHistory"
+            placeholder="Search conversations..."
+            class="w-full pl-10 pr-10 py-2.5 bg-white/80 backdrop-blur-sm border border-gray-200 rounded-xl text-sm text-gray-700 placeholder-gray-400
+                   focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-400 focus:bg-white
+                   hover:border-gray-300 hover:bg-white
+                   transition-all duration-200 ease-out
+                   shadow-sm hover:shadow focus:shadow-md"
+          >
+          <!-- Clear button -->
+          <button
+            v-if="searchHistory"
+            @click="searchHistory = ''"
+            class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-teal-500 transition-colors duration-200"
+          >
+            <i class="fas fa-times-circle"></i>
+          </button>
+          <!-- Search shortcut hint -->
+          <div
+            v-if="!searchHistory"
+            class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none"
+          >
+            <kbd class="hidden sm:inline-flex px-1.5 py-0.5 text-[10px] font-medium text-gray-400 bg-gray-100 rounded border border-gray-200">/</kbd>
+          </div>
         </div>
       </div>
 
@@ -2394,6 +2420,57 @@ function handleEntityClick(entity: { text: string; type: string }) {
 .slide-left-enter-from,
 .slide-left-leave-to {
   transform: translateX(-100%);
+  opacity: 0;
+}
+
+/* Search Container Styles */
+.search-container {
+  position: relative;
+}
+
+.search-container input {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.search-container input:focus {
+  transform: scale(1.01);
+}
+
+.search-container input::placeholder {
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.search-container input:focus::placeholder {
+  opacity: 0.5;
+  transform: translateX(4px);
+}
+
+/* Search icon animation */
+.search-container .fa-search {
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.search-container:focus-within .fa-search {
+  transform: scale(1.1);
+}
+
+/* Clear button animation */
+.search-container button {
+  transition: transform 0.15s ease, opacity 0.15s ease;
+  opacity: 0.7;
+}
+
+.search-container button:hover {
+  transform: scale(1.1);
+  opacity: 1;
+}
+
+/* Keyboard shortcut hint */
+.search-container kbd {
+  transition: opacity 0.2s ease;
+}
+
+.search-container:focus-within kbd {
   opacity: 0;
 }
 </style>
