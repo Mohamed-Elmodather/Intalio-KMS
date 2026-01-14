@@ -2008,26 +2008,14 @@ function formatVersionDate(date: Date): string {
               <p class="text-sm text-gray-500">Document Author</p>
             </div>
           </div>
-          <div class="flex items-center gap-3">
-            <button @click="printDocument" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-medium flex items-center gap-2 transition-colors">
-              <i class="fas fa-print"></i>
-              <span>Print</span>
-            </button>
-            <SocialShareButtons
-              :title="document.name"
-              :description="document.description"
-              layout="horizontal"
-              size="sm"
-            />
-            <RatingStars
-              :model-value="rating?.userRating || 0"
-              :average="rating?.average"
-              :count="rating?.count"
-              size="md"
-              :show-count="true"
-              @update:model-value="handleRating"
-            />
-          </div>
+          <RatingStars
+            :model-value="rating?.userRating || 0"
+            :average="rating?.average"
+            :count="rating?.count"
+            size="md"
+            :show-count="true"
+            @update:model-value="handleRating"
+          />
         </div>
       </div>
 
@@ -2049,6 +2037,39 @@ function formatVersionDate(date: Date): string {
               <p class="text-sm text-gray-500">{{ doc.size }} • {{ doc.type }}</p>
             </div>
           </div>
+        </div>
+      </div>
+
+      <!-- Engagement & Share Section -->
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mt-6">
+        <div class="flex items-center justify-between flex-wrap gap-4">
+          <div class="flex items-center gap-3">
+            <BookmarkButton
+              :content-id="document.id.toString()"
+              content-type="document"
+              size="md"
+              variant="button"
+              :show-label="true"
+            />
+            <button
+              @click="showAddToCollection = true"
+              class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-medium flex items-center gap-2 transition-colors"
+              title="Add to Collection"
+            >
+              <i class="fas fa-folder-plus"></i>
+              <span>Collection</span>
+            </button>
+            <button @click="printDocument" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-medium flex items-center gap-2 transition-colors">
+              <i class="fas fa-print"></i>
+              <span>Print</span>
+            </button>
+          </div>
+          <SocialShareButtons
+            :title="document.name"
+            :description="document.description"
+            layout="horizontal"
+            size="sm"
+          />
         </div>
       </div>
 
