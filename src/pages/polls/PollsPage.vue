@@ -1152,18 +1152,16 @@ function getInsightTypeColor(type: string) {
               </div>
             </div>
 
-            <!-- Right Side - Action -->
-            <div class="trending-action">
-              <button class="trending-vote-btn">
-                <span class="btn-text">{{ textConstants.voteNow }}</span>
+            <!-- Bottom Bar - Ends In & Vote Button -->
+            <div class="trending-bottom-bar">
+              <div class="ends-in-badge">
+                <i class="fas fa-hourglass-half"></i>
+                <span>Ends in {{ poll.endsIn }}</span>
+              </div>
+              <button class="trending-vote-btn-sm">
+                <span>{{ textConstants.voteNow }}</span>
                 <i class="fas fa-arrow-right"></i>
               </button>
-            </div>
-
-            <!-- Ends In Badge - Bottom -->
-            <div class="ends-in-bottom">
-              <i class="fas fa-hourglass-half"></i>
-              <span>Ends in {{ poll.endsIn }}</span>
             </div>
           </div>
         </div>
@@ -3247,32 +3245,67 @@ function getInsightTypeColor(type: string) {
   50% { transform: rotate(180deg); }
 }
 
-/* Ends In Bottom Badge */
-.ends-in-bottom {
+/* Trending Bottom Bar */
+.trending-bottom-bar {
   position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
+  justify-content: space-between;
   padding: 0.625rem 1rem;
-  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-  border-top: 1px solid rgba(251, 191, 36, 0.3);
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: #92400e;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border-top: 1px solid #e2e8f0;
   z-index: 1;
 }
 
-.ends-in-bottom i {
+.ends-in-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.375rem 0.75rem;
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border-radius: 0.5rem;
   font-size: 0.6875rem;
+  font-weight: 600;
+  color: #92400e;
+}
+
+.ends-in-badge i {
+  font-size: 0.625rem;
   animation: hourglass-flip 2s ease-in-out infinite;
 }
 
-.trending-card-enhanced:hover .ends-in-bottom {
-  background: linear-gradient(135deg, #fde68a 0%, #fcd34d 100%);
+.trending-vote-btn-sm {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem 1rem;
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(20, 184, 166, 0.3);
+}
+
+.trending-vote-btn-sm:hover {
+  background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%);
+  transform: translateX(2px);
+  box-shadow: 0 4px 12px rgba(20, 184, 166, 0.4);
+}
+
+.trending-vote-btn-sm i {
+  font-size: 0.625rem;
+  transition: transform 0.3s ease;
+}
+
+.trending-vote-btn-sm:hover i {
+  transform: translateX(3px);
 }
 
 /* Progress Circle */
