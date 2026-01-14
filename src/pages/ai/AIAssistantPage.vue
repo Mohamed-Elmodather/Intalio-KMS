@@ -1,14 +1,74 @@
 <script setup lang="ts">
-import { ref, computed, nextTick } from 'vue'
+import { ref, computed, nextTick, onMounted, onUnmounted, watch } from 'vue'
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
 import { useAIServicesStore } from '@/stores/aiServices'
 import { useComparisonStore } from '@/stores/comparison'
-import { AILoadingIndicator } from '@/components/ai'
+import { useAIWorkflowsStore } from '@/stores/aiWorkflows'
+import { useAIPreferencesStore } from '@/stores/aiPreferences'
+import {
+  AILoadingIndicator,
+  AIToolsPalette,
+  AIToolsToolbar,
+  AIMessageContent,
+  AIVoiceInput,
+  AIOperationProgress,
+  AIContentSuggestions,
+  AIWorkflowBuilder
+} from '@/components/ai'
 import ComparisonPanel from '@/components/ai/ComparisonPanel.vue'
 import ComparisonModal from '@/components/ai/ComparisonModal.vue'
+import { useSlashCommands } from '@/composables/useSlashCommands'
+import { useVoiceInput } from '@/composables/useVoiceInput'
+import type { AIOperationType } from '@/types/ai'
 
 const aiStore = useAIServicesStore()
 const comparisonStore = useComparisonStore()
+const workflowsStore = useAIWorkflowsStore()
+const preferencesStore = useAIPreferencesStore()
+
+// Keyboard shortcuts
+function handleKeyboard(e: KeyboardEvent) {
+  // Ctrl+K for tools palette
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+    e.preventDefault()
+    e.stopPropagation()
+    showToolsPalette.value = !showToolsPalette.value
+    console.log('Ctrl+K pressed, showToolsPalette:', showToolsPalette.value)
+  }
+  // Escape to close modals
+  if (e.key === 'Escape') {
+    showToolsPalette.value = false
+    showWorkflowBuilder.value = false
+  }
+}
+
+// Initialize stores and keyboard listener
+onMounted(() => {
+  workflowsStore.initialize()
+  preferencesStore.initialize()
+  window.addEventListener('keydown', handleKeyboard)
+  console.log('Keyboard listener registered')
+})
+
+onUnmounted(() => {
+  window.removeEventListener('keydown', handleKeyboard)
+})
+
+// Slash commands
+const {
+  parseInput: parseCommand,
+  filterCommands: getCommandSuggestions,
+  SLASH_COMMANDS: availableCommands
+} = useSlashCommands()
+
+// Voice input
+const {
+  isListening,
+  isSupported: isVoiceSupported,
+  transcript,
+  startListening,
+  stopListening
+} = useVoiceInput()
 
 // Types
 interface Chat {
@@ -143,6 +203,48 @@ const quickActions = ref<QuickAction[]>([
   { id: 'analyze', label: 'Analyze content', icon: 'fas fa-chart-bar' },
   { id: 'compare', label: 'Compare docs', icon: 'fas fa-columns' }
 ])
+
+// ============================================================================
+// Enhanced AI Features - State
+// ============================================================================
+
+// Tools Palette & Toolbar
+const showToolsPalette = ref(false)
+const showWorkflowBuilder = ref(false)
+const showToolsToolbar = ref(true)
+
+// Current AI Operation
+const currentOperation = ref<{
+  type: AIOperationType
+  status: 'pending' | 'processing' | 'success' | 'error'
+  progress: number
+  message?: string
+} | null>(null)
+
+// Slash command suggestions
+const showCommandSuggestions = ref(false)
+const commandSuggestions = computed(() => {
+  if (!inputMessage.value.startsWith('/')) return []
+  return getCommandSuggestions(inputMessage.value)
+})
+
+// Content suggestions based on conversation
+const contentSuggestions = ref<any[]>([])
+const loadingContentSuggestions = ref(false)
+
+// Voice input integration
+watch(transcript, (newTranscript) => {
+  if (newTranscript) {
+    inputMessage.value = newTranscript
+  }
+})
+
+// Watch for slash commands
+watch(inputMessage, (newValue) => {
+  // Show suggestions when typing / (even just /)
+  showCommandSuggestions.value = newValue.startsWith('/') && !newValue.includes(' ')
+  console.log('Input changed:', newValue, 'Show suggestions:', showCommandSuggestions.value, 'Suggestions count:', commandSuggestions.value.length)
+})
 
 // ============================================================================
 // Advanced AI Features - State
@@ -396,6 +498,99 @@ async function sendMessage() {
   const userQuery = inputMessage.value
   const attachments = [...pendingAttachments.value]
 
+  // Check if this is a slash command
+  if (userQuery.startsWith('/')) {
+    const result = await executeSlashCommand(userQuery)
+    if (result) {
+      // Add user message
+      messages.value.push({
+        role: 'user',
+        content: userQuery,
+        timestamp: new Date()
+      })
+      // Add AI response
+      messages.value.push({
+        role: 'assistant',
+        content: result,
+        timestamp: new Date()
+      })
+    }
+    inputMessage.value = ''
+    pendingAttachments.value = []
+    // Clear operation after a delay
+    setTimeout(() => {
+      currentOperation.value = null
+    }, 2000)
+    return
+  }
+
+  // Check if there's a pending operation from toolbar
+  if (currentOperation.value && currentOperation.value.status === 'pending') {
+    const operation = currentOperation.value.type
+    currentOperation.value = {
+      type: operation,
+      status: 'processing',
+      progress: 0,
+      message: `Running ${operation}...`
+    }
+
+    // Simulate progress
+    const progressInterval = setInterval(() => {
+      if (currentOperation.value && currentOperation.value.progress < 90) {
+        currentOperation.value.progress += 10
+      }
+    }, 200)
+
+    // Simulate AI operation
+    setTimeout(async () => {
+      clearInterval(progressInterval)
+
+      // Add user message
+      messages.value.push({
+        role: 'user',
+        content: userQuery,
+        attachments: attachments.length > 0 ? attachments : undefined,
+        timestamp: new Date()
+      })
+
+      // Generate response based on operation
+      const operationResponses: Record<AIOperationType, string> = {
+        'summarize': `<p><strong>Summary:</strong></p><p>This is a concise summary of the provided content.</p>`,
+        'translate': `<p><strong>Translation:</strong></p><p>Translated content appears here.</p>`,
+        'extract-entities': `<p><strong>Entities Found:</strong></p><ul><li>Organization: AFC</li><li>Event: Asian Cup 2027</li><li>Location: Saudi Arabia</li></ul>`,
+        'analyze-sentiment': `<p><strong>Sentiment Analysis:</strong></p><p>Overall: <span class="text-green-600 font-medium">Positive (85%)</span></p>`,
+        'classify': `<p><strong>Classification:</strong></p><p>Category: <span class="font-medium">Sports/Tournament</span> (92% confidence)</p>`,
+        'ocr': `<p><strong>Extracted Text:</strong></p><p>Text extracted from the document...</p>`,
+        'generate-title': `<p><strong>Suggested Titles:</strong></p><ol><li>Comprehensive Guide</li><li>Complete Overview</li><li>Essential Information</li></ol>`,
+        'auto-tag': `<p><strong>Suggested Tags:</strong></p><p><span class="px-2 py-1 bg-teal-100 text-teal-700 rounded mr-1">tournament</span><span class="px-2 py-1 bg-blue-100 text-blue-700 rounded mr-1">football</span><span class="px-2 py-1 bg-purple-100 text-purple-700 rounded">asia</span></p>`,
+        'smart-search': `<p><strong>Search Results:</strong></p><ul><li>Result 1 - Relevant document</li><li>Result 2 - Related content</li></ul>`,
+        'chat': '<p>Response to your message.</p>'
+      }
+
+      currentOperation.value = {
+        type: operation,
+        status: 'success',
+        progress: 100
+      }
+
+      messages.value.push({
+        role: 'assistant',
+        content: operationResponses[operation] || '<p>Operation completed.</p>',
+        timestamp: new Date()
+      })
+
+      inputMessage.value = ''
+      pendingAttachments.value = []
+
+      // Clear operation after delay
+      setTimeout(() => {
+        currentOperation.value = null
+      }, 2000)
+    }, 1500)
+
+    return
+  }
+
   // Create user message with attachments
   const userMessage: Message = {
     role: 'user',
@@ -520,6 +715,287 @@ function shareChat() {
 function saveSettings() {
   showSettings.value = false
 }
+
+// ============================================================================
+// Enhanced AI Features - Functions
+// ============================================================================
+
+// Handle AI tool selection from palette
+function handleToolSelect(tool: { id: AIOperationType; name: string }) {
+  showToolsPalette.value = false
+
+  // Track operation
+  preferencesStore.trackOperation(tool.id)
+
+  // Set current operation
+  currentOperation.value = {
+    type: tool.id,
+    status: 'pending',
+    progress: 0
+  }
+
+  // Add placeholder based on tool type
+  const toolPrefixes: Record<AIOperationType, string> = {
+    'extract-entities': 'Extract entities from: ',
+    'analyze-sentiment': 'Analyze sentiment of: ',
+    'summarize': 'Summarize: ',
+    'classify': 'Classify: ',
+    'ocr': 'Extract text from this image: ',
+    'translate': 'Translate to Arabic: ',
+    'generate-title': 'Generate titles for: ',
+    'auto-tag': 'Suggest tags for: ',
+    'smart-search': 'Search for: ',
+    'chat': ''
+  }
+
+  inputMessage.value = toolPrefixes[tool.id] || ''
+}
+
+// Handle AI tool selection from toolbar
+function handleToolbarClick(toolId: AIOperationType, option?: string) {
+  // Track operation
+  preferencesStore.trackOperation(toolId)
+
+  // Set current operation
+  currentOperation.value = {
+    type: toolId,
+    status: 'pending',
+    progress: 0
+  }
+
+  // Add placeholder based on tool type with option
+  const toolPrefixes: Record<AIOperationType, string> = {
+    'extract-entities': 'Extract entities from: ',
+    'analyze-sentiment': 'Analyze sentiment of: ',
+    'summarize': option ? `Summarize (${option}): ` : 'Summarize: ',
+    'classify': 'Classify: ',
+    'ocr': 'Extract text from this image: ',
+    'translate': option ? `Translate to ${option}: ` : 'Translate: ',
+    'generate-title': option ? `Generate ${option} titles for: ` : 'Generate titles for: ',
+    'auto-tag': 'Suggest tags for: ',
+    'smart-search': 'Search for: ',
+    'chat': ''
+  }
+
+  inputMessage.value = toolPrefixes[toolId] || ''
+  console.log('Toolbar click:', toolId, option)
+}
+
+// Handle slash command selection
+function handleCommandSelect(command: { command: string; description: string }) {
+  showCommandSuggestions.value = false
+
+  // Parse the command to get the operation
+  const parsed = parseCommand(command.command + ' ')
+  if (parsed) {
+    inputMessage.value = `/${parsed.command} `
+  }
+}
+
+// Execute a slash command
+async function executeSlashCommand(message: string) {
+  const parsed = parseCommand(message)
+  if (!parsed.isCommand || !parsed.command) return false
+
+  const slashCommand = parsed.command
+  const args = parsed.input
+  const commandName = slashCommand.command.slice(1) // Remove leading /
+
+  // Check if it's a recognized operation
+  const operation = slashCommand.operation
+  if (operation === 'help') {
+    // Show help message
+    messages.value.push({
+      role: 'assistant',
+      content: `<p><strong>Available Slash Commands:</strong></p>
+        <ul>
+          ${availableCommands.map(cmd => `<li><code>${cmd.command}</code> - ${cmd.description}</li>`).join('')}
+        </ul>
+        <p>Type a command followed by your content, e.g., <code>/summarize your text here</code></p>`,
+      timestamp: new Date()
+    })
+    return true
+  }
+
+  if (operation === 'chat') {
+    // Handle compare command
+    if (commandName === 'compare') {
+      if (comparisonStore.canCompare) {
+        comparisonStore.startComparison()
+      } else {
+        openContentBrowser()
+      }
+      return true
+    }
+    return false
+  }
+
+  // It's an AI operation
+  const aiOperation = operation as AIOperationType
+
+  // Track the operation
+  preferencesStore.trackOperation(aiOperation)
+
+  // Set current operation
+  currentOperation.value = {
+    type: aiOperation,
+    status: 'processing',
+    progress: 0,
+    message: `Running ${commandName}...`
+  }
+
+  // Simulate progress
+  const progressInterval = setInterval(() => {
+    if (currentOperation.value && currentOperation.value.progress < 90) {
+      currentOperation.value.progress += 10
+    }
+  }, 200)
+
+  try {
+    // Simulate AI operation (in real implementation, call actual AI service)
+    await new Promise(resolve => setTimeout(resolve, 1500))
+
+    clearInterval(progressInterval)
+    currentOperation.value = {
+      type: aiOperation,
+      status: 'success',
+      progress: 100
+    }
+
+    // Generate mock response based on operation
+    const operationResponses: Record<AIOperationType, string> = {
+      summarize: `<p><strong>Summary:</strong></p><p>${args ? `This is a summary of: "${args}"` : 'Please provide content to summarize.'}</p>`,
+      translate: `<p><strong>Translation:</strong></p><p>${args ? `Translated: "${args}"` : 'Please provide text to translate.'}</p>`,
+      'extract-entities': `<p><strong>Entities Found:</strong></p><ul><li>Organization: AFC</li><li>Event: Asian Cup 2027</li><li>Location: Saudi Arabia</li></ul>`,
+      'analyze-sentiment': `<p><strong>Sentiment Analysis:</strong></p><p>Overall: <span class="text-green-600 font-medium">Positive (85%)</span></p>`,
+      classify: `<p><strong>Classification:</strong></p><p>Category: <span class="font-medium">Sports/Tournament</span> (92% confidence)</p>`,
+      ocr: `<p><strong>Extracted Text:</strong></p><p>Text extracted from the document...</p>`,
+      'generate-title': `<p><strong>Suggested Titles:</strong></p><ol><li>Comprehensive Guide to AFC Asian Cup 2027</li><li>Everything You Need to Know About the Tournament</li><li>Asian Cup 2027: A Complete Overview</li></ol>`,
+      'auto-tag': `<p><strong>Suggested Tags:</strong></p><p><span class="px-2 py-1 bg-teal-100 text-teal-700 rounded mr-1">tournament</span><span class="px-2 py-1 bg-blue-100 text-blue-700 rounded mr-1">football</span><span class="px-2 py-1 bg-purple-100 text-purple-700 rounded">asia</span></p>`,
+      'smart-search': `<p><strong>Search Results:</strong></p><ul><li>Tournament Handbook - Main reference document</li><li>Venue Guidelines - Stadium information</li><li>Media Accreditation Guide</li></ul>`,
+      'chat': '<p>Chat response</p>'
+    }
+
+    return operationResponses[aiOperation] || '<p>Operation completed.</p>'
+  } catch (error) {
+    clearInterval(progressInterval)
+    currentOperation.value = {
+      type: aiOperation,
+      status: 'error',
+      progress: 0,
+      message: 'Operation failed'
+    }
+    return null
+  }
+}
+
+// Handle voice input toggle
+function toggleVoiceInput() {
+  if (isListening.value) {
+    stopListening()
+  } else {
+    startListening()
+  }
+}
+
+// Handle voice transcript
+function handleVoiceTranscript(text: string, isFinal: boolean) {
+  inputMessage.value = text
+  console.log('Voice transcript:', text, 'Final:', isFinal)
+}
+
+// Cancel current operation
+function cancelOperation() {
+  currentOperation.value = null
+}
+
+// Run a workflow
+async function runWorkflow(workflowId: string) {
+  const input = inputMessage.value || 'Sample input for workflow'
+
+  try {
+    await workflowsStore.executeWorkflow(workflowId, input, (step, total, result) => {
+      currentOperation.value = {
+        type: result.operation,
+        status: 'processing',
+        progress: Math.round((step / total) * 100),
+        message: `Step ${step}/${total}: ${result.output}`
+      }
+    })
+
+    currentOperation.value = null
+
+    // Add workflow result to messages
+    messages.value.push({
+      role: 'assistant',
+      content: `<p><strong>Workflow completed!</strong></p><p>All ${workflowsStore.workflows.find(w => w.id === workflowId)?.steps.length || 0} steps executed successfully.</p>`,
+      timestamp: new Date()
+    })
+  } catch (error) {
+    currentOperation.value = {
+      type: 'summarize', // fallback
+      status: 'error',
+      progress: 0,
+      message: 'Workflow execution failed'
+    }
+  }
+}
+
+// Generate content suggestions based on conversation context
+function generateContentSuggestions() {
+  loadingContentSuggestions.value = true
+
+  setTimeout(() => {
+    contentSuggestions.value = [
+      {
+        id: '1',
+        type: 'article',
+        title: 'Tournament Operations Guide',
+        reason: 'Related to your discussion about event management',
+        relevanceScore: 0.92,
+        suggestionType: 'related',
+        metadata: { category: 'Operations', readTime: '8 min' }
+      },
+      {
+        id: '2',
+        type: 'document',
+        title: 'AFC Asian Cup 2027 Handbook',
+        reason: 'Referenced in conversation',
+        relevanceScore: 0.88,
+        suggestionType: 'referenced',
+        metadata: { category: 'Official', readTime: '15 min' }
+      },
+      {
+        id: '3',
+        type: 'article',
+        title: 'Venue Management Best Practices',
+        reason: 'Similar to content you viewed',
+        relevanceScore: 0.75,
+        suggestionType: 'similar',
+        metadata: { category: 'Venues', readTime: '5 min' }
+      }
+    ]
+    loadingContentSuggestions.value = false
+  }, 800)
+}
+
+// Handle content suggestion selection
+function handleSuggestionSelect(suggestion: any) {
+  attachContent({
+    id: suggestion.id,
+    type: suggestion.type,
+    title: suggestion.title,
+    excerpt: suggestion.reason,
+    icon: suggestion.type === 'article' ? 'fas fa-file-alt' : 'fas fa-file-pdf',
+    iconBg: suggestion.type === 'article' ? 'bg-blue-100' : 'bg-red-100'
+  })
+}
+
+// Handle entity click (from AIMessageContent)
+function handleEntityClick(entity: { text: string; type: string }) {
+  inputMessage.value = `Tell me more about ${entity.text}`
+  sendMessage()
+}
 </script>
 
 <template>
@@ -610,6 +1086,22 @@ function saveSettings() {
           </div>
         </div>
         <div class="flex items-center gap-2">
+          <!-- Tools Palette (Ctrl+K) -->
+          <button @click="showToolsPalette = true"
+                  class="px-3 py-1.5 rounded-lg bg-teal-50 hover:bg-teal-100 text-teal-700 text-sm font-medium flex items-center gap-2 transition-colors ripple"
+                  title="AI Tools (Ctrl+K)">
+            <i class="fas fa-wand-magic-sparkles"></i>
+            <span class="hidden sm:inline">Tools</span>
+            <kbd class="hidden md:inline px-1.5 py-0.5 bg-white rounded text-xs text-gray-500 border border-gray-200">⌘K</kbd>
+          </button>
+          <!-- Workflows -->
+          <button @click="showWorkflowBuilder = true"
+                  class="px-3 py-1.5 rounded-lg bg-purple-50 hover:bg-purple-100 text-purple-700 text-sm font-medium flex items-center gap-2 transition-colors ripple"
+                  title="AI Workflows">
+            <i class="fas fa-stream"></i>
+            <span class="hidden sm:inline">Workflows</span>
+          </button>
+          <div class="w-px h-6 bg-teal-200"></div>
           <!-- Context Panel Toggle -->
           <button @click="showContextPanel = !showContextPanel"
                   :class="['p-2 rounded-lg transition-colors ripple',
@@ -636,6 +1128,13 @@ function saveSettings() {
           </button>
         </div>
       </div>
+
+      <!-- AI Tools Toolbar -->
+      <AIToolsToolbar
+        v-if="showToolsToolbar"
+        @tool-click="handleToolbarClick"
+        class="border-b border-teal-100"
+      />
 
       <!-- Messages Area -->
       <div class="flex-1 overflow-y-auto p-6 scrollbar-thin">
@@ -760,6 +1259,19 @@ function saveSettings() {
       <!-- Input Area -->
       <div class="p-4 border-t border-teal-100 bg-white/50 card-animated">
         <div class="max-w-4xl mx-auto">
+          <!-- Current Operation Progress -->
+          <Transition name="fade">
+            <AIOperationProgress
+              v-if="currentOperation"
+              :operation="currentOperation.type"
+              :status="currentOperation.status"
+              :progress="currentOperation.progress"
+              :message="currentOperation.message"
+              @cancel="cancelOperation"
+              class="mb-3"
+            />
+          </Transition>
+
           <!-- Quick Actions -->
           <div class="flex flex-wrap gap-2 mb-3">
             <button v-for="action in quickActions" :key="action.id"
@@ -795,12 +1307,35 @@ function saveSettings() {
 
           <div class="flex items-end gap-3">
             <div class="flex-1 relative">
+              <!-- Slash Command Suggestions -->
+              <Transition name="fade-up">
+                <div v-if="showCommandSuggestions && commandSuggestions.length > 0"
+                     class="absolute bottom-full left-0 right-0 mb-2 bg-white rounded-xl shadow-xl border border-gray-200 overflow-hidden z-10">
+                  <div class="p-2 border-b border-gray-100">
+                    <span class="text-xs font-medium text-gray-500">Slash Commands</span>
+                  </div>
+                  <div class="max-h-48 overflow-y-auto">
+                    <button v-for="cmd in commandSuggestions" :key="cmd.command"
+                            @click="handleCommandSelect(cmd)"
+                            class="w-full px-3 py-2 text-left hover:bg-teal-50 flex items-center gap-3 transition-colors">
+                      <div class="w-8 h-8 rounded-lg bg-teal-100 text-teal-600 flex items-center justify-center">
+                        <i :class="cmd.icon || 'fas fa-terminal'"></i>
+                      </div>
+                      <div>
+                        <p class="text-sm font-medium text-gray-900">{{ cmd.command }}</p>
+                        <p class="text-xs text-gray-500">{{ cmd.description }}</p>
+                      </div>
+                    </button>
+                  </div>
+                </div>
+              </Transition>
+
               <textarea v-model="inputMessage"
                         @keydown.enter.exact.prevent="sendMessage"
                         @keydown.shift.enter="() => {}"
-                        placeholder="Ask me anything... Attach documents for AI analysis"
+                        placeholder="Ask me anything... Type / for commands, or attach documents"
                         rows="1"
-                        class="input resize-none pr-24 min-h-[48px] max-h-32"
+                        class="input resize-none pr-28 min-h-[48px] max-h-32"
                         :style="{ height: inputHeight }"></textarea>
               <div class="absolute right-2 bottom-2 flex items-center gap-1">
                 <button @click="openContentBrowser"
@@ -812,7 +1347,16 @@ function saveSettings() {
                     {{ pendingAttachments.length }}
                   </span>
                 </button>
-                <button class="p-2 rounded-lg hover:bg-teal-100 text-teal-500 ripple" title="Voice input">
+                <!-- Voice Input -->
+                <AIVoiceInput
+                  v-if="isVoiceSupported"
+                  @transcript="handleVoiceTranscript"
+                  class="inline-flex"
+                />
+                <button v-else
+                        class="p-2 rounded-lg text-gray-300 cursor-not-allowed"
+                        title="Voice input not supported"
+                        disabled>
                   <i class="fas fa-microphone icon-soft"></i>
                 </button>
               </div>
@@ -826,7 +1370,7 @@ function saveSettings() {
           </div>
 
           <p class="text-xs text-teal-400 text-center mt-3">
-            AI can make mistakes. Consider checking important information. • Attach documents for AI-powered analysis.
+            AI can make mistakes. Consider checking important information. • Type <kbd class="px-1 bg-teal-100 rounded">/</kbd> for commands • <kbd class="px-1 bg-teal-100 rounded">Ctrl+K</kbd> for tools
           </p>
         </div>
       </div>
@@ -883,85 +1427,227 @@ function saveSettings() {
 
     <!-- Context Panel (Sidebar) -->
     <Transition name="slide-right">
-      <div v-if="showContextPanel" class="fixed right-0 top-0 h-full w-80 bg-white shadow-2xl z-40 flex flex-col border-l border-gray-200">
-        <div class="p-4 border-b border-gray-100 bg-gradient-to-r from-teal-500 to-emerald-500">
+      <div v-if="showContextPanel" class="fixed right-0 top-0 h-full w-96 bg-gradient-to-b from-gray-50 to-white shadow-2xl z-40 flex flex-col border-l border-gray-200">
+        <!-- Header -->
+        <div class="p-5 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
-                <i class="fas fa-brain text-white"></i>
+              <div class="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                <i class="fas fa-brain text-white text-xl"></i>
               </div>
               <div>
-                <h3 class="font-semibold text-white">Conversation Context</h3>
-                <p class="text-xs text-white/80">AI understands your intent</p>
+                <h3 class="font-bold text-white text-lg">Context Intelligence</h3>
+                <p class="text-xs text-white/80">Real-time conversation analysis</p>
               </div>
             </div>
-            <button @click="showContextPanel = false" class="p-2 hover:bg-white/20 rounded-lg transition-colors">
+            <button @click="showContextPanel = false" class="p-2.5 hover:bg-white/20 rounded-xl transition-colors">
               <i class="fas fa-times text-white"></i>
             </button>
           </div>
+
+          <!-- Quick Stats -->
+          <div class="flex items-center gap-4 mt-4 pt-4 border-t border-white/20">
+            <div class="flex-1 text-center">
+              <p class="text-2xl font-bold text-white">{{ messages.length }}</p>
+              <p class="text-xs text-white/70">Messages</p>
+            </div>
+            <div class="w-px h-8 bg-white/20"></div>
+            <div class="flex-1 text-center">
+              <p class="text-2xl font-bold text-white">{{ conversationContext.entities.length }}</p>
+              <p class="text-xs text-white/70">Entities</p>
+            </div>
+            <div class="w-px h-8 bg-white/20"></div>
+            <div class="flex-1 text-center">
+              <p class="text-2xl font-bold text-white">{{ conversationContext.topics.length }}</p>
+              <p class="text-xs text-white/70">Topics</p>
+            </div>
+          </div>
         </div>
 
-        <div class="flex-1 overflow-y-auto p-4 space-y-6">
-          <!-- Intent -->
-          <div>
-            <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Detected Intent</h4>
-            <div class="flex items-center gap-2 p-3 bg-teal-50 rounded-xl">
-              <i class="fas fa-compass text-teal-600"></i>
-              <span class="text-sm font-medium text-teal-900">{{ conversationContext.intent }}</span>
-            </div>
-          </div>
-
-          <!-- Topics -->
-          <div>
-            <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Active Topics</h4>
-            <div class="flex flex-wrap gap-2">
-              <span v-for="topic in conversationContext.topics" :key="topic"
-                    class="px-3 py-1.5 bg-blue-100 text-blue-700 rounded-full text-sm font-medium">
-                {{ topic }}
-              </span>
-            </div>
-          </div>
-
-          <!-- Entities -->
-          <div>
-            <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Recognized Entities</h4>
-            <div class="space-y-2">
-              <div v-for="entity in conversationContext.entities" :key="entity.text"
-                   class="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
-                <div class="flex items-center gap-2">
-                  <i :class="[entity.type === 'organization' ? 'fas fa-building' :
-                              entity.type === 'location' ? 'fas fa-map-marker-alt' : 'fas fa-tag',
-                              'text-gray-400 text-sm']"></i>
-                  <span class="text-sm text-gray-700">{{ entity.text }}</span>
+        <div class="flex-1 overflow-y-auto">
+          <!-- Intent Card -->
+          <div class="p-4">
+            <div class="bg-gradient-to-r from-teal-500 to-emerald-500 rounded-2xl p-4 text-white shadow-lg">
+              <div class="flex items-center gap-2 mb-2">
+                <i class="fas fa-crosshairs"></i>
+                <span class="text-xs font-semibold uppercase tracking-wider opacity-80">Detected Intent</span>
+              </div>
+              <p class="text-lg font-semibold">{{ conversationContext.intent }}</p>
+              <div class="flex items-center gap-2 mt-3 pt-3 border-t border-white/20">
+                <div class="flex-1 bg-white/20 rounded-full h-2">
+                  <div class="bg-white rounded-full h-2 w-4/5"></div>
                 </div>
-                <span class="text-xs text-gray-400">{{ entity.count }}x</span>
+                <span class="text-xs font-medium">85% confidence</span>
               </div>
             </div>
           </div>
 
-          <!-- Summary Points -->
-          <div>
-            <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Context Summary</h4>
-            <ul class="space-y-2">
-              <li v-for="(point, idx) in conversationContext.summaryPoints" :key="idx"
-                  class="flex items-start gap-2 text-sm text-gray-600">
-                <i class="fas fa-check-circle text-teal-500 mt-0.5"></i>
-                <span>{{ point }}</span>
-              </li>
-            </ul>
+          <!-- Conversation Sentiment -->
+          <div class="px-4 pb-4">
+            <div class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+              <div class="flex items-center justify-between mb-3">
+                <h4 class="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                  <i class="fas fa-heart text-pink-500"></i>
+                  Conversation Mood
+                </h4>
+                <span class="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">Positive</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <div class="flex-1">
+                  <div class="flex items-center justify-between text-xs text-gray-500 mb-1">
+                    <span>Negative</span>
+                    <span>Positive</span>
+                  </div>
+                  <div class="h-3 bg-gradient-to-r from-red-200 via-yellow-200 to-green-200 rounded-full relative">
+                    <div class="absolute top-1/2 -translate-y-1/2 w-4 h-4 bg-white border-2 border-green-500 rounded-full shadow-md" style="left: 75%"></div>
+                  </div>
+                </div>
+              </div>
+              <div class="flex items-center justify-center gap-4 mt-3 pt-3 border-t border-gray-100">
+                <div class="text-center">
+                  <i class="fas fa-smile text-green-500 text-lg"></i>
+                  <p class="text-xs text-gray-500 mt-1">Helpful</p>
+                </div>
+                <div class="text-center">
+                  <i class="fas fa-lightbulb text-yellow-500 text-lg"></i>
+                  <p class="text-xs text-gray-500 mt-1">Informative</p>
+                </div>
+                <div class="text-center">
+                  <i class="fas fa-handshake text-blue-500 text-lg"></i>
+                  <p class="text-xs text-gray-500 mt-1">Collaborative</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Active Topics -->
+          <div class="px-4 pb-4">
+            <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 flex items-center gap-2">
+              <i class="fas fa-hashtag text-blue-500"></i>
+              Active Topics
+            </h4>
+            <div class="flex flex-wrap gap-2">
+              <button v-for="topic in conversationContext.topics" :key="topic"
+                      class="group px-4 py-2 bg-gradient-to-r from-blue-50 to-indigo-50 hover:from-blue-100 hover:to-indigo-100 border border-blue-200 text-blue-700 rounded-xl text-sm font-medium transition-all hover:shadow-md">
+                <i class="fas fa-tag text-blue-400 mr-2 group-hover:text-blue-600"></i>
+                {{ topic }}
+              </button>
+            </div>
+          </div>
+
+          <!-- Recognized Entities -->
+          <div class="px-4 pb-4">
+            <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 flex items-center gap-2">
+              <i class="fas fa-cube text-purple-500"></i>
+              Recognized Entities
+            </h4>
+            <div class="space-y-2">
+              <button v-for="entity in conversationContext.entities" :key="entity.text"
+                      class="w-full flex items-center justify-between p-3 bg-white hover:bg-purple-50 rounded-xl border border-gray-100 hover:border-purple-200 transition-all group">
+                <div class="flex items-center gap-3">
+                  <div :class="[
+                    'w-10 h-10 rounded-xl flex items-center justify-center',
+                    entity.type === 'organization' ? 'bg-blue-100 text-blue-600' :
+                    entity.type === 'location' ? 'bg-green-100 text-green-600' :
+                    entity.type === 'person' ? 'bg-orange-100 text-orange-600' :
+                    entity.type === 'event' ? 'bg-pink-100 text-pink-600' :
+                    'bg-gray-100 text-gray-600'
+                  ]">
+                    <i :class="[
+                      entity.type === 'organization' ? 'fas fa-building' :
+                      entity.type === 'location' ? 'fas fa-map-marker-alt' :
+                      entity.type === 'person' ? 'fas fa-user' :
+                      entity.type === 'event' ? 'fas fa-calendar-star' :
+                      'fas fa-tag'
+                    ]"></i>
+                  </div>
+                  <div class="text-left">
+                    <p class="text-sm font-medium text-gray-800">{{ entity.text }}</p>
+                    <p class="text-xs text-gray-400 capitalize">{{ entity.type }}</p>
+                  </div>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="px-2 py-1 bg-gray-100 group-hover:bg-purple-100 rounded-lg text-xs font-medium text-gray-600 group-hover:text-purple-700">
+                    {{ entity.count }}x
+                  </span>
+                  <i class="fas fa-search text-gray-300 group-hover:text-purple-500"></i>
+                </div>
+              </button>
+            </div>
+          </div>
+
+          <!-- Key Insights -->
+          <div class="px-4 pb-4">
+            <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 flex items-center gap-2">
+              <i class="fas fa-lightbulb text-yellow-500"></i>
+              Key Insights
+            </h4>
+            <div class="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-2xl p-4 border border-yellow-100">
+              <ul class="space-y-3">
+                <li v-for="(point, idx) in conversationContext.summaryPoints" :key="idx"
+                    class="flex items-start gap-3">
+                  <div class="w-6 h-6 rounded-full bg-yellow-200 text-yellow-700 flex items-center justify-center flex-shrink-0 text-xs font-bold">
+                    {{ idx + 1 }}
+                  </div>
+                  <span class="text-sm text-gray-700">{{ point }}</span>
+                </li>
+              </ul>
+            </div>
           </div>
 
           <!-- Referenced Documents -->
-          <div v-if="conversationContext.documentReferences.length > 0">
-            <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Referenced Documents</h4>
+          <div v-if="conversationContext.documentReferences.length > 0" class="px-4 pb-4">
+            <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 flex items-center gap-2">
+              <i class="fas fa-folder-open text-amber-500"></i>
+              Referenced Documents
+            </h4>
             <div class="space-y-2">
-              <div v-for="doc in conversationContext.documentReferences" :key="doc"
-                   class="flex items-center gap-2 p-2 bg-amber-50 rounded-lg text-sm text-amber-700">
-                <i class="fas fa-file-alt"></i>
-                <span>{{ doc }}</span>
+              <button v-for="doc in conversationContext.documentReferences" :key="doc"
+                      class="w-full flex items-center gap-3 p-3 bg-white hover:bg-amber-50 rounded-xl border border-gray-100 hover:border-amber-200 transition-all group">
+                <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center">
+                  <i class="fas fa-file-alt"></i>
+                </div>
+                <div class="flex-1 text-left">
+                  <p class="text-sm font-medium text-gray-800">{{ doc }}</p>
+                  <p class="text-xs text-gray-400">Click to view document</p>
+                </div>
+                <i class="fas fa-external-link-alt text-gray-300 group-hover:text-amber-500"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- AI Suggestions -->
+          <div class="px-4 pb-6">
+            <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 flex items-center gap-2">
+              <i class="fas fa-magic text-indigo-500"></i>
+              AI Suggestions
+            </h4>
+            <div class="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-2xl p-4 border border-indigo-100">
+              <p class="text-sm text-gray-600 mb-3">Based on this conversation, you might want to:</p>
+              <div class="space-y-2">
+                <button class="w-full flex items-center gap-3 p-2.5 bg-white hover:bg-indigo-100 rounded-xl text-left transition-colors group">
+                  <i class="fas fa-file-export text-indigo-500"></i>
+                  <span class="text-sm text-gray-700 group-hover:text-indigo-700">Export conversation summary</span>
+                </button>
+                <button class="w-full flex items-center gap-3 p-2.5 bg-white hover:bg-indigo-100 rounded-xl text-left transition-colors group">
+                  <i class="fas fa-tasks text-indigo-500"></i>
+                  <span class="text-sm text-gray-700 group-hover:text-indigo-700">Create action items</span>
+                </button>
+                <button class="w-full flex items-center gap-3 p-2.5 bg-white hover:bg-indigo-100 rounded-xl text-left transition-colors group">
+                  <i class="fas fa-search-plus text-indigo-500"></i>
+                  <span class="text-sm text-gray-700 group-hover:text-indigo-700">Deep dive into topics</span>
+                </button>
               </div>
             </div>
           </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="p-4 border-t border-gray-200 bg-white">
+          <button class="w-full py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-xl font-medium transition-all flex items-center justify-center gap-2 shadow-lg hover:shadow-xl">
+            <i class="fas fa-download"></i>
+            Export Context Report
+          </button>
         </div>
       </div>
     </Transition>
@@ -1133,6 +1819,17 @@ function saveSettings() {
       </div>
     </Teleport>
 
+    <!-- AI Tools Palette Modal -->
+    <AIToolsPalette
+      v-model="showToolsPalette"
+      @select="handleToolSelect"
+    />
+
+    <!-- AI Workflow Builder Modal -->
+    <AIWorkflowBuilder
+      v-model="showWorkflowBuilder"
+    />
+
     <!-- Comparison Components -->
     <ComparisonPanel />
     <ComparisonModal />
@@ -1240,5 +1937,28 @@ function saveSettings() {
 /* Content browser card hover */
 .content-card:hover {
   transform: translateY(-2px);
+}
+
+/* Fade transition */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+/* Fade up transition */
+.fade-up-enter-active,
+.fade-up-leave-active {
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.fade-up-enter-from,
+.fade-up-leave-to {
+  opacity: 0;
+  transform: translateY(10px);
 }
 </style>
