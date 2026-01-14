@@ -1172,142 +1172,149 @@ function handleEntityClick(entity: { text: string; type: string }) {
     <!-- Conversation History Sidebar -->
     <aside
       :class="[
-        'border-r border-teal-100 bg-white flex-shrink-0 flex flex-col h-full transition-all duration-300',
-        isHistorySidebarCollapsed ? 'w-16' : 'w-80'
+        'border-r border-gray-200 bg-gray-50 flex-shrink-0 flex flex-col h-full transition-all duration-300',
+        isHistorySidebarCollapsed ? 'w-14' : 'w-72'
       ]"
     >
-      <!-- Collapse Toggle Button -->
-      <div class="p-3 border-b border-teal-100 flex items-center" :class="isHistorySidebarCollapsed ? 'justify-center' : 'justify-between'">
-        <span v-if="!isHistorySidebarCollapsed" class="text-sm font-semibold text-teal-700 px-2">History</span>
+      <!-- Header -->
+      <div class="p-3 flex items-center" :class="isHistorySidebarCollapsed ? 'justify-center' : 'justify-between'">
+        <span v-if="!isHistorySidebarCollapsed" class="text-sm font-medium text-gray-700">Chats</span>
         <button
           @click="isHistorySidebarCollapsed = !isHistorySidebarCollapsed"
-          class="p-2 rounded-lg hover:bg-teal-100 text-teal-500 transition-colors"
-          :title="isHistorySidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'"
+          class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-200 text-gray-500 transition-colors"
+          :title="isHistorySidebarCollapsed ? 'Expand' : 'Collapse'"
         >
-          <i :class="['fas', isHistorySidebarCollapsed ? 'fa-chevron-right' : 'fa-chevron-left']"></i>
+          <i :class="['fas text-xs', isHistorySidebarCollapsed ? 'fa-angles-right' : 'fa-angles-left']"></i>
         </button>
       </div>
 
       <!-- New Chat Button -->
-      <div class="p-2 border-b border-teal-100">
+      <div :class="isHistorySidebarCollapsed ? 'px-2 pb-3' : 'px-3 pb-3'">
         <button
           @click="startNewChat"
           :class="[
-            'btn btn-vibrant ripple transition-all',
-            isHistorySidebarCollapsed ? 'w-full p-2 flex items-center justify-center' : 'w-full'
+            'flex items-center justify-center gap-2 rounded-lg font-medium transition-all',
+            isHistorySidebarCollapsed
+              ? 'w-10 h-10 bg-teal-500 hover:bg-teal-600 text-white'
+              : 'w-full py-2.5 bg-teal-500 hover:bg-teal-600 text-white'
           ]"
-          :title="isHistorySidebarCollapsed ? 'New Conversation' : ''"
+          :title="isHistorySidebarCollapsed ? 'New Chat' : ''"
         >
-          <i class="fas fa-plus icon-vibrant"></i>
-          <span v-if="!isHistorySidebarCollapsed" class="ml-2">New Conversation</span>
+          <i class="fas fa-plus text-sm"></i>
+          <span v-if="!isHistorySidebarCollapsed" class="text-sm">New Chat</span>
         </button>
       </div>
 
-      <!-- Search (hidden when collapsed) -->
+      <!-- Search -->
       <div v-if="!isHistorySidebarCollapsed" class="px-3 pb-3">
-        <div class="search-container group relative">
-          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <i class="fas fa-search text-gray-400 group-focus-within:text-teal-500 transition-colors duration-200"></i>
-          </div>
+        <div class="relative">
+          <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
           <input
             type="text"
             v-model="searchHistory"
-            placeholder="Search conversations..."
-            class="w-full pl-10 pr-10 py-2.5 bg-white/80 backdrop-blur-sm border border-gray-200 rounded-xl text-sm text-gray-700 placeholder-gray-400
-                   focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-400 focus:bg-white
-                   hover:border-gray-300 hover:bg-white
-                   transition-all duration-200 ease-out
-                   shadow-sm hover:shadow focus:shadow-md"
-          >
-          <!-- Clear button -->
-          <button
-            v-if="searchHistory"
-            @click="searchHistory = ''"
-            class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-teal-500 transition-colors duration-200"
-          >
-            <i class="fas fa-times-circle"></i>
-          </button>
-          <!-- Search shortcut hint -->
-          <div
-            v-if="!searchHistory"
-            class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none"
-          >
-            <kbd class="hidden sm:inline-flex px-1.5 py-0.5 text-[10px] font-medium text-gray-400 bg-gray-100 rounded border border-gray-200">/</kbd>
-          </div>
+            placeholder="Search..."
+            class="w-full pl-9 pr-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-teal-400 focus:ring-1 focus:ring-teal-400"
+          />
         </div>
       </div>
 
       <!-- Conversations List -->
-      <div class="flex-1 overflow-y-auto scrollbar-thin">
-        <!-- Today -->
-        <div :class="isHistorySidebarCollapsed ? 'px-2 py-2' : 'px-4 py-2'">
-          <span v-if="!isHistorySidebarCollapsed" class="text-xs font-semibold text-teal-500 uppercase tracking-wider">Today</span>
-          <div v-else class="w-full h-px bg-teal-200"></div>
-        </div>
-        <div v-for="chat in todayChats" :key="chat.id"
-             @click="selectChat(chat)"
-             :class="[
-               'cursor-pointer transition-all mb-1 list-item-animated ripple rounded-xl',
-               isHistorySidebarCollapsed ? 'mx-1 p-2 flex justify-center' : 'mx-2 p-3',
-               activeChat?.id === chat.id ? 'bg-teal-100' : 'hover:bg-teal-50'
-             ]"
-             :title="isHistorySidebarCollapsed ? chat.title : ''">
-          <div :class="['flex items-start', isHistorySidebarCollapsed ? '' : 'gap-3']">
-            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center flex-shrink-0 ai-glow">
-              <i class="fas fa-comment text-white text-xs icon-soft"></i>
-            </div>
-            <div v-if="!isHistorySidebarCollapsed" class="flex-1 min-w-0">
-              <p class="text-sm font-medium text-teal-900 truncate">{{ chat.title }}</p>
-              <p class="text-xs text-teal-500 truncate">{{ chat.preview }}</p>
+      <div class="flex-1 overflow-y-auto">
+        <!-- Today Section -->
+        <div v-if="todayChats.length > 0">
+          <div v-if="!isHistorySidebarCollapsed" class="px-3 py-2">
+            <span class="text-xs font-medium text-gray-400 uppercase">Today</span>
+          </div>
+          <div v-for="chat in todayChats" :key="chat.id"
+               @click="selectChat(chat)"
+               :class="[
+                 'group cursor-pointer transition-colors',
+                 isHistorySidebarCollapsed ? 'px-2 py-2' : 'px-3 py-2',
+                 activeChat?.id === chat.id ? 'bg-teal-100' : 'hover:bg-gray-100'
+               ]"
+               :title="isHistorySidebarCollapsed ? chat.title : ''">
+            <div class="flex items-center gap-3">
+              <div :class="[
+                'flex-shrink-0 flex items-center justify-center rounded-lg',
+                isHistorySidebarCollapsed ? 'w-10 h-10' : 'w-8 h-8',
+                activeChat?.id === chat.id ? 'bg-teal-500 text-white' : 'bg-gray-200 text-gray-500 group-hover:bg-gray-300'
+              ]">
+                <i class="fas fa-message text-xs"></i>
+              </div>
+              <div v-if="!isHistorySidebarCollapsed" class="flex-1 min-w-0">
+                <p class="text-sm text-gray-800 truncate">{{ chat.title }}</p>
+                <p class="text-xs text-gray-400 truncate">{{ chat.preview }}</p>
+              </div>
             </div>
           </div>
         </div>
 
-        <!-- Yesterday -->
-        <div :class="isHistorySidebarCollapsed ? 'px-2 py-2 mt-2' : 'px-4 py-2 mt-2'">
-          <span v-if="!isHistorySidebarCollapsed" class="text-xs font-semibold text-teal-500 uppercase tracking-wider">Yesterday</span>
-          <div v-else class="w-full h-px bg-teal-200"></div>
-        </div>
-        <div v-for="chat in yesterdayChats" :key="chat.id"
-             @click="selectChat(chat)"
-             :class="[
-               'cursor-pointer transition-all mb-1 list-item-animated ripple rounded-xl',
-               isHistorySidebarCollapsed ? 'mx-1 p-2 flex justify-center' : 'mx-2 p-3',
-               activeChat?.id === chat.id ? 'bg-teal-100' : 'hover:bg-teal-50'
-             ]"
-             :title="isHistorySidebarCollapsed ? chat.title : ''">
-          <div :class="['flex items-start', isHistorySidebarCollapsed ? '' : 'gap-3']">
-            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center flex-shrink-0 ai-glow">
-              <i class="fas fa-comment text-white text-xs icon-soft"></i>
-            </div>
-            <div v-if="!isHistorySidebarCollapsed" class="flex-1 min-w-0">
-              <p class="text-sm font-medium text-teal-900 truncate">{{ chat.title }}</p>
-              <p class="text-xs text-teal-500 truncate">{{ chat.preview }}</p>
+        <!-- Yesterday Section -->
+        <div v-if="yesterdayChats.length > 0">
+          <div v-if="!isHistorySidebarCollapsed" class="px-3 py-2 mt-2">
+            <span class="text-xs font-medium text-gray-400 uppercase">Yesterday</span>
+          </div>
+          <div v-else class="mx-2 my-2 h-px bg-gray-200"></div>
+          <div v-for="chat in yesterdayChats" :key="chat.id"
+               @click="selectChat(chat)"
+               :class="[
+                 'group cursor-pointer transition-colors',
+                 isHistorySidebarCollapsed ? 'px-2 py-2' : 'px-3 py-2',
+                 activeChat?.id === chat.id ? 'bg-teal-100' : 'hover:bg-gray-100'
+               ]"
+               :title="isHistorySidebarCollapsed ? chat.title : ''">
+            <div class="flex items-center gap-3">
+              <div :class="[
+                'flex-shrink-0 flex items-center justify-center rounded-lg',
+                isHistorySidebarCollapsed ? 'w-10 h-10' : 'w-8 h-8',
+                activeChat?.id === chat.id ? 'bg-teal-500 text-white' : 'bg-gray-200 text-gray-500 group-hover:bg-gray-300'
+              ]">
+                <i class="fas fa-message text-xs"></i>
+              </div>
+              <div v-if="!isHistorySidebarCollapsed" class="flex-1 min-w-0">
+                <p class="text-sm text-gray-800 truncate">{{ chat.title }}</p>
+                <p class="text-xs text-gray-400 truncate">{{ chat.preview }}</p>
+              </div>
             </div>
           </div>
         </div>
 
-        <!-- Previous 7 Days -->
-        <div :class="isHistorySidebarCollapsed ? 'px-2 py-2 mt-2' : 'px-4 py-2 mt-2'">
-          <span v-if="!isHistorySidebarCollapsed" class="text-xs font-semibold text-teal-500 uppercase tracking-wider">Previous 7 Days</span>
-          <div v-else class="w-full h-px bg-teal-200"></div>
+        <!-- Older Section -->
+        <div v-if="olderChats.length > 0">
+          <div v-if="!isHistorySidebarCollapsed" class="px-3 py-2 mt-2">
+            <span class="text-xs font-medium text-gray-400 uppercase">Previous 7 Days</span>
+          </div>
+          <div v-else class="mx-2 my-2 h-px bg-gray-200"></div>
+          <div v-for="chat in olderChats" :key="chat.id"
+               @click="selectChat(chat)"
+               :class="[
+                 'group cursor-pointer transition-colors',
+                 isHistorySidebarCollapsed ? 'px-2 py-2' : 'px-3 py-2',
+                 activeChat?.id === chat.id ? 'bg-teal-100' : 'hover:bg-gray-100'
+               ]"
+               :title="isHistorySidebarCollapsed ? chat.title : ''">
+            <div class="flex items-center gap-3">
+              <div :class="[
+                'flex-shrink-0 flex items-center justify-center rounded-lg',
+                isHistorySidebarCollapsed ? 'w-10 h-10' : 'w-8 h-8',
+                activeChat?.id === chat.id ? 'bg-teal-500 text-white' : 'bg-gray-200 text-gray-500 group-hover:bg-gray-300'
+              ]">
+                <i class="fas fa-message text-xs"></i>
+              </div>
+              <div v-if="!isHistorySidebarCollapsed" class="flex-1 min-w-0">
+                <p class="text-sm text-gray-800 truncate">{{ chat.title }}</p>
+                <p class="text-xs text-gray-400 truncate">{{ chat.preview }}</p>
+              </div>
+            </div>
+          </div>
         </div>
-        <div v-for="chat in olderChats" :key="chat.id"
-             @click="selectChat(chat)"
-             :class="[
-               'cursor-pointer transition-all mb-1 list-item-animated ripple rounded-xl',
-               isHistorySidebarCollapsed ? 'mx-1 p-2 flex justify-center' : 'mx-2 p-3',
-               activeChat?.id === chat.id ? 'bg-teal-100' : 'hover:bg-teal-50'
-             ]"
-             :title="isHistorySidebarCollapsed ? chat.title : ''">
-          <div :class="['flex items-start', isHistorySidebarCollapsed ? '' : 'gap-3']">
-            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center flex-shrink-0 ai-glow">
-              <i class="fas fa-comment text-white text-xs icon-soft"></i>
-            </div>
-            <div v-if="!isHistorySidebarCollapsed" class="flex-1 min-w-0">
-              <p class="text-sm font-medium text-teal-900 truncate">{{ chat.title }}</p>
-              <p class="text-xs text-teal-500 truncate">{{ chat.preview }}</p>
-            </div>
+
+        <!-- Empty State -->
+        <div v-if="todayChats.length === 0 && yesterdayChats.length === 0 && olderChats.length === 0"
+             class="px-3 py-8 text-center">
+          <div v-if="!isHistorySidebarCollapsed">
+            <i class="fas fa-comments text-2xl text-gray-300 mb-2"></i>
+            <p class="text-sm text-gray-400">No conversations yet</p>
           </div>
         </div>
       </div>
