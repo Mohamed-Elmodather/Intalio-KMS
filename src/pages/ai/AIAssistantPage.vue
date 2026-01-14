@@ -1396,19 +1396,24 @@ function handleEntityClick(entity: { text: string; type: string }) {
         <div v-else class="space-y-6 max-w-4xl mx-auto">
           <div v-for="(msg, idx) in messages" :key="idx" class="animate-fadeIn fade-in-up">
             <!-- User Message -->
-            <div v-if="msg.role === 'user'" class="flex justify-end mb-4">
-              <div class="max-w-[80%]">
-                <!-- Attachments -->
-                <div v-if="msg.attachments && msg.attachments.length > 0" class="flex flex-wrap gap-2 justify-end mb-2">
-                  <div v-for="attachment in msg.attachments" :key="attachment.id"
-                       class="inline-flex items-center gap-2 px-3 py-1.5 bg-teal-100 rounded-lg text-sm text-teal-700">
-                    <i :class="attachment.icon"></i>
-                    <span class="font-medium">{{ attachment.title }}</span>
+            <div v-if="msg.role === 'user'" class="flex gap-4 justify-end mb-4">
+              <div class="flex-1 flex justify-end">
+                <div class="max-w-[90%]">
+                  <!-- Attachments -->
+                  <div v-if="msg.attachments && msg.attachments.length > 0" class="flex flex-wrap gap-2 justify-end mb-2">
+                    <div v-for="attachment in msg.attachments" :key="attachment.id"
+                         class="inline-flex items-center gap-2 px-3 py-1.5 bg-teal-100 rounded-lg text-sm text-teal-700">
+                      <i :class="attachment.icon"></i>
+                      <span class="font-medium">{{ attachment.title }}</span>
+                    </div>
+                  </div>
+                  <div class="bg-white/80 backdrop-blur-sm p-4 rounded-2xl rounded-tr-md shadow-sm border border-teal-100 transition-all duration-300 hover:shadow-md">
+                    <p class="whitespace-pre-wrap text-teal-900">{{ msg.content }}</p>
                   </div>
                 </div>
-                <div class="bg-gradient-to-r from-teal-500 to-teal-600 text-white p-4 rounded-2xl rounded-br-md shadow-lg">
-                  <p class="whitespace-pre-wrap">{{ msg.content }}</p>
-                </div>
+              </div>
+              <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center flex-shrink-0">
+                <i class="fas fa-user text-white"></i>
               </div>
             </div>
 
