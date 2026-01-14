@@ -1406,8 +1406,8 @@ function handleEntityClick(entity: { text: string; type: string }) {
                     <span class="font-medium">{{ attachment.title }}</span>
                   </div>
                 </div>
-                <div class="bg-gradient-to-r from-teal-500 to-teal-600 text-white p-4 rounded-2xl rounded-br-md shadow-lg card-animated">
-                  <p>{{ msg.content }}</p>
+                <div class="bg-gradient-to-r from-teal-500 to-teal-600 text-white p-4 rounded-2xl rounded-br-md shadow-lg">
+                  <p class="whitespace-pre-wrap">{{ msg.content }}</p>
                 </div>
               </div>
             </div>
@@ -1418,7 +1418,7 @@ function handleEntityClick(entity: { text: string; type: string }) {
                 <i class="fas fa-robot text-white icon-vibrant"></i>
               </div>
               <div class="flex-1">
-                <div class="bg-white/80 p-4 rounded-2xl rounded-tl-md shadow-sm border border-teal-100 max-w-[90%] card-animated">
+                <div class="bg-white/80 backdrop-blur-sm p-4 rounded-2xl rounded-tl-md shadow-sm border border-teal-100 max-w-[90%] transition-all duration-300 hover:shadow-md">
                   <div class="prose prose-teal text-teal-900" v-html="msg.content"></div>
 
                   <!-- Sources/References -->
@@ -1459,7 +1459,7 @@ function handleEntityClick(entity: { text: string; type: string }) {
             <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center flex-shrink-0 ai-glow">
               <i class="fas fa-robot text-white icon-vibrant"></i>
             </div>
-            <div class="bg-white/80 p-4 rounded-2xl rounded-tl-md shadow-sm border border-teal-100 card-animated">
+            <div class="bg-white/80 backdrop-blur-sm p-4 rounded-2xl rounded-tl-md shadow-sm border border-teal-100">
               <div class="flex items-center gap-2">
                 <div class="flex items-center gap-1">
                   <div class="w-2 h-2 bg-teal-400 rounded-full animate-bounce" style="animation-delay: 0ms"></div>
