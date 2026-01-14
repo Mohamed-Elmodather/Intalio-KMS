@@ -7,7 +7,6 @@ import { useAIWorkflowsStore } from '@/stores/aiWorkflows'
 import { useAIPreferencesStore } from '@/stores/aiPreferences'
 import {
   AILoadingIndicator,
-  AIToolsPalette,
   AIMessageContent,
   AIVoiceInput,
   AIOperationProgress,
@@ -156,6 +155,7 @@ interface ConversationSummary {
 
 // State
 const showSettings = ref(false)
+const isHistorySidebarCollapsed = ref(false)
 const searchHistory = ref('')
 const inputMessage = ref('')
 const isTyping = ref(false)
@@ -1165,69 +1165,115 @@ function handleEntityClick(entity: { text: string; type: string }) {
 <template>
   <div class="flex min-h-[calc(100vh-80px)]">
     <!-- Conversation History Sidebar -->
-    <aside class="w-80 border-r border-teal-100 bg-white/50 flex-shrink-0 flex flex-col h-[calc(100vh-80px)] card-animated fade-in-up">
-      <div class="p-4 border-b border-teal-100">
-        <button @click="startNewChat" class="btn btn-vibrant w-full ripple">
-          <i class="fas fa-plus icon-vibrant"></i> New Conversation
+    <aside
+      :class="[
+        'border-r border-teal-100 bg-white/50 flex-shrink-0 flex flex-col h-[calc(100vh-80px)] card-animated fade-in-up transition-all duration-300',
+        isHistorySidebarCollapsed ? 'w-16' : 'w-80'
+      ]"
+    >
+      <!-- Collapse Toggle Button -->
+      <div class="p-2 border-b border-teal-100 flex items-center" :class="isHistorySidebarCollapsed ? 'justify-center' : 'justify-between'">
+        <span v-if="!isHistorySidebarCollapsed" class="text-sm font-semibold text-teal-700 px-2">History</span>
+        <button
+          @click="isHistorySidebarCollapsed = !isHistorySidebarCollapsed"
+          class="p-2 rounded-lg hover:bg-teal-100 text-teal-500 transition-colors"
+          :title="isHistorySidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'"
+        >
+          <i :class="['fas', isHistorySidebarCollapsed ? 'fa-chevron-right' : 'fa-chevron-left']"></i>
         </button>
       </div>
 
-      <div class="p-4">
+      <!-- New Chat Button -->
+      <div class="p-2 border-b border-teal-100">
+        <button
+          @click="startNewChat"
+          :class="[
+            'btn btn-vibrant ripple transition-all',
+            isHistorySidebarCollapsed ? 'w-full p-2 flex items-center justify-center' : 'w-full'
+          ]"
+          :title="isHistorySidebarCollapsed ? 'New Conversation' : ''"
+        >
+          <i class="fas fa-plus icon-vibrant"></i>
+          <span v-if="!isHistorySidebarCollapsed" class="ml-2">New Conversation</span>
+        </button>
+      </div>
+
+      <!-- Search (hidden when collapsed) -->
+      <div v-if="!isHistorySidebarCollapsed" class="p-4">
         <div class="input-group">
           <i class="input-icon fas fa-search"></i>
           <input type="text" v-model="searchHistory" placeholder="Search conversations..." class="input text-sm">
         </div>
       </div>
 
+      <!-- Conversations List -->
       <div class="flex-1 overflow-y-auto scrollbar-thin">
-        <div class="px-4 py-2">
-          <span class="text-xs font-semibold text-teal-500 uppercase tracking-wider">Today</span>
+        <!-- Today -->
+        <div :class="isHistorySidebarCollapsed ? 'px-2 py-2' : 'px-4 py-2'">
+          <span v-if="!isHistorySidebarCollapsed" class="text-xs font-semibold text-teal-500 uppercase tracking-wider">Today</span>
+          <div v-else class="w-full h-px bg-teal-200"></div>
         </div>
         <div v-for="chat in todayChats" :key="chat.id"
              @click="selectChat(chat)"
-             :class="['mx-2 p-3 rounded-xl cursor-pointer transition-all mb-1 list-item-animated ripple',
-                      activeChat?.id === chat.id ? 'bg-teal-100' : 'hover:bg-teal-50']">
-          <div class="flex items-start gap-3">
+             :class="[
+               'cursor-pointer transition-all mb-1 list-item-animated ripple rounded-xl',
+               isHistorySidebarCollapsed ? 'mx-1 p-2 flex justify-center' : 'mx-2 p-3',
+               activeChat?.id === chat.id ? 'bg-teal-100' : 'hover:bg-teal-50'
+             ]"
+             :title="isHistorySidebarCollapsed ? chat.title : ''">
+          <div :class="['flex items-start', isHistorySidebarCollapsed ? '' : 'gap-3']">
             <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center flex-shrink-0 ai-glow">
               <i class="fas fa-comment text-white text-xs icon-soft"></i>
             </div>
-            <div class="flex-1 min-w-0">
+            <div v-if="!isHistorySidebarCollapsed" class="flex-1 min-w-0">
               <p class="text-sm font-medium text-teal-900 truncate">{{ chat.title }}</p>
               <p class="text-xs text-teal-500 truncate">{{ chat.preview }}</p>
             </div>
           </div>
         </div>
 
-        <div class="px-4 py-2 mt-2">
-          <span class="text-xs font-semibold text-teal-500 uppercase tracking-wider">Yesterday</span>
+        <!-- Yesterday -->
+        <div :class="isHistorySidebarCollapsed ? 'px-2 py-2 mt-2' : 'px-4 py-2 mt-2'">
+          <span v-if="!isHistorySidebarCollapsed" class="text-xs font-semibold text-teal-500 uppercase tracking-wider">Yesterday</span>
+          <div v-else class="w-full h-px bg-teal-200"></div>
         </div>
         <div v-for="chat in yesterdayChats" :key="chat.id"
              @click="selectChat(chat)"
-             :class="['mx-2 p-3 rounded-xl cursor-pointer transition-all mb-1 list-item-animated ripple',
-                      activeChat?.id === chat.id ? 'bg-teal-100' : 'hover:bg-teal-50']">
-          <div class="flex items-start gap-3">
+             :class="[
+               'cursor-pointer transition-all mb-1 list-item-animated ripple rounded-xl',
+               isHistorySidebarCollapsed ? 'mx-1 p-2 flex justify-center' : 'mx-2 p-3',
+               activeChat?.id === chat.id ? 'bg-teal-100' : 'hover:bg-teal-50'
+             ]"
+             :title="isHistorySidebarCollapsed ? chat.title : ''">
+          <div :class="['flex items-start', isHistorySidebarCollapsed ? '' : 'gap-3']">
             <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center flex-shrink-0 ai-glow">
               <i class="fas fa-comment text-white text-xs icon-soft"></i>
             </div>
-            <div class="flex-1 min-w-0">
+            <div v-if="!isHistorySidebarCollapsed" class="flex-1 min-w-0">
               <p class="text-sm font-medium text-teal-900 truncate">{{ chat.title }}</p>
               <p class="text-xs text-teal-500 truncate">{{ chat.preview }}</p>
             </div>
           </div>
         </div>
 
-        <div class="px-4 py-2 mt-2">
-          <span class="text-xs font-semibold text-teal-500 uppercase tracking-wider">Previous 7 Days</span>
+        <!-- Previous 7 Days -->
+        <div :class="isHistorySidebarCollapsed ? 'px-2 py-2 mt-2' : 'px-4 py-2 mt-2'">
+          <span v-if="!isHistorySidebarCollapsed" class="text-xs font-semibold text-teal-500 uppercase tracking-wider">Previous 7 Days</span>
+          <div v-else class="w-full h-px bg-teal-200"></div>
         </div>
         <div v-for="chat in olderChats" :key="chat.id"
              @click="selectChat(chat)"
-             :class="['mx-2 p-3 rounded-xl cursor-pointer transition-all mb-1 list-item-animated ripple',
-                      activeChat?.id === chat.id ? 'bg-teal-100' : 'hover:bg-teal-50']">
-          <div class="flex items-start gap-3">
+             :class="[
+               'cursor-pointer transition-all mb-1 list-item-animated ripple rounded-xl',
+               isHistorySidebarCollapsed ? 'mx-1 p-2 flex justify-center' : 'mx-2 p-3',
+               activeChat?.id === chat.id ? 'bg-teal-100' : 'hover:bg-teal-50'
+             ]"
+             :title="isHistorySidebarCollapsed ? chat.title : ''">
+          <div :class="['flex items-start', isHistorySidebarCollapsed ? '' : 'gap-3']">
             <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center flex-shrink-0 ai-glow">
               <i class="fas fa-comment text-white text-xs icon-soft"></i>
             </div>
-            <div class="flex-1 min-w-0">
+            <div v-if="!isHistorySidebarCollapsed" class="flex-1 min-w-0">
               <p class="text-sm font-medium text-teal-900 truncate">{{ chat.title }}</p>
               <p class="text-xs text-teal-500 truncate">{{ chat.preview }}</p>
             </div>
