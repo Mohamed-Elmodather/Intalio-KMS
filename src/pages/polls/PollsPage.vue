@@ -61,6 +61,7 @@ const textConstants = {
   selectAnOption: 'Select an option',
   submitVote: 'Submit Vote',
   voteRecorded: 'Your vote has been recorded',
+  viewFullDetails: 'View Full Details',
 
   // Trending Section
   trendingNow: 'Trending Now',
@@ -577,20 +578,15 @@ function submitVote(pollId: number) {
 }
 
 function openTrendingPoll(pollId: number) {
-  // Find the trending poll and scroll to active polls section or show details
-  const trendingPoll = trendingPolls.value.find(p => p.id === pollId)
-  if (trendingPoll) {
-    // Switch to active tab and search for the poll
-    activeTab.value = 'active'
-    searchQuery.value = trendingPoll.question.substring(0, 20)
-    // Scroll to the polls section
-    scrollToAllPolls()
-  }
+  router.push(`/polls/${pollId}`)
 }
 
-function scrollToAllPolls() {
-  activeTab.value = 'active'
-  const pollsSection = document.querySelector('.bg-white.rounded-xl.border')
+function openPoll(pollId: number | string) {
+  router.push(`/polls/${pollId}`)
+}
+
+function scrollToPolls() {
+  const pollsSection = document.getElementById('all-polls')
   if (pollsSection) {
     pollsSection.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
@@ -1089,6 +1085,16 @@ function getInsightTypeColor(type: string) {
                 </div>
                 <span>{{ textConstants.voteRecorded }}</span>
               </div>
+
+              <!-- View Details Link -->
+              <button
+                class="view-details-btn"
+                @click="openPoll(featuredPoll.id)"
+              >
+                <i class="fas fa-expand-alt"></i>
+                <span>{{ textConstants.viewFullDetails }}</span>
+                <i class="fas fa-arrow-right arrow-icon"></i>
+              </button>
             </div>
           </div>
         </div>
@@ -1108,7 +1114,7 @@ function getInsightTypeColor(type: string) {
               <p class="trending-subtitle">{{ textConstants.trendingSubtitle }}</p>
             </div>
           </div>
-          <a href="#" class="trending-view-all" @click.prevent="scrollToAllPolls">
+          <a href="#all-polls" class="trending-view-all" @click.prevent="scrollToPolls">
             {{ textConstants.viewAll }}
             <i class="fas fa-arrow-right"></i>
           </a>
@@ -1189,7 +1195,7 @@ function getInsightTypeColor(type: string) {
       </section>
 
       <!-- Section Header / Toolbar - Documents Style -->
-      <div class="bg-white rounded-xl border border-gray-100 shadow-sm fade-in-up" style="animation-delay: 0.3s">
+      <div id="all-polls" class="bg-white rounded-xl border border-gray-100 shadow-sm fade-in-up" style="animation-delay: 0.3s">
         <div class="border-b border-gray-100">
           <!-- Top Row - Title and Primary Actions -->
           <div class="px-4 py-3 flex items-center justify-between">
@@ -1386,8 +1392,9 @@ function getInsightTypeColor(type: string) {
         <div
           v-for="(poll, index) in filteredActivePolls"
           :key="poll.id"
-          class="poll-card fade-in-up"
+          class="poll-card fade-in-up cursor-pointer"
           :style="{ animationDelay: (0.35 + index * 0.05) + 's' }"
+          @click="openPoll(poll.id)"
         >
           <!-- Urgency Bar -->
           <div :class="['urgency-bar', poll.urgencyClass]"></div>
@@ -1415,7 +1422,7 @@ function getInsightTypeColor(type: string) {
               v-for="(option, idx) in poll.options"
               :key="idx"
               :class="['poll-option', { voted: poll.hasVoted, selected: poll.selectedOption === idx }]"
-              @click="!poll.hasVoted && selectOption(poll.id, idx)"
+              @click.stop="!poll.hasVoted && selectOption(poll.id, idx)"
             >
               <template v-if="poll.hasVoted">
                 <div
@@ -1462,10 +1469,9 @@ function getInsightTypeColor(type: string) {
             <button
               v-if="!poll.hasVoted"
               class="btn-vibrant btn-sm ripple-effect"
-              :disabled="poll.selectedOption === undefined"
-              @click="submitVote(poll.id)"
+              @click.stop="openPoll(poll.id)"
             >{{ textConstants.vote }}</button>
-            <button v-else class="btn btn-secondary btn-sm ripple-effect">{{ textConstants.results }}</button>
+            <button v-else class="btn btn-secondary btn-sm ripple-effect" @click.stop="openPoll(poll.id)">{{ textConstants.results }}</button>
           </div>
         </div>
       </div>
@@ -2580,6 +2586,40 @@ function getInsightTypeColor(type: string) {
   0% { transform: scale(0); }
   50% { transform: scale(1.2); }
   100% { transform: scale(1); }
+}
+
+/* View Details Button */
+.view-details-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  margin-top: 1rem;
+  padding: 0.75rem 1rem;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.8);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.view-details-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.3);
+  color: white;
+}
+
+.view-details-btn:hover .arrow-icon {
+  transform: translateX(4px);
+}
+
+.view-details-btn .arrow-icon {
+  transition: transform 0.3s ease;
+  margin-left: auto;
 }
 
 /* Quick Poll Card */

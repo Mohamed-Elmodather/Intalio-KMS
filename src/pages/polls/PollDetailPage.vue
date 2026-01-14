@@ -7,6 +7,88 @@ import { useSharing } from '@/composables/useSharing'
 import { CommentsSection, SocialShareButtons, RelatedContentCarousel, AuthorCard, BookmarkButton } from '@/components/common'
 import type { Author } from '@/types/detail-pages'
 
+// Text constants for localization
+const textConstants = {
+  // Loading
+  loadingPoll: 'Loading poll...',
+
+  // Navigation
+  back: 'Back',
+  polls: 'Polls',
+
+  // Status
+  statusActive: 'Active',
+  statusScheduled: 'Scheduled',
+  statusCompleted: 'Completed',
+  statusDraft: 'Draft',
+  anonymous: 'Anonymous',
+
+  // Stats
+  votes: 'votes',
+  participation: 'participation',
+  options: 'options',
+
+  // Voting
+  castYourVote: 'Cast Your Vote',
+  results: 'Results',
+  pollOptions: 'Poll Options',
+  yourChoice: 'Your choice',
+  leading: 'Leading',
+  submitVote: 'Submit Vote',
+  submitting: 'Submitting...',
+  selectOption: 'Please select an option first',
+
+  // Time
+  ended: 'Ended',
+  remaining: 'remaining',
+  daysRemaining: 'd remaining',
+  hoursRemaining: 'h remaining',
+  minutesRemaining: 'm remaining',
+
+  // Analytics
+  aiSentimentAnalysis: 'AI Sentiment Analysis',
+  sentimentInsights: 'Real-time sentiment analysis of poll responses',
+  voteDistribution: 'Vote Distribution',
+  votesOverTime: 'Votes over the past week',
+
+  // Poll Details Sidebar
+  pollDetails: 'Poll Details',
+  targetAudience: 'Target Audience',
+  resultsVisibility: 'Results Visibility',
+  always: 'Always visible',
+  afterVote: 'After voting',
+  afterEnd: 'After poll ends',
+  multipleAnswers: 'Multiple Answers',
+  allowed: 'Allowed',
+  notAllowed: 'Not allowed',
+  pollType: 'Poll Type',
+  anonymousPoll: 'Anonymous Poll',
+  publicPoll: 'Public Poll',
+
+  // Author
+  aboutAuthor: 'About the Author',
+
+  // Tags
+  tags: 'Tags',
+
+  // Share
+  sharePoll: 'Share this Poll',
+  copyLink: 'Copy Link',
+  linkCopied: 'Link copied to clipboard!',
+
+  // Related
+  relatedPolls: 'Related Polls',
+
+  // Comments
+  discussion: 'Discussion',
+  comments: 'comments',
+
+  // CTA
+  createPollCTA: 'Want to create your own poll?',
+  createPollDesc: 'Gather feedback from your team with custom polls and surveys.',
+  createNewPoll: 'Create New Poll',
+}
+
 const route = useRoute()
 const router = useRouter()
 
@@ -299,47 +381,105 @@ watch(() => route.params.id, () => {
     <div v-if="isLoading" class="flex items-center justify-center min-h-screen">
       <div class="text-center">
         <i class="fas fa-spinner fa-spin text-4xl text-teal-500 mb-4"></i>
-        <p class="text-gray-600">Loading poll...</p>
+        <p class="text-gray-600">{{ textConstants.loadingPoll }}</p>
       </div>
     </div>
 
     <!-- Content -->
     <template v-else-if="poll">
-      <!-- Header -->
-      <header class="bg-white border-b border-gray-200 sticky top-0 z-30">
-        <div class="px-6 py-4">
-          <div class="flex items-center justify-between">
-            <div class="flex items-center gap-4">
-              <button
-                @click="goBack"
-                class="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-              >
-                <i class="fas fa-arrow-left text-gray-600"></i>
-              </button>
-              <div>
-                <div class="flex items-center gap-2 text-sm text-gray-500 mb-1">
-                  <router-link to="/polls" class="hover:text-teal-600">Polls</router-link>
-                  <i class="fas fa-chevron-right text-xs"></i>
-                  <span>{{ poll.category }}</span>
+      <!-- Enhanced Header with Gradient -->
+      <header class="poll-detail-header">
+        <!-- Decorative Background -->
+        <div class="header-decor">
+          <div class="decor-orb decor-orb-1"></div>
+          <div class="decor-orb decor-orb-2"></div>
+          <div class="decor-pattern"></div>
+        </div>
+
+        <div class="header-content">
+          <!-- Navigation Row -->
+          <div class="header-nav">
+            <button
+              @click="goBack"
+              class="back-btn"
+            >
+              <i class="fas fa-arrow-left"></i>
+              <span>{{ textConstants.back }}</span>
+            </button>
+            <div class="breadcrumb">
+              <router-link to="/polls" class="breadcrumb-link">
+                <i class="fas fa-poll"></i>
+                {{ textConstants.polls }}
+              </router-link>
+              <i class="fas fa-chevron-right breadcrumb-sep"></i>
+              <span class="breadcrumb-category">
+                <i :class="poll.categoryIcon"></i>
+                {{ poll.category }}
+              </span>
+            </div>
+          </div>
+
+          <!-- Main Header Content -->
+          <div class="header-main">
+            <div class="header-left">
+              <!-- Status & Time Badges -->
+              <div class="header-badges">
+                <span :class="['status-badge', poll.status]">
+                  <span class="status-dot"></span>
+                  <i :class="statusConfig.icon"></i>
+                  {{ statusConfig.label }}
+                </span>
+                <span v-if="poll.isAnonymous" class="anon-badge">
+                  <i class="fas fa-user-secret"></i>
+                  {{ textConstants.anonymous }}
+                </span>
+                <span v-if="timeRemaining" class="time-badge">
+                  <i class="fas fa-hourglass-half hourglass-icon"></i>
+                  {{ timeRemaining }}
+                </span>
+              </div>
+
+              <!-- Poll Title -->
+              <h1 class="poll-title">{{ poll.question }}</h1>
+              <p class="poll-desc">{{ poll.description }}</p>
+
+              <!-- Quick Stats -->
+              <div class="header-stats">
+                <div class="stat-item">
+                  <i class="fas fa-users"></i>
+                  <span class="stat-value">{{ poll.totalVotes.toLocaleString() }}</span>
+                  <span class="stat-label">{{ textConstants.votes }}</span>
                 </div>
-                <h1 class="text-xl font-semibold text-gray-900">Poll Details</h1>
+                <div class="stat-item">
+                  <i class="fas fa-chart-pie"></i>
+                  <span class="stat-value">{{ poll.participationRate }}%</span>
+                  <span class="stat-label">{{ textConstants.participation }}</span>
+                </div>
+                <div class="stat-item">
+                  <i class="fas fa-list-ul"></i>
+                  <span class="stat-value">{{ poll.options.length }}</span>
+                  <span class="stat-label">{{ textConstants.options }}</span>
+                </div>
               </div>
             </div>
 
-            <div class="flex items-center gap-3">
+            <!-- Header Actions -->
+            <div class="header-actions">
               <BookmarkButton
                 :content-id="poll.id"
                 content-type="poll"
                 size="sm"
+                class="action-btn"
               />
               <button
                 @click="showShareModal = true"
-                class="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                class="action-btn"
+                title="Share"
               >
-                <i class="fas fa-share-alt text-gray-600"></i>
+                <i class="fas fa-share-alt"></i>
               </button>
-              <button class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-                <i class="fas fa-ellipsis-v text-gray-600"></i>
+              <button class="action-btn" title="More options">
+                <i class="fas fa-ellipsis-v"></i>
               </button>
             </div>
           </div>
@@ -351,48 +491,13 @@ watch(() => route.params.id, () => {
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <!-- Left Column - Poll Content -->
           <div class="lg:col-span-2 space-y-6">
-            <!-- Poll Question Card -->
+            <!-- Voting Options Card -->
             <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-              <!-- Status Banner -->
-              <div :class="[
-                'px-6 py-3 flex items-center justify-between',
-                poll.status === 'active' ? 'bg-gradient-to-r from-teal-500 to-teal-600' : 'bg-gray-100'
-              ]">
-                <div class="flex items-center gap-2">
-                  <span :class="[
-                    'px-3 py-1 rounded-full text-sm font-medium',
-                    statusConfig.class
-                  ]">
-                    <i :class="[statusConfig.icon, 'mr-1']"></i>
-                    {{ statusConfig.label }}
-                  </span>
-                  <span v-if="poll.isAnonymous" class="px-3 py-1 bg-white/20 rounded-full text-sm text-white">
-                    <i class="fas fa-user-secret mr-1"></i>
-                    Anonymous
-                  </span>
-                </div>
-                <div v-if="timeRemaining" :class="[
-                  'text-sm font-medium',
-                  poll.status === 'active' ? 'text-white' : 'text-gray-600'
-                ]">
-                  <i class="fas fa-clock mr-1"></i>
-                  {{ timeRemaining }}
-                </div>
-              </div>
-
-              <!-- Question -->
               <div class="p-6">
-                <div class="flex items-start gap-3 mb-4">
-                  <div class="w-10 h-10 bg-teal-100 rounded-lg flex items-center justify-center">
-                    <i class="fas fa-poll text-teal-600"></i>
-                  </div>
-                  <div class="flex-1">
-                    <h2 class="text-2xl font-bold text-gray-900 mb-2">
-                      {{ poll.question }}
-                    </h2>
-                    <p class="text-gray-600">{{ poll.description }}</p>
-                  </div>
-                </div>
+                <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                  <i class="fas fa-vote-yea text-teal-500"></i>
+                  {{ canVote ? textConstants.castYourVote : (poll.hasVoted ? textConstants.results : textConstants.pollOptions) }}
+                </h3>
 
                 <!-- Options -->
                 <div class="space-y-3 mt-6">
@@ -482,7 +587,7 @@ watch(() => route.params.id, () => {
                     ]"
                   >
                     <i v-if="isVoting" class="fas fa-spinner fa-spin mr-2"></i>
-                    {{ isVoting ? 'Submitting...' : 'Submit Vote' }}
+                    {{ isVoting ? textConstants.submitting : textConstants.submitVote }}
                   </button>
                 </div>
 
@@ -498,11 +603,11 @@ watch(() => route.params.id, () => {
                   <div class="flex items-center gap-4">
                     <span class="text-gray-500">
                       <i class="fas fa-users mr-1"></i>
-                      {{ poll.totalVotes.toLocaleString() }} votes
+                      {{ poll.totalVotes.toLocaleString() }} {{ textConstants.votes }}
                     </span>
                     <span class="text-gray-500">
                       <i class="fas fa-chart-pie mr-1"></i>
-                      {{ poll.participationRate }}% participation
+                      {{ poll.participationRate }}% {{ textConstants.participation }}
                     </span>
                   </div>
                   <span class="text-gray-500">
@@ -520,8 +625,8 @@ watch(() => route.params.id, () => {
                   <i class="fas fa-brain text-purple-600"></i>
                 </div>
                 <div>
-                  <h3 class="font-semibold text-gray-900">AI Sentiment Analysis</h3>
-                  <p class="text-sm text-gray-500">Understanding the sentiment behind each option</p>
+                  <h3 class="font-semibold text-gray-900">{{ textConstants.aiSentimentAnalysis }}</h3>
+                  <p class="text-sm text-gray-500">{{ textConstants.sentimentInsights }}</p>
                 </div>
               </div>
 
@@ -626,7 +731,7 @@ watch(() => route.params.id, () => {
               <RelatedContentCarousel
                 content-type="poll"
                 :content-id="poll.id"
-                title="Related Polls"
+                :title="textConstants.relatedPolls"
                 :limit="4"
               />
             </div>
@@ -636,13 +741,13 @@ watch(() => route.params.id, () => {
           <div class="space-y-6">
             <!-- Author Card -->
             <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-              <h3 class="font-semibold text-gray-900 mb-4">Created by</h3>
+              <h3 class="font-semibold text-gray-900 mb-4">{{ textConstants.aboutAuthor }}</h3>
               <AuthorCard :author="poll.author" variant="compact" />
             </div>
 
             <!-- Poll Details -->
             <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-              <h3 class="font-semibold text-gray-900 mb-4">Poll Details</h3>
+              <h3 class="font-semibold text-gray-900 mb-4">{{ textConstants.pollDetails }}</h3>
               <div class="space-y-4">
                 <div class="flex items-center justify-between">
                   <span class="text-gray-500">
@@ -684,7 +789,7 @@ watch(() => route.params.id, () => {
 
             <!-- Tags -->
             <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-              <h3 class="font-semibold text-gray-900 mb-4">Tags</h3>
+              <h3 class="font-semibold text-gray-900 mb-4">{{ textConstants.tags }}</h3>
               <div class="flex flex-wrap gap-2">
                 <span
                   v-for="tag in poll.tags"
@@ -698,7 +803,7 @@ watch(() => route.params.id, () => {
 
             <!-- Share Section -->
             <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-              <h3 class="font-semibold text-gray-900 mb-4">Share this Poll</h3>
+              <h3 class="font-semibold text-gray-900 mb-4">{{ textConstants.sharePoll }}</h3>
               <SocialShareButtons
                 :title="poll.question"
                 :description="poll.description"
@@ -709,16 +814,16 @@ watch(() => route.params.id, () => {
 
             <!-- Quick Actions -->
             <div class="bg-gradient-to-br from-teal-500 to-teal-600 rounded-2xl p-6 text-white">
-              <h3 class="font-semibold mb-2">Want to create your own poll?</h3>
+              <h3 class="font-semibold mb-2">{{ textConstants.createPollCTA }}</h3>
               <p class="text-teal-100 text-sm mb-4">
-                Gather feedback from your team with custom polls and surveys.
+                {{ textConstants.createPollDesc }}
               </p>
               <router-link
                 to="/polls/new"
                 class="inline-flex items-center gap-2 px-4 py-2 bg-white text-teal-600 rounded-lg font-medium hover:bg-teal-50 transition-colors"
               >
                 <i class="fas fa-plus"></i>
-                Create Poll
+                {{ textConstants.createNewPoll }}
               </router-link>
             </div>
           </div>
@@ -764,5 +869,369 @@ watch(() => route.params.id, () => {
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
+}
+
+/* Enhanced Header Styles */
+.poll-detail-header {
+  background: linear-gradient(135deg, #0f766e 0%, #0d9488 50%, #14b8a6 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Decorative Elements */
+.header-decor {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.decor-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px);
+  opacity: 0.3;
+}
+
+.decor-orb-1 {
+  width: 300px;
+  height: 300px;
+  background: linear-gradient(135deg, #5eead4, #99f6e4);
+  top: -100px;
+  right: -50px;
+  animation: orb-float 8s ease-in-out infinite;
+}
+
+.decor-orb-2 {
+  width: 200px;
+  height: 200px;
+  background: linear-gradient(135deg, #2dd4bf, #5eead4);
+  bottom: -80px;
+  left: 10%;
+  animation: orb-float 10s ease-in-out infinite reverse;
+}
+
+.decor-pattern {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+  background-size: 24px 24px;
+  opacity: 0.5;
+}
+
+@keyframes orb-float {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(20px, -20px); }
+}
+
+/* Header Content */
+.header-content {
+  position: relative;
+  z-index: 2;
+  padding: 1.5rem 2rem 2rem;
+}
+
+/* Navigation Row */
+.header-nav {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.back-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 0.75rem;
+  color: white;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.back-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateX(-2px);
+}
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.breadcrumb-link {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.breadcrumb-link:hover {
+  color: white;
+}
+
+.breadcrumb-sep {
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 0.625rem;
+}
+
+.breadcrumb-category {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  color: white;
+  font-weight: 500;
+}
+
+/* Main Header Content */
+.header-main {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 2rem;
+}
+
+.header-left {
+  flex: 1;
+  max-width: 700px;
+}
+
+/* Badges */
+.header-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.375rem 0.875rem;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 2rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: white;
+  backdrop-filter: blur(8px);
+}
+
+.status-badge.active {
+  background: rgba(34, 197, 94, 0.25);
+  border: 1px solid rgba(34, 197, 94, 0.4);
+}
+
+.status-badge.completed {
+  background: rgba(148, 163, 184, 0.25);
+  border: 1px solid rgba(148, 163, 184, 0.4);
+}
+
+.status-badge.scheduled {
+  background: rgba(59, 130, 246, 0.25);
+  border: 1px solid rgba(59, 130, 246, 0.4);
+}
+
+.status-badge.draft {
+  background: rgba(234, 179, 8, 0.25);
+  border: 1px solid rgba(234, 179, 8, 0.4);
+}
+
+.status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+.status-badge.active .status-dot {
+  background: #22c55e;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.2); }
+}
+
+.anon-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.375rem 0.875rem;
+  background: rgba(139, 92, 246, 0.25);
+  border: 1px solid rgba(139, 92, 246, 0.4);
+  border-radius: 2rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: white;
+}
+
+.time-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.375rem 0.875rem;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 2rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: white;
+}
+
+.hourglass-icon {
+  animation: hourglass-flip 3s ease-in-out infinite;
+}
+
+@keyframes hourglass-flip {
+  0%, 45% { transform: rotate(0deg); }
+  50%, 95% { transform: rotate(180deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Poll Title & Description */
+.poll-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: white;
+  line-height: 1.3;
+  margin-bottom: 0.5rem;
+}
+
+.poll-desc {
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.85);
+  line-height: 1.5;
+  margin-bottom: 1.5rem;
+}
+
+/* Header Stats */
+.header-stats {
+  display: flex;
+  gap: 2rem;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.875rem;
+}
+
+.stat-item i {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.stat-value {
+  font-weight: 700;
+  color: white;
+}
+
+.stat-label {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* Header Actions */
+.header-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.action-btn {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 0.75rem;
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.action-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateY(-2px);
+}
+
+/* Poll Options Animation */
+.poll-detail-page :deep(.space-y-3 > div) {
+  animation: slide-in 0.3s ease-out;
+  animation-fill-mode: both;
+}
+
+.poll-detail-page :deep(.space-y-3 > div:nth-child(1)) { animation-delay: 0.05s; }
+.poll-detail-page :deep(.space-y-3 > div:nth-child(2)) { animation-delay: 0.1s; }
+.poll-detail-page :deep(.space-y-3 > div:nth-child(3)) { animation-delay: 0.15s; }
+.poll-detail-page :deep(.space-y-3 > div:nth-child(4)) { animation-delay: 0.2s; }
+.poll-detail-page :deep(.space-y-3 > div:nth-child(5)) { animation-delay: 0.25s; }
+
+@keyframes slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Card Hover Effects */
+.poll-detail-page :deep(.bg-white.rounded-2xl) {
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.poll-detail-page :deep(.bg-white.rounded-2xl:hover) {
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+}
+
+/* Stats item hover */
+.stat-item {
+  transition: transform 0.2s ease;
+}
+
+.stat-item:hover {
+  transform: scale(1.05);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .header-content {
+    padding: 1rem 1.5rem 1.5rem;
+  }
+
+  .header-main {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .header-actions {
+    position: absolute;
+    top: 1rem;
+    right: 1.5rem;
+  }
+
+  .poll-title {
+    font-size: 1.375rem;
+  }
+
+  .header-stats {
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
 }
 </style>
