@@ -8,7 +8,6 @@ import { useAIPreferencesStore } from '@/stores/aiPreferences'
 import {
   AILoadingIndicator,
   AIToolsPalette,
-  AIToolsToolbar,
   AIMessageContent,
   AIVoiceInput,
   AIOperationProgress,
@@ -208,10 +207,9 @@ const quickActions = ref<QuickAction[]>([
 // Enhanced AI Features - State
 // ============================================================================
 
-// Tools Palette & Toolbar
+// Tools Palette & Sidebar
 const showToolsPalette = ref(false)
 const showWorkflowBuilder = ref(false)
-const showToolsToolbar = ref(true)
 const toolsSearchQuery = ref('')
 
 // Sidebar Tools Configuration
@@ -1294,13 +1292,6 @@ function handleEntityClick(entity: { text: string; type: string }) {
           </button>
         </div>
       </div>
-
-      <!-- AI Tools Toolbar -->
-      <AIToolsToolbar
-        v-if="showToolsToolbar"
-        @tool-click="handleToolbarClick"
-        class="border-b border-teal-100"
-      />
 
       <!-- Messages Area -->
       <div class="flex-1 overflow-y-auto p-6 scrollbar-thin">
