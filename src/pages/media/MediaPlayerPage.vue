@@ -38,7 +38,8 @@ const textConstants = {
   relatedMedia: 'Related Media',
 
   // AI Features
-  aiFeatures: 'AI Features',
+  aiFeatures: 'AI Analysis',
+  poweredBy: 'Powered by Intalio AI',
   transcript: 'Transcript',
   summary: 'Summary',
   moments: 'Moments',
@@ -750,34 +751,47 @@ function copySummary() {
         <!-- AI Sidebar -->
         <div class="space-y-6">
           <!-- AI Features Panel -->
-          <div class="ai-panel fade-in-up" style="animation-delay: 0.2s">
-            <!-- Panel Header -->
-            <div class="ai-panel-header">
-              <div class="ai-panel-title">
-                <div class="ai-icon">
-                  <i class="fas fa-wand-magic-sparkles"></i>
+          <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <!-- AI Panel Header -->
+            <div class="px-6 py-4 bg-gradient-to-r from-teal-50 to-transparent border-b border-teal-100">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center">
+                    <i class="fas fa-wand-magic-sparkles text-white"></i>
+                  </div>
+                  <div>
+                    <h3 class="text-lg font-semibold text-gray-900">{{ textConstants.aiFeatures }}</h3>
+                    <p class="text-sm text-gray-500">{{ textConstants.poweredBy }}</p>
+                  </div>
                 </div>
-                <span>{{ textConstants.aiFeatures }}</span>
+                <button @click="toggleAIPanel" class="w-8 h-8 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 flex items-center justify-center transition-all">
+                  <i :class="['fas transition-transform duration-300', showAIPanel ? 'fa-chevron-up' : 'fa-chevron-down']"></i>
+                </button>
               </div>
-              <button @click="toggleAIPanel" class="ai-toggle-btn">
-                <i :class="['fas', showAIPanel ? 'fa-chevron-up' : 'fa-chevron-down']"></i>
-              </button>
             </div>
 
-            <!-- Panel Content -->
-            <div v-if="showAIPanel" class="p-4">
-              <!-- AI Tabs -->
-              <div class="flex gap-1 mb-4 bg-gray-100 rounded-lg p-1">
-                <button v-for="tab in [
-                  { id: 'transcript', icon: 'fas fa-closed-captioning', label: 'Transcript' },
-                  { id: 'summary', icon: 'fas fa-file-lines', label: 'Summary' },
-                  { id: 'moments', icon: 'fas fa-bookmark', label: 'Moments' },
-                  { id: 'translate', icon: 'fas fa-language', label: 'Translate' }
-                ]" :key="tab.id" @click="activeAITab = tab.id as any" :class="[
-                  'flex-1 px-2 py-2 rounded-md text-xs font-medium transition-all flex items-center justify-center gap-1',
-                  activeAITab === tab.id ? 'bg-white text-teal-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'
-                ]">
-                  <i :class="tab.icon"></i>
+            <!-- AI Panel Content -->
+            <div v-if="showAIPanel" class="p-4 space-y-4">
+              <!-- AI Tab Navigation -->
+              <div class="grid grid-cols-4 gap-2">
+                <button
+                  v-for="tab in [
+                    { id: 'transcript', icon: 'fas fa-closed-captioning', label: textConstants.transcript },
+                    { id: 'summary', icon: 'fas fa-file-lines', label: textConstants.summary },
+                    { id: 'moments', icon: 'fas fa-bookmark', label: textConstants.moments },
+                    { id: 'translate', icon: 'fas fa-language', label: textConstants.translate }
+                  ]"
+                  :key="tab.id"
+                  @click="activeAITab = tab.id as any"
+                  :class="[
+                    'px-3 py-2.5 rounded-xl text-xs font-medium transition-all flex flex-col items-center gap-1.5',
+                    activeAITab === tab.id
+                      ? 'bg-teal-50 text-teal-700 border-2 border-teal-200'
+                      : 'bg-gray-50 text-gray-600 border-2 border-transparent hover:bg-gray-100'
+                  ]"
+                >
+                  <i :class="[tab.icon, 'text-base']"></i>
+                  <span>{{ tab.label }}</span>
                 </button>
               </div>
 
@@ -818,29 +832,42 @@ function copySummary() {
                   {{ isLoadingSummary ? 'Generating...' : 'Generate Summary' }}
                 </button>
 
-                <div v-if="mediaSummary" class="space-y-3">
-                  <div class="bg-teal-50 rounded-lg p-4 border border-teal-100">
-                    <p class="text-sm text-gray-700">{{ mediaSummary.summary }}</p>
-                  </div>
+                <Transition name="slide-fade">
+                  <div v-if="mediaSummary" class="space-y-3 pt-3 border-t border-gray-100">
+                    <div class="p-3 bg-teal-50 rounded-xl">
+                      <div class="flex items-center justify-between mb-2">
+                        <span class="text-sm font-medium text-teal-700">{{ textConstants.summary }}</span>
+                        <button @click="mediaSummary = null" class="text-teal-400 hover:text-teal-600">
+                          <i class="fas fa-times text-sm"></i>
+                        </button>
+                      </div>
+                      <p class="text-sm text-teal-800 leading-relaxed">{{ mediaSummary.summary }}</p>
+                    </div>
 
-                  <div class="space-y-2">
-                    <p class="text-xs font-semibold text-gray-500 uppercase">Key Points</p>
-                    <ul class="space-y-1">
-                      <li v-for="(point, idx) in mediaSummary.keyPoints" :key="idx" class="flex items-start gap-2 text-sm text-gray-600">
-                        <i class="fas fa-check-circle text-teal-500 mt-0.5 flex-shrink-0"></i>
-                        <span>{{ point }}</span>
-                      </li>
-                    </ul>
-                  </div>
+                    <!-- Key Points -->
+                    <div v-if="mediaSummary.keyPoints?.length" class="p-3 bg-gray-50 rounded-xl">
+                      <div class="flex items-center gap-2 mb-2">
+                        <i class="fas fa-lightbulb text-amber-500"></i>
+                        <span class="text-sm font-medium text-gray-700">{{ textConstants.keyPoints }}</span>
+                      </div>
+                      <ul class="space-y-1.5">
+                        <li v-for="(point, idx) in mediaSummary.keyPoints" :key="idx" class="flex items-start gap-2 text-sm text-gray-600">
+                          <i class="fas fa-check-circle text-teal-500 mt-0.5 flex-shrink-0"></i>
+                          <span>{{ point }}</span>
+                        </li>
+                      </ul>
+                    </div>
 
-                  <div class="flex items-center justify-between text-xs text-gray-400">
-                    <span>{{ ((mediaSummary.confidence ?? 0) * 100).toFixed(0) }}% confidence</span>
-                    <button @click="copySummary" class="flex items-center gap-1 text-teal-600 hover:text-teal-700">
-                      <i class="fas fa-copy"></i>
-                      Copy
-                    </button>
+                    <!-- Confidence & Copy -->
+                    <div class="flex items-center justify-between text-xs text-gray-400">
+                      <span>{{ ((mediaSummary.confidence ?? 0) * 100).toFixed(0) }}% {{ textConstants.confidence }}</span>
+                      <button @click="copySummary" class="flex items-center gap-1 text-teal-600 hover:text-teal-700">
+                        <i class="fas fa-copy"></i>
+                        {{ textConstants.copy }}
+                      </button>
+                    </div>
                   </div>
-                </div>
+                </Transition>
               </div>
 
               <!-- Key Moments Tab -->
@@ -1346,57 +1373,20 @@ function copySummary() {
 }
 
 /* ========================================
-   AI Panel
+   AI Panel Transitions
    ======================================== */
-.ai-panel {
-  background: white;
-  border-radius: 1rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  border: 1px solid #e5e7eb;
-  overflow: hidden;
-  position: sticky;
-  top: 1.5rem;
+.slide-fade-enter-active {
+  transition: all 0.3s ease-out;
 }
 
-.ai-panel-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 1rem 1.25rem;
-  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+.slide-fade-leave-active {
+  transition: all 0.2s ease-in;
 }
 
-.ai-panel-title {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  color: white;
-  font-weight: 600;
-}
-
-.ai-icon {
-  width: 36px;
-  height: 36px;
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 0.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.ai-toggle-btn {
-  width: 32px;
-  height: 32px;
-  background: rgba(255, 255, 255, 0.15);
-  border: none;
-  border-radius: 0.5rem;
-  color: white;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.ai-toggle-btn:hover {
-  background: rgba(255, 255, 255, 0.25);
+.slide-fade-enter-from,
+.slide-fade-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
 }
 
 /* Custom scrollbar for AI panels */
@@ -1418,18 +1408,6 @@ function copySummary() {
 .max-h-48::-webkit-scrollbar-thumb {
   background: #14b8a6;
   border-radius: 2px;
-}
-
-/* AI Panel Animation */
-.ai-panel-enter-active,
-.ai-panel-leave-active {
-  transition: all 0.3s ease;
-}
-
-.ai-panel-enter-from,
-.ai-panel-leave-to {
-  opacity: 0;
-  max-height: 0;
 }
 
 /* ========================================
