@@ -946,6 +946,16 @@ onUnmounted(() => {
       <div class="flex gap-8">
         <!-- Main Content -->
         <main class="flex-1 min-w-0">
+          <!-- Collection Info Card -->
+          <div class="mb-6 bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+            <h3 class="font-semibold text-gray-900 mb-4">About this Collection</h3>
+            <p class="text-gray-600 leading-relaxed">{{ collection.description }}</p>
+            <div class="mt-4 pt-4 border-t border-gray-100 flex items-center gap-6 text-sm text-gray-500">
+              <span><i class="fas fa-calendar mr-2"></i>Created {{ formatDate(collection.createdAt) }}</span>
+              <span><i class="fas fa-clock mr-2"></i>Updated {{ formatDate(collection.updatedAt) }}</span>
+            </div>
+          </div>
+
           <!-- Items Card -->
           <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
             <!-- Card Header with Filters -->
@@ -1164,15 +1174,6 @@ onUnmounted(() => {
             </div>
           </div>
 
-          <!-- Collection Info Card -->
-          <div class="mt-8 bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-            <h3 class="font-semibold text-gray-900 mb-4">About this Collection</h3>
-            <p class="text-gray-600 leading-relaxed">{{ collection.description }}</p>
-            <div class="mt-4 pt-4 border-t border-gray-100 flex items-center gap-6 text-sm text-gray-500">
-              <span><i class="fas fa-calendar mr-2"></i>Created {{ formatDate(collection.createdAt) }}</span>
-              <span><i class="fas fa-clock mr-2"></i>Updated {{ formatDate(collection.updatedAt) }}</span>
-            </div>
-          </div>
         </main>
 
         <!-- Sidebar -->
