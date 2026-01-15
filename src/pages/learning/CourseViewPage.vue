@@ -189,7 +189,7 @@ const isGeneratingSummary = ref(false)
 const isExtractingConcepts = ref(false)
 const isGeneratingQuiz = ref(false)
 const showAISidebar = ref(true)
-const activeAITab = ref<'summary' | 'concepts' | 'quiz' | 'notes' | 'discuss'>('summary')
+const activeAITab = ref<'summary' | 'concepts' | 'quiz' | 'notes'>('summary')
 
 // AI Results
 interface CourseSummary {
@@ -914,7 +914,7 @@ const estimatedTimeRemaining = computed(() => {
           <!-- AI Tabs -->
           <div class="ai-tabs">
             <button
-              v-for="tab in ['summary', 'concepts', 'quiz', 'notes', 'discuss']"
+              v-for="tab in ['summary', 'concepts', 'quiz', 'notes']"
               :key="tab"
               :class="['ai-tab', { 'active': activeAITab === tab }]"
               @click="activeAITab = tab as typeof activeAITab"
@@ -923,8 +923,7 @@ const estimatedTimeRemaining = computed(() => {
                 'fas fa-file-alt': tab === 'summary',
                 'fas fa-lightbulb': tab === 'concepts',
                 'fas fa-question-circle': tab === 'quiz',
-                'fas fa-sticky-note': tab === 'notes',
-                'fas fa-comments': tab === 'discuss'
+                'fas fa-sticky-note': tab === 'notes'
               }"></i>
               <span>{{ tab.charAt(0).toUpperCase() + tab.slice(1) }}</span>
             </button>
@@ -1110,20 +1109,6 @@ const estimatedTimeRemaining = computed(() => {
             </div>
           </div>
 
-          <!-- Discussion Tab -->
-          <div v-if="activeAITab === 'discuss'" class="ai-tab-content">
-            <div class="ai-action-header">
-              <h4>Discussion</h4>
-              <span class="text-xs text-gray-500">{{ discussionComments.length }} posts</span>
-            </div>
-            <CommentsSection
-              content-type="course"
-              :content-id="course.id.toString()"
-              :comments="discussionComments"
-              :is-loading="discussionLoading"
-              @add-comment="addDiscussionPost"
-            />
-          </div>
         </div>
 
         <!-- Course Rating Section (shown at bottom of sidebar when collapsed) -->
@@ -1138,6 +1123,23 @@ const estimatedTimeRemaining = computed(() => {
             @update:model-value="handleCourseRating"
           />
         </div>
+      </div>
+    </div>
+
+    <!-- Full Width Comments Section -->
+    <div class="comments-section-wrapper">
+      <div class="comments-card">
+        <div class="comments-header">
+          <h3><i class="fas fa-comments"></i> Discussion</h3>
+          <span class="comments-count">{{ discussionComments.length }} posts</span>
+        </div>
+        <CommentsSection
+          content-type="course"
+          :content-id="course.id.toString()"
+          :comments="discussionComments"
+          :is-loading="discussionLoading"
+          @add-comment="addDiscussionPost"
+        />
       </div>
     </div>
 
@@ -2221,6 +2223,53 @@ const estimatedTimeRemaining = computed(() => {
   color: #4b5563;
   line-height: 1.7;
   font-size: 0.9rem;
+}
+
+/* Full Width Comments Section */
+.comments-section-wrapper {
+  width: 100%;
+  padding: 1.5rem;
+  background: #f9fafb;
+  margin-top: 0;
+}
+
+.comments-card {
+  background: white;
+  border-radius: 16px;
+  border: 1px solid #e5e7eb;
+  padding: 1.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.comments-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.comments-header h3 {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #1f2937;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.comments-header h3 i {
+  color: #14b8a6;
+}
+
+.comments-count {
+  font-size: 0.875rem;
+  color: #6b7280;
+  background: #f3f4f6;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
 }
 
 /* Course Objectives Card */
