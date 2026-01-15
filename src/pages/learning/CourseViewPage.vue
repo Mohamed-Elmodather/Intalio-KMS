@@ -754,12 +754,12 @@ const estimatedTimeRemaining = computed(() => {
     <!-- Main Content -->
     <div :class="['course-content-wrapper', { 'syllabus-collapsed': !showSyllabus, 'ai-collapsed': !showAISidebar }]">
       <!-- Syllabus Sidebar -->
-      <div :class="['syllabus-sidebar bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden', { 'collapsed': !showSyllabus }]">
+      <div :class="['syllabus-sidebar', { 'collapsed': !showSyllabus }]">
         <button @click="showSyllabus = !showSyllabus" class="syllabus-toggle">
           <i :class="showSyllabus ? 'fas fa-chevron-left' : 'fas fa-chevron-right'"></i>
         </button>
 
-        <div v-if="showSyllabus" class="syllabus-content">
+        <div v-if="showSyllabus" class="syllabus-card bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
           <div class="syllabus-header">
             <h3 class="font-semibold text-gray-900 flex items-center gap-2">
               <i class="fas fa-list text-teal-500"></i>
@@ -769,28 +769,33 @@ const estimatedTimeRemaining = computed(() => {
           </div>
 
           <div class="syllabus-list">
-          <div
-            v-for="(lesson, index) in course.syllabus"
-            :key="lesson.id"
-            :class="['syllabus-item', { 'active': currentLesson?.id === lesson.id, 'completed': lesson.completed }]"
-            @click="selectLesson(lesson, index)"
-          >
-            <div class="lesson-status">
-              <i v-if="lesson.completed" class="fas fa-check-circle text-green-500"></i>
-              <span v-else class="lesson-number">{{ index + 1 }}</span>
-            </div>
-            <div class="lesson-info">
-              <h4>{{ lesson.title }}</h4>
-              <div class="lesson-meta">
-                <i :class="getLessonIcon(lesson.type)"></i>
-                <span>{{ lesson.duration }}</span>
+            <div
+              v-for="(lesson, index) in course.syllabus"
+              :key="lesson.id"
+              :class="['syllabus-item', { 'active': currentLesson?.id === lesson.id, 'completed': lesson.completed }]"
+              @click="selectLesson(lesson, index)"
+            >
+              <div class="lesson-status">
+                <i v-if="lesson.completed" class="fas fa-check-circle text-green-500"></i>
+                <span v-else class="lesson-number">{{ index + 1 }}</span>
+              </div>
+              <div class="lesson-info">
+                <h4>{{ lesson.title }}</h4>
+                <div class="lesson-meta">
+                  <i :class="getLessonIcon(lesson.type)"></i>
+                  <span>{{ lesson.duration }}</span>
+                </div>
+              </div>
+              <div v-if="lesson.current" class="current-badge">
+                <i class="fas fa-play"></i>
               </div>
             </div>
-            <div v-if="lesson.current" class="current-badge">
-              <i class="fas fa-play"></i>
-            </div>
           </div>
-          </div>
+        </div>
+
+        <!-- Collapsed state icon -->
+        <div v-if="!showSyllabus" class="collapsed-icon">
+          <i class="fas fa-list text-teal-500"></i>
         </div>
       </div>
 
@@ -860,12 +865,12 @@ const estimatedTimeRemaining = computed(() => {
       </div>
 
       <!-- AI Sidebar -->
-      <div :class="['ai-sidebar bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden', { 'collapsed': !showAISidebar }]">
+      <div :class="['ai-sidebar', { 'collapsed': !showAISidebar }]">
         <button @click="showAISidebar = !showAISidebar" class="ai-sidebar-toggle">
           <i :class="showAISidebar ? 'fas fa-chevron-right' : 'fas fa-chevron-left'"></i>
         </button>
 
-        <div v-if="showAISidebar" class="ai-sidebar-content">
+        <div v-if="showAISidebar" class="ai-sidebar-card bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
           <div class="ai-sidebar-header bg-gradient-to-r from-teal-500 to-teal-600 text-white px-4 py-3">
             <div class="flex items-center gap-2">
               <i class="fas fa-wand-magic-sparkles"></i>
@@ -1071,19 +1076,23 @@ const estimatedTimeRemaining = computed(() => {
             </div>
           </div>
 
+          <!-- Course Rating Section -->
+          <div class="course-rating-section p-4 border-t border-gray-200 bg-gray-50 rounded-b-xl">
+            <h4 class="text-sm font-semibold text-gray-700 mb-2">Rate this Course</h4>
+            <RatingStars
+              :model-value="courseRating?.userRating || 0"
+              :average="courseRating?.average"
+              :count="courseRating?.count"
+              size="md"
+              :show-count="true"
+              @update:model-value="handleCourseRating"
+            />
+          </div>
         </div>
 
-        <!-- Course Rating Section (shown at bottom of sidebar when collapsed) -->
-        <div class="course-rating-section p-4 border-t border-gray-200 bg-gray-50 rounded-b-xl">
-          <h4 class="text-sm font-semibold text-gray-700 mb-2">Rate this Course</h4>
-          <RatingStars
-            :model-value="courseRating?.userRating || 0"
-            :average="courseRating?.average"
-            :count="courseRating?.count"
-            size="md"
-            :show-count="true"
-            @update:model-value="handleCourseRating"
-          />
+        <!-- Collapsed state icon -->
+        <div v-if="!showAISidebar" class="collapsed-icon">
+          <i class="fas fa-wand-magic-sparkles text-teal-500"></i>
         </div>
       </div>
     </div>
@@ -1321,15 +1330,24 @@ const estimatedTimeRemaining = computed(() => {
 }
 
 .syllabus-sidebar.collapsed {
-  width: 48px;
-  min-width: 48px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: white;
+  border-radius: 1rem;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  padding: 1rem 0;
+}
+
+.syllabus-card {
+  width: 100%;
 }
 
 .syllabus-toggle {
   position: absolute;
   right: -12px;
-  top: 50%;
-  transform: translateY(-50%);
+  top: 20px;
   width: 24px;
   height: 48px;
   background: white;
@@ -1344,8 +1362,23 @@ const estimatedTimeRemaining = computed(() => {
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
+.syllabus-sidebar.collapsed .syllabus-toggle {
+  position: relative;
+  right: auto;
+  top: auto;
+  margin-bottom: 1rem;
+}
+
 .syllabus-toggle:hover {
   background: #f9fafb;
+  color: #14b8a6;
+}
+
+.collapsed-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
 }
 
 .syllabus-header {
@@ -1650,15 +1683,24 @@ const estimatedTimeRemaining = computed(() => {
 }
 
 .ai-sidebar.collapsed {
-  width: 48px;
-  min-width: 48px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: white;
+  border-radius: 1rem;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  padding: 1rem 0;
+}
+
+.ai-sidebar-card {
+  width: 100%;
 }
 
 .ai-sidebar-toggle {
   position: absolute;
   left: -12px;
-  top: 50%;
-  transform: translateY(-50%);
+  top: 20px;
   width: 24px;
   height: 48px;
   background: white;
@@ -1673,8 +1715,16 @@ const estimatedTimeRemaining = computed(() => {
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
+.ai-sidebar.collapsed .ai-sidebar-toggle {
+  position: relative;
+  left: auto;
+  top: auto;
+  margin-bottom: 1rem;
+}
+
 .ai-sidebar-toggle:hover {
   background: #f9fafb;
+  color: #14b8a6;
 }
 
 .ai-sidebar-content {
