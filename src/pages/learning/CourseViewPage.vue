@@ -537,6 +537,15 @@ function getLessonIcon(type: string) {
   }
 }
 
+function getLevelBadgeClass(level: string) {
+  switch (level.toLowerCase()) {
+    case 'beginner': return 'bg-green-500 text-white'
+    case 'intermediate': return 'bg-amber-500 text-white'
+    case 'advanced': return 'bg-red-500 text-white'
+    default: return 'bg-teal-500 text-white'
+  }
+}
+
 // ============================================================================
 // Resources & Materials
 // ============================================================================
@@ -630,60 +639,123 @@ const estimatedTimeRemaining = computed(() => {
 </script>
 
 <template>
-  <div class="course-view-page">
-    <!-- Header -->
-    <div class="course-header">
-      <div class="course-header-content">
-        <button @click="goBack" class="back-btn">
-          <i class="fas fa-arrow-left"></i>
-          <span>Back to Learning</span>
-        </button>
+  <div class="course-view-page min-h-screen bg-gray-50">
+    <!-- Hero Section -->
+    <header class="relative">
+      <div class="h-[400px] w-full overflow-hidden">
+        <img
+          :src="course.image"
+          :alt="course.title"
+          class="w-full h-full object-cover"
+        >
+        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
+      </div>
 
-        <div class="course-title-section">
-          <div class="course-badges">
-            <span :class="['level-badge', course.levelClass]">{{ course.level }}</span>
-            <span class="duration-badge"><i class="fas fa-clock"></i> {{ course.duration }}</span>
-            <span class="rating-badge"><i class="fas fa-star text-amber-400"></i> {{ course.rating }}</span>
-            <span class="students-badge"><i class="fas fa-users"></i> {{ course.students.toLocaleString() }}</span>
-            <span v-if="estimatedTimeRemaining !== '0 min'" class="time-remaining-badge">
-              <i class="fas fa-hourglass-half"></i> {{ estimatedTimeRemaining }} left
+      <!-- Header Content -->
+      <div class="absolute bottom-0 left-0 right-0 px-6 py-8">
+        <div>
+          <!-- Navigation Row -->
+          <div class="header-nav">
+            <button @click="goBack" class="back-btn">
+              <i class="fas fa-arrow-left"></i>
+              <span>Back</span>
+            </button>
+            <div class="breadcrumb">
+              <router-link to="/learning" class="breadcrumb-link">
+                <i class="fas fa-graduation-cap"></i>
+                Learning
+              </router-link>
+              <i class="fas fa-chevron-right breadcrumb-sep"></i>
+              <span class="breadcrumb-current">{{ course.title }}</span>
+            </div>
+          </div>
+
+          <!-- Level & Tags -->
+          <div class="flex items-center gap-2 mb-4 flex-wrap">
+            <span :class="['px-3 py-1 rounded-full text-sm font-medium', getLevelBadgeClass(course.level)]">
+              {{ course.level }}
             </span>
+            <span v-for="tag in course.tags" :key="tag" class="px-3 py-1 bg-white/20 backdrop-blur-sm text-white rounded-full text-sm">
+              {{ tag }}
+            </span>
+          </div>
+
+          <!-- Title -->
+          <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold text-white leading-tight mb-4">
+            {{ course.title }}
+          </h1>
+
+          <!-- Description -->
+          <p class="text-lg text-white/80 max-w-3xl">{{ course.description }}</p>
+        </div>
+      </div>
+    </header>
+
+    <!-- Metadata Bar -->
+    <div class="bg-white border-b border-gray-200 sticky top-0 z-20">
+      <div class="px-6 py-3">
+        <div class="flex items-center justify-between flex-wrap gap-4">
+          <!-- Instructor & Meta -->
+          <div class="flex items-center gap-4">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-full bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center text-white font-bold">
+                {{ course.instructorInitials }}
+              </div>
+              <div>
+                <p class="font-semibold text-gray-900 text-sm">{{ course.instructor }}</p>
+                <p class="text-xs text-gray-500">
+                  {{ course.instructorBio }}
+                </p>
+              </div>
+            </div>
+
+            <div class="hidden md:flex items-center gap-4 pl-4 border-l border-gray-200 text-sm text-gray-500">
+              <span><i class="fas fa-clock mr-1"></i> {{ course.duration }}</span>
+              <span><i class="fas fa-users mr-1"></i> {{ course.students.toLocaleString() }} students</span>
+              <span><i class="fas fa-star text-amber-400 mr-1"></i> {{ course.rating }}</span>
+              <span v-if="estimatedTimeRemaining !== '0 min'" class="text-amber-600">
+                <i class="fas fa-hourglass-half mr-1"></i> {{ estimatedTimeRemaining }} left
+              </span>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="flex items-center gap-2">
             <BookmarkButton
               :content-id="course.id.toString()"
               content-type="course"
               size="sm"
             />
-          </div>
-          <h1 class="course-title">{{ course.title }}</h1>
-
-          <!-- Course Tags -->
-          <div class="course-tags">
-            <span v-for="tag in course.tags" :key="tag" class="course-tag">
-              {{ tag }}
-            </span>
-          </div>
-
-          <div class="course-instructor">
-            <div class="instructor-avatar">{{ course.instructorInitials }}</div>
-            <div class="instructor-info">
-              <span class="instructor-name">{{ course.instructor }}</span>
-              <span class="instructor-bio">{{ course.instructorBio }}</span>
-            </div>
-            <button v-if="courseCompleted" @click="openCertificatePreview" class="certificate-btn">
-              <i class="fas fa-certificate"></i>
-              View Certificate
+            <button
+              v-if="courseCompleted"
+              @click="openCertificatePreview"
+              class="px-3 py-2 rounded-lg text-sm font-medium bg-amber-100 text-amber-700 hover:bg-amber-200 transition-all"
+            >
+              <i class="fas fa-certificate mr-1"></i>
+              Certificate
+            </button>
+            <button
+              @click="showAISidebar = !showAISidebar"
+              class="px-3 py-2 rounded-lg text-sm font-medium transition-all"
+              :class="showAISidebar ? 'bg-teal-100 text-teal-700' : 'bg-gray-100 text-gray-600 hover:bg-teal-50 hover:text-teal-600'"
+            >
+              <i class="fas fa-wand-magic-sparkles mr-1"></i>
+              AI Assist
             </button>
           </div>
         </div>
 
         <!-- Progress Bar -->
-        <div class="course-progress-bar">
-          <div class="progress-info">
-            <span>{{ course.completedLessons }} of {{ course.totalLessons }} lessons completed</span>
-            <span class="progress-percent">{{ course.progress }}%</span>
+        <div class="mt-3 pt-3 border-t border-gray-100">
+          <div class="flex items-center justify-between text-sm mb-1.5">
+            <span class="text-gray-600">{{ course.completedLessons }} of {{ course.totalLessons }} lessons completed</span>
+            <span class="font-semibold text-teal-600">{{ course.progress }}%</span>
           </div>
-          <div class="progress-track">
-            <div class="progress-fill" :style="{ width: course.progress + '%' }"></div>
+          <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
+            <div
+              class="h-full bg-gradient-to-r from-teal-500 to-teal-400 rounded-full transition-all duration-500"
+              :style="{ width: course.progress + '%' }"
+            ></div>
           </div>
         </div>
       </div>
@@ -1134,139 +1206,75 @@ const estimatedTimeRemaining = computed(() => {
 
 <style scoped>
 .course-view-page {
-  min-height: 100vh;
-  background: #f8fafc;
+  animation: fadeIn 0.3s ease;
 }
 
-/* Header */
-.course-header {
-  background: linear-gradient(135deg, #0d9488 0%, #14b8a6 50%, #10b981 100%);
-  padding: 1.5rem 2rem;
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
-.course-header-content {
-  /* Full width */
+/* Navigation */
+.header-nav {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
 }
 
 .back-btn {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   gap: 0.5rem;
   padding: 0.5rem 1rem;
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 0.75rem;
   color: white;
-  border: none;
-  border-radius: 8px;
   font-size: 0.875rem;
+  font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s;
-  margin-bottom: 1rem;
+  backdrop-filter: blur(8px);
+  transition: all 0.2s ease;
 }
 
 .back-btn:hover {
-  background: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateX(-2px);
 }
 
-.course-badges {
-  display: flex;
-  gap: 0.75rem;
-  margin-bottom: 0.75rem;
-}
-
-.level-badge {
-  padding: 0.25rem 0.75rem;
-  border-radius: 20px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  background: rgba(255, 255, 255, 0.2);
-  color: white;
-}
-
-.duration-badge,
-.rating-badge {
+.breadcrumb {
   display: flex;
   align-items: center;
-  gap: 0.375rem;
-  padding: 0.25rem 0.75rem;
-  background: rgba(255, 255, 255, 0.15);
-  color: white;
-  border-radius: 20px;
-  font-size: 0.75rem;
-}
-
-.course-title {
-  font-size: 1.75rem;
-  font-weight: 700;
-  color: white;
-  margin-bottom: 1rem;
-}
-
-.course-instructor {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  margin-bottom: 1.5rem;
-}
-
-.instructor-avatar {
-  width: 44px;
-  height: 44px;
-  background: rgba(255, 255, 255, 0.3);
-  color: white;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 600;
+  gap: 0.5rem;
   font-size: 0.875rem;
 }
 
-.instructor-info {
+.breadcrumb-link {
   display: flex;
-  flex-direction: column;
-}
-
-.instructor-name {
-  color: white;
-  font-weight: 600;
-  font-size: 0.9rem;
-}
-
-.instructor-bio {
+  align-items: center;
+  gap: 0.375rem;
   color: rgba(255, 255, 255, 0.8);
-  font-size: 0.75rem;
+  text-decoration: none;
+  transition: color 0.2s ease;
 }
 
-.course-progress-bar {
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 12px;
-  padding: 1rem;
-}
-
-.progress-info {
-  display: flex;
-  justify-content: space-between;
+.breadcrumb-link:hover {
   color: white;
-  font-size: 0.8rem;
-  margin-bottom: 0.5rem;
 }
 
-.progress-percent {
-  font-weight: 700;
+.breadcrumb-sep {
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 0.625rem;
 }
 
-.progress-track {
-  height: 8px;
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 4px;
+.breadcrumb-current {
+  color: white;
+  font-weight: 500;
+  max-width: 300px;
   overflow: hidden;
-}
-
-.progress-fill {
-  height: 100%;
-  background: white;
-  border-radius: 4px;
-  transition: width 0.3s ease;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* Content Wrapper */
