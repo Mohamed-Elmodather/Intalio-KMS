@@ -1808,19 +1808,21 @@ onUnmounted(() => {
 /* Main Content */
 .main-content {
   display: flex;
+  flex-direction: row;
   gap: 1.5rem;
   padding: 1.5rem 2rem;
   max-width: 1600px;
-  margin: 0 auto;
+  margin-left: auto;
+  margin-right: auto;
   box-sizing: border-box;
   width: 100%;
 }
 
-/* Items Section */
+/* Items Section - takes remaining space after sidebar */
 .items-section {
-  flex: 1;
+  flex: 1 1 auto;
   min-width: 0;
-  overflow: visible;
+  max-width: calc(100% - 360px - 1.5rem);
 }
 
 /* ============================================================================
@@ -2344,21 +2346,25 @@ onUnmounted(() => {
   color: #94a3b8;
 }
 
-/* Sidebar */
+/* Sidebar - fixed width, no shrink */
 .sidebar {
+  flex: 0 0 360px;
   width: 360px;
-  max-width: 100%;
-  flex-shrink: 0;
+  min-width: 360px;
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  box-sizing: border-box;
 }
 
+/* Panel base styles */
 .panel {
   background: white;
   border: 1px solid #e5e7eb;
   border-radius: 12px;
-  overflow: visible;
+  overflow: hidden;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .panel-header {
@@ -2883,7 +2889,13 @@ onUnmounted(() => {
    ============================================================================ */
 @media (max-width: 1200px) {
   .sidebar {
+    flex: 0 0 320px;
     width: 320px;
+    min-width: 320px;
+  }
+
+  .items-section {
+    max-width: calc(100% - 320px - 1.5rem);
   }
 }
 
@@ -2893,9 +2905,15 @@ onUnmounted(() => {
     padding: 1rem;
   }
 
-  .sidebar {
+  .items-section {
+    max-width: 100%;
     width: 100%;
-    max-width: none;
+  }
+
+  .sidebar {
+    flex: 1 1 auto;
+    width: 100%;
+    min-width: 100%;
   }
 
   .hero-content {
