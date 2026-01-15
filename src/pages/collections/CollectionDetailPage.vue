@@ -187,6 +187,35 @@ const viewMode = ref<'list' | 'grid'>('list')
 const sortBy = ref<'recent' | 'oldest' | 'az' | 'za' | 'type'>('recent')
 const filterType = ref<'all' | 'article' | 'document' | 'media'>('all')
 
+// Add Items Modal state
+const showAddItemsModal = ref(false)
+const addItemsSearch = ref('')
+const addItemsFilter = ref<'all' | 'article' | 'document' | 'media'>('all')
+const selectedItems = ref<Set<string>>(new Set())
+
+// Available items to add (mock data - in real app, fetch from API)
+interface AvailableItem {
+  id: string
+  contentType: 'article' | 'document' | 'media'
+  title: string
+  thumbnail?: string
+  description?: string
+  metadata?: Record<string, any>
+}
+
+const availableItems = ref<AvailableItem[]>([
+  { id: 'avail-1', contentType: 'article', title: 'Group Stage Preview: What to Expect', thumbnail: 'https://images.unsplash.com/photo-1489944440615-453fc2b6a9a9?w=400', description: 'Comprehensive preview of all group stage matches.', metadata: { readTime: '10 min' } },
+  { id: 'avail-2', contentType: 'article', title: 'Rising Stars: Young Players to Watch', thumbnail: 'https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=400', description: 'Spotlight on emerging talents in Asian football.', metadata: { readTime: '7 min' } },
+  { id: 'avail-3', contentType: 'media', title: 'Opening Ceremony Rehearsal', thumbnail: 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?w=400', description: 'Behind the scenes of opening ceremony preparations.', metadata: { duration: '15:30', type: 'video' } },
+  { id: 'avail-4', contentType: 'media', title: 'National Team Training Sessions', thumbnail: 'https://images.unsplash.com/photo-1526232761682-d26e03ac148e?w=400', description: 'Exclusive footage from team training camps.', metadata: { duration: '22:15', type: 'video' } },
+  { id: 'avail-5', contentType: 'document', title: 'Tournament Rules & Regulations', description: 'Official tournament rulebook and guidelines.', metadata: { size: '3.2 MB', format: 'PDF' } },
+  { id: 'avail-6', contentType: 'document', title: 'Venue Safety Guidelines', description: 'Safety protocols and emergency procedures.', metadata: { size: '1.5 MB', format: 'PDF' } },
+  { id: 'avail-7', contentType: 'article', title: 'Fan Guide: Getting to the Stadiums', thumbnail: 'https://images.unsplash.com/photo-1518091043644-c1d4457512c6?w=400', description: 'Transportation and access information for fans.', metadata: { readTime: '5 min' } },
+  { id: 'avail-8', contentType: 'media', title: 'Mascot Reveal Video', thumbnail: 'https://images.unsplash.com/photo-1551958219-acbc608c6377?w=400', description: 'Official unveiling of the tournament mascot.', metadata: { duration: '3:45', type: 'video' } },
+  { id: 'avail-9', contentType: 'document', title: 'Press Kit 2027', description: 'Media resources and official assets.', metadata: { size: '45 MB', format: 'ZIP' } },
+  { id: 'avail-10', contentType: 'media', title: 'Stadium Flyover Tours', thumbnail: 'https://images.unsplash.com/photo-1522778526097-ce0a22ceb253?w=400', description: 'Aerial tours of all tournament venues.', metadata: { photoCount: 32, type: 'gallery' } }
+])
+
 // Activity log (mock data)
 const activities = ref<Activity[]>([
   {
@@ -423,6 +452,35 @@ const itemCounts = computed(() => ({
   media: collection.value.items.filter(i => i.contentType === 'media').length
 }))
 
+// Filtered available items (excluding already added items)
+const filteredAvailableItems = computed(() => {
+  const existingIds = new Set(collection.value.items.map(i => `${i.contentType}-${i.contentId}`))
+
+  let items = availableItems.value.filter(item => {
+    // Exclude items already in collection
+    const itemKey = `${item.contentType}-${item.id}`
+    return !existingIds.has(itemKey)
+  })
+
+  // Apply type filter
+  if (addItemsFilter.value !== 'all') {
+    items = items.filter(item => item.contentType === addItemsFilter.value)
+  }
+
+  // Apply search
+  if (addItemsSearch.value.trim()) {
+    const query = addItemsSearch.value.toLowerCase()
+    items = items.filter(item =>
+      item.title.toLowerCase().includes(query) ||
+      item.description?.toLowerCase().includes(query)
+    )
+  }
+
+  return items
+})
+
+const selectedItemsCount = computed(() => selectedItems.value.size)
+
 // Helper functions
 function formatDate(dateString: string): string {
   const date = new Date(dateString)
@@ -532,6 +590,56 @@ function removeItem(itemId: string) {
     collection.value.itemCount = collection.value.items.length
     collection.value.updatedAt = new Date().toISOString()
   }
+}
+
+// Add Items Modal functions
+function openAddItemsModal() {
+  showAddItemsModal.value = true
+  addItemsSearch.value = ''
+  addItemsFilter.value = 'all'
+  selectedItems.value = new Set()
+}
+
+function closeAddItemsModal() {
+  showAddItemsModal.value = false
+}
+
+function toggleItemSelection(itemId: string) {
+  if (selectedItems.value.has(itemId)) {
+    selectedItems.value.delete(itemId)
+  } else {
+    selectedItems.value.add(itemId)
+  }
+}
+
+function isItemSelected(itemId: string): boolean {
+  return selectedItems.value.has(itemId)
+}
+
+function addSelectedItems() {
+  const itemsToAdd = availableItems.value.filter(item => selectedItems.value.has(item.id))
+  const maxOrder = Math.max(...collection.value.items.map(i => i.order), 0)
+
+  itemsToAdd.forEach((item, index) => {
+    const newItem: CollectionItem = {
+      id: `item-${Date.now()}-${index}`,
+      contentType: item.contentType,
+      contentId: item.id,
+      addedAt: new Date().toISOString(),
+      addedBy: currentUser.value.id,
+      order: maxOrder + index + 1,
+      title: item.title,
+      thumbnail: item.thumbnail,
+      description: item.description,
+      metadata: item.metadata
+    }
+    collection.value.items.push(newItem)
+  })
+
+  collection.value.itemCount = collection.value.items.length
+  collection.value.updatedAt = new Date().toISOString()
+
+  closeAddItemsModal()
 }
 
 function openItem(item: CollectionItem) {
@@ -965,9 +1073,19 @@ onUnmounted(() => {
                   <i class="fas fa-layer-group text-teal-500"></i>
                   {{ textConstants.collectionItems }}
                 </h2>
-                <span class="px-3 py-1 bg-teal-50 text-teal-700 rounded-full text-sm font-medium">
-                  {{ filteredAndSortedItems.length }} {{ textConstants.items }}
-                </span>
+                <div class="flex items-center gap-3">
+                  <span class="px-3 py-1 bg-teal-50 text-teal-700 rounded-full text-sm font-medium">
+                    {{ filteredAndSortedItems.length }} {{ textConstants.items }}
+                  </span>
+                  <button
+                    v-if="canEdit"
+                    @click="openAddItemsModal"
+                    class="px-4 py-2 bg-teal-500 text-white rounded-lg text-sm font-medium hover:bg-teal-600 transition-all flex items-center gap-2"
+                  >
+                    <i class="fas fa-plus"></i>
+                    Add Items
+                  </button>
+                </div>
               </div>
 
               <!-- Controls Row -->
@@ -1374,6 +1492,136 @@ onUnmounted(() => {
               <button @click="deleteCollection" class="btn-delete">
                 <i class="fas fa-trash-alt mr-2"></i>
                 Delete Collection
+              </button>
+            </div>
+          </div>
+        </div>
+      </Transition>
+    </Teleport>
+
+    <!-- Add Items Modal -->
+    <Teleport to="body">
+      <Transition name="modal">
+        <div v-if="showAddItemsModal" class="modal-overlay" @click.self="closeAddItemsModal">
+          <div class="modal-content add-items-modal">
+            <!-- Header -->
+            <div class="modal-header">
+              <h3 class="modal-title">
+                <i class="fas fa-plus-circle text-teal-500 mr-2"></i>
+                Add Items to Collection
+              </h3>
+              <button @click="closeAddItemsModal" class="modal-close">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+
+            <!-- Filters -->
+            <div class="add-items-filters">
+              <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input
+                  v-model="addItemsSearch"
+                  type="text"
+                  placeholder="Search content..."
+                  class="search-input"
+                />
+                <button v-if="addItemsSearch" @click="addItemsSearch = ''" class="clear-search">
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
+              <div class="type-filters">
+                <button
+                  @click="addItemsFilter = 'all'"
+                  :class="['type-filter-btn', addItemsFilter === 'all' ? 'active' : '']"
+                >
+                  All
+                </button>
+                <button
+                  @click="addItemsFilter = 'article'"
+                  :class="['type-filter-btn', addItemsFilter === 'article' ? 'active' : '']"
+                >
+                  <i class="fas fa-newspaper"></i>
+                  Articles
+                </button>
+                <button
+                  @click="addItemsFilter = 'document'"
+                  :class="['type-filter-btn', addItemsFilter === 'document' ? 'active' : '']"
+                >
+                  <i class="fas fa-file-alt"></i>
+                  Documents
+                </button>
+                <button
+                  @click="addItemsFilter = 'media'"
+                  :class="['type-filter-btn', addItemsFilter === 'media' ? 'active' : '']"
+                >
+                  <i class="fas fa-photo-video"></i>
+                  Media
+                </button>
+              </div>
+            </div>
+
+            <!-- Items List -->
+            <div class="modal-body add-items-body">
+              <div v-if="filteredAvailableItems.length > 0" class="available-items-list">
+                <div
+                  v-for="item in filteredAvailableItems"
+                  :key="item.id"
+                  @click="toggleItemSelection(item.id)"
+                  :class="['available-item', { selected: isItemSelected(item.id) }]"
+                >
+                  <div class="item-checkbox">
+                    <i v-if="isItemSelected(item.id)" class="fas fa-check"></i>
+                  </div>
+                  <div class="item-thumb">
+                    <img v-if="item.thumbnail" :src="item.thumbnail" :alt="item.title" />
+                    <div v-else class="thumb-placeholder">
+                      <i :class="getContentTypeIcon(item.contentType)"></i>
+                    </div>
+                  </div>
+                  <div class="item-info">
+                    <div class="item-type-badge" :class="item.contentType">
+                      <i :class="getContentTypeIcon(item.contentType)"></i>
+                      {{ getContentTypeLabel(item.contentType) }}
+                    </div>
+                    <h4 class="item-title">{{ item.title }}</h4>
+                    <p v-if="item.description" class="item-desc">{{ item.description }}</p>
+                    <div class="item-meta">
+                      <span v-if="item.metadata?.readTime">
+                        <i class="fas fa-book-open"></i> {{ item.metadata.readTime }}
+                      </span>
+                      <span v-if="item.metadata?.duration">
+                        <i class="fas fa-clock"></i> {{ item.metadata.duration }}
+                      </span>
+                      <span v-if="item.metadata?.size">
+                        <i class="fas fa-file"></i> {{ item.metadata.size }}
+                      </span>
+                      <span v-if="item.metadata?.photoCount">
+                        <i class="fas fa-images"></i> {{ item.metadata.photoCount }} photos
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Empty State -->
+              <div v-else class="empty-items-state">
+                <i class="fas fa-search"></i>
+                <p>No items found matching your criteria</p>
+              </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="modal-footer">
+              <button @click="closeAddItemsModal" class="btn-cancel">
+                Cancel
+              </button>
+              <button
+                @click="addSelectedItems"
+                class="btn-save"
+                :disabled="selectedItemsCount === 0"
+              >
+                <i class="fas fa-plus mr-2"></i>
+                Add {{ selectedItemsCount }} Item{{ selectedItemsCount !== 1 ? 's' : '' }}
               </button>
             </div>
           </div>
@@ -2658,5 +2906,267 @@ onUnmounted(() => {
   .grid.grid-cols-2 {
     grid-template-columns: 1fr;
   }
+}
+
+/* ============================================================================
+   ADD ITEMS MODAL
+   ============================================================================ */
+.add-items-modal {
+  max-width: 600px;
+  max-height: 85vh;
+}
+
+.add-items-filters {
+  padding: 1rem 1.5rem;
+  background: #f8fafc;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.search-box {
+  position: relative;
+  margin-bottom: 0.75rem;
+}
+
+.search-box > i {
+  position: absolute;
+  left: 0.875rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #94a3b8;
+  font-size: 0.875rem;
+}
+
+.search-input {
+  width: 100%;
+  padding: 0.625rem 2.5rem 0.625rem 2.5rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  background: white;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #14b8a6;
+  box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.1);
+}
+
+.clear-search {
+  position: absolute;
+  right: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f1f5f9;
+  border: none;
+  border-radius: 50%;
+  color: #64748b;
+  cursor: pointer;
+  font-size: 0.75rem;
+}
+
+.clear-search:hover {
+  background: #e5e7eb;
+}
+
+.type-filters {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.type-filter-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem 0.875rem;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 20px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.type-filter-btn:hover {
+  border-color: #cbd5e1;
+}
+
+.type-filter-btn.active {
+  background: #0f766e;
+  border-color: #0f766e;
+  color: white;
+}
+
+.add-items-body {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.available-items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.available-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.875rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.available-item:hover {
+  border-color: #cbd5e1;
+  background: #f8fafc;
+}
+
+.available-item.selected {
+  border-color: #14b8a6;
+  background: #f0fdfa;
+}
+
+.item-checkbox {
+  width: 22px;
+  height: 22px;
+  border: 2px solid #e5e7eb;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 0.25rem;
+  transition: all 0.15s;
+}
+
+.available-item.selected .item-checkbox {
+  background: #14b8a6;
+  border-color: #14b8a6;
+  color: white;
+}
+
+.item-checkbox i {
+  font-size: 0.625rem;
+}
+
+.item-thumb {
+  width: 64px;
+  height: 48px;
+  border-radius: 8px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.item-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.item-thumb .thumb-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
+  color: #94a3b8;
+  font-size: 1rem;
+}
+
+.item-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.item-type-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.125rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.625rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-bottom: 0.25rem;
+}
+
+.item-type-badge.article {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.item-type-badge.document {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.item-type-badge.media {
+  background: #f3e8ff;
+  color: #7c3aed;
+}
+
+.item-info .item-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0 0 0.25rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.item-desc {
+  font-size: 0.75rem;
+  color: #64748b;
+  margin: 0 0 0.375rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.item-info .item-meta {
+  display: flex;
+  gap: 0.75rem;
+  font-size: 0.6875rem;
+  color: #94a3b8;
+}
+
+.item-info .item-meta span {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.empty-items-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 3rem;
+  color: #94a3b8;
+  text-align: center;
+}
+
+.empty-items-state i {
+  font-size: 2rem;
+}
+
+.empty-items-state p {
+  margin: 0;
+  font-size: 0.875rem;
 }
 </style>
