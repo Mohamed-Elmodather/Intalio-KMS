@@ -978,221 +978,243 @@ onUnmounted(() => {
       </div>
     </div>
 
-    <!-- Main Content -->
-    <div class="main-content">
-      <!-- Items Section -->
-      <div class="items-section">
-        <div class="section-header-enhanced">
-          <div class="section-title-row">
-            <h2 class="section-title">
-              <i class="fas fa-layer-group"></i>
-              {{ textConstants.collectionItems }}
-            </h2>
-            <span class="item-count-badge">{{ filteredAndSortedItems.length }} {{ textConstants.items }}</span>
-          </div>
+    <!-- Main Content Area -->
+    <div class="px-6 py-8">
+      <div class="flex gap-8">
+        <!-- Main Content -->
+        <main class="flex-1 min-w-0">
+          <!-- Items Card -->
+          <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+            <!-- Card Header with Filters -->
+            <div class="px-6 py-4 border-b border-gray-100">
+              <div class="flex items-center justify-between mb-4">
+                <h2 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                  <i class="fas fa-layer-group text-teal-500"></i>
+                  {{ textConstants.collectionItems }}
+                </h2>
+                <span class="px-3 py-1 bg-teal-50 text-teal-700 rounded-full text-sm font-medium">
+                  {{ filteredAndSortedItems.length }} {{ textConstants.items }}
+                </span>
+              </div>
 
-          <!-- Controls Row -->
-          <div class="controls-row">
-            <!-- Filter Tabs -->
-            <div class="filter-tabs">
-              <button
-                @click="filterType = 'all'"
-                :class="['filter-tab', filterType === 'all' ? 'active' : '']"
-              >
-                {{ textConstants.allTypes }}
-                <span class="count">{{ itemCounts.all }}</span>
-              </button>
-              <button
-                @click="filterType = 'article'"
-                :class="['filter-tab', filterType === 'article' ? 'active' : '']"
-              >
-                <i class="fas fa-newspaper"></i>
-                {{ textConstants.articles }}
-                <span class="count">{{ itemCounts.article }}</span>
-              </button>
-              <button
-                @click="filterType = 'document'"
-                :class="['filter-tab', filterType === 'document' ? 'active' : '']"
-              >
-                <i class="fas fa-file-alt"></i>
-                {{ textConstants.documents }}
-                <span class="count">{{ itemCounts.document }}</span>
-              </button>
-              <button
-                @click="filterType = 'media'"
-                :class="['filter-tab', filterType === 'media' ? 'active' : '']"
-              >
-                <i class="fas fa-photo-video"></i>
-                {{ textConstants.media }}
-                <span class="count">{{ itemCounts.media }}</span>
-              </button>
+              <!-- Controls Row -->
+              <div class="flex items-center justify-between flex-wrap gap-4">
+                <!-- Filter Tabs -->
+                <div class="flex gap-2 flex-wrap">
+                  <button
+                    @click="filterType = 'all'"
+                    :class="['filter-chip', filterType === 'all' ? 'active' : '']"
+                  >
+                    {{ textConstants.allTypes }}
+                    <span class="chip-count">{{ itemCounts.all }}</span>
+                  </button>
+                  <button
+                    @click="filterType = 'article'"
+                    :class="['filter-chip', filterType === 'article' ? 'active' : '']"
+                  >
+                    <i class="fas fa-newspaper"></i>
+                    {{ textConstants.articles }}
+                    <span class="chip-count">{{ itemCounts.article }}</span>
+                  </button>
+                  <button
+                    @click="filterType = 'document'"
+                    :class="['filter-chip', filterType === 'document' ? 'active' : '']"
+                  >
+                    <i class="fas fa-file-alt"></i>
+                    {{ textConstants.documents }}
+                    <span class="chip-count">{{ itemCounts.document }}</span>
+                  </button>
+                  <button
+                    @click="filterType = 'media'"
+                    :class="['filter-chip', filterType === 'media' ? 'active' : '']"
+                  >
+                    <i class="fas fa-photo-video"></i>
+                    {{ textConstants.media }}
+                    <span class="chip-count">{{ itemCounts.media }}</span>
+                  </button>
+                </div>
+
+                <!-- Sort & View Controls -->
+                <div class="flex items-center gap-3">
+                  <select v-model="sortBy" class="sort-select">
+                    <option value="recent">{{ textConstants.sortRecent }}</option>
+                    <option value="oldest">{{ textConstants.sortOldest }}</option>
+                    <option value="az">{{ textConstants.sortAZ }}</option>
+                    <option value="za">{{ textConstants.sortZA }}</option>
+                    <option value="type">{{ textConstants.sortType }}</option>
+                  </select>
+
+                  <div class="flex bg-gray-100 rounded-lg p-1">
+                    <button
+                      @click="viewMode = 'list'"
+                      :class="['view-btn', viewMode === 'list' ? 'active' : '']"
+                      :title="textConstants.listView"
+                    >
+                      <i class="fas fa-list"></i>
+                    </button>
+                    <button
+                      @click="viewMode = 'grid'"
+                      :class="['view-btn', viewMode === 'grid' ? 'active' : '']"
+                      :title="textConstants.gridView"
+                    >
+                      <i class="fas fa-th"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
 
-            <!-- Sort & View Controls -->
-            <div class="view-controls">
-              <select v-model="sortBy" class="sort-select">
-                <option value="recent">{{ textConstants.sortRecent }}</option>
-                <option value="oldest">{{ textConstants.sortOldest }}</option>
-                <option value="az">{{ textConstants.sortAZ }}</option>
-                <option value="za">{{ textConstants.sortZA }}</option>
-                <option value="type">{{ textConstants.sortType }}</option>
-              </select>
-
-              <div class="view-toggle">
-                <button
-                  @click="viewMode = 'list'"
-                  :class="['view-btn', viewMode === 'list' ? 'active' : '']"
-                  :title="textConstants.listView"
+            <!-- Items Content -->
+            <div class="p-6">
+              <!-- List View -->
+              <div v-if="filteredAndSortedItems.length > 0 && viewMode === 'list'" class="space-y-3">
+                <div
+                  v-for="item in filteredAndSortedItems"
+                  :key="item.id"
+                  class="item-card"
+                  :class="{ 'dragging': draggedItem === item.id }"
+                  :draggable="canEdit"
+                  @dragstart="handleDragStart($event, item.id)"
+                  @dragover="handleDragOver"
+                  @drop="handleDrop($event, item.id)"
+                  @dragend="handleDragEnd"
+                  @click="openItem(item)"
                 >
-                  <i class="fas fa-list"></i>
-                </button>
-                <button
-                  @click="viewMode = 'grid'"
-                  :class="['view-btn', viewMode === 'grid' ? 'active' : '']"
-                  :title="textConstants.gridView"
+                  <!-- Drag Handle -->
+                  <div v-if="canEdit" class="drag-handle" :title="textConstants.dragToReorder">
+                    <i class="fas fa-grip-vertical"></i>
+                  </div>
+
+                  <!-- Thumbnail -->
+                  <div class="item-thumbnail">
+                    <img v-if="item.thumbnail" :src="item.thumbnail" :alt="item.title" />
+                    <div v-else class="thumbnail-placeholder">
+                      <i :class="getContentTypeIcon(item.contentType)"></i>
+                    </div>
+                    <div :class="['type-badge', getContentTypeColor(item.contentType)]">
+                      <i :class="getContentTypeIcon(item.contentType)"></i>
+                      <span>{{ getContentTypeLabel(item.contentType) }}</span>
+                    </div>
+                  </div>
+
+                  <!-- Content -->
+                  <div class="item-content">
+                    <h3 class="item-title">{{ item.title }}</h3>
+                    <p class="item-description">{{ item.description }}</p>
+                    <div class="item-meta">
+                      <span v-if="item.metadata?.duration" class="meta-tag">
+                        <i class="fas fa-clock"></i>
+                        {{ item.metadata.duration }}
+                      </span>
+                      <span v-if="item.metadata?.views" class="meta-tag">
+                        <i class="fas fa-eye"></i>
+                        {{ item.metadata.views }}
+                      </span>
+                      <span v-if="item.metadata?.readTime" class="meta-tag">
+                        <i class="fas fa-book-open"></i>
+                        {{ item.metadata.readTime }}
+                      </span>
+                      <span v-if="item.metadata?.size" class="meta-tag">
+                        <i class="fas fa-file"></i>
+                        {{ item.metadata.size }}
+                      </span>
+                      <span v-if="item.metadata?.photoCount" class="meta-tag">
+                        <i class="fas fa-images"></i>
+                        {{ item.metadata.photoCount }} photos
+                      </span>
+                    </div>
+                  </div>
+
+                  <!-- Remove Button -->
+                  <button
+                    v-if="canEdit"
+                    @click.stop="removeItem(item.id)"
+                    class="remove-btn"
+                    :title="textConstants.removeFromCollection"
+                  >
+                    <i class="fas fa-times"></i>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Grid View -->
+              <div v-else-if="filteredAndSortedItems.length > 0 && viewMode === 'grid'" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                <div
+                  v-for="item in filteredAndSortedItems"
+                  :key="item.id"
+                  class="grid-item-card"
+                  @click="openItem(item)"
                 >
-                  <i class="fas fa-th"></i>
-                </button>
+                  <!-- Thumbnail -->
+                  <div class="grid-item-thumbnail">
+                    <img v-if="item.thumbnail" :src="item.thumbnail" :alt="item.title" />
+                    <div v-else class="grid-thumbnail-placeholder">
+                      <i :class="getContentTypeIcon(item.contentType)"></i>
+                    </div>
+                    <div :class="['grid-type-badge', getContentTypeColor(item.contentType)]">
+                      <i :class="getContentTypeIcon(item.contentType)"></i>
+                    </div>
+                    <!-- Remove Button -->
+                    <button
+                      v-if="canEdit"
+                      @click.stop="removeItem(item.id)"
+                      class="grid-remove-btn"
+                      :title="textConstants.removeFromCollection"
+                    >
+                      <i class="fas fa-times"></i>
+                    </button>
+                  </div>
+
+                  <!-- Content -->
+                  <div class="grid-item-content">
+                    <h3 class="grid-item-title">{{ item.title }}</h3>
+                    <div class="grid-item-meta">
+                      <span v-if="item.metadata?.duration">
+                        <i class="fas fa-clock"></i>
+                        {{ item.metadata.duration }}
+                      </span>
+                      <span v-else-if="item.metadata?.readTime">
+                        <i class="fas fa-book-open"></i>
+                        {{ item.metadata.readTime }}
+                      </span>
+                      <span v-else-if="item.metadata?.size">
+                        <i class="fas fa-file"></i>
+                        {{ item.metadata.size }}
+                      </span>
+                      <span v-else-if="item.metadata?.photoCount">
+                        <i class="fas fa-images"></i>
+                        {{ item.metadata.photoCount }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Empty State -->
+              <div v-else class="text-center py-16">
+                <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <i class="fas fa-layer-group text-3xl text-gray-400"></i>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-700 mb-2">{{ textConstants.noItems }}</h3>
+                <p class="text-gray-500">{{ textConstants.noItemsDesc }}</p>
               </div>
             </div>
           </div>
-        </div>
 
-        <!-- List View -->
-        <div v-if="filteredAndSortedItems.length > 0 && viewMode === 'list'" class="items-list">
-          <div
-            v-for="item in filteredAndSortedItems"
-            :key="item.id"
-            class="item-card"
-            :class="{ 'dragging': draggedItem === item.id }"
-            :draggable="canEdit"
-            @dragstart="handleDragStart($event, item.id)"
-            @dragover="handleDragOver"
-            @drop="handleDrop($event, item.id)"
-            @dragend="handleDragEnd"
-            @click="openItem(item)"
-          >
-            <!-- Drag Handle -->
-            <div v-if="canEdit" class="drag-handle" :title="textConstants.dragToReorder">
-              <i class="fas fa-grip-vertical"></i>
-            </div>
-
-            <!-- Thumbnail -->
-            <div class="item-thumbnail">
-              <img v-if="item.thumbnail" :src="item.thumbnail" :alt="item.title" />
-              <div v-else class="thumbnail-placeholder">
-                <i :class="getContentTypeIcon(item.contentType)"></i>
-              </div>
-              <div :class="['type-badge', getContentTypeColor(item.contentType)]">
-                <i :class="getContentTypeIcon(item.contentType)"></i>
-                <span>{{ getContentTypeLabel(item.contentType) }}</span>
-              </div>
-            </div>
-
-            <!-- Content -->
-            <div class="item-content">
-              <h3 class="item-title">{{ item.title }}</h3>
-              <p class="item-description">{{ item.description }}</p>
-              <div class="item-meta">
-                <span v-if="item.metadata?.duration" class="meta-tag">
-                  <i class="fas fa-clock"></i>
-                  {{ item.metadata.duration }}
-                </span>
-                <span v-if="item.metadata?.views" class="meta-tag">
-                  <i class="fas fa-eye"></i>
-                  {{ item.metadata.views }}
-                </span>
-                <span v-if="item.metadata?.readTime" class="meta-tag">
-                  <i class="fas fa-book-open"></i>
-                  {{ item.metadata.readTime }}
-                </span>
-                <span v-if="item.metadata?.size" class="meta-tag">
-                  <i class="fas fa-file"></i>
-                  {{ item.metadata.size }}
-                </span>
-                <span v-if="item.metadata?.photoCount" class="meta-tag">
-                  <i class="fas fa-images"></i>
-                  {{ item.metadata.photoCount }} photos
-                </span>
-              </div>
-            </div>
-
-            <!-- Remove Button -->
-            <button
-              v-if="canEdit"
-              @click.stop="removeItem(item.id)"
-              class="remove-btn"
-              :title="textConstants.removeFromCollection"
-            >
-              <i class="fas fa-times"></i>
-            </button>
-          </div>
-        </div>
-
-        <!-- Grid View -->
-        <div v-else-if="filteredAndSortedItems.length > 0 && viewMode === 'grid'" class="items-grid-view">
-          <div
-            v-for="item in filteredAndSortedItems"
-            :key="item.id"
-            class="grid-item-card"
-            @click="openItem(item)"
-          >
-            <!-- Thumbnail -->
-            <div class="grid-item-thumbnail">
-              <img v-if="item.thumbnail" :src="item.thumbnail" :alt="item.title" />
-              <div v-else class="grid-thumbnail-placeholder">
-                <i :class="getContentTypeIcon(item.contentType)"></i>
-              </div>
-              <div :class="['grid-type-badge', getContentTypeColor(item.contentType)]">
-                <i :class="getContentTypeIcon(item.contentType)"></i>
-              </div>
-              <!-- Remove Button -->
-              <button
-                v-if="canEdit"
-                @click.stop="removeItem(item.id)"
-                class="grid-remove-btn"
-                :title="textConstants.removeFromCollection"
-              >
-                <i class="fas fa-times"></i>
-              </button>
-            </div>
-
-            <!-- Content -->
-            <div class="grid-item-content">
-              <h3 class="grid-item-title">{{ item.title }}</h3>
-              <div class="grid-item-meta">
-                <span v-if="item.metadata?.duration">
-                  <i class="fas fa-clock"></i>
-                  {{ item.metadata.duration }}
-                </span>
-                <span v-else-if="item.metadata?.readTime">
-                  <i class="fas fa-book-open"></i>
-                  {{ item.metadata.readTime }}
-                </span>
-                <span v-else-if="item.metadata?.size">
-                  <i class="fas fa-file"></i>
-                  {{ item.metadata.size }}
-                </span>
-                <span v-else-if="item.metadata?.photoCount">
-                  <i class="fas fa-images"></i>
-                  {{ item.metadata.photoCount }}
-                </span>
-              </div>
+          <!-- Collection Info Card -->
+          <div class="mt-8 bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+            <h3 class="font-semibold text-gray-900 mb-4">About this Collection</h3>
+            <p class="text-gray-600 leading-relaxed">{{ collection.description }}</p>
+            <div class="mt-4 pt-4 border-t border-gray-100 flex items-center gap-6 text-sm text-gray-500">
+              <span><i class="fas fa-calendar mr-2"></i>Created {{ formatDate(collection.createdAt) }}</span>
+              <span><i class="fas fa-clock mr-2"></i>Updated {{ formatDate(collection.updatedAt) }}</span>
             </div>
           </div>
-        </div>
+        </main>
 
-        <div v-else class="empty-items">
-          <div class="empty-icon">
-            <i class="fas fa-layer-group"></i>
-          </div>
-          <h3>{{ textConstants.noItems }}</h3>
-          <p>{{ textConstants.noItemsDesc }}</p>
-        </div>
-      </div>
-
-      <!-- Sidebar -->
-      <aside class="detail-sidebar">
+        <!-- Sidebar -->
+        <aside class="w-80 flex-shrink-0">
+          <div class="sticky top-24 space-y-4">
         <!-- Collaborators Card -->
         <div class="sidebar-card">
           <div class="card-header">
@@ -1334,7 +1356,9 @@ onUnmounted(() => {
             </div>
           </div>
         </div>
-      </aside>
+          </div>
+        </aside>
+      </div>
     </div>
 
     <!-- Invite Collaborator Modal -->
@@ -1672,127 +1696,46 @@ onUnmounted(() => {
   color: white;
 }
 
-/* Main Content */
-.main-content {
-  display: flex;
-  flex-wrap: nowrap;
-  gap: 1.5rem;
-  padding: 1.5rem;
-  max-width: 100%;
-  overflow: visible;
-}
-
-/* Items Section */
-.items-section {
-  flex: 1 1 0;
-  min-width: 0;
-  overflow: visible;
-  order: 1;
-}
-
 /* ============================================================================
-   SECTION HEADER WITH CONTROLS
+   FILTER CHIPS & CONTROLS
    ============================================================================ */
-.section-header-enhanced {
-  background: white;
-  border-radius: 16px;
-  padding: 1.25rem;
-  margin-bottom: 1rem;
-  border: 1px solid #e5e7eb;
-  box-sizing: border-box;
-  overflow: visible;
-}
-
-.section-title-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 1rem;
-}
-
-.section-title {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: #1e293b;
-  margin: 0;
-}
-
-.section-title i {
-  color: #14b8a6;
-}
-
-.item-count-badge {
-  background: #f0fdfa;
-  color: #0f766e;
-  padding: 0.25rem 0.75rem;
-  border-radius: 20px;
-  font-size: 0.8125rem;
-  font-weight: 600;
-}
-
-/* Controls Row */
-.controls-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 1rem;
-}
-
-/* Filter Tabs */
-.filter-tabs {
-  display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-  overflow: visible;
-}
-
-.filter-tab {
+.filter-chip {
   display: flex;
   align-items: center;
   gap: 0.375rem;
   padding: 0.5rem 0.875rem;
   background: #f8fafc;
   border: 1px solid #e5e7eb;
-  border-radius: 8px;
+  border-radius: 20px;
   font-size: 0.8125rem;
   font-weight: 500;
   color: #64748b;
   cursor: pointer;
-  transition: all 0.15s;
+  transition: all 0.2s;
 }
 
-.filter-tab:hover {
+.filter-chip:hover {
   background: #f1f5f9;
   border-color: #cbd5e1;
 }
 
-.filter-tab.active {
+.filter-chip.active {
   background: #0f766e;
   border-color: #0f766e;
   color: white;
 }
 
-.filter-tab .count {
+.filter-chip .chip-count {
   background: rgba(255, 255, 255, 0.2);
-  padding: 0.125rem 0.375rem;
-  border-radius: 4px;
+  padding: 0.125rem 0.5rem;
+  border-radius: 10px;
   font-size: 0.6875rem;
+  font-weight: 600;
 }
 
-.filter-tab:not(.active) .count {
+.filter-chip:not(.active) .chip-count {
   background: #e5e7eb;
   color: #64748b;
-}
-
-/* View Controls */
-.view-controls {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
 }
 
 .sort-select {
@@ -1811,13 +1754,6 @@ onUnmounted(() => {
   outline: none;
   border-color: #14b8a6;
   box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.1);
-}
-
-.view-toggle {
-  display: flex;
-  background: #f1f5f9;
-  border-radius: 8px;
-  padding: 0.25rem;
 }
 
 .view-btn {
@@ -2882,33 +2818,31 @@ onUnmounted(() => {
    RESPONSIVE
    ============================================================================ */
 @media (max-width: 1200px) {
-  .detail-sidebar {
-    width: 300px;
+  aside {
+    width: 280px;
   }
 }
 
 @media (max-width: 1024px) {
-  .main-content {
-    flex-direction: column;
+  .collection-detail-page > .px-6 {
     padding: 1rem;
   }
 
-  .detail-sidebar {
+  .collection-detail-page > .px-6 > .flex {
+    flex-direction: column;
+  }
+
+  aside {
     width: 100%;
   }
 
-  .controls-row {
-    flex-direction: column;
-    align-items: stretch;
+  aside .sticky {
+    position: static;
   }
 
-  .filter-tabs {
-    overflow-x: auto;
-    padding-bottom: 0.5rem;
-  }
-
-  .view-controls {
-    justify-content: space-between;
+  .filter-chip {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.75rem;
   }
 }
 
@@ -2925,10 +2859,6 @@ onUnmounted(() => {
     display: none;
   }
 
-  .section-header-enhanced {
-    padding: 1rem;
-  }
-
   .item-card {
     flex-direction: column;
     gap: 0.75rem;
@@ -2943,32 +2873,32 @@ onUnmounted(() => {
     display: none;
   }
 
-  .items-grid-view {
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  .grid.grid-cols-2 {
+    grid-template-columns: repeat(2, 1fr);
     gap: 0.75rem;
   }
 
-  .filter-tab {
-    padding: 0.375rem 0.625rem;
-    font-size: 0.75rem;
-  }
-
-  .filter-tab i {
+  .filter-chip i {
     display: none;
   }
 }
 
 @media (max-width: 480px) {
-  header.relative .h-\\[400px\\] {
-    height: 300px;
+  header.relative > div:first-child {
+    height: 250px !important;
   }
 
-  header.relative .h-\\[300px\\] {
-    height: 250px;
+  .collection-detail-page .px-6 {
+    padding-left: 1rem;
+    padding-right: 1rem;
   }
 
-  .stat-item {
-    font-size: 0.75rem;
+  .filter-chip .chip-count {
+    display: none;
+  }
+
+  .grid.grid-cols-2 {
+    grid-template-columns: 1fr;
   }
 }
 </style>
