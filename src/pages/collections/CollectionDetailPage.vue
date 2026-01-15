@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { BookmarkButton, SocialShareButtons } from '@/components/common'
+import { BookmarkButton, SocialShareButtons, CommentsSection } from '@/components/common'
 
 const route = useRoute()
 const router = useRouter()
@@ -178,7 +178,6 @@ const showCollaboratorModal = ref(false)
 const showDeleteConfirm = ref(false)
 const showShareModal = ref(false)
 const showExportMenu = ref(false)
-const newComment = ref('')
 const inviteEmail = ref('')
 const inviteRole = ref<'editor' | 'viewer'>('viewer')
 const draggedItem = ref<string | null>(null)
@@ -618,42 +617,6 @@ function updateCollaboratorRole(collaboratorId: string, newRole: 'editor' | 'vie
   if (collaborator && collaborator.role !== 'owner') {
     collaborator.role = newRole
   }
-}
-
-// Comments
-function addComment() {
-  if (!newComment.value.trim()) return
-
-  const comment: Comment = {
-    id: `comment-${Date.now()}`,
-    author: { ...currentUser.value },
-    content: newComment.value.trim(),
-    createdAt: new Date().toISOString(),
-    mentions: extractMentions(newComment.value)
-  }
-
-  collection.value.comments.push(comment)
-  newComment.value = ''
-}
-
-function extractMentions(text: string): string[] {
-  const mentions: string[] = []
-  const regex = /@(\w+)/g
-  let match: RegExpExecArray | null
-  while ((match = regex.exec(text)) !== null) {
-    const matchedName = match[1]
-    const collaborator = collection.value.collaborators.find(
-      c => c.name.toLowerCase().includes(matchedName.toLowerCase())
-    )
-    if (collaborator) {
-      mentions.push(collaborator.id)
-    }
-  }
-  return mentions
-}
-
-function formatCommentContent(content: string): string {
-  return content.replace(/@(\w+\s?\w*)/g, '<span class="mention">@$1</span>')
 }
 
 function goBack() {
@@ -1303,61 +1266,18 @@ onUnmounted(() => {
           </div>
         </div>
 
-        <!-- Comments Card -->
-        <div class="sidebar-card comments-card">
-          <div class="card-header">
-            <div class="card-title">
-              <span class="card-icon comments-icon">
-                <i class="fas fa-message"></i>
-              </span>
-              <span>{{ textConstants.comments }}</span>
-            </div>
-            <span class="comments-badge">{{ collection.comments.length }}</span>
-          </div>
-          <div class="card-body comments-body">
-            <div class="comments-feed">
-              <div
-                v-for="comment in collection.comments"
-                :key="comment.id"
-                class="comment-bubble"
-              >
-                <div class="bubble-header">
-                  <div class="bubble-avatar" :style="{ backgroundColor: comment.author.color }">
-                    {{ comment.author.initials }}
-                  </div>
-                  <div class="bubble-meta">
-                    <span class="bubble-author">{{ comment.author.name }}</span>
-                    <span class="bubble-time">{{ formatDate(comment.createdAt) }}</span>
-                  </div>
-                </div>
-                <div class="bubble-content" v-html="formatCommentContent(comment.content)"></div>
-              </div>
-            </div>
-            <div class="comment-composer">
-              <div class="composer-avatar" :style="{ backgroundColor: currentUser.color }">
-                {{ currentUser.initials }}
-              </div>
-              <div class="composer-input-wrap">
-                <textarea
-                  v-model="newComment"
-                  class="composer-input"
-                  :placeholder="textConstants.addComment"
-                  rows="1"
-                  @keydown.enter.ctrl="addComment"
-                ></textarea>
-                <button
-                  @click="addComment"
-                  class="composer-send"
-                  :disabled="!newComment.trim()"
-                >
-                  <i class="fas fa-paper-plane"></i>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
           </div>
         </aside>
+      </div>
+    </div>
+
+    <!-- Comments Section (Full Width) -->
+    <div class="px-6 pb-8">
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+        <CommentsSection
+          content-type="collection"
+          :content-id="collection.id"
+        />
       </div>
     </div>
 
@@ -2414,169 +2334,6 @@ onUnmounted(() => {
   color: #64748b;
   margin: 0;
   line-height: 1.4;
-}
-
-/* Comments Card */
-.comments-badge {
-  background: #14b8a6;
-  color: white;
-  font-size: 0.75rem;
-  font-weight: 600;
-  padding: 0.25rem 0.625rem;
-  border-radius: 12px;
-  min-width: 24px;
-  text-align: center;
-}
-
-.comments-body {
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  max-height: 400px;
-}
-
-.comments-feed {
-  flex: 1;
-  overflow-y: auto;
-  padding: 1rem 1.25rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.comment-bubble {
-  background: #f8fafc;
-  border-radius: 12px;
-  padding: 0.875rem;
-}
-
-.bubble-header {
-  display: flex;
-  align-items: center;
-  gap: 0.625rem;
-  margin-bottom: 0.5rem;
-}
-
-.bubble-avatar {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.625rem;
-  font-weight: 600;
-  color: white;
-}
-
-.bubble-meta {
-  display: flex;
-  flex-direction: column;
-}
-
-.bubble-author {
-  font-size: 0.8125rem;
-  font-weight: 600;
-  color: #1e293b;
-}
-
-.bubble-time {
-  font-size: 0.6875rem;
-  color: #94a3b8;
-}
-
-.bubble-content {
-  font-size: 0.8125rem;
-  color: #475569;
-  line-height: 1.5;
-}
-
-.bubble-content :deep(.mention) {
-  color: #0d9488;
-  font-weight: 500;
-}
-
-/* Comment Composer */
-.comment-composer {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.75rem;
-  padding: 1rem 1.25rem;
-  border-top: 1px solid #f1f5f9;
-  background: #fafafa;
-}
-
-.composer-avatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.6875rem;
-  font-weight: 600;
-  color: white;
-  flex-shrink: 0;
-}
-
-.composer-input-wrap {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  background: white;
-  border: 1px solid #e5e7eb;
-  border-radius: 24px;
-  padding: 0.375rem 0.5rem 0.375rem 1rem;
-  transition: all 0.2s;
-}
-
-.composer-input-wrap:focus-within {
-  border-color: #14b8a6;
-  box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.1);
-}
-
-.composer-input {
-  flex: 1;
-  border: none;
-  background: transparent;
-  font-size: 0.8125rem;
-  resize: none;
-  padding: 0.375rem 0;
-  min-height: 24px;
-}
-
-.composer-input:focus {
-  outline: none;
-}
-
-.composer-input::placeholder {
-  color: #94a3b8;
-}
-
-.composer-send {
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #14b8a6;
-  border: none;
-  border-radius: 50%;
-  color: white;
-  cursor: pointer;
-  transition: all 0.2s;
-  flex-shrink: 0;
-}
-
-.composer-send:hover:not(:disabled) {
-  background: #0d9488;
-  transform: scale(1.05);
-}
-
-.composer-send:disabled {
-  background: #e5e7eb;
-  cursor: not-allowed;
 }
 
 /* Modal Styles */
