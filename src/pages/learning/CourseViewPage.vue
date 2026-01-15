@@ -753,10 +753,13 @@ const estimatedTimeRemaining = computed(() => {
     <!-- Main Content -->
     <div class="course-content-wrapper">
       <!-- Syllabus Sidebar -->
-      <div class="syllabus-sidebar">
+      <div class="syllabus-sidebar bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
         <div class="syllabus-header">
-          <h3><i class="fas fa-list"></i> Course Content</h3>
-          <span class="lesson-count">{{ course.syllabus.length }} lessons</span>
+          <h3 class="font-semibold text-gray-900 flex items-center gap-2">
+            <i class="fas fa-list text-teal-500"></i>
+            Course Content
+          </h3>
+          <span class="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">{{ course.syllabus.length }} lessons</span>
         </div>
 
         <div class="syllabus-list">
@@ -786,7 +789,7 @@ const estimatedTimeRemaining = computed(() => {
 
       <!-- Main Lesson Content -->
       <div class="lesson-content">
-        <div v-if="currentLesson" class="lesson-viewer">
+        <div v-if="currentLesson" class="lesson-viewer bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
           <!-- Lesson Header -->
           <div class="lesson-header">
             <div class="lesson-title-section">
@@ -850,17 +853,17 @@ const estimatedTimeRemaining = computed(() => {
       </div>
 
       <!-- AI Sidebar -->
-      <div :class="['ai-sidebar', { 'collapsed': !showAISidebar }]">
+      <div :class="['ai-sidebar bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden', { 'collapsed': !showAISidebar }]">
         <button @click="showAISidebar = !showAISidebar" class="ai-sidebar-toggle">
           <i :class="showAISidebar ? 'fas fa-chevron-right' : 'fas fa-chevron-left'"></i>
         </button>
 
         <div v-if="showAISidebar" class="ai-sidebar-content">
-          <div class="ai-sidebar-header">
-            <div class="ai-badge">
+          <div class="ai-sidebar-header bg-gradient-to-r from-teal-500 to-teal-600 text-white px-4 py-3">
+            <div class="flex items-center gap-2">
               <i class="fas fa-wand-magic-sparkles"></i>
+              <h3 class="font-semibold">AI Assistant</h3>
             </div>
-            <h3>AI Assistant</h3>
           </div>
 
           <!-- AI Tabs -->
@@ -1284,22 +1287,21 @@ const estimatedTimeRemaining = computed(() => {
 /* Content Wrapper */
 .course-content-wrapper {
   display: grid;
-  grid-template-columns: 280px 1fr 320px;
-  gap: 0;
+  grid-template-columns: 300px 1fr 340px;
+  gap: 1.5rem;
   width: 100%;
   min-height: calc(100vh - 200px);
+  padding: 1.5rem;
 }
 
 /* Syllabus Sidebar */
 .syllabus-sidebar {
-  background: white;
-  border-right: 1px solid #e5e7eb;
   overflow-y: auto;
   max-height: calc(100vh - 200px);
 }
 
 .syllabus-header {
-  padding: 1rem;
+  padding: 1rem 1.25rem;
   border-bottom: 1px solid #e5e7eb;
   display: flex;
   align-items: center;
@@ -1308,20 +1310,6 @@ const estimatedTimeRemaining = computed(() => {
   top: 0;
   background: white;
   z-index: 10;
-}
-
-.syllabus-header h3 {
-  font-size: 0.9rem;
-  font-weight: 700;
-  color: #1f2937;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.lesson-count {
-  font-size: 0.75rem;
-  color: #6b7280;
 }
 
 .syllabus-list {
@@ -1420,10 +1408,7 @@ const estimatedTimeRemaining = computed(() => {
 }
 
 .lesson-viewer {
-  background: white;
-  border-radius: 16px;
-  border: 1px solid #e5e7eb;
-  overflow: hidden;
+  /* Card styling applied via Tailwind classes */
 }
 
 .lesson-header {
@@ -1614,11 +1599,8 @@ const estimatedTimeRemaining = computed(() => {
 
 /* AI Sidebar */
 .ai-sidebar {
-  background: white;
-  border-left: 1px solid #e5e7eb;
   position: relative;
   transition: all 0.3s ease;
-  overflow: hidden;
 }
 
 .ai-sidebar.collapsed {
@@ -1628,47 +1610,34 @@ const estimatedTimeRemaining = computed(() => {
 
 .ai-sidebar-toggle {
   position: absolute;
-  left: 0;
+  left: -12px;
   top: 50%;
   transform: translateY(-50%);
   width: 24px;
   height: 48px;
-  background: #f3f4f6;
+  background: white;
   border: 1px solid #e5e7eb;
-  border-left: none;
-  border-radius: 0 8px 8px 0;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   color: #6b7280;
   z-index: 10;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.ai-sidebar-toggle:hover {
+  background: #f9fafb;
 }
 
 .ai-sidebar-content {
-  padding: 1rem;
   overflow-y: auto;
   max-height: calc(100vh - 200px);
 }
 
 .ai-sidebar-header {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  margin-bottom: 1rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid #e5e7eb;
-}
-
-.ai-badge {
-  width: 36px;
-  height: 36px;
-  background: linear-gradient(135deg, #14b8a6 0%, #06b6d4 100%);
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
+  /* Styled via Tailwind classes */
 }
 
 .ai-sidebar-header h3 {
@@ -1683,6 +1652,8 @@ const estimatedTimeRemaining = computed(() => {
   grid-template-columns: repeat(4, 1fr);
   gap: 0.25rem;
   margin-bottom: 1rem;
+  padding: 1rem;
+  border-bottom: 1px solid #e5e7eb;
 }
 
 .ai-tab {
@@ -1715,6 +1686,7 @@ const estimatedTimeRemaining = computed(() => {
 
 .ai-tab-content {
   animation: fadeIn 0.3s ease;
+  padding: 0 1rem 1rem;
 }
 
 @keyframes fadeIn {
