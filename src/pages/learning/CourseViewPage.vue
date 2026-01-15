@@ -847,54 +847,6 @@ const estimatedTimeRemaining = computed(() => {
           </div>
         </div>
 
-        <!-- About this Course -->
-        <div class="about-course-card">
-          <h3><i class="fas fa-info-circle text-teal-500 mr-2"></i>About this Course</h3>
-          <p>{{ course.description }}</p>
-        </div>
-
-        <!-- Course Objectives -->
-        <div class="course-objectives-card">
-          <div class="objectives-header">
-            <div class="objectives-icon">
-              <i class="fas fa-bullseye"></i>
-            </div>
-            <div>
-              <h3>Learning Objectives</h3>
-              <p>What you'll achieve by completing this course</p>
-            </div>
-          </div>
-          <div class="objectives-grid">
-            <div v-for="(objective, index) in course.objectives" :key="index" class="objective-item">
-              <div class="objective-check">
-                <i class="fas fa-check"></i>
-              </div>
-              <span>{{ objective }}</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Resources & Materials -->
-        <div class="resources-card">
-          <div class="resources-header">
-            <h3><i class="fas fa-folder-open"></i> Resources & Materials</h3>
-            <span class="resource-count">{{ courseResources.length }} files</span>
-          </div>
-          <div class="resources-list">
-            <div v-for="resource in courseResources" :key="resource.id" class="resource-item">
-              <div class="resource-icon" :class="resource.type">
-                <i :class="getResourceIcon(resource.type)"></i>
-              </div>
-              <div class="resource-info">
-                <h4>{{ resource.name }}</h4>
-                <span class="resource-meta">{{ resource.size }} • {{ resource.type.toUpperCase() }}</span>
-              </div>
-              <button class="resource-download-btn" @click="downloadResource(resource)">
-                <i class="fas fa-download"></i>
-              </button>
-            </div>
-          </div>
-        </div>
       </div>
 
       <!-- AI Sidebar -->
@@ -1122,6 +1074,61 @@ const estimatedTimeRemaining = computed(() => {
             :show-count="true"
             @update:model-value="handleCourseRating"
           />
+        </div>
+      </div>
+    </div>
+
+    <!-- Full Width About Section -->
+    <div class="full-width-section">
+      <div class="section-content">
+        <div class="section-header">
+          <i class="fas fa-info-circle"></i>
+          <h3>About this Course</h3>
+        </div>
+        <p class="about-text">{{ course.description }}</p>
+      </div>
+    </div>
+
+    <!-- Full Width Learning Objectives Section -->
+    <div class="full-width-section">
+      <div class="section-content">
+        <div class="section-header">
+          <i class="fas fa-bullseye"></i>
+          <h3>Learning Objectives</h3>
+          <span class="section-subtitle">What you'll achieve by completing this course</span>
+        </div>
+        <div class="objectives-grid">
+          <div v-for="(objective, index) in course.objectives" :key="index" class="objective-item">
+            <div class="objective-check">
+              <i class="fas fa-check"></i>
+            </div>
+            <span>{{ objective }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Full Width Resources Section -->
+    <div class="full-width-section">
+      <div class="section-content">
+        <div class="section-header">
+          <i class="fas fa-folder-open"></i>
+          <h3>Resources & Materials</h3>
+          <span class="resource-count">{{ courseResources.length }} files</span>
+        </div>
+        <div class="resources-grid">
+          <div v-for="resource in courseResources" :key="resource.id" class="resource-item">
+            <div class="resource-icon" :class="resource.type">
+              <i :class="getResourceIcon(resource.type)"></i>
+            </div>
+            <div class="resource-info">
+              <h4>{{ resource.name }}</h4>
+              <span class="resource-meta">{{ resource.size }} • {{ resource.type.toUpperCase() }}</span>
+            </div>
+            <button class="resource-download-btn" @click="downloadResource(resource)">
+              <i class="fas fa-download"></i>
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -2201,28 +2208,54 @@ const estimatedTimeRemaining = computed(() => {
   background: rgba(255, 255, 255, 0.3);
 }
 
-/* About Course Card */
-.about-course-card {
+/* Full Width Sections */
+.full-width-section {
+  width: 100%;
   background: white;
-  border-radius: 16px;
-  border: 1px solid #e5e7eb;
-  padding: 1.5rem;
-  margin-top: 1.5rem;
+  border-top: 1px solid #e5e7eb;
+  padding: 2rem 0;
 }
 
-.about-course-card h3 {
-  font-size: 1rem;
-  font-weight: 700;
-  color: #1f2937;
-  margin-bottom: 0.75rem;
+.full-width-section:first-of-type {
+  border-top: none;
+}
+
+.section-content {
+  padding: 0 2rem;
+}
+
+.section-header {
   display: flex;
   align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
 }
 
-.about-course-card p {
+.section-header i {
+  font-size: 1.25rem;
+  color: #14b8a6;
+}
+
+.section-header h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0;
+}
+
+.section-subtitle {
+  font-size: 0.875rem;
+  color: #6b7280;
+  width: 100%;
+  margin-top: 0.25rem;
+}
+
+.about-text {
   color: #4b5563;
-  line-height: 1.7;
-  font-size: 0.9rem;
+  line-height: 1.8;
+  font-size: 1rem;
+  max-width: 900px;
 }
 
 /* Full Width Comments Section */
@@ -2269,51 +2302,10 @@ const estimatedTimeRemaining = computed(() => {
   border-radius: 20px;
 }
 
-/* Course Objectives Card */
-.course-objectives-card {
-  background: white;
-  border-radius: 16px;
-  border: 1px solid #e5e7eb;
-  padding: 1.5rem;
-  margin-top: 1.5rem;
-}
-
-.objectives-header {
-  display: flex;
-  align-items: flex-start;
-  gap: 1rem;
-  margin-bottom: 1.25rem;
-}
-
-.objectives-icon {
-  width: 48px;
-  height: 48px;
-  background: linear-gradient(135deg, #14b8a6 0%, #06b6d4 100%);
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-size: 1.25rem;
-  flex-shrink: 0;
-}
-
-.objectives-header h3 {
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: #1f2937;
-  margin: 0;
-}
-
-.objectives-header p {
-  font-size: 0.85rem;
-  color: #6b7280;
-  margin: 0.25rem 0 0 0;
-}
-
+/* Objectives Grid - Full Width */
 .objectives-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 1rem;
 }
 
@@ -2346,45 +2338,11 @@ const estimatedTimeRemaining = computed(() => {
   line-height: 1.5;
 }
 
-/* Resources Card */
-.resources-card {
-  background: white;
-  border-radius: 16px;
-  border: 1px solid #e5e7eb;
-  padding: 1.5rem;
-  margin-top: 1.5rem;
-}
-
-.resources-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 1rem;
-  padding-bottom: 0.75rem;
-  border-bottom: 1px solid #e5e7eb;
-}
-
-.resources-header h3 {
-  font-size: 1rem;
-  font-weight: 700;
-  color: #1f2937;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.resource-count {
-  font-size: 0.75rem;
-  color: #6b7280;
-  background: #f3f4f6;
-  padding: 0.25rem 0.625rem;
-  border-radius: 20px;
-}
-
-.resources-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
+/* Resources Grid - Full Width */
+.resources-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1rem;
 }
 
 .resource-item {
