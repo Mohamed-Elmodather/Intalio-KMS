@@ -188,7 +188,7 @@ const isGeneratingSummary = ref(false)
 const isExtractingConcepts = ref(false)
 const isGeneratingQuiz = ref(false)
 const showAISidebar = ref(true)
-const activeAITab = ref<'summary' | 'concepts' | 'quiz' | 'discuss'>('summary')
+const activeAITab = ref<'summary' | 'concepts' | 'quiz' | 'notes' | 'discuss'>('summary')
 
 // AI Results
 interface CourseSummary {
@@ -536,6 +536,97 @@ function getLessonIcon(type: string) {
     default: return 'fas fa-file'
   }
 }
+
+// ============================================================================
+// Resources & Materials
+// ============================================================================
+
+interface CourseResource {
+  id: number
+  name: string
+  type: 'pdf' | 'xlsx' | 'pptx' | 'zip' | 'doc'
+  size: string
+  url: string
+}
+
+const courseResources = ref<CourseResource[]>([
+  { id: 1, name: 'Course Slides - Complete Pack', type: 'pptx', size: '12.5 MB', url: '#' },
+  { id: 2, name: 'Practice Exercises & Solutions', type: 'pdf', size: '3.2 MB', url: '#' },
+  { id: 3, name: 'Sample Datasets', type: 'zip', size: '45.8 MB', url: '#' },
+  { id: 4, name: 'Quick Reference Guide', type: 'pdf', size: '1.1 MB', url: '#' },
+  { id: 5, name: 'Cheat Sheet - Key Formulas', type: 'xlsx', size: '856 KB', url: '#' }
+])
+
+function getResourceIcon(type: string) {
+  switch (type) {
+    case 'pdf': return 'fas fa-file-pdf'
+    case 'xlsx': return 'fas fa-file-excel'
+    case 'pptx': return 'fas fa-file-powerpoint'
+    case 'zip': return 'fas fa-file-archive'
+    case 'doc': return 'fas fa-file-word'
+    default: return 'fas fa-file'
+  }
+}
+
+function downloadResource(resource: CourseResource) {
+  // Simulate download
+  console.log('Downloading:', resource.name)
+}
+
+// ============================================================================
+// Notes Feature
+// ============================================================================
+
+const showNotesEditor = ref(false)
+const isSavingNotes = ref(false)
+
+async function saveNotes() {
+  if (!aiNotes.value.trim()) return
+  isSavingNotes.value = true
+  await new Promise(resolve => setTimeout(resolve, 800))
+  isSavingNotes.value = false
+}
+
+// ============================================================================
+// Certificate Preview
+// ============================================================================
+
+const courseCompleted = computed(() => course.value.progress === 100)
+
+function openCertificatePreview() {
+  showCertificatePreview.value = true
+}
+
+function closeCertificatePreview() {
+  showCertificatePreview.value = false
+}
+
+function downloadCertificate() {
+  console.log('Downloading certificate...')
+  closeCertificatePreview()
+}
+
+// ============================================================================
+// Estimated Time Remaining
+// ============================================================================
+
+const estimatedTimeRemaining = computed(() => {
+  const remainingLessons = course.value.syllabus.filter(l => !l.completed)
+  let totalMinutes = 0
+  remainingLessons.forEach(lesson => {
+    const match = lesson.duration.match(/(\d+)/)
+    if (match) {
+      totalMinutes += parseInt(match[1])
+    }
+  })
+
+  if (totalMinutes < 60) {
+    return `${totalMinutes} min`
+  }
+  const hours = Math.floor(totalMinutes / 60)
+  const mins = totalMinutes % 60
+  return mins > 0 ? `${hours}h ${mins}m` : `${hours}h`
+})
 </script>
 
 <template>
@@ -553,6 +644,10 @@ function getLessonIcon(type: string) {
             <span :class="['level-badge', course.levelClass]">{{ course.level }}</span>
             <span class="duration-badge"><i class="fas fa-clock"></i> {{ course.duration }}</span>
             <span class="rating-badge"><i class="fas fa-star text-amber-400"></i> {{ course.rating }}</span>
+            <span class="students-badge"><i class="fas fa-users"></i> {{ course.students.toLocaleString() }}</span>
+            <span v-if="estimatedTimeRemaining !== '0 min'" class="time-remaining-badge">
+              <i class="fas fa-hourglass-half"></i> {{ estimatedTimeRemaining }} left
+            </span>
             <BookmarkButton
               :content-id="course.id.toString()"
               content-type="course"
@@ -560,12 +655,24 @@ function getLessonIcon(type: string) {
             />
           </div>
           <h1 class="course-title">{{ course.title }}</h1>
+
+          <!-- Course Tags -->
+          <div class="course-tags">
+            <span v-for="tag in course.tags" :key="tag" class="course-tag">
+              {{ tag }}
+            </span>
+          </div>
+
           <div class="course-instructor">
             <div class="instructor-avatar">{{ course.instructorInitials }}</div>
             <div class="instructor-info">
               <span class="instructor-name">{{ course.instructor }}</span>
               <span class="instructor-bio">{{ course.instructorBio }}</span>
             </div>
+            <button v-if="courseCompleted" @click="openCertificatePreview" class="certificate-btn">
+              <i class="fas fa-certificate"></i>
+              View Certificate
+            </button>
           </div>
         </div>
 
@@ -678,6 +785,49 @@ function getLessonIcon(type: string) {
             </button>
           </div>
         </div>
+
+        <!-- Course Objectives -->
+        <div class="course-objectives-card">
+          <div class="objectives-header">
+            <div class="objectives-icon">
+              <i class="fas fa-bullseye"></i>
+            </div>
+            <div>
+              <h3>Learning Objectives</h3>
+              <p>What you'll achieve by completing this course</p>
+            </div>
+          </div>
+          <div class="objectives-grid">
+            <div v-for="(objective, index) in course.objectives" :key="index" class="objective-item">
+              <div class="objective-check">
+                <i class="fas fa-check"></i>
+              </div>
+              <span>{{ objective }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Resources & Materials -->
+        <div class="resources-card">
+          <div class="resources-header">
+            <h3><i class="fas fa-folder-open"></i> Resources & Materials</h3>
+            <span class="resource-count">{{ courseResources.length }} files</span>
+          </div>
+          <div class="resources-list">
+            <div v-for="resource in courseResources" :key="resource.id" class="resource-item">
+              <div class="resource-icon" :class="resource.type">
+                <i :class="getResourceIcon(resource.type)"></i>
+              </div>
+              <div class="resource-info">
+                <h4>{{ resource.name }}</h4>
+                <span class="resource-meta">{{ resource.size }} • {{ resource.type.toUpperCase() }}</span>
+              </div>
+              <button class="resource-download-btn" @click="downloadResource(resource)">
+                <i class="fas fa-download"></i>
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- AI Sidebar -->
@@ -697,7 +847,7 @@ function getLessonIcon(type: string) {
           <!-- AI Tabs -->
           <div class="ai-tabs">
             <button
-              v-for="tab in ['summary', 'concepts', 'quiz', 'discuss']"
+              v-for="tab in ['summary', 'concepts', 'quiz', 'notes', 'discuss']"
               :key="tab"
               :class="['ai-tab', { 'active': activeAITab === tab }]"
               @click="activeAITab = tab as typeof activeAITab"
@@ -706,6 +856,7 @@ function getLessonIcon(type: string) {
                 'fas fa-file-alt': tab === 'summary',
                 'fas fa-lightbulb': tab === 'concepts',
                 'fas fa-question-circle': tab === 'quiz',
+                'fas fa-sticky-note': tab === 'notes',
                 'fas fa-comments': tab === 'discuss'
               }"></i>
               <span>{{ tab.charAt(0).toUpperCase() + tab.slice(1) }}</span>
@@ -860,6 +1011,38 @@ function getLessonIcon(type: string) {
             </div>
           </div>
 
+          <!-- Notes Tab -->
+          <div v-if="activeAITab === 'notes'" class="ai-tab-content">
+            <div class="ai-action-header">
+              <h4>My Notes</h4>
+              <button
+                @click="saveNotes"
+                :disabled="isSavingNotes || !aiNotes.trim()"
+                class="save-notes-btn"
+              >
+                <i :class="isSavingNotes ? 'fas fa-spinner fa-spin' : 'fas fa-save'"></i>
+                {{ isSavingNotes ? 'Saving...' : 'Save' }}
+              </button>
+            </div>
+            <div class="notes-container">
+              <div class="notes-lesson-info">
+                <i class="fas fa-bookmark text-teal-500"></i>
+                <span>{{ currentLesson?.title || 'Select a lesson' }}</span>
+              </div>
+              <textarea
+                v-model="aiNotes"
+                class="notes-textarea"
+                placeholder="Take notes as you learn... These notes are saved per lesson and will help you review later."
+              ></textarea>
+              <div class="notes-tips">
+                <div class="notes-tip">
+                  <i class="fas fa-lightbulb text-amber-500"></i>
+                  <span>Tip: Summarize key points in your own words for better retention</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <!-- Discussion Tab -->
           <div v-if="activeAITab === 'discuss'" class="ai-tab-content">
             <div class="ai-action-header">
@@ -890,6 +1073,62 @@ function getLessonIcon(type: string) {
         </div>
       </div>
     </div>
+
+    <!-- Certificate Preview Modal -->
+    <Teleport to="body">
+      <Transition name="modal">
+        <div v-if="showCertificatePreview" class="certificate-modal-overlay" @click.self="closeCertificatePreview">
+          <div class="certificate-modal">
+            <button class="certificate-modal-close" @click="closeCertificatePreview">
+              <i class="fas fa-times"></i>
+            </button>
+
+            <div class="certificate-preview">
+              <div class="certificate-border">
+                <div class="certificate-inner">
+                  <div class="certificate-logo">
+                    <i class="fas fa-graduation-cap"></i>
+                  </div>
+                  <h2 class="certificate-title">Certificate of Completion</h2>
+                  <p class="certificate-subtitle">This is to certify that</p>
+                  <h3 class="certificate-name">{{ course.instructor }}</h3>
+                  <p class="certificate-text">has successfully completed the course</p>
+                  <h4 class="certificate-course">{{ course.title }}</h4>
+                  <div class="certificate-details">
+                    <div class="certificate-detail">
+                      <i class="fas fa-calendar-alt"></i>
+                      <span>{{ new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) }}</span>
+                    </div>
+                    <div class="certificate-detail">
+                      <i class="fas fa-clock"></i>
+                      <span>{{ course.duration }} of learning</span>
+                    </div>
+                    <div class="certificate-detail">
+                      <i class="fas fa-book"></i>
+                      <span>{{ course.totalLessons }} lessons completed</span>
+                    </div>
+                  </div>
+                  <div class="certificate-badge">
+                    <i class="fas fa-award"></i>
+                    <span>{{ course.level }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="certificate-actions">
+              <button @click="downloadCertificate" class="download-certificate-btn">
+                <i class="fas fa-download"></i>
+                Download Certificate
+              </button>
+              <button @click="closeCertificatePreview" class="close-certificate-btn">
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      </Transition>
+    </Teleport>
   </div>
 </template>
 
@@ -1899,6 +2138,550 @@ function getLessonIcon(type: string) {
     width: 48px;
     height: 24px;
     border-radius: 0 0 8px 8px;
+  }
+}
+
+/* Course Tags */
+.course-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.course-tag {
+  padding: 0.25rem 0.75rem;
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  backdrop-filter: blur(4px);
+}
+
+/* Additional Header Badges */
+.students-badge,
+.time-remaining-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.75rem;
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+  border-radius: 20px;
+  font-size: 0.75rem;
+}
+
+.time-remaining-badge {
+  background: rgba(251, 191, 36, 0.3);
+}
+
+.certificate-btn {
+  margin-left: auto;
+  padding: 0.5rem 1rem;
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.certificate-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Course Objectives Card */
+.course-objectives-card {
+  background: white;
+  border-radius: 16px;
+  border: 1px solid #e5e7eb;
+  padding: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.objectives-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.objectives-icon {
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, #14b8a6 0%, #06b6d4 100%);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+.objectives-header h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0;
+}
+
+.objectives-header p {
+  font-size: 0.85rem;
+  color: #6b7280;
+  margin: 0.25rem 0 0 0;
+}
+
+.objectives-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.objective-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.875rem;
+  background: #f9fafb;
+  border-radius: 10px;
+  border: 1px solid #f3f4f6;
+}
+
+.objective-check {
+  width: 24px;
+  height: 24px;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 0.65rem;
+  flex-shrink: 0;
+}
+
+.objective-item span {
+  font-size: 0.85rem;
+  color: #374151;
+  line-height: 1.5;
+}
+
+/* Resources Card */
+.resources-card {
+  background: white;
+  border-radius: 16px;
+  border: 1px solid #e5e7eb;
+  padding: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.resources-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.resources-header h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1f2937;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.resource-count {
+  font-size: 0.75rem;
+  color: #6b7280;
+  background: #f3f4f6;
+  padding: 0.25rem 0.625rem;
+  border-radius: 20px;
+}
+
+.resources-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.resource-item {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  padding: 0.875rem;
+  background: #f9fafb;
+  border-radius: 10px;
+  border: 1px solid #f3f4f6;
+  transition: all 0.2s;
+}
+
+.resource-item:hover {
+  background: #f3f4f6;
+  border-color: #e5e7eb;
+}
+
+.resource-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.resource-icon.pdf {
+  background: #fef2f2;
+  color: #dc2626;
+}
+
+.resource-icon.xlsx {
+  background: #ecfdf5;
+  color: #059669;
+}
+
+.resource-icon.pptx {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+.resource-icon.zip {
+  background: #f0f9ff;
+  color: #0284c7;
+}
+
+.resource-icon.doc {
+  background: #eff6ff;
+  color: #2563eb;
+}
+
+.resource-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.resource-info h4 {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.resource-meta {
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.resource-download-btn {
+  width: 36px;
+  height: 36px;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  color: #6b7280;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.resource-download-btn:hover {
+  background: #14b8a6;
+  border-color: #14b8a6;
+  color: white;
+}
+
+/* Notes Tab Enhancements */
+.save-notes-btn {
+  padding: 0.375rem 0.75rem;
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  transition: all 0.2s;
+}
+
+.save-notes-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%);
+}
+
+.save-notes-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.notes-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.notes-lesson-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 0.875rem;
+  background: #f0fdfa;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  color: #0f766e;
+  font-weight: 500;
+}
+
+.notes-tips {
+  margin-top: 0.5rem;
+}
+
+.notes-tip {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0.625rem;
+  background: #fffbeb;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  color: #92400e;
+}
+
+/* AI Tabs Grid - 5 columns for new notes tab */
+.ai-tabs {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.25rem;
+  margin-bottom: 1rem;
+}
+
+/* Certificate Modal */
+.certificate-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 2rem;
+}
+
+.certificate-modal {
+  background: white;
+  border-radius: 20px;
+  max-width: 700px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+}
+
+.certificate-modal-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 36px;
+  height: 36px;
+  background: #f3f4f6;
+  border: none;
+  border-radius: 50%;
+  color: #6b7280;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  z-index: 10;
+}
+
+.certificate-modal-close:hover {
+  background: #e5e7eb;
+  color: #1f2937;
+}
+
+.certificate-preview {
+  padding: 2rem;
+}
+
+.certificate-border {
+  border: 3px solid #14b8a6;
+  border-radius: 16px;
+  padding: 0.5rem;
+  background: linear-gradient(135deg, #f0fdfa 0%, #ecfeff 100%);
+}
+
+.certificate-inner {
+  border: 1px dashed #99f6e4;
+  border-radius: 12px;
+  padding: 2.5rem;
+  text-align: center;
+}
+
+.certificate-logo {
+  width: 64px;
+  height: 64px;
+  background: linear-gradient(135deg, #14b8a6 0%, #06b6d4 100%);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.75rem;
+  margin: 0 auto 1.5rem;
+}
+
+.certificate-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #0f766e;
+  margin: 0 0 0.5rem 0;
+}
+
+.certificate-subtitle {
+  font-size: 0.9rem;
+  color: #6b7280;
+  margin: 0 0 0.5rem 0;
+}
+
+.certificate-name {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 0.5rem 0;
+}
+
+.certificate-text {
+  font-size: 0.9rem;
+  color: #6b7280;
+  margin: 0 0 0.5rem 0;
+}
+
+.certificate-course {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #14b8a6;
+  margin: 0 0 1.5rem 0;
+}
+
+.certificate-details {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.certificate-detail {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+.certificate-detail i {
+  color: #14b8a6;
+}
+
+.certificate-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1.25rem;
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  color: white;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.certificate-actions {
+  padding: 1.5rem 2rem;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.download-certificate-btn {
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s;
+}
+
+.download-certificate-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(20, 184, 166, 0.3);
+}
+
+.close-certificate-btn {
+  padding: 0.75rem 1.5rem;
+  background: #f3f4f6;
+  color: #4b5563;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.close-certificate-btn:hover {
+  background: #e5e7eb;
+}
+
+/* Modal Transition */
+.modal-enter-active,
+.modal-leave-active {
+  transition: all 0.3s ease;
+}
+
+.modal-enter-from,
+.modal-leave-to {
+  opacity: 0;
+}
+
+.modal-enter-from .certificate-modal,
+.modal-leave-to .certificate-modal {
+  transform: scale(0.9);
+}
+
+/* Responsive for objectives */
+@media (max-width: 768px) {
+  .objectives-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .certificate-details {
+    flex-direction: column;
+    gap: 0.75rem;
   }
 }
 </style>
