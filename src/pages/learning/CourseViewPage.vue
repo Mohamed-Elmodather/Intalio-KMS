@@ -188,6 +188,7 @@ onMounted(async () => {
 const isGeneratingSummary = ref(false)
 const isExtractingConcepts = ref(false)
 const isGeneratingQuiz = ref(false)
+const showSyllabus = ref(true)
 const showAISidebar = ref(true)
 const activeAITab = ref<'summary' | 'concepts' | 'quiz' | 'notes'>('summary')
 
@@ -751,18 +752,23 @@ const estimatedTimeRemaining = computed(() => {
     </div>
 
     <!-- Main Content -->
-    <div class="course-content-wrapper">
+    <div :class="['course-content-wrapper', { 'syllabus-collapsed': !showSyllabus, 'ai-collapsed': !showAISidebar }]">
       <!-- Syllabus Sidebar -->
-      <div class="syllabus-sidebar bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-        <div class="syllabus-header">
-          <h3 class="font-semibold text-gray-900 flex items-center gap-2">
-            <i class="fas fa-list text-teal-500"></i>
-            Course Content
-          </h3>
-          <span class="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">{{ course.syllabus.length }} lessons</span>
-        </div>
+      <div :class="['syllabus-sidebar bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden', { 'collapsed': !showSyllabus }]">
+        <button @click="showSyllabus = !showSyllabus" class="syllabus-toggle">
+          <i :class="showSyllabus ? 'fas fa-chevron-left' : 'fas fa-chevron-right'"></i>
+        </button>
 
-        <div class="syllabus-list">
+        <div v-if="showSyllabus" class="syllabus-content">
+          <div class="syllabus-header">
+            <h3 class="font-semibold text-gray-900 flex items-center gap-2">
+              <i class="fas fa-list text-teal-500"></i>
+              Course Content
+            </h3>
+            <span class="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">{{ course.syllabus.length }} lessons</span>
+          </div>
+
+          <div class="syllabus-list">
           <div
             v-for="(lesson, index) in course.syllabus"
             :key="lesson.id"
@@ -783,6 +789,7 @@ const estimatedTimeRemaining = computed(() => {
             <div v-if="lesson.current" class="current-badge">
               <i class="fas fa-play"></i>
             </div>
+          </div>
           </div>
         </div>
       </div>
@@ -1292,11 +1299,53 @@ const estimatedTimeRemaining = computed(() => {
   width: 100%;
   padding: 1.5rem;
   align-items: start;
+  transition: grid-template-columns 0.3s ease;
+}
+
+.course-content-wrapper.syllabus-collapsed {
+  grid-template-columns: 48px 1fr 340px;
+}
+
+.course-content-wrapper.ai-collapsed {
+  grid-template-columns: 300px 1fr 48px;
+}
+
+.course-content-wrapper.syllabus-collapsed.ai-collapsed {
+  grid-template-columns: 48px 1fr 48px;
 }
 
 /* Syllabus Sidebar */
 .syllabus-sidebar {
-  /* Height determined by content */
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.syllabus-sidebar.collapsed {
+  width: 48px;
+  min-width: 48px;
+}
+
+.syllabus-toggle {
+  position: absolute;
+  right: -12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 24px;
+  height: 48px;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #6b7280;
+  z-index: 10;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.syllabus-toggle:hover {
+  background: #f9fafb;
 }
 
 .syllabus-header {
