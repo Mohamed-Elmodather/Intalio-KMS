@@ -1805,22 +1805,20 @@ onUnmounted(() => {
   color: white;
 }
 
-/* Main Content - using CSS Grid for reliable layout */
+/* Main Content */
 .main-content {
-  display: grid;
-  grid-template-columns: 1fr 360px;
+  display: flex;
+  flex-wrap: nowrap;
   gap: 1.5rem;
   padding: 1.5rem 2rem;
   max-width: 1600px;
   margin: 0 auto;
-  box-sizing: border-box;
-  width: 100%;
 }
 
 /* Items Section */
 .items-section {
+  flex: 1;
   min-width: 0;
-  overflow: hidden;
 }
 
 /* ============================================================================
@@ -2346,10 +2344,11 @@ onUnmounted(() => {
 
 /* Sidebar */
 .sidebar {
+  flex: 0 0 360px;
+  width: 360px;
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  min-width: 0;
 }
 
 /* Panel base styles */
@@ -2357,7 +2356,7 @@ onUnmounted(() => {
   background: white;
   border: 1px solid #e5e7eb;
   border-radius: 12px;
-  overflow: hidden;
+  padding: 0;
 }
 
 .panel-header {
@@ -2881,15 +2880,21 @@ onUnmounted(() => {
    RESPONSIVE
    ============================================================================ */
 @media (max-width: 1200px) {
-  .main-content {
-    grid-template-columns: 1fr 320px;
+  .sidebar {
+    flex: 0 0 320px;
+    width: 320px;
   }
 }
 
 @media (max-width: 1024px) {
   .main-content {
-    grid-template-columns: 1fr;
+    flex-direction: column;
     padding: 1rem;
+  }
+
+  .sidebar {
+    flex: none;
+    width: 100%;
   }
 
   .hero-content {
