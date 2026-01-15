@@ -1,9 +1,111 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { BookmarkButton, SocialShareButtons } from '@/components/common'
 
 const route = useRoute()
 const router = useRouter()
+
+// Text constants for i18n
+const textConstants = {
+  // Header
+  backToCollections: 'Back to Collections',
+  editCollection: 'Edit',
+  download: 'Download',
+  share: 'Share',
+  collection: 'Collection',
+  save: 'Save',
+  duplicate: 'Duplicate',
+  delete: 'Delete',
+  cancel: 'Cancel',
+  saveChanges: 'Save',
+
+  // Visibility
+  private: 'Private',
+  shared: 'Shared',
+  makeShared: 'Make Shared',
+  makePrivate: 'Make Private',
+
+  // Stats
+  items: 'items',
+  collaborators: 'collaborators',
+  comments: 'comments',
+  lastUpdated: 'Last updated',
+
+  // Views
+  gridView: 'Grid View',
+  listView: 'List View',
+
+  // Sorting
+  sortBy: 'Sort by',
+  sortRecent: 'Recently Added',
+  sortOldest: 'Oldest First',
+  sortAZ: 'A-Z',
+  sortZA: 'Z-A',
+  sortType: 'By Type',
+
+  // Filter
+  filterBy: 'Filter',
+  allTypes: 'All Types',
+  articles: 'Articles',
+  documents: 'Documents',
+  media: 'Media',
+
+  // Content types
+  article: 'Article',
+  document: 'Document',
+  mediaItem: 'Media',
+  item: 'Item',
+
+  // Actions
+  removeFromCollection: 'Remove from collection',
+  openItem: 'Open',
+  dragToReorder: 'Drag to reorder',
+
+  // Export
+  exportCollection: 'Export Collection',
+  exportAsZip: 'Download as ZIP',
+  exportAsPdf: 'Export as PDF',
+  exportAsJson: 'Export metadata (JSON)',
+  copyLinks: 'Copy all links',
+
+  // Activity
+  activity: 'Activity',
+  recentActivity: 'Recent Activity',
+  addedItem: 'added',
+  removedItem: 'removed',
+  reorderedItems: 'reordered items',
+  updatedCollection: 'updated collection',
+  invitedCollaborator: 'invited',
+
+  // Empty state
+  noItems: 'No items yet',
+  noItemsDesc: 'Add articles, documents, and media to this collection from their respective pages.',
+
+  // Collaborators
+  inviteCollaborator: 'Invite Collaborator',
+  emailAddress: 'Email Address',
+  role: 'Role',
+  editor: 'Editor',
+  editorDesc: 'Can add, remove, and reorder items',
+  viewer: 'Viewer',
+  viewerDesc: 'Can only view the collection',
+  owner: 'Owner',
+  sendInvitation: 'Send Invitation',
+  removeCollaborator: 'Remove collaborator',
+
+  // Delete
+  deleteCollection: 'Delete Collection?',
+  deleteWarning: 'Are you sure you want to delete',
+  deleteNote: 'This action cannot be undone. The items will remain in their original locations.',
+
+  // Misc
+  createdBy: 'Created by',
+  created: 'Created',
+  updated: 'Updated',
+  collectionItems: 'Collection Items',
+  addComment: 'Add a comment... Use @name to mention'
+}
 
 // Types
 interface Collaborator {
@@ -61,15 +163,69 @@ const currentUser = ref({
   email: 'ahmed@afc.com'
 })
 
+// Activity interface
+interface Activity {
+  id: string
+  type: 'added' | 'removed' | 'reordered' | 'updated' | 'invited' | 'commented'
+  user: { id: string; name: string; initials: string; color: string }
+  target?: string
+  timestamp: string
+}
+
 // UI State
 const isEditing = ref(false)
 const showCollaboratorModal = ref(false)
 const showDeleteConfirm = ref(false)
 const showShareModal = ref(false)
+const showExportMenu = ref(false)
 const newComment = ref('')
 const inviteEmail = ref('')
 const inviteRole = ref<'editor' | 'viewer'>('viewer')
 const draggedItem = ref<string | null>(null)
+
+// View and filter state
+const viewMode = ref<'list' | 'grid'>('list')
+const sortBy = ref<'recent' | 'oldest' | 'az' | 'za' | 'type'>('recent')
+const filterType = ref<'all' | 'article' | 'document' | 'media'>('all')
+
+// Activity log (mock data)
+const activities = ref<Activity[]>([
+  {
+    id: 'act-1',
+    type: 'added',
+    user: { id: 'user-2', name: 'Sarah Chen', initials: 'SC', color: '#8b5cf6' },
+    target: 'Fan Zone Highlights: Opening Weekend',
+    timestamp: '2027-01-07T09:00:00Z'
+  },
+  {
+    id: 'act-2',
+    type: 'commented',
+    user: { id: 'user-2', name: 'Sarah Chen', initials: 'SC', color: '#8b5cf6' },
+    target: 'Added the fan zone gallery',
+    timestamp: '2027-01-07T09:15:00Z'
+  },
+  {
+    id: 'act-3',
+    type: 'invited',
+    user: { id: 'user-1', name: 'Ahmed Imam', initials: 'AI', color: '#14b8a6' },
+    target: 'Mohammed Al-Rashid',
+    timestamp: '2027-01-06T09:00:00Z'
+  },
+  {
+    id: 'act-4',
+    type: 'added',
+    user: { id: 'user-2', name: 'Sarah Chen', initials: 'SC', color: '#8b5cf6' },
+    target: 'King Fahd Stadium: Behind the Scenes Tour',
+    timestamp: '2027-01-06T14:00:00Z'
+  },
+  {
+    id: 'act-5',
+    type: 'updated',
+    user: { id: 'user-1', name: 'Ahmed Imam', initials: 'AI', color: '#14b8a6' },
+    target: 'collection description',
+    timestamp: '2027-01-05T15:00:00Z'
+  }
+])
 
 // Editable fields
 const editName = ref('')
@@ -222,9 +378,51 @@ const canEdit = computed(() => {
   return userCollab?.role === 'editor'
 })
 
+// Filtered and sorted items
+const filteredAndSortedItems = computed(() => {
+  let items = [...collection.value.items]
+
+  // Apply filter
+  if (filterType.value !== 'all') {
+    items = items.filter(item => item.contentType === filterType.value)
+  }
+
+  // Apply sort
+  switch (sortBy.value) {
+    case 'recent':
+      items.sort((a, b) => new Date(b.addedAt).getTime() - new Date(a.addedAt).getTime())
+      break
+    case 'oldest':
+      items.sort((a, b) => new Date(a.addedAt).getTime() - new Date(b.addedAt).getTime())
+      break
+    case 'az':
+      items.sort((a, b) => a.title.localeCompare(b.title))
+      break
+    case 'za':
+      items.sort((a, b) => b.title.localeCompare(a.title))
+      break
+    case 'type':
+      items.sort((a, b) => a.contentType.localeCompare(b.contentType))
+      break
+    default:
+      items.sort((a, b) => a.order - b.order)
+  }
+
+  return items
+})
+
+// Keep sortedItems for backward compatibility
 const sortedItems = computed(() => {
   return [...collection.value.items].sort((a, b) => a.order - b.order)
 })
+
+// Item counts by type
+const itemCounts = computed(() => ({
+  all: collection.value.items.length,
+  article: collection.value.items.filter(i => i.contentType === 'article').length,
+  document: collection.value.items.filter(i => i.contentType === 'document').length,
+  media: collection.value.items.filter(i => i.contentType === 'media').length
+}))
 
 // Helper functions
 function formatDate(dateString: string): string {
@@ -462,107 +660,307 @@ function goBack() {
   router.push('/collections')
 }
 
+// Export functions
+function exportAsJson() {
+  const exportData = {
+    collection: {
+      id: collection.value.id,
+      name: collection.value.name,
+      description: collection.value.description,
+      createdAt: collection.value.createdAt,
+      updatedAt: collection.value.updatedAt,
+      visibility: collection.value.visibility,
+      author: collection.value.author.name
+    },
+    items: collection.value.items.map(item => ({
+      id: item.id,
+      title: item.title,
+      type: item.contentType,
+      addedAt: item.addedAt
+    })),
+    collaborators: collection.value.collaborators.map(c => ({
+      name: c.name,
+      role: c.role
+    }))
+  }
+
+  const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = `${collection.value.name.replace(/\s+/g, '-').toLowerCase()}-metadata.json`
+  document.body.appendChild(a)
+  a.click()
+  document.body.removeChild(a)
+  URL.revokeObjectURL(url)
+  showExportMenu.value = false
+}
+
+function copyAllLinks() {
+  const baseUrl = window.location.origin
+  const routes: Record<string, string> = {
+    article: '/articles/',
+    document: '/documents/',
+    media: '/media/'
+  }
+
+  const links = collection.value.items.map(item => {
+    return `${item.title}: ${baseUrl}${routes[item.contentType]}${item.contentId}`
+  }).join('\n')
+
+  navigator.clipboard.writeText(links)
+  alert('All item links copied to clipboard!')
+  showExportMenu.value = false
+}
+
+function exportAsPdf() {
+  // In production, this would generate a PDF
+  alert('PDF export would be generated here. This feature requires a PDF generation library.')
+  showExportMenu.value = false
+}
+
+function downloadAsZip() {
+  // In production, this would trigger a server-side ZIP generation
+  alert('ZIP download would be triggered here. This feature requires server-side support.')
+  showExportMenu.value = false
+}
+
+// Share function using Web Share API
+function shareCollection() {
+  const shareData = {
+    title: collection.value.name,
+    text: collection.value.description,
+    url: window.location.href
+  }
+
+  if (navigator.share) {
+    navigator.share(shareData).catch(() => {
+      // Fallback to clipboard
+      navigator.clipboard.writeText(window.location.href)
+      alert('Link copied to clipboard!')
+    })
+  } else {
+    navigator.clipboard.writeText(window.location.href)
+    alert('Link copied to clipboard!')
+  }
+}
+
+// Activity helpers
+function getActivityIcon(type: Activity['type']): string {
+  switch (type) {
+    case 'added': return 'fas fa-plus-circle'
+    case 'removed': return 'fas fa-minus-circle'
+    case 'reordered': return 'fas fa-arrows-alt'
+    case 'updated': return 'fas fa-edit'
+    case 'invited': return 'fas fa-user-plus'
+    case 'commented': return 'fas fa-comment'
+    default: return 'fas fa-circle'
+  }
+}
+
+function getActivityColor(type: Activity['type']): string {
+  switch (type) {
+    case 'added': return 'text-green-500'
+    case 'removed': return 'text-red-500'
+    case 'reordered': return 'text-blue-500'
+    case 'updated': return 'text-amber-500'
+    case 'invited': return 'text-purple-500'
+    case 'commented': return 'text-teal-500'
+    default: return 'text-gray-500'
+  }
+}
+
+function getActivityText(activity: Activity): string {
+  switch (activity.type) {
+    case 'added': return `added "${activity.target}"`
+    case 'removed': return `removed "${activity.target}"`
+    case 'reordered': return 'reordered collection items'
+    case 'updated': return `updated ${activity.target}`
+    case 'invited': return `invited ${activity.target}`
+    case 'commented': return `commented: "${activity.target}"`
+    default: return 'performed an action'
+  }
+}
+
+// Close export menu on outside click
+function handleOutsideClick(e: MouseEvent) {
+  const target = e.target as HTMLElement
+  if (!target.closest('.export-menu-container')) {
+    showExportMenu.value = false
+  }
+}
+
 onMounted(() => {
   // In real app, fetch collection by route.params.id
   console.log('Collection ID:', route.params.id)
+  document.addEventListener('click', handleOutsideClick)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('click', handleOutsideClick)
 })
 </script>
 
 <template>
   <div class="collection-detail-page">
-    <!-- Header -->
-    <div class="page-header">
-      <div class="header-content">
-        <!-- Back Button -->
-        <button @click="goBack" class="back-btn">
-          <i class="fas fa-arrow-left"></i>
-        </button>
+    <!-- Hero Header with Cover Image -->
+    <div class="hero-header">
+      <!-- Cover Image Background -->
+      <div class="hero-bg">
+        <img
+          v-if="collection.thumbnail"
+          :src="collection.thumbnail"
+          alt=""
+          class="hero-bg-image"
+        />
+        <div class="hero-overlay"></div>
+      </div>
+
+      <!-- Header Content -->
+      <div class="hero-content">
+        <!-- Top Navigation -->
+        <div class="hero-nav">
+          <button @click="goBack" class="back-btn-hero">
+            <i class="fas fa-arrow-left"></i>
+            <span>{{ textConstants.backToCollections }}</span>
+          </button>
+
+          <!-- Edit Mode Controls -->
+          <div v-if="isEditing" class="edit-controls">
+            <button @click="cancelEditing" class="px-4 py-2 bg-white/10 text-white border border-white/30 rounded-xl font-medium hover:bg-white/20 transition-all flex items-center gap-2">
+              <i class="fas fa-times"></i>
+              <span class="hidden sm:inline">{{ textConstants.cancel }}</span>
+            </button>
+            <button @click="saveEditing" :disabled="!editName.trim()" class="px-4 py-2 bg-teal-500 text-white rounded-xl font-medium hover:bg-teal-600 transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+              <i class="fas fa-check"></i>
+              <span class="hidden sm:inline">{{ textConstants.saveChanges }}</span>
+            </button>
+          </div>
+        </div>
 
         <!-- Collection Info -->
-        <div class="collection-info">
+        <div class="hero-info">
           <div v-if="!isEditing" class="info-display">
-            <div class="title-row">
-              <h1 class="collection-title">{{ collection.name }}</h1>
-              <div :class="['visibility-badge', collection.visibility]">
+            <div class="flex items-center gap-3 mb-2">
+              <span :class="['visibility-badge-hero', collection.visibility]">
                 <i :class="collection.visibility === 'private' ? 'fas fa-lock' : 'fas fa-globe'"></i>
-                <span>{{ collection.visibility === 'private' ? 'Private' : 'Shared' }}</span>
-              </div>
+                {{ collection.visibility === 'private' ? textConstants.private : textConstants.shared }}
+              </span>
             </div>
-            <p class="collection-description">{{ collection.description }}</p>
+            <h1 class="hero-title">{{ collection.name }}</h1>
+            <p class="hero-description">{{ collection.description }}</p>
           </div>
-          <div v-else class="info-edit">
+          <div v-else class="info-edit-hero">
             <input
               v-model="editName"
               type="text"
-              class="edit-title-input"
+              class="edit-title-hero"
               placeholder="Collection name"
               autofocus
             />
             <textarea
               v-model="editDescription"
-              class="edit-description-input"
+              class="edit-description-hero"
               rows="2"
               placeholder="Add a description..."
             ></textarea>
           </div>
         </div>
 
-        <!-- Actions -->
-        <div class="header-actions">
-          <template v-if="!isEditing">
-            <button v-if="canEdit" @click="startEditing" class="action-btn">
-              <i class="fas fa-pen"></i>
-              <span>Edit</span>
-            </button>
-            <button @click="showShareModal = true" class="action-btn">
-              <i class="fas fa-share-alt"></i>
-              <span>Share</span>
-            </button>
-            <button @click="duplicateCollection" class="action-btn">
-              <i class="fas fa-copy"></i>
-              <span>Duplicate</span>
-            </button>
-            <button v-if="canEdit" @click="toggleVisibility" class="action-btn">
-              <i :class="collection.visibility === 'private' ? 'fas fa-globe' : 'fas fa-lock'"></i>
-              <span>{{ collection.visibility === 'private' ? 'Make Shared' : 'Make Private' }}</span>
-            </button>
-            <button v-if="isOwner" @click="showDeleteConfirm = true" class="action-btn danger">
-              <i class="fas fa-trash-alt"></i>
-              <span>Delete</span>
-            </button>
-          </template>
-          <template v-else>
-            <button @click="cancelEditing" class="action-btn">
-              <i class="fas fa-times"></i>
-              <span>Cancel</span>
-            </button>
-            <button @click="saveEditing" class="action-btn primary" :disabled="!editName.trim()">
-              <i class="fas fa-check"></i>
-              <span>Save</span>
-            </button>
-          </template>
-        </div>
-      </div>
-
-      <!-- Meta Info -->
-      <div class="header-meta">
-        <div class="meta-item">
-          <div class="author-avatar" :style="{ backgroundColor: collection.author.color }">
-            {{ collection.author.initials }}
+        <!-- Meta & Stats Row -->
+        <div class="hero-meta">
+          <div class="meta-author">
+            <div class="author-avatar-hero" :style="{ backgroundColor: collection.author.color }">
+              {{ collection.author.initials }}
+            </div>
+            <div class="author-info">
+              <span class="author-name">{{ collection.author.name }}</span>
+              <span class="author-role">{{ textConstants.owner }}</span>
+            </div>
           </div>
-          <span>Created by {{ collection.author.name }}</span>
+          <div class="meta-stats">
+            <div class="stat-item">
+              <i class="fas fa-layer-group"></i>
+              <span>{{ collection.itemCount }} {{ textConstants.items }}</span>
+            </div>
+            <div class="stat-item">
+              <i class="fas fa-users"></i>
+              <span>{{ collection.collaborators.length }} {{ textConstants.collaborators }}</span>
+            </div>
+            <div class="stat-item">
+              <i class="fas fa-comments"></i>
+              <span>{{ collection.comments.length }} {{ textConstants.comments }}</span>
+            </div>
+            <div class="stat-item">
+              <i class="fas fa-clock"></i>
+              <span>{{ textConstants.lastUpdated }} {{ formatDate(collection.updatedAt) }}</span>
+            </div>
+          </div>
         </div>
-        <div class="meta-item">
-          <i class="fas fa-calendar-alt"></i>
-          <span>Created {{ formatDate(collection.createdAt) }}</span>
-        </div>
-        <div class="meta-item">
-          <i class="fas fa-clock"></i>
-          <span>Updated {{ formatDate(collection.updatedAt) }}</span>
-        </div>
-        <div class="meta-item">
-          <i class="fas fa-file-alt"></i>
-          <span>{{ collection.itemCount }} items</span>
+
+        <!-- Action Buttons (Unified Style) -->
+        <div v-if="!isEditing" class="hero-actions">
+          <!-- Export/Download Dropdown -->
+          <div class="export-menu-container relative">
+            <button @click.stop="showExportMenu = !showExportMenu" class="px-4 py-2 bg-white/10 text-white border border-white/30 rounded-xl font-medium hover:bg-white/20 transition-all flex items-center gap-2">
+              <i class="fas fa-download"></i>
+              <span class="hidden sm:inline">{{ textConstants.download }}</span>
+              <i class="fas fa-chevron-down text-xs ml-1"></i>
+            </button>
+            <Transition name="dropdown">
+              <div v-if="showExportMenu" class="export-dropdown">
+                <button @click="downloadAsZip" class="dropdown-item">
+                  <i class="fas fa-file-archive"></i>
+                  {{ textConstants.exportAsZip }}
+                </button>
+                <button @click="exportAsPdf" class="dropdown-item">
+                  <i class="fas fa-file-pdf"></i>
+                  {{ textConstants.exportAsPdf }}
+                </button>
+                <button @click="exportAsJson" class="dropdown-item">
+                  <i class="fas fa-code"></i>
+                  {{ textConstants.exportAsJson }}
+                </button>
+                <div class="dropdown-divider"></div>
+                <button @click="copyAllLinks" class="dropdown-item">
+                  <i class="fas fa-link"></i>
+                  {{ textConstants.copyLinks }}
+                </button>
+              </div>
+            </Transition>
+          </div>
+
+          <button @click="shareCollection" class="px-4 py-2 bg-white/10 text-white border border-white/30 rounded-xl font-medium hover:bg-white/20 transition-all flex items-center gap-2">
+            <i class="fas fa-share-alt"></i>
+            <span class="hidden sm:inline">{{ textConstants.share }}</span>
+          </button>
+
+          <button @click="duplicateCollection" class="px-4 py-2 bg-white/10 text-white border border-white/30 rounded-xl font-medium hover:bg-white/20 transition-all flex items-center gap-2">
+            <i class="fas fa-copy"></i>
+            <span class="hidden sm:inline">{{ textConstants.duplicate }}</span>
+          </button>
+
+          <BookmarkButton
+            content-type="collection"
+            :content-id="collection.id"
+            size="md"
+            variant="icon"
+          />
+
+          <button v-if="canEdit" @click="startEditing" class="px-4 py-2 bg-white/10 text-white border border-white/30 rounded-xl font-medium hover:bg-white/20 transition-all flex items-center gap-2">
+            <i class="fas fa-pen"></i>
+            <span class="hidden sm:inline">{{ textConstants.editCollection }}</span>
+          </button>
+
+          <button v-if="canEdit" @click="toggleVisibility" class="px-4 py-2 bg-white/10 text-white border border-white/30 rounded-xl font-medium hover:bg-white/20 transition-all flex items-center gap-2">
+            <i :class="collection.visibility === 'private' ? 'fas fa-globe' : 'fas fa-lock'"></i>
+            <span class="hidden sm:inline">{{ collection.visibility === 'private' ? textConstants.makeShared : textConstants.makePrivate }}</span>
+          </button>
+
+          <button v-if="isOwner" @click="showDeleteConfirm = true" class="px-4 py-2 bg-red-500/20 text-red-300 border border-red-500/30 rounded-xl font-medium hover:bg-red-500/30 transition-all flex items-center gap-2">
+            <i class="fas fa-trash-alt"></i>
+            <span class="hidden sm:inline">{{ textConstants.delete }}</span>
+          </button>
         </div>
       </div>
     </div>
@@ -571,17 +969,86 @@ onMounted(() => {
     <div class="main-content">
       <!-- Items Section -->
       <div class="items-section">
-        <div class="section-header">
-          <h2 class="section-title">
-            <i class="fas fa-layer-group"></i>
-            Collection Items
-          </h2>
-          <span class="item-count">{{ sortedItems.length }} items</span>
+        <div class="section-header-enhanced">
+          <div class="section-title-row">
+            <h2 class="section-title">
+              <i class="fas fa-layer-group"></i>
+              {{ textConstants.collectionItems }}
+            </h2>
+            <span class="item-count-badge">{{ filteredAndSortedItems.length }} {{ textConstants.items }}</span>
+          </div>
+
+          <!-- Controls Row -->
+          <div class="controls-row">
+            <!-- Filter Tabs -->
+            <div class="filter-tabs">
+              <button
+                @click="filterType = 'all'"
+                :class="['filter-tab', filterType === 'all' ? 'active' : '']"
+              >
+                {{ textConstants.allTypes }}
+                <span class="count">{{ itemCounts.all }}</span>
+              </button>
+              <button
+                @click="filterType = 'article'"
+                :class="['filter-tab', filterType === 'article' ? 'active' : '']"
+              >
+                <i class="fas fa-newspaper"></i>
+                {{ textConstants.articles }}
+                <span class="count">{{ itemCounts.article }}</span>
+              </button>
+              <button
+                @click="filterType = 'document'"
+                :class="['filter-tab', filterType === 'document' ? 'active' : '']"
+              >
+                <i class="fas fa-file-alt"></i>
+                {{ textConstants.documents }}
+                <span class="count">{{ itemCounts.document }}</span>
+              </button>
+              <button
+                @click="filterType = 'media'"
+                :class="['filter-tab', filterType === 'media' ? 'active' : '']"
+              >
+                <i class="fas fa-photo-video"></i>
+                {{ textConstants.media }}
+                <span class="count">{{ itemCounts.media }}</span>
+              </button>
+            </div>
+
+            <!-- Sort & View Controls -->
+            <div class="view-controls">
+              <select v-model="sortBy" class="sort-select">
+                <option value="recent">{{ textConstants.sortRecent }}</option>
+                <option value="oldest">{{ textConstants.sortOldest }}</option>
+                <option value="az">{{ textConstants.sortAZ }}</option>
+                <option value="za">{{ textConstants.sortZA }}</option>
+                <option value="type">{{ textConstants.sortType }}</option>
+              </select>
+
+              <div class="view-toggle">
+                <button
+                  @click="viewMode = 'list'"
+                  :class="['view-btn', viewMode === 'list' ? 'active' : '']"
+                  :title="textConstants.listView"
+                >
+                  <i class="fas fa-list"></i>
+                </button>
+                <button
+                  @click="viewMode = 'grid'"
+                  :class="['view-btn', viewMode === 'grid' ? 'active' : '']"
+                  :title="textConstants.gridView"
+                >
+                  <i class="fas fa-th"></i>
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div v-if="sortedItems.length > 0" class="items-grid">
+        <!-- List View -->
+        <div v-if="filteredAndSortedItems.length > 0 && viewMode === 'list'" class="items-list">
           <div
-            v-for="item in sortedItems"
+            v-for="item in filteredAndSortedItems"
             :key="item.id"
             class="item-card"
             :class="{ 'dragging': draggedItem === item.id }"
@@ -593,7 +1060,7 @@ onMounted(() => {
             @click="openItem(item)"
           >
             <!-- Drag Handle -->
-            <div v-if="canEdit" class="drag-handle">
+            <div v-if="canEdit" class="drag-handle" :title="textConstants.dragToReorder">
               <i class="fas fa-grip-vertical"></i>
             </div>
 
@@ -642,10 +1109,63 @@ onMounted(() => {
               v-if="canEdit"
               @click.stop="removeItem(item.id)"
               class="remove-btn"
-              title="Remove from collection"
+              :title="textConstants.removeFromCollection"
             >
               <i class="fas fa-times"></i>
             </button>
+          </div>
+        </div>
+
+        <!-- Grid View -->
+        <div v-else-if="filteredAndSortedItems.length > 0 && viewMode === 'grid'" class="items-grid-view">
+          <div
+            v-for="item in filteredAndSortedItems"
+            :key="item.id"
+            class="grid-item-card"
+            @click="openItem(item)"
+          >
+            <!-- Thumbnail -->
+            <div class="grid-item-thumbnail">
+              <img v-if="item.thumbnail" :src="item.thumbnail" :alt="item.title" />
+              <div v-else class="grid-thumbnail-placeholder">
+                <i :class="getContentTypeIcon(item.contentType)"></i>
+              </div>
+              <div :class="['grid-type-badge', getContentTypeColor(item.contentType)]">
+                <i :class="getContentTypeIcon(item.contentType)"></i>
+              </div>
+              <!-- Remove Button -->
+              <button
+                v-if="canEdit"
+                @click.stop="removeItem(item.id)"
+                class="grid-remove-btn"
+                :title="textConstants.removeFromCollection"
+              >
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+
+            <!-- Content -->
+            <div class="grid-item-content">
+              <h3 class="grid-item-title">{{ item.title }}</h3>
+              <div class="grid-item-meta">
+                <span v-if="item.metadata?.duration">
+                  <i class="fas fa-clock"></i>
+                  {{ item.metadata.duration }}
+                </span>
+                <span v-else-if="item.metadata?.readTime">
+                  <i class="fas fa-book-open"></i>
+                  {{ item.metadata.readTime }}
+                </span>
+                <span v-else-if="item.metadata?.size">
+                  <i class="fas fa-file"></i>
+                  {{ item.metadata.size }}
+                </span>
+                <span v-else-if="item.metadata?.photoCount">
+                  <i class="fas fa-images"></i>
+                  {{ item.metadata.photoCount }}
+                </span>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -653,8 +1173,8 @@ onMounted(() => {
           <div class="empty-icon">
             <i class="fas fa-layer-group"></i>
           </div>
-          <h3>No items yet</h3>
-          <p>Add articles, documents, and media to this collection from their respective pages.</p>
+          <h3>{{ textConstants.noItems }}</h3>
+          <p>{{ textConstants.noItemsDesc }}</p>
         </div>
       </div>
 
@@ -701,12 +1221,40 @@ onMounted(() => {
           </div>
         </div>
 
+        <!-- Activity Timeline Panel -->
+        <div class="panel activity-panel">
+          <div class="panel-header">
+            <h3 class="panel-title">
+              <i class="fas fa-history"></i>
+              {{ textConstants.recentActivity }}
+            </h3>
+          </div>
+          <div class="activity-list">
+            <div
+              v-for="activity in activities"
+              :key="activity.id"
+              class="activity-item"
+            >
+              <div class="activity-icon-wrapper" :class="getActivityColor(activity.type)">
+                <i :class="getActivityIcon(activity.type)"></i>
+              </div>
+              <div class="activity-content">
+                <p class="activity-text">
+                  <span class="activity-user">{{ activity.user.name }}</span>
+                  {{ getActivityText(activity) }}
+                </p>
+                <span class="activity-time">{{ formatDate(activity.timestamp) }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- Comments Panel -->
         <div class="panel comments-panel">
           <div class="panel-header">
             <h3 class="panel-title">
               <i class="fas fa-comments"></i>
-              Comments
+              {{ textConstants.comments }}
             </h3>
             <span class="comment-count">{{ collection.comments.length }}</span>
           </div>
@@ -736,7 +1284,7 @@ onMounted(() => {
               <textarea
                 v-model="newComment"
                 class="comment-input"
-                placeholder="Add a comment... Use @name to mention"
+                :placeholder="textConstants.addComment"
                 rows="2"
                 @keydown.enter.ctrl="addComment"
               ></textarea>
@@ -860,99 +1408,290 @@ onMounted(() => {
   background: #f8fafc;
 }
 
-/* Header */
-.page-header {
-  background: white;
-  border-bottom: 1px solid #e5e7eb;
-  padding: 1.5rem 2rem;
-}
-
-.header-content {
+/* ============================================================================
+   HERO HEADER
+   ============================================================================ */
+.hero-header {
+  position: relative;
+  min-height: 320px;
   display: flex;
-  align-items: flex-start;
-  gap: 1rem;
-  margin-bottom: 1rem;
+  flex-direction: column;
 }
 
-.back-btn {
-  width: 40px;
-  height: 40px;
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.hero-bg-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(15, 23, 42, 0.7) 0%,
+    rgba(15, 23, 42, 0.85) 50%,
+    rgba(15, 23, 42, 0.95) 100%
+  );
+}
+
+.hero-content {
+  position: relative;
+  z-index: 10;
+  padding: 1.5rem 2rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Navigation */
+.hero-nav {
   display: flex;
   align-items: center;
-  justify-content: center;
-  background: #f1f5f9;
-  border: none;
+  justify-content: space-between;
+}
+
+.back-btn-hero {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 10px;
-  color: #64748b;
+  color: white;
+  font-size: 0.875rem;
+  font-weight: 500;
   cursor: pointer;
-  transition: all 0.15s;
-  flex-shrink: 0;
+  transition: all 0.2s;
 }
 
-.back-btn:hover {
-  background: #e5e7eb;
-  color: #1e293b;
+.back-btn-hero:hover {
+  background: rgba(255, 255, 255, 0.2);
 }
 
-.collection-info {
-  flex: 1;
-  min-width: 0;
+.edit-controls {
+  display: flex;
+  gap: 0.5rem;
 }
 
-.title-row {
+/* Hero Info */
+.hero-info {
+  max-width: 800px;
+}
+
+.visibility-badge-hero {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.375rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.visibility-badge-hero.private {
+  background: rgba(30, 41, 59, 0.8);
+  color: white;
+}
+
+.visibility-badge-hero.shared {
+  background: rgba(20, 184, 166, 0.9);
+  color: white;
+}
+
+.hero-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: white;
+  margin: 0 0 0.5rem;
+  line-height: 1.2;
+}
+
+.hero-description {
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.8);
+  margin: 0;
+  max-width: 600px;
+}
+
+/* Edit Mode in Hero */
+.info-edit-hero {
+  max-width: 600px;
+}
+
+.edit-title-hero {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(20, 184, 166, 0.5);
+  border-radius: 10px;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: white;
+  margin-bottom: 0.75rem;
+}
+
+.edit-title-hero::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.edit-title-hero:focus {
+  outline: none;
+  border-color: #14b8a6;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.edit-description-hero {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  font-size: 0.9375rem;
+  color: white;
+  resize: none;
+}
+
+.edit-description-hero::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.edit-description-hero:focus {
+  outline: none;
+  border-color: rgba(20, 184, 166, 0.5);
+}
+
+/* Meta & Stats */
+.hero-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.meta-author {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  margin-bottom: 0.375rem;
 }
 
-.collection-title {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #1e293b;
-  margin: 0;
+.author-avatar-hero {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: white;
+  border: 2px solid rgba(255, 255, 255, 0.3);
 }
 
-.collection-description {
+.author-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.author-name {
+  color: white;
+  font-weight: 600;
   font-size: 0.9375rem;
-  color: #64748b;
-  margin: 0;
 }
 
-.visibility-badge {
+.author-role {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+}
+
+.meta-stats {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.stat-item {
   display: flex;
   align-items: center;
   gap: 0.375rem;
-  padding: 0.25rem 0.625rem;
-  border-radius: 20px;
-  font-size: 0.75rem;
-  font-weight: 500;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.8125rem;
 }
 
-.visibility-badge.private {
-  background: #1e293b;
-  color: white;
+.stat-item i {
+  color: rgba(255, 255, 255, 0.5);
 }
 
-.visibility-badge.shared {
-  background: #14b8a6;
-  color: white;
+/* Hero Actions */
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
 }
 
-/* Edit Mode */
-.edit-title-input {
+/* Export Dropdown */
+.export-dropdown {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  left: 0;
+  min-width: 200px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  z-index: 100;
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
   width: 100%;
-  padding: 0.5rem 0.75rem;
-  border: 2px solid #14b8a6;
-  border-radius: 8px;
-  font-size: 1.25rem;
-  font-weight: 600;
-  margin-bottom: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: none;
+  border: none;
+  font-size: 0.875rem;
+  color: #374151;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s;
 }
 
-.edit-title-input:focus {
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.1);
+.dropdown-item:hover {
+  background: #f3f4f6;
+}
+
+.dropdown-item i {
+  width: 16px;
+  color: #6b7280;
+}
+
+.dropdown-divider {
+  height: 1px;
+  background: #e5e7eb;
+  margin: 0.25rem 0;
+}
+
+.dropdown-enter-active,
+.dropdown-leave-active {
+  transition: all 0.2s ease;
+}
+
+.dropdown-enter-from,
+.dropdown-leave-to {
+  opacity: 0;
+  transform: translateY(-8px);
 }
 
 .edit-description-input {
@@ -1068,7 +1807,18 @@ onMounted(() => {
   min-width: 0;
 }
 
-.section-header {
+/* ============================================================================
+   SECTION HEADER WITH CONTROLS
+   ============================================================================ */
+.section-header-enhanced {
+  background: white;
+  border-radius: 16px;
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+  border: 1px solid #e5e7eb;
+}
+
+.section-title-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -1082,19 +1832,136 @@ onMounted(() => {
   font-size: 1.125rem;
   font-weight: 600;
   color: #1e293b;
+  margin: 0;
 }
 
 .section-title i {
   color: #14b8a6;
 }
 
-.item-count {
+.item-count-badge {
+  background: #f0fdfa;
+  color: #0f766e;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
   font-size: 0.8125rem;
-  color: #94a3b8;
+  font-weight: 600;
 }
 
-/* Items Grid */
-.items-grid {
+/* Controls Row */
+.controls-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+/* Filter Tabs */
+.filter-tabs {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.filter-tab {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem 0.875rem;
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.filter-tab:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+.filter-tab.active {
+  background: #0f766e;
+  border-color: #0f766e;
+  color: white;
+}
+
+.filter-tab .count {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 0.125rem 0.375rem;
+  border-radius: 4px;
+  font-size: 0.6875rem;
+}
+
+.filter-tab:not(.active) .count {
+  background: #e5e7eb;
+  color: #64748b;
+}
+
+/* View Controls */
+.view-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.sort-select {
+  padding: 0.5rem 2rem 0.5rem 0.75rem;
+  background: white url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%2364748b'%3E%3Cpath fill-rule='evenodd' d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' clip-rule='evenodd'/%3E%3C/svg%3E") right 0.5rem center no-repeat;
+  background-size: 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 0.8125rem;
+  color: #374151;
+  cursor: pointer;
+  appearance: none;
+}
+
+.sort-select:focus {
+  outline: none;
+  border-color: #14b8a6;
+  box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.1);
+}
+
+.view-toggle {
+  display: flex;
+  background: #f1f5f9;
+  border-radius: 8px;
+  padding: 0.25rem;
+}
+
+.view-btn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.view-btn:hover {
+  color: #374151;
+}
+
+.view-btn.active {
+  background: white;
+  color: #14b8a6;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* ============================================================================
+   LIST VIEW
+   ============================================================================ */
+.items-list {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
@@ -1276,6 +2143,182 @@ onMounted(() => {
   font-size: 0.875rem;
   color: #64748b;
   max-width: 300px;
+}
+
+/* ============================================================================
+   GRID VIEW
+   ============================================================================ */
+.items-grid-view {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.grid-item-card {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.grid-item-card:hover {
+  border-color: #99f6e4;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transform: translateY(-2px);
+}
+
+.grid-item-thumbnail {
+  position: relative;
+  aspect-ratio: 16/10;
+  overflow: hidden;
+}
+
+.grid-item-thumbnail img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s;
+}
+
+.grid-item-card:hover .grid-item-thumbnail img {
+  transform: scale(1.05);
+}
+
+.grid-thumbnail-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
+  color: #94a3b8;
+  font-size: 2rem;
+}
+
+.grid-type-badge {
+  position: absolute;
+  bottom: 0.5rem;
+  left: 0.5rem;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  font-size: 0.75rem;
+}
+
+.grid-remove-btn {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.5);
+  border: none;
+  border-radius: 50%;
+  color: white;
+  cursor: pointer;
+  opacity: 0;
+  transition: all 0.15s;
+}
+
+.grid-item-card:hover .grid-remove-btn {
+  opacity: 1;
+}
+
+.grid-remove-btn:hover {
+  background: #dc2626;
+}
+
+.grid-item-content {
+  padding: 0.75rem;
+}
+
+.grid-item-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0 0 0.25rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.grid-item-meta {
+  font-size: 0.75rem;
+  color: #94a3b8;
+}
+
+.grid-item-meta span {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+/* ============================================================================
+   ACTIVITY PANEL
+   ============================================================================ */
+.activity-panel {
+  max-height: 320px;
+  display: flex;
+  flex-direction: column;
+}
+
+.activity-list {
+  padding: 0.5rem;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.activity-item {
+  display: flex;
+  gap: 0.75rem;
+  padding: 0.625rem 0.5rem;
+  border-radius: 8px;
+  transition: background 0.15s;
+}
+
+.activity-item:hover {
+  background: #f8fafc;
+}
+
+.activity-icon-wrapper {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 0.75rem;
+}
+
+.activity-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.activity-text {
+  font-size: 0.8125rem;
+  color: #475569;
+  margin: 0 0 0.25rem;
+  line-height: 1.4;
+}
+
+.activity-user {
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.activity-time {
+  font-size: 0.6875rem;
+  color: #94a3b8;
 }
 
 /* Sidebar */
@@ -1811,7 +2854,9 @@ onMounted(() => {
   transform: scale(0.95) translateY(20px);
 }
 
-/* Responsive */
+/* ============================================================================
+   RESPONSIVE
+   ============================================================================ */
 @media (max-width: 1024px) {
   .main-content {
     flex-direction: column;
@@ -1820,26 +2865,100 @@ onMounted(() => {
   .sidebar {
     width: 100%;
   }
-}
 
-@media (max-width: 768px) {
-  .header-content {
+  .hero-meta {
     flex-direction: column;
     align-items: flex-start;
   }
 
-  .header-actions {
-    width: 100%;
+  .controls-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filter-tabs {
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+  }
+
+  .view-controls {
+    justify-content: space-between;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero-content {
+    padding: 1rem 1rem 1.5rem;
+  }
+
+  .hero-title {
+    font-size: 1.5rem;
+  }
+
+  .hero-actions {
     flex-wrap: wrap;
   }
 
-  .action-btn span {
+  .hero-actions button span {
     display: none;
   }
 
+  .back-btn-hero span {
+    display: none;
+  }
+
+  .section-header-enhanced {
+    padding: 1rem;
+  }
+
+  .item-card {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
   .item-thumbnail {
-    width: 100px;
-    height: 70px;
+    width: 100%;
+    height: 160px;
+  }
+
+  .drag-handle {
+    display: none;
+  }
+
+  .items-grid-view {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 0.75rem;
+  }
+
+  .filter-tab {
+    padding: 0.375rem 0.625rem;
+    font-size: 0.75rem;
+  }
+
+  .filter-tab i {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-header {
+    min-height: 280px;
+  }
+
+  .hero-title {
+    font-size: 1.25rem;
+  }
+
+  .hero-description {
+    font-size: 0.875rem;
+  }
+
+  .meta-stats {
+    gap: 0.75rem;
+  }
+
+  .stat-item {
+    font-size: 0.75rem;
   }
 }
 </style>

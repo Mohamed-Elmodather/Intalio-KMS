@@ -80,7 +80,7 @@ export interface ShareOption {
 export interface Bookmark {
   id: string
   contentId: string
-  contentType: 'article' | 'document' | 'media' | 'course' | 'event' | 'poll' | 'service'
+  contentType: 'article' | 'document' | 'media' | 'course' | 'event' | 'poll' | 'service' | 'collection'
   createdAt: Date
   collectionId?: string
 }
