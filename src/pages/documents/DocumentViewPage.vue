@@ -277,6 +277,16 @@ onMounted(async () => {
   }, 500)
 })
 
+function getDocumentTypeClass(type: string) {
+  switch (type.toLowerCase()) {
+    case 'pdf': return 'bg-rose-500 text-white'
+    case 'word': return 'bg-blue-500 text-white'
+    case 'excel': return 'bg-emerald-500 text-white'
+    case 'powerpoint': return 'bg-orange-500 text-white'
+    default: return 'bg-gray-500 text-white'
+  }
+}
+
 function goBack() {
   router.push('/documents')
 }
@@ -1087,62 +1097,90 @@ function formatVersionDate(date: Date): string {
 
     <!-- Document Content -->
     <div v-else-if="document" class="page-view fade-in">
-      <!-- Hero Header -->
-      <div class="hero-gradient relative overflow-hidden rounded-2xl mb-6">
-        <!-- Decorative circles -->
-        <div class="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/4"></div>
-        <div class="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/4"></div>
-        <div class="absolute top-1/2 right-1/3 w-32 h-32 bg-white/10 rounded-full"></div>
+      <!-- Hero Section -->
+      <header class="relative">
+        <div class="h-[180px] w-full bg-gradient-to-br from-teal-600 via-teal-500 to-emerald-500"></div>
 
-        <div class="relative z-10 px-8 py-6">
-          <!-- Navigation Row -->
-          <div class="header-nav">
-            <button @click="goBack" class="back-btn">
-              <i class="fas fa-arrow-left"></i>
-              <span>Back</span>
-            </button>
-            <div class="breadcrumb">
-              <router-link to="/documents" class="breadcrumb-link">
-                <i class="fas fa-folder-open"></i>
-                Documents
-              </router-link>
-              <i class="fas fa-chevron-right breadcrumb-sep"></i>
-              <span class="breadcrumb-current">{{ document.name }}</span>
+        <!-- Header Content -->
+        <div class="absolute bottom-0 left-0 right-0 px-6 py-5">
+          <div>
+            <!-- Navigation Row -->
+            <div class="header-nav">
+              <button @click="goBack" class="back-btn">
+                <i class="fas fa-arrow-left"></i>
+                <span>Back</span>
+              </button>
+              <div class="breadcrumb">
+                <router-link to="/documents" class="breadcrumb-link">
+                  <i class="fas fa-folder-open"></i>
+                  Documents
+                </router-link>
+                <i class="fas fa-chevron-right breadcrumb-sep"></i>
+                <span class="breadcrumb-current">{{ document.name }}</span>
+              </div>
+            </div>
+
+            <!-- Title -->
+            <h1 class="text-2xl md:text-3xl font-bold text-white leading-tight mb-2">
+              {{ document.name }}
+            </h1>
+
+            <!-- Tags -->
+            <div class="flex items-center gap-2 flex-wrap">
+              <span :class="['px-2.5 py-0.5 rounded-full text-xs font-medium', getDocumentTypeClass(document.type)]">
+                {{ document.type }}
+              </span>
+              <span v-for="tag in document.tags" :key="tag" class="px-2.5 py-0.5 bg-white/20 backdrop-blur-sm text-white rounded-full text-xs">
+                {{ tag }}
+              </span>
             </div>
           </div>
+        </div>
+      </header>
 
-          <!-- Title and actions row -->
+      <!-- Metadata Bar -->
+      <div class="bg-white border-b border-gray-200 sticky top-0 z-20 mb-6">
+        <div class="px-6 py-3">
           <div class="flex items-center justify-between flex-wrap gap-4">
+            <!-- Author & Meta -->
             <div class="flex items-center gap-4">
-              <div :class="['w-14 h-14 rounded-xl shadow-lg flex items-center justify-center', document.iconBg]">
-                <i :class="[document.icon, document.iconColor, 'text-2xl']"></i>
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold" :style="{ backgroundColor: document.author.color }">
+                  {{ document.author.initials }}
+                </div>
+                <div>
+                  <p class="font-semibold text-gray-900 text-sm">{{ document.author.name }}</p>
+                  <p class="text-xs text-gray-500">{{ document.library }}</p>
+                </div>
               </div>
-              <div>
-                <h1 class="text-2xl md:text-3xl font-bold text-white">{{ document.name }}</h1>
-                <p class="text-white/70">{{ document.type }} • {{ document.size }} • Version {{ document.version }}</p>
+
+              <div class="hidden md:flex items-center gap-4 pl-4 border-l border-gray-200 text-sm text-gray-500">
+                <span><i class="fas fa-file mr-1"></i> {{ document.size }}</span>
+                <span><i class="fas fa-code-branch mr-1"></i> v{{ document.version }}</span>
+                <span><i class="fas fa-eye mr-1"></i> {{ document.views.toLocaleString() }}</span>
+                <span><i class="fas fa-download mr-1"></i> {{ document.downloads.toLocaleString() }}</span>
               </div>
             </div>
 
-            <!-- Action buttons -->
-            <div class="flex items-center gap-3">
-              <button @click="downloadDocument" class="px-4 py-2 bg-transparent text-white border border-white/30 rounded-xl font-medium hover:bg-white/10 transition-all flex items-center gap-2">
+            <!-- Actions -->
+            <div class="flex items-center gap-2">
+              <button @click="downloadDocument" class="px-3 py-2 rounded-lg text-sm font-medium bg-teal-500 text-white hover:bg-teal-600 transition-all flex items-center gap-2">
                 <i class="fas fa-download"></i>
                 <span class="hidden sm:inline">Download</span>
               </button>
-              <button @click="showAddToCollection = true" class="px-4 py-2 bg-transparent text-white border border-white/30 rounded-xl font-medium hover:bg-white/10 transition-all flex items-center gap-2" title="Add to Collection">
+              <button @click="showAddToCollection = true" class="px-3 py-2 rounded-lg text-sm font-medium bg-gray-100 text-gray-600 hover:bg-gray-200 transition-all" title="Add to Collection">
                 <i class="fas fa-folder-plus"></i>
-                <span class="hidden sm:inline">Collection</span>
-              </button>
-              <button @click="shareDocument" class="px-4 py-2 bg-transparent text-white border border-white/30 rounded-xl font-medium hover:bg-white/10 transition-all flex items-center gap-2">
-                <i class="fas fa-share-alt"></i>
-                <span class="hidden sm:inline">Share</span>
               </button>
               <BookmarkButton
                 :content-id="document.id.toString()"
                 content-type="document"
-                size="md"
-                variant="icon"
-                class="text-white"
+                size="sm"
+              />
+              <SocialShareButtons
+                :title="document.name"
+                :description="document.description"
+                layout="horizontal"
+                size="sm"
               />
             </div>
           </div>
