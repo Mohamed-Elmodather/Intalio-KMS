@@ -663,11 +663,13 @@ const estimatedTimeRemaining = computed(() => {
             </div>
           </div>
 
-          <!-- Title & Tags Row -->
-          <div class="flex items-center gap-3 flex-wrap">
-            <h1 class="text-2xl md:text-3xl font-bold text-white leading-tight">
-              {{ course.title }}
-            </h1>
+          <!-- Title -->
+          <h1 class="text-2xl md:text-3xl font-bold text-white leading-tight mb-2">
+            {{ course.title }}
+          </h1>
+
+          <!-- Tags -->
+          <div class="flex items-center gap-2 flex-wrap">
             <span :class="['px-2.5 py-0.5 rounded-full text-xs font-medium', getLevelBadgeClass(course.level)]">
               {{ course.level }}
             </span>
