@@ -1179,40 +1179,57 @@ onUnmounted(() => {
       </div>
 
       <!-- Sidebar -->
-      <div class="sidebar">
-        <!-- Collaborators Panel -->
-        <div class="panel collaborators-panel">
-          <div class="panel-header">
-            <h3 class="panel-title">
-              <i class="fas fa-users"></i>
-              Collaborators
-            </h3>
-            <button v-if="isOwner" @click="showCollaboratorModal = true" class="add-btn">
+      <aside class="detail-sidebar">
+        <!-- Collaborators Card -->
+        <div class="sidebar-card">
+          <div class="card-header">
+            <div class="card-title">
+              <span class="card-icon collaborators-icon">
+                <i class="fas fa-user-friends"></i>
+              </span>
+              <span>Collaborators</span>
+            </div>
+            <button v-if="isOwner" @click="showCollaboratorModal = true" class="card-action-btn">
               <i class="fas fa-plus"></i>
+              Add
             </button>
           </div>
-          <div class="collaborators-list">
-            <div
-              v-for="collaborator in collection.collaborators"
-              :key="collaborator.id"
-              class="collaborator-item"
-            >
-              <div class="collaborator-avatar" :style="{ backgroundColor: collaborator.color }">
-                {{ collaborator.initials }}
+          <div class="card-body">
+            <div class="collaborators-stack">
+              <div
+                v-for="(collaborator, index) in collection.collaborators.slice(0, 5)"
+                :key="collaborator.id"
+                class="collab-avatar-wrapper"
+                :style="{ zIndex: 10 - index }"
+                :title="collaborator.name"
+              >
+                <div class="collab-avatar" :style="{ backgroundColor: collaborator.color }">
+                  {{ collaborator.initials }}
+                </div>
               </div>
-              <div class="collaborator-info">
-                <span class="collaborator-name">{{ collaborator.name }}</span>
-                <span class="collaborator-email">{{ collaborator.email }}</span>
+              <div v-if="collection.collaborators.length > 5" class="collab-more">
+                +{{ collection.collaborators.length - 5 }}
               </div>
-              <div class="collaborator-actions">
-                <span :class="['role-badge', getRoleColor(collaborator.role)]">
-                  {{ getRoleLabel(collaborator.role) }}
-                </span>
+            </div>
+            <div class="collaborators-details">
+              <div
+                v-for="collaborator in collection.collaborators"
+                :key="collaborator.id"
+                class="collab-row"
+              >
+                <div class="collab-info">
+                  <div class="collab-avatar-sm" :style="{ backgroundColor: collaborator.color }">
+                    {{ collaborator.initials }}
+                  </div>
+                  <div class="collab-text">
+                    <span class="collab-name">{{ collaborator.name }}</span>
+                    <span class="collab-role" :class="collaborator.role">{{ getRoleLabel(collaborator.role) }}</span>
+                  </div>
+                </div>
                 <button
                   v-if="isOwner && collaborator.role !== 'owner'"
                   @click="removeCollaborator(collaborator.id)"
-                  class="remove-collaborator-btn"
-                  title="Remove collaborator"
+                  class="collab-remove"
                 >
                   <i class="fas fa-times"></i>
                 </button>
@@ -1221,84 +1238,90 @@ onUnmounted(() => {
           </div>
         </div>
 
-        <!-- Activity Timeline Panel -->
-        <div class="panel activity-panel">
-          <div class="panel-header">
-            <h3 class="panel-title">
-              <i class="fas fa-history"></i>
-              {{ textConstants.recentActivity }}
-            </h3>
+        <!-- Activity Card -->
+        <div class="sidebar-card">
+          <div class="card-header">
+            <div class="card-title">
+              <span class="card-icon activity-icon">
+                <i class="fas fa-clock-rotate-left"></i>
+              </span>
+              <span>{{ textConstants.recentActivity }}</span>
+            </div>
           </div>
-          <div class="activity-list">
-            <div
-              v-for="activity in activities"
-              :key="activity.id"
-              class="activity-item"
-            >
-              <div class="activity-icon-wrapper" :class="getActivityColor(activity.type)">
-                <i :class="getActivityIcon(activity.type)"></i>
-              </div>
-              <div class="activity-content">
-                <p class="activity-text">
-                  <span class="activity-user">{{ activity.user.name }}</span>
-                  {{ getActivityText(activity) }}
-                </p>
-                <span class="activity-time">{{ formatDate(activity.timestamp) }}</span>
+          <div class="card-body activity-body">
+            <div class="activity-timeline">
+              <div
+                v-for="(activity, index) in activities"
+                :key="activity.id"
+                class="timeline-item"
+              >
+                <div class="timeline-marker" :class="activity.type"></div>
+                <div class="timeline-content">
+                  <div class="timeline-header">
+                    <span class="timeline-user">{{ activity.user.name }}</span>
+                    <span class="timeline-time">{{ formatDate(activity.timestamp) }}</span>
+                  </div>
+                  <p class="timeline-text">{{ getActivityText(activity) }}</p>
+                </div>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Comments Panel -->
-        <div class="panel comments-panel">
-          <div class="panel-header">
-            <h3 class="panel-title">
-              <i class="fas fa-comments"></i>
-              {{ textConstants.comments }}
-            </h3>
-            <span class="comment-count">{{ collection.comments.length }}</span>
-          </div>
-          <div class="comments-list">
-            <div
-              v-for="comment in collection.comments"
-              :key="comment.id"
-              class="comment-item"
-            >
-              <div class="comment-avatar" :style="{ backgroundColor: comment.author.color }">
-                {{ comment.author.initials }}
-              </div>
-              <div class="comment-content">
-                <div class="comment-header">
-                  <span class="comment-author">{{ comment.author.name }}</span>
-                  <span class="comment-time">{{ formatDate(comment.createdAt) }}</span>
-                </div>
-                <p class="comment-text" v-html="formatCommentContent(comment.content)"></p>
-              </div>
+        <!-- Comments Card -->
+        <div class="sidebar-card comments-card">
+          <div class="card-header">
+            <div class="card-title">
+              <span class="card-icon comments-icon">
+                <i class="fas fa-message"></i>
+              </span>
+              <span>{{ textConstants.comments }}</span>
             </div>
+            <span class="comments-badge">{{ collection.comments.length }}</span>
           </div>
-          <div class="comment-input-wrapper">
-            <div class="comment-input-avatar" :style="{ backgroundColor: currentUser.color }">
-              {{ currentUser.initials }}
-            </div>
-            <div class="comment-input-container">
-              <textarea
-                v-model="newComment"
-                class="comment-input"
-                :placeholder="textConstants.addComment"
-                rows="2"
-                @keydown.enter.ctrl="addComment"
-              ></textarea>
-              <button
-                @click="addComment"
-                class="send-comment-btn"
-                :disabled="!newComment.trim()"
+          <div class="card-body comments-body">
+            <div class="comments-feed">
+              <div
+                v-for="comment in collection.comments"
+                :key="comment.id"
+                class="comment-bubble"
               >
-                <i class="fas fa-paper-plane"></i>
-              </button>
+                <div class="bubble-header">
+                  <div class="bubble-avatar" :style="{ backgroundColor: comment.author.color }">
+                    {{ comment.author.initials }}
+                  </div>
+                  <div class="bubble-meta">
+                    <span class="bubble-author">{{ comment.author.name }}</span>
+                    <span class="bubble-time">{{ formatDate(comment.createdAt) }}</span>
+                  </div>
+                </div>
+                <div class="bubble-content" v-html="formatCommentContent(comment.content)"></div>
+              </div>
+            </div>
+            <div class="comment-composer">
+              <div class="composer-avatar" :style="{ backgroundColor: currentUser.color }">
+                {{ currentUser.initials }}
+              </div>
+              <div class="composer-input-wrap">
+                <textarea
+                  v-model="newComment"
+                  class="composer-input"
+                  :placeholder="textConstants.addComment"
+                  rows="1"
+                  @keydown.enter.ctrl="addComment"
+                ></textarea>
+                <button
+                  @click="addComment"
+                  class="composer-send"
+                  :disabled="!newComment.trim()"
+                >
+                  <i class="fas fa-paper-plane"></i>
+                </button>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </aside>
     </div>
 
     <!-- Invite Collaborator Modal -->
@@ -2285,306 +2308,424 @@ onUnmounted(() => {
 }
 
 /* ============================================================================
-   ACTIVITY PANEL
+   SIDEBAR - REDESIGNED
    ============================================================================ */
-.activity-panel {
-  max-height: 320px;
-  display: flex;
-  flex-direction: column;
-}
-
-.activity-list {
-  padding: 0.5rem;
-  overflow-y: auto;
-  flex: 1;
-}
-
-.activity-item {
-  display: flex;
-  gap: 0.75rem;
-  padding: 0.625rem 0.5rem;
-  border-radius: 8px;
-  transition: background 0.15s;
-}
-
-.activity-item:hover {
-  background: #f8fafc;
-}
-
-.activity-icon-wrapper {
-  width: 28px;
-  height: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.detail-sidebar {
+  width: 320px;
   flex-shrink: 0;
-  font-size: 0.75rem;
-}
-
-.activity-content {
-  flex: 1;
-  min-width: 0;
-}
-
-.activity-text {
-  font-size: 0.8125rem;
-  color: #475569;
-  margin: 0 0 0.25rem;
-  line-height: 1.4;
-}
-
-.activity-user {
-  font-weight: 600;
-  color: #1e293b;
-}
-
-.activity-time {
-  font-size: 0.6875rem;
-  color: #94a3b8;
-}
-
-/* Sidebar */
-.sidebar {
-  flex: 0 0 340px;
-  width: 340px;
-  min-width: 280px;
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  overflow: visible;
-  order: 2;
 }
 
-/* Panel base styles */
-.panel {
+/* Sidebar Card Base */
+.sidebar-card {
   background: white;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  padding: 0;
+  border-radius: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
 }
 
-.panel-header {
+.card-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1rem;
+  padding: 1rem 1.25rem;
+  background: linear-gradient(to right, #f8fafc, #ffffff);
   border-bottom: 1px solid #f1f5f9;
 }
 
-.panel-title {
+.card-title {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.625rem;
   font-size: 0.9375rem;
   font-weight: 600;
   color: #1e293b;
 }
 
-.panel-title i {
-  color: #14b8a6;
+.card-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.875rem;
 }
 
-.add-btn {
+.card-icon.collaborators-icon {
+  background: linear-gradient(135deg, #ddd6fe, #c4b5fd);
+  color: #7c3aed;
+}
+
+.card-icon.activity-icon {
+  background: linear-gradient(135deg, #fef3c7, #fde68a);
+  color: #d97706;
+}
+
+.card-icon.comments-icon {
+  background: linear-gradient(135deg, #ccfbf1, #99f6e4);
+  color: #0d9488;
+}
+
+.card-action-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem 0.875rem;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 8px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #16a34a;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.card-action-btn:hover {
+  background: #16a34a;
+  border-color: #16a34a;
+  color: white;
+}
+
+.card-body {
+  padding: 1rem 1.25rem;
+}
+
+/* Collaborators Stack */
+.collaborators-stack {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.collab-avatar-wrapper {
+  margin-left: -8px;
+  position: relative;
+}
+
+.collab-avatar-wrapper:first-child {
+  margin-left: 0;
+}
+
+.collab-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: white;
+  border: 3px solid white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.collab-more {
+  margin-left: -8px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: #e5e7eb;
+  color: #64748b;
+  border: 3px solid white;
+}
+
+/* Collaborators Details List */
+.collaborators-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.collab-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem;
+  border-radius: 10px;
+  transition: background 0.15s;
+}
+
+.collab-row:hover {
+  background: #f8fafc;
+}
+
+.collab-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.collab-avatar-sm {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: white;
+}
+
+.collab-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.collab-name {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #1e293b;
+}
+
+.collab-role {
+  font-size: 0.6875rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.collab-role.owner {
+  color: #7c3aed;
+}
+
+.collab-role.editor {
+  color: #0891b2;
+}
+
+.collab-role.viewer {
+  color: #64748b;
+}
+
+.collab-remove {
   width: 28px;
   height: 28px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #f0fdfa;
-  border: 1px solid #99f6e4;
-  border-radius: 50%;
-  color: #0f766e;
-  cursor: pointer;
-  transition: all 0.15s;
-}
-
-.add-btn:hover {
-  background: #14b8a6;
-  border-color: #14b8a6;
-  color: white;
-}
-
-.comment-count {
-  background: #f1f5f9;
-  padding: 0.125rem 0.5rem;
-  border-radius: 10px;
-  font-size: 0.75rem;
-  font-weight: 500;
-  color: #64748b;
-}
-
-/* Collaborators List */
-.collaborators-list {
-  padding: 0.5rem;
-}
-
-.collaborator-item {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.625rem 0.5rem;
-  border-radius: 8px;
-  transition: background 0.15s;
-}
-
-.collaborator-item:hover {
-  background: #f8fafc;
-}
-
-.collaborator-avatar {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: white;
-  flex-shrink: 0;
-}
-
-.collaborator-info {
-  flex: 1;
-  min-width: 0;
-}
-
-.collaborator-name {
-  display: block;
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: #1e293b;
-}
-
-.collaborator-email {
-  display: block;
-  font-size: 0.75rem;
-  color: #94a3b8;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.collaborator-actions {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.role-badge {
-  padding: 0.25rem 0.5rem;
-  border-radius: 6px;
-  font-size: 0.6875rem;
-  font-weight: 600;
-  text-transform: uppercase;
-}
-
-.remove-collaborator-btn {
-  width: 24px;
-  height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   background: transparent;
   border: none;
-  border-radius: 50%;
+  border-radius: 6px;
   color: #94a3b8;
   cursor: pointer;
   opacity: 0;
   transition: all 0.15s;
 }
 
-.collaborator-item:hover .remove-collaborator-btn {
+.collab-row:hover .collab-remove {
   opacity: 1;
 }
 
-.remove-collaborator-btn:hover {
+.collab-remove:hover {
   background: #fef2f2;
   color: #dc2626;
 }
 
-/* Comments Panel */
-.comments-panel {
-  display: flex;
-  flex-direction: column;
-  max-height: 500px;
+/* Activity Timeline */
+.activity-body {
+  padding: 0;
 }
 
-.comments-list {
-  flex: 1;
+.activity-timeline {
+  max-height: 280px;
   overflow-y: auto;
-  padding: 0.75rem;
+  padding: 1rem 1.25rem;
 }
 
-.comment-item {
+.timeline-item {
   display: flex;
-  gap: 0.625rem;
-  padding: 0.5rem 0;
+  gap: 0.875rem;
+  padding-bottom: 1rem;
+  position: relative;
 }
 
-.comment-item:not(:last-child) {
-  border-bottom: 1px solid #f1f5f9;
-  padding-bottom: 0.75rem;
-  margin-bottom: 0.5rem;
+.timeline-item:not(:last-child)::before {
+  content: '';
+  position: absolute;
+  left: 5px;
+  top: 18px;
+  bottom: 0;
+  width: 2px;
+  background: #e5e7eb;
 }
 
-.comment-avatar {
-  width: 32px;
-  height: 32px;
+.timeline-item:last-child {
+  padding-bottom: 0;
+}
+
+.timeline-marker {
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.6875rem;
-  font-weight: 600;
-  color: white;
   flex-shrink: 0;
+  margin-top: 4px;
+  position: relative;
+  z-index: 1;
 }
 
-.comment-content {
+.timeline-marker.added {
+  background: #22c55e;
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.2);
+}
+
+.timeline-marker.removed {
+  background: #ef4444;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
+}
+
+.timeline-marker.reordered {
+  background: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+.timeline-marker.updated {
+  background: #f59e0b;
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2);
+}
+
+.timeline-marker.invited {
+  background: #a855f7;
+  box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.2);
+}
+
+.timeline-marker.commented {
+  background: #14b8a6;
+  box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.2);
+}
+
+.timeline-content {
   flex: 1;
   min-width: 0;
 }
 
-.comment-header {
+.timeline-header {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  justify-content: space-between;
   margin-bottom: 0.25rem;
 }
 
-.comment-author {
+.timeline-user {
   font-size: 0.8125rem;
   font-weight: 600;
   color: #1e293b;
 }
 
-.comment-time {
+.timeline-time {
   font-size: 0.6875rem;
   color: #94a3b8;
 }
 
-.comment-text {
+.timeline-text {
+  font-size: 0.8125rem;
+  color: #64748b;
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* Comments Card */
+.comments-badge {
+  background: #14b8a6;
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.25rem 0.625rem;
+  border-radius: 12px;
+  min-width: 24px;
+  text-align: center;
+}
+
+.comments-body {
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  max-height: 400px;
+}
+
+.comments-feed {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.comment-bubble {
+  background: #f8fafc;
+  border-radius: 12px;
+  padding: 0.875rem;
+}
+
+.bubble-header {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  margin-bottom: 0.5rem;
+}
+
+.bubble-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.625rem;
+  font-weight: 600;
+  color: white;
+}
+
+.bubble-meta {
+  display: flex;
+  flex-direction: column;
+}
+
+.bubble-author {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.bubble-time {
+  font-size: 0.6875rem;
+  color: #94a3b8;
+}
+
+.bubble-content {
   font-size: 0.8125rem;
   color: #475569;
   line-height: 1.5;
-  margin: 0;
 }
 
-.comment-text :deep(.mention) {
+.bubble-content :deep(.mention) {
   color: #0d9488;
   font-weight: 500;
 }
 
-.comment-input-wrapper {
+/* Comment Composer */
+.comment-composer {
   display: flex;
-  gap: 0.625rem;
-  padding: 0.75rem;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
   border-top: 1px solid #f1f5f9;
-  background: #f8fafc;
+  background: #fafafa;
 }
 
-.comment-input-avatar {
+.composer-avatar {
   width: 32px;
   height: 32px;
   border-radius: 50%;
@@ -2597,33 +2738,44 @@ onUnmounted(() => {
   flex-shrink: 0;
 }
 
-.comment-input-container {
+.composer-input-wrap {
   flex: 1;
-  position: relative;
-}
-
-.comment-input {
-  width: 100%;
-  padding: 0.5rem 2.5rem 0.5rem 0.75rem;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  font-size: 0.8125rem;
-  resize: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 24px;
+  padding: 0.375rem 0.5rem 0.375rem 1rem;
+  transition: all 0.2s;
 }
 
-.comment-input:focus {
-  outline: none;
+.composer-input-wrap:focus-within {
   border-color: #14b8a6;
   box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.1);
 }
 
-.send-comment-btn {
-  position: absolute;
-  right: 0.5rem;
-  bottom: 0.5rem;
-  width: 28px;
-  height: 28px;
+.composer-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-size: 0.8125rem;
+  resize: none;
+  padding: 0.375rem 0;
+  min-height: 24px;
+}
+
+.composer-input:focus {
+  outline: none;
+}
+
+.composer-input::placeholder {
+  color: #94a3b8;
+}
+
+.composer-send {
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2632,15 +2784,16 @@ onUnmounted(() => {
   border-radius: 50%;
   color: white;
   cursor: pointer;
-  transition: all 0.15s;
+  transition: all 0.2s;
+  flex-shrink: 0;
 }
 
-.send-comment-btn:hover:not(:disabled) {
+.composer-send:hover:not(:disabled) {
   background: #0d9488;
   transform: scale(1.05);
 }
 
-.send-comment-btn:disabled {
+.composer-send:disabled {
   background: #e5e7eb;
   cursor: not-allowed;
 }
@@ -2884,8 +3037,7 @@ onUnmounted(() => {
    RESPONSIVE
    ============================================================================ */
 @media (max-width: 1200px) {
-  .sidebar {
-    flex: 0 0 300px;
+  .detail-sidebar {
     width: 300px;
   }
 }
@@ -2896,8 +3048,7 @@ onUnmounted(() => {
     padding: 1rem;
   }
 
-  .sidebar {
-    flex: none;
+  .detail-sidebar {
     width: 100%;
   }
 
