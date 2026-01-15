@@ -1805,24 +1805,22 @@ onUnmounted(() => {
   color: white;
 }
 
-/* Main Content */
+/* Main Content - using CSS Grid for reliable layout */
 .main-content {
-  display: flex;
-  flex-direction: row;
+  display: grid;
+  grid-template-columns: 1fr 360px;
   gap: 1.5rem;
   padding: 1.5rem 2rem;
   max-width: 1600px;
-  margin-left: auto;
-  margin-right: auto;
+  margin: 0 auto;
   box-sizing: border-box;
   width: 100%;
 }
 
-/* Items Section - takes remaining space after sidebar */
+/* Items Section */
 .items-section {
-  flex: 1 1 auto;
   min-width: 0;
-  max-width: calc(100% - 360px - 1.5rem);
+  overflow: hidden;
 }
 
 /* ============================================================================
@@ -2346,15 +2344,12 @@ onUnmounted(() => {
   color: #94a3b8;
 }
 
-/* Sidebar - fixed width, no shrink */
+/* Sidebar */
 .sidebar {
-  flex: 0 0 360px;
-  width: 360px;
-  min-width: 360px;
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  box-sizing: border-box;
+  min-width: 0;
 }
 
 /* Panel base styles */
@@ -2363,8 +2358,6 @@ onUnmounted(() => {
   border: 1px solid #e5e7eb;
   border-radius: 12px;
   overflow: hidden;
-  width: 100%;
-  box-sizing: border-box;
 }
 
 .panel-header {
@@ -2888,32 +2881,15 @@ onUnmounted(() => {
    RESPONSIVE
    ============================================================================ */
 @media (max-width: 1200px) {
-  .sidebar {
-    flex: 0 0 320px;
-    width: 320px;
-    min-width: 320px;
-  }
-
-  .items-section {
-    max-width: calc(100% - 320px - 1.5rem);
+  .main-content {
+    grid-template-columns: 1fr 320px;
   }
 }
 
 @media (max-width: 1024px) {
   .main-content {
-    flex-direction: column;
+    grid-template-columns: 1fr;
     padding: 1rem;
-  }
-
-  .items-section {
-    max-width: 100%;
-    width: 100%;
-  }
-
-  .sidebar {
-    flex: 1 1 auto;
-    width: 100%;
-    min-width: 100%;
   }
 
   .hero-content {
