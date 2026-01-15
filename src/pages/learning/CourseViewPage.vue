@@ -2210,8 +2210,7 @@ const estimatedTimeRemaining = computed(() => {
 
 /* Sections Container */
 .sections-container {
-  max-width: 1200px;
-  margin: 0 auto;
+  width: 100%;
   padding: 2rem;
   display: flex;
   flex-direction: column;
