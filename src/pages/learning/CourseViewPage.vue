@@ -674,12 +674,9 @@ const estimatedTimeRemaining = computed(() => {
           </div>
 
           <!-- Title -->
-          <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold text-white leading-tight mb-4">
+          <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold text-white leading-tight">
             {{ course.title }}
           </h1>
-
-          <!-- Description -->
-          <p class="text-lg text-white/80 max-w-3xl">{{ course.description }}</p>
         </div>
       </div>
     </header>
@@ -849,6 +846,12 @@ const estimatedTimeRemaining = computed(() => {
               <i class="fas fa-chevron-right"></i>
             </button>
           </div>
+        </div>
+
+        <!-- About this Course -->
+        <div class="about-course-card">
+          <h3><i class="fas fa-info-circle text-teal-500 mr-2"></i>About this Course</h3>
+          <p>{{ course.description }}</p>
         </div>
 
         <!-- Course Objectives -->
@@ -2195,6 +2198,30 @@ const estimatedTimeRemaining = computed(() => {
 
 .certificate-btn:hover {
   background: rgba(255, 255, 255, 0.3);
+}
+
+/* About Course Card */
+.about-course-card {
+  background: white;
+  border-radius: 16px;
+  border: 1px solid #e5e7eb;
+  padding: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.about-course-card h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+}
+
+.about-course-card p {
+  color: #4b5563;
+  line-height: 1.7;
+  font-size: 0.9rem;
 }
 
 /* Course Objectives Card */
