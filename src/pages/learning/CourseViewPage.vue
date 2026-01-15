@@ -1078,25 +1078,24 @@ const estimatedTimeRemaining = computed(() => {
       </div>
     </div>
 
-    <!-- Full Width About Section -->
-    <div class="full-width-section">
-      <div class="section-content">
-        <div class="section-header">
-          <i class="fas fa-info-circle"></i>
-          <h3>About this Course</h3>
-        </div>
-        <p class="about-text">{{ course.description }}</p>
+    <!-- Full Width Sections Container -->
+    <div class="sections-container">
+      <!-- About this Course -->
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+        <h3 class="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+          <i class="fas fa-info-circle text-teal-500"></i>
+          About this Course
+        </h3>
+        <p class="text-gray-600 leading-relaxed">{{ course.description }}</p>
       </div>
-    </div>
 
-    <!-- Full Width Learning Objectives Section -->
-    <div class="full-width-section">
-      <div class="section-content">
-        <div class="section-header">
-          <i class="fas fa-bullseye"></i>
-          <h3>Learning Objectives</h3>
-          <span class="section-subtitle">What you'll achieve by completing this course</span>
-        </div>
+      <!-- Learning Objectives -->
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+        <h3 class="font-semibold text-gray-900 mb-2 flex items-center gap-2">
+          <i class="fas fa-bullseye text-teal-500"></i>
+          Learning Objectives
+        </h3>
+        <p class="text-sm text-gray-500 mb-4">What you'll achieve by completing this course</p>
         <div class="objectives-grid">
           <div v-for="(objective, index) in course.objectives" :key="index" class="objective-item">
             <div class="objective-check">
@@ -1106,15 +1105,15 @@ const estimatedTimeRemaining = computed(() => {
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Full Width Resources Section -->
-    <div class="full-width-section">
-      <div class="section-content">
-        <div class="section-header">
-          <i class="fas fa-folder-open"></i>
-          <h3>Resources & Materials</h3>
-          <span class="resource-count">{{ courseResources.length }} files</span>
+      <!-- Resources & Materials -->
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="font-semibold text-gray-900 flex items-center gap-2">
+            <i class="fas fa-folder-open text-teal-500"></i>
+            Resources & Materials
+          </h3>
+          <span class="text-xs text-gray-500 bg-gray-100 px-2.5 py-1 rounded-full">{{ courseResources.length }} files</span>
         </div>
         <div class="resources-grid">
           <div v-for="resource in courseResources" :key="resource.id" class="resource-item">
@@ -1131,14 +1130,15 @@ const estimatedTimeRemaining = computed(() => {
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Full Width Comments Section -->
-    <div class="comments-section-wrapper">
-      <div class="comments-card">
-        <div class="comments-header">
-          <h3><i class="fas fa-comments"></i> Discussion</h3>
-          <span class="comments-count">{{ discussionComments.length }} posts</span>
+      <!-- Comments Section -->
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="font-semibold text-gray-900 flex items-center gap-2">
+            <i class="fas fa-comments text-teal-500"></i>
+            Discussion
+          </h3>
+          <span class="text-xs text-gray-500 bg-gray-100 px-2.5 py-1 rounded-full">{{ discussionComments.length }} posts</span>
         </div>
         <CommentsSection
           content-type="course"
@@ -2208,98 +2208,14 @@ const estimatedTimeRemaining = computed(() => {
   background: rgba(255, 255, 255, 0.3);
 }
 
-/* Full Width Sections */
-.full-width-section {
-  width: 100%;
-  background: white;
-  border-top: 1px solid #e5e7eb;
-  padding: 2rem 0;
-}
-
-.full-width-section:first-of-type {
-  border-top: none;
-}
-
-.section-content {
-  padding: 0 2rem;
-}
-
-.section-header {
+/* Sections Container */
+.sections-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
   display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  margin-bottom: 1.25rem;
-  flex-wrap: wrap;
-}
-
-.section-header i {
-  font-size: 1.25rem;
-  color: #14b8a6;
-}
-
-.section-header h3 {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: #1f2937;
-  margin: 0;
-}
-
-.section-subtitle {
-  font-size: 0.875rem;
-  color: #6b7280;
-  width: 100%;
-  margin-top: 0.25rem;
-}
-
-.about-text {
-  color: #4b5563;
-  line-height: 1.8;
-  font-size: 1rem;
-  max-width: 900px;
-}
-
-/* Full Width Comments Section */
-.comments-section-wrapper {
-  width: 100%;
-  padding: 0;
-  background: white;
-  border-top: 1px solid #e5e7eb;
-}
-
-.comments-card {
-  background: white;
-  padding: 1.5rem 2rem;
-  width: 100%;
-}
-
-.comments-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 1.25rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid #e5e7eb;
-}
-
-.comments-header h3 {
-  font-size: 1.125rem;
-  font-weight: 700;
-  color: #1f2937;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.comments-header h3 i {
-  color: #14b8a6;
-}
-
-.comments-count {
-  font-size: 0.875rem;
-  color: #6b7280;
-  background: #f3f4f6;
-  padding: 0.25rem 0.75rem;
-  border-radius: 20px;
+  flex-direction: column;
+  gap: 1.5rem;
 }
 
 /* Objectives Grid - Full Width */
