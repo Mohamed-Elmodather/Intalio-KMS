@@ -1406,7 +1406,6 @@ onUnmounted(() => {
 .collection-detail-page {
   min-height: 100vh;
   background: #f8fafc;
-  overflow-x: hidden;
   width: 100%;
 }
 
@@ -1810,15 +1809,16 @@ onUnmounted(() => {
   display: flex;
   flex-wrap: nowrap;
   gap: 1.5rem;
-  padding: 1.5rem 2rem;
-  max-width: 1600px;
-  margin: 0 auto;
+  padding: 1.5rem;
+  max-width: 100%;
+  overflow: visible;
 }
 
 /* Items Section */
 .items-section {
-  flex: 1;
+  flex: 1 1 0;
   min-width: 0;
+  overflow: visible;
 }
 
 /* ============================================================================
@@ -2344,11 +2344,13 @@ onUnmounted(() => {
 
 /* Sidebar */
 .sidebar {
-  flex: 0 0 360px;
-  width: 360px;
+  flex: 0 0 340px;
+  width: 340px;
+  min-width: 280px;
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  overflow: visible;
 }
 
 /* Panel base styles */
@@ -2881,8 +2883,8 @@ onUnmounted(() => {
    ============================================================================ */
 @media (max-width: 1200px) {
   .sidebar {
-    flex: 0 0 320px;
-    width: 320px;
+    flex: 0 0 300px;
+    width: 300px;
   }
 }
 
