@@ -1406,6 +1406,8 @@ onUnmounted(() => {
 .collection-detail-page {
   min-height: 100vh;
   background: #f8fafc;
+  overflow-x: hidden;
+  width: 100%;
 }
 
 .collection-detail-page *,
@@ -2345,11 +2347,11 @@ onUnmounted(() => {
 /* Sidebar */
 .sidebar {
   width: 360px;
+  max-width: 100%;
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  min-width: 0;
 }
 
 .panel {
@@ -2879,13 +2881,25 @@ onUnmounted(() => {
 /* ============================================================================
    RESPONSIVE
    ============================================================================ */
+@media (max-width: 1200px) {
+  .sidebar {
+    width: 320px;
+  }
+}
+
 @media (max-width: 1024px) {
   .main-content {
     flex-direction: column;
+    padding: 1rem;
   }
 
   .sidebar {
     width: 100%;
+    max-width: none;
+  }
+
+  .hero-content {
+    padding: 1.5rem 1rem 2rem;
   }
 
   .hero-meta {
