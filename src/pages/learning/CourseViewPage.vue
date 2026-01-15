@@ -642,14 +642,7 @@ const estimatedTimeRemaining = computed(() => {
   <div class="course-view-page min-h-screen bg-gray-50">
     <!-- Hero Section -->
     <header class="relative">
-      <div class="h-[400px] w-full overflow-hidden">
-        <img
-          :src="course.image"
-          :alt="course.title"
-          class="w-full h-full object-cover"
-        >
-        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
-      </div>
+      <div class="h-[350px] w-full bg-gradient-to-br from-teal-600 via-teal-500 to-emerald-500"></div>
 
       <!-- Header Content -->
       <div class="absolute bottom-0 left-0 right-0 px-6 py-8">
