@@ -7,7 +7,8 @@ import {
   CommentsSection,
   RatingStars,
   RelatedContentCarousel,
-  BookmarkButton
+  BookmarkButton,
+  SocialShareButtons
 } from '@/components/common'
 import { useComments } from '@/composables/useComments'
 import { useRatings } from '@/composables/useRatings'
@@ -724,14 +725,12 @@ const estimatedTimeRemaining = computed(() => {
               <i class="fas fa-certificate mr-1"></i>
               Certificate
             </button>
-            <button
-              @click="showAISidebar = !showAISidebar"
-              class="px-3 py-2 rounded-lg text-sm font-medium transition-all"
-              :class="showAISidebar ? 'bg-teal-100 text-teal-700' : 'bg-gray-100 text-gray-600 hover:bg-teal-50 hover:text-teal-600'"
-            >
-              <i class="fas fa-wand-magic-sparkles mr-1"></i>
-              AI Assist
-            </button>
+            <SocialShareButtons
+              :title="course.title"
+              :description="course.description"
+              layout="horizontal"
+              size="sm"
+            />
           </div>
         </div>
 
