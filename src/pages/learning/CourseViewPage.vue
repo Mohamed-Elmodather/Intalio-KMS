@@ -2228,18 +2228,15 @@ const estimatedTimeRemaining = computed(() => {
 /* Full Width Comments Section */
 .comments-section-wrapper {
   width: 100%;
-  padding: 1.5rem;
-  background: #f9fafb;
-  margin-top: 0;
+  padding: 0;
+  background: white;
+  border-top: 1px solid #e5e7eb;
 }
 
 .comments-card {
   background: white;
-  border-radius: 16px;
-  border: 1px solid #e5e7eb;
-  padding: 1.5rem;
-  max-width: 1200px;
-  margin: 0 auto;
+  padding: 1.5rem 2rem;
+  width: 100%;
 }
 
 .comments-header {
