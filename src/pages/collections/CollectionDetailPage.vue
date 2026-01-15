@@ -1408,6 +1408,12 @@ onUnmounted(() => {
   background: #f8fafc;
 }
 
+.collection-detail-page *,
+.collection-detail-page *::before,
+.collection-detail-page *::after {
+  box-sizing: border-box;
+}
+
 /* ============================================================================
    HERO HEADER
    ============================================================================ */
@@ -1416,6 +1422,7 @@ onUnmounted(() => {
   min-height: 320px;
   display: flex;
   flex-direction: column;
+  background: #0f172a;
 }
 
 .hero-bg {
@@ -1444,10 +1451,14 @@ onUnmounted(() => {
 .hero-content {
   position: relative;
   z-index: 10;
+  width: 100%;
+  max-width: 1600px;
+  margin: 0 auto;
   padding: 1.5rem 2rem 2rem;
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  box-sizing: border-box;
 }
 
 /* Navigation */
@@ -1799,12 +1810,15 @@ onUnmounted(() => {
   padding: 1.5rem 2rem;
   max-width: 1600px;
   margin: 0 auto;
+  box-sizing: border-box;
+  width: 100%;
 }
 
 /* Items Section */
 .items-section {
   flex: 1;
   min-width: 0;
+  overflow: visible;
 }
 
 /* ============================================================================
@@ -1816,6 +1830,8 @@ onUnmounted(() => {
   padding: 1.25rem;
   margin-bottom: 1rem;
   border: 1px solid #e5e7eb;
+  box-sizing: border-box;
+  overflow: visible;
 }
 
 .section-title-row {
@@ -1862,6 +1878,7 @@ onUnmounted(() => {
   display: flex;
   gap: 0.5rem;
   flex-wrap: wrap;
+  overflow: visible;
 }
 
 .filter-tab {
@@ -1965,6 +1982,7 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+  overflow: visible;
 }
 
 .item-card {
@@ -1977,6 +1995,8 @@ onUnmounted(() => {
   cursor: pointer;
   transition: all 0.2s;
   position: relative;
+  box-sizing: border-box;
+  overflow: visible;
 }
 
 .item-card:hover {
@@ -2152,6 +2172,7 @@ onUnmounted(() => {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 1rem;
+  overflow: visible;
 }
 
 .grid-item-card {
@@ -2328,13 +2349,14 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  min-width: 0;
 }
 
 .panel {
   background: white;
   border: 1px solid #e5e7eb;
   border-radius: 12px;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .panel-header {
