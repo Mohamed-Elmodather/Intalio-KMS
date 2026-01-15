@@ -1290,14 +1290,13 @@ const estimatedTimeRemaining = computed(() => {
   grid-template-columns: 300px 1fr 340px;
   gap: 1.5rem;
   width: 100%;
-  min-height: calc(100vh - 200px);
   padding: 1.5rem;
+  align-items: start;
 }
 
 /* Syllabus Sidebar */
 .syllabus-sidebar {
-  overflow-y: auto;
-  max-height: calc(100vh - 200px);
+  /* Height determined by content */
 }
 
 .syllabus-header {
@@ -1402,9 +1401,7 @@ const estimatedTimeRemaining = computed(() => {
 
 /* Lesson Content */
 .lesson-content {
-  padding: 1.5rem;
-  overflow-y: auto;
-  max-height: calc(100vh - 200px);
+  /* No scroll - height matches content */
 }
 
 .lesson-viewer {
@@ -1632,8 +1629,7 @@ const estimatedTimeRemaining = computed(() => {
 }
 
 .ai-sidebar-content {
-  overflow-y: auto;
-  max-height: calc(100vh - 200px);
+  /* No scroll - height matches content */
 }
 
 .ai-sidebar-header {
