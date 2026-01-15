@@ -803,164 +803,177 @@ onUnmounted(() => {
 
 <template>
   <div class="collection-detail-page">
-    <!-- Hero Header with Cover Image -->
-    <div class="hero-header">
-      <!-- Cover Image Background -->
-      <div class="hero-bg">
+    <!-- Hero Section (Article Style) -->
+    <header class="relative">
+      <!-- Cover Image -->
+      <div v-if="collection.thumbnail" class="h-[400px] w-full overflow-hidden">
         <img
-          v-if="collection.thumbnail"
           :src="collection.thumbnail"
-          alt=""
-          class="hero-bg-image"
+          :alt="collection.name"
+          class="w-full h-full object-cover"
         />
-        <div class="hero-overlay"></div>
+        <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent"></div>
       </div>
+      <div v-else class="h-[300px] w-full bg-gradient-to-br from-teal-500 to-teal-700"></div>
 
       <!-- Header Content -->
-      <div class="hero-content">
-        <!-- Top Navigation -->
-        <div class="hero-nav">
-          <button @click="goBack" class="back-btn-hero">
-            <i class="fas fa-arrow-left"></i>
-            <span>{{ textConstants.backToCollections }}</span>
-          </button>
-
-          <!-- Edit Mode Controls -->
-          <div v-if="isEditing" class="edit-controls">
-            <button @click="cancelEditing" class="px-4 py-2 bg-white/10 text-white border border-white/30 rounded-xl font-medium hover:bg-white/20 transition-all flex items-center gap-2">
-              <i class="fas fa-times"></i>
-              <span class="hidden sm:inline">{{ textConstants.cancel }}</span>
+      <div class="absolute bottom-0 left-0 right-0 px-6 py-8">
+        <div>
+          <!-- Navigation Row -->
+          <div class="header-nav">
+            <button @click="goBack" class="back-btn">
+              <i class="fas fa-arrow-left"></i>
+              <span>Back</span>
             </button>
-            <button @click="saveEditing" :disabled="!editName.trim()" class="px-4 py-2 bg-teal-500 text-white rounded-xl font-medium hover:bg-teal-600 transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
-              <i class="fas fa-check"></i>
-              <span class="hidden sm:inline">{{ textConstants.saveChanges }}</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- Collection Info -->
-        <div class="hero-info">
-          <div v-if="!isEditing" class="info-display">
-            <div class="flex items-center gap-3 mb-2">
-              <span :class="['visibility-badge-hero', collection.visibility]">
-                <i :class="collection.visibility === 'private' ? 'fas fa-lock' : 'fas fa-globe'"></i>
-                {{ collection.visibility === 'private' ? textConstants.private : textConstants.shared }}
-              </span>
+            <div class="breadcrumb">
+              <router-link to="/collections" class="breadcrumb-link">
+                <i class="fas fa-layer-group"></i>
+                Collections
+              </router-link>
+              <i class="fas fa-chevron-right breadcrumb-sep"></i>
+              <span class="breadcrumb-current">{{ collection.name }}</span>
             </div>
-            <h1 class="hero-title">{{ collection.name }}</h1>
-            <p class="hero-description">{{ collection.description }}</p>
+
+            <!-- Edit Mode Controls -->
+            <div v-if="isEditing" class="edit-controls ml-auto">
+              <button @click="cancelEditing" class="back-btn">
+                <i class="fas fa-times"></i>
+                <span>{{ textConstants.cancel }}</span>
+              </button>
+              <button @click="saveEditing" :disabled="!editName.trim()" class="px-4 py-2 bg-teal-500 text-white rounded-xl font-medium hover:bg-teal-600 transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                <i class="fas fa-check"></i>
+                <span>{{ textConstants.saveChanges }}</span>
+              </button>
+            </div>
           </div>
-          <div v-else class="info-edit-hero">
+
+          <!-- Visibility Badge & Tags -->
+          <div class="flex items-center gap-2 mb-4 flex-wrap">
+            <span :class="['px-3 py-1 rounded-full text-sm font-medium', collection.visibility === 'private' ? 'bg-amber-500 text-white' : 'bg-teal-500 text-white']">
+              <i :class="[collection.visibility === 'private' ? 'fas fa-lock' : 'fas fa-globe', 'mr-1']"></i>
+              {{ collection.visibility === 'private' ? textConstants.private : textConstants.shared }}
+            </span>
+            <span class="px-3 py-1 bg-white/20 backdrop-blur-sm text-white rounded-full text-sm">
+              {{ collection.itemCount }} {{ textConstants.items }}
+            </span>
+          </div>
+
+          <!-- Title & Description -->
+          <div v-if="!isEditing">
+            <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold text-white leading-tight mb-4">
+              {{ collection.name }}
+            </h1>
+            <p class="text-lg text-white/80 max-w-3xl">{{ collection.description }}</p>
+          </div>
+          <div v-else class="max-w-2xl">
             <input
               v-model="editName"
               type="text"
-              class="edit-title-hero"
+              class="w-full bg-white/10 border border-white/30 rounded-xl px-4 py-3 text-2xl font-bold text-white placeholder-white/50 focus:outline-none focus:border-teal-400 mb-3"
               placeholder="Collection name"
               autofocus
             />
             <textarea
               v-model="editDescription"
-              class="edit-description-hero"
+              class="w-full bg-white/10 border border-white/30 rounded-xl px-4 py-3 text-white placeholder-white/50 focus:outline-none focus:border-teal-400 resize-none"
               rows="2"
               placeholder="Add a description..."
             ></textarea>
           </div>
         </div>
+      </div>
+    </header>
 
-        <!-- Meta & Stats Row -->
-        <div class="hero-meta">
-          <div class="meta-author">
-            <div class="author-avatar-hero" :style="{ backgroundColor: collection.author.color }">
-              {{ collection.author.initials }}
-            </div>
-            <div class="author-info">
-              <span class="author-name">{{ collection.author.name }}</span>
-              <span class="author-role">{{ textConstants.owner }}</span>
-            </div>
-          </div>
-          <div class="meta-stats">
-            <div class="stat-item">
-              <i class="fas fa-layer-group"></i>
-              <span>{{ collection.itemCount }} {{ textConstants.items }}</span>
-            </div>
-            <div class="stat-item">
-              <i class="fas fa-users"></i>
-              <span>{{ collection.collaborators.length }} {{ textConstants.collaborators }}</span>
-            </div>
-            <div class="stat-item">
-              <i class="fas fa-comments"></i>
-              <span>{{ collection.comments.length }} {{ textConstants.comments }}</span>
-            </div>
-            <div class="stat-item">
-              <i class="fas fa-clock"></i>
-              <span>{{ textConstants.lastUpdated }} {{ formatDate(collection.updatedAt) }}</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Action Buttons (Unified Style) -->
-        <div v-if="!isEditing" class="hero-actions">
-          <!-- Export/Download Dropdown -->
-          <div class="export-menu-container relative">
-            <button @click.stop="showExportMenu = !showExportMenu" class="px-4 py-2 bg-white/10 text-white border border-white/30 rounded-xl font-medium hover:bg-white/20 transition-all flex items-center gap-2">
-              <i class="fas fa-download"></i>
-              <span class="hidden sm:inline">{{ textConstants.download }}</span>
-              <i class="fas fa-chevron-down text-xs ml-1"></i>
-            </button>
-            <Transition name="dropdown">
-              <div v-if="showExportMenu" class="export-dropdown">
-                <button @click="downloadAsZip" class="dropdown-item">
-                  <i class="fas fa-file-archive"></i>
-                  {{ textConstants.exportAsZip }}
-                </button>
-                <button @click="exportAsPdf" class="dropdown-item">
-                  <i class="fas fa-file-pdf"></i>
-                  {{ textConstants.exportAsPdf }}
-                </button>
-                <button @click="exportAsJson" class="dropdown-item">
-                  <i class="fas fa-code"></i>
-                  {{ textConstants.exportAsJson }}
-                </button>
-                <div class="dropdown-divider"></div>
-                <button @click="copyAllLinks" class="dropdown-item">
-                  <i class="fas fa-link"></i>
-                  {{ textConstants.copyLinks }}
-                </button>
+    <!-- Metadata Bar (Sticky) -->
+    <div class="bg-white border-b border-gray-200 sticky top-0 z-20">
+      <div class="px-6 py-3">
+        <div class="flex items-center justify-between flex-wrap gap-4">
+          <!-- Author & Meta -->
+          <div class="flex items-center gap-4">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold" :style="{ backgroundColor: collection.author.color }">
+                {{ collection.author.initials }}
               </div>
-            </Transition>
+              <div>
+                <p class="font-semibold text-gray-900 text-sm">{{ collection.author.name }}</p>
+                <p class="text-xs text-gray-500">
+                  {{ textConstants.owner }}
+                  <span class="mx-1">•</span>
+                  {{ textConstants.lastUpdated }} {{ formatDate(collection.updatedAt) }}
+                </p>
+              </div>
+            </div>
+
+            <div class="hidden md:flex items-center gap-4 pl-4 border-l border-gray-200 text-sm text-gray-500">
+              <span><i class="fas fa-layer-group mr-1"></i> {{ collection.itemCount }}</span>
+              <span><i class="fas fa-users mr-1"></i> {{ collection.collaborators.length }}</span>
+              <span><i class="fas fa-comment mr-1"></i> {{ collection.comments.length }}</span>
+            </div>
           </div>
 
-          <button @click="shareCollection" class="px-4 py-2 bg-white/10 text-white border border-white/30 rounded-xl font-medium hover:bg-white/20 transition-all flex items-center gap-2">
-            <i class="fas fa-share-alt"></i>
-            <span class="hidden sm:inline">{{ textConstants.share }}</span>
-          </button>
+          <!-- Actions -->
+          <div class="flex items-center gap-2">
+            <BookmarkButton
+              :content-id="collection.id"
+              content-type="collection"
+              size="sm"
+            />
 
-          <button @click="duplicateCollection" class="px-4 py-2 bg-white/10 text-white border border-white/30 rounded-xl font-medium hover:bg-white/20 transition-all flex items-center gap-2">
-            <i class="fas fa-copy"></i>
-            <span class="hidden sm:inline">{{ textConstants.duplicate }}</span>
-          </button>
+            <!-- Export Dropdown -->
+            <div class="export-menu-container relative">
+              <button @click.stop="showExportMenu = !showExportMenu" class="px-3 py-2 rounded-lg text-sm font-medium bg-gray-100 text-gray-600 hover:bg-teal-50 hover:text-teal-600 transition-all flex items-center gap-1">
+                <i class="fas fa-download"></i>
+                <span class="hidden sm:inline">Export</span>
+                <i class="fas fa-chevron-down text-xs"></i>
+              </button>
+              <Transition name="dropdown">
+                <div v-if="showExportMenu" class="export-dropdown">
+                  <button @click="downloadAsZip" class="dropdown-item">
+                    <i class="fas fa-file-archive"></i>
+                    {{ textConstants.exportAsZip }}
+                  </button>
+                  <button @click="exportAsPdf" class="dropdown-item">
+                    <i class="fas fa-file-pdf"></i>
+                    {{ textConstants.exportAsPdf }}
+                  </button>
+                  <button @click="exportAsJson" class="dropdown-item">
+                    <i class="fas fa-code"></i>
+                    {{ textConstants.exportAsJson }}
+                  </button>
+                  <div class="dropdown-divider"></div>
+                  <button @click="copyAllLinks" class="dropdown-item">
+                    <i class="fas fa-link"></i>
+                    {{ textConstants.copyLinks }}
+                  </button>
+                </div>
+              </Transition>
+            </div>
 
-          <BookmarkButton
-            content-type="collection"
-            :content-id="collection.id"
-            size="md"
-            variant="icon"
-          />
+            <button @click="shareCollection" class="px-3 py-2 rounded-lg text-sm font-medium bg-gray-100 text-gray-600 hover:bg-teal-50 hover:text-teal-600 transition-all">
+              <i class="fas fa-share-alt mr-1"></i>
+              <span class="hidden sm:inline">Share</span>
+            </button>
 
-          <button v-if="canEdit" @click="startEditing" class="px-4 py-2 bg-white/10 text-white border border-white/30 rounded-xl font-medium hover:bg-white/20 transition-all flex items-center gap-2">
-            <i class="fas fa-pen"></i>
-            <span class="hidden sm:inline">{{ textConstants.editCollection }}</span>
-          </button>
+            <button @click="duplicateCollection" class="px-3 py-2 rounded-lg text-sm font-medium bg-gray-100 text-gray-600 hover:bg-teal-50 hover:text-teal-600 transition-all">
+              <i class="fas fa-copy mr-1"></i>
+              <span class="hidden sm:inline">Duplicate</span>
+            </button>
 
-          <button v-if="canEdit" @click="toggleVisibility" class="px-4 py-2 bg-white/10 text-white border border-white/30 rounded-xl font-medium hover:bg-white/20 transition-all flex items-center gap-2">
-            <i :class="collection.visibility === 'private' ? 'fas fa-globe' : 'fas fa-lock'"></i>
-            <span class="hidden sm:inline">{{ collection.visibility === 'private' ? textConstants.makeShared : textConstants.makePrivate }}</span>
-          </button>
+            <button v-if="canEdit" @click="startEditing" class="px-3 py-2 rounded-lg text-sm font-medium bg-gray-100 text-gray-600 hover:bg-teal-50 hover:text-teal-600 transition-all">
+              <i class="fas fa-pen mr-1"></i>
+              <span class="hidden sm:inline">Edit</span>
+            </button>
 
-          <button v-if="isOwner" @click="showDeleteConfirm = true" class="px-4 py-2 bg-red-500/20 text-red-300 border border-red-500/30 rounded-xl font-medium hover:bg-red-500/30 transition-all flex items-center gap-2">
-            <i class="fas fa-trash-alt"></i>
-            <span class="hidden sm:inline">{{ textConstants.delete }}</span>
-          </button>
+            <button v-if="canEdit" @click="toggleVisibility" class="px-3 py-2 rounded-lg text-sm font-medium bg-gray-100 text-gray-600 hover:bg-teal-50 hover:text-teal-600 transition-all">
+              <i :class="[collection.visibility === 'private' ? 'fas fa-globe' : 'fas fa-lock', 'mr-1']"></i>
+              <span class="hidden sm:inline">{{ collection.visibility === 'private' ? 'Make Public' : 'Make Private' }}</span>
+            </button>
+
+            <button v-if="isOwner" @click="showDeleteConfirm = true" class="px-3 py-2 rounded-lg text-sm font-medium bg-red-50 text-red-600 hover:bg-red-100 transition-all">
+              <i class="fas fa-trash-alt mr-1"></i>
+              <span class="hidden sm:inline">Delete</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -1439,240 +1452,72 @@ onUnmounted(() => {
 }
 
 /* ============================================================================
-   HERO HEADER
+   HEADER (Article Style)
    ============================================================================ */
-.hero-header {
-  position: relative;
-  min-height: 320px;
-  display: flex;
-  flex-direction: column;
-  background: #0f172a;
-}
-
-.hero-bg {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-}
-
-.hero-bg-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.hero-overlay {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    180deg,
-    rgba(15, 23, 42, 0.7) 0%,
-    rgba(15, 23, 42, 0.85) 50%,
-    rgba(15, 23, 42, 0.95) 100%
-  );
-}
-
-.hero-content {
-  position: relative;
-  z-index: 10;
-  width: 100%;
-  max-width: 1600px;
-  margin: 0 auto;
-  padding: 1.5rem 2rem 2rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  box-sizing: border-box;
-}
-
-/* Navigation */
-.hero-nav {
+.header-nav {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
 }
 
-.back-btn-hero {
+.back-btn {
   display: flex;
   align-items: center;
   gap: 0.5rem;
   padding: 0.5rem 1rem;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.15);
   border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 10px;
+  border-radius: 0.75rem;
   color: white;
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
 }
 
-.back-btn-hero:hover {
-  background: rgba(255, 255, 255, 0.2);
+.back-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateX(-2px);
+}
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.breadcrumb-link {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.breadcrumb-link:hover {
+  color: white;
+}
+
+.breadcrumb-sep {
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 0.625rem;
+}
+
+.breadcrumb-current {
+  color: white;
+  font-weight: 500;
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .edit-controls {
   display: flex;
   gap: 0.5rem;
-}
-
-/* Hero Info */
-.hero-info {
-  max-width: 800px;
-}
-
-.visibility-badge-hero {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.375rem;
-  padding: 0.375rem 0.75rem;
-  border-radius: 20px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-}
-
-.visibility-badge-hero.private {
-  background: rgba(30, 41, 59, 0.8);
-  color: white;
-}
-
-.visibility-badge-hero.shared {
-  background: rgba(20, 184, 166, 0.9);
-  color: white;
-}
-
-.hero-title {
-  font-size: 2rem;
-  font-weight: 700;
-  color: white;
-  margin: 0 0 0.5rem;
-  line-height: 1.2;
-}
-
-.hero-description {
-  font-size: 1rem;
-  color: rgba(255, 255, 255, 0.8);
-  margin: 0;
-  max-width: 600px;
-}
-
-/* Edit Mode in Hero */
-.info-edit-hero {
-  max-width: 600px;
-}
-
-.edit-title-hero {
-  width: 100%;
-  padding: 0.75rem 1rem;
-  background: rgba(255, 255, 255, 0.1);
-  border: 2px solid rgba(20, 184, 166, 0.5);
-  border-radius: 10px;
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: white;
-  margin-bottom: 0.75rem;
-}
-
-.edit-title-hero::placeholder {
-  color: rgba(255, 255, 255, 0.5);
-}
-
-.edit-title-hero:focus {
-  outline: none;
-  border-color: #14b8a6;
-  background: rgba(255, 255, 255, 0.15);
-}
-
-.edit-description-hero {
-  width: 100%;
-  padding: 0.75rem 1rem;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 10px;
-  font-size: 0.9375rem;
-  color: white;
-  resize: none;
-}
-
-.edit-description-hero::placeholder {
-  color: rgba(255, 255, 255, 0.5);
-}
-
-.edit-description-hero:focus {
-  outline: none;
-  border-color: rgba(20, 184, 166, 0.5);
-}
-
-/* Meta & Stats */
-.hero-meta {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 1rem;
-}
-
-.meta-author {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.author-avatar-hero {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: white;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-}
-
-.author-info {
-  display: flex;
-  flex-direction: column;
-}
-
-.author-name {
-  color: white;
-  font-weight: 600;
-  font-size: 0.9375rem;
-}
-
-.author-role {
-  color: rgba(255, 255, 255, 0.6);
-  font-size: 0.75rem;
-  text-transform: uppercase;
-}
-
-.meta-stats {
-  display: flex;
-  gap: 1.5rem;
-  flex-wrap: wrap;
-}
-
-.stat-item {
-  display: flex;
-  align-items: center;
-  gap: 0.375rem;
-  color: rgba(255, 255, 255, 0.8);
-  font-size: 0.8125rem;
-}
-
-.stat-item i {
-  color: rgba(255, 255, 255, 0.5);
-}
-
-/* Hero Actions */
-.hero-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-top: 0.5rem;
 }
 
 /* Export Dropdown */
@@ -3052,15 +2897,6 @@ onUnmounted(() => {
     width: 100%;
   }
 
-  .hero-content {
-    padding: 1.5rem 1rem 2rem;
-  }
-
-  .hero-meta {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
   .controls-row {
     flex-direction: column;
     align-items: stretch;
@@ -3077,23 +2913,15 @@ onUnmounted(() => {
 }
 
 @media (max-width: 768px) {
-  .hero-content {
-    padding: 1rem 1rem 1.5rem;
-  }
-
-  .hero-title {
-    font-size: 1.5rem;
-  }
-
-  .hero-actions {
+  .header-nav {
     flex-wrap: wrap;
   }
 
-  .hero-actions button span {
+  .breadcrumb {
     display: none;
   }
 
-  .back-btn-hero span {
+  .back-btn span {
     display: none;
   }
 
@@ -3131,20 +2959,12 @@ onUnmounted(() => {
 }
 
 @media (max-width: 480px) {
-  .hero-header {
-    min-height: 280px;
+  header.relative .h-\\[400px\\] {
+    height: 300px;
   }
 
-  .hero-title {
-    font-size: 1.25rem;
-  }
-
-  .hero-description {
-    font-size: 0.875rem;
-  }
-
-  .meta-stats {
-    gap: 0.75rem;
+  header.relative .h-\\[300px\\] {
+    height: 250px;
   }
 
   .stat-item {
