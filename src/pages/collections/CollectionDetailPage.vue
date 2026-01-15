@@ -1819,6 +1819,7 @@ onUnmounted(() => {
   flex: 1 1 0;
   min-width: 0;
   overflow: visible;
+  order: 1;
 }
 
 /* ============================================================================
@@ -2351,6 +2352,7 @@ onUnmounted(() => {
   flex-direction: column;
   gap: 1rem;
   overflow: visible;
+  order: 2;
 }
 
 /* Panel base styles */
