@@ -642,10 +642,10 @@ const estimatedTimeRemaining = computed(() => {
   <div class="course-view-page min-h-screen bg-gray-50">
     <!-- Hero Section -->
     <header class="relative">
-      <div class="h-[350px] w-full bg-gradient-to-br from-teal-600 via-teal-500 to-emerald-500"></div>
+      <div class="h-[180px] w-full bg-gradient-to-br from-teal-600 via-teal-500 to-emerald-500"></div>
 
       <!-- Header Content -->
-      <div class="absolute bottom-0 left-0 right-0 px-6 py-8">
+      <div class="absolute bottom-0 left-0 right-0 px-6 py-5">
         <div>
           <!-- Navigation Row -->
           <div class="header-nav">
@@ -663,20 +663,18 @@ const estimatedTimeRemaining = computed(() => {
             </div>
           </div>
 
-          <!-- Level & Tags -->
-          <div class="flex items-center gap-2 mb-4 flex-wrap">
-            <span :class="['px-3 py-1 rounded-full text-sm font-medium', getLevelBadgeClass(course.level)]">
+          <!-- Title & Tags Row -->
+          <div class="flex items-center gap-3 flex-wrap">
+            <h1 class="text-2xl md:text-3xl font-bold text-white leading-tight">
+              {{ course.title }}
+            </h1>
+            <span :class="['px-2.5 py-0.5 rounded-full text-xs font-medium', getLevelBadgeClass(course.level)]">
               {{ course.level }}
             </span>
-            <span v-for="tag in course.tags" :key="tag" class="px-3 py-1 bg-white/20 backdrop-blur-sm text-white rounded-full text-sm">
+            <span v-for="tag in course.tags" :key="tag" class="px-2.5 py-0.5 bg-white/20 backdrop-blur-sm text-white rounded-full text-xs">
               {{ tag }}
             </span>
           </div>
-
-          <!-- Title -->
-          <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold text-white leading-tight">
-            {{ course.title }}
-          </h1>
         </div>
       </div>
     </header>
