@@ -191,6 +191,8 @@ const isGeneratingQuiz = ref(false)
 const showSyllabus = ref(true)
 const showAISidebar = ref(true)
 const activeAITab = ref<'summary' | 'concepts' | 'quiz' | 'notes'>('summary')
+const isVideoFullscreen = ref(false)
+const videoContainerRef = ref<HTMLElement | null>(null)
 
 // AI Results
 interface CourseSummary {
@@ -529,6 +531,24 @@ function prevLesson() {
   }
 }
 
+function toggleVideoFullscreen() {
+  isVideoFullscreen.value = !isVideoFullscreen.value
+
+  if (isVideoFullscreen.value) {
+    // Add escape key listener
+    document.addEventListener('keydown', handleEscapeKey)
+  } else {
+    document.removeEventListener('keydown', handleEscapeKey)
+  }
+}
+
+function handleEscapeKey(e: KeyboardEvent) {
+  if (e.key === 'Escape' && isVideoFullscreen.value) {
+    isVideoFullscreen.value = false
+    document.removeEventListener('keydown', handleEscapeKey)
+  }
+}
+
 function getLessonIcon(type: string) {
   switch (type) {
     case 'video': return 'fas fa-play-circle'
@@ -837,6 +857,9 @@ const estimatedTimeRemaining = computed(() => {
                 </button>
               </div>
               <div class="video-duration">{{ currentLesson.duration }}</div>
+              <button @click="toggleVideoFullscreen" class="fullscreen-btn">
+                <i class="fas fa-expand"></i>
+              </button>
             </div>
             <div v-else class="reading-content">
               <i :class="[getLessonIcon(currentLesson.type), 'reading-icon']"></i>
@@ -1168,6 +1191,76 @@ const estimatedTimeRemaining = computed(() => {
         />
       </div>
     </div>
+
+    <!-- Video Fullscreen Modal -->
+    <Teleport to="body">
+      <Transition name="modal">
+        <div v-if="isVideoFullscreen" class="video-fullscreen-overlay" @click.self="toggleVideoFullscreen">
+          <div class="video-fullscreen-container">
+            <!-- Close button -->
+            <button @click="toggleVideoFullscreen" class="video-fullscreen-close">
+              <i class="fas fa-times"></i>
+            </button>
+
+            <!-- Video header -->
+            <div class="video-fullscreen-header">
+              <div class="video-fullscreen-title">
+                <span class="lesson-badge">
+                  <i class="fas fa-play-circle"></i>
+                  Lesson {{ selectedLessonIndex + 1 }}
+                </span>
+                <h2>{{ currentLesson?.title }}</h2>
+              </div>
+            </div>
+
+            <!-- Video player -->
+            <div class="video-fullscreen-player">
+              <img :src="course.image" :alt="currentLesson?.title" class="video-fullscreen-thumbnail" />
+              <div class="video-fullscreen-play-overlay">
+                <button class="video-fullscreen-play-btn">
+                  <i class="fas fa-play"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Video controls -->
+            <div class="video-fullscreen-controls">
+              <div class="video-progress-bar">
+                <div class="video-progress-fill" style="width: 35%"></div>
+              </div>
+              <div class="video-controls-row">
+                <div class="video-controls-left">
+                  <button class="video-control-btn">
+                    <i class="fas fa-play"></i>
+                  </button>
+                  <button class="video-control-btn">
+                    <i class="fas fa-backward"></i>
+                  </button>
+                  <button class="video-control-btn">
+                    <i class="fas fa-forward"></i>
+                  </button>
+                  <button class="video-control-btn">
+                    <i class="fas fa-volume-up"></i>
+                  </button>
+                  <span class="video-time">0:00 / {{ currentLesson?.duration }}</span>
+                </div>
+                <div class="video-controls-right">
+                  <button class="video-control-btn">
+                    <i class="fas fa-cog"></i>
+                  </button>
+                  <button class="video-control-btn">
+                    <i class="fas fa-closed-captioning"></i>
+                  </button>
+                  <button @click="toggleVideoFullscreen" class="video-control-btn">
+                    <i class="fas fa-compress"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Transition>
+    </Teleport>
 
     <!-- Certificate Preview Modal -->
     <Teleport to="body">
@@ -1604,6 +1697,200 @@ const estimatedTimeRemaining = computed(() => {
   color: white;
   border-radius: 4px;
   font-size: 0.75rem;
+}
+
+.fullscreen-btn {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 40px;
+  height: 40px;
+  background: rgba(0, 0, 0, 0.6);
+  border: none;
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.fullscreen-btn:hover {
+  background: rgba(0, 0, 0, 0.8);
+  transform: scale(1.1);
+}
+
+/* Video Fullscreen Modal */
+.video-fullscreen-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.95);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.video-fullscreen-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+}
+
+.video-fullscreen-close {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  width: 48px;
+  height: 48px;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  border-radius: 50%;
+  color: white;
+  font-size: 1.25rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  z-index: 10;
+}
+
+.video-fullscreen-close:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.video-fullscreen-header {
+  padding: 1rem 2rem;
+}
+
+.video-fullscreen-title {
+  color: white;
+}
+
+.video-fullscreen-title .lesson-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0.75rem;
+  background: rgba(20, 184, 166, 0.2);
+  color: #5eead4;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  margin-bottom: 0.5rem;
+}
+
+.video-fullscreen-title h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.video-fullscreen-player {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  margin: 0 2rem;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #000;
+}
+
+.video-fullscreen-thumbnail {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.video-fullscreen-play-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.video-fullscreen-play-btn {
+  width: 80px;
+  height: 80px;
+  background: rgba(20, 184, 166, 0.9);
+  border: none;
+  border-radius: 50%;
+  color: white;
+  font-size: 2rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.video-fullscreen-play-btn:hover {
+  background: #14b8a6;
+  transform: scale(1.1);
+}
+
+.video-fullscreen-controls {
+  padding: 1rem 2rem 2rem;
+}
+
+.video-progress-bar {
+  width: 100%;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+  margin-bottom: 1rem;
+  cursor: pointer;
+}
+
+.video-progress-fill {
+  height: 100%;
+  background: #14b8a6;
+  border-radius: 3px;
+  transition: width 0.1s;
+}
+
+.video-controls-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.video-controls-left,
+.video-controls-right {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.video-control-btn {
+  width: 40px;
+  height: 40px;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.video-control-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.video-time {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.875rem;
+  margin-left: 0.5rem;
 }
 
 .reading-content {
