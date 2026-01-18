@@ -1065,28 +1065,28 @@ function getCategoryColor(category: string) {
             <i class="fas fa-calendar-alt"></i>
           </div>
           <p class="stat-value-mini">{{ eventStats.total }}</p>
-          <p class="stat-label-mini">Total Events</p>
+          <p class="stat-label-mini">{{ $t('events.totalEvents') }}</p>
         </div>
         <div class="stat-card-square">
           <div class="stat-icon-box">
             <i class="fas fa-calendar-week"></i>
           </div>
           <p class="stat-value-mini">{{ eventStats.thisWeek }}</p>
-          <p class="stat-label-mini">This Week</p>
+          <p class="stat-label-mini">{{ $t('events.thisWeek') }}</p>
         </div>
         <div class="stat-card-square">
           <div class="stat-icon-box">
             <i class="fas fa-check-circle"></i>
           </div>
           <p class="stat-value-mini">{{ eventStats.yourRsvps }}</p>
-          <p class="stat-label-mini">Your RSVPs</p>
+          <p class="stat-label-mini">{{ $t('events.yourRsvps') }}</p>
         </div>
         <div class="stat-card-square">
           <div class="stat-icon-box">
             <i class="fas fa-sun"></i>
           </div>
           <p class="stat-value-mini">{{ todayEventsCount }}</p>
-          <p class="stat-label-mini">Today</p>
+          <p class="stat-label-mini">{{ $t('common.today') }}</p>
         </div>
       </div>
 
@@ -1096,25 +1096,24 @@ function getCategoryColor(category: string) {
           AFC Asian Cup 2027
         </div>
 
-        <h1 class="text-3xl font-bold text-white mb-2">Events & Calendar</h1>
-        <p class="text-teal-100 max-w-lg">Stay connected with company events, meetings, and activities.</p>
+        <h1 class="text-3xl font-bold text-white mb-2">{{ $t('events.title') }}</h1>
+        <p class="text-teal-100 max-w-lg">{{ $t('events.subtitle') }}</p>
 
         <div class="flex flex-wrap gap-3 mt-6">
           <button @click="showCreateModal = true" class="px-5 py-2.5 bg-white text-teal-600 rounded-xl font-semibold text-sm flex items-center gap-2 hover:bg-teal-50 transition-all shadow-lg">
             <i class="fas fa-plus"></i>
-            Create Event
+            {{ $t('events.createEvent') }}
           </button>
           <!-- AI Action Buttons -->
           <button @click="analyzeSmartSchedule"
                   class="px-5 py-2.5 bg-gradient-to-r from-teal-500/20 to-emerald-500/20 backdrop-blur-sm text-white rounded-xl font-semibold text-sm flex items-center gap-2 hover:from-teal-500/30 hover:to-emerald-500/30 transition-all border border-white/20">
             <i class="fas fa-wand-magic-sparkles"></i>
-            Smart Scheduling
+            {{ $t('events.smartScheduling') }}
           </button>
           <button @click="fetchRelatedEvents()"
                   class="px-5 py-2.5 bg-white/10 backdrop-blur-sm text-white rounded-xl font-semibold text-sm flex items-center gap-2 hover:bg-white/20 transition-all border border-white/20">
             <i class="fas fa-robot"></i>
-            AI Suggestions
-          </button>
+            {{ $t('ai.aiSuggestions') }}
         </div>
       </div>
     </div>
@@ -1131,7 +1130,7 @@ function getCategoryColor(category: string) {
         <div class="featured-event-header">
           <div class="featured-badge-premium">
             <i class="fas fa-star"></i>
-            <span>Next Up</span>
+            <span>{{ $t('events.nextUp') }}</span>
           </div>
           <!-- Countdown Badge -->
           <div v-if="featuredEventCountdown" class="featured-countdown">
@@ -1171,7 +1170,7 @@ function getCategoryColor(category: string) {
               <div class="featured-meta-icon">
                 <i class="fas fa-video"></i>
               </div>
-              <span>Virtual Event</span>
+              <span>{{ $t('events.virtualEvent') }}</span>
             </div>
           </div>
         </div>
@@ -1196,7 +1195,7 @@ function getCategoryColor(category: string) {
             </button>
             <button class="featured-rsvp-btn">
               <i class="fas fa-check"></i>
-              <span>RSVP Now</span>
+              <span>{{ $t('events.rsvpNow') }}</span>
             </button>
           </div>
         </div>

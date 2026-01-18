@@ -1275,28 +1275,28 @@ function getCategoryColor(category: string): string {
             <i class="fas fa-file-alt"></i>
           </div>
           <p class="stat-value-mini">{{ documentStats.totalDocuments }}</p>
-          <p class="stat-label-mini">Documents</p>
+          <p class="stat-label-mini">{{ $t('documents.title') }}</p>
         </div>
         <div class="stat-card-square">
           <div class="stat-icon-box">
             <i class="fas fa-folder"></i>
           </div>
           <p class="stat-value-mini">{{ documentStats.totalLibraries }}</p>
-          <p class="stat-label-mini">Libraries</p>
+          <p class="stat-label-mini">{{ $t('documents.libraries') }}</p>
         </div>
         <div class="stat-card-square">
           <div class="stat-icon-box">
             <i class="fas fa-hdd"></i>
           </div>
           <p class="stat-value-mini">{{ formatTotalSize(documentStats.totalSize) }}</p>
-          <p class="stat-label-mini">Total Size</p>
+          <p class="stat-label-mini">{{ $t('documents.totalSize') }}</p>
         </div>
         <div class="stat-card-square">
           <div class="stat-icon-box">
             <i class="fas fa-clock"></i>
           </div>
           <p class="stat-value-mini">{{ documentStats.recentUploads }}</p>
-          <p class="stat-label-mini">This Week</p>
+          <p class="stat-label-mini">{{ $t('common.thisWeek') }}</p>
         </div>
       </div>
 
@@ -1306,17 +1306,17 @@ function getCategoryColor(category: string): string {
           AFC Asian Cup 2027
         </div>
 
-        <h1 class="text-3xl font-bold text-white mb-2">Document Library</h1>
-        <p class="text-teal-100 max-w-lg">Access official tournament documents, media assets, and operational resources.</p>
+        <h1 class="text-3xl font-bold text-white mb-2">{{ $t('documents.documentLibrary') }}</h1>
+        <p class="text-teal-100 max-w-lg">{{ $t('documents.subtitle') }}</p>
 
         <div class="flex flex-wrap gap-3 mt-6">
           <button class="px-5 py-2.5 bg-white text-teal-600 rounded-xl font-semibold text-sm flex items-center gap-2 hover:bg-teal-50 transition-all shadow-lg">
             <i class="fas fa-upload"></i>
-            Upload Document
+            {{ $t('documents.uploadDocument') }}
           </button>
           <button class="px-5 py-2.5 bg-white/20 backdrop-blur-sm border border-white/30 text-white rounded-xl font-semibold text-sm hover:bg-white/30 transition-all flex items-center gap-2">
             <i class="fas fa-folder-plus"></i>
-            New Folder
+            {{ $t('documents.newFolder') }}
           </button>
         </div>
       </div>
@@ -1333,12 +1333,12 @@ function getCategoryColor(category: string): string {
                 <i class="fas fa-star text-white text-sm"></i>
               </div>
               <div>
-                <span class="block">Starred</span>
-                <span class="text-xs font-medium text-gray-500">Quick access to important files</span>
+                <span class="block">{{ $t('documents.starred') }}</span>
+                <span class="text-xs font-medium text-gray-500">{{ $t('documents.quickAccess') }}</span>
               </div>
             </h2>
             <button @click="currentView = 'starred'" class="text-sm text-teal-600 hover:text-teal-700 font-medium flex items-center gap-1">
-              View all
+              {{ $t('common.viewAll') }}
               <i class="fas fa-arrow-right text-xs"></i>
             </button>
           </div>
@@ -1399,12 +1399,12 @@ function getCategoryColor(category: string): string {
                 <i class="fas fa-clock-rotate-left text-white text-sm"></i>
               </div>
               <div>
-                <span class="block">Recent Files</span>
-                <span class="text-xs font-medium text-gray-500">Recently modified</span>
+                <span class="block">{{ $t('documents.recentFiles') }}</span>
+                <span class="text-xs font-medium text-gray-500">{{ $t('documents.recentlyModified') }}</span>
               </div>
             </h2>
             <button class="text-sm text-teal-600 hover:text-teal-700 font-medium flex items-center gap-1">
-              View all
+              {{ $t('common.viewAll') }}
               <i class="fas fa-arrow-right text-xs"></i>
             </button>
           </div>
