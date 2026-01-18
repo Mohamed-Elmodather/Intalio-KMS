@@ -4567,129 +4567,108 @@ function resumeFeaturedAutoPlay() {
           <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
             <div v-if="paginatedLessons.length > 0">
               <!-- Grid View -->
-              <div v-if="lessonsViewMode === 'grid'" class="grid grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-5">
+              <div v-if="lessonsViewMode === 'grid'" class="grid grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-4">
                 <article
                   v-for="lesson in paginatedLessons"
                   :key="lesson.id"
                   @click="openLessonDetail(lesson)"
                   :class="[
-                    'group bg-white rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 hover:-translate-y-1.5 border',
+                    'group bg-white rounded-xl p-4 cursor-pointer transition-all duration-300 hover:-translate-y-1 border',
                     lesson.isFeatured
-                      ? 'border-teal-200 shadow-lg shadow-teal-100/50 hover:shadow-xl hover:shadow-teal-200/50'
-                      : 'border-gray-100 shadow-sm hover:shadow-lg hover:border-teal-200'
+                      ? 'border-teal-200 shadow-md hover:shadow-lg hover:border-teal-300 bg-gradient-to-br from-teal-50/30 to-white'
+                      : 'border-gray-200 shadow-sm hover:shadow-md hover:border-teal-200'
                   ]"
                 >
-                  <!-- Card Image -->
-                  <div class="relative h-44 overflow-hidden bg-gradient-to-br from-teal-50 to-cyan-50">
-                    <div class="absolute inset-0 bg-gradient-to-br from-teal-500 via-teal-600 to-cyan-600">
-                      <div class="absolute inset-0 opacity-10" style="background-image: url('data:image/svg+xml,%3Csvg width=&quot;40&quot; height=&quot;40&quot; viewBox=&quot;0 0 40 40&quot; xmlns=&quot;http://www.w3.org/2000/svg&quot;%3E%3Cg fill=&quot;%23fff&quot; fill-opacity=&quot;1&quot;%3E%3Cpath d=&quot;M20 20h20v20H20zM0 0h20v20H0z&quot;/%3E%3C/g%3E%3C/svg%3E');"></div>
-                    </div>
-                    <div class="absolute inset-0 flex items-center justify-center">
-                      <i :class="[getLessonCategoryInfo(lesson.category).icon, 'text-5xl text-white/30']"></i>
+                  <!-- Card Header -->
+                  <div class="flex items-start justify-between gap-3 mb-3">
+                    <!-- Category Icon -->
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500 to-cyan-500 flex items-center justify-center flex-shrink-0 shadow-sm">
+                      <i :class="[getLessonCategoryInfo(lesson.category).icon, 'text-white text-sm']"></i>
                     </div>
 
-                    <!-- Gradient Overlay -->
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-
-                    <!-- Top Badges -->
-                    <div class="absolute top-3 left-3 right-3 flex items-start justify-between">
-                      <div class="flex flex-wrap gap-1.5">
-                        <!-- Featured Badge -->
-                        <span v-if="lesson.isFeatured" class="px-2 py-0.5 bg-amber-500 text-white text-[10px] font-semibold rounded-full flex items-center gap-1">
-                          <i class="fas fa-star text-[8px]"></i> Featured
-                        </span>
-                        <!-- Priority Badge -->
-                        <span :class="['px-2 py-0.5 text-[10px] font-semibold rounded-full', lesson.priority === 'critical' ? 'bg-red-500 text-white' : lesson.priority === 'high' ? 'bg-orange-500 text-white' : lesson.priority === 'medium' ? 'bg-amber-500 text-white' : 'bg-green-500 text-white']">
-                          {{ lesson.priority }}
-                        </span>
-                      </div>
-                      <!-- Action Buttons -->
-                      <div class="flex items-center gap-1.5">
-                        <button
-                          @click.stop="toggleLessonBookmark(lesson.id)"
-                          :class="[
-                            'w-7 h-7 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center transition-all shadow-sm',
-                            lesson.isBookmarked ? 'text-teal-600' : 'text-gray-400 hover:text-teal-600 hover:bg-white'
-                          ]"
-                        >
-                          <i :class="lesson.isBookmarked ? 'fas fa-bookmark' : 'far fa-bookmark'" class="text-xs"></i>
-                        </button>
-                      </div>
-                    </div>
-
-                    <!-- Category Badge (Bottom) -->
-                    <div class="absolute bottom-3 left-3">
-                      <span class="px-2 py-1 bg-white/90 backdrop-blur-sm text-teal-700 text-[10px] font-semibold rounded-full flex items-center gap-1">
-                        <i :class="[getLessonCategoryInfo(lesson.category).icon, 'text-[9px]']"></i>
-                        {{ getLessonCategoryInfo(lesson.category).label }}
+                    <!-- Badges & Actions -->
+                    <div class="flex items-center gap-2">
+                      <!-- Featured Badge -->
+                      <span v-if="lesson.isFeatured" class="px-2 py-0.5 bg-amber-100 text-amber-700 text-[10px] font-semibold rounded-full flex items-center gap-1">
+                        <i class="fas fa-star text-[8px]"></i> Featured
                       </span>
-                    </div>
-
-                    <!-- Read Button (Hover) -->
-                    <div class="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0">
-                      <button @click.stop="openLessonDetail(lesson)" class="px-3 py-1.5 bg-white text-teal-600 text-xs font-semibold rounded-full flex items-center gap-1.5 shadow-md hover:bg-teal-500 hover:text-white transition-colors">
-                        <span>Read</span>
-                        <i class="fas fa-arrow-right text-[10px]"></i>
+                      <!-- Priority Badge -->
+                      <span :class="['px-2 py-0.5 text-[10px] font-semibold rounded-full', lesson.priority === 'critical' ? 'bg-red-100 text-red-700' : lesson.priority === 'high' ? 'bg-orange-100 text-orange-700' : lesson.priority === 'medium' ? 'bg-amber-100 text-amber-700' : 'bg-green-100 text-green-700']">
+                        {{ lesson.priority }}
+                      </span>
+                      <!-- Bookmark Button -->
+                      <button
+                        @click.stop="toggleLessonBookmark(lesson.id)"
+                        :class="[
+                          'w-7 h-7 rounded-lg flex items-center justify-center transition-all',
+                          lesson.isBookmarked ? 'bg-teal-100 text-teal-600' : 'bg-gray-100 text-gray-400 hover:bg-teal-50 hover:text-teal-500'
+                        ]"
+                      >
+                        <i :class="lesson.isBookmarked ? 'fas fa-bookmark' : 'far fa-bookmark'" class="text-xs"></i>
                       </button>
                     </div>
                   </div>
 
-                  <!-- Card Content -->
-                  <div class="p-4">
-                    <!-- Meta Info -->
-                    <div class="flex items-center gap-3 text-[11px] text-gray-400 mb-2">
+                  <!-- Category & Date -->
+                  <div class="flex items-center gap-3 text-[11px] text-gray-400 mb-2">
+                    <span class="flex items-center gap-1 text-teal-600 font-medium">
+                      <i :class="[getLessonCategoryInfo(lesson.category).icon, 'text-[9px]']"></i>
+                      {{ getLessonCategoryInfo(lesson.category).label }}
+                    </span>
+                    <span class="flex items-center gap-1">
+                      <i class="fas fa-calendar text-[9px]"></i>
+                      {{ lesson.createdAt }}
+                    </span>
+                  </div>
+
+                  <!-- Title -->
+                  <h3 class="text-sm font-semibold text-gray-800 mb-2 line-clamp-2 group-hover:text-teal-600 transition-colors leading-snug">
+                    {{ lesson.title }}
+                  </h3>
+
+                  <!-- Summary -->
+                  <p class="text-xs text-gray-500 mb-3 line-clamp-2 leading-relaxed">
+                    {{ lesson.summary }}
+                  </p>
+
+                  <!-- Tags -->
+                  <div class="flex flex-wrap gap-1.5 mb-3">
+                    <span
+                      v-for="tag in lesson.tags?.slice(0, 3)"
+                      :key="tag"
+                      class="px-2 py-0.5 bg-gray-100 text-gray-600 text-[10px] font-medium rounded-full hover:bg-teal-50 hover:text-teal-600 transition-colors"
+                    >
+                      {{ tag }}
+                    </span>
+                    <span v-if="lesson.tags?.length > 3" class="px-2 py-0.5 bg-teal-50 text-teal-600 text-[10px] font-medium rounded-full">
+                      +{{ lesson.tags.length - 3 }}
+                    </span>
+                  </div>
+
+                  <!-- Footer -->
+                  <div class="flex items-center justify-between pt-3 border-t border-gray-100">
+                    <!-- Author -->
+                    <div class="flex items-center gap-2">
+                      <div class="w-6 h-6 rounded-full bg-gradient-to-br from-teal-400 to-cyan-500 flex items-center justify-center text-white text-[9px] font-semibold">
+                        {{ lesson.author?.initials || 'U' }}
+                      </div>
+                      <span class="text-xs text-gray-600 font-medium">{{ lesson.author?.name }}</span>
+                    </div>
+
+                    <!-- Stats -->
+                    <div class="flex items-center gap-3 text-[11px] text-gray-400">
                       <span class="flex items-center gap-1">
                         <i class="fas fa-eye text-[9px]"></i>
-                        {{ lesson.viewCount }} views
+                        {{ lesson.viewCount }}
                       </span>
                       <span class="flex items-center gap-1">
-                        <i class="fas fa-calendar text-[9px]"></i>
-                        {{ lesson.createdAt }}
+                        <i class="fas fa-heart text-[9px]"></i>
+                        {{ lesson.likeCount || 0 }}
                       </span>
-                    </div>
-
-                    <!-- Title -->
-                    <h3 class="text-sm font-semibold text-gray-800 mb-2 line-clamp-2 group-hover:text-teal-600 transition-colors leading-snug">
-                      {{ lesson.title }}
-                    </h3>
-
-                    <!-- Excerpt -->
-                    <p class="text-xs text-gray-500 mb-3 line-clamp-2 leading-relaxed">
-                      {{ lesson.summary }}
-                    </p>
-
-                    <!-- Tags -->
-                    <div class="flex flex-wrap gap-1.5 mb-3">
-                      <span
-                        v-for="tag in lesson.tags?.slice(0, 3)"
-                        :key="tag"
-                        class="px-2 py-0.5 bg-gray-100 text-gray-600 text-[10px] font-medium rounded-full hover:bg-teal-50 hover:text-teal-600 transition-colors"
-                      >
-                        {{ tag }}
+                      <span class="flex items-center gap-1">
+                        <i class="fas fa-comment text-[9px]"></i>
+                        {{ lesson.commentCount || 0 }}
                       </span>
-                    </div>
-
-                    <!-- Footer -->
-                    <div class="flex items-center justify-between pt-3 border-t border-gray-100">
-                      <!-- Author -->
-                      <div class="flex items-center gap-2">
-                        <div class="w-7 h-7 rounded-full bg-gradient-to-br from-teal-400 to-cyan-500 flex items-center justify-center text-white text-[10px] font-semibold shadow-sm">
-                          {{ lesson.author?.initials || 'U' }}
-                        </div>
-                        <span class="text-xs text-gray-600 font-medium">{{ lesson.author?.name }}</span>
-                      </div>
-
-                      <!-- Stats -->
-                      <div class="flex items-center gap-3 text-[11px] text-gray-400">
-                        <span class="flex items-center gap-1 hover:text-teal-500 transition-colors">
-                          <i class="fas fa-eye text-[9px]"></i>
-                          {{ lesson.viewCount }}
-                        </span>
-                        <span class="flex items-center gap-1 hover:text-red-400 transition-colors">
-                          <i class="fas fa-heart text-[9px]"></i>
-                          {{ lesson.likeCount || 0 }}
-                        </span>
-                      </div>
                     </div>
                   </div>
                 </article>
@@ -4702,29 +4681,15 @@ function resumeFeaturedAutoPlay() {
                   :key="lesson.id"
                   @click="openLessonDetail(lesson)"
                   :class="[
-                    'group flex gap-4 p-4 bg-white rounded-2xl cursor-pointer transition-all duration-300 border',
+                    'group flex gap-4 p-4 bg-white rounded-xl cursor-pointer transition-all duration-300 border',
                     lesson.isFeatured
-                      ? 'border-teal-200 shadow-md hover:shadow-lg hover:border-teal-300'
-                      : 'border-gray-100 shadow-sm hover:shadow-md hover:border-teal-200'
+                      ? 'border-teal-200 shadow-md hover:shadow-lg hover:border-teal-300 bg-gradient-to-r from-teal-50/30 to-white'
+                      : 'border-gray-200 shadow-sm hover:shadow-md hover:border-teal-200'
                   ]"
                 >
-                  <!-- Thumbnail -->
-                  <div class="relative w-32 h-24 flex-shrink-0 rounded-xl overflow-hidden bg-gradient-to-br from-teal-500 to-cyan-600">
-                    <div class="absolute inset-0 flex items-center justify-center">
-                      <i :class="[getLessonCategoryInfo(lesson.category).icon, 'text-2xl text-white/50']"></i>
-                    </div>
-                    <!-- Featured Star -->
-                    <div v-if="lesson.isFeatured" class="absolute top-1.5 left-1.5">
-                      <span class="w-5 h-5 bg-amber-500 rounded-full flex items-center justify-center shadow-sm">
-                        <i class="fas fa-star text-white text-[8px]"></i>
-                      </span>
-                    </div>
-                    <!-- Priority Badge -->
-                    <div class="absolute bottom-1.5 left-1.5">
-                      <span :class="['px-1.5 py-0.5 text-[9px] font-semibold rounded-full', lesson.priority === 'critical' ? 'bg-red-500 text-white' : lesson.priority === 'high' ? 'bg-orange-500 text-white' : lesson.priority === 'medium' ? 'bg-amber-500 text-white' : 'bg-green-500 text-white']">
-                        {{ lesson.priority }}
-                      </span>
-                    </div>
+                  <!-- Category Icon -->
+                  <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-teal-500 to-cyan-500 flex items-center justify-center flex-shrink-0 shadow-sm">
+                    <i :class="[getLessonCategoryInfo(lesson.category).icon, 'text-white text-lg']"></i>
                   </div>
 
                   <!-- Content -->
@@ -4734,6 +4699,12 @@ function resumeFeaturedAutoPlay() {
                       <span class="px-2 py-0.5 bg-teal-50 text-teal-700 text-[10px] font-semibold rounded-full flex items-center gap-1">
                         <i :class="[getLessonCategoryInfo(lesson.category).icon, 'text-[8px]']"></i>
                         {{ getLessonCategoryInfo(lesson.category).label }}
+                      </span>
+                      <span v-if="lesson.isFeatured" class="px-2 py-0.5 bg-amber-100 text-amber-700 text-[10px] font-semibold rounded-full flex items-center gap-1">
+                        <i class="fas fa-star text-[8px]"></i> Featured
+                      </span>
+                      <span :class="['px-2 py-0.5 text-[10px] font-semibold rounded-full', lesson.priority === 'critical' ? 'bg-red-100 text-red-700' : lesson.priority === 'high' ? 'bg-orange-100 text-orange-700' : lesson.priority === 'medium' ? 'bg-amber-100 text-amber-700' : 'bg-green-100 text-green-700']">
+                        {{ lesson.priority }}
                       </span>
                       <span class="text-[10px] text-gray-400 flex items-center gap-1">
                         <i class="fas fa-calendar text-[8px]"></i>
