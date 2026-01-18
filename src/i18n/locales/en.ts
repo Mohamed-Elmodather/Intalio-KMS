@@ -245,6 +245,13 @@ export default {
     busy: 'Busy',
   },
 
+  // Profile
+  profile: {
+    follow: 'Follow',
+    aiInsights: 'AI Insights',
+    editProfile: 'Edit Profile',
+  },
+
   // Dashboard
   dashboard: {
     title: 'Dashboard',
@@ -689,8 +696,14 @@ export default {
 
   // Analytics
   analytics: {
-    title: 'Analytics & Reporting',
-    subtitle: 'Gain insights from your organizational data',
+    title: 'Knowledge Hub Analytics',
+    subtitle: 'Track platform adoption, content engagement, and employee participation across all departments.',
+    adoption: 'Adoption',
+    activeUsers: 'Active Users',
+    exportReport: 'Export Report',
+    scheduleReport: 'Schedule Report',
+    askAI: 'Ask AI',
+    aiReport: 'AI Report',
     overview: 'Overview',
     reports: 'Reports',
     dashboards: 'Dashboards',
@@ -731,7 +744,7 @@ export default {
     language: 'Language',
     accessibility: 'Accessibility',
     integrations: 'Integrations',
-    dataExport: 'Data Export',
+    dataExport: 'Export Data',
     deleteAccount: 'Delete Account',
     saveChanges: 'Save Changes',
     changesSaved: 'Changes saved successfully',
@@ -741,8 +754,12 @@ export default {
     weeklyDigest: 'Weekly Digest',
     twoFactorAuth: 'Two-Factor Authentication',
     connectedAccounts: 'Connected Accounts',
+    connectedApps: 'Connected Apps',
     sessions: 'Active Sessions',
+    activeSessions: 'Active Sessions',
     apiKeys: 'API Keys',
+    profileComplete: 'Profile Complete',
+    securityStrong: 'Security: Strong',
   },
 
   // Search

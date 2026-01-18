@@ -392,7 +392,7 @@ function changePassword() {
             <i class="fas fa-home"></i>
           </router-link>
           <i class="fas fa-chevron-right text-xs"></i>
-          <span class="text-gray-900 font-medium">Settings</span>
+          <span class="text-gray-900 font-medium">{{ $t('settings.title') }}</span>
         </nav>
       </div>
 
@@ -419,11 +419,11 @@ function changePassword() {
             <div class="flex items-center gap-2">
               <router-link to="/profile" class="px-4 py-2 bg-white/20 backdrop-blur text-white rounded-xl font-medium text-sm hover:bg-white/30 transition-all flex items-center gap-2">
                 <i class="fas fa-user"></i>
-                View Profile
+                {{ $t('user.viewProfile') }}
               </router-link>
               <button class="px-4 py-2 bg-white text-teal-600 rounded-xl font-medium text-sm hover:bg-teal-50 transition-all flex items-center gap-2 shadow-lg">
                 <i class="fas fa-download"></i>
-                Export Data
+                {{ $t('settings.dataExport') }}
               </button>
             </div>
           </div>
@@ -432,21 +432,21 @@ function changePassword() {
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-6">
             <div class="bg-white/10 backdrop-blur rounded-xl p-3 text-center">
               <p class="text-2xl font-bold text-white">89%</p>
-              <p class="text-xs text-teal-100">Profile Complete</p>
+              <p class="text-xs text-teal-100">{{ $t('settings.profileComplete') }}</p>
             </div>
             <div class="bg-white/10 backdrop-blur rounded-xl p-3 text-center">
               <p class="text-2xl font-bold text-white">12</p>
-              <p class="text-xs text-teal-100">Connected Apps</p>
+              <p class="text-xs text-teal-100">{{ $t('settings.connectedApps') }}</p>
             </div>
             <div class="bg-white/10 backdrop-blur rounded-xl p-3 text-center">
               <p class="text-2xl font-bold text-white">3</p>
-              <p class="text-xs text-teal-100">Active Sessions</p>
+              <p class="text-xs text-teal-100">{{ $t('settings.activeSessions') }}</p>
             </div>
             <div class="bg-white/10 backdrop-blur rounded-xl p-3 text-center">
               <p class="text-2xl font-bold text-white flex items-center justify-center gap-1">
                 <i class="fas fa-shield-check text-green-300 text-lg"></i>
               </p>
-              <p class="text-xs text-teal-100">Security: Strong</p>
+              <p class="text-xs text-teal-100">{{ $t('settings.securityStrong') }}</p>
             </div>
           </div>
         </div>

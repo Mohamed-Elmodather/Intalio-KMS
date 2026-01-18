@@ -504,28 +504,28 @@ function getAnomalySeverityColor(severity: string): string {
             <i class="fas fa-users"></i>
           </div>
           <p class="stat-value-mini">{{ stats.platformAdoption }}%</p>
-          <p class="stat-label-mini">Adoption</p>
+          <p class="stat-label-mini">{{ $t('analytics.adoption') }}</p>
         </div>
         <div class="stat-card-square">
           <div class="stat-icon-box">
             <i class="fas fa-user-check"></i>
           </div>
           <p class="stat-value-mini">{{ stats.activeUsers }}</p>
-          <p class="stat-label-mini">Active Users</p>
+          <p class="stat-label-mini">{{ $t('analytics.activeUsers') }}</p>
         </div>
         <div class="stat-card-square">
           <div class="stat-icon-box">
             <i class="fas fa-file-alt"></i>
           </div>
           <p class="stat-value-mini">{{ formatNumber(stats.totalContent) }}</p>
-          <p class="stat-label-mini">Content</p>
+          <p class="stat-label-mini">{{ $t('common.content') }}</p>
         </div>
         <div class="stat-card-square">
           <div class="stat-icon-box">
             <i class="fas fa-chart-line"></i>
           </div>
           <p class="stat-value-mini">{{ stats.engagementScore }}/10</p>
-          <p class="stat-label-mini">Engagement</p>
+          <p class="stat-label-mini">{{ $t('analytics.engagement') }}</p>
         </div>
       </div>
 
@@ -535,26 +535,26 @@ function getAnomalySeverityColor(severity: string): string {
           AFC Asian Cup 2027
         </div>
 
-        <h1 class="text-3xl font-bold text-white mb-2">Knowledge Hub Analytics</h1>
-        <p class="text-teal-100 max-w-lg">Track platform adoption, content engagement, and employee participation across all departments.</p>
+        <h1 class="text-3xl font-bold text-white mb-2">{{ $t('analytics.title') }}</h1>
+        <p class="text-teal-100 max-w-lg">{{ $t('analytics.subtitle') }}</p>
 
         <div class="flex flex-wrap gap-3 mt-6">
           <button @click="exportData('PDF')" class="px-5 py-2.5 bg-white text-teal-600 rounded-xl font-semibold text-sm flex items-center gap-2 hover:bg-teal-50 transition-all shadow-lg">
             <i class="fas fa-download"></i>
-            Export Report
+            {{ $t('analytics.exportReport') }}
           </button>
           <button class="px-5 py-2.5 bg-white/20 backdrop-blur-sm border border-white/30 text-white rounded-xl font-semibold text-sm hover:bg-white/30 transition-all flex items-center gap-2">
             <i class="fas fa-calendar-alt"></i>
-            Schedule Report
+            {{ $t('analytics.scheduleReport') }}
           </button>
           <!-- AI Buttons -->
           <button @click="showNLQueryModal = true" class="px-5 py-2.5 bg-gradient-to-r from-emerald-400 to-teal-400 text-white rounded-xl font-semibold text-sm hover:from-emerald-500 hover:to-teal-500 transition-all flex items-center gap-2 shadow-lg shadow-teal-500/20">
             <i class="fas fa-comment-dots"></i>
-            Ask AI
+            {{ $t('analytics.askAI') }}
           </button>
           <button @click="generateAIReport" class="px-5 py-2.5 bg-white/20 backdrop-blur-sm border border-white/30 text-white rounded-xl font-semibold text-sm hover:bg-white/30 transition-all flex items-center gap-2">
             <i class="fas fa-wand-magic-sparkles"></i>
-            AI Report
+            {{ $t('analytics.aiReport') }}
           </button>
         </div>
 

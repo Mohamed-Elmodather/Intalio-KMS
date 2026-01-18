@@ -754,7 +754,7 @@ function getInsightColor(type: string): string {
                   </button>
                   <button class="px-4 py-2 bg-teal-500 text-white rounded-lg font-medium text-sm flex items-center gap-1.5 hover:bg-teal-600 transition-all shadow-md">
                     <i class="fas fa-user-plus"></i>
-                    Follow
+                    {{ $t('profile.follow') }}
                   </button>
                 </template>
 
@@ -762,7 +762,7 @@ function getInsightColor(type: string): string {
                 <template v-else>
                   <button @click="loadAIInsights" class="px-3 py-2 bg-gradient-to-r from-violet-500 to-purple-600 text-white rounded-lg font-medium text-xs flex items-center gap-1.5 hover:from-violet-600 hover:to-purple-700 transition-all shadow-md">
                     <i class="fas fa-wand-magic-sparkles"></i>
-                    AI Insights
+                    {{ $t('profile.aiInsights') }}
                   </button>
                   <button @click="showEditProfile = true" class="px-3 py-2 bg-teal-500 text-white rounded-lg font-medium text-xs flex items-center gap-1.5 hover:bg-teal-600 transition-all shadow-md">
                     <i class="fas fa-edit"></i>

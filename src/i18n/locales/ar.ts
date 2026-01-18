@@ -245,6 +245,13 @@ export default {
     busy: 'مشغول',
   },
 
+  // Profile
+  profile: {
+    follow: 'متابعة',
+    aiInsights: 'رؤى الذكاء الاصطناعي',
+    editProfile: 'تعديل الملف الشخصي',
+  },
+
   // Dashboard
   dashboard: {
     title: 'لوحة التحكم',
@@ -689,8 +696,14 @@ export default {
 
   // Analytics
   analytics: {
-    title: 'التحليلات والتقارير',
-    subtitle: 'احصل على رؤى من بيانات مؤسستك',
+    title: 'تحليلات مركز المعرفة',
+    subtitle: 'تتبع تبني المنصة ومشاركة المحتوى ومشاركة الموظفين عبر جميع الأقسام.',
+    adoption: 'التبني',
+    activeUsers: 'المستخدمون النشطون',
+    exportReport: 'تصدير التقرير',
+    scheduleReport: 'جدولة التقرير',
+    askAI: 'اسأل الذكاء الاصطناعي',
+    aiReport: 'تقرير ذكي',
     overview: 'نظرة عامة',
     reports: 'التقارير',
     dashboards: 'لوحات المعلومات',
@@ -741,8 +754,12 @@ export default {
     weeklyDigest: 'الملخص الأسبوعي',
     twoFactorAuth: 'المصادقة الثنائية',
     connectedAccounts: 'الحسابات المتصلة',
+    connectedApps: 'التطبيقات المتصلة',
     sessions: 'الجلسات النشطة',
+    activeSessions: 'الجلسات النشطة',
     apiKeys: 'مفاتيح API',
+    profileComplete: 'اكتمال الملف الشخصي',
+    securityStrong: 'الأمان: قوي',
   },
 
   // Search
