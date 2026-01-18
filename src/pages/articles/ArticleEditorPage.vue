@@ -76,14 +76,14 @@ const draftKey = 'article_draft_new'
 let autoSuggestTimer: ReturnType<typeof setTimeout> | null = null
 
 // Categories (mock)
-const categories = [
-  { id: '1', name: 'Company News' },
-  { id: '2', name: 'HR & Policies' },
-  { id: '3', name: 'Technology' },
-  { id: '4', name: 'Training' },
-  { id: '5', name: 'Sports & Athletics' },
-  { id: '6', name: 'Tournament Coverage' },
-]
+const categories = computed(() => [
+  { id: '1', name: t('articles.categoryCompanyNews') },
+  { id: '2', name: t('articles.categoryHRPolicies') },
+  { id: '3', name: t('articles.categoryTechnology') },
+  { id: '4', name: t('articles.categoryTraining') },
+  { id: '5', name: t('articles.categorySports') },
+  { id: '6', name: t('articles.categoryTournament') },
+])
 
 // Popular tags for autocomplete
 const popularTags = ['asia-cup', 'tournament', 'saudi-arabia', 'football', 'cricket', 'sports', 'news', 'update', 'announcement', '2027']
@@ -106,11 +106,11 @@ const showAIResults = computed(() =>
 )
 
 const contentChecklist = computed(() => [
-  { label: 'Title added', complete: title.value.length >= 10, icon: 'fa-heading' },
-  { label: 'Category selected', complete: !!category.value, icon: 'fa-folder' },
-  { label: 'Tags (3+)', complete: tags.value.length >= 3, icon: 'fa-tags' },
-  { label: 'Excerpt written', complete: excerpt.value.length >= 50, icon: 'fa-align-left' },
-  { label: 'Cover image', complete: !!coverImage.value || !!coverImagePreview.value, icon: 'fa-image' },
+  { label: t('articles.checklistTitleAdded'), complete: title.value.length >= 10, icon: 'fa-heading' },
+  { label: t('articles.checklistCategorySelected'), complete: !!category.value, icon: 'fa-folder' },
+  { label: t('articles.checklistTagsCount'), complete: tags.value.length >= 3, icon: 'fa-tags' },
+  { label: t('articles.checklistExcerptWritten'), complete: excerpt.value.length >= 50, icon: 'fa-align-left' },
+  { label: t('articles.checklistCoverImage'), complete: !!coverImage.value || !!coverImagePreview.value, icon: 'fa-image' },
 ])
 
 const filteredExistingTags = computed(() => {
@@ -126,12 +126,12 @@ function getFieldError(field: string): string | null {
   if (!touchedFields.value.has(field)) return null
 
   if (field === 'title') {
-    if (!title.value) return 'Title is required'
-    if (title.value.length < 10) return 'Title must be at least 10 characters'
-    if (title.value.length > 100) return 'Title must be under 100 characters'
+    if (!title.value) return t('articles.titleRequired')
+    if (title.value.length < 10) return t('articles.titleMinLength')
+    if (title.value.length > 100) return t('articles.titleMaxLength')
   }
   if (field === 'excerpt' && excerpt.value.length > 200) {
-    return 'Excerpt should be under 200 characters'
+    return t('articles.excerptMaxLength')
   }
   return null
 }
@@ -181,7 +181,7 @@ function handleKeydown(e: KeyboardEvent) {
 async function generateTitleSuggestions() {
   if (!hasEnoughContent.value || isGeneratingTitles.value) {
     if (!hasEnoughContent.value) {
-      uiStore.showWarning('Need more content', 'Add at least 50 characters of content to generate titles')
+      uiStore.showWarning(t('articles.needMoreContent'), t('articles.addMoreContentForTitles'))
     }
     return
   }
@@ -194,7 +194,7 @@ async function generateTitleSuggestions() {
     titleSuggestions.value = await aiApi.generateTitles(content.value)
   } catch (err) {
     console.error('Title generation failed:', err)
-    uiStore.showError('AI Error', 'Failed to generate title suggestions')
+    uiStore.showError(t('articles.aiError'), t('articles.failedGenerateTitles'))
   } finally {
     isGeneratingTitles.value = false
   }
@@ -203,7 +203,7 @@ async function generateTitleSuggestions() {
 async function generateTagSuggestions() {
   if (!hasEnoughContent.value || isGeneratingTags.value) {
     if (!hasEnoughContent.value) {
-      uiStore.showWarning('Need more content', 'Add at least 50 characters of content to generate tags')
+      uiStore.showWarning(t('articles.needMoreContent'), t('articles.addMoreContentForTags'))
     }
     return
   }
@@ -216,7 +216,7 @@ async function generateTagSuggestions() {
     tagSuggestions.value = await aiApi.autoTag(content.value)
   } catch (err) {
     console.error('Tag generation failed:', err)
-    uiStore.showError('AI Error', 'Failed to generate tag suggestions')
+    uiStore.showError(t('articles.aiError'), t('articles.failedGenerateTags'))
   } finally {
     isGeneratingTags.value = false
   }
@@ -225,7 +225,7 @@ async function generateTagSuggestions() {
 async function classifyContent() {
   if (!hasEnoughContent.value || isClassifying.value) {
     if (!hasEnoughContent.value) {
-      uiStore.showWarning('Need more content', 'Add at least 50 characters of content to classify')
+      uiStore.showWarning(t('articles.needMoreContent'), t('articles.addMoreContentForClassify'))
     }
     return
   }
@@ -246,7 +246,7 @@ async function classifyContent() {
     }
   } catch (err) {
     console.error('Classification failed:', err)
-    uiStore.showError('AI Error', 'Failed to classify content')
+    uiStore.showError(t('articles.aiError'), t('articles.failedClassifyContent'))
   } finally {
     isClassifying.value = false
   }
@@ -262,10 +262,10 @@ async function generateSummary() {
     // Optionally auto-fill excerpt
     if (!excerpt.value && summaryResult.value) {
       excerpt.value = summaryResult.value.summary.substring(0, 200)
-      uiStore.showSuccess('Excerpt generated', 'AI-generated excerpt has been set')
+      uiStore.showSuccess(t('articles.excerptGenerated'), t('articles.aiExcerptSet'))
     }
   } catch (err) {
-    uiStore.showError('AI Error', 'Failed to generate summary')
+    uiStore.showError(t('articles.aiError'), t('articles.failedGenerateSummary'))
   } finally {
     isSummarizing.value = false
   }
@@ -362,7 +362,7 @@ async function analyzeSentiment() {
   try {
     sentimentResult.value = await aiApi.analyzeSentiment(content.value)
   } catch (err) {
-    uiStore.showError('AI Error', 'Failed to analyze sentiment')
+    uiStore.showError(t('articles.aiError'), t('articles.failedAnalyzeSentiment'))
   } finally {
     isAnalyzingSentiment.value = false
   }
@@ -379,7 +379,7 @@ function getSEOScoreClass(score: number): string {
 function selectTitle(suggestedTitle: string) {
   title.value = suggestedTitle
   showAITitleSuggestions.value = false
-  uiStore.showSuccess('Title applied', 'AI-suggested title has been set')
+  uiStore.showSuccess(t('articles.titleApplied'), t('articles.aiTitleSet'))
 }
 
 function addTag(tag: string) {
@@ -415,9 +415,10 @@ function hideTagSuggestions() {
 
 function applyAllSuggestedTags() {
   if (tagSuggestions.value) {
-    tagSuggestions.value.tags.forEach(t => addTag(t.tag))
+    const tagCount = tagSuggestions.value.tags.length
+    tagSuggestions.value.tags.forEach(tag => addTag(tag.tag))
     showAITagSuggestions.value = false
-    uiStore.showSuccess('Tags applied', `${tagSuggestions.value.tags.length} AI-suggested tags added`)
+    uiStore.showSuccess(t('articles.tagsApplied'), t('articles.aiTagsAdded', { count: tagCount }))
   }
 }
 
@@ -437,7 +438,7 @@ function handleImageSelect(e: Event) {
 
 function processImageFile(file: File) {
   if (file.size > 5 * 1024 * 1024) {
-    uiStore.showError('File too large', 'Image must be under 5MB')
+    uiStore.showError(t('articles.fileTooLarge'), t('articles.imageMaxSize'))
     return
   }
   const reader = new FileReader()
@@ -489,7 +490,7 @@ function loadDraft() {
         category.value = draft.category || ''
         tags.value = draft.tags || []
         coverImage.value = draft.coverImage || ''
-        uiStore.showSuccess('Draft restored', 'Your previous work has been loaded')
+        uiStore.showSuccess(t('articles.draftRestored'), t('articles.previousWorkLoaded'))
       } else {
         localStorage.removeItem(draftKey)
       }
@@ -543,12 +544,12 @@ async function saveArticle(publish = false) {
   touchedFields.value.add('title')
 
   if (!title.value.trim()) {
-    uiStore.showError('Title is required')
+    uiStore.showError(t('articles.titleRequired'))
     return
   }
 
   if (title.value.length < 10) {
-    uiStore.showError('Title must be at least 10 characters')
+    uiStore.showError(t('articles.titleMinLength'))
     return
   }
 
@@ -557,9 +558,9 @@ async function saveArticle(publish = false) {
   await new Promise(resolve => setTimeout(resolve, 1000))
 
   if (publish) {
-    uiStore.showSuccess('Article published', 'Your article is now live')
+    uiStore.showSuccess(t('articles.articlePublished'), t('articles.articleNowLive'))
   } else {
-    uiStore.showSuccess('Draft saved', 'Your changes have been saved')
+    uiStore.showSuccess(t('articles.draftSaved'), t('articles.changesSaved'))
   }
 
   // Clear draft after successful save

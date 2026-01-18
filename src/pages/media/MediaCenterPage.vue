@@ -67,27 +67,27 @@ const selectedTags = ref<string[]>([])
 const selectedStatusFilters = ref<string[]>([])
 
 // Status filter options
-const statusFilterOptions = [
-  { id: 'saved', label: 'My Saved', icon: 'fas fa-bookmark', color: 'text-amber-500' },
-  { id: 'shared', label: 'Shared with me', icon: 'fas fa-share-alt', color: 'text-purple-500' }
-]
+const statusFilterOptions = computed(() => [
+  { id: 'saved', label: t('media.mySaved'), icon: 'fas fa-bookmark', color: 'text-amber-500' },
+  { id: 'shared', label: t('media.sharedWithMe'), icon: 'fas fa-share-alt', color: 'text-purple-500' }
+])
 
 // Sort options with icons
-const sortOptionsList = ref([
-  { value: 'recent', label: 'Date Modified', icon: 'fas fa-clock' },
-  { value: 'name', label: 'Name', icon: 'fas fa-font' },
-  { value: 'popular', label: 'Most Popular', icon: 'fas fa-fire' },
-  { value: 'views', label: 'Most Viewed', icon: 'fas fa-eye' },
-  { value: 'duration', label: 'Duration', icon: 'fas fa-hourglass-half' }
+const sortOptionsList = computed(() => [
+  { value: 'recent', label: t('media.dateModified'), icon: 'fas fa-clock' },
+  { value: 'name', label: t('media.name'), icon: 'fas fa-font' },
+  { value: 'popular', label: t('media.mostPopular'), icon: 'fas fa-fire' },
+  { value: 'views', label: t('media.mostViewed'), icon: 'fas fa-eye' },
+  { value: 'duration', label: t('media.duration'), icon: 'fas fa-hourglass-half' }
 ])
 
 // View navigation items
-const viewNavItems = ref([
-  { id: 'all', name: 'All Media', icon: 'fas fa-photo-film', color: 'text-teal-500' },
-  { id: 'recent', name: 'Recently Viewed', icon: 'fas fa-clock', color: 'text-blue-500' },
-  { id: 'popular', name: 'Most Popular', icon: 'fas fa-fire', color: 'text-orange-500' },
-  { id: 'saved', name: 'Saved', icon: 'fas fa-bookmark', color: 'text-amber-500' },
-  { id: 'trash', name: 'Trash', icon: 'fas fa-trash-alt', color: 'text-red-500' }
+const viewNavItems = computed(() => [
+  { id: 'all', name: t('media.allMedia'), icon: 'fas fa-photo-film', color: 'text-teal-500' },
+  { id: 'recent', name: t('media.recentlyViewed'), icon: 'fas fa-clock', color: 'text-blue-500' },
+  { id: 'popular', name: t('media.mostPopular'), icon: 'fas fa-fire', color: 'text-orange-500' },
+  { id: 'saved', name: t('media.saved'), icon: 'fas fa-bookmark', color: 'text-amber-500' },
+  { id: 'trash', name: t('media.trash'), icon: 'fas fa-trash-alt', color: 'text-red-500' }
 ])
 
 // Folder tree structure
@@ -143,31 +143,31 @@ const folderTree = ref([
 ])
 
 // Media type filter options
-const mediaTypeOptions = ref([
-  { id: 'video', label: 'Videos', icon: 'fas fa-video', color: 'text-blue-500' },
-  { id: 'audio', label: 'Audio', icon: 'fas fa-headphones', color: 'text-purple-500' },
-  { id: 'image', label: 'Images', icon: 'fas fa-image', color: 'text-green-500' },
-  { id: 'gallery', label: 'Galleries', icon: 'fas fa-images', color: 'text-amber-500' }
+const mediaTypeOptions = computed(() => [
+  { id: 'video', label: t('media.videos'), icon: 'fas fa-video', color: 'text-blue-500' },
+  { id: 'audio', label: t('media.audio'), icon: 'fas fa-headphones', color: 'text-purple-500' },
+  { id: 'image', label: t('media.images'), icon: 'fas fa-image', color: 'text-green-500' },
+  { id: 'gallery', label: t('media.galleries'), icon: 'fas fa-images', color: 'text-amber-500' }
 ])
 
 // Sort Options
-const sortOptions = ref([
-  { value: 'recent', label: 'Recent', icon: 'fas fa-clock' },
-  { value: 'popular', label: 'Popular', icon: 'fas fa-fire' },
-  { value: 'duration', label: 'Duration', icon: 'fas fa-hourglass-half' }
+const sortOptions = computed(() => [
+  { value: 'recent', label: t('media.recent'), icon: 'fas fa-clock' },
+  { value: 'popular', label: t('common.popular'), icon: 'fas fa-fire' },
+  { value: 'duration', label: t('media.duration'), icon: 'fas fa-hourglass-half' }
 ])
 
 // Media Tabs
-const mediaTabs = ref([
-  { id: 'all', label: 'All', icon: 'fas fa-th-large' },
-  { id: 'video', label: 'Videos', icon: 'fas fa-video' },
-  { id: 'audio', label: 'Audio', icon: 'fas fa-headphones' },
-  { id: 'image', label: 'Images', icon: 'fas fa-image' },
-  { id: 'gallery', label: 'Galleries', icon: 'fas fa-images' },
+const mediaTabs = computed(() => [
+  { id: 'all', label: t('common.all'), icon: 'fas fa-th-large' },
+  { id: 'video', label: t('media.videos'), icon: 'fas fa-video' },
+  { id: 'audio', label: t('media.audio'), icon: 'fas fa-headphones' },
+  { id: 'image', label: t('media.images'), icon: 'fas fa-image' },
+  { id: 'gallery', label: t('media.galleries'), icon: 'fas fa-images' },
 ])
 
 // Categories
-const categories = ref(['Highlights', 'Interviews', 'Behind the Scenes', 'Matches', 'Teams', 'Venues', 'Fans'])
+const categories = computed(() => [t('media.highlights'), t('media.interviews'), t('media.behindTheScenes'), t('media.matches'), t('media.teams'), t('media.venues'), t('media.fans')])
 
 // Date utility functions
 function formatRelativeDate(dateInput: Date | string): string {
@@ -179,11 +179,11 @@ function formatRelativeDate(dateInput: Date | string): string {
   const diffDays = Math.floor(diffMs / 86400000)
   const diffWeeks = Math.floor(diffDays / 7)
 
-  if (diffMins < 1) return 'Just now'
-  if (diffMins < 60) return `${diffMins} min ago`
-  if (diffHours < 24) return diffHours === 1 ? '1 hour ago' : `${diffHours} hours ago`
-  if (diffDays < 7) return diffDays === 1 ? 'Yesterday' : `${diffDays} days ago`
-  if (diffWeeks < 4) return diffWeeks === 1 ? '1 week ago' : `${diffWeeks} weeks ago`
+  if (diffMins < 1) return t('media.justNow')
+  if (diffMins < 60) return t('media.minAgo', { n: diffMins })
+  if (diffHours < 24) return diffHours === 1 ? t('media.hourAgo') : t('media.hoursAgo', { n: diffHours })
+  if (diffDays < 7) return diffDays === 1 ? t('common.yesterday') : t('media.daysAgo', { n: diffDays })
+  if (diffWeeks < 4) return diffWeeks === 1 ? t('media.weekAgo') : t('media.weeksAgo', { n: diffWeeks })
   return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
 }
 
@@ -2217,19 +2217,19 @@ onUnmounted(() => {
                 <i class="fas fa-photo-film text-white text-sm"></i>
               </div>
               <div>
-                <span class="block">Media Library</span>
-                <span class="text-xs font-medium text-gray-500">{{ filteredMedia.length }} items</span>
+                <span class="block">{{ $t('media.mediaLibrary') }}</span>
+                <span class="text-xs font-medium text-gray-500">{{ filteredMedia.length }} {{ $t('media.items') }}</span>
               </div>
             </h2>
             <div class="flex items-center gap-2">
               <!-- Primary Actions -->
               <button @click="showUploadModal = true" class="px-4 py-2 bg-gradient-to-r from-teal-500 to-teal-600 text-white rounded-lg text-sm font-medium hover:from-teal-600 hover:to-teal-700 transition-all flex items-center gap-2 shadow-sm shadow-teal-200">
                 <i class="fas fa-cloud-arrow-up"></i>
-                Upload Media
+                {{ $t('media.uploadMedia') }}
               </button>
               <button class="px-3 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 hover:border-gray-300 transition-all flex items-center gap-2">
                 <i class="fas fa-folder-plus text-amber-500"></i>
-                New Folder
+                {{ $t('media.newFolder') }}
               </button>
 
               <!-- Divider -->
@@ -2238,7 +2238,7 @@ onUnmounted(() => {
               <!-- Refresh Button -->
               <button
                 class="w-9 h-9 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-800 flex items-center justify-center transition-all"
-                title="Refresh"
+                :title="$t('media.refresh')"
               >
                 <i class="fas fa-sync-alt text-sm"></i>
               </button>
@@ -2260,10 +2260,10 @@ onUnmounted(() => {
                       ? 'bg-gradient-to-r from-teal-500 to-cyan-500 border-teal-500 text-white'
                       : 'bg-gray-100 border-gray-200 text-gray-500 hover:bg-gray-200'
                   ]"
-                  title="Toggle AI Search"
+                  :title="$t('media.toggleAISearch')"
                 >
                   <i class="fas fa-wand-magic-sparkles"></i>
-                  <span class="hidden sm:inline">AI</span>
+                  <span class="hidden sm:inline">{{ $t('media.aiSearch') }}</span>
                 </button>
 
                 <!-- Search Input -->
@@ -2275,7 +2275,7 @@ onUnmounted(() => {
                   <input
                     v-model="unifiedSearchQuery"
                     type="text"
-                    :placeholder="isAISearchMode ? 'Ask AI: Show me highlights from Japan matches...' : 'Search media...'"
+                    :placeholder="isAISearchMode ? $t('media.askAIPlaceholder') : $t('media.searchMedia')"
                     @keyup.enter="handleUnifiedSearch"
                     @input="handleSearchInput"
                     :class="[
@@ -2315,7 +2315,7 @@ onUnmounted(() => {
               >
                 <div class="px-3 py-1.5 text-xs font-semibold text-teal-500 flex items-center gap-2">
                   <i class="fas fa-lightbulb"></i>
-                  Try asking:
+                  {{ $t('media.tryAsking') }}
                 </div>
                 <button
                   v-for="suggestion in nlSearchSuggestions"
@@ -2336,8 +2336,8 @@ onUnmounted(() => {
                 <div class="flex items-center gap-3">
                   <div class="w-8 h-8 border-2 border-teal-500 border-t-transparent rounded-full animate-spin"></div>
                   <div>
-                    <p class="text-sm font-medium text-gray-700">AI is analyzing your query...</p>
-                    <p class="text-xs text-gray-400">Finding relevant media content</p>
+                    <p class="text-sm font-medium text-gray-700">{{ $t('media.aiIsAnalyzing') }}</p>
+                    <p class="text-xs text-gray-400">{{ $t('media.findingRelevantContent') }}</p>
                   </div>
                 </div>
               </div>
@@ -2353,7 +2353,7 @@ onUnmounted(() => {
                 ]"
               >
                 <i class="fas fa-video text-sm"></i>
-                <span>{{ selectedMediaTypes.length > 0 ? `${selectedMediaTypes.length} Types` : 'Media Type' }}</span>
+                <span>{{ selectedMediaTypes.length > 0 ? $t('media.nTypes', { n: selectedMediaTypes.length }) : $t('media.mediaType') }}</span>
                 <i :class="showMediaTypeFilter ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ml-1"></i>
               </button>
 
@@ -2362,7 +2362,7 @@ onUnmounted(() => {
                 v-if="showMediaTypeFilter"
                 class="absolute left-0 top-full mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
               >
-                <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Select Media Types</div>
+                <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">{{ $t('media.selectMediaTypes') }}</div>
                 <div class="max-h-48 overflow-y-auto">
                   <button
                     v-for="type in mediaTypeOptions"
@@ -2389,13 +2389,13 @@ onUnmounted(() => {
                     @click="selectedMediaTypes = []; showMediaTypeFilter = false"
                     class="flex-1 px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
                   >
-                    Clear All
+                    {{ $t('common.clearAll') }}
                   </button>
                   <button
                     @click="showMediaTypeFilter = false"
                     class="flex-1 px-3 py-1.5 text-xs font-medium text-white bg-teal-500 rounded-lg hover:bg-teal-600 transition-colors"
                   >
-                    Apply
+                    {{ $t('common.apply') }}
                   </button>
                 </div>
               </div>
@@ -2412,7 +2412,7 @@ onUnmounted(() => {
                 ]"
               >
                 <i class="fas fa-layer-group text-sm"></i>
-                <span>{{ selectedCategories.length > 0 ? `${selectedCategories.length} Categories` : 'Category' }}</span>
+                <span>{{ selectedCategories.length > 0 ? $t('media.nCategories', { n: selectedCategories.length }) : $t('common.category') }}</span>
                 <i :class="showCategoryFilter ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ml-1"></i>
               </button>
 
@@ -2421,7 +2421,7 @@ onUnmounted(() => {
                 v-if="showCategoryFilter"
                 class="absolute left-0 top-full mt-2 w-64 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
               >
-                <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Select Categories</div>
+                <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">{{ $t('media.selectCategories') }}</div>
                 <div class="max-h-48 overflow-y-auto">
                   <button
                     v-for="cat in categories"
@@ -2447,13 +2447,13 @@ onUnmounted(() => {
                     @click="selectedCategories = []; showCategoryFilter = false"
                     class="flex-1 px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
                   >
-                    Clear All
+                    {{ $t('common.clearAll') }}
                   </button>
                   <button
                     @click="showCategoryFilter = false"
                     class="flex-1 px-3 py-1.5 text-xs font-medium text-white bg-teal-500 rounded-lg hover:bg-teal-600 transition-colors"
                   >
-                    Apply
+                    {{ $t('common.apply') }}
                   </button>
                 </div>
               </div>
@@ -2470,7 +2470,7 @@ onUnmounted(() => {
                 ]"
               >
                 <i class="fas fa-tags text-sm"></i>
-                <span>{{ selectedTags.length > 0 ? `${selectedTags.length} Tags` : 'Tags' }}</span>
+                <span>{{ selectedTags.length > 0 ? $t('media.nTags', { n: selectedTags.length }) : $t('common.tags') }}</span>
                 <i :class="showTagFilter ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ml-1"></i>
               </button>
 
@@ -2479,7 +2479,7 @@ onUnmounted(() => {
                 v-if="showTagFilter"
                 class="absolute left-0 top-full mt-2 w-64 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
               >
-                <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Select Tags</div>
+                <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">{{ $t('media.selectTags') }}</div>
                 <div class="max-h-48 overflow-y-auto">
                   <button
                     v-for="tag in allTags"
@@ -2507,13 +2507,13 @@ onUnmounted(() => {
                     @click="selectedTags = []; showTagFilter = false"
                     class="flex-1 px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
                   >
-                    Clear All
+                    {{ $t('common.clearAll') }}
                   </button>
                   <button
                     @click="showTagFilter = false"
                     class="flex-1 px-3 py-1.5 text-xs font-medium text-white bg-teal-500 rounded-lg hover:bg-teal-600 transition-colors"
                   >
-                    Apply
+                    {{ $t('common.apply') }}
                   </button>
                 </div>
               </div>
@@ -2532,7 +2532,7 @@ onUnmounted(() => {
                 ]"
               >
                 <i class="fas fa-bookmark text-sm"></i>
-                <span>{{ selectedStatusFilters.length > 0 ? `${selectedStatusFilters.length} Saved & Shared` : 'Saved & Shared' }}</span>
+                <span>{{ selectedStatusFilters.length > 0 ? $t('media.nSavedShared', { n: selectedStatusFilters.length }) : $t('media.savedAndShared') }}</span>
                 <i :class="showStatusFilter ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ml-1"></i>
               </button>
 
@@ -2541,7 +2541,7 @@ onUnmounted(() => {
                 v-if="showStatusFilter"
                 class="absolute left-0 top-full mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
               >
-                <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Filter by Status</div>
+                <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">{{ $t('media.savedAndShared') }}</div>
                 <div class="max-h-48 overflow-y-auto">
                   <button
                     v-for="option in statusFilterOptions"
@@ -2570,13 +2570,13 @@ onUnmounted(() => {
                     @click="selectedStatusFilters = []; showStatusFilter = false"
                     class="flex-1 px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
                   >
-                    Clear All
+                    {{ $t('common.clearAll') }}
                   </button>
                   <button
                     @click="showStatusFilter = false"
                     class="flex-1 px-3 py-1.5 text-xs font-medium text-white bg-teal-500 rounded-lg hover:bg-teal-600 transition-colors"
                   >
-                    Apply
+                    {{ $t('common.apply') }}
                   </button>
                 </div>
               </div>
@@ -2598,7 +2598,7 @@ onUnmounted(() => {
                 <button
                   @click="sortOrder = sortOrder === 'asc' ? 'desc' : 'asc'"
                   class="flex items-center justify-center w-8 h-8 rounded-r-lg text-xs font-medium transition-all border bg-white border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-teal-600"
-                  :title="sortOrder === 'asc' ? 'Ascending order - Click for descending' : 'Descending order - Click for ascending'"
+                  :title="sortOrder === 'asc' ? $t('media.ascendingOrder') : $t('media.descendingOrder')"
                 >
                   <i :class="sortOrder === 'asc' ? 'fas fa-arrow-up' : 'fas fa-arrow-down'" class="text-sm text-teal-500"></i>
                 </button>
@@ -2608,7 +2608,7 @@ onUnmounted(() => {
                   v-if="showSortDropdown"
                   class="absolute left-0 top-full mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
                 >
-                  <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Sort By</div>
+                  <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">{{ $t('common.sortBy') }}</div>
                   <div class="max-h-64 overflow-y-auto">
                     <button
                       v-for="option in sortOptionsList"
@@ -2633,14 +2633,14 @@ onUnmounted(() => {
                 <button
                   @click="viewMode = 'grid'"
                   :class="['px-2.5 py-1 rounded-md transition-all', viewMode === 'grid' ? 'bg-teal-500 text-white' : 'text-gray-500 hover:bg-gray-100']"
-                  title="Grid view"
+                  :title="$t('media.gridView')"
                 >
                   <i class="fas fa-th-large text-xs"></i>
                 </button>
                 <button
                   @click="viewMode = 'list'"
                   :class="['px-2.5 py-1 rounded-md transition-all', viewMode === 'list' ? 'bg-teal-500 text-white' : 'text-gray-500 hover:bg-gray-100']"
-                  title="List view"
+                  :title="$t('media.listView')"
                 >
                   <i class="fas fa-list text-xs"></i>
                 </button>
