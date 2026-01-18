@@ -548,13 +548,17 @@ export default {
   // Media
   media: {
     title: 'Media Center',
-    subtitle: 'Browse videos, podcasts, and multimedia content',
+    subtitle: 'Videos, audio, images, and photo galleries - all the multimedia content.',
     allMedia: 'All Media',
     videos: 'Videos',
     podcasts: 'Podcasts',
     images: 'Images',
     audio: 'Audio',
+    galleries: 'Galleries',
     uploadMedia: 'Upload Media',
+    watchFeatured: 'Watch Featured',
+    featuredContent: 'Featured Content',
+    upNext: 'Up Next',
     mediaTitle: 'Title',
     mediaDescription: 'Description',
     mediaDuration: 'Duration',
@@ -624,8 +628,15 @@ export default {
 
   // Self-Services
   services: {
-    title: 'Self-Services',
-    subtitle: 'Access IT and HR services through our self-service portal',
+    title: 'Self-Service Portal',
+    subtitle: 'Request services, track progress, and get instant help from our support team.',
+    open: 'Open',
+    avgTime: 'Avg. Time',
+    services: 'Services',
+    viewHistory: 'View History',
+    smartSuggestions: 'Smart Suggestions',
+    serviceCatalog: 'Service Catalog',
+    servicesAvailable: 'services available',
     allServices: 'All Services',
     myRequests: 'My Requests',
     submitRequest: 'Submit Request',

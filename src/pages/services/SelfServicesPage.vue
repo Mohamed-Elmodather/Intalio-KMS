@@ -350,28 +350,28 @@ function getMatchTypeColor(type: string) {
               <i class="fas fa-clock"></i>
             </div>
             <p class="stat-value-mini">{{ openRequestsCount }}</p>
-            <p class="stat-label-mini">Open</p>
+            <p class="stat-label-mini">{{ $t('services.open') }}</p>
           </div>
           <div class="stat-card-square">
             <div class="stat-icon-box">
               <i class="fas fa-check-circle"></i>
             </div>
             <p class="stat-value-mini">{{ completedRequestsCount }}</p>
-            <p class="stat-label-mini">Completed</p>
+            <p class="stat-label-mini">{{ $t('common.completed') }}</p>
           </div>
           <div class="stat-card-square">
             <div class="stat-icon-box">
               <i class="fas fa-bolt"></i>
             </div>
             <p class="stat-value-mini">{{ avgResolutionTime }}h</p>
-            <p class="stat-label-mini">Avg. Time</p>
+            <p class="stat-label-mini">{{ $t('services.avgTime') }}</p>
           </div>
           <div class="stat-card-square">
             <div class="stat-icon-box">
               <i class="fas fa-th-large"></i>
             </div>
             <p class="stat-value-mini">{{ totalServices }}</p>
-            <p class="stat-label-mini">Services</p>
+            <p class="stat-label-mini">{{ $t('services.services') }}</p>
           </div>
         </div>
 
@@ -381,23 +381,23 @@ function getMatchTypeColor(type: string) {
             AFC Asian Cup 2027
           </div>
 
-          <h1 class="text-3xl font-bold text-white mb-2">Self-Service Portal</h1>
-          <p class="text-teal-100 max-w-lg">Request services, track progress, and get instant help from our support team.</p>
+          <h1 class="text-3xl font-bold text-white mb-2">{{ $t('services.title') }}</h1>
+          <p class="text-teal-100 max-w-lg">{{ $t('services.subtitle') }}</p>
 
           <div class="flex flex-wrap gap-3 mt-6">
             <button @click="showNewRequest = true" class="px-5 py-2.5 bg-white text-teal-600 rounded-xl font-semibold text-sm flex items-center gap-2 hover:bg-teal-50 transition-all shadow-lg">
               <i class="fas fa-plus"></i>
-              New Request
+              {{ $t('services.newRequest') }}
             </button>
             <button class="px-5 py-2.5 bg-white/20 backdrop-blur-sm border border-white/30 text-white rounded-xl font-semibold text-sm hover:bg-white/30 transition-all flex items-center gap-2">
               <i class="fas fa-history"></i>
-              View History
+              {{ $t('services.viewHistory') }}
             </button>
             <!-- AI Action Buttons -->
             <button @click="fetchAIRecommendations"
                     class="px-5 py-2.5 bg-gradient-to-r from-teal-500/20 to-emerald-500/20 backdrop-blur-sm text-white rounded-xl font-semibold text-sm flex items-center gap-2 hover:from-teal-500/30 hover:to-emerald-500/30 transition-all border border-white/20">
               <i class="fas fa-wand-magic-sparkles"></i>
-              Smart Suggestions
+              {{ $t('services.smartSuggestions') }}
             </button>
           </div>
         </div>
@@ -417,13 +417,13 @@ function getMatchTypeColor(type: string) {
                       <i class="fas fa-th-large text-white text-sm"></i>
                     </div>
                     <div>
-                      <span class="block">Service Catalog</span>
-                      <span class="text-xs font-medium text-gray-500">{{ filteredServices.length }} services available</span>
+                      <span class="block">{{ $t('services.serviceCatalog') }}</span>
+                      <span class="text-xs font-medium text-gray-500">{{ filteredServices.length }} {{ $t('services.servicesAvailable') }}</span>
                     </div>
                   </h2>
                   <button @click="showNewRequest = true" class="px-4 py-2 bg-gradient-to-r from-teal-500 to-teal-600 text-white rounded-lg text-sm font-medium hover:from-teal-600 hover:to-teal-700 transition-all flex items-center gap-2 shadow-sm shadow-teal-200">
                     <i class="fas fa-plus"></i>
-                    New Request
+                    {{ $t('services.newRequest') }}
                   </button>
                 </div>
                 <!-- Filter Row -->

@@ -548,13 +548,17 @@ export default {
   // Media
   media: {
     title: 'مركز الوسائط',
-    subtitle: 'تصفح الفيديوهات والبودكاست والمحتوى المتعدد الوسائط',
+    subtitle: 'فيديوهات وصوتيات وصور ومعارض الصور - جميع محتوى الوسائط المتعددة.',
     allMedia: 'جميع الوسائط',
     videos: 'الفيديوهات',
     podcasts: 'البودكاست',
     images: 'الصور',
     audio: 'الصوتيات',
+    galleries: 'معارض الصور',
     uploadMedia: 'رفع وسائط',
+    watchFeatured: 'مشاهدة المميز',
+    featuredContent: 'المحتوى المميز',
+    upNext: 'التالي',
     mediaTitle: 'العنوان',
     mediaDescription: 'الوصف',
     mediaDuration: 'المدة',
@@ -624,8 +628,15 @@ export default {
 
   // Self-Services
   services: {
-    title: 'الخدمات الذاتية',
-    subtitle: 'الوصول إلى خدمات تقنية المعلومات والموارد البشرية',
+    title: 'بوابة الخدمة الذاتية',
+    subtitle: 'اطلب الخدمات، تتبع التقدم، واحصل على مساعدة فورية من فريق الدعم.',
+    open: 'مفتوح',
+    avgTime: 'متوسط الوقت',
+    services: 'الخدمات',
+    viewHistory: 'عرض السجل',
+    smartSuggestions: 'اقتراحات ذكية',
+    serviceCatalog: 'كتالوج الخدمات',
+    servicesAvailable: 'خدمة متاحة',
     allServices: 'جميع الخدمات',
     myRequests: 'طلباتي',
     submitRequest: 'تقديم طلب',

@@ -1848,28 +1848,28 @@ onUnmounted(() => {
             <i class="fas fa-video"></i>
           </div>
           <p class="stat-value-mini">{{ mediaStats.totalVideos }}</p>
-          <p class="stat-label-mini">Videos</p>
+          <p class="stat-label-mini">{{ $t('media.videos') }}</p>
         </div>
         <div class="stat-card-square">
           <div class="stat-icon-box">
             <i class="fas fa-headphones"></i>
           </div>
           <p class="stat-value-mini">{{ mediaStats.audio }}</p>
-          <p class="stat-label-mini">Audio</p>
+          <p class="stat-label-mini">{{ $t('media.audio') }}</p>
         </div>
         <div class="stat-card-square">
           <div class="stat-icon-box">
             <i class="fas fa-image"></i>
           </div>
           <p class="stat-value-mini">{{ mediaStats.images }}</p>
-          <p class="stat-label-mini">Images</p>
+          <p class="stat-label-mini">{{ $t('media.images') }}</p>
         </div>
         <div class="stat-card-square">
           <div class="stat-icon-box">
             <i class="fas fa-images"></i>
           </div>
           <p class="stat-value-mini">{{ mediaStats.galleries }}</p>
-          <p class="stat-label-mini">Galleries</p>
+          <p class="stat-label-mini">{{ $t('media.galleries') }}</p>
         </div>
       </div>
 
@@ -1879,17 +1879,17 @@ onUnmounted(() => {
           AFC Asian Cup 2027
         </div>
 
-        <h1 class="text-3xl font-bold text-white mb-2">Media Center</h1>
-        <p class="text-teal-100 max-w-lg">Videos, audio, images, and photo galleries - all the multimedia content for AFC Asian Cup 2027.</p>
+        <h1 class="text-3xl font-bold text-white mb-2">{{ $t('media.title') }}</h1>
+        <p class="text-teal-100 max-w-lg">{{ $t('media.subtitle') }}</p>
 
         <div class="flex flex-wrap gap-3 mt-6">
           <button @click="showUploadModal = true" class="px-5 py-2.5 bg-white text-teal-600 rounded-xl font-semibold text-sm flex items-center gap-2 hover:bg-teal-50 transition-all shadow-lg">
             <i class="fas fa-cloud-upload-alt"></i>
-            Upload Media
+            {{ $t('media.uploadMedia') }}
           </button>
           <button @click="playFeatured" class="px-5 py-2.5 bg-white/20 backdrop-blur-sm border border-white/30 text-white rounded-xl font-semibold text-sm hover:bg-white/30 transition-all flex items-center gap-2">
             <i class="fas fa-play-circle"></i>
-            Watch Featured
+            {{ $t('media.watchFeatured') }}
           </button>
         </div>
       </div>
@@ -1905,9 +1905,9 @@ onUnmounted(() => {
           <div class="section-header-row">
             <h2 class="section-title-sm">
               <i class="fas fa-star text-amber-500"></i>
-              Featured Content
+              {{ $t('media.featuredContent') }}
             </h2>
-            <router-link to="/media" class="view-all-link">View All <i class="fas fa-arrow-right"></i></router-link>
+            <router-link to="/media" class="view-all-link">{{ $t('common.viewAll') }} <i class="fas fa-arrow-right"></i></router-link>
           </div>
           <!-- Featured Grid: Main + Up Next side by side -->
           <div class="featured-inner-grid">
@@ -1920,7 +1920,7 @@ onUnmounted(() => {
                 <div class="featured-main-overlay"></div>
                 <!-- Badges -->
                 <div class="featured-main-badges">
-                  <span class="badge-featured"><i class="fas fa-star"></i> Featured</span>
+                  <span class="badge-featured"><i class="fas fa-star"></i> {{ $t('common.featured') }}</span>
                   <span class="badge-category">{{ featuredVideo.category }}</span>
                 </div>
                 <!-- Play Button -->
@@ -1964,7 +1964,7 @@ onUnmounted(() => {
 
             <!-- Up Next Videos (Vertical Stack) -->
             <div class="up-next-column">
-              <h3 class="up-next-title"><i class="fas fa-list"></i> Up Next</h3>
+              <h3 class="up-next-title"><i class="fas fa-list"></i> {{ $t('media.upNext') }}</h3>
               <div class="up-next-vertical">
                 <div v-for="video in upNextVideos.slice(0, 3)" :key="video.id"
                      @click="goToMedia(video)"
