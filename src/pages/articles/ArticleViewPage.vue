@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import { ref, onMounted, computed, watch, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { articlesApi } from '@/api'
 import { aiApi } from '@/api/ai'
 import type { Article } from '@/types'
+
+const { t } = useI18n()
 import type { SummarizationResult, TranslationResult, NERResult, SupportedLanguage } from '@/types/ai'
 import { SUPPORTED_LANGUAGES } from '@/types/ai'
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue'

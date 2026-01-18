@@ -249,7 +249,7 @@ export default {
   dashboard: {
     title: 'Dashboard',
     welcome: 'Welcome',
-    welcomeMessage: 'Welcome back, {name}!',
+    welcomeMessage: 'Welcome to the Knowledge Management System. You have',
     quickActions: 'Quick Actions',
     recentActivity: 'Recent Activity',
     statistics: 'Statistics',
@@ -261,6 +261,16 @@ export default {
     continueReading: 'Continue Reading',
     recommendations: 'Recommendations',
     overview: 'Overview',
+    greeting: {
+      morning: 'Good morning, {name}!',
+      afternoon: 'Good afternoon, {name}!',
+      evening: 'Good evening, {name}!',
+    },
+    pendingTasks: '{count} pending tasks',
+    newUpdates: '{count} new updates',
+    createContent: 'Create Content',
+    viewEvents: 'View Events',
+    forYou: 'For You',
   },
 
   // Articles

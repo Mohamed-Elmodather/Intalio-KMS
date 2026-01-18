@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { useAIServicesStore } from '@/stores/aiServices'
+
+const { t } = useI18n()
 import { AILoadingIndicator, AIConfidenceBar } from '@/components/ai'
 import {
   CommentsSection,

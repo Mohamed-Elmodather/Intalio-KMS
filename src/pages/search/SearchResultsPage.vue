@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { useUIStore } from '@/stores/ui'
 import { useAIServicesStore } from '@/stores/aiServices'
 import { AIVoiceInput } from '@/components/ai'
@@ -10,6 +11,7 @@ const uiStore = useUIStore()
 const aiStore = useAIServicesStore()
 const route = useRoute()
 const router = useRouter()
+const { t } = useI18n()
 
 // Layout state
 const isSidebarCollapsed = computed(() => uiStore.sidebarCollapsed)

@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { ref, computed, nextTick, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useAIServicesStore } from '@/stores/aiServices'
+
+const { t } = useI18n()
 import { AILoadingIndicator, AISuggestionChip, AISentimentBadge } from '@/components/ai'
 import type { SentimentResult, SummarizationResult } from '@/types/ai'
 

@@ -1,11 +1,14 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { useComments } from '@/composables/useComments'
 import { useRelatedContent } from '@/composables/useRelatedContent'
 import { useSharing } from '@/composables/useSharing'
 import { CommentsSection, SocialShareButtons, RelatedContentCarousel, AuthorCard, BookmarkButton, AddToCollectionModal } from '@/components/common'
 import type { Author } from '@/types/detail-pages'
+
+const { t } = useI18n()
 
 // Text constants for localization
 const textConstants = {

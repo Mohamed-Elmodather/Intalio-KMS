@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useAIServicesStore } from '@/stores/aiServices'
 import { AILoadingIndicator, AIConfidenceBar } from '@/components/ai'
 
+const { t } = useI18n()
 const aiStore = useAIServicesStore()
 
 // Helper function to safely get max value from array

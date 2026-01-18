@@ -249,7 +249,7 @@ export default {
   dashboard: {
     title: 'لوحة التحكم',
     welcome: 'مرحباً',
-    welcomeMessage: 'مرحباً بعودتك، {name}!',
+    welcomeMessage: 'مرحباً بك في نظام إدارة المعرفة. لديك',
     quickActions: 'إجراءات سريعة',
     recentActivity: 'النشاط الأخير',
     statistics: 'الإحصائيات',
@@ -261,6 +261,16 @@ export default {
     continueReading: 'متابعة القراءة',
     recommendations: 'التوصيات',
     overview: 'نظرة عامة',
+    greeting: {
+      morning: 'صباح الخير، {name}!',
+      afternoon: 'مساء الخير، {name}!',
+      evening: 'مساء الخير، {name}!',
+    },
+    pendingTasks: '{count} مهام معلقة',
+    newUpdates: '{count} تحديثات جديدة',
+    createContent: 'إنشاء محتوى',
+    viewEvents: 'عرض الفعاليات',
+    forYou: 'مخصص لك',
   },
 
   // Articles

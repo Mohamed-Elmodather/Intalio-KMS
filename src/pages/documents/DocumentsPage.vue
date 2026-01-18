@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import AddToCollectionModal from '@/components/common/AddToCollectionModal.vue'
 import { useAIServicesStore } from '@/stores/aiServices'
 import { useComparisonStore } from '@/stores/comparison'
@@ -11,6 +12,7 @@ import type { ComparisonItem } from '@/types'
 import type { ClassificationResult } from '@/types/ai'
 
 const router = useRouter()
+const { t } = useI18n()
 const aiStore = useAIServicesStore()
 const comparisonStore = useComparisonStore()
 

@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
 import { CommentsSection, SocialShareButtons, RelatedContentCarousel, BookmarkButton } from '@/components/common'
 import type { EventAttendee, EventAgendaItem, EventSpeaker, Author, Attachment } from '@/types/detail-pages'
 
 const route = useRoute()
 const router = useRouter()
+const { t } = useI18n()
 
 // State
 const isLoading = ref(true)

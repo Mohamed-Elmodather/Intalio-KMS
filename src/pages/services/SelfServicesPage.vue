@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
 import { useAIServicesStore } from '@/stores/aiServices'
 import { AILoadingIndicator, AISuggestionChip } from '@/components/ai'
 
 const router = useRouter()
+const { t } = useI18n()
 
 // Initialize AI store
 const aiStore = useAIServicesStore()

@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { BookmarkButton, SocialShareButtons, CommentsSection } from '@/components/common'
 
 const route = useRoute()
 const router = useRouter()
+const { t } = useI18n()
 
 // Text constants for i18n
 const textConstants = {

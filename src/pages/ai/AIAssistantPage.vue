@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, nextTick, onMounted, onUnmounted, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
 import { useAIServicesStore } from '@/stores/aiServices'
 import { useComparisonStore } from '@/stores/comparison'
@@ -20,6 +21,7 @@ import { useSlashCommands } from '@/composables/useSlashCommands'
 import { useVoiceInput } from '@/composables/useVoiceInput'
 import type { AIOperationType } from '@/types/ai'
 
+const { t } = useI18n()
 const aiStore = useAIServicesStore()
 const comparisonStore = useComparisonStore()
 const workflowsStore = useAIWorkflowsStore()

@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
 import { useAIServicesStore } from '@/stores/aiServices'
 import { AILoadingIndicator, AIConfidenceBar } from '@/components/ai'
 
+const { t } = useI18n()
 const aiStore = useAIServicesStore()
 
 // Loading state

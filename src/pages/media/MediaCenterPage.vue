@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import ContentActionsDropdown from '@/components/common/ContentActionsDropdown.vue'
+
+const { t } = useI18n()
 import AddToCollectionModal from '@/components/common/AddToCollectionModal.vue'
 import { useAIServicesStore } from '@/stores/aiServices'
 import { useComparisonStore } from '@/stores/comparison'

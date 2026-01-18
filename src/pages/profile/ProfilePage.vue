@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
 import { useAIServicesStore } from '@/stores/aiServices'
 import { AILoadingIndicator, AISuggestionChip, AIConfidenceBar } from '@/components/ai'
 
 const router = useRouter()
 const route = useRoute()
+const { t } = useI18n()
 const aiStore = useAIServicesStore()
 
 // Loading state

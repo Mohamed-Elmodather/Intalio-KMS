@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { useComments } from '@/composables/useComments'
 import { useRatings } from '@/composables/useRatings'
 import { CommentsSection, RatingStars, BookmarkButton } from '@/components/common'
@@ -8,6 +9,7 @@ import type { Author, ServiceRequestStep } from '@/types/detail-pages'
 
 const route = useRoute()
 const router = useRouter()
+const { t } = useI18n()
 
 // Service Request interface
 interface ServiceRequest {

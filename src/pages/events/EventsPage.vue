@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { useAIServicesStore } from '@/stores/aiServices'
 import { useComparisonStore } from '@/stores/comparison'
 import { AILoadingIndicator, AISuggestionChip, AIConfidenceBar } from '@/components/ai'
@@ -10,6 +11,7 @@ import type { SummarizationResult, ClassificationResult } from '@/types/ai'
 import type { ComparisonItem } from '@/types'
 
 const router = useRouter()
+const { t } = useI18n()
 
 // Initialize AI store
 const aiStore = useAIServicesStore()

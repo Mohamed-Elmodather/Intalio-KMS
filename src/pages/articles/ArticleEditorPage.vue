@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { useRouter, onBeforeRouteLeave } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { useUIStore } from '@/stores/ui'
 import { aiApi } from '@/api/ai'
+
+const { t } = useI18n()
 import type { TitleGenerationResult, ClassificationResult, AutoTagResult, SummarizationResult, SentimentResult } from '@/types/ai'
 import {
   AIActionButton,

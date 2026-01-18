@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { useUIStore } from '@/stores/ui'
 import { useAIServicesStore } from '@/stores/aiServices'
 import { AILoadingIndicator, AISuggestionChip } from '@/components/ai'
+
+const { t } = useI18n()
 
 // Text constants for localization
 const textConstants = {

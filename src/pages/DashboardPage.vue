@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { useAIServicesStore } from '@/stores/aiServices'
 import { AILoadingIndicator, AISuggestionChip, AIConfidenceBar } from '@/components/ai'
 
 const router = useRouter()
+const { t } = useI18n()
 const aiStore = useAIServicesStore()
 
 // Current user data (would come from auth store in production)
@@ -1344,36 +1346,36 @@ onUnmounted(() => {
         </div>
 
         <h1 class="text-3xl font-bold text-white mb-3 fade-in-up" style="animation-delay: 0.3s;">
-          Good {{ timeOfDay }}, {{ currentUser.name }}! <span class="text-2xl inline-block icon-float">👋</span>
+          {{ $t(`dashboard.greeting.${timeOfDay}`, { name: currentUser.name }) }} <span class="text-2xl inline-block icon-float">👋</span>
         </h1>
         <p class="text-teal-100 max-w-lg fade-in-up text-base" style="animation-delay: 0.4s;">
-          Welcome to the Knowledge Management System. You have
-          <span class="font-semibold text-white">{{ pendingTasksCount }} pending tasks</span> and
-          <span class="font-semibold text-white">{{ newUpdatesCount }} new updates</span> to review.
+          {{ $t('dashboard.welcomeMessage') }}
+          <span class="font-semibold text-white">{{ $t('dashboard.pendingTasks', { count: pendingTasksCount }) }}</span> {{ $t('common.and') }}
+          <span class="font-semibold text-white">{{ $t('dashboard.newUpdates', { count: newUpdatesCount }) }}</span>.
         </p>
 
         <!-- Quick Action Buttons -->
         <div class="flex flex-wrap gap-3 mt-6 fade-in-up" style="animation-delay: 0.5s;">
           <router-link to="/learning" class="px-5 py-2.5 bg-white text-teal-600 rounded-xl font-semibold text-sm flex items-center gap-2 hover:bg-teal-50 transition-all shadow-lg shadow-black/10">
             <i class="fas fa-play text-xs"></i>
-            Continue Learning
+            {{ $t('learning.continueLearning') }}
           </router-link>
           <router-link to="/articles/new" class="px-5 py-2.5 bg-white/20 backdrop-blur-sm border border-white/30 text-white rounded-xl font-semibold text-sm hover:bg-white/30 transition-all flex items-center gap-2">
             <i class="fas fa-plus text-xs"></i>
-            Create Content
+            {{ $t('dashboard.createContent') }}
           </router-link>
           <router-link to="/events" class="px-5 py-2.5 bg-white/20 backdrop-blur-sm border border-white/30 text-white rounded-xl font-semibold text-sm hover:bg-white/30 transition-all flex items-center gap-2">
             <i class="fas fa-calendar text-xs"></i>
-            View Events
+            {{ $t('dashboard.viewEvents') }}
           </router-link>
           <!-- AI Buttons -->
           <button @click="loadAIInsights" class="px-5 py-2.5 bg-gradient-to-r from-emerald-400 to-teal-400 text-white rounded-xl font-semibold text-sm hover:from-emerald-500 hover:to-teal-500 transition-all flex items-center gap-2 shadow-lg shadow-teal-500/20">
             <i class="fas fa-wand-magic-sparkles text-xs"></i>
-            AI Insights
+            {{ $t('learning.aiInsights') }}
           </button>
           <button @click="loadRecommendations" class="px-5 py-2.5 bg-white/20 backdrop-blur-sm border border-white/30 text-white rounded-xl font-semibold text-sm hover:bg-white/30 transition-all flex items-center gap-2">
             <i class="fas fa-compass text-xs"></i>
-            For You
+            {{ $t('dashboard.forYou') }}
           </button>
         </div>
 
