@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
+import { useI18n } from 'vue-i18n'
 import UnifiedSearch from './UnifiedSearch.vue'
 import LanguageSwitcher from '@/components/common/LanguageSwitcher.vue'
+
+const { t } = useI18n()
 
 // Types
 export interface HeaderAction {
@@ -185,7 +188,7 @@ onBeforeUnmount(() => {
     <div class="unified-header__content">
       <!-- Left: Logo & Toggle -->
       <div class="unified-header__left">
-        <button @click="toggleSidebar" class="unified-header__toggle" title="Toggle Sidebar">
+        <button @click="toggleSidebar" class="unified-header__toggle" :title="$t('header.toggleSidebar')">
           <i class="fas fa-bars"></i>
         </button>
         <div class="unified-header__brand">
@@ -214,13 +217,13 @@ onBeforeUnmount(() => {
       <div class="unified-header__right">
         <!-- Create Button -->
         <div v-if="createMenuItems.length > 0" class="header-dropdown-trigger relative">
-          <button @click.stop="toggleCreate" class="unified-header__btn" title="Create New">
+          <button @click.stop="toggleCreate" class="unified-header__btn" :title="$t('header.createNew')">
             <i class="fas fa-plus"></i>
           </button>
           <Transition name="dropdown">
             <div v-if="showCreateMenu" class="unified-header__dropdown unified-header__dropdown--create">
               <div class="unified-header__dropdown-header">
-                <p>Create New</p>
+                <p>{{ $t('header.createNew') }}</p>
               </div>
               <div class="unified-header__dropdown-content">
                 <button
@@ -244,7 +247,7 @@ onBeforeUnmount(() => {
 
         <!-- Notifications -->
         <div class="header-dropdown-trigger relative">
-          <button @click.stop="toggleNotifications" class="unified-header__btn" title="Notifications">
+          <button @click.stop="toggleNotifications" class="unified-header__btn" :title="$t('header.notifications')">
             <i class="fas fa-bell"></i>
             <span v-if="unreadCount > 0" class="unified-header__badge">
               {{ unreadCount > 9 ? '9+' : unreadCount }}
@@ -253,13 +256,13 @@ onBeforeUnmount(() => {
           <Transition name="dropdown">
             <div v-if="showNotifications" class="unified-header__dropdown unified-header__dropdown--notifications">
               <div class="unified-header__dropdown-header unified-header__dropdown-header--between">
-                <p>Notifications</p>
-                <button @click="handleMarkAllRead" class="unified-header__mark-read">Mark all read</button>
+                <p>{{ $t('header.notifications') }}</p>
+                <button @click="handleMarkAllRead" class="unified-header__mark-read">{{ $t('header.markAllRead') }}</button>
               </div>
               <div class="unified-header__notifications-list">
                 <div v-if="notifications.length === 0" class="unified-header__notifications-empty">
                   <i class="fas fa-bell-slash"></i>
-                  <p>No notifications</p>
+                  <p>{{ $t('header.noNotifications') }}</p>
                 </div>
                 <a
                   v-for="notif in notifications"
@@ -289,7 +292,7 @@ onBeforeUnmount(() => {
               </div>
               <div class="unified-header__dropdown-footer">
                 <button @click="handleViewAllNotifications" class="unified-header__view-all">
-                  View all notifications
+                  {{ $t('header.viewAllNotifications') }}
                   <i class="fas fa-arrow-right"></i>
                 </button>
               </div>
@@ -327,7 +330,7 @@ onBeforeUnmount(() => {
               <p class="unified-header__user-name">{{ user.displayName }}</p>
               <p class="unified-header__user-status">
                 <span v-if="user.isOnline !== false" class="unified-header__status-dot"></span>
-                {{ user.isOnline !== false ? 'Online' : 'Offline' }}
+                {{ user.isOnline !== false ? $t('user.online') : $t('user.offline') }}
               </p>
             </div>
             <div class="unified-header__avatar">
@@ -352,17 +355,17 @@ onBeforeUnmount(() => {
               <div class="unified-header__user-menu">
                 <button @click="handleProfileClick" class="unified-header__user-menu-item">
                   <i class="fas fa-user"></i>
-                  <span>My Profile</span>
+                  <span>{{ $t('user.myProfile') }}</span>
                 </button>
                 <button @click="handleSettingsClick" class="unified-header__user-menu-item">
                   <i class="fas fa-cog"></i>
-                  <span>Settings</span>
+                  <span>{{ $t('nav.settings') }}</span>
                 </button>
               </div>
               <div class="unified-header__user-footer">
                 <button @click="handleLogout" class="unified-header__logout-btn">
                   <i class="fas fa-sign-out-alt"></i>
-                  <span>Sign Out</span>
+                  <span>{{ $t('auth.signOut') }}</span>
                 </button>
               </div>
             </div>

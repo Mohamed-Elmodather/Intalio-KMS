@@ -237,7 +237,7 @@ async function classifyContent() {
   try {
     classificationResult.value = await aiApi.classifyContent(content.value)
     if (!category.value && classificationResult.value?.primaryCategory) {
-      const matchingCat = categories.find(c =>
+      const matchingCat = categories.value.find((c: { id: string; name: string }) =>
         c.name.toLowerCase().includes(classificationResult.value!.primaryCategory.toLowerCase())
       )
       if (matchingCat) {

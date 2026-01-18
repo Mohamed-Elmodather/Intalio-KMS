@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 interface Collection {
   id: string
@@ -62,10 +65,10 @@ const getContentTypeIcon = computed(() => {
 
 const getContentTypeLabel = computed(() => {
   switch (props.contentType) {
-    case 'article': return 'Article'
-    case 'document': return 'Document'
-    case 'media': return 'Media'
-    default: return 'Item'
+    case 'article': return t('nav.articles')
+    case 'document': return t('nav.documents')
+    case 'media': return t('nav.media')
+    default: return t('collections.item')
   }
 })
 
@@ -149,8 +152,8 @@ watch(() => props.show, (newValue) => {
           <!-- Header -->
           <div class="modal-header">
             <h3 class="modal-title">
-              <i class="fas fa-layer-group text-teal-500 mr-2"></i>
-              Add to Collection
+              <i class="fas fa-layer-group text-teal-500 me-2"></i>
+              {{ $t('collections.addToCollection') }}
             </h3>
             <button @click="closeModal" class="modal-close">
               <i class="fas fa-times"></i>
@@ -183,7 +186,7 @@ watch(() => props.show, (newValue) => {
               class="create-new-btn"
             >
               <i class="fas fa-plus"></i>
-              <span>Create New Collection</span>
+              <span>{{ $t('collections.createNewCollection') }}</span>
             </button>
 
             <!-- Create New Form -->
@@ -192,7 +195,7 @@ watch(() => props.show, (newValue) => {
                 v-model="newCollectionName"
                 type="text"
                 class="new-collection-input"
-                placeholder="Collection name..."
+                :placeholder="$t('collections.collectionNamePlaceholder')"
                 autofocus
                 @keydown.enter="createNewCollection"
               />
@@ -201,28 +204,28 @@ watch(() => props.show, (newValue) => {
                   <button
                     @click="newCollectionVisibility = 'private'"
                     :class="['visibility-btn', newCollectionVisibility === 'private' ? 'active' : '']"
-                    title="Private"
+                    :title="$t('collections.private')"
                   >
                     <i class="fas fa-lock"></i>
                   </button>
                   <button
                     @click="newCollectionVisibility = 'shared'"
                     :class="['visibility-btn', newCollectionVisibility === 'shared' ? 'active' : '']"
-                    title="Shared"
+                    :title="$t('collections.shared')"
                   >
                     <i class="fas fa-globe"></i>
                   </button>
                 </div>
                 <div class="create-btns">
                   <button @click="showCreateNew = false" class="cancel-create-btn">
-                    Cancel
+                    {{ $t('common.cancel') }}
                   </button>
                   <button
                     @click="createNewCollection"
                     class="confirm-create-btn"
                     :disabled="!newCollectionName.trim()"
                   >
-                    Create
+                    {{ $t('common.create') }}
                   </button>
                 </div>
               </div>
@@ -235,7 +238,7 @@ watch(() => props.show, (newValue) => {
                 v-model="searchQuery"
                 type="text"
                 class="search-input"
-                placeholder="Search collections..."
+                :placeholder="$t('collections.searchCollections')"
               />
               <button v-if="searchQuery" @click="searchQuery = ''" class="clear-search">
                 <i class="fas fa-times"></i>
@@ -262,10 +265,10 @@ watch(() => props.show, (newValue) => {
                 <div class="collection-info">
                   <span class="collection-name">{{ collection.name }}</span>
                   <span class="collection-meta">
-                    {{ collection.itemCount }} items
+                    {{ $t('collections.itemCount', { count: collection.itemCount }) }}
                     <span v-if="collection.containsItem" class="already-badge">
                       <i class="fas fa-check-circle"></i>
-                      Already added
+                      {{ $t('collections.alreadyAdded') }}
                     </span>
                   </span>
                 </div>
@@ -277,7 +280,7 @@ watch(() => props.show, (newValue) => {
               <!-- Empty State -->
               <div v-if="filteredCollections.length === 0" class="empty-state">
                 <i class="fas fa-search"></i>
-                <span>No collections found</span>
+                <span>{{ $t('collections.noCollectionsFound') }}</span>
               </div>
             </div>
           </div>
@@ -285,15 +288,15 @@ watch(() => props.show, (newValue) => {
           <!-- Footer -->
           <div class="modal-footer">
             <button @click="closeModal" class="btn-cancel">
-              Cancel
+              {{ $t('common.cancel') }}
             </button>
             <button
               @click="addToCollections"
               class="btn-add"
               :disabled="selectedCount === 0"
             >
-              <i class="fas fa-plus mr-2"></i>
-              Add to {{ selectedCount }} Collection{{ selectedCount !== 1 ? 's' : '' }}
+              <i class="fas fa-plus me-2"></i>
+              {{ $t('collections.addToCount', { count: selectedCount }) }}
             </button>
           </div>
         </div>

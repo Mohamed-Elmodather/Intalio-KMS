@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { AIOperationType } from '@/types/ai'
+
+const { t } = useI18n()
 
 export interface AITool {
   id: AIOperationType
@@ -29,11 +32,11 @@ const selectedIndex = ref(0)
 const searchInputRef = ref<HTMLInputElement | null>(null)
 
 // AI Tools configuration
-const aiTools: AITool[] = [
+const aiTools = computed<AITool[]>(() => [
   {
     id: 'extract-entities',
-    name: 'Entity Recognition',
-    description: 'Extract people, organizations, locations, dates, events',
+    name: t('ai.aiTools.entityRecognition'),
+    description: t('ai.aiTools.entityRecognitionDesc'),
     icon: 'fas fa-tags',
     shortcut: 'Ctrl+E',
     category: 'analysis',
@@ -42,8 +45,8 @@ const aiTools: AITool[] = [
   },
   {
     id: 'analyze-sentiment',
-    name: 'Sentiment Analysis',
-    description: 'Analyze emotional tone and sentiment of text',
+    name: t('ai.aiTools.sentimentAnalysis'),
+    description: t('ai.aiTools.sentimentAnalysisDesc'),
     icon: 'fas fa-smile',
     shortcut: 'Ctrl+S',
     category: 'analysis',
@@ -52,8 +55,8 @@ const aiTools: AITool[] = [
   },
   {
     id: 'summarize',
-    name: 'Summarize',
-    description: 'Generate concise summaries in multiple styles',
+    name: t('ai.aiTools.summarize'),
+    description: t('ai.aiTools.summarizeDesc'),
     icon: 'fas fa-compress-alt',
     shortcut: 'Ctrl+M',
     category: 'content',
@@ -62,8 +65,8 @@ const aiTools: AITool[] = [
   },
   {
     id: 'classify',
-    name: 'Classify Content',
-    description: 'Categorize content with confidence scores',
+    name: t('ai.aiTools.classifyContent'),
+    description: t('ai.aiTools.classifyContentDesc'),
     icon: 'fas fa-folder-tree',
     shortcut: 'Ctrl+C',
     category: 'analysis',
@@ -72,8 +75,8 @@ const aiTools: AITool[] = [
   },
   {
     id: 'ocr',
-    name: 'OCR - Extract Text',
-    description: 'Extract text from images and documents',
+    name: t('ai.aiTools.ocrExtractText'),
+    description: t('ai.aiTools.ocrExtractTextDesc'),
     icon: 'fas fa-file-image',
     shortcut: 'Ctrl+O',
     category: 'extraction',
@@ -82,8 +85,8 @@ const aiTools: AITool[] = [
   },
   {
     id: 'translate',
-    name: 'Translate',
-    description: 'Translate content to 16+ languages',
+    name: t('ai.aiTools.translate'),
+    description: t('ai.aiTools.translateDesc'),
     icon: 'fas fa-language',
     shortcut: 'Ctrl+T',
     category: 'content',
@@ -92,8 +95,8 @@ const aiTools: AITool[] = [
   },
   {
     id: 'generate-title',
-    name: 'Generate Titles',
-    description: 'Create title suggestions for content',
+    name: t('ai.aiTools.generateTitles'),
+    description: t('ai.aiTools.generateTitlesDesc'),
     icon: 'fas fa-heading',
     category: 'content',
     color: 'indigo',
@@ -101,8 +104,8 @@ const aiTools: AITool[] = [
   },
   {
     id: 'auto-tag',
-    name: 'Auto-Tag',
-    description: 'Generate relevant tags automatically',
+    name: t('ai.aiTools.autoTag'),
+    description: t('ai.aiTools.autoTagDesc'),
     icon: 'fas fa-hashtag',
     category: 'extraction',
     color: 'cyan',
@@ -110,30 +113,30 @@ const aiTools: AITool[] = [
   },
   {
     id: 'smart-search',
-    name: 'Smart Search',
-    description: 'Search with AI-powered intent detection',
+    name: t('ai.aiTools.smartSearch'),
+    description: t('ai.aiTools.smartSearchDesc'),
     icon: 'fas fa-search',
     shortcut: 'Ctrl+F',
     category: 'search',
     color: 'orange',
     requiresInput: true
   }
-]
+])
 
 // Category labels
-const categories = {
-  analysis: { label: 'Analysis', icon: 'fas fa-chart-bar' },
-  content: { label: 'Content', icon: 'fas fa-file-alt' },
-  extraction: { label: 'Extraction', icon: 'fas fa-magic' },
-  search: { label: 'Search & Discovery', icon: 'fas fa-compass' }
-}
+const categories = computed(() => ({
+  analysis: { label: t('ai.categories.analysis'), icon: 'fas fa-chart-bar' },
+  content: { label: t('ai.categories.content'), icon: 'fas fa-file-alt' },
+  extraction: { label: t('ai.categories.extraction'), icon: 'fas fa-magic' },
+  search: { label: t('ai.categories.searchDiscovery'), icon: 'fas fa-compass' }
+}))
 
 // Filter tools based on search query
 const filteredTools = computed(() => {
-  if (!searchQuery.value) return aiTools
+  if (!searchQuery.value) return aiTools.value
 
   const query = searchQuery.value.toLowerCase()
-  return aiTools.filter(tool =>
+  return aiTools.value.filter(tool =>
     tool.name.toLowerCase().includes(query) ||
     tool.description.toLowerCase().includes(query) ||
     tool.category.toLowerCase().includes(query)
@@ -157,7 +160,7 @@ const groupedTools = computed(() => {
 // Get all tools in flat list for keyboard navigation
 const flatTools = computed(() => {
   const flat: AITool[] = []
-  for (const category of Object.keys(categories)) {
+  for (const category of Object.keys(categories.value)) {
     if (groupedTools.value[category]) {
       flat.push(...groupedTools.value[category])
     }
@@ -258,7 +261,7 @@ function isSelected(tool: AITool): boolean {
                   ref="searchInputRef"
                   v-model="searchQuery"
                   type="text"
-                  placeholder="Search AI tools... (Press Ctrl+K to toggle)"
+                  :placeholder="$t('ai.searchTools')"
                   class="w-full text-lg bg-transparent border-none outline-none text-gray-800 placeholder-gray-400"
                 />
               </div>
@@ -273,12 +276,12 @@ function isSelected(tool: AITool): boolean {
 
           <!-- Tools List -->
           <div class="max-h-[60vh] overflow-y-auto p-3">
-            <template v-for="(catKey, index) in Object.keys(categories)" :key="catKey">
+            <template v-for="(catKey) in Object.keys(categories)" :key="catKey">
               <div v-if="groupedTools[catKey]?.length" class="mb-4">
                 <!-- Category Header -->
                 <div class="flex items-center gap-2 px-2 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                  <i :class="categories[catKey as keyof typeof categories].icon"></i>
-                  <span>{{ categories[catKey as keyof typeof categories].label }}</span>
+                  <i :class="(categories as any)[catKey].icon"></i>
+                  <span>{{ (categories as any)[catKey].label }}</span>
                 </div>
 
                 <!-- Tools Grid -->
@@ -329,7 +332,7 @@ function isSelected(tool: AITool): boolean {
               <div class="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4">
                 <i class="fas fa-search text-2xl text-gray-400"></i>
               </div>
-              <p class="text-gray-500">No tools found matching "{{ searchQuery }}"</p>
+              <p class="text-gray-500">{{ $t('ai.noToolsFound', { query: searchQuery }) }}</p>
             </div>
           </div>
 
@@ -338,18 +341,18 @@ function isSelected(tool: AITool): boolean {
             <div class="flex items-center gap-4">
               <span class="flex items-center gap-1">
                 <kbd class="px-1.5 py-0.5 bg-gray-200 rounded text-[10px]">↑↓</kbd>
-                Navigate
+                {{ $t('ai.navigate') }}
               </span>
               <span class="flex items-center gap-1">
                 <kbd class="px-1.5 py-0.5 bg-gray-200 rounded text-[10px]">Enter</kbd>
-                Select
+                {{ $t('common.select') }}
               </span>
               <span class="flex items-center gap-1">
                 <kbd class="px-1.5 py-0.5 bg-gray-200 rounded text-[10px]">Esc</kbd>
-                Close
+                {{ $t('common.close') }}
               </span>
             </div>
-            <span>{{ filteredTools.length }} tools available</span>
+            <span>{{ $t('ai.toolsAvailable', { count: filteredTools.length }) }}</span>
           </div>
         </div>
       </div>

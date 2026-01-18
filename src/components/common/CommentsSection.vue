@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useComments } from '@/composables/useComments'
 import type { Comment } from '@/types/detail-pages'
+
+const { t } = useI18n()
 
 const props = defineProps<{
   contentType: string
@@ -82,13 +85,13 @@ function getReactionIcon(type: string): string {
     <!-- Header -->
     <div class="flex items-center justify-between mb-6">
       <h3 class="text-lg font-semibold text-gray-900">
-        Comments
+        {{ $t('comments.title') }}
         <span class="text-gray-500 font-normal">({{ totalComments }})</span>
       </h3>
       <select v-model="sortBy" class="text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-500">
-        <option value="newest">Newest First</option>
-        <option value="oldest">Oldest First</option>
-        <option value="popular">Most Popular</option>
+        <option value="newest">{{ $t('comments.newestFirst') }}</option>
+        <option value="oldest">{{ $t('comments.oldestFirst') }}</option>
+        <option value="popular">{{ $t('comments.mostPopular') }}</option>
       </select>
     </div>
 
@@ -101,7 +104,7 @@ function getReactionIcon(type: string): string {
         <div class="flex-1">
           <textarea
             v-model="newComment"
-            placeholder="Write a comment..."
+            :placeholder="$t('comments.writeComment')"
             rows="3"
             class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent resize-none"
           ></textarea>
@@ -111,8 +114,8 @@ function getReactionIcon(type: string): string {
               :disabled="!newComment.trim() || isSubmitting"
               class="px-4 py-2 bg-teal-500 text-white rounded-lg font-medium hover:bg-teal-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
-              <i class="fas fa-paper-plane mr-2"></i>
-              Post Comment
+              <i class="fas fa-paper-plane me-2"></i>
+              {{ $t('comments.postComment') }}
             </button>
           </div>
         </div>
@@ -122,7 +125,7 @@ function getReactionIcon(type: string): string {
     <!-- Loading State -->
     <div v-if="isLoading" class="text-center py-8">
       <i class="fas fa-spinner fa-spin text-2xl text-teal-500"></i>
-      <p class="text-gray-500 mt-2">Loading comments...</p>
+      <p class="text-gray-500 mt-2">{{ $t('comments.loading') }}</p>
     </div>
 
     <!-- Comments List -->
@@ -135,7 +138,7 @@ function getReactionIcon(type: string): string {
         <!-- Pinned Badge -->
         <div v-if="comment.isPinned" class="flex items-center gap-2 text-xs text-orange-600 mb-2">
           <i class="fas fa-thumbtack"></i>
-          <span>Pinned comment</span>
+          <span>{{ $t('comments.pinnedComment') }}</span>
         </div>
 
         <!-- Comment Content -->
@@ -149,7 +152,7 @@ function getReactionIcon(type: string): string {
               <span class="text-xs text-gray-500">{{ comment.author.role }}</span>
               <span class="text-xs text-gray-400">•</span>
               <span class="text-xs text-gray-500">{{ formatTimeAgo(comment.createdAt) }}</span>
-              <span v-if="comment.isEdited" class="text-xs text-gray-400">(edited)</span>
+              <span v-if="comment.isEdited" class="text-xs text-gray-400">({{ $t('comments.edited') }})</span>
             </div>
             <p class="text-gray-700 mb-3">{{ comment.content }}</p>
 
@@ -182,8 +185,8 @@ function getReactionIcon(type: string): string {
                 @click="startReply(comment.id)"
                 class="text-gray-500 hover:text-teal-600 transition-colors"
               >
-                <i class="fas fa-reply mr-1"></i>
-                Reply
+                <i class="fas fa-reply me-1"></i>
+                {{ $t('comments.reply') }}
               </button>
 
               <!-- Show Replies -->
@@ -192,16 +195,16 @@ function getReactionIcon(type: string): string {
                 @click="toggleReplies(comment.id)"
                 class="text-teal-600 hover:text-teal-700 transition-colors"
               >
-                <i :class="expandedReplies.has(comment.id) ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="mr-1"></i>
-                {{ expandedReplies.has(comment.id) ? 'Hide' : 'Show' }} {{ comment.replies.length }} {{ comment.replies.length === 1 ? 'reply' : 'replies' }}
+                <i :class="expandedReplies.has(comment.id) ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="me-1"></i>
+                {{ expandedReplies.has(comment.id) ? $t('comments.hideReplies', { count: comment.replies.length }) : $t('comments.showReplies', { count: comment.replies.length }) }}
               </button>
             </div>
 
             <!-- Reply Form -->
-            <div v-if="replyingTo === comment.id" class="mt-4 pl-4 border-l-2 border-teal-200">
+            <div v-if="replyingTo === comment.id" class="mt-4 ps-4 border-s-2 border-teal-200">
               <textarea
                 v-model="replyContent"
-                placeholder="Write a reply..."
+                :placeholder="$t('comments.writeReply')"
                 rows="2"
                 class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 resize-none text-sm"
               ></textarea>
@@ -210,20 +213,20 @@ function getReactionIcon(type: string): string {
                   @click="cancelReply"
                   class="px-3 py-1.5 text-gray-600 hover:bg-gray-100 rounded-lg text-sm transition-colors"
                 >
-                  Cancel
+                  {{ $t('common.cancel') }}
                 </button>
                 <button
                   @click="handleSubmitReply(comment.id)"
                   :disabled="!replyContent.trim() || isSubmitting"
                   class="px-3 py-1.5 bg-teal-500 text-white rounded-lg text-sm hover:bg-teal-600 disabled:opacity-50 transition-colors"
                 >
-                  Reply
+                  {{ $t('comments.reply') }}
                 </button>
               </div>
             </div>
 
             <!-- Replies -->
-            <div v-if="expandedReplies.has(comment.id) && comment.replies.length > 0" class="mt-4 pl-4 border-l-2 border-gray-200 space-y-4">
+            <div v-if="expandedReplies.has(comment.id) && comment.replies.length > 0" class="mt-4 ps-4 border-s-2 border-gray-200 space-y-4">
               <div
                 v-for="reply in comment.replies"
                 :key="reply.id"
@@ -263,7 +266,7 @@ function getReactionIcon(type: string): string {
     <!-- Empty State -->
     <div v-else class="text-center py-12 bg-gray-50 rounded-xl">
       <i class="fas fa-comments text-4xl text-gray-300 mb-3"></i>
-      <p class="text-gray-500">No comments yet. Be the first to comment!</p>
+      <p class="text-gray-500">{{ $t('comments.noComments') }}</p>
     </div>
   </div>
 </template>
