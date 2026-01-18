@@ -408,28 +408,28 @@ function saveNewCollection() {
             <i class="fas fa-layer-group"></i>
           </div>
           <p class="stat-value-mini">{{ stats.total }}</p>
-          <p class="stat-label-mini">Collections</p>
+          <p class="stat-label-mini">{{ $t('collections.title') }}</p>
         </div>
         <div class="stat-card-square">
           <div class="stat-icon-box">
             <i class="fas fa-user"></i>
           </div>
           <p class="stat-value-mini">{{ stats.myCollections }}</p>
-          <p class="stat-label-mini">My Collections</p>
+          <p class="stat-label-mini">{{ $t('collections.myCollections') }}</p>
         </div>
         <div class="stat-card-square">
           <div class="stat-icon-box">
             <i class="fas fa-share-alt"></i>
           </div>
           <p class="stat-value-mini">{{ stats.sharedWithMe }}</p>
-          <p class="stat-label-mini">Shared</p>
+          <p class="stat-label-mini">{{ $t('common.share') }}</p>
         </div>
         <div class="stat-card-square">
           <div class="stat-icon-box">
             <i class="fas fa-file-alt"></i>
           </div>
           <p class="stat-value-mini">{{ stats.totalItems }}</p>
-          <p class="stat-label-mini">Total Items</p>
+          <p class="stat-label-mini">{{ $t('collections.totalItems') }}</p>
         </div>
       </div>
 
@@ -439,17 +439,17 @@ function saveNewCollection() {
           AFC Asian Cup 2027
         </div>
 
-        <h1 class="text-3xl font-bold text-white mb-2">Collections</h1>
-        <p class="text-teal-100 max-w-lg">Organize and curate content from articles, documents, and media into custom collections.</p>
+        <h1 class="text-3xl font-bold text-white mb-2">{{ $t('collections.title') }}</h1>
+        <p class="text-teal-100 max-w-lg">{{ $t('collections.subtitle') }}</p>
 
         <div class="flex flex-wrap gap-3 mt-6">
           <button @click="createNewCollection" class="px-5 py-2.5 bg-white text-teal-600 rounded-xl font-semibold text-sm flex items-center gap-2 hover:bg-teal-50 transition-all shadow-lg">
             <i class="fas fa-plus"></i>
-            New Collection
+            {{ $t('collections.newCollection') }}
           </button>
           <button class="px-5 py-2.5 bg-white/20 backdrop-blur-sm border border-white/30 text-white rounded-xl font-semibold text-sm hover:bg-white/30 transition-all flex items-center gap-2">
             <i class="fas fa-bookmark"></i>
-            My Saved
+            {{ $t('collections.mySaved') }}
           </button>
         </div>
       </div>
@@ -479,7 +479,7 @@ function saveNewCollection() {
         <input
           v-model="searchQuery"
           type="text"
-          placeholder="Search collections..."
+          :placeholder="$t('collections.searchCollections')"
           class="search-input"
         />
         <button v-if="searchQuery" @click="searchQuery = ''" class="clear-search">

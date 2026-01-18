@@ -1420,7 +1420,7 @@ watch(currentMessages, () => {
               <h2 class="font-bold text-base tracking-tight">AFC 2027</h2>
               <span class="text-xs text-teal-100 flex items-center gap-1.5">
                 <span class="w-2 h-2 bg-emerald-300 rounded-full animate-pulse"></span>
-                {{ channelMembers.length }} members online
+                {{ channelMembers.length }} {{ $t('collaboration.membersOnline') }}
               </span>
             </div>
           </div>
@@ -1462,7 +1462,7 @@ watch(currentMessages, () => {
               <input
                 v-model="unifiedSearchQuery"
                 type="text"
-                :placeholder="isAISearchMode ? 'Ask AI: Find messages...' : 'Search conversations...'"
+                :placeholder="isAISearchMode ? $t('collaboration.askAIPlaceholder') : $t('collaboration.searchConversations')"
                 @keyup.enter="handleUnifiedSearch"
                 @input="handleSearchInput"
                 :class="[

@@ -182,79 +182,79 @@ const messages = ref<Message[]>([])
 // ============================================================================
 // Configurable Text Constants - All UI text in one place for easy localization
 // ============================================================================
-const textConstants = {
+const textConstants = computed(() => ({
   // Header
-  appTitle: 'Intalio AI Assistant',
-  appSubtitle: 'Powered by advanced AI',
+  appTitle: t('ai.appTitle'),
+  appSubtitle: t('ai.appSubtitle'),
 
   // Buttons & Actions
-  tools: 'Tools',
-  workflows: 'Workflows',
-  newChat: 'New Chat',
-  saveSettings: 'Save Settings',
-  addMore: 'Add more',
+  tools: t('ai.tools'),
+  workflows: t('ai.workflows'),
+  newChat: t('ai.newChat'),
+  saveSettings: t('ai.saveSettings'),
+  addMore: t('ai.addMore'),
 
   // History Sidebar
-  chats: 'Chats',
-  today: 'Today',
-  yesterday: 'Yesterday',
-  previous7Days: 'Previous 7 Days',
-  noConversationsYet: 'No conversations yet',
-  searchPlaceholder: 'Search...',
-  expand: 'Expand',
-  collapse: 'Collapse',
+  chats: t('ai.chats'),
+  today: t('ai.today'),
+  yesterday: t('ai.yesterday'),
+  previous7Days: t('ai.previous7Days'),
+  noConversationsYet: t('ai.noConversationsYet'),
+  searchPlaceholder: t('ai.searchPlaceholder'),
+  expand: t('ai.expand'),
+  collapse: t('ai.collapse'),
 
   // Welcome Screen
-  welcomeTitle: 'How can I help you?',
-  welcomeSubtitle: 'Ask me anything or try one of these suggestions',
+  welcomeTitle: t('ai.welcomeTitle'),
+  welcomeSubtitle: t('ai.welcomeSubtitle'),
 
   // Input Area
-  inputPlaceholder: 'Ask me anything... Type / for commands',
-  slashCommands: 'Slash Commands',
-  suggestedFollowUps: 'Suggested follow-ups:',
-  attachPlatformContent: 'Attach platform content',
-  voiceInputNotSupported: 'Voice input not supported',
+  inputPlaceholder: t('ai.inputPlaceholder'),
+  slashCommands: t('ai.slashCommands'),
+  suggestedFollowUps: t('ai.suggestedFollowUps'),
+  attachPlatformContent: t('ai.attachPlatformContent'),
+  voiceInputNotSupported: t('ai.voiceInputNotSupported'),
 
   // Messages
-  sources: 'Sources',
-  analyzingContent: 'Analyzing content...',
+  sources: t('ai.sources'),
+  analyzingContent: t('ai.analyzingContent'),
 
   // Disclaimers
-  aiDisclaimer: 'AI can make mistakes. Consider checking important information.',
+  aiDisclaimer: t('ai.aiDisclaimer'),
 
   // Settings Panel
-  settingsTitle: 'AI Settings',
-  settingsSubtitle: 'Customize AI behavior',
-  responseStyle: 'Response Style',
-  language: 'Language',
-  preferences: 'Preferences',
-  concise: 'Concise',
-  conciseDesc: 'Brief, to-the-point responses',
-  detailed: 'Detailed',
-  detailedDesc: 'Comprehensive explanations',
-  conversational: 'Conversational',
-  conversationalDesc: 'Friendly, natural dialogue',
-  includeSourceReferences: 'Include source references',
-  saveConversationHistory: 'Save conversation history',
+  settingsTitle: t('ai.settingsTitle'),
+  settingsSubtitle: t('ai.settingsSubtitle'),
+  responseStyle: t('ai.responseStyle'),
+  language: t('ai.language'),
+  preferences: t('ai.preferences'),
+  concise: t('ai.concise'),
+  conciseDesc: t('ai.conciseDesc'),
+  detailed: t('ai.detailed'),
+  detailedDesc: t('ai.detailedDesc'),
+  conversational: t('ai.conversational'),
+  conversationalDesc: t('ai.conversationalDesc'),
+  includeSourceReferences: t('ai.includeSourceReferences'),
+  saveConversationHistory: t('ai.saveConversationHistory'),
 
   // Context Panel
-  contextIntelligence: 'Context Intelligence',
-  contextSubtitle: 'Real-time conversation analysis',
-  messages: 'Messages',
-  entities: 'Entities',
-  topics: 'Topics',
-  detectedIntent: 'Detected Intent',
-  conversationMood: 'Conversation Mood',
-  positive: 'Positive',
-  negative: 'Negative',
-  helpful: 'Helpful',
-  informative: 'Informative',
-  collaborative: 'Collaborative',
-  activeTopics: 'Active Topics',
-  recognizedEntities: 'Recognized Entities',
-  keyInsights: 'Key Insights',
-  referencedDocuments: 'Referenced Documents'
-}
+  contextIntelligence: t('ai.contextIntelligence'),
+  contextSubtitle: t('ai.contextSubtitle'),
+  messages: t('ai.messages'),
+  entities: t('ai.entities'),
+  topics: t('ai.topics'),
+  detectedIntent: t('ai.detectedIntent'),
+  conversationMood: t('ai.conversationMood'),
+  positive: t('ai.positive'),
+  negative: t('ai.negative'),
+  helpful: t('ai.helpful'),
+  informative: t('ai.informative'),
+  collaborative: t('ai.collaborative'),
+  activeTopics: t('ai.activeTopics'),
+  recognizedEntities: t('ai.recognizedEntities'),
+  keyInsights: t('ai.keyInsights'),
+  referencedDocuments: t('ai.referencedDocuments')
+}))
 
 // Chat history - stored conversations (empty by default, populated from store/API)
 const chatHistory = ref<Chat[]>([])
