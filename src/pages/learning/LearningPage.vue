@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { useAIServicesStore } from '@/stores/aiServices'
 import { AILoadingIndicator, AIConfidenceBar, AISuggestionChip } from '@/components/ai'
 import type { ClassificationResult, NERResult } from '@/types/ai'
 
 const router = useRouter()
+const { t } = useI18n()
 const aiStore = useAIServicesStore()
 
 // Loading state
@@ -2232,44 +2234,44 @@ function resumeFeaturedAutoPlay() {
             <i class="fas fa-graduation-cap"></i>
           </div>
           <p class="stat-value-mini">{{ completedCourses }}/{{ totalCourses }}</p>
-          <p class="stat-label-mini">Completed</p>
+          <p class="stat-label-mini">{{ $t('common.completed') }}</p>
         </div>
         <div class="stat-card-square">
           <div class="stat-icon-box">
             <i class="fas fa-clock"></i>
           </div>
           <p class="stat-value-mini">{{ learningHours }}h</p>
-          <p class="stat-label-mini">Learning</p>
+          <p class="stat-label-mini">{{ $t('nav.learning') }}</p>
         </div>
         <div class="stat-card-square">
           <div class="stat-icon-box">
             <i class="fas fa-certificate"></i>
           </div>
           <p class="stat-value-mini">{{ certificates }}</p>
-          <p class="stat-label-mini">Certificates</p>
+          <p class="stat-label-mini">{{ $t('learning.certificates') }}</p>
         </div>
         <div class="stat-card-square">
           <div class="stat-icon-box">
             <i class="fas fa-fire"></i>
           </div>
           <p class="stat-value-mini">{{ streak }}</p>
-          <p class="stat-label-mini">Day Streak</p>
+          <p class="stat-label-mini">{{ $t('learning.dayStreak') }}</p>
         </div>
       </div>
 
       <div class="relative px-8 py-8">
         <div class="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-white text-xs font-semibold inline-flex items-center gap-2 mb-4">
           <i class="fas fa-graduation-cap"></i>
-          AFC Asian Cup 2027
+          {{ $t('app.name') }}
         </div>
 
-        <h1 class="text-3xl font-bold text-white mb-2">Learning & Development</h1>
-        <p class="text-teal-100 max-w-lg">Expand your skills with curated courses, learning paths, and professional certifications.</p>
+        <h1 class="text-3xl font-bold text-white mb-2">{{ $t('learning.title') }}</h1>
+        <p class="text-teal-100 max-w-lg">{{ $t('learning.subtitle') }}</p>
 
         <div class="flex flex-wrap gap-3 mt-6">
           <button v-if="currentCourse" @click="navigateToCourse(currentCourse.id)" class="px-5 py-2.5 bg-white text-teal-600 rounded-xl font-semibold text-sm flex items-center gap-2 hover:bg-teal-50 transition-all shadow-lg">
             <i class="fas fa-play"></i>
-            Continue Learning
+            {{ $t('learning.continueLearning') }}
           </button>
           <!-- AI Action Buttons -->
           <button
@@ -2278,7 +2280,7 @@ function resumeFeaturedAutoPlay() {
             class="px-5 py-2.5 bg-gradient-to-r from-purple-500 to-indigo-500 text-white rounded-xl font-semibold text-sm flex items-center gap-2 hover:from-purple-600 hover:to-indigo-600 transition-all shadow-lg disabled:opacity-50"
           >
             <i :class="isAnalyzingSkillGaps ? 'fas fa-spinner fa-spin' : 'fas fa-wand-magic-sparkles'"></i>
-            {{ isAnalyzingSkillGaps ? 'Analyzing...' : 'Skill Gap Analysis' }}
+            {{ isAnalyzingSkillGaps ? $t('learning.analyzing') : $t('learning.skillGapAnalysis') }}
           </button>
           <button
             @click="generateAILearningPaths"
@@ -2286,7 +2288,7 @@ function resumeFeaturedAutoPlay() {
             class="px-5 py-2.5 bg-gradient-to-r from-teal-500 to-cyan-500 text-white rounded-xl font-semibold text-sm flex items-center gap-2 hover:from-teal-600 hover:to-cyan-600 transition-all shadow-lg disabled:opacity-50"
           >
             <i :class="isGeneratingLearningPath ? 'fas fa-spinner fa-spin' : 'fas fa-route'"></i>
-            {{ isGeneratingLearningPath ? 'Generating...' : 'AI Learning Paths' }}
+            {{ isGeneratingLearningPath ? $t('learning.generating') : $t('learning.aiLearningPaths') }}
           </button>
         </div>
       </div>
@@ -2299,7 +2301,7 @@ function resumeFeaturedAutoPlay() {
           <div class="ai-icon-badge">
             <i class="fas fa-wand-magic-sparkles"></i>
           </div>
-          <span class="font-semibold text-gray-800">AI Insights</span>
+          <span class="font-semibold text-gray-800">{{ $t('learning.aiInsights') }}</span>
           <span class="text-xs px-2 py-0.5 bg-teal-100 text-teal-700 rounded-full">{{ aiInsights.length }} new</span>
         </div>
         <button @click="showAIInsightsPanel = !showAIInsightsPanel" class="text-gray-500 hover:text-gray-700">

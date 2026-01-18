@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '@/stores/auth'
 import { useUIStore } from '@/stores/ui'
 import { useReducedMotion } from '@/composables/useReducedMotion'
 
 const router = useRouter()
 const route = useRoute()
+const { t } = useI18n()
 const authStore = useAuthStore()
 const uiStore = useUIStore()
 
@@ -60,7 +62,7 @@ async function handleDevLogin() {
 
 async function handleLogin() {
   if (!email.value || !password.value) {
-    uiStore.showWarning('Required Fields', 'Please enter both email and password')
+    uiStore.showWarning(t('validation.requiredFields'), t('validation.enterEmailAndPassword'))
     return
   }
 
@@ -74,10 +76,10 @@ async function handleLogin() {
     })
 
     if (success) {
-      uiStore.showSuccess('Welcome back!', `Logged in as ${authStore.user?.displayName}`)
+      uiStore.showSuccess(t('auth.welcomeBack'), t('auth.loggedInAs', { name: authStore.user?.displayName }))
       router.push(redirectPath.value)
     } else {
-      uiStore.showError('Login Failed', authStore.error || 'Invalid email or password')
+      uiStore.showError(t('auth.loginFailed'), authStore.error || t('auth.invalidCredentials'))
     }
   } finally {
     isLoading.value = false
@@ -92,11 +94,11 @@ async function handleSSOLogin() {
     if (config) {
       authStore.initiateSSO()
     } else {
-      uiStore.showError('SSO Unavailable', 'Single Sign-On is not configured')
+      uiStore.showError(t('auth.ssoUnavailable'), t('auth.ssoNotConfigured'))
       isLoading.value = false
     }
   } catch {
-    uiStore.showError('SSO Error', 'Failed to initiate SSO login')
+    uiStore.showError(t('auth.ssoError'), t('auth.ssoInitFailed'))
     isLoading.value = false
   }
 }
@@ -114,8 +116,8 @@ async function handleSSOLogin() {
             <img src="@/assets/images/logo.png" alt="Intalio" class="logo" />
           </div>
           <div class="brand-text">
-            <h1>Welcome Back</h1>
-            <p>Sign in to your Knowledge Hub account</p>
+            <h1>{{ $t('auth.welcomeBack') }}</h1>
+            <p>{{ $t('auth.loginSubtitle') }}</p>
           </div>
         </div>
 
@@ -135,11 +137,11 @@ async function handleSSOLogin() {
             @click="handleDevLogin"
           >
             <i class="fas fa-bolt"></i>
-            <span>Quick Dev Login</span>
+            <span>{{ $t('auth.quickDevLogin') }}</span>
           </button>
 
           <div v-if="isDev" class="divider">
-            <span>or continue with</span>
+            <span>{{ $t('auth.orContinueWith') }}</span>
           </div>
 
           <!-- SSO Button -->
@@ -154,17 +156,17 @@ async function handleSSOLogin() {
               <rect x="1" y="11" width="9" height="9" fill="#00a4ef"/>
               <rect x="11" y="11" width="9" height="9" fill="#ffb900"/>
             </svg>
-            <span>Sign in with Microsoft</span>
+            <span>{{ $t('auth.ssoLogin') }}</span>
           </button>
 
           <div class="divider">
-            <span>or sign in with email</span>
+            <span>{{ $t('auth.orContinueWith') }}</span>
           </div>
 
           <!-- Login Form -->
           <form @submit.prevent="handleLogin" class="login-form">
             <div class="form-group">
-              <label for="email">Email Address</label>
+              <label for="email">{{ $t('auth.email') }}</label>
               <div class="input-field">
                 <span class="field-icon">
                   <i class="fas fa-envelope"></i>
@@ -173,7 +175,7 @@ async function handleSSOLogin() {
                   id="email"
                   v-model="email"
                   type="email"
-                  placeholder="you@company.com"
+                  :placeholder="$t('auth.emailPlaceholder')"
                   autocomplete="email"
                   :disabled="isLoading"
                 />
@@ -181,7 +183,7 @@ async function handleSSOLogin() {
             </div>
 
             <div class="form-group">
-              <label for="password">Password</label>
+              <label for="password">{{ $t('auth.password') }}</label>
               <div class="input-field">
                 <span class="field-icon">
                   <i class="fas fa-lock"></i>
@@ -190,7 +192,7 @@ async function handleSSOLogin() {
                   id="password"
                   v-model="password"
                   :type="showPassword ? 'text' : 'password'"
-                  placeholder="Enter your password"
+                  :placeholder="$t('auth.passwordPlaceholder')"
                   autocomplete="current-password"
                   :disabled="isLoading"
                 />
@@ -208,9 +210,9 @@ async function handleSSOLogin() {
             <div class="form-options">
               <label class="remember-me">
                 <input type="checkbox" v-model="rememberMe" :disabled="isLoading" />
-                <span>Remember me</span>
+                <span>{{ $t('auth.rememberMe') }}</span>
               </label>
-              <a href="#" class="forgot-link">Forgot password?</a>
+              <a href="#" class="forgot-link">{{ $t('auth.forgotPassword') }}</a>
             </div>
 
             <button
@@ -218,10 +220,10 @@ async function handleSSOLogin() {
               class="login-btn"
               :disabled="isLoading"
             >
-              <span v-if="!isLoading">Sign In</span>
+              <span v-if="!isLoading">{{ $t('auth.signIn') }}</span>
               <span v-else class="loading-state">
                 <i class="fas fa-spinner fa-spin"></i>
-                Signing in...
+                {{ $t('auth.signingIn') }}
               </span>
             </button>
           </form>
@@ -229,8 +231,8 @@ async function handleSSOLogin() {
 
         <!-- Footer -->
         <div class="login-footer">
-          <p>Powered by <strong>Intalio</strong></p>
-          <p class="footer-sub">Knowledge Management System</p>
+          <p>{{ $t('footer.poweredBy') }} <strong>Intalio</strong></p>
+          <p class="footer-sub">{{ $t('app.subtitle') }}</p>
         </div>
       </div>
     </div>
@@ -254,27 +256,27 @@ async function handleSSOLogin() {
       <div class="login-hero-content">
         <div class="hero-badge">
           <span class="badge-dot"></span>
-          <span>Enterprise Platform</span>
+          <span>{{ $t('auth.hero.badge') }}</span>
         </div>
 
-        <h2>Unlock Your<br/><span class="gradient-text">Knowledge Potential</span></h2>
-        <p>Transform how your organization captures, shares, and leverages collective intelligence with our AI-powered platform.</p>
+        <h2 v-html="$t('auth.hero.title')"></h2>
+        <p>{{ $t('auth.hero.description') }}</p>
 
         <!-- Stats Row -->
         <div class="hero-stats">
           <div class="stat-item">
             <span class="stat-value">99.9%</span>
-            <span class="stat-label">Uptime</span>
+            <span class="stat-label">{{ $t('auth.hero.stats.uptime') }}</span>
           </div>
           <div class="stat-divider"></div>
           <div class="stat-item">
             <span class="stat-value">50K+</span>
-            <span class="stat-label">Users</span>
+            <span class="stat-label">{{ $t('auth.hero.stats.users') }}</span>
           </div>
           <div class="stat-divider"></div>
           <div class="stat-item">
             <span class="stat-value">150+</span>
-            <span class="stat-label">Enterprises</span>
+            <span class="stat-label">{{ $t('auth.hero.stats.enterprises') }}</span>
           </div>
         </div>
 
@@ -284,25 +286,25 @@ async function handleSSOLogin() {
             <div class="feature-icon">
               <i class="fas fa-search"></i>
             </div>
-            <span>AI-Powered Search</span>
+            <span>{{ $t('auth.hero.features.aiSearch') }}</span>
           </div>
           <div class="feature-card">
             <div class="feature-icon">
               <i class="fas fa-share-alt"></i>
             </div>
-            <span>Real-time Collaboration</span>
+            <span>{{ $t('auth.hero.features.collaboration') }}</span>
           </div>
           <div class="feature-card">
             <div class="feature-icon">
               <i class="fas fa-shield-alt"></i>
             </div>
-            <span>Enterprise Security</span>
+            <span>{{ $t('auth.hero.features.security') }}</span>
           </div>
           <div class="feature-card">
             <div class="feature-icon">
               <i class="fas fa-cogs"></i>
             </div>
-            <span>Workflow Automation</span>
+            <span>{{ $t('auth.hero.features.automation') }}</span>
           </div>
         </div>
       </div>

@@ -145,6 +145,7 @@ export default {
   app: {
     name: 'Knowledge Hub',
     tagline: 'Your Knowledge Management System',
+    subtitle: 'Knowledge Management System',
   },
 
   // Navigation
@@ -174,8 +175,10 @@ export default {
     logout: 'Logout',
     signIn: 'Sign In',
     signUp: 'Sign Up',
-    email: 'Email',
+    email: 'Email Address',
+    emailPlaceholder: 'you@company.com',
     password: 'Password',
+    passwordPlaceholder: 'Enter your password',
     rememberMe: 'Remember me',
     forgotPassword: 'Forgot password?',
     resetPassword: 'Reset Password',
@@ -187,9 +190,34 @@ export default {
     haveAccount: 'Already have an account?',
     createAccount: 'Create account',
     loggingIn: 'Logging in...',
+    signingIn: 'Signing in...',
     loginSuccess: 'Login successful',
     loginError: 'Login failed. Please check your credentials.',
     logoutSuccess: 'Logged out successfully',
+    quickDevLogin: 'Quick Dev Login',
+    loggedInAs: 'Logged in as {name}',
+    loginFailed: 'Login Failed',
+    invalidCredentials: 'Invalid email or password',
+    ssoUnavailable: 'SSO Unavailable',
+    ssoNotConfigured: 'Single Sign-On is not configured',
+    ssoError: 'SSO Error',
+    ssoInitFailed: 'Failed to initiate SSO login',
+    hero: {
+      badge: 'Enterprise Platform',
+      title: 'Unlock Your<br/><span class="gradient-text">Knowledge Potential</span>',
+      description: 'Transform how your organization captures, shares, and leverages collective intelligence with our AI-powered platform.',
+      stats: {
+        uptime: 'Uptime',
+        users: 'Users',
+        enterprises: 'Enterprises',
+      },
+      features: {
+        aiSearch: 'AI-Powered Search',
+        collaboration: 'Real-time Collaboration',
+        security: 'Enterprise Security',
+        automation: 'Workflow Automation',
+      },
+    },
   },
 
   // User
@@ -237,8 +265,8 @@ export default {
 
   // Articles
   articles: {
-    title: 'Articles',
-    subtitle: 'Discover knowledge and insights shared by your colleagues',
+    title: 'Articles Hub',
+    subtitle: 'Discover articles, tutorials, best practices, and knowledge resources.',
     allArticles: 'All Articles',
     myArticles: 'My Articles',
     drafts: 'Drafts',
@@ -280,6 +308,13 @@ export default {
     latest: 'Latest',
     mostViewed: 'Most Viewed',
     topRated: 'Top Rated',
+    totalViews: 'Total Views',
+    contributors: 'Contributors',
+    myBookmarks: 'My Bookmarks',
+    continueReading: 'Continue Reading',
+    resume: 'Resume',
+    yourBookmarks: 'Your Bookmarks',
+    recommendedForYou: 'Recommended for You',
   },
 
   // Documents
@@ -385,6 +420,14 @@ export default {
     insightsShared: 'Insights Shared',
     activeContributors: 'Active Contributors',
     totalImpact: 'Total Impact',
+    certificates: 'Certificates',
+    dayStreak: 'Day Streak',
+    continueLearning: 'Continue Learning',
+    skillGapAnalysis: 'Skill Gap Analysis',
+    analyzing: 'Analyzing...',
+    generating: 'Generating...',
+    aiLearningPaths: 'AI Learning Paths',
+    aiInsights: 'AI Insights',
   },
 
   // Events
@@ -605,6 +648,7 @@ export default {
     capabilities: 'Capabilities',
     limitations: 'Limitations',
     privacyNote: 'Your conversations are private and secure',
+    aiPowered: 'AI Powered',
   },
 
   // Analytics
@@ -713,6 +757,8 @@ export default {
   // Validation
   validation: {
     required: 'This field is required',
+    requiredFields: 'Required Fields',
+    enterEmailAndPassword: 'Please enter both email and password',
     email: 'Please enter a valid email',
     minLength: 'Minimum {min} characters required',
     maxLength: 'Maximum {max} characters allowed',
@@ -752,6 +798,7 @@ export default {
   // Footer
   footer: {
     copyright: '© {year} Knowledge Hub. All rights reserved.',
+    poweredBy: 'Powered by',
     terms: 'Terms of Service',
     privacy: 'Privacy Policy',
     contact: 'Contact Us',

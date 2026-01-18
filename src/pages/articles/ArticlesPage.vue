@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import ContentActionsDropdown from '@/components/common/ContentActionsDropdown.vue'
 import AddToCollectionModal from '@/components/common/AddToCollectionModal.vue'
 import { useAIServicesStore } from '@/stores/aiServices'
@@ -12,6 +13,7 @@ import type { ContentRecommendation, SentimentResult } from '@/types/ai'
 import type { ComparisonItem } from '@/types'
 
 const router = useRouter()
+const { t } = useI18n()
 const aiStore = useAIServicesStore()
 const comparisonStore = useComparisonStore()
 
@@ -1247,48 +1249,48 @@ onUnmounted(() => {
             <i class="fas fa-newspaper"></i>
           </div>
           <p class="stat-value-mini">{{ articles.length }}</p>
-          <p class="stat-label-mini">Articles</p>
+          <p class="stat-label-mini">{{ $t('nav.articles') }}</p>
         </div>
         <div class="stat-card-square">
           <div class="stat-icon-box">
             <i class="fas fa-layer-group"></i>
           </div>
           <p class="stat-value-mini">{{ categories.length }}</p>
-          <p class="stat-label-mini">Categories</p>
+          <p class="stat-label-mini">{{ $t('common.categories') }}</p>
         </div>
         <div class="stat-card-square">
           <div class="stat-icon-box">
             <i class="fas fa-eye"></i>
           </div>
           <p class="stat-value-mini">{{ totalViews }}</p>
-          <p class="stat-label-mini">Total Views</p>
+          <p class="stat-label-mini">{{ $t('articles.totalViews') }}</p>
         </div>
         <div class="stat-card-square">
           <div class="stat-icon-box">
             <i class="fas fa-users"></i>
           </div>
           <p class="stat-value-mini">{{ contributors }}</p>
-          <p class="stat-label-mini">Contributors</p>
+          <p class="stat-label-mini">{{ $t('articles.contributors') }}</p>
         </div>
       </div>
 
       <div class="relative px-8 py-8">
         <div class="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-white text-xs font-semibold inline-flex items-center gap-2 mb-4">
           <i class="fas fa-book-open"></i>
-          AFC Asian Cup 2027
+          {{ $t('app.name') }}
         </div>
 
-        <h1 class="text-3xl font-bold text-white mb-2">Articles Hub</h1>
-        <p class="text-teal-100 max-w-lg">Discover articles, tutorials, best practices, and knowledge resources.</p>
+        <h1 class="text-3xl font-bold text-white mb-2">{{ $t('articles.title') }}</h1>
+        <p class="text-teal-100 max-w-lg">{{ $t('articles.subtitle') }}</p>
 
         <div class="flex flex-wrap gap-3 mt-6">
           <button @click="navigateToEditor" class="px-5 py-2.5 bg-white text-teal-600 rounded-xl font-semibold text-sm flex items-center gap-2 hover:bg-teal-50 transition-all shadow-lg">
             <i class="fas fa-plus"></i>
-            New Article
+            {{ $t('articles.newArticle') }}
           </button>
           <button @click="scrollToBookmarks" class="px-5 py-2.5 bg-white/20 backdrop-blur-sm border border-white/30 text-white rounded-xl font-semibold text-sm hover:bg-white/30 transition-all flex items-center gap-2">
             <i class="fas fa-bookmark"></i>
-            My Bookmarks
+            {{ $t('articles.myBookmarks') }}
           </button>
         </div>
       </div>
@@ -1306,9 +1308,9 @@ onUnmounted(() => {
           <div class="section-header-row">
             <h2 class="section-title-sm">
               <i class="fas fa-history text-purple-500"></i>
-              Continue Reading
+              {{ $t('articles.continueReading') }}
             </h2>
-            <button @click="scrollToAllArticles" class="view-all-link">View All <i class="fas fa-arrow-right"></i></button>
+            <button @click="scrollToAllArticles" class="view-all-link">{{ $t('common.viewAll') }} <i class="fas fa-arrow-right"></i></button>
           </div>
           <div class="section-scroll scrollbar-elegant">
             <div v-for="article in continueReadingArticles" :key="'continue-' + article!.id"
@@ -1323,7 +1325,7 @@ onUnmounted(() => {
                 <div v-else class="continue-card-placeholder">
                   <i :class="article!.icon || 'fas fa-newspaper'" class="text-teal-600 text-xl"></i>
                 </div>
-                <span class="resume-badge"><i class="fas fa-play mr-1"></i> Resume</span>
+                <span class="resume-badge"><i class="fas fa-play mr-1"></i> {{ $t('articles.resume') }}</span>
                 <div class="reading-progress-bar">
                   <div class="reading-progress-fill" :style="{ width: (article as any).progress + '%' }"></div>
                 </div>
@@ -1345,9 +1347,9 @@ onUnmounted(() => {
           <div class="section-header-row">
             <h2 class="section-title-sm">
               <i class="fas fa-bookmark text-yellow-500"></i>
-              Your Bookmarks
+              {{ $t('articles.yourBookmarks') }}
             </h2>
-            <button @click="scrollToAllArticles" class="view-all-link">View All ({{ bookmarkedArticles.length }}) <i class="fas fa-arrow-right"></i></button>
+            <button @click="scrollToAllArticles" class="view-all-link">{{ $t('common.viewAll') }} ({{ bookmarkedArticles.length }}) <i class="fas fa-arrow-right"></i></button>
           </div>
           <div class="section-scroll scrollbar-elegant">
             <div v-for="article in bookmarkedArticles" :key="'bookmark-' + article!.id"
@@ -1389,8 +1391,8 @@ onUnmounted(() => {
             <div class="ai-icon-wrapper">
               <i class="fas fa-wand-magic-sparkles"></i>
             </div>
-            Recommended for You
-            <span class="ai-powered-badge">AI Powered</span>
+            {{ $t('articles.recommendedForYou') }}
+            <span class="ai-powered-badge">{{ $t('ai.aiPowered') }}</span>
           </h2>
           <div class="flex items-center gap-2">
             <button @click="refreshRecommendations" class="ai-refresh-btn" :disabled="isLoadingRecommendations">

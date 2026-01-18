@@ -145,6 +145,7 @@ export default {
   app: {
     name: 'مركز المعرفة',
     tagline: 'نظام إدارة المعرفة الخاص بك',
+    subtitle: 'نظام إدارة المعرفة',
   },
 
   // Navigation
@@ -175,7 +176,9 @@ export default {
     signIn: 'دخول',
     signUp: 'تسجيل',
     email: 'البريد الإلكتروني',
+    emailPlaceholder: 'you@company.com',
     password: 'كلمة المرور',
+    passwordPlaceholder: 'أدخل كلمة المرور',
     rememberMe: 'تذكرني',
     forgotPassword: 'نسيت كلمة المرور؟',
     resetPassword: 'إعادة تعيين كلمة المرور',
@@ -187,9 +190,34 @@ export default {
     haveAccount: 'لديك حساب بالفعل؟',
     createAccount: 'إنشاء حساب',
     loggingIn: 'جاري تسجيل الدخول...',
+    signingIn: 'جاري الدخول...',
     loginSuccess: 'تم تسجيل الدخول بنجاح',
     loginError: 'فشل تسجيل الدخول. يرجى التحقق من بياناتك.',
     logoutSuccess: 'تم تسجيل الخروج بنجاح',
+    quickDevLogin: 'دخول سريع للمطورين',
+    loggedInAs: 'تم الدخول كـ {name}',
+    loginFailed: 'فشل تسجيل الدخول',
+    invalidCredentials: 'بريد إلكتروني أو كلمة مرور غير صحيحة',
+    ssoUnavailable: 'SSO غير متاح',
+    ssoNotConfigured: 'تسجيل الدخول الموحد غير مُهيأ',
+    ssoError: 'خطأ في SSO',
+    ssoInitFailed: 'فشل بدء تسجيل الدخول عبر SSO',
+    hero: {
+      badge: 'منصة المؤسسات',
+      title: 'أطلق العنان<br/><span class="gradient-text">لإمكانات معرفتك</span>',
+      description: 'غيّر طريقة التقاط ومشاركة واستثمار الذكاء الجماعي لمؤسستك من خلال منصتنا المدعومة بالذكاء الاصطناعي.',
+      stats: {
+        uptime: 'وقت التشغيل',
+        users: 'المستخدمون',
+        enterprises: 'المؤسسات',
+      },
+      features: {
+        aiSearch: 'بحث بالذكاء الاصطناعي',
+        collaboration: 'تعاون فوري',
+        security: 'أمان المؤسسات',
+        automation: 'أتمتة سير العمل',
+      },
+    },
   },
 
   // User
@@ -237,8 +265,8 @@ export default {
 
   // Articles
   articles: {
-    title: 'المقالات',
-    subtitle: 'اكتشف المعرفة والرؤى التي يشاركها زملاؤك',
+    title: 'مركز المقالات',
+    subtitle: 'اكتشف المقالات والدروس وأفضل الممارسات ومصادر المعرفة.',
     allArticles: 'جميع المقالات',
     myArticles: 'مقالاتي',
     drafts: 'المسودات',
@@ -280,6 +308,13 @@ export default {
     latest: 'الأحدث',
     mostViewed: 'الأكثر مشاهدة',
     topRated: 'الأعلى تقييماً',
+    totalViews: 'إجمالي المشاهدات',
+    contributors: 'المساهمون',
+    myBookmarks: 'مفضلاتي',
+    continueReading: 'متابعة القراءة',
+    resume: 'استئناف',
+    yourBookmarks: 'مفضلاتك',
+    recommendedForYou: 'موصى به لك',
   },
 
   // Documents
@@ -385,6 +420,14 @@ export default {
     insightsShared: 'رؤى مشاركة',
     activeContributors: 'مساهمون نشطون',
     totalImpact: 'إجمالي التأثير',
+    certificates: 'الشهادات',
+    dayStreak: 'سلسلة الأيام',
+    continueLearning: 'متابعة التعلم',
+    skillGapAnalysis: 'تحليل فجوة المهارات',
+    analyzing: 'جاري التحليل...',
+    generating: 'جاري الإنشاء...',
+    aiLearningPaths: 'مسارات التعلم بالذكاء الاصطناعي',
+    aiInsights: 'رؤى الذكاء الاصطناعي',
   },
 
   // Events
@@ -605,6 +648,7 @@ export default {
     capabilities: 'القدرات',
     limitations: 'القيود',
     privacyNote: 'محادثاتك خاصة وآمنة',
+    aiPowered: 'مدعوم بالذكاء الاصطناعي',
   },
 
   // Analytics
@@ -713,6 +757,8 @@ export default {
   // Validation
   validation: {
     required: 'هذا الحقل مطلوب',
+    requiredFields: 'الحقول المطلوبة',
+    enterEmailAndPassword: 'يرجى إدخال البريد الإلكتروني وكلمة المرور',
     email: 'يرجى إدخال بريد إلكتروني صحيح',
     minLength: 'الحد الأدنى {min} حرف',
     maxLength: 'الحد الأقصى {max} حرف',
@@ -752,6 +798,7 @@ export default {
   // Footer
   footer: {
     copyright: '© {year} مركز المعرفة. جميع الحقوق محفوظة.',
+    poweredBy: 'مدعوم من',
     terms: 'شروط الخدمة',
     privacy: 'سياسة الخصوصية',
     contact: 'اتصل بنا',

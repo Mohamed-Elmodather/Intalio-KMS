@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '@/stores/auth'
 import { useUIStore } from '@/stores/ui'
 import { useNotificationsStore } from '@/stores/notifications'
@@ -9,6 +10,7 @@ import type { NavItem, WorkspaceItem, BottomAction, CreateMenuItem, Notification
 import AppToast from '../common/AppToast.vue'
 
 const router = useRouter()
+const { t } = useI18n()
 const authStore = useAuthStore()
 const uiStore = useUIStore()
 const notificationsStore = useNotificationsStore()
@@ -28,40 +30,40 @@ const user = computed(() => {
 })
 
 // Navigation items for sidebar
-const navigationItems: NavItem[] = [
-  { id: 'dashboard', icon: 'fas fa-th-large', label: 'Dashboard', route: '/' },
-  { id: 'articles', icon: 'fas fa-book-open', label: 'Articles', route: '/articles', badge: '24', badgeClass: 'bg-teal-200 text-teal-700' },
-  { id: 'documents', icon: 'fas fa-folder', label: 'Documents', route: '/documents' },
-  { id: 'media', icon: 'fas fa-photo-video', label: 'Media Center', route: '/media' },
-  { id: 'collections', icon: 'fas fa-layer-group', label: 'Collections', route: '/collections' },
-  { id: 'learning', icon: 'fas fa-graduation-cap', label: 'Learning', route: '/learning', badge: '2', badgeClass: 'bg-blue-200 text-blue-700' },
-  { id: 'events', icon: 'fas fa-calendar-alt', label: 'Events', route: '/events' },
-  { id: 'collaboration', icon: 'fas fa-users', label: 'Collaboration', route: '/collaboration' },
-  { id: 'polls', icon: 'fas fa-poll', label: 'Polls & Surveys', route: '/polls', badge: '3', badgeClass: 'bg-orange-200 text-orange-700' },
-  { id: 'services', icon: 'fas fa-concierge-bell', label: 'Self-Services', route: '/self-services' },
-  { id: 'analytics', icon: 'fas fa-chart-bar', label: 'Analytics', route: '/analytics' },
-]
+const navigationItems = computed<NavItem[]>(() => [
+  { id: 'dashboard', icon: 'fas fa-th-large', label: t('nav.dashboard'), route: '/' },
+  { id: 'articles', icon: 'fas fa-book-open', label: t('nav.articles'), route: '/articles', badge: '24', badgeClass: 'bg-teal-200 text-teal-700' },
+  { id: 'documents', icon: 'fas fa-folder', label: t('nav.documents'), route: '/documents' },
+  { id: 'media', icon: 'fas fa-photo-video', label: t('nav.media'), route: '/media' },
+  { id: 'collections', icon: 'fas fa-layer-group', label: t('nav.collections'), route: '/collections' },
+  { id: 'learning', icon: 'fas fa-graduation-cap', label: t('nav.learning'), route: '/learning', badge: '2', badgeClass: 'bg-blue-200 text-blue-700' },
+  { id: 'events', icon: 'fas fa-calendar-alt', label: t('nav.events'), route: '/events' },
+  { id: 'collaboration', icon: 'fas fa-users', label: t('nav.collaboration'), route: '/collaboration' },
+  { id: 'polls', icon: 'fas fa-poll', label: t('nav.polls'), route: '/polls', badge: '3', badgeClass: 'bg-orange-200 text-orange-700' },
+  { id: 'services', icon: 'fas fa-concierge-bell', label: t('nav.services'), route: '/self-services' },
+  { id: 'analytics', icon: 'fas fa-chart-bar', label: t('nav.analytics'), route: '/analytics' },
+])
 
 // Workspace items for sidebar
-const workspaceItems: WorkspaceItem[] = [
+const workspaceItems = computed<WorkspaceItem[]>(() => [
   { id: 'ws-hr', label: 'HR Portal', initials: 'HR', color: '#8B5CF6' },
   { id: 'ws-it', label: 'IT Knowledge', initials: 'IT', color: '#3B82F6' },
   { id: 'ws-sales', label: 'Sales Enablement', initials: 'SE', color: '#10B981' },
-]
+])
 
 // Bottom actions for sidebar
-const bottomActions: BottomAction[] = [
-  { id: 'settings', icon: 'fas fa-cog', label: 'Settings', route: '/settings', hoverEffect: 'rotate' },
-  { id: 'ai-assistant', icon: 'fas fa-wand-magic-sparkles', label: 'AI Assistant', route: '/ai-assistant', hoverEffect: 'scale' },
-]
+const bottomActions = computed<BottomAction[]>(() => [
+  { id: 'settings', icon: 'fas fa-cog', label: t('nav.settings'), route: '/settings', hoverEffect: 'rotate' },
+  { id: 'ai-assistant', icon: 'fas fa-wand-magic-sparkles', label: t('nav.aiAssistant'), route: '/ai-assistant', hoverEffect: 'scale' },
+])
 
 // Create menu items for header
-const createMenuItems: CreateMenuItem[] = [
-  { id: 'article', icon: 'fas fa-file-alt', iconBgClass: 'bg-blue-50', iconColorClass: 'text-blue-500', title: 'Article', description: 'Write a new article' },
-  { id: 'poll', icon: 'fas fa-poll', iconBgClass: 'bg-purple-50', iconColorClass: 'text-purple-500', title: 'Poll', description: 'Create a survey' },
-  { id: 'event', icon: 'fas fa-calendar-plus', iconBgClass: 'bg-green-50', iconColorClass: 'text-green-500', title: 'Event', description: 'Schedule an event' },
-  { id: 'document', icon: 'fas fa-folder-plus', iconBgClass: 'bg-amber-50', iconColorClass: 'text-amber-500', title: 'Document', description: 'Upload a file' },
-]
+const createMenuItems = computed<CreateMenuItem[]>(() => [
+  { id: 'article', icon: 'fas fa-file-alt', iconBgClass: 'bg-blue-50', iconColorClass: 'text-blue-500', title: t('create.article'), description: t('create.articleDesc') },
+  { id: 'poll', icon: 'fas fa-poll', iconBgClass: 'bg-purple-50', iconColorClass: 'text-purple-500', title: t('create.poll'), description: t('create.pollDesc') },
+  { id: 'event', icon: 'fas fa-calendar-plus', iconBgClass: 'bg-green-50', iconColorClass: 'text-green-500', title: t('create.event'), description: t('create.eventDesc') },
+  { id: 'document', icon: 'fas fa-folder-plus', iconBgClass: 'bg-amber-50', iconColorClass: 'text-amber-500', title: t('create.document'), description: t('create.documentDesc') },
+])
 
 // Notifications
 const notifications = computed<NotificationItem[]>(() =>
@@ -78,9 +80,9 @@ const notifications = computed<NotificationItem[]>(() =>
 const unreadCount = computed(() => notificationsStore.unreadCount)
 
 // Header actions
-const headerActions = [
-  { id: 'messages', icon: 'fas fa-comment-dots', label: 'Messages', badge: 3 }
-]
+const headerActions = computed(() => [
+  { id: 'messages', icon: 'fas fa-comment-dots', label: t('common.messages'), badge: 3 }
+])
 
 // Event handlers
 function handleToggleSidebar() {
@@ -153,8 +155,8 @@ onMounted(async () => {
     <UnifiedHeader
       logo-src="/Intalio.png"
       logo-alt="Intalio"
-      app-name="Knowledge Hub"
-      search-placeholder="Search anything... articles, documents, people, events"
+      :app-name="$t('app.name')"
+      :search-placeholder="$t('common.searchPlaceholder')"
       :user="user"
       :create-menu-items="createMenuItems"
       :notifications="notifications"
@@ -182,7 +184,7 @@ onMounted(async () => {
         :workspace-items="workspaceItems"
         :bottom-actions="bottomActions"
         :is-collapsed="isCollapsed"
-        workspaces-title="Workspaces"
+        :workspaces-title="$t('nav.workspaces')"
       />
     </aside>
 
