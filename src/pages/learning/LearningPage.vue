@@ -382,7 +382,7 @@ const inProgressCourses = computed(() =>
 )
 
 // View state
-const currentView = ref<'all' | 'my-courses' | 'paths' | 'certificates'>('all')
+const currentView = ref<'all' | 'my-courses' | 'paths' | 'lessons-learned' | 'certificates'>('all')
 const viewMode = ref<'grid' | 'list'>('grid')
 
 // Stats
@@ -399,6 +399,7 @@ const viewOptions = ref([
   { id: 'all', name: 'All Courses', icon: 'fas fa-graduation-cap', color: 'text-teal-500' },
   { id: 'my-courses', name: 'My Courses', icon: 'fas fa-book-reader', color: 'text-blue-500' },
   { id: 'paths', name: 'Learning Paths', icon: 'fas fa-route', color: 'text-indigo-500' },
+  { id: 'lessons-learned', name: 'Lessons Learned', icon: 'fas fa-lightbulb', color: 'text-amber-500' },
   { id: 'certificates', name: 'Certificates', icon: 'fas fa-certificate', color: 'text-teal-500' },
 ])
 
@@ -1319,6 +1320,551 @@ const certScoreOptions = [
   { value: 'below80', label: 'Below 80%', min: 0, max: 79 },
 ]
 
+// ============================================
+// LESSONS LEARNED DATA
+// ============================================
+
+type LessonPriority = 'low' | 'medium' | 'high' | 'critical'
+type LessonCategory = 'technical' | 'process' | 'communication' | 'leadership' | 'project' | 'other'
+
+interface LessonLearned {
+  id: string
+  title: string
+  summary: string
+  content: string
+  category: LessonCategory
+  priority: LessonPriority
+  tags: string[]
+  author: {
+    id: string
+    name: string
+    initials: string
+    avatar?: string
+    department?: string
+  }
+  createdAt: string
+  viewCount: number
+  likeCount: number
+  commentCount: number
+  isLiked?: boolean
+  isBookmarked?: boolean
+  isFeatured?: boolean
+  projectName?: string
+  impact?: string
+  recommendations?: string[]
+}
+
+const lessonsLearned = ref<LessonLearned[]>([
+  {
+    id: '1',
+    title: 'Effective Stakeholder Communication During Project Delays',
+    summary: 'Key strategies for maintaining stakeholder trust and engagement when facing unexpected project timeline extensions.',
+    content: 'When our venue construction project faced a 3-month delay due to supply chain issues, we learned that proactive, transparent communication was essential. We implemented weekly stakeholder updates, created a visual timeline dashboard, and held bi-weekly town halls. The key was acknowledging issues early and presenting mitigation plans alongside problems.',
+    category: 'communication',
+    priority: 'high',
+    tags: ['Stakeholder Management', 'Communication', 'Crisis Management'],
+    author: { id: '1', name: 'Sarah Chen', initials: 'SC', department: 'Project Management' },
+    createdAt: 'Jan 15, 2026',
+    viewCount: 234,
+    likeCount: 45,
+    commentCount: 12,
+    isLiked: true,
+    isBookmarked: false,
+    isFeatured: true,
+    projectName: 'Stadium Construction Phase 2',
+    impact: 'Maintained 95% stakeholder satisfaction despite delays',
+    recommendations: ['Create communication templates for different scenarios', 'Establish escalation protocols early', 'Use visual dashboards for complex timelines']
+  },
+  {
+    id: '2',
+    title: 'API Integration Best Practices for Large-Scale Systems',
+    summary: 'Lessons from integrating multiple third-party APIs including error handling, rate limiting, and fallback strategies.',
+    content: 'During the ticketing system integration, we connected with 12 different payment gateways and 8 regional ticketing partners. Key learnings included implementing circuit breakers, maintaining detailed API versioning, and creating comprehensive fallback mechanisms. We reduced integration failures by 78% after implementing these practices.',
+    category: 'technical',
+    priority: 'critical',
+    tags: ['API', 'Integration', 'Architecture', 'Resilience'],
+    author: { id: '2', name: 'James Wilson', initials: 'JW', department: 'Engineering' },
+    createdAt: 'Jan 12, 2026',
+    viewCount: 456,
+    likeCount: 89,
+    commentCount: 23,
+    isLiked: false,
+    isBookmarked: true,
+    isFeatured: true,
+    projectName: 'Unified Ticketing Platform',
+    impact: '78% reduction in integration failures, 99.9% uptime achieved',
+    recommendations: ['Implement circuit breaker patterns', 'Version all APIs from day one', 'Build comprehensive fallback mechanisms', 'Monitor API health in real-time']
+  },
+  {
+    id: '3',
+    title: 'Building High-Performance Remote Teams',
+    summary: 'Practical insights on fostering collaboration, maintaining culture, and driving productivity in distributed teams.',
+    content: 'Managing a team of 45 people across 6 time zones for the Asian Cup 2027 project required rethinking our collaboration approach. We established core overlap hours, implemented async-first communication, and created virtual team rituals. Regular in-person meetups every quarter helped maintain team cohesion.',
+    category: 'leadership',
+    priority: 'high',
+    tags: ['Remote Work', 'Team Building', 'Leadership', 'Culture'],
+    author: { id: '3', name: 'Maria Garcia', initials: 'MG', department: 'Operations' },
+    createdAt: 'Jan 10, 2026',
+    viewCount: 312,
+    likeCount: 67,
+    commentCount: 18,
+    isLiked: true,
+    isBookmarked: true,
+    isFeatured: false,
+    projectName: 'Global Operations Setup',
+    impact: 'Team productivity increased by 32%, retention rate improved to 94%',
+    recommendations: ['Define core overlap hours for all time zones', 'Document everything asynchronously', 'Invest in quarterly in-person gatherings', 'Use video for important discussions']
+  },
+  {
+    id: '4',
+    title: 'Agile Sprint Planning: What Works and What Doesn\'t',
+    summary: 'Refined approaches to sprint planning based on real-world experience across multiple project types.',
+    content: 'After 18 months of sprints across 5 different project teams, we identified patterns that consistently led to successful delivery. Two-week sprints with proper backlog grooming sessions, limiting work-in-progress, and having clear definition of done were game-changers. We also learned that sprint planning should never exceed 2 hours.',
+    category: 'process',
+    priority: 'medium',
+    tags: ['Agile', 'Sprint Planning', 'Scrum', 'Best Practices'],
+    author: { id: '4', name: 'David Lee', initials: 'DL', department: 'Product' },
+    createdAt: 'Jan 8, 2026',
+    viewCount: 189,
+    likeCount: 34,
+    commentCount: 8,
+    isLiked: false,
+    isBookmarked: false,
+    isFeatured: false,
+    projectName: 'Multiple Projects',
+    impact: 'Sprint completion rate improved from 65% to 89%',
+    recommendations: ['Keep sprints to 2 weeks maximum', 'Groom backlog before sprint planning', 'Limit WIP to team capacity', 'Time-box planning to 2 hours']
+  },
+  {
+    id: '5',
+    title: 'Database Migration Strategies Without Downtime',
+    summary: 'Step-by-step approach to migrating production databases while maintaining zero downtime and data integrity.',
+    content: 'Migrating 2.5TB of production data from legacy Oracle to PostgreSQL required careful planning. We used dual-write patterns, implemented data validation checksums, and ran parallel systems for 3 weeks before the cutover. The blue-green deployment strategy allowed instant rollback capability throughout the migration.',
+    category: 'technical',
+    priority: 'critical',
+    tags: ['Database', 'Migration', 'DevOps', 'Zero Downtime'],
+    author: { id: '5', name: 'Alex Thompson', initials: 'AT', department: 'Infrastructure' },
+    createdAt: 'Jan 5, 2026',
+    viewCount: 567,
+    likeCount: 112,
+    commentCount: 31,
+    isLiked: true,
+    isBookmarked: false,
+    isFeatured: true,
+    projectName: 'Database Modernization',
+    impact: 'Zero downtime achieved, 40% cost reduction in database licensing',
+    recommendations: ['Use dual-write pattern during transition', 'Implement data validation checksums', 'Run parallel systems before cutover', 'Always have rollback capability']
+  },
+  {
+    id: '6',
+    title: 'Managing Scope Creep in Complex Projects',
+    summary: 'Proven techniques for identifying, preventing, and handling scope creep while maintaining client satisfaction.',
+    content: 'The media center project started with 45 requirements and ended with 127. We learned to implement strict change control processes, maintain a parking lot for future features, and communicate the impact of changes clearly. Weekly scope reviews and a change request board helped keep everyone aligned.',
+    category: 'project',
+    priority: 'high',
+    tags: ['Project Management', 'Scope Management', 'Change Control'],
+    author: { id: '6', name: 'Emma Wilson', initials: 'EW', department: 'Project Management' },
+    createdAt: 'Jan 3, 2026',
+    viewCount: 278,
+    likeCount: 56,
+    commentCount: 15,
+    isLiked: false,
+    isBookmarked: true,
+    isFeatured: false,
+    projectName: 'Media Center Development',
+    impact: 'Reduced unplanned scope changes by 60%',
+    recommendations: ['Implement formal change control process', 'Maintain a parking lot for future ideas', 'Communicate impact of every change', 'Hold weekly scope review meetings']
+  },
+  {
+    id: '7',
+    title: 'Vendor Management for Large-Scale Events',
+    summary: 'Best practices for coordinating multiple vendors while ensuring quality, timeline adherence, and cost control.',
+    content: 'Coordinating 35+ vendors for the opening ceremony required a centralized vendor management system, clear SLAs, and regular performance reviews. We created vendor scorecards, established communication channels, and built contingency plans for each critical vendor.',
+    category: 'project',
+    priority: 'high',
+    tags: ['Vendor Management', 'Events', 'Procurement', 'SLA'],
+    author: { id: '7', name: 'Robert Kim', initials: 'RK', department: 'Procurement' },
+    createdAt: 'Dec 28, 2025',
+    viewCount: 198,
+    likeCount: 42,
+    commentCount: 9,
+    isLiked: false,
+    isBookmarked: false,
+    isFeatured: false,
+    projectName: 'Opening Ceremony Planning',
+    impact: '100% on-time delivery from critical vendors',
+    recommendations: ['Create vendor scorecards', 'Establish clear SLAs upfront', 'Build contingency plans for critical vendors', 'Hold regular performance reviews']
+  },
+  {
+    id: '8',
+    title: 'Security Best Practices for Public-Facing Applications',
+    summary: 'Essential security measures learned from building high-traffic, public-facing tournament applications.',
+    content: 'With millions of expected users, security was paramount. We implemented defense-in-depth, conducted regular penetration testing, and established bug bounty programs. Key learnings included the importance of input validation, secure session management, and real-time threat monitoring.',
+    category: 'technical',
+    priority: 'critical',
+    tags: ['Security', 'Application Security', 'Best Practices'],
+    author: { id: '8', name: 'Lisa Park', initials: 'LP', department: 'Security' },
+    createdAt: 'Dec 20, 2025',
+    viewCount: 423,
+    likeCount: 98,
+    commentCount: 27,
+    isLiked: true,
+    isBookmarked: true,
+    isFeatured: false,
+    projectName: 'Fan Portal Security',
+    impact: 'Zero security breaches, passed all compliance audits',
+    recommendations: ['Implement defense-in-depth strategy', 'Conduct regular penetration testing', 'Establish bug bounty program', 'Monitor threats in real-time']
+  }
+])
+
+// Lessons Learned filter & search state
+const lessonsSearch = ref('')
+const selectedLessonsCategories = ref<string[]>([])
+const selectedLessonsPriorities = ref<string[]>([])
+const selectedLessonsTags = ref<string[]>([])
+const showBookmarkedOnly = ref(false)
+const lessonsSortBy = ref('newest')
+const lessonsSortOrder = ref<'asc' | 'desc'>('desc')
+const showLessonsCategoryDropdown = ref(false)
+const showLessonsPriorityDropdown = ref(false)
+const showLessonsTagsDropdown = ref(false)
+const showLessonsSortDropdown = ref(false)
+const lessonsViewMode = ref<'grid' | 'list'>('grid')
+const lessonsCurrentPage = ref(1)
+const lessonsItemsPerPage = ref(12)
+const lessonsItemsPerPageOptions = [6, 12, 24, 48]
+
+// Legacy compatibility (keep for backward compat with some components)
+const lessonsCategoryFilter = ref<LessonCategory | 'all'>('all')
+const lessonsPriorityFilter = ref<LessonPriority | 'all'>('all')
+
+// Lessons category options
+const lessonsCategoryOptions = [
+  { id: 'all', label: 'All Categories', icon: 'fas fa-th-large', color: 'text-gray-500' },
+  { id: 'technical', label: 'Technical', icon: 'fas fa-code', color: 'text-blue-500' },
+  { id: 'process', label: 'Process', icon: 'fas fa-cogs', color: 'text-purple-500' },
+  { id: 'communication', label: 'Communication', icon: 'fas fa-comments', color: 'text-teal-500' },
+  { id: 'leadership', label: 'Leadership', icon: 'fas fa-crown', color: 'text-indigo-500' },
+  { id: 'project', label: 'Project', icon: 'fas fa-tasks', color: 'text-cyan-500' },
+  { id: 'other', label: 'Other', icon: 'fas fa-folder', color: 'text-gray-500' }
+]
+
+// Lessons priority options
+const lessonsPriorityOptions = [
+  { id: 'all', label: 'All Priorities', color: 'bg-gray-100 text-gray-700' },
+  { id: 'critical', label: 'Critical', color: 'bg-red-100 text-red-700' },
+  { id: 'high', label: 'High', color: 'bg-orange-100 text-orange-700' },
+  { id: 'medium', label: 'Medium', color: 'bg-amber-100 text-amber-700' },
+  { id: 'low', label: 'Low', color: 'bg-green-100 text-green-700' }
+]
+
+// Lessons sort options
+const lessonsSortOptions = [
+  { value: 'newest', label: 'Newest First', icon: 'fas fa-clock' },
+  { value: 'popular', label: 'Most Popular', icon: 'fas fa-fire' },
+  { value: 'liked', label: 'Most Liked', icon: 'fas fa-heart' },
+  { value: 'title', label: 'Title A-Z', icon: 'fas fa-sort-alpha-down' }
+]
+
+// All unique tags from lessons
+const allLessonsTags = computed(() => {
+  const tags = new Set<string>()
+  lessonsLearned.value.forEach(l => l.tags.forEach(t => tags.add(t)))
+  return Array.from(tags).sort()
+})
+
+// Helper functions for multi-select filters
+function toggleLessonsCategoryFilter(categoryId: string) {
+  const index = selectedLessonsCategories.value.indexOf(categoryId)
+  if (index > -1) {
+    selectedLessonsCategories.value.splice(index, 1)
+  } else {
+    selectedLessonsCategories.value.push(categoryId)
+  }
+  lessonsCurrentPage.value = 1
+}
+
+function toggleLessonsPriorityFilter(priorityId: string) {
+  const index = selectedLessonsPriorities.value.indexOf(priorityId)
+  if (index > -1) {
+    selectedLessonsPriorities.value.splice(index, 1)
+  } else {
+    selectedLessonsPriorities.value.push(priorityId)
+  }
+  lessonsCurrentPage.value = 1
+}
+
+function toggleLessonsTagFilter(tag: string) {
+  const index = selectedLessonsTags.value.indexOf(tag)
+  if (index > -1) {
+    selectedLessonsTags.value.splice(index, 1)
+  } else {
+    selectedLessonsTags.value.push(tag)
+  }
+  lessonsCurrentPage.value = 1
+}
+
+function isLessonsCategorySelected(categoryId: string) {
+  return selectedLessonsCategories.value.includes(categoryId)
+}
+
+function isLessonsPrioritySelected(priorityId: string) {
+  return selectedLessonsPriorities.value.includes(priorityId)
+}
+
+function isLessonsTagSelected(tag: string) {
+  return selectedLessonsTags.value.includes(tag)
+}
+
+// Filtered lessons
+const filteredLessons = computed(() => {
+  let lessons = [...lessonsLearned.value]
+
+  // Search filter
+  if (lessonsSearch.value.trim()) {
+    const search = lessonsSearch.value.toLowerCase()
+    lessons = lessons.filter(l =>
+      l.title.toLowerCase().includes(search) ||
+      l.summary.toLowerCase().includes(search) ||
+      l.tags.some(t => t.toLowerCase().includes(search))
+    )
+  }
+
+  // Category filter (multi-select)
+  if (selectedLessonsCategories.value.length > 0) {
+    lessons = lessons.filter(l => selectedLessonsCategories.value.includes(l.category))
+  }
+
+  // Priority filter (multi-select)
+  if (selectedLessonsPriorities.value.length > 0) {
+    lessons = lessons.filter(l => selectedLessonsPriorities.value.includes(l.priority))
+  }
+
+  // Tags filter (multi-select)
+  if (selectedLessonsTags.value.length > 0) {
+    lessons = lessons.filter(l => selectedLessonsTags.value.some(tag => l.tags.includes(tag)))
+  }
+
+  // Bookmarked filter
+  if (showBookmarkedOnly.value) {
+    lessons = lessons.filter(l => l.isBookmarked)
+  }
+
+  // Sort
+  const multiplier = lessonsSortOrder.value === 'asc' ? 1 : -1
+  switch (lessonsSortBy.value) {
+    case 'newest':
+      // Already sorted by date in mock data
+      break
+    case 'popular':
+      lessons.sort((a, b) => (b.viewCount - a.viewCount) * multiplier)
+      break
+    case 'liked':
+      lessons.sort((a, b) => (b.likeCount - a.likeCount) * multiplier)
+      break
+    case 'title':
+      lessons.sort((a, b) => a.title.localeCompare(b.title) * multiplier)
+      break
+  }
+
+  return lessons
+})
+
+// Paginated lessons
+const paginatedLessons = computed(() => {
+  const start = (lessonsCurrentPage.value - 1) * lessonsItemsPerPage.value
+  const end = start + lessonsItemsPerPage.value
+  return filteredLessons.value.slice(start, end)
+})
+
+// Total pages for lessons
+const lessonsTotalPages = computed(() =>
+  Math.ceil(filteredLessons.value.length / lessonsItemsPerPage.value) || 1
+)
+
+// Pagination functions
+function lessonsGoToPage(page: number) {
+  lessonsCurrentPage.value = page
+}
+
+function lessonsPrevPage() {
+  if (lessonsCurrentPage.value > 1) {
+    lessonsCurrentPage.value--
+  }
+}
+
+function lessonsNextPage() {
+  if (lessonsCurrentPage.value < lessonsTotalPages.value) {
+    lessonsCurrentPage.value++
+  }
+}
+
+function changeLessonsItemsPerPage(value: number) {
+  lessonsItemsPerPage.value = value
+  lessonsCurrentPage.value = 1
+}
+
+// Lessons stats
+const lessonsStats = computed(() => ({
+  total: lessonsLearned.value.length,
+  thisMonth: lessonsLearned.value.filter(l => l.createdAt.includes('Jan')).length,
+  critical: lessonsLearned.value.filter(l => l.priority === 'critical').length,
+  bookmarked: lessonsLearned.value.filter(l => l.isBookmarked).length,
+  totalViews: lessonsLearned.value.reduce((sum, l) => sum + l.viewCount, 0),
+  totalLikes: lessonsLearned.value.reduce((sum, l) => sum + l.likeCount, 0)
+}))
+
+// Featured lessons
+const featuredLessons = computed(() =>
+  lessonsLearned.value.filter(l => l.isFeatured).slice(0, 5)
+)
+
+// Featured lessons carousel state
+const currentFeaturedLessonIndex = ref(0)
+const featuredLessonInterval = ref<number | null>(null)
+
+const currentFeaturedLesson = computed(() =>
+  featuredLessons.value[currentFeaturedLessonIndex.value] || featuredLessons.value[0]
+)
+
+function nextFeaturedLesson() {
+  if (featuredLessons.value.length > 0) {
+    currentFeaturedLessonIndex.value = (currentFeaturedLessonIndex.value + 1) % featuredLessons.value.length
+  }
+}
+
+function prevFeaturedLesson() {
+  if (featuredLessons.value.length > 0) {
+    currentFeaturedLessonIndex.value = currentFeaturedLessonIndex.value === 0
+      ? featuredLessons.value.length - 1
+      : currentFeaturedLessonIndex.value - 1
+  }
+}
+
+function goToFeaturedLesson(index: number) {
+  currentFeaturedLessonIndex.value = index
+}
+
+function startFeaturedLessonAutoPlay() {
+  if (featuredLessonInterval.value) return
+  featuredLessonInterval.value = window.setInterval(() => {
+    nextFeaturedLesson()
+  }, 5000)
+}
+
+function pauseFeaturedLessonAutoPlay() {
+  if (featuredLessonInterval.value) {
+    clearInterval(featuredLessonInterval.value)
+    featuredLessonInterval.value = null
+  }
+}
+
+function resumeFeaturedLessonAutoPlay() {
+  startFeaturedLessonAutoPlay()
+}
+
+// Next lessons for sidebar (excluding current)
+const nextFeaturedLessons = computed(() => {
+  if (featuredLessons.value.length <= 1) return []
+  const lessons = []
+  for (let i = 1; i <= 3; i++) {
+    const idx = (currentFeaturedLessonIndex.value + i) % featuredLessons.value.length
+    if (idx !== currentFeaturedLessonIndex.value) {
+      lessons.push({ ...featuredLessons.value[idx], displayIndex: idx })
+    }
+  }
+  return lessons.slice(0, 3)
+})
+
+// Category stats for quick filter chips
+const categoryStats = computed(() => {
+  const stats: Record<string, number> = {}
+  lessonsLearned.value.forEach(l => {
+    stats[l.category] = (stats[l.category] || 0) + 1
+  })
+  return stats
+})
+
+// Detail modal state
+const showLessonDetailModal = ref(false)
+const selectedLessonForModal = ref<LessonLearned | null>(null)
+
+// Open lesson detail modal
+function openLessonDetail(lesson: LessonLearned) {
+  selectedLessonForModal.value = lesson
+  showLessonDetailModal.value = true
+}
+
+// Close lesson detail modal
+function closeLessonDetail() {
+  showLessonDetailModal.value = false
+  selectedLessonForModal.value = null
+}
+
+// Get lesson category info
+function getLessonCategoryInfo(category: LessonCategory) {
+  return lessonsCategoryOptions.find(c => c.id === category) || lessonsCategoryOptions[0]
+}
+
+// Get lesson priority color
+function getLessonPriorityColor(priority: LessonPriority) {
+  switch (priority) {
+    case 'critical': return 'bg-red-100 text-red-700 border-red-200'
+    case 'high': return 'bg-orange-100 text-orange-700 border-orange-200'
+    case 'medium': return 'bg-amber-100 text-amber-700 border-amber-200'
+    case 'low': return 'bg-green-100 text-green-700 border-green-200'
+    default: return 'bg-gray-100 text-gray-700 border-gray-200'
+  }
+}
+
+// Toggle lesson like
+function toggleLessonLike(lessonId: string) {
+  const lesson = lessonsLearned.value.find(l => l.id === lessonId)
+  if (lesson) {
+    lesson.isLiked = !lesson.isLiked
+    lesson.likeCount += lesson.isLiked ? 1 : -1
+  }
+}
+
+// Toggle lesson bookmark
+function toggleLessonBookmark(lessonId: string) {
+  const lesson = lessonsLearned.value.find(l => l.id === lessonId)
+  if (lesson) {
+    lesson.isBookmarked = !lesson.isBookmarked
+  }
+}
+
+// Selected lesson for detail view
+const selectedLesson = ref<LessonLearned | null>(null)
+
+// View lesson detail (expand card)
+function viewLessonDetail(lesson: LessonLearned) {
+  selectedLesson.value = selectedLesson.value?.id === lesson.id ? null : lesson
+}
+
+// Clear lessons filters
+function clearLessonsFilters() {
+  lessonsSearch.value = ''
+  selectedLessonsCategories.value = []
+  selectedLessonsPriorities.value = []
+  selectedLessonsTags.value = []
+  showBookmarkedOnly.value = false
+  lessonsSortBy.value = 'newest'
+  lessonsSortOrder.value = 'desc'
+  lessonsCurrentPage.value = 1
+}
+
+// Active lessons filters count
+const activeLessonsFiltersCount = computed(() => {
+  let count = 0
+  if (lessonsSearch.value.trim()) count++
+  count += selectedLessonsCategories.value.length
+  count += selectedLessonsPriorities.value.length
+  count += selectedLessonsTags.value.length
+  if (showBookmarkedOnly.value) count++
+  return count
+})
+
 // Path filter & search state
 const pathFilter = ref('all')
 const pathsSearch = ref('')
@@ -1932,8 +2478,8 @@ function resumeFeaturedAutoPlay() {
           </div>
         </div>
 
-        <!-- Featured Courses Section (Other views) -->
-        <div v-if="currentView !== 'my-courses' && enrolledCourses.length > 0" class="featured-courses-section">
+        <!-- Featured Courses Section (All Courses view only) -->
+        <div v-if="currentView === 'all' && enrolledCourses.length > 0" class="featured-courses-section">
           <div class="featured-courses-header">
             <div class="flex items-center gap-3">
               <div class="featured-courses-icon">
@@ -2225,7 +2771,7 @@ function resumeFeaturedAutoPlay() {
         </div>
 
         <!-- All Courses Section -->
-        <div class="all-courses-wrapper bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <div v-if="currentView === 'all' || currentView === 'my-courses'" class="all-courses-wrapper bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
           <!-- Section Header / Toolbar -->
           <div class="border-b border-gray-100">
             <!-- Top Row - Title and Primary Actions -->
@@ -3487,6 +4033,974 @@ function resumeFeaturedAutoPlay() {
             </div>
           </div>
         </div>
+      </div>
+
+      <!-- Lessons Learned Section -->
+      <div v-if="currentView === 'lessons-learned'" class="lessons-learned-section">
+
+        <!-- Featured Insights Section -->
+        <div v-if="featuredLessons.length > 0" class="ll-featured-section" @mouseenter="pauseFeaturedLessonAutoPlay" @mouseleave="resumeFeaturedLessonAutoPlay">
+          <!-- Section Header -->
+          <div class="ll-featured-header">
+            <div class="ll-featured-title-wrap">
+              <div class="ll-featured-icon">
+                <i class="fas fa-sparkles"></i>
+              </div>
+              <div>
+                <h2 class="ll-featured-title">Featured Insights</h2>
+                <p class="ll-featured-subtitle">Discover top lessons from our knowledge base</p>
+              </div>
+            </div>
+            <div class="ll-featured-nav">
+              <span class="ll-featured-counter">{{ currentFeaturedLessonIndex + 1 }} / {{ featuredLessons.length }}</span>
+              <button @click="prevFeaturedLesson" class="ll-nav-btn" :disabled="featuredLessons.length <= 1">
+                <i class="fas fa-chevron-left"></i>
+              </button>
+              <button @click="nextFeaturedLesson" class="ll-nav-btn" :disabled="featuredLessons.length <= 1">
+                <i class="fas fa-chevron-right"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Two Column Layout -->
+          <div class="ll-featured-content">
+            <!-- Main Featured Card -->
+            <div class="ll-main-card-wrap">
+              <div v-if="currentFeaturedLesson" class="ll-main-card" @click="openLessonDetail(currentFeaturedLesson)">
+                <!-- Decorative Elements -->
+                <div class="ll-card-glow"></div>
+                <div class="ll-card-pattern"></div>
+
+                <div class="ll-main-card-inner">
+                  <!-- Top Section -->
+                  <div class="ll-main-top">
+                    <div class="ll-main-badges">
+                      <span class="ll-main-featured-badge">
+                        <i class="fas fa-star"></i> Featured
+                      </span>
+                      <span :class="['ll-main-priority', 'priority-' + currentFeaturedLesson.priority]">
+                        <i class="fas fa-flag"></i> {{ currentFeaturedLesson.priority }}
+                      </span>
+                    </div>
+                    <span class="ll-main-category">
+                      <i :class="getLessonCategoryInfo(currentFeaturedLesson.category).icon"></i>
+                      {{ getLessonCategoryInfo(currentFeaturedLesson.category).label }}
+                    </span>
+                  </div>
+
+                  <!-- Content Section -->
+                  <div class="ll-main-content">
+                    <h3 class="ll-main-title">{{ currentFeaturedLesson.title }}</h3>
+                    <p class="ll-main-summary">{{ currentFeaturedLesson.summary }}</p>
+
+                    <!-- Impact Highlight -->
+                    <div v-if="currentFeaturedLesson.impact" class="ll-main-impact">
+                      <div class="ll-impact-icon-wrap">
+                        <i class="fas fa-bolt"></i>
+                      </div>
+                      <div class="ll-impact-content">
+                        <span class="ll-impact-label">Key Impact</span>
+                        <span class="ll-impact-text">{{ currentFeaturedLesson.impact }}</span>
+                      </div>
+                    </div>
+
+                    <!-- Recommendations Preview -->
+                    <div v-if="currentFeaturedLesson.recommendations?.length" class="ll-main-takeaways">
+                      <div class="ll-takeaway-header">
+                        <i class="fas fa-lightbulb"></i>
+                        <span>Quick Takeaways</span>
+                      </div>
+                      <div class="ll-takeaway-list">
+                        <div v-for="(rec, idx) in currentFeaturedLesson.recommendations.slice(0, 2)" :key="idx" class="ll-takeaway-item">
+                          <span class="ll-takeaway-num">{{ idx + 1 }}</span>
+                          <span class="ll-takeaway-text">{{ rec }}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Footer Section -->
+                  <div class="ll-main-footer">
+                    <div class="ll-main-author">
+                      <div class="ll-main-avatar">{{ currentFeaturedLesson.author.initials }}</div>
+                      <div class="ll-main-author-info">
+                        <span class="ll-main-author-name">{{ currentFeaturedLesson.author.name }}</span>
+                        <span class="ll-main-author-meta">{{ currentFeaturedLesson.author.department }}</span>
+                      </div>
+                    </div>
+                    <div class="ll-main-stats">
+                      <span class="ll-main-stat"><i class="fas fa-eye"></i> {{ currentFeaturedLesson.viewCount }}</span>
+                      <span class="ll-main-stat"><i class="fas fa-heart"></i> {{ currentFeaturedLesson.likeCount }}</span>
+                      <span class="ll-main-stat"><i class="fas fa-comment"></i> {{ currentFeaturedLesson.commentCount }}</span>
+                    </div>
+                  </div>
+
+                  <!-- CTA Button -->
+                  <button class="ll-main-cta">
+                    <span>Read Full Lesson</span>
+                    <i class="fas fa-arrow-right"></i>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Progress Dots -->
+              <div class="ll-progress-dots">
+                <button
+                  v-for="(_, index) in featuredLessons"
+                  :key="index"
+                  @click="goToFeaturedLesson(index)"
+                  :class="['ll-progress-dot', { active: index === currentFeaturedLessonIndex }]"
+                ></button>
+              </div>
+            </div>
+
+            <!-- Next Lessons Sidebar -->
+            <div class="ll-next-lessons">
+              <div class="ll-next-header">
+                <i class="fas fa-layer-group"></i>
+                <span>Up Next</span>
+              </div>
+
+              <div class="ll-next-list">
+                <div
+                  v-for="(lesson, idx) in nextFeaturedLessons"
+                  :key="lesson.id"
+                  class="ll-next-card"
+                  @click="goToFeaturedLesson(lesson.displayIndex)"
+                >
+                  <div class="ll-next-index">{{ idx + 1 }}</div>
+                  <div class="ll-next-content">
+                    <div class="ll-next-meta">
+                      <span class="ll-next-category">
+                        <i :class="getLessonCategoryInfo(lesson.category).icon"></i>
+                        {{ getLessonCategoryInfo(lesson.category).label }}
+                      </span>
+                      <span :class="['ll-next-priority', 'priority-' + lesson.priority]">{{ lesson.priority }}</span>
+                    </div>
+                    <h4 class="ll-next-title">{{ lesson.title }}</h4>
+                    <p class="ll-next-summary">{{ lesson.summary }}</p>
+                    <div class="ll-next-footer">
+                      <span class="ll-next-author">
+                        <span class="ll-next-avatar">{{ lesson.author.initials }}</span>
+                        {{ lesson.author.name }}
+                      </span>
+                      <span class="ll-next-stats">
+                        <i class="fas fa-eye"></i> {{ lesson.viewCount }}
+                      </span>
+                    </div>
+                  </div>
+                  <div class="ll-next-arrow">
+                    <i class="fas fa-chevron-right"></i>
+                  </div>
+                </div>
+              </div>
+
+              <!-- View All Link -->
+              <button class="ll-view-all-btn">
+                <span>View All Featured</span>
+                <i class="fas fa-arrow-right"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- All Lessons Section - Matching ArticlesPage Design -->
+        <div class="px-6 pb-6 all-lessons-section">
+          <!-- Section Header -->
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-bold text-gray-900 flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center shadow-lg shadow-teal-200">
+                <i class="fas fa-lightbulb text-white text-sm"></i>
+              </div>
+              <div>
+                <span class="block">All Lessons</span>
+                <span class="text-xs font-medium text-gray-500">{{ filteredLessons.length }} lessons found</span>
+              </div>
+            </h2>
+          </div>
+
+          <!-- Toolbar (ArticlesPage Style) -->
+          <div class="bg-white rounded-2xl shadow-sm border border-gray-100 mb-4">
+            <div class="px-4 py-3 bg-gray-50/50 rounded-2xl flex flex-wrap items-center gap-3">
+              <!-- Search -->
+              <div class="relative flex-1 max-w-xl">
+                <div class="relative">
+                  <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-400"></i>
+                  <input
+                    v-model="lessonsSearch"
+                    type="text"
+                    placeholder="Search lessons..."
+                    @input="lessonsCurrentPage = 1"
+                    class="w-full pl-9 pr-20 py-2 text-sm rounded-lg bg-white border border-gray-200 focus:ring-2 focus:ring-teal-500 focus:border-transparent focus:outline-none transition-all"
+                  >
+                  <div class="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                    <button
+                      v-if="lessonsSearch"
+                      @click="lessonsSearch = ''; lessonsCurrentPage = 1"
+                      class="p-1 rounded text-gray-400 hover:text-gray-600 transition-colors"
+                    >
+                      <i class="fas fa-times text-xs"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Category Filter (Multi-select with checkboxes) -->
+              <div class="relative">
+                <button
+                  @click="showLessonsCategoryDropdown = !showLessonsCategoryDropdown"
+                  :class="[
+                    'flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border',
+                    selectedLessonsCategories.length > 0 ? 'bg-teal-50 border-teal-200 text-teal-700' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+                  ]"
+                >
+                  <i class="fas fa-layer-group text-sm"></i>
+                  <span>{{ selectedLessonsCategories.length > 0 ? `Category (${selectedLessonsCategories.length})` : 'Category' }}</span>
+                  <i :class="showLessonsCategoryDropdown ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ml-1"></i>
+                </button>
+
+                <div v-if="showLessonsCategoryDropdown" @click="showLessonsCategoryDropdown = false" class="fixed inset-0 z-40"></div>
+
+                <div
+                  v-if="showLessonsCategoryDropdown"
+                  class="absolute left-0 top-full mt-2 w-64 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
+                >
+                  <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Categories</div>
+                  <div class="max-h-48 overflow-y-auto">
+                    <button
+                      v-for="cat in lessonsCategoryOptions.filter(c => c.id !== 'all')"
+                      :key="cat.id"
+                      @click="toggleLessonsCategoryFilter(cat.id)"
+                      :class="[
+                        'w-full px-3 py-2 text-left text-sm flex items-center gap-3 transition-colors',
+                        isLessonsCategorySelected(cat.id) ? 'bg-teal-50 text-teal-700' : 'text-gray-700 hover:bg-gray-50'
+                      ]"
+                    >
+                      <div :class="[
+                        'w-4 h-4 rounded border-2 flex items-center justify-center transition-all',
+                        isLessonsCategorySelected(cat.id) ? 'bg-teal-500 border-teal-500' : 'border-gray-300'
+                      ]">
+                        <i v-if="isLessonsCategorySelected(cat.id)" class="fas fa-check text-white text-[8px]"></i>
+                      </div>
+                      <i :class="[cat.icon, 'text-teal-500 text-sm']"></i>
+                      <span class="flex-1">{{ cat.label }}</span>
+                      <span class="text-xs text-gray-400">{{ categoryStats[cat.id] || 0 }}</span>
+                    </button>
+                  </div>
+
+                  <div class="my-2 border-t border-gray-100"></div>
+
+                  <div class="px-3 flex gap-2">
+                    <button
+                      @click="selectedLessonsCategories = []; lessonsCurrentPage = 1; showLessonsCategoryDropdown = false"
+                      class="flex-1 px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                    >
+                      Clear
+                    </button>
+                    <button
+                      @click="showLessonsCategoryDropdown = false"
+                      class="flex-1 px-3 py-1.5 text-xs font-medium text-white bg-teal-500 rounded-lg hover:bg-teal-600 transition-colors"
+                    >
+                      Apply
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Priority Filter (Multi-select with checkboxes) -->
+              <div class="relative">
+                <button
+                  @click="showLessonsPriorityDropdown = !showLessonsPriorityDropdown"
+                  :class="[
+                    'flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border',
+                    selectedLessonsPriorities.length > 0 ? 'bg-teal-50 border-teal-200 text-teal-700' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+                  ]"
+                >
+                  <i class="fas fa-flag text-sm"></i>
+                  <span>{{ selectedLessonsPriorities.length > 0 ? `Priority (${selectedLessonsPriorities.length})` : 'Priority' }}</span>
+                  <i :class="showLessonsPriorityDropdown ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ml-1"></i>
+                </button>
+
+                <div v-if="showLessonsPriorityDropdown" @click="showLessonsPriorityDropdown = false" class="fixed inset-0 z-40"></div>
+
+                <div
+                  v-if="showLessonsPriorityDropdown"
+                  class="absolute left-0 top-full mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
+                >
+                  <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Priorities</div>
+                  <div class="max-h-48 overflow-y-auto">
+                    <button
+                      v-for="pri in lessonsPriorityOptions.filter(p => p.id !== 'all')"
+                      :key="pri.id"
+                      @click="toggleLessonsPriorityFilter(pri.id)"
+                      :class="[
+                        'w-full px-3 py-2 text-left text-sm flex items-center gap-3 transition-colors',
+                        isLessonsPrioritySelected(pri.id) ? 'bg-teal-50 text-teal-700' : 'text-gray-700 hover:bg-gray-50'
+                      ]"
+                    >
+                      <div :class="[
+                        'w-4 h-4 rounded border-2 flex items-center justify-center transition-all',
+                        isLessonsPrioritySelected(pri.id) ? 'bg-teal-500 border-teal-500' : 'border-gray-300'
+                      ]">
+                        <i v-if="isLessonsPrioritySelected(pri.id)" class="fas fa-check text-white text-[8px]"></i>
+                      </div>
+                      <span :class="['w-2.5 h-2.5 rounded-full', pri.id === 'critical' ? 'bg-red-500' : pri.id === 'high' ? 'bg-orange-500' : pri.id === 'medium' ? 'bg-amber-500' : 'bg-green-500']"></span>
+                      <span class="flex-1 capitalize">{{ pri.label }}</span>
+                    </button>
+                  </div>
+
+                  <div class="my-2 border-t border-gray-100"></div>
+
+                  <div class="px-3 flex gap-2">
+                    <button
+                      @click="selectedLessonsPriorities = []; lessonsCurrentPage = 1; showLessonsPriorityDropdown = false"
+                      class="flex-1 px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                    >
+                      Clear
+                    </button>
+                    <button
+                      @click="showLessonsPriorityDropdown = false"
+                      class="flex-1 px-3 py-1.5 text-xs font-medium text-white bg-teal-500 rounded-lg hover:bg-teal-600 transition-colors"
+                    >
+                      Apply
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Tags Filter (Multi-select) -->
+              <div class="relative">
+                <button
+                  @click="showLessonsTagsDropdown = !showLessonsTagsDropdown"
+                  :class="[
+                    'flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border',
+                    selectedLessonsTags.length > 0 ? 'bg-teal-50 border-teal-200 text-teal-700' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+                  ]"
+                >
+                  <i class="fas fa-tags text-sm"></i>
+                  <span>{{ selectedLessonsTags.length > 0 ? `Tags (${selectedLessonsTags.length})` : 'Tags' }}</span>
+                  <i :class="showLessonsTagsDropdown ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ml-1"></i>
+                </button>
+
+                <div v-if="showLessonsTagsDropdown" @click="showLessonsTagsDropdown = false" class="fixed inset-0 z-40"></div>
+
+                <div
+                  v-if="showLessonsTagsDropdown"
+                  class="absolute left-0 top-full mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
+                >
+                  <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Tags</div>
+                  <div class="max-h-48 overflow-y-auto">
+                    <button
+                      v-for="tag in allLessonsTags"
+                      :key="tag"
+                      @click="toggleLessonsTagFilter(tag)"
+                      :class="[
+                        'w-full px-3 py-2 text-left text-sm flex items-center gap-3 transition-colors',
+                        isLessonsTagSelected(tag) ? 'bg-teal-50 text-teal-700' : 'text-gray-700 hover:bg-gray-50'
+                      ]"
+                    >
+                      <div :class="[
+                        'w-4 h-4 rounded border-2 flex items-center justify-center transition-all',
+                        isLessonsTagSelected(tag) ? 'bg-teal-500 border-teal-500' : 'border-gray-300'
+                      ]">
+                        <i v-if="isLessonsTagSelected(tag)" class="fas fa-check text-white text-[8px]"></i>
+                      </div>
+                      <i class="fas fa-tag text-teal-500 text-sm"></i>
+                      <span class="flex-1">{{ tag }}</span>
+                    </button>
+                  </div>
+
+                  <div class="my-2 border-t border-gray-100"></div>
+
+                  <div class="px-3 flex gap-2">
+                    <button
+                      @click="selectedLessonsTags = []; lessonsCurrentPage = 1; showLessonsTagsDropdown = false"
+                      class="flex-1 px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                    >
+                      Clear
+                    </button>
+                    <button
+                      @click="showLessonsTagsDropdown = false"
+                      class="flex-1 px-3 py-1.5 text-xs font-medium text-white bg-teal-500 rounded-lg hover:bg-teal-600 transition-colors"
+                    >
+                      Apply
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Bookmarked Filter -->
+              <button
+                @click="showBookmarkedOnly = !showBookmarkedOnly; lessonsCurrentPage = 1"
+                :class="[
+                  'flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border',
+                  showBookmarkedOnly ? 'bg-teal-50 border-teal-200 text-teal-700' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+                ]"
+              >
+                <i :class="showBookmarkedOnly ? 'fas fa-bookmark' : 'far fa-bookmark'" class="text-sm"></i>
+                <span>Bookmarked</span>
+              </button>
+
+              <!-- Sort Options with Order Toggle -->
+              <div class="relative ml-auto flex items-center">
+                <button
+                  @click="showLessonsSortDropdown = !showLessonsSortDropdown"
+                  class="flex items-center gap-2 px-3 py-1.5 rounded-l-lg text-xs font-medium transition-all border border-r-0 bg-white border-gray-200 text-gray-600 hover:bg-gray-50"
+                >
+                  <i :class="[lessonsSortOptions.find(o => o.value === lessonsSortBy)?.icon || 'fas fa-sort', 'text-sm text-teal-500']"></i>
+                  <span>{{ lessonsSortOptions.find(o => o.value === lessonsSortBy)?.label || 'Sort' }}</span>
+                  <i :class="showLessonsSortDropdown ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ml-1"></i>
+                </button>
+                <button
+                  @click="lessonsSortOrder = lessonsSortOrder === 'asc' ? 'desc' : 'asc'"
+                  class="flex items-center justify-center w-8 h-8 rounded-r-lg text-xs font-medium transition-all border bg-white border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-teal-600"
+                  :title="lessonsSortOrder === 'asc' ? 'Ascending order - Click for descending' : 'Descending order - Click for ascending'"
+                >
+                  <i :class="lessonsSortOrder === 'asc' ? 'fas fa-arrow-up' : 'fas fa-arrow-down'" class="text-sm text-teal-500"></i>
+                </button>
+
+                <div v-if="showLessonsSortDropdown" @click="showLessonsSortDropdown = false" class="fixed inset-0 z-40"></div>
+
+                <div
+                  v-if="showLessonsSortDropdown"
+                  class="absolute left-0 top-full mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
+                >
+                  <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Sort By</div>
+                  <div class="max-h-64 overflow-y-auto">
+                    <button
+                      v-for="option in lessonsSortOptions"
+                      :key="option.value"
+                      @click="lessonsSortBy = option.value; showLessonsSortDropdown = false"
+                      :class="[
+                        'w-full px-3 py-2 text-left text-sm flex items-center gap-3 transition-colors',
+                        lessonsSortBy === option.value ? 'bg-teal-50 text-teal-700' : 'text-gray-700 hover:bg-gray-50'
+                      ]"
+                    >
+                      <i :class="[option.icon, 'text-sm w-4', lessonsSortBy === option.value ? 'text-teal-500' : 'text-gray-400']"></i>
+                      <span class="flex-1">{{ option.label }}</span>
+                      <i v-if="lessonsSortBy === option.value" class="fas fa-check text-teal-500 text-xs"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- View Toggle -->
+              <div class="flex items-center gap-0.5 bg-white border border-gray-200 rounded-lg p-1">
+                <button
+                  @click="lessonsViewMode = 'grid'"
+                  :class="['px-2.5 py-1 rounded-md transition-all', lessonsViewMode === 'grid' ? 'bg-teal-500 text-white' : 'text-gray-500 hover:bg-gray-100']"
+                  title="Grid view"
+                >
+                  <i class="fas fa-th-large text-xs"></i>
+                </button>
+                <button
+                  @click="lessonsViewMode = 'list'"
+                  :class="['px-2.5 py-1 rounded-md transition-all', lessonsViewMode === 'list' ? 'bg-teal-500 text-white' : 'text-gray-500 hover:bg-gray-100']"
+                  title="List view"
+                >
+                  <i class="fas fa-list text-xs"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Active Filters Bar -->
+          <div v-if="activeLessonsFiltersCount > 0" class="flex items-center gap-3 mb-4 p-3 bg-white rounded-xl border border-gray-100 shadow-sm">
+            <div class="flex items-center gap-2 px-2 py-1 bg-gray-100 rounded-lg">
+              <i class="fas fa-filter text-gray-400 text-xs"></i>
+              <span class="text-xs font-medium text-gray-600">Active Filters</span>
+            </div>
+            <div class="flex flex-wrap gap-2 flex-1">
+              <!-- Search Filter -->
+              <span v-if="lessonsSearch" class="px-2.5 py-1 bg-gray-100 text-gray-700 rounded-lg text-xs font-medium flex items-center gap-1.5 border border-gray-200">
+                <i class="fas fa-search text-[10px]"></i>
+                "{{ lessonsSearch }}"
+                <button @click="lessonsSearch = ''; lessonsCurrentPage = 1" class="ml-1 hover:text-gray-900 hover:bg-gray-200 rounded-full w-4 h-4 flex items-center justify-center"><i class="fas fa-times text-[10px]"></i></button>
+              </span>
+              <!-- Category Filters (multiple) -->
+              <span
+                v-for="catId in selectedLessonsCategories"
+                :key="'cat-' + catId"
+                class="px-2.5 py-1 bg-teal-50 text-teal-700 rounded-lg text-xs font-medium flex items-center gap-1.5 border border-teal-100"
+              >
+                <i class="fas fa-layer-group text-[10px]"></i>
+                {{ getLessonCategoryInfo(catId as LessonCategory).label }}
+                <button @click="toggleLessonsCategoryFilter(catId)" class="ml-1 hover:text-teal-900 hover:bg-teal-100 rounded-full w-4 h-4 flex items-center justify-center"><i class="fas fa-times text-[10px]"></i></button>
+              </span>
+              <!-- Priority Filters (multiple) -->
+              <span
+                v-for="priId in selectedLessonsPriorities"
+                :key="'pri-' + priId"
+                class="px-2.5 py-1 bg-teal-50 text-teal-700 rounded-lg text-xs font-medium flex items-center gap-1.5 border border-teal-100"
+              >
+                <i class="fas fa-flag text-[10px]"></i>
+                {{ priId }}
+                <button @click="toggleLessonsPriorityFilter(priId)" class="ml-1 hover:text-teal-900 hover:bg-teal-100 rounded-full w-4 h-4 flex items-center justify-center"><i class="fas fa-times text-[10px]"></i></button>
+              </span>
+              <!-- Tag Filters (multiple) -->
+              <span
+                v-for="tag in selectedLessonsTags"
+                :key="'tag-' + tag"
+                class="px-2.5 py-1 bg-teal-50 text-teal-700 rounded-lg text-xs font-medium flex items-center gap-1.5 border border-teal-100"
+              >
+                <i class="fas fa-tag text-[10px]"></i>
+                {{ tag }}
+                <button @click="toggleLessonsTagFilter(tag)" class="ml-1 hover:text-teal-900 hover:bg-teal-100 rounded-full w-4 h-4 flex items-center justify-center"><i class="fas fa-times text-[10px]"></i></button>
+              </span>
+              <!-- Bookmarked Filter -->
+              <span
+                v-if="showBookmarkedOnly"
+                class="px-2.5 py-1 bg-amber-50 text-amber-700 rounded-lg text-xs font-medium flex items-center gap-1.5 border border-amber-100"
+              >
+                <i class="fas fa-bookmark text-[10px]"></i>
+                Bookmarked
+                <button @click="showBookmarkedOnly = false; lessonsCurrentPage = 1" class="ml-1 hover:text-amber-900 hover:bg-amber-100 rounded-full w-4 h-4 flex items-center justify-center"><i class="fas fa-times text-[10px]"></i></button>
+              </span>
+            </div>
+            <button @click="clearLessonsFilters" class="px-3 py-1.5 text-xs font-medium text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors flex items-center gap-1.5">
+              <i class="fas fa-times-circle"></i>
+              Clear all
+            </button>
+          </div>
+
+          <!-- Content Area -->
+          <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+            <div v-if="paginatedLessons.length > 0">
+              <!-- Grid View -->
+              <div v-if="lessonsViewMode === 'grid'" class="grid grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-5">
+                <article
+                  v-for="lesson in paginatedLessons"
+                  :key="lesson.id"
+                  @click="openLessonDetail(lesson)"
+                  :class="[
+                    'group bg-white rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 hover:-translate-y-1.5 border',
+                    lesson.isFeatured
+                      ? 'border-teal-200 shadow-lg shadow-teal-100/50 hover:shadow-xl hover:shadow-teal-200/50'
+                      : 'border-gray-100 shadow-sm hover:shadow-lg hover:border-teal-200'
+                  ]"
+                >
+                  <!-- Card Image -->
+                  <div class="relative h-44 overflow-hidden bg-gradient-to-br from-teal-50 to-cyan-50">
+                    <div class="absolute inset-0 bg-gradient-to-br from-teal-500 via-teal-600 to-cyan-600">
+                      <div class="absolute inset-0 opacity-10" style="background-image: url('data:image/svg+xml,%3Csvg width=&quot;40&quot; height=&quot;40&quot; viewBox=&quot;0 0 40 40&quot; xmlns=&quot;http://www.w3.org/2000/svg&quot;%3E%3Cg fill=&quot;%23fff&quot; fill-opacity=&quot;1&quot;%3E%3Cpath d=&quot;M20 20h20v20H20zM0 0h20v20H0z&quot;/%3E%3C/g%3E%3C/svg%3E');"></div>
+                    </div>
+                    <div class="absolute inset-0 flex items-center justify-center">
+                      <i :class="[getLessonCategoryInfo(lesson.category).icon, 'text-5xl text-white/30']"></i>
+                    </div>
+
+                    <!-- Gradient Overlay -->
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+
+                    <!-- Top Badges -->
+                    <div class="absolute top-3 left-3 right-3 flex items-start justify-between">
+                      <div class="flex flex-wrap gap-1.5">
+                        <!-- Featured Badge -->
+                        <span v-if="lesson.isFeatured" class="px-2 py-0.5 bg-amber-500 text-white text-[10px] font-semibold rounded-full flex items-center gap-1">
+                          <i class="fas fa-star text-[8px]"></i> Featured
+                        </span>
+                        <!-- Priority Badge -->
+                        <span :class="['px-2 py-0.5 text-[10px] font-semibold rounded-full', lesson.priority === 'critical' ? 'bg-red-500 text-white' : lesson.priority === 'high' ? 'bg-orange-500 text-white' : lesson.priority === 'medium' ? 'bg-amber-500 text-white' : 'bg-green-500 text-white']">
+                          {{ lesson.priority }}
+                        </span>
+                      </div>
+                      <!-- Action Buttons -->
+                      <div class="flex items-center gap-1.5">
+                        <button
+                          @click.stop="toggleLessonBookmark(lesson.id)"
+                          :class="[
+                            'w-7 h-7 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center transition-all shadow-sm',
+                            lesson.isBookmarked ? 'text-teal-600' : 'text-gray-400 hover:text-teal-600 hover:bg-white'
+                          ]"
+                        >
+                          <i :class="lesson.isBookmarked ? 'fas fa-bookmark' : 'far fa-bookmark'" class="text-xs"></i>
+                        </button>
+                      </div>
+                    </div>
+
+                    <!-- Category Badge (Bottom) -->
+                    <div class="absolute bottom-3 left-3">
+                      <span class="px-2 py-1 bg-white/90 backdrop-blur-sm text-teal-700 text-[10px] font-semibold rounded-full flex items-center gap-1">
+                        <i :class="[getLessonCategoryInfo(lesson.category).icon, 'text-[9px]']"></i>
+                        {{ getLessonCategoryInfo(lesson.category).label }}
+                      </span>
+                    </div>
+
+                    <!-- Read Button (Hover) -->
+                    <div class="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0">
+                      <button @click.stop="openLessonDetail(lesson)" class="px-3 py-1.5 bg-white text-teal-600 text-xs font-semibold rounded-full flex items-center gap-1.5 shadow-md hover:bg-teal-500 hover:text-white transition-colors">
+                        <span>Read</span>
+                        <i class="fas fa-arrow-right text-[10px]"></i>
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Card Content -->
+                  <div class="p-4">
+                    <!-- Meta Info -->
+                    <div class="flex items-center gap-3 text-[11px] text-gray-400 mb-2">
+                      <span class="flex items-center gap-1">
+                        <i class="fas fa-eye text-[9px]"></i>
+                        {{ lesson.viewCount }} views
+                      </span>
+                      <span class="flex items-center gap-1">
+                        <i class="fas fa-calendar text-[9px]"></i>
+                        {{ lesson.createdAt }}
+                      </span>
+                    </div>
+
+                    <!-- Title -->
+                    <h3 class="text-sm font-semibold text-gray-800 mb-2 line-clamp-2 group-hover:text-teal-600 transition-colors leading-snug">
+                      {{ lesson.title }}
+                    </h3>
+
+                    <!-- Excerpt -->
+                    <p class="text-xs text-gray-500 mb-3 line-clamp-2 leading-relaxed">
+                      {{ lesson.summary }}
+                    </p>
+
+                    <!-- Tags -->
+                    <div class="flex flex-wrap gap-1.5 mb-3">
+                      <span
+                        v-for="tag in lesson.tags?.slice(0, 3)"
+                        :key="tag"
+                        class="px-2 py-0.5 bg-gray-100 text-gray-600 text-[10px] font-medium rounded-full hover:bg-teal-50 hover:text-teal-600 transition-colors"
+                      >
+                        {{ tag }}
+                      </span>
+                    </div>
+
+                    <!-- Footer -->
+                    <div class="flex items-center justify-between pt-3 border-t border-gray-100">
+                      <!-- Author -->
+                      <div class="flex items-center gap-2">
+                        <div class="w-7 h-7 rounded-full bg-gradient-to-br from-teal-400 to-cyan-500 flex items-center justify-center text-white text-[10px] font-semibold shadow-sm">
+                          {{ lesson.author?.initials || 'U' }}
+                        </div>
+                        <span class="text-xs text-gray-600 font-medium">{{ lesson.author?.name }}</span>
+                      </div>
+
+                      <!-- Stats -->
+                      <div class="flex items-center gap-3 text-[11px] text-gray-400">
+                        <span class="flex items-center gap-1 hover:text-teal-500 transition-colors">
+                          <i class="fas fa-eye text-[9px]"></i>
+                          {{ lesson.viewCount }}
+                        </span>
+                        <span class="flex items-center gap-1 hover:text-red-400 transition-colors">
+                          <i class="fas fa-heart text-[9px]"></i>
+                          {{ lesson.likeCount || 0 }}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </article>
+              </div>
+
+              <!-- List View -->
+              <div v-else class="space-y-3">
+                <article
+                  v-for="lesson in paginatedLessons"
+                  :key="lesson.id"
+                  @click="openLessonDetail(lesson)"
+                  :class="[
+                    'group flex gap-4 p-4 bg-white rounded-2xl cursor-pointer transition-all duration-300 border',
+                    lesson.isFeatured
+                      ? 'border-teal-200 shadow-md hover:shadow-lg hover:border-teal-300'
+                      : 'border-gray-100 shadow-sm hover:shadow-md hover:border-teal-200'
+                  ]"
+                >
+                  <!-- Thumbnail -->
+                  <div class="relative w-32 h-24 flex-shrink-0 rounded-xl overflow-hidden bg-gradient-to-br from-teal-500 to-cyan-600">
+                    <div class="absolute inset-0 flex items-center justify-center">
+                      <i :class="[getLessonCategoryInfo(lesson.category).icon, 'text-2xl text-white/50']"></i>
+                    </div>
+                    <!-- Featured Star -->
+                    <div v-if="lesson.isFeatured" class="absolute top-1.5 left-1.5">
+                      <span class="w-5 h-5 bg-amber-500 rounded-full flex items-center justify-center shadow-sm">
+                        <i class="fas fa-star text-white text-[8px]"></i>
+                      </span>
+                    </div>
+                    <!-- Priority Badge -->
+                    <div class="absolute bottom-1.5 left-1.5">
+                      <span :class="['px-1.5 py-0.5 text-[9px] font-semibold rounded-full', lesson.priority === 'critical' ? 'bg-red-500 text-white' : lesson.priority === 'high' ? 'bg-orange-500 text-white' : lesson.priority === 'medium' ? 'bg-amber-500 text-white' : 'bg-green-500 text-white']">
+                        {{ lesson.priority }}
+                      </span>
+                    </div>
+                  </div>
+
+                  <!-- Content -->
+                  <div class="flex-1 min-w-0">
+                    <!-- Header Badges -->
+                    <div class="flex flex-wrap items-center gap-2 mb-1.5">
+                      <span class="px-2 py-0.5 bg-teal-50 text-teal-700 text-[10px] font-semibold rounded-full flex items-center gap-1">
+                        <i :class="[getLessonCategoryInfo(lesson.category).icon, 'text-[8px]']"></i>
+                        {{ getLessonCategoryInfo(lesson.category).label }}
+                      </span>
+                      <span class="text-[10px] text-gray-400 flex items-center gap-1">
+                        <i class="fas fa-calendar text-[8px]"></i>
+                        {{ lesson.createdAt }}
+                      </span>
+                    </div>
+
+                    <!-- Title -->
+                    <h3 class="text-sm font-semibold text-gray-800 mb-1 truncate group-hover:text-teal-600 transition-colors">
+                      {{ lesson.title }}
+                    </h3>
+
+                    <!-- Excerpt -->
+                    <p class="text-xs text-gray-500 mb-2 line-clamp-1">
+                      {{ lesson.summary }}
+                    </p>
+
+                    <!-- Footer -->
+                    <div class="flex items-center justify-between">
+                      <!-- Author & Date -->
+                      <div class="flex items-center gap-2">
+                        <div class="w-6 h-6 rounded-full bg-gradient-to-br from-teal-400 to-cyan-500 flex items-center justify-center text-white text-[9px] font-semibold">
+                          {{ lesson.author?.initials || 'U' }}
+                        </div>
+                        <span class="text-[11px] text-gray-500">
+                          {{ lesson.author?.name }}
+                        </span>
+                      </div>
+
+                      <!-- Stats & Tags -->
+                      <div class="flex items-center gap-3">
+                        <div class="hidden sm:flex items-center gap-1.5">
+                          <span
+                            v-for="tag in lesson.tags?.slice(0, 2)"
+                            :key="tag"
+                            class="px-1.5 py-0.5 bg-gray-100 text-gray-500 text-[10px] rounded-full"
+                          >
+                            {{ tag }}
+                          </span>
+                        </div>
+                        <div class="flex items-center gap-2 text-[11px] text-gray-400">
+                          <span class="flex items-center gap-1">
+                            <i class="fas fa-eye text-[9px]"></i>
+                            {{ lesson.viewCount }}
+                          </span>
+                          <span class="flex items-center gap-1">
+                            <i class="fas fa-heart text-[9px]"></i>
+                            {{ lesson.likeCount || 0 }}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Actions -->
+                  <div class="flex flex-col gap-2">
+                    <button
+                      @click.stop="toggleLessonBookmark(lesson.id)"
+                      :class="[
+                        'w-8 h-8 rounded-lg flex items-center justify-center transition-colors',
+                        lesson.isBookmarked ? 'bg-teal-50 text-teal-600' : 'bg-gray-50 text-gray-400 hover:bg-teal-50 hover:text-teal-600'
+                      ]"
+                      title="Bookmark"
+                    >
+                      <i :class="lesson.isBookmarked ? 'fas fa-bookmark' : 'far fa-bookmark'" class="text-xs"></i>
+                    </button>
+                  </div>
+                </article>
+              </div>
+
+              <!-- Pagination Footer (ArticlesPage Style) -->
+              <div class="mt-4 px-4 py-3 bg-white rounded-2xl border border-gray-100 shadow-sm">
+                <div class="flex items-center justify-between flex-wrap gap-3">
+                  <!-- Left: Stats & Items Per Page -->
+                  <div class="flex items-center gap-4 flex-wrap">
+                    <span class="text-xs text-gray-500">
+                      Showing <span class="font-semibold text-gray-700">{{ Math.min((lessonsCurrentPage - 1) * lessonsItemsPerPage + 1, filteredLessons.length) }}</span>
+                      to <span class="font-semibold text-gray-700">{{ Math.min(lessonsCurrentPage * lessonsItemsPerPage, filteredLessons.length) }}</span>
+                      of <span class="font-semibold text-gray-700">{{ filteredLessons.length }}</span> lessons
+                    </span>
+
+                    <!-- Items Per Page Selector -->
+                    <div class="flex items-center gap-2">
+                      <span class="text-xs text-gray-500">Show:</span>
+                      <select
+                        v-model="lessonsItemsPerPage"
+                        @change="changeLessonsItemsPerPage(Number(($event.target as HTMLSelectElement).value))"
+                        class="text-xs px-2 py-1.5 rounded-lg border border-gray-200 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 cursor-pointer"
+                      >
+                        <option v-for="option in lessonsItemsPerPageOptions" :key="option" :value="option">
+                          {{ option }}
+                        </option>
+                      </select>
+                      <span class="text-xs text-gray-500">per page</span>
+                    </div>
+                  </div>
+
+                  <!-- Right: Pagination Controls -->
+                  <div class="flex items-center gap-2">
+                    <button
+                      @click="lessonsPrevPage"
+                      :disabled="lessonsCurrentPage === 1"
+                      :class="[
+                        'px-3 py-1.5 text-xs rounded-lg transition-colors flex items-center gap-1.5 border',
+                        lessonsCurrentPage === 1
+                          ? 'text-gray-300 border-gray-100 cursor-not-allowed'
+                          : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100 border-gray-200'
+                      ]"
+                    >
+                      <i class="fas fa-chevron-left text-[10px]"></i>
+                      Previous
+                    </button>
+
+                    <!-- Page Numbers -->
+                    <div class="flex items-center gap-1">
+                      <template v-for="page in lessonsTotalPages" :key="page">
+                        <button
+                          v-if="page === 1 || page === lessonsTotalPages || (page >= lessonsCurrentPage - 1 && page <= lessonsCurrentPage + 1)"
+                          @click="lessonsGoToPage(page)"
+                          :class="[
+                            'w-8 h-8 text-xs rounded-lg transition-colors flex items-center justify-center',
+                            page === lessonsCurrentPage
+                              ? 'font-medium text-teal-600 bg-teal-50'
+                              : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
+                          ]"
+                        >
+                          {{ page }}
+                        </button>
+                        <span
+                          v-else-if="page === lessonsCurrentPage - 2 || page === lessonsCurrentPage + 2"
+                          class="text-xs text-gray-400 px-1"
+                        >...</span>
+                      </template>
+                    </div>
+
+                    <button
+                      @click="lessonsNextPage"
+                      :disabled="lessonsCurrentPage === lessonsTotalPages"
+                      :class="[
+                        'px-3 py-1.5 text-xs rounded-lg transition-colors flex items-center gap-1.5 border',
+                        lessonsCurrentPage === lessonsTotalPages
+                          ? 'text-gray-300 border-gray-100 cursor-not-allowed'
+                          : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100 border-gray-200'
+                      ]"
+                    >
+                      Next
+                      <i class="fas fa-chevron-right text-[10px]"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Empty State -->
+            <div v-else class="py-16 text-center">
+              <div class="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-teal-100 to-cyan-100 flex items-center justify-center">
+                <i class="fas fa-search text-3xl text-teal-400"></i>
+              </div>
+              <h3 class="text-lg font-semibold text-gray-800 mb-2">No lessons found</h3>
+              <p class="text-sm text-gray-500 mb-4">Try adjusting your search or filters</p>
+              <button @click="clearLessonsFilters" class="px-4 py-2 bg-teal-500 text-white text-sm font-medium rounded-lg hover:bg-teal-600 transition-colors inline-flex items-center gap-2">
+                <i class="fas fa-rotate"></i>
+                Clear Filters
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Lesson Detail Modal -->
+        <Teleport to="body">
+          <div v-if="showLessonDetailModal && selectedLessonForModal" class="ll-modal-overlay" @click.self="closeLessonDetail">
+            <div class="ll-modal">
+              <div class="ll-modal-header" :class="'cat-' + selectedLessonForModal.category">
+                <div class="ll-modal-badges">
+                  <span :class="['ll-modal-priority', 'priority-' + selectedLessonForModal.priority]">
+                    <i class="fas fa-flag"></i> {{ selectedLessonForModal.priority }} Priority
+                  </span>
+                  <span class="ll-modal-category">
+                    <i :class="getLessonCategoryInfo(selectedLessonForModal.category).icon"></i>
+                    {{ getLessonCategoryInfo(selectedLessonForModal.category).label }}
+                  </span>
+                </div>
+                <button @click="closeLessonDetail" class="ll-modal-close">
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
+
+              <div class="ll-modal-body">
+                <h2 class="ll-modal-title">{{ selectedLessonForModal.title }}</h2>
+
+                <div class="ll-modal-meta">
+                  <div class="ll-modal-author">
+                    <div class="ll-modal-avatar">{{ selectedLessonForModal.author.initials }}</div>
+                    <div>
+                      <span class="ll-modal-author-name">{{ selectedLessonForModal.author.name }}</span>
+                      <span class="ll-modal-author-dept">{{ selectedLessonForModal.author.department }}</span>
+                    </div>
+                  </div>
+                  <div class="ll-modal-info">
+                    <span><i class="fas fa-calendar"></i> {{ selectedLessonForModal.createdAt }}</span>
+                    <span v-if="selectedLessonForModal.projectName"><i class="fas fa-folder"></i> {{ selectedLessonForModal.projectName }}</span>
+                  </div>
+                </div>
+
+                <div class="ll-modal-stats">
+                  <span><i class="fas fa-eye"></i> {{ selectedLessonForModal.viewCount }} views</span>
+                  <span><i class="fas fa-heart"></i> {{ selectedLessonForModal.likeCount }} likes</span>
+                  <span><i class="fas fa-comment"></i> {{ selectedLessonForModal.commentCount }} comments</span>
+                </div>
+
+                <div class="ll-modal-section">
+                  <h4><i class="fas fa-align-left"></i> Summary</h4>
+                  <p>{{ selectedLessonForModal.summary }}</p>
+                </div>
+
+                <div class="ll-modal-section">
+                  <h4><i class="fas fa-book-open"></i> Full Lesson</h4>
+                  <p>{{ selectedLessonForModal.content }}</p>
+                </div>
+
+                <div v-if="selectedLessonForModal.impact" class="ll-modal-impact">
+                  <h4><i class="fas fa-chart-line"></i> Impact</h4>
+                  <div class="ll-impact-highlight">{{ selectedLessonForModal.impact }}</div>
+                </div>
+
+                <div v-if="selectedLessonForModal.recommendations?.length" class="ll-modal-section">
+                  <h4><i class="fas fa-lightbulb"></i> Key Recommendations</h4>
+                  <ul class="ll-recommendations">
+                    <li v-for="(rec, idx) in selectedLessonForModal.recommendations" :key="idx">
+                      <i class="fas fa-check-circle"></i>
+                      <span>{{ rec }}</span>
+                    </li>
+                  </ul>
+                </div>
+
+                <div class="ll-modal-tags">
+                  <span v-for="tag in selectedLessonForModal.tags" :key="tag" class="ll-modal-tag">{{ tag }}</span>
+                </div>
+              </div>
+
+              <div class="ll-modal-footer">
+                <div class="ll-modal-actions">
+                  <button
+                    @click="toggleLessonLike(selectedLessonForModal.id)"
+                    class="ll-action-btn"
+                    :class="{ 'active': selectedLessonForModal.isLiked }"
+                  >
+                    <i :class="selectedLessonForModal.isLiked ? 'fas fa-heart' : 'far fa-heart'"></i>
+                    {{ selectedLessonForModal.isLiked ? 'Liked' : 'Like' }}
+                  </button>
+                  <button
+                    @click="toggleLessonBookmark(selectedLessonForModal.id)"
+                    class="ll-action-btn"
+                    :class="{ 'active': selectedLessonForModal.isBookmarked }"
+                  >
+                    <i :class="selectedLessonForModal.isBookmarked ? 'fas fa-bookmark' : 'far fa-bookmark'"></i>
+                    {{ selectedLessonForModal.isBookmarked ? 'Bookmarked' : 'Bookmark' }}
+                  </button>
+                  <button class="ll-action-btn">
+                    <i class="fas fa-share-alt"></i> Share
+                  </button>
+                </div>
+                <button @click="closeLessonDetail" class="ll-close-btn">Close</button>
+              </div>
+            </div>
+          </div>
+        </Teleport>
       </div>
 
       <!-- Certificates Section - Premium Enhanced -->
@@ -7521,7 +9035,1978 @@ function resumeFeaturedAutoPlay() {
    CERTIFICATES SECTION - PREMIUM STYLES
    ======================================== */
 
-/* Stats Section */
+/* ============================================
+   LESSONS LEARNED SECTION STYLES - ENHANCED
+   ============================================ */
+
+/* Main Section */
+.lessons-learned-section {
+  padding: 0;
+}
+
+/* Featured Insights Section - Enhanced */
+.ll-featured-section {
+  background: white;
+  border-radius: 1.5rem;
+  padding: 1.75rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+}
+
+.ll-featured-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.ll-featured-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.ll-featured-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  color: white;
+  box-shadow: 0 4px 14px rgba(20, 184, 166, 0.35);
+}
+
+.ll-featured-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0;
+}
+
+.ll-featured-subtitle {
+  font-size: 0.9rem;
+  color: #6b7280;
+  margin: 0.25rem 0 0;
+}
+
+.ll-featured-nav {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.ll-featured-counter {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #14b8a6;
+  background: #f0fdfa;
+  padding: 0.5rem 1rem;
+  border-radius: 9999px;
+}
+
+.ll-nav-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  background: white;
+  color: #6b7280;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.ll-nav-btn:hover:not(:disabled) {
+  background: #14b8a6;
+  border-color: #14b8a6;
+  color: white;
+  transform: scale(1.05);
+}
+
+.ll-nav-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Two Column Layout */
+.ll-featured-content {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 1.5rem;
+}
+
+/* Main Featured Card */
+.ll-main-card-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.ll-main-card {
+  position: relative;
+  border-radius: 1.25rem;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.4s ease;
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 50%, #115e59 100%);
+  min-height: 420px;
+}
+
+.ll-main-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 50px rgba(20, 184, 166, 0.3);
+}
+
+.ll-card-glow {
+  position: absolute;
+  top: -50%;
+  right: -20%;
+  width: 60%;
+  height: 100%;
+  background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.ll-card-pattern {
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  pointer-events: none;
+}
+
+.ll-main-card-inner {
+  position: relative;
+  z-index: 1;
+  padding: 2rem;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 420px;
+}
+
+.ll-main-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
+}
+
+.ll-main-badges {
+  display: flex;
+  gap: 0.625rem;
+  flex-wrap: wrap;
+}
+
+.ll-main-featured-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem 1rem;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(8px);
+  border-radius: 9999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.ll-main-featured-badge i {
+  color: #fde68a;
+}
+
+.ll-main-priority {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem 1rem;
+  border-radius: 9999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.ll-main-priority.priority-critical { background: rgba(239, 68, 68, 0.9); }
+.ll-main-priority.priority-high { background: rgba(249, 115, 22, 0.9); }
+.ll-main-priority.priority-medium { background: rgba(245, 158, 11, 0.9); }
+.ll-main-priority.priority-low { background: rgba(34, 197, 94, 0.9); }
+
+.ll-main-category {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem 1rem;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(4px);
+  border-radius: 9999px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.ll-main-content {
+  flex: 1;
+}
+
+.ll-main-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin: 0 0 0.75rem;
+  line-height: 1.3;
+}
+
+.ll-main-summary {
+  font-size: 1.05rem;
+  opacity: 0.9;
+  line-height: 1.6;
+  margin: 0 0 1.25rem;
+}
+
+.ll-main-impact {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 1rem;
+  margin-bottom: 1.25rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.ll-impact-icon-wrap {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.ll-impact-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.ll-impact-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  opacity: 0.8;
+}
+
+.ll-impact-text {
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.ll-main-takeaways {
+  margin-bottom: 1.25rem;
+}
+
+.ll-takeaway-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  opacity: 0.9;
+}
+
+.ll-takeaway-header i {
+  color: #fde68a;
+}
+
+.ll-takeaway-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.ll-takeaway-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.625rem 0.875rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 0.75rem;
+}
+
+.ll-takeaway-num {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.ll-takeaway-text {
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.ll-main-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 1.25rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  margin-bottom: 1rem;
+}
+
+.ll-main-author {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.ll-main-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.ll-main-author-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.ll-main-author-name {
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.ll-main-author-meta {
+  font-size: 0.8rem;
+  opacity: 0.8;
+}
+
+.ll-main-stats {
+  display: flex;
+  gap: 1rem;
+}
+
+.ll-main-stat {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+.ll-main-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.25rem;
+  background: white;
+  border: none;
+  border-radius: 0.625rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #0d9488;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.ll-main-cta:hover {
+  background: #f0fdfa;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.ll-main-cta i {
+  transition: transform 0.2s ease;
+}
+
+.ll-main-cta:hover i {
+  transform: translateX(4px);
+}
+
+/* Progress Dots */
+.ll-progress-dots {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.ll-progress-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: none;
+  background: #e5e7eb;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 0;
+}
+
+.ll-progress-dot:hover {
+  background: #99f6e4;
+}
+
+.ll-progress-dot.active {
+  background: #14b8a6;
+  width: 32px;
+  border-radius: 5px;
+}
+
+/* Next Lessons Sidebar */
+.ll-next-lessons {
+  display: flex;
+  flex-direction: column;
+  background: #f8fafc;
+  border-radius: 1.25rem;
+  padding: 1.25rem;
+  border: 1px solid #e5e7eb;
+}
+
+.ll-next-header {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.ll-next-header i {
+  color: #14b8a6;
+}
+
+.ll-next-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  flex: 1;
+}
+
+.ll-next-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.875rem;
+  padding: 1rem;
+  background: white;
+  border-radius: 1rem;
+  border: 1px solid #e5e7eb;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.ll-next-card:hover {
+  border-color: #14b8a6;
+  box-shadow: 0 4px 16px rgba(20, 184, 166, 0.12);
+  transform: translateX(4px);
+}
+
+.ll-next-index {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.ll-next-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.ll-next-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.375rem;
+}
+
+.ll-next-category {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.7rem;
+  color: #6b7280;
+}
+
+.ll-next-category i {
+  font-size: 0.65rem;
+  color: #14b8a6;
+}
+
+.ll-next-priority {
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: capitalize;
+  padding: 0.125rem 0.5rem;
+  border-radius: 9999px;
+}
+
+.ll-next-priority.priority-critical { background: #fee2e2; color: #dc2626; }
+.ll-next-priority.priority-high { background: #ffedd5; color: #ea580c; }
+.ll-next-priority.priority-medium { background: #fef3c7; color: #d97706; }
+.ll-next-priority.priority-low { background: #dcfce7; color: #16a34a; }
+
+.ll-next-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #111827;
+  margin: 0 0 0.375rem;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.ll-next-summary {
+  font-size: 0.8rem;
+  color: #6b7280;
+  margin: 0 0 0.5rem;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.ll-next-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.ll-next-author {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.ll-next-avatar {
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.6rem;
+  font-weight: 600;
+}
+
+.ll-next-stats {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.75rem;
+  color: #9ca3af;
+}
+
+.ll-next-arrow {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: #f3f4f6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #9ca3af;
+  font-size: 0.7rem;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.ll-next-card:hover .ll-next-arrow {
+  background: #14b8a6;
+  color: white;
+}
+
+.ll-view-all-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.875rem;
+  margin-top: 0.75rem;
+  background: white;
+  border: 1px solid #14b8a6;
+  border-radius: 0.75rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #14b8a6;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.ll-view-all-btn:hover {
+  background: #14b8a6;
+  color: white;
+}
+
+.ll-view-all-btn i {
+  transition: transform 0.2s ease;
+}
+
+.ll-view-all-btn:hover i {
+  transform: translateX(4px);
+}
+
+/* Responsive for Featured Section */
+@media (max-width: 1024px) {
+  .ll-featured-content {
+    grid-template-columns: 1fr;
+  }
+
+  .ll-next-lessons {
+    display: none;
+  }
+
+  .ll-featured-header {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 768px) {
+  .ll-featured-section {
+    padding: 1.25rem;
+  }
+
+  .ll-main-card-inner {
+    padding: 1.5rem;
+    min-height: auto;
+  }
+
+  .ll-main-title {
+    font-size: 1.35rem;
+  }
+
+  .ll-main-summary {
+    font-size: 0.95rem;
+  }
+
+  .ll-main-footer {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+}
+
+/* Legacy carousel styles - keep for compatibility */
+.ll-carousel-priority {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.375rem 0.875rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.ll-carousel-priority.priority-critical { background: rgba(239, 68, 68, 0.9); }
+.ll-carousel-priority.priority-high { background: rgba(249, 115, 22, 0.9); }
+.ll-carousel-priority.priority-medium { background: rgba(245, 158, 11, 0.9); }
+.ll-carousel-priority.priority-low { background: rgba(34, 197, 94, 0.9); }
+
+.ll-carousel-category {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.375rem 0.875rem;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(4px);
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.ll-carousel-card-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0 0 0.75rem;
+  line-height: 1.3;
+}
+
+.ll-carousel-card-summary {
+  font-size: 1rem;
+  opacity: 0.9;
+  line-height: 1.6;
+  margin: 0 0 1rem;
+}
+
+.ll-carousel-impact {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.625rem;
+  padding: 0.875rem 1rem;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.ll-carousel-impact i {
+  font-size: 1rem;
+  margin-top: 0.125rem;
+}
+
+.ll-carousel-impact span {
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.ll-carousel-recommendations {
+  margin-bottom: 1rem;
+}
+
+.ll-reco-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 0.625rem;
+  opacity: 0.9;
+}
+
+.ll-carousel-recommendations ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.ll-carousel-recommendations li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  opacity: 0.9;
+  line-height: 1.4;
+  padding-left: 1rem;
+  position: relative;
+}
+
+.ll-carousel-recommendations li::before {
+  content: '→';
+  position: absolute;
+  left: 0;
+  opacity: 0.7;
+}
+
+.ll-carousel-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: auto;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.ll-carousel-author {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.ll-carousel-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.ll-carousel-author-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.ll-carousel-author-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.ll-carousel-author-meta {
+  font-size: 0.8rem;
+  opacity: 0.8;
+}
+
+.ll-carousel-stats {
+  display: flex;
+  gap: 1rem;
+}
+
+.ll-carousel-stats span {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.85rem;
+  opacity: 0.9;
+}
+
+.ll-carousel-cta {
+  padding: 1rem 1.75rem 1.5rem;
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.ll-carousel-read-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.625rem;
+  width: 100%;
+  padding: 0.875rem 1.5rem;
+  background: white;
+  border: none;
+  border-radius: 0.75rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #111827;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.ll-carousel-read-btn:hover {
+  background: #f9fafb;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+@media (max-width: 768px) {
+  .ll-carousel-header {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+
+  .ll-carousel-card {
+    min-height: auto;
+  }
+
+  .ll-carousel-card-title {
+    font-size: 1.25rem;
+  }
+
+  .ll-carousel-card-summary {
+    font-size: 0.9rem;
+  }
+
+  .ll-carousel-footer {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+}
+
+/* Stats Bar */
+.ll-stats-bar {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  padding: 1rem 1.5rem;
+  background: white;
+  border-radius: 1rem;
+  border: 1px solid #e5e7eb;
+  margin-bottom: 1.5rem;
+}
+
+.ll-stat-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 1;
+}
+
+.ll-stat-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+}
+
+.ll-stat-icon.total { background: #ccfbf4; color: #14b8a6; }
+.ll-stat-icon.views { background: #dbeafe; color: #3b82f6; }
+.ll-stat-icon.likes { background: #fee2e2; color: #ef4444; }
+.ll-stat-icon.critical { background: #fee2e2; color: #ef4444; }
+.ll-stat-icon.bookmarked { background: #ccfbf4; color: #14b8a6; }
+
+.ll-stat-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.ll-stat-value {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #111827;
+  line-height: 1;
+}
+
+.ll-stat-label {
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin-top: 0.25rem;
+}
+
+.ll-stat-divider {
+  width: 1px;
+  height: 40px;
+  background: #e5e7eb;
+  margin: 0 1rem;
+}
+
+/* Category Chips */
+.ll-category-chips {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+
+.ll-category-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 9999px;
+  font-size: 0.8rem;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.ll-category-chip:hover {
+  border-color: #d1d5db;
+  background: #f9fafb;
+}
+
+.ll-category-chip.active {
+  border-color: transparent;
+  font-weight: 500;
+}
+
+.ll-category-chip.active.chip-technical { background: #dbeafe; color: #1d4ed8; }
+.ll-category-chip.active.chip-process { background: #f3e8ff; color: #7c3aed; }
+.ll-category-chip.active.chip-communication { background: #ccfbf1; color: #0f766e; }
+.ll-category-chip.active.chip-leadership { background: #e0e7ff; color: #4338ca; }
+.ll-category-chip.active.chip-project { background: #cffafe; color: #0e7490; }
+.ll-category-chip.active.chip-other { background: #f3f4f6; color: #374151; }
+
+.ll-chip-count {
+  padding: 0.125rem 0.5rem;
+  background: rgba(0, 0, 0, 0.08);
+  border-radius: 9999px;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.ll-category-chip.active .ll-chip-count {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+/* Toolbar */
+.ll-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.ll-search-wrap {
+  position: relative;
+  flex: 1;
+  max-width: 400px;
+}
+
+.ll-search-wrap i.fa-search {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #9ca3af;
+  font-size: 0.875rem;
+}
+
+.ll-search-wrap input {
+  width: 100%;
+  padding: 0.75rem 2.5rem 0.75rem 2.75rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.875rem;
+  font-size: 0.875rem;
+  background: white;
+  transition: all 0.2s ease;
+}
+
+.ll-search-wrap input:focus {
+  outline: none;
+  border-color: #14b8a6;
+  box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.1);
+}
+
+.ll-search-clear {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #f3f4f6;
+  color: #6b7280;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.ll-search-clear:hover {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+.ll-toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* Filter Dropdown */
+.ll-filter-dropdown {
+  position: relative;
+}
+
+.ll-filter-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.75rem;
+  background: white;
+  font-size: 0.85rem;
+  color: #374151;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-transform: capitalize;
+}
+
+.ll-filter-btn:hover {
+  border-color: #d1d5db;
+  background: #f9fafb;
+}
+
+.ll-filter-btn.active {
+  border-color: #14b8a6;
+  background: #f0fdfa;
+  color: #0f766e;
+}
+
+.ll-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  min-width: 180px;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.75rem;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12);
+  z-index: 50;
+  padding: 0.5rem;
+}
+
+.ll-dropdown-menu.right {
+  left: auto;
+  right: 0;
+}
+
+.ll-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.625rem 0.875rem;
+  border: none;
+  background: transparent;
+  font-size: 0.85rem;
+  color: #374151;
+  cursor: pointer;
+  border-radius: 0.5rem;
+  transition: all 0.2s ease;
+  text-transform: capitalize;
+}
+
+.ll-dropdown-item:hover {
+  background: #f3f4f6;
+}
+
+.ll-dropdown-item.active {
+  background: #f0fdfa;
+  color: #0f766e;
+}
+
+.ll-dropdown-item .fa-check {
+  margin-left: auto;
+  color: #14b8a6;
+}
+
+.ll-priority-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.ll-priority-dot.priority-all { background: #9ca3af; }
+.ll-priority-dot.priority-critical { background: #ef4444; }
+.ll-priority-dot.priority-high { background: #f97316; }
+.ll-priority-dot.priority-medium { background: #f59e0b; }
+.ll-priority-dot.priority-low { background: #22c55e; }
+
+/* Active Filters */
+.ll-active-filters {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: #f0fdfa;
+  border: 1px solid #5eead4;
+  border-radius: 0.75rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.ll-filters-label {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #0f766e;
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.ll-filter-chips {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.ll-active-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.375rem 0.75rem;
+  background: white;
+  border: 1px solid #5eead4;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  color: #0f766e;
+}
+
+.ll-active-chip button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border: none;
+  background: transparent;
+  color: #14b8a6;
+  cursor: pointer;
+  padding: 0;
+  margin-left: 0.25rem;
+}
+
+.ll-active-chip button:hover {
+  color: #ef4444;
+}
+
+.ll-clear-all {
+  margin-left: auto;
+  padding: 0.375rem 0.75rem;
+  border: none;
+  background: transparent;
+  font-size: 0.8rem;
+  color: #0f766e;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.ll-clear-all:hover {
+  color: #ef4444;
+}
+
+/* Results Header */
+.ll-results-header {
+  margin-bottom: 1rem;
+}
+
+.ll-results-count {
+  font-size: 0.9rem;
+  color: #6b7280;
+}
+
+/* Grid */
+.ll-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+}
+
+/* Card */
+.ll-card {
+  background: white;
+  border-radius: 1rem;
+  border: 1px solid #e5e7eb;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.ll-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1);
+  border-color: #14b8a6;
+}
+
+.ll-card.featured {
+  border-color: #5eead4;
+}
+
+.ll-card-accent {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+}
+
+.ll-card-accent.cat-technical { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
+.ll-card-accent.cat-process { background: linear-gradient(90deg, #8b5cf6, #a78bfa); }
+.ll-card-accent.cat-communication { background: linear-gradient(90deg, #14b8a6, #2dd4bf); }
+.ll-card-accent.cat-leadership { background: linear-gradient(90deg, #6366f1, #818cf8); }
+.ll-card-accent.cat-project { background: linear-gradient(90deg, #06b6d4, #22d3ee); }
+.ll-card-accent.cat-other { background: linear-gradient(90deg, #6b7280, #9ca3af); }
+
+.ll-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 1.25rem 1.25rem 0;
+}
+
+.ll-card-badges {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.ll-priority-tag {
+  padding: 0.25rem 0.625rem;
+  border-radius: 9999px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.ll-priority-tag.priority-critical { background: #fee2e2; color: #dc2626; }
+.ll-priority-tag.priority-high { background: #ffedd5; color: #ea580c; }
+.ll-priority-tag.priority-medium { background: #fef3c7; color: #d97706; }
+.ll-priority-tag.priority-low { background: #dcfce7; color: #16a34a; }
+
+.ll-featured-tag {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.625rem;
+  background: #ccfbf4;
+  color: #14b8a6;
+  border-radius: 9999px;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.ll-bookmark-btn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: #f3f4f6;
+  border-radius: 0.5rem;
+  color: #9ca3af;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.ll-bookmark-btn:hover {
+  background: #e5e7eb;
+  color: #14b8a6;
+}
+
+.ll-bookmark-btn.active {
+  background: #ccfbf4;
+  color: #14b8a6;
+}
+
+/* Card Body */
+.ll-card-body {
+  padding: 1rem 1.25rem;
+  flex: 1;
+}
+
+.ll-card-category {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin-bottom: 0.625rem;
+}
+
+.ll-card-category i {
+  font-size: 0.7rem;
+}
+
+.ll-project-name {
+  color: #9ca3af;
+}
+
+.ll-card-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #111827;
+  line-height: 1.4;
+  margin: 0 0 0.5rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.ll-card-summary {
+  font-size: 0.85rem;
+  color: #6b7280;
+  line-height: 1.5;
+  margin: 0 0 0.875rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.ll-impact-box {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0.625rem 0.75rem;
+  background: #f0fdf4;
+  border-radius: 0.5rem;
+  margin-bottom: 0.875rem;
+}
+
+.ll-impact-box i {
+  color: #22c55e;
+  font-size: 0.8rem;
+  margin-top: 0.125rem;
+}
+
+.ll-impact-box span {
+  font-size: 0.75rem;
+  color: #166534;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.ll-card-tags {
+  display: flex;
+  gap: 0.375rem;
+  flex-wrap: wrap;
+}
+
+.ll-tag {
+  padding: 0.25rem 0.5rem;
+  background: #f3f4f6;
+  border-radius: 0.375rem;
+  font-size: 0.7rem;
+  color: #6b7280;
+}
+
+.ll-tag-more {
+  padding: 0.25rem 0.5rem;
+  background: #e5e7eb;
+  border-radius: 0.375rem;
+  font-size: 0.7rem;
+  color: #374151;
+  font-weight: 500;
+}
+
+/* Card Footer */
+.ll-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.25rem;
+  border-top: 1px solid #f3f4f6;
+  background: #fafafa;
+}
+
+.ll-card-author {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+}
+
+.ll-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.ll-author-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.ll-name {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #374151;
+}
+
+.ll-meta {
+  font-size: 0.7rem;
+  color: #9ca3af;
+}
+
+.ll-card-stats {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.ll-stat {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.75rem;
+  color: #9ca3af;
+}
+
+.ll-stat i {
+  font-size: 0.7rem;
+}
+
+.ll-like-btn {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.2s ease;
+}
+
+.ll-like-btn:hover {
+  color: #ef4444;
+}
+
+.ll-like-btn.liked {
+  color: #ef4444;
+}
+
+/* Empty State */
+.ll-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  text-align: center;
+  background: white;
+  border-radius: 1rem;
+  border: 1px solid #e5e7eb;
+}
+
+.ll-empty-icon {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ccfbf4 0%, #99f6e4 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.ll-empty-icon i {
+  font-size: 2rem;
+  color: #14b8a6;
+}
+
+.ll-empty-state h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #111827;
+  margin: 0 0 0.5rem;
+}
+
+.ll-empty-state p {
+  font-size: 0.9rem;
+  color: #6b7280;
+  margin: 0 0 1.5rem;
+}
+
+.ll-empty-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+  color: white;
+  border: none;
+  border-radius: 0.75rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.ll-empty-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(20, 184, 166, 0.3);
+}
+
+/* Modal */
+.ll-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 2rem;
+}
+
+.ll-modal {
+  background: white;
+  border-radius: 1.25rem;
+  width: 100%;
+  max-width: 720px;
+  max-height: 90vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+}
+
+.ll-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.ll-modal-header.cat-technical { background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); }
+.ll-modal-header.cat-process { background: linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 100%); }
+.ll-modal-header.cat-communication { background: linear-gradient(135deg, #ccfbf1 0%, #99f6e4 100%); }
+.ll-modal-header.cat-leadership { background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%); }
+.ll-modal-header.cat-project { background: linear-gradient(135deg, #cffafe 0%, #a5f3fc 100%); }
+.ll-modal-header.cat-other { background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%); }
+
+.ll-modal-badges {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.ll-modal-priority {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.375rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.ll-modal-priority.priority-critical { background: #fee2e2; color: #dc2626; }
+.ll-modal-priority.priority-high { background: #ffedd5; color: #ea580c; }
+.ll-modal-priority.priority-medium { background: #fef3c7; color: #d97706; }
+.ll-modal-priority.priority-low { background: #dcfce7; color: #16a34a; }
+
+.ll-modal-category {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.375rem 0.75rem;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #374151;
+}
+
+.ll-modal-close {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 50%;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.ll-modal-close:hover {
+  background: white;
+  color: #374151;
+}
+
+.ll-modal-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.5rem;
+}
+
+.ll-modal-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 1rem;
+  line-height: 1.3;
+}
+
+.ll-modal-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.ll-modal-author {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.ll-modal-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.ll-modal-author-name {
+  display: block;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #374151;
+}
+
+.ll-modal-author-dept {
+  display: block;
+  font-size: 0.8rem;
+  color: #9ca3af;
+}
+
+.ll-modal-info {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.ll-modal-info span {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+.ll-modal-stats {
+  display: flex;
+  gap: 1.5rem;
+  padding: 1rem;
+  background: #f9fafb;
+  border-radius: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.ll-modal-stats span {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+.ll-modal-section {
+  margin-bottom: 1.5rem;
+}
+
+.ll-modal-section h4 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #374151;
+  margin: 0 0 0.75rem;
+}
+
+.ll-modal-section h4 i {
+  color: #14b8a6;
+}
+
+.ll-modal-section p {
+  font-size: 0.9rem;
+  color: #4b5563;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.ll-modal-impact {
+  margin-bottom: 1.5rem;
+}
+
+.ll-modal-impact h4 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #374151;
+  margin: 0 0 0.75rem;
+}
+
+.ll-modal-impact h4 i {
+  color: #22c55e;
+}
+
+.ll-impact-highlight {
+  padding: 1rem;
+  background: #f0fdf4;
+  border-left: 3px solid #22c55e;
+  border-radius: 0.5rem;
+  font-size: 0.9rem;
+  color: #166534;
+  line-height: 1.6;
+}
+
+.ll-recommendations {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.ll-recommendations li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.625rem;
+  padding: 0.75rem 1rem;
+  background: #f0fdfa;
+  border-radius: 0.5rem;
+  font-size: 0.85rem;
+  color: #0f766e;
+}
+
+.ll-recommendations li i {
+  color: #14b8a6;
+  font-size: 0.875rem;
+  margin-top: 0.125rem;
+}
+
+.ll-modal-tags {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.ll-modal-tag {
+  padding: 0.375rem 0.75rem;
+  background: #f3f4f6;
+  border-radius: 9999px;
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+.ll-modal-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #e5e7eb;
+  background: #fafafa;
+}
+
+.ll-modal-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.ll-action-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.75rem;
+  background: white;
+  font-size: 0.85rem;
+  color: #374151;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.ll-action-btn:hover {
+  background: #f9fafb;
+  border-color: #d1d5db;
+}
+
+.ll-action-btn.active {
+  background: #ccfbf4;
+  border-color: #5eead4;
+  color: #0f766e;
+}
+
+.ll-close-btn {
+  padding: 0.625rem 1.25rem;
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+  border: none;
+  border-radius: 0.75rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.ll-close-btn:hover {
+  box-shadow: 0 4px 12px rgba(20, 184, 166, 0.3);
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+  .ll-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .ll-grid {
+    grid-template-columns: 1fr;
+  }
+  .ll-stats-bar {
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  .ll-stat-divider {
+    display: none;
+  }
+  .ll-stat-item {
+    flex: 0 0 calc(50% - 0.5rem);
+  }
+  .ll-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .ll-search-wrap {
+    max-width: none;
+  }
+  .ll-toolbar-actions {
+    justify-content: flex-start;
+  }
+  .ll-modal {
+    max-height: 100vh;
+    border-radius: 0;
+  }
+  .ll-modal-overlay {
+    padding: 0;
+  }
+}
+
+/* ============================================
+   END LESSONS LEARNED SECTION STYLES
+   ============================================ */
+
 .cert-stats-section {
   padding: 0;
 }
