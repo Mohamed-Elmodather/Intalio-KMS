@@ -1,7 +1,9 @@
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import router from './router'
+import i18n from './i18n'
 import App from './App.vue'
+import { useLocaleStore } from './stores/locale'
 
 // Styles
 import '@fortawesome/fontawesome-free/css/all.min.css'
@@ -29,10 +31,16 @@ async function init() {
   await enableMocking()
 
   const app = createApp(App)
+  const pinia = createPinia()
 
   // Install plugins
-  app.use(createPinia())
+  app.use(pinia)
   app.use(router)
+  app.use(i18n)
+
+  // Initialize locale store
+  const localeStore = useLocaleStore()
+  localeStore.initLocale()
 
   // Mount app
   app.mount('#app')

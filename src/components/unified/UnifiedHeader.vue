@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import UnifiedSearch from './UnifiedSearch.vue'
+import LanguageSwitcher from '@/components/common/LanguageSwitcher.vue'
 
 // Types
 export interface HeaderAction {
@@ -313,6 +314,9 @@ onBeforeUnmount(() => {
         <!-- Slot for additional actions -->
         <slot name="actions"></slot>
 
+        <!-- Language Switcher -->
+        <LanguageSwitcher />
+
         <!-- Divider -->
         <div v-if="user" class="unified-header__divider"></div>
 
@@ -434,8 +438,8 @@ onBeforeUnmount(() => {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding-left: 12px;
-  border-left: 1px solid #e5e7eb;
+  padding-inline-start: 12px;
+  border-inline-start: 1px solid #e5e7eb;
 }
 
 .unified-header__app-name span {
@@ -479,7 +483,7 @@ onBeforeUnmount(() => {
 .unified-header__badge {
   position: absolute;
   top: 6px;
-  right: 6px;
+  inset-inline-end: 6px;
   min-width: 16px;
   height: 16px;
   padding: 0 4px;
@@ -519,7 +523,7 @@ onBeforeUnmount(() => {
 }
 
 .unified-header__user-info {
-  text-align: right;
+  text-align: end;
 }
 
 .unified-header__user-name {
@@ -540,6 +544,10 @@ onBeforeUnmount(() => {
   align-items: center;
   justify-content: flex-end;
   gap: 4px;
+}
+
+[dir="rtl"] .unified-header__user-status {
+  justify-content: flex-start;
 }
 
 .unified-header__status-dot {
@@ -574,7 +582,7 @@ onBeforeUnmount(() => {
 .unified-header__avatar-status {
   position: absolute;
   bottom: -2px;
-  right: -2px;
+  inset-inline-end: -2px;
   width: 12px;
   height: 12px;
   background: #10b981;
@@ -595,7 +603,7 @@ onBeforeUnmount(() => {
 /* Dropdowns */
 .unified-header__dropdown {
   position: absolute;
-  right: 0;
+  inset-inline-end: 0;
   top: calc(100% + 8px);
   background: white;
   border-radius: 16px;
@@ -662,7 +670,7 @@ onBeforeUnmount(() => {
   border: none;
   cursor: pointer;
   transition: background 0.2s ease;
-  text-align: left;
+  text-align: start;
 }
 
 .unified-header__create-item:hover {
@@ -864,7 +872,7 @@ onBeforeUnmount(() => {
   border: none;
   cursor: pointer;
   transition: background 0.2s ease;
-  text-align: left;
+  text-align: start;
 }
 
 .unified-header__user-menu-item:hover {

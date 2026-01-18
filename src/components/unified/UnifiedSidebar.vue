@@ -214,7 +214,7 @@ function getHoverClass(effect?: string): string {
   border: none;
   width: 100%;
   cursor: pointer;
-  text-align: left;
+  text-align: start;
 }
 
 .unified-sidebar__item:hover {
@@ -264,7 +264,7 @@ function getHoverClass(effect?: string): string {
 }
 
 .unified-sidebar__badge {
-  margin-left: auto;
+  margin-inline-start: auto;
   padding: 2px 8px;
   font-size: 12px;
   font-weight: 600;
@@ -274,7 +274,7 @@ function getHoverClass(effect?: string): string {
 .unified-sidebar__badge-dot {
   position: absolute;
   top: 4px;
-  right: 4px;
+  inset-inline-end: 4px;
   width: 8px;
   height: 8px;
   background: #14b8a6;

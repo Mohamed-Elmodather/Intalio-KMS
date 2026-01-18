@@ -1,3 +1,5 @@
+import tailwindcssRtl from 'tailwindcss-rtl'
+
 /** @type {import('tailwindcss').Config} */
 export default {
   content: [
@@ -38,6 +40,7 @@ export default {
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+        arabic: ['Cairo', 'system-ui', '-apple-system', 'sans-serif'],
       },
       boxShadow: {
         'card': '0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)',
@@ -45,5 +48,5 @@ export default {
       },
     },
   },
-  plugins: [],
+  plugins: [tailwindcssRtl],
 }

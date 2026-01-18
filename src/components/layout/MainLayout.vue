@@ -173,7 +173,7 @@ onMounted(async () => {
 
     <!-- Fixed Sidebar - starts at 64px from top -->
     <aside
-      class="fixed left-0 bg-white border-r z-40 overflow-hidden sidebar-bounce"
+      class="fixed start-0 bg-white border-e z-40 overflow-hidden sidebar-bounce"
       style="top: 64px; height: calc(100vh - 64px);"
       :class="isCollapsed ? 'w-20' : 'w-64'"
     >
@@ -190,7 +190,7 @@ onMounted(async () => {
     <main
       class="relative z-10 content-bounce"
       style="margin-top: 64px; min-height: calc(100vh - 64px);"
-      :class="isCollapsed ? 'ml-20' : 'ml-64'"
+      :class="isCollapsed ? 'ms-20' : 'ms-64'"
     >
       <slot />
     </main>
