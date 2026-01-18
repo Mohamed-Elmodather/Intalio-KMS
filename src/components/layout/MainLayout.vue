@@ -35,6 +35,7 @@ const navigationItems: NavItem[] = [
   { id: 'media', icon: 'fas fa-photo-video', label: 'Media Center', route: '/media' },
   { id: 'collections', icon: 'fas fa-layer-group', label: 'Collections', route: '/collections' },
   { id: 'learning', icon: 'fas fa-graduation-cap', label: 'Learning', route: '/learning', badge: '2', badgeClass: 'bg-blue-200 text-blue-700' },
+  { id: 'lessons-learned', icon: 'fas fa-lightbulb', label: 'Lessons Learned', route: '/lessons-learned' },
   { id: 'events', icon: 'fas fa-calendar-alt', label: 'Events', route: '/events' },
   { id: 'collaboration', icon: 'fas fa-users', label: 'Collaboration', route: '/collaboration' },
   { id: 'polls', icon: 'fas fa-poll', label: 'Polls & Surveys', route: '/polls', badge: '3', badgeClass: 'bg-orange-200 text-orange-700' },

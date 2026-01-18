@@ -16,6 +16,9 @@ const MediaCenterPage = () => import('@/pages/media/MediaCenterPage.vue')
 const MediaPlayerPage = () => import('@/pages/media/MediaPlayerPage.vue')
 const LearningPage = () => import('@/pages/learning/LearningPage.vue')
 const CourseViewPage = () => import('@/pages/learning/CourseViewPage.vue')
+const LessonsLearnedPage = () => import('@/pages/lessons-learned/LessonsLearnedPage.vue')
+const LessonLearnedDetailPage = () => import('@/pages/lessons-learned/LessonLearnedDetailPage.vue')
+const LessonLearnedEditorPage = () => import('@/pages/lessons-learned/LessonLearnedEditorPage.vue')
 const CollaborationPage = () => import('@/pages/collaboration/CollaborationPage.vue')
 const PollsPage = () => import('@/pages/polls/PollsPage.vue')
 const PollCreatePage = () => import('@/pages/polls/PollCreatePage.vue')
@@ -145,6 +148,32 @@ export const routes: RouteRecordRaw[] = [
     name: 'CourseView',
     component: CourseViewPage,
     meta: { requiresAuth: true, title: 'Course' },
+  },
+
+  // Lessons Learned
+  {
+    path: '/lessons-learned',
+    name: 'LessonsLearned',
+    component: LessonsLearnedPage,
+    meta: { requiresAuth: true, title: 'Lessons Learned' },
+  },
+  {
+    path: '/lessons-learned/new',
+    name: 'LessonLearnedCreate',
+    component: LessonLearnedEditorPage,
+    meta: { requiresAuth: true, title: 'New Lesson Learned' },
+  },
+  {
+    path: '/lessons-learned/:id',
+    name: 'LessonLearnedDetail',
+    component: LessonLearnedDetailPage,
+    meta: { requiresAuth: true, title: 'Lesson Learned' },
+  },
+  {
+    path: '/lessons-learned/:id/edit',
+    name: 'LessonLearnedEdit',
+    component: LessonLearnedEditorPage,
+    meta: { requiresAuth: true, title: 'Edit Lesson Learned' },
   },
 
   // Collaboration

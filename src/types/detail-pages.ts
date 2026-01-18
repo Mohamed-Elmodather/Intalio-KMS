@@ -42,7 +42,7 @@ export interface Rating {
 
 export interface RelatedItem {
   id: string
-  type: 'article' | 'document' | 'media' | 'course' | 'event' | 'poll' | 'service'
+  type: 'article' | 'document' | 'media' | 'course' | 'event' | 'poll' | 'service' | 'lesson'
   title: string
   thumbnail?: string
   description?: string
@@ -80,7 +80,7 @@ export interface ShareOption {
 export interface Bookmark {
   id: string
   contentId: string
-  contentType: 'article' | 'document' | 'media' | 'course' | 'event' | 'poll' | 'service' | 'collection'
+  contentType: 'article' | 'document' | 'media' | 'course' | 'event' | 'poll' | 'service' | 'collection' | 'lesson'
   createdAt: Date
   collectionId?: string
 }
