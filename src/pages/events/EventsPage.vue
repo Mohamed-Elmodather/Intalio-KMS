@@ -1114,6 +1114,7 @@ function getCategoryColor(category: string) {
                   class="px-5 py-2.5 bg-white/10 backdrop-blur-sm text-white rounded-xl font-semibold text-sm flex items-center gap-2 hover:bg-white/20 transition-all border border-white/20">
             <i class="fas fa-robot"></i>
             {{ $t('ai.aiSuggestions') }}
+          </button>
         </div>
       </div>
     </div>
