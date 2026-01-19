@@ -581,16 +581,16 @@ function goBack() {
     <!-- Hero Header -->
     <div class="hero-gradient relative overflow-hidden rounded-2xl mb-6">
       <!-- Decorative circles -->
-      <div class="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/4"></div>
-      <div class="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/4"></div>
-      <div class="absolute top-1/2 right-1/3 w-32 h-32 bg-white/10 rounded-full"></div>
+      <div class="absolute top-0 end-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/4 rtl:-translate-x-1/4"></div>
+      <div class="absolute bottom-0 start-0 w-48 h-48 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/4 rtl:translate-x-1/4"></div>
+      <div class="absolute top-1/2 end-1/3 w-32 h-32 bg-white/10 rounded-full"></div>
 
       <div class="relative z-10 px-8 py-6">
         <!-- Breadcrumb -->
         <div class="flex items-center gap-2 text-white/70 text-sm mb-4">
-          <router-link to="/articles" class="hover:text-white transition-colors">Articles</router-link>
-          <i class="fas fa-chevron-right text-xs"></i>
-          <span class="text-white">New Article</span>
+          <router-link to="/articles" class="hover:text-white transition-colors">{{ $t('articles.title') }}</router-link>
+          <i class="fas fa-chevron-right rtl:rotate-180 text-xs"></i>
+          <span class="text-white">{{ $t('articles.newArticle') }}</span>
         </div>
 
         <!-- Title and actions row -->
@@ -600,8 +600,8 @@ function goBack() {
               <i class="fas fa-arrow-left"></i>
             </button>
             <div>
-              <h1 class="text-2xl md:text-3xl font-bold text-white">Create New Article</h1>
-              <p class="text-white/70">Craft compelling content with AI assistance</p>
+              <h1 class="text-2xl md:text-3xl font-bold text-white">{{ $t('articles.createNewArticle') }}</h1>
+              <p class="text-white/70">{{ $t('articles.craftCompellingContent') }}</p>
             </div>
           </div>
 
@@ -609,10 +609,10 @@ function goBack() {
           <div class="flex items-center gap-3">
             <div v-if="hasUnsavedChanges" class="text-amber-200 text-sm flex items-center gap-1">
               <i class="fas fa-circle text-xs animate-pulse"></i>
-              <span>Unsaved</span>
+              <span>{{ $t('articles.unsaved') }}</span>
             </div>
             <span v-if="lastAutoSaved" class="text-white/60 text-sm hidden sm:inline">
-              <i class="fas fa-cloud-check mr-1"></i>
+              <i class="fas fa-cloud-check me-1"></i>
               Auto-saved {{ lastAutoSaved }}
             </span>
             <button
@@ -621,7 +621,7 @@ function goBack() {
               class="px-4 py-2 bg-transparent text-white border border-white/30 rounded-xl font-medium hover:bg-white/10 transition-all flex items-center gap-2"
             >
               <i class="fas fa-save"></i>
-              <span class="hidden sm:inline">Save Draft</span>
+              <span class="hidden sm:inline">{{ $t('articles.saveDraft') }}</span>
             </button>
             <button
               @click="saveArticle(true)"
@@ -629,7 +629,7 @@ function goBack() {
               class="px-4 py-2 bg-white text-teal-700 rounded-xl font-medium hover:bg-teal-50 transition-all shadow-sm flex items-center gap-2"
             >
               <i class="fas fa-paper-plane"></i>
-              <span>Publish</span>
+              <span>{{ $t('articles.publish') }}</span>
             </button>
           </div>
         </div>
@@ -649,8 +649,8 @@ function goBack() {
                 <i class="fas fa-heading text-teal-600"></i>
               </div>
               <div class="flex-1">
-                <h3 class="text-lg font-semibold text-gray-900">Title</h3>
-                <p class="text-sm text-gray-500">Give your article a compelling title</p>
+                <h3 class="text-lg font-semibold text-gray-900">{{ $t('articles.titleLabel') }}</h3>
+                <p class="text-sm text-gray-500">{{ $t('articles.titleDescription') }}</p>
               </div>
               <span class="text-xs text-gray-400">{{ title.length }}/100</span>
             </div>
@@ -682,8 +682,8 @@ function goBack() {
                   <i class="fas fa-edit text-purple-600"></i>
                 </div>
                 <div>
-                  <h3 class="text-lg font-semibold text-gray-900">Content</h3>
-                  <p class="text-sm text-gray-500">Write your article content</p>
+                  <h3 class="text-lg font-semibold text-gray-900">{{ $t('articles.contentLabel') }}</h3>
+                  <p class="text-sm text-gray-500">{{ $t('articles.contentDescription') }}</p>
                 </div>
               </div>
             </div>
@@ -713,11 +713,11 @@ function goBack() {
                 <i class="fas fa-heading"></i>
                 <i class="fas fa-chevron-down text-xs"></i>
               </button>
-              <div v-if="showHeadingDropdown" class="absolute top-full left-0 mt-1 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-20 min-w-32">
-                <button v-for="h in [1,2,3,4]" :key="h" @click="setHeading(h)" class="w-full px-3 py-2 text-left text-sm hover:bg-teal-50 hover:text-teal-700">
-                  Heading {{ h }}
+              <div v-if="showHeadingDropdown" class="absolute top-full start-0 mt-1 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-20 min-w-32">
+                <button v-for="h in [1,2,3,4]" :key="h" @click="setHeading(h)" class="w-full px-3 py-2 text-start text-sm hover:bg-teal-50 hover:text-teal-700">
+                  {{ $t('articles.heading') }} {{ h }}
                 </button>
-                <button @click="setParagraph" class="w-full px-3 py-2 text-left text-sm hover:bg-teal-50 hover:text-teal-700">Paragraph</button>
+                <button @click="setParagraph" class="w-full px-3 py-2 text-start text-sm hover:bg-teal-50 hover:text-teal-700">{{ $t('articles.paragraph') }}</button>
               </div>
             </div>
 
@@ -747,7 +747,7 @@ function goBack() {
               :class="['toolbar-btn px-3', isMarkdownMode && 'active']"
               title="Toggle Markdown"
             >
-              <i class="fab fa-markdown mr-1"></i>
+              <i class="fab fa-markdown me-1"></i>
               <span class="text-xs hidden sm:inline">MD</span>
             </button>
             <button
@@ -755,8 +755,8 @@ function goBack() {
               :class="['toolbar-btn px-3', showPreview && 'active']"
               title="Toggle Preview"
             >
-              <i class="fas fa-eye mr-1"></i>
-              <span class="text-xs hidden sm:inline">Preview</span>
+              <i class="fas fa-eye me-1"></i>
+              <span class="text-xs hidden sm:inline">{{ $t('articles.preview') }}</span>
             </button>
           </div>
 
@@ -771,19 +771,19 @@ function goBack() {
                 @input="onEditorInput"
                 @keydown="handleKeydown"
                 class="prose prose-teal max-w-none p-4 min-h-[400px] focus:outline-none"
-                data-placeholder="Start writing your article..."
+                :data-placeholder="$t('articles.startWriting')"
               ></div>
               <textarea
                 v-else
                 v-model="content"
                 class="w-full p-4 min-h-[400px] font-mono text-sm focus:outline-none resize-none"
-                placeholder="Write in Markdown..."
+                :placeholder="$t('articles.writeMarkdown')"
               ></textarea>
             </div>
 
             <!-- Preview Pane -->
             <div v-if="showPreview" class="preview-pane p-4 bg-gray-50 overflow-auto max-h-[500px]">
-              <div class="prose prose-teal max-w-none text-sm" v-html="content || '<p class=&quot;text-gray-400&quot;>Preview will appear here...</p>'"></div>
+              <div class="prose prose-teal max-w-none text-sm" v-html="content || `<p class='text-gray-400'>${$t('articles.previewAppearHere')}</p>`"></div>
             </div>
           </div>
 
@@ -791,14 +791,14 @@ function goBack() {
           <div class="px-4 py-3 bg-gray-50 border-t border-gray-200 flex items-center justify-between text-sm">
             <div class="flex items-center gap-4">
               <span class="text-gray-600">
-                <i class="fas fa-font mr-1"></i>
-                {{ wordCount }} / {{ wordTarget }} words
-                <i v-if="wordCount >= wordTarget" class="fas fa-check-circle text-green-500 ml-1"></i>
+                <i class="fas fa-font me-1"></i>
+                {{ wordCount }} / {{ wordTarget }} {{ $t('articles.words') }}
+                <i v-if="wordCount >= wordTarget" class="fas fa-check-circle text-green-500 ms-1"></i>
               </span>
-              <span class="text-gray-500 hidden sm:inline">{{ characterCount }} chars</span>
+              <span class="text-gray-500 hidden sm:inline">{{ characterCount }} {{ $t('articles.characters') }}</span>
               <span class="text-gray-500">
-                <i class="fas fa-clock mr-1"></i>
-                ~{{ readingTime }} min read
+                <i class="fas fa-clock me-1"></i>
+                ~{{ readingTime }} {{ $t('articles.minRead', { min: readingTime }) }}
               </span>
             </div>
             <div class="flex items-center gap-2">
@@ -823,8 +823,8 @@ function goBack() {
                   <i class="fas fa-align-left text-amber-600"></i>
                 </div>
                 <div>
-                  <h3 class="text-lg font-semibold text-gray-900">Excerpt</h3>
-                  <p class="text-sm text-gray-500">Brief summary for previews</p>
+                  <h3 class="text-lg font-semibold text-gray-900">{{ $t('articles.excerptLabel') }}</h3>
+                  <p class="text-sm text-gray-500">{{ $t('articles.excerptDescription') }}</p>
                 </div>
               </div>
               <div class="flex items-center gap-2">
@@ -835,7 +835,7 @@ function goBack() {
                   class="text-xs text-teal-600 hover:text-teal-700 flex items-center gap-1"
                 >
                   <i class="fas fa-wand-magic-sparkles"></i>
-                  Generate
+                  {{ $t('common.generate') }}
                 </button>
               </div>
             </div>
@@ -844,7 +844,7 @@ function goBack() {
             <textarea
               v-model="excerpt"
               @blur="touchedFields.add('excerpt')"
-              placeholder="Write a brief summary of your article..."
+              :placeholder="$t('articles.excerptPlaceholder')"
               rows="3"
               :class="[
                 'w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-teal-200 outline-none resize-none transition-colors',
@@ -871,8 +871,8 @@ function goBack() {
                   <i class="fas fa-wand-magic-sparkles text-white"></i>
                 </div>
                 <div>
-                  <h3 class="text-lg font-semibold text-gray-900">AI Assistant</h3>
-                  <p class="text-sm text-gray-500">Powered by Intalio AI</p>
+                  <h3 class="text-lg font-semibold text-gray-900">{{ $t('ai.assistant') }}</h3>
+                  <p class="text-sm text-gray-500">{{ $t('ai.poweredByIntalio') }}</p>
                 </div>
               </div>
               <AILoadingIndicator v-if="isAnyAIProcessing" variant="pulse" size="sm" :show-text="false" />
@@ -944,7 +944,7 @@ function goBack() {
                 <!-- Summary Result -->
                 <div v-if="summaryResult" class="p-3 bg-teal-50 rounded-xl">
                   <div class="flex items-center justify-between mb-2">
-                    <span class="text-sm font-medium text-teal-700">Summary</span>
+                    <span class="text-sm font-medium text-teal-700">{{ $t('articles.summary') }}</span>
                     <button @click="summaryResult = null" class="text-teal-400 hover:text-teal-600">
                       <i class="fas fa-times text-sm"></i>
                     </button>
@@ -955,7 +955,7 @@ function goBack() {
                 <!-- SEO Result -->
                 <div v-if="seoResult" class="p-3 bg-gray-50 rounded-xl">
                   <div class="flex items-center justify-between mb-2">
-                    <span class="text-sm font-medium text-gray-700">SEO Score</span>
+                    <span class="text-sm font-medium text-gray-700">{{ $t('articles.seoScore') }}</span>
                     <button @click="seoResult = null" class="text-gray-400 hover:text-gray-600">
                       <i class="fas fa-times text-sm"></i>
                     </button>
@@ -979,7 +979,7 @@ function goBack() {
                 <!-- Sentiment Result -->
                 <div v-if="sentimentResult" class="p-3 bg-purple-50 rounded-xl">
                   <div class="flex items-center justify-between mb-2">
-                    <span class="text-sm font-medium text-purple-700">Content Tone</span>
+                    <span class="text-sm font-medium text-purple-700">{{ $t('articles.contentTone') }}</span>
                     <button @click="sentimentResult = null" class="text-purple-400 hover:text-purple-600">
                       <i class="fas fa-times text-sm"></i>
                     </button>
@@ -998,22 +998,22 @@ function goBack() {
               <div v-if="showAITitleSuggestions" class="mt-4 pt-4 border-t border-gray-100">
                 <div class="flex items-center justify-between mb-3">
                   <h4 class="text-sm font-medium text-gray-700">
-                    <i class="fas fa-lightbulb text-amber-500 mr-1"></i>
-                    Title Suggestions
+                    <i class="fas fa-lightbulb text-amber-500 me-1"></i>
+                    {{ $t('ai.titleSuggestions') }}
                   </h4>
                   <button @click="showAITitleSuggestions = false" class="text-gray-400 hover:text-gray-600">
                     <i class="fas fa-times"></i>
                   </button>
                 </div>
                 <div v-if="isGeneratingTitles" class="py-4 text-center">
-                  <AILoadingIndicator variant="dots" text="Generating..." />
+                  <AILoadingIndicator variant="dots" :text="$t('common.generating')" />
                 </div>
                 <div v-else-if="titleSuggestions" class="space-y-2">
                   <button
                     v-for="(suggestion, idx) in titleSuggestions.suggestions"
                     :key="idx"
                     @click="selectTitle(suggestion.title)"
-                    class="w-full text-left p-2 bg-white rounded-lg border border-gray-100 hover:border-teal-300 hover:bg-teal-50 transition-all text-sm"
+                    class="w-full text-start p-2 bg-white rounded-lg border border-gray-100 hover:border-teal-300 hover:bg-teal-50 transition-all text-sm"
                   >
                     {{ suggestion.title }}
                   </button>
@@ -1026,15 +1026,15 @@ function goBack() {
               <div v-if="showAITagSuggestions" class="mt-4 pt-4 border-t border-gray-100">
                 <div class="flex items-center justify-between mb-3">
                   <h4 class="text-sm font-medium text-gray-700">
-                    <i class="fas fa-tags text-purple-500 mr-1"></i>
-                    Tag Suggestions
+                    <i class="fas fa-tags text-purple-500 me-1"></i>
+                    {{ $t('ai.tagSuggestions') }}
                   </h4>
                   <button @click="showAITagSuggestions = false" class="text-gray-400 hover:text-gray-600">
                     <i class="fas fa-times"></i>
                   </button>
                 </div>
                 <div v-if="isGeneratingTags" class="py-4 text-center">
-                  <AILoadingIndicator variant="dots" text="Generating..." />
+                  <AILoadingIndicator variant="dots" :text="$t('common.generating')" />
                 </div>
                 <div v-else-if="tagSuggestions" class="space-y-2">
                   <div class="flex flex-wrap gap-1">
@@ -1048,7 +1048,7 @@ function goBack() {
                     />
                   </div>
                   <button @click="applyAllSuggestedTags" class="text-xs text-teal-600 hover:text-teal-700">
-                    <i class="fas fa-plus-circle mr-1"></i>Add all
+                    <i class="fas fa-plus-circle me-1"></i>{{ $t('common.addAll') }}
                   </button>
                 </div>
               </div>
@@ -1059,20 +1059,20 @@ function goBack() {
               <div v-if="showAIClassification" class="mt-4 pt-4 border-t border-gray-100">
                 <div class="flex items-center justify-between mb-3">
                   <h4 class="text-sm font-medium text-gray-700">
-                    <i class="fas fa-layer-group text-blue-500 mr-1"></i>
-                    Classification
+                    <i class="fas fa-layer-group text-blue-500 me-1"></i>
+                    {{ $t('ai.classification') }}
                   </h4>
                   <button @click="showAIClassification = false" class="text-gray-400 hover:text-gray-600">
                     <i class="fas fa-times"></i>
                   </button>
                 </div>
                 <div v-if="isClassifying" class="py-4 text-center">
-                  <AILoadingIndicator variant="spinner" text="Classifying..." />
+                  <AILoadingIndicator variant="spinner" :text="$t('ai.classifying')" />
                 </div>
                 <div v-else-if="classificationResult" class="space-y-2">
                   <div class="p-2 bg-teal-50 rounded-lg">
                     <p class="text-sm font-semibold text-teal-700">{{ classificationResult.primaryCategory }}</p>
-                    <p class="text-xs text-teal-600">{{ Math.round(classificationResult.confidence * 100) }}% match</p>
+                    <p class="text-xs text-teal-600">{{ Math.round(classificationResult.confidence * 100) }}% {{ $t('articles.match') }}</p>
                   </div>
                 </div>
               </div>
@@ -1088,17 +1088,17 @@ function goBack() {
                 <i class="fas fa-cog text-blue-600"></i>
               </div>
               <div>
-                <h3 class="text-lg font-semibold text-gray-900">Settings</h3>
-                <p class="text-sm text-gray-500">Category & Tags</p>
+                <h3 class="text-lg font-semibold text-gray-900">{{ $t('settings.title') }}</h3>
+                <p class="text-sm text-gray-500">{{ $t('articles.categoryAndTags') }}</p>
               </div>
             </div>
           </div>
           <div class="p-4 space-y-4">
             <!-- Category -->
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Category</label>
+              <label class="block text-sm font-medium text-gray-700 mb-2">{{ $t('articles.category') }}</label>
               <select v-model="category" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-teal-200 focus:border-teal-500 outline-none">
-                <option value="">Select category...</option>
+                <option value="">{{ $t('articles.selectCategory') }}</option>
                 <option v-for="cat in categories" :key="cat.id" :value="cat.id">
                   {{ cat.name }}
                 </option>
@@ -1107,7 +1107,7 @@ function goBack() {
 
             <!-- Tags with Autocomplete -->
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Tags</label>
+              <label class="block text-sm font-medium text-gray-700 mb-2">{{ $t('articles.tags') }}</label>
               <div class="relative">
                 <div class="flex flex-wrap gap-2 p-3 border border-gray-200 rounded-xl bg-white focus-within:border-teal-500 focus-within:ring-2 focus-within:ring-teal-200 min-h-[48px]">
                   <span
@@ -1127,7 +1127,7 @@ function goBack() {
                     @focus="showTagSuggestions = true"
                     @blur="hideTagSuggestions"
                     type="text"
-                    placeholder="Add tags..."
+                    :placeholder="$t('articles.addTags')"
                     class="flex-1 min-w-[100px] outline-none text-sm"
                   >
                 </div>
@@ -1136,13 +1136,13 @@ function goBack() {
                 <Transition name="dropdown">
                   <div
                     v-if="showTagSuggestions && filteredExistingTags.length > 0"
-                    class="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-20 max-h-40 overflow-auto"
+                    class="absolute top-full start-0 end-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-20 max-h-40 overflow-auto"
                   >
                     <button
                       v-for="suggestion in filteredExistingTags"
                       :key="suggestion"
                       @mousedown.prevent="addTag(suggestion)"
-                      class="w-full px-4 py-2 text-left text-sm hover:bg-teal-50 hover:text-teal-700 transition-colors flex items-center gap-2"
+                      class="w-full px-4 py-2 text-start text-sm hover:bg-teal-50 hover:text-teal-700 transition-colors flex items-center gap-2"
                     >
                       <i class="fas fa-tag text-gray-400 text-xs"></i>
                       {{ suggestion }}
@@ -1153,7 +1153,7 @@ function goBack() {
 
               <!-- Popular Tags -->
               <div class="mt-2 flex flex-wrap gap-1">
-                <span class="text-xs text-gray-500">Popular:</span>
+                <span class="text-xs text-gray-500">{{ $t('articles.popular') }}:</span>
                 <button
                   v-for="tag in popularTags.slice(0, 4)"
                   :key="tag"
@@ -1176,8 +1176,8 @@ function goBack() {
                 <i class="fas fa-image text-pink-600"></i>
               </div>
               <div>
-                <h3 class="text-lg font-semibold text-gray-900">Cover Image</h3>
-                <p class="text-sm text-gray-500">Add a featured image</p>
+                <h3 class="text-lg font-semibold text-gray-900">{{ $t('articles.coverImage') }}</h3>
+                <p class="text-sm text-gray-500">{{ $t('articles.addFeaturedImage') }}</p>
               </div>
             </div>
           </div>
@@ -1224,8 +1224,8 @@ function goBack() {
                   <i class="fas fa-cloud-upload-alt text-gray-400"></i>
                 </div>
                 <div>
-                  <p class="text-sm font-medium text-gray-700">Drop image or click</p>
-                  <p class="text-xs text-gray-500">PNG, JPG up to 5MB</p>
+                  <p class="text-sm font-medium text-gray-700">{{ $t('articles.dropImageOrClick') }}</p>
+                  <p class="text-xs text-gray-500">{{ $t('articles.imageFormats') }}</p>
                 </div>
               </div>
             </div>
@@ -1233,8 +1233,8 @@ function goBack() {
             <!-- URL Input -->
             <div class="mt-3">
               <button @click="showUrlInput = !showUrlInput" class="text-xs text-teal-600 hover:text-teal-700">
-                <i class="fas fa-link mr-1"></i>
-                Or use URL
+                <i class="fas fa-link me-1"></i>
+                {{ $t('articles.orUseUrl') }}
               </button>
               <Transition name="slide-fade">
                 <input
@@ -1257,22 +1257,22 @@ function goBack() {
                 <i class="fas fa-check-double text-emerald-600"></i>
               </div>
               <div>
-                <h3 class="text-lg font-semibold text-gray-900">Quality</h3>
-                <p class="text-sm text-gray-500">Content checklist</p>
+                <h3 class="text-lg font-semibold text-gray-900">{{ $t('articles.quality') }}</h3>
+                <p class="text-sm text-gray-500">{{ $t('articles.contentChecklist') }}</p>
               </div>
             </div>
           </div>
           <div class="p-4 space-y-4">
             <!-- Reading Time -->
             <div class="flex items-center justify-between">
-              <span class="text-sm text-gray-600">Reading Time</span>
+              <span class="text-sm text-gray-600">{{ $t('articles.readingTime') }}</span>
               <span class="font-semibold text-gray-900">~{{ readingTime }} min</span>
             </div>
 
             <!-- Word Count Progress -->
             <div>
               <div class="flex items-center justify-between mb-1">
-                <span class="text-sm text-gray-600">Word Count</span>
+                <span class="text-sm text-gray-600">{{ $t('articles.wordCount') }}</span>
                 <span class="text-sm text-gray-500">{{ wordCount }} / {{ wordTarget }}</span>
               </div>
               <div class="h-2 bg-gray-100 rounded-full overflow-hidden">

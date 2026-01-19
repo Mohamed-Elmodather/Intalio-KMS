@@ -1238,9 +1238,9 @@ onUnmounted(() => {
     <!-- Hero Section -->
     <div class="hero-gradient relative overflow-hidden">
       <!-- Decorative elements with animations -->
-      <div class="circle-drift-1 absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full"></div>
-      <div class="circle-drift-2 absolute bottom-0 left-0 w-64 h-64 bg-white/5 rounded-full"></div>
-      <div class="circle-drift-3 absolute top-1/2 right-1/4 w-32 h-32 bg-white/10 rounded-full"></div>
+      <div class="circle-drift-1 absolute top-0 end-0 w-96 h-96 bg-white/5 rounded-full"></div>
+      <div class="circle-drift-2 absolute bottom-0 start-0 w-64 h-64 bg-white/5 rounded-full"></div>
+      <div class="circle-drift-3 absolute top-1/2 end-1/4 w-32 h-32 bg-white/10 rounded-full"></div>
 
       <!-- Stats - Absolute Top Right -->
       <div class="stats-top-right">
@@ -1325,7 +1325,7 @@ onUnmounted(() => {
                 <div v-else class="continue-card-placeholder">
                   <i :class="article!.icon || 'fas fa-newspaper'" class="text-teal-600 text-xl"></i>
                 </div>
-                <span class="resume-badge"><i class="fas fa-play mr-1"></i> {{ $t('articles.resume') }}</span>
+                <span class="resume-badge"><i class="fas fa-play me-1"></i> {{ $t('articles.resume') }}</span>
                 <div class="reading-progress-bar">
                   <div class="reading-progress-fill" :style="{ width: (article as any).progress + '%' }"></div>
                 </div>
@@ -1334,8 +1334,8 @@ onUnmounted(() => {
                 <div class="text-xs text-teal-600 font-semibold mb-1">{{ (article as any).progress }}% complete</div>
                 <h4 class="text-sm font-semibold text-gray-900 line-clamp-2 group-hover:text-teal-600 transition-colors">{{ article!.title }}</h4>
                 <div class="flex items-center gap-3 text-xs text-gray-400 mt-2">
-                  <span><i class="fas fa-clock mr-1"></i>{{ article!.readTime }}</span>
-                  <span>Last read {{ (article as any).lastReadAt }}</span>
+                  <span><i class="fas fa-clock me-1"></i>{{ article!.readTime }}</span>
+                  <span>{{ $t('articles.lastRead', { time: (article as any).lastReadAt }) }}</span>
                 </div>
               </div>
             </div>
@@ -1375,8 +1375,8 @@ onUnmounted(() => {
                 <span class="category-pill-sm">{{ article!.category }}</span>
                 <h4 class="text-sm font-semibold text-gray-900 line-clamp-2 mt-2 group-hover:text-teal-600 transition-colors">{{ article!.title }}</h4>
                 <div class="flex items-center gap-3 text-xs text-gray-400 mt-2">
-                  <span><i class="fas fa-clock mr-1"></i>{{ article!.readTime }}</span>
-                  <span><i class="fas fa-eye mr-1"></i>{{ formatNumber(article!.views) }}</span>
+                  <span><i class="fas fa-clock me-1"></i>{{ article!.readTime }}</span>
+                  <span><i class="fas fa-eye me-1"></i>{{ formatNumber(article!.views) }}</span>
                 </div>
               </div>
             </div>
@@ -1434,7 +1434,7 @@ onUnmounted(() => {
                   {{ rec.reason }}
                 </div>
                 <div class="ai-rec-score">
-                  <span class="score-label">Match</span>
+                  <span class="score-label">{{ $t('articles.match') }}</span>
                   <span class="score-value">{{ Math.round(rec.relevanceScore * 100) }}%</span>
                 </div>
               </div>
@@ -1465,17 +1465,17 @@ onUnmounted(() => {
                   <div class="featured-spotlight-main">
                     <div class="featured-spotlight-content">
                       <div class="flex items-center gap-2 mb-4 flex-wrap">
-                        <span class="featured-badge-lg"><i class="fas fa-star mr-1"></i> Featured</span>
-                        <span class="editor-pick-badge" v-if="currentFeaturedItem.editorPick">Editor's Pick</span>
+                        <span class="featured-badge-lg"><i class="fas fa-star me-1"></i> {{ $t('articles.featured') }}</span>
+                        <span class="editor-pick-badge" v-if="currentFeaturedItem.editorPick">{{ $t('articles.editorPick') }}</span>
                         <span class="featured-category-badge">
-                          <i class="fas fa-folder mr-1"></i> {{ currentFeaturedArticle.category }}
+                          <i class="fas fa-folder me-1"></i> {{ currentFeaturedArticle.category }}
                         </span>
                       </div>
                       <h2 class="text-2xl font-bold text-white mb-3">{{ currentFeaturedArticle.title }}</h2>
                       <p class="text-teal-100 mb-4">{{ currentFeaturedArticle.excerpt }}</p>
 
                       <div v-if="currentFeaturedItem.editorNote" class="editor-note">
-                        <i class="fas fa-quote-left mr-2 text-teal-300"></i>
+                        <i class="fas fa-quote-left me-2 text-teal-300"></i>
                         {{ currentFeaturedItem.editorNote }}
                       </div>
 
@@ -1488,14 +1488,14 @@ onUnmounted(() => {
 
                       <div class="flex items-center gap-4 mt-4 flex-wrap">
                         <button @click="goToArticle(currentFeaturedArticle.id)" class="btn-featured-primary">
-                          <i class="fas fa-book-open mr-2"></i> Read Article
+                          <i class="fas fa-book-open me-2"></i> {{ $t('articles.readArticle') }}
                         </button>
                         <button @click="toggleBookmark(currentFeaturedArticle.id)" class="btn-featured-secondary">
-                          <i :class="isBookmarked(currentFeaturedArticle.id) ? 'fas fa-bookmark' : 'far fa-bookmark'" class="mr-2"></i>
-                          {{ isBookmarked(currentFeaturedArticle.id) ? 'Saved' : 'Save' }}
+                          <i :class="isBookmarked(currentFeaturedArticle.id) ? 'fas fa-bookmark' : 'far fa-bookmark'" class="me-2"></i>
+                          {{ isBookmarked(currentFeaturedArticle.id) ? $t('articles.saved') : $t('articles.save') }}
                         </button>
                         <button @click="openShareModal(currentFeaturedArticle)" class="btn-featured-secondary">
-                          <i class="fas fa-share-alt mr-2"></i> Share
+                          <i class="fas fa-share-alt me-2"></i> {{ $t('articles.share') }}
                         </button>
                       </div>
                       <div class="featured-author">
@@ -1509,7 +1509,7 @@ onUnmounted(() => {
                   </div>
                   <div class="related-articles-panel">
                     <h3 class="related-articles-header">
-                      <i class="fas fa-link"></i> Related Articles
+                      <i class="fas fa-link"></i> {{ $t('articles.relatedArticles') }}
                     </h3>
                     <div class="related-articles-list">
                       <a v-for="(related, index) in currentFeaturedItem.relatedArticles" :key="related.id"
@@ -1549,7 +1549,7 @@ onUnmounted(() => {
           <!-- Top Contributors -->
           <div class="contributors-card">
             <h3 class="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-              <i class="fas fa-trophy text-orange-500"></i> Top Contributors
+              <i class="fas fa-trophy text-orange-500"></i> {{ $t('articles.topContributors') }}
             </h3>
             <div class="space-y-0">
               <div
@@ -1565,7 +1565,7 @@ onUnmounted(() => {
                   <p class="font-medium text-gray-900 text-sm">{{ contributor.name }}</p>
                   <p class="text-xs text-gray-500">{{ contributor.articleCount }} articles</p>
                 </div>
-                <div class="text-right">
+                <div class="text-end">
                   <span v-if="contributor.badge" class="contributor-badge">{{ contributor.badge }}</span>
                   <p class="text-xs text-gray-400 mt-1">
                     <i class="fas fa-star text-amber-400"></i> {{ contributor.avgRating }}
@@ -1610,19 +1610,19 @@ onUnmounted(() => {
                     <i class="fas fa-arrow-right text-teal-600"></i>
                   </div>
                 </div>
-                <div v-if="index < 3" class="absolute top-2 left-2 flex gap-1">
+                <div v-if="index < 3" class="absolute top-2 start-2 flex gap-1">
                   <span class="new-badge bg-orange-500">
                     <i class="fas fa-fire"></i> Hot
                   </span>
                 </div>
-                <div class="absolute bottom-2 right-2 px-2 py-0.5 rounded bg-black/70 text-white text-xs font-medium backdrop-blur-sm">
+                <div class="absolute bottom-2 end-2 px-2 py-0.5 rounded bg-black/70 text-white text-xs font-medium backdrop-blur-sm">
                   {{ article.readTime }}
                 </div>
               </div>
               <div class="mt-3">
                 <h4 class="font-medium text-sm text-gray-900 line-clamp-2 group-hover:text-teal-700 transition-colors">{{ article.title }}</h4>
                 <p class="text-xs text-gray-500 mt-1 flex items-center gap-2">
-                  <span><i class="fas fa-fire text-red-500 mr-1"></i>{{ formatNumber(article.views) }} views</span>
+                  <span><i class="fas fa-fire text-red-500 me-1"></i>{{ formatNumber(article.views) }} {{ $t('articles.views') }}</span>
                   <span class="text-gray-300">|</span>
                   <span>{{ article.category }}</span>
                 </p>
@@ -1636,10 +1636,10 @@ onUnmounted(() => {
           <div class="section-header-row">
             <h2 class="section-title-sm">
               <i class="fas fa-history text-blue-500"></i>
-              Recently Viewed
+              {{ $t('common.recentlyViewed') }}
             </h2>
             <button @click="scrollToAllArticles" class="view-all-link">
-              View All <i class="fas fa-arrow-right"></i>
+              {{ $t('common.viewAll') }} <i class="fas fa-arrow-right"></i>
             </button>
           </div>
           <div class="recently-viewed-scroll scrollbar-elegant">
@@ -1663,7 +1663,7 @@ onUnmounted(() => {
                     <i class="fas fa-arrow-right text-blue-600"></i>
                   </div>
                 </div>
-                <div class="absolute bottom-2 right-2 px-2 py-0.5 rounded bg-black/70 text-white text-xs font-medium backdrop-blur-sm">
+                <div class="absolute bottom-2 end-2 px-2 py-0.5 rounded bg-black/70 text-white text-xs font-medium backdrop-blur-sm">
                   {{ article.readTime }}
                 </div>
               </div>
@@ -1672,7 +1672,7 @@ onUnmounted(() => {
                 <p class="text-xs text-gray-500 mt-1 flex items-center gap-2">
                   <span>{{ article.category }}</span>
                   <span class="text-gray-300">|</span>
-                  <span><i class="fas fa-eye text-gray-400 mr-1"></i>{{ formatNumber(article.views) }}</span>
+                  <span><i class="fas fa-eye text-gray-400 me-1"></i>{{ formatNumber(article.views) }}</span>
                 </p>
               </div>
             </div>
@@ -1696,8 +1696,8 @@ onUnmounted(() => {
             <i class="fas fa-newspaper text-white text-sm"></i>
           </div>
           <div>
-            <span class="block">All Articles</span>
-            <span class="text-xs font-medium text-gray-500">{{ filteredArticles.length }} articles found</span>
+            <span class="block">{{ $t('articles.allArticles') }}</span>
+            <span class="text-xs font-medium text-gray-500">{{ $t('articles.articlesFound', { count: filteredArticles.length }) }}</span>
           </div>
         </h2>
       </div>
@@ -1713,7 +1713,7 @@ onUnmounted(() => {
                 v-if="showAIFeatures"
                 @click="isAISearchMode = !isAISearchMode"
                 :class="[
-                  'px-3 rounded-l-lg border border-r-0 flex items-center gap-1.5 text-xs font-medium transition-all',
+                  'px-3 rounded-s-lg border border-e-0 flex items-center gap-1.5 text-xs font-medium transition-all',
                   isAISearchMode
                     ? 'bg-gradient-to-r from-teal-500 to-cyan-500 border-teal-500 text-white'
                     : 'bg-gray-100 border-gray-200 text-gray-500 hover:bg-gray-200'
@@ -1727,7 +1727,7 @@ onUnmounted(() => {
               <!-- Search Input -->
               <div class="relative flex-1">
                 <i :class="[
-                  'absolute left-3 top-1/2 -translate-y-1/2 text-sm transition-colors',
+                  'absolute start-3 top-1/2 -translate-y-1/2 text-sm transition-colors',
                   isAISearchMode ? 'fas fa-brain text-teal-500' : 'fas fa-search text-gray-400'
                 ]"></i>
                 <input
@@ -1739,16 +1739,16 @@ onUnmounted(() => {
                   @focus="unifiedSearchQuery.length >= 2 && (showSearchSuggestions = true)"
                   @blur="hideSearchSuggestions"
                   :class="[
-                    'w-full pl-9 pr-20 py-2 text-sm focus:outline-none transition-all',
-                    showAIFeatures ? 'rounded-r-lg' : 'rounded-lg',
+                    'w-full ps-9 pe-20 py-2 text-sm focus:outline-none transition-all',
+                    showAIFeatures ? 'rounded-e-lg' : 'rounded-lg',
                     isAISearchMode
                       ? 'bg-gradient-to-r from-teal-50 to-cyan-50 border border-teal-200 focus:ring-2 focus:ring-teal-400 focus:border-transparent placeholder:text-teal-400'
                       : 'bg-white border border-gray-200 focus:ring-2 focus:ring-teal-500 focus:border-transparent',
-                    !showAIFeatures && 'rounded-l-lg'
+                    !showAIFeatures && 'rounded-s-lg'
                   ]"
                 >
                 <!-- Clear & Search Buttons -->
-                <div class="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                <div class="absolute end-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
                   <button
                     v-if="unifiedSearchQuery"
                     @click="clearUnifiedSearch"
@@ -1771,17 +1771,17 @@ onUnmounted(() => {
             <!-- AI Search Suggestions Dropdown -->
             <div
               v-if="showAIFeatures && isAISearchMode && showAISuggestions && !unifiedSearchQuery"
-              class="absolute left-0 top-full mt-2 w-full bg-white rounded-xl shadow-lg border border-teal-100 py-2 z-50"
+              class="absolute start-0 top-full mt-2 w-full bg-white rounded-xl shadow-lg border border-teal-100 py-2 z-50"
             >
               <div class="px-3 py-1.5 text-xs font-semibold text-teal-500 flex items-center gap-2">
                 <i class="fas fa-lightbulb"></i>
-                Try asking:
+                {{ $t('articles.tryAsking') }}
               </div>
               <button
                 v-for="suggestion in nlSearchSuggestions"
                 :key="suggestion"
                 @click="unifiedSearchQuery = suggestion; handleUnifiedSearch()"
-                class="w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-teal-50 flex items-center gap-2"
+                class="w-full px-3 py-2 text-start text-sm text-gray-700 hover:bg-teal-50 flex items-center gap-2"
               >
                 <i class="fas fa-search text-teal-400 text-xs"></i>
                 {{ suggestion }}
@@ -1795,7 +1795,7 @@ onUnmounted(() => {
             >
               <div class="ai-suggestions-header">
                 <i class="fas fa-wand-magic-sparkles text-teal-500"></i>
-                <span>AI Suggestions</span>
+                <span>{{ $t('articles.aiSuggestions') }}</span>
               </div>
               <div class="ai-suggestions-list">
                 <button
@@ -1814,15 +1814,15 @@ onUnmounted(() => {
             <!-- AI Processing Indicator -->
             <div
               v-if="isProcessingNLSearch"
-              class="absolute left-0 top-full mt-2 w-full bg-gradient-to-r from-teal-50 to-cyan-50 rounded-xl shadow-lg border border-teal-100 p-4 z-50"
+              class="absolute start-0 top-full mt-2 w-full bg-gradient-to-r from-teal-50 to-cyan-50 rounded-xl shadow-lg border border-teal-100 p-4 z-50"
             >
               <div class="flex items-center gap-3">
                 <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-teal-500 to-cyan-500 flex items-center justify-center">
                   <i class="fas fa-brain text-white text-sm animate-pulse"></i>
                 </div>
                 <div>
-                  <div class="text-sm font-medium text-teal-700">AI is searching...</div>
-                  <div class="text-xs text-teal-500">Analyzing your query</div>
+                  <div class="text-sm font-medium text-teal-700">{{ $t('articles.aiSearching') }}</div>
+                  <div class="text-xs text-teal-500">{{ $t('articles.analyzingQuery') }}</div>
                 </div>
               </div>
             </div>
@@ -1839,7 +1839,7 @@ onUnmounted(() => {
             >
               <i class="fas fa-file-alt text-sm"></i>
               <span>{{ selectedTypes.length > 0 ? `Type (${selectedTypes.length})` : 'Type' }}</span>
-              <i :class="showTypeFilter ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ml-1"></i>
+              <i :class="showTypeFilter ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ms-1"></i>
             </button>
 
             <!-- Click outside to close (must be before dropdown) -->
@@ -1848,16 +1848,16 @@ onUnmounted(() => {
             <!-- Dropdown Menu -->
             <div
               v-if="showTypeFilter"
-              class="absolute left-0 top-full mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
+              class="absolute start-0 top-full mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
             >
-              <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Select Types</div>
+              <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">{{ $t('articles.selectTypes') }}</div>
               <div class="max-h-48 overflow-y-auto">
                 <button
                   v-for="type in articleTypes"
                   :key="type.id"
                   @click="toggleTypeFilter(type.id)"
                   :class="[
-                    'w-full px-3 py-2 text-left text-sm flex items-center gap-3 transition-colors',
+                    'w-full px-3 py-2 text-start text-sm flex items-center gap-3 transition-colors',
                     isTypeSelected(type.id) ? 'bg-teal-50 text-teal-700' : 'text-gray-700 hover:bg-gray-50'
                   ]"
                 >
@@ -1902,7 +1902,7 @@ onUnmounted(() => {
             >
               <i class="fas fa-layer-group text-sm"></i>
               <span>{{ selectedCategories.length > 0 ? `Category (${selectedCategories.length})` : 'Category' }}</span>
-              <i :class="showCategoryFilter ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ml-1"></i>
+              <i :class="showCategoryFilter ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ms-1"></i>
             </button>
 
             <!-- Click outside to close (must be before dropdown) -->
@@ -1911,14 +1911,14 @@ onUnmounted(() => {
             <!-- Dropdown Menu -->
             <div
               v-if="showCategoryFilter"
-              class="absolute left-0 top-full mt-2 w-64 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
+              class="absolute start-0 top-full mt-2 w-64 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
             >
               <!-- Featured Option (Special) -->
-              <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Special Filter</div>
+              <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">{{ $t('articles.specialFilter') }}</div>
               <button
                 @click="toggleCategoryFilter('featured')"
                 :class="[
-                  'w-full px-3 py-2 text-left text-sm flex items-center gap-3 transition-colors',
+                  'w-full px-3 py-2 text-start text-sm flex items-center gap-3 transition-colors',
                   isCategorySelected('featured') ? 'bg-amber-50 text-amber-700' : 'text-gray-700 hover:bg-gray-50'
                 ]"
               >
@@ -1929,21 +1929,21 @@ onUnmounted(() => {
                   <i v-if="isCategorySelected('featured')" class="fas fa-check text-white text-[8px]"></i>
                 </div>
                 <i class="fas fa-star text-amber-500 text-sm"></i>
-                <span class="flex-1">Featured</span>
+                <span class="flex-1">{{ $t('articles.featured') }}</span>
                 <span class="text-xs text-gray-400">{{ categories.find(c => c.id === 'featured')?.count }}</span>
               </button>
 
               <div class="my-2 border-t border-gray-100"></div>
 
               <!-- Regular Categories -->
-              <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Categories</div>
+              <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">{{ $t('common.categories') }}</div>
               <div class="max-h-48 overflow-y-auto">
                 <button
                   v-for="cat in categories.filter(c => c.id !== 'featured')"
                   :key="cat.id"
                   @click="toggleCategoryFilter(cat.id)"
                   :class="[
-                    'w-full px-3 py-2 text-left text-sm flex items-center gap-3 transition-colors',
+                    'w-full px-3 py-2 text-start text-sm flex items-center gap-3 transition-colors',
                     isCategorySelected(cat.id) ? 'bg-teal-50 text-teal-700' : 'text-gray-700 hover:bg-gray-50'
                   ]"
                 >
@@ -1989,7 +1989,7 @@ onUnmounted(() => {
             >
               <i class="fas fa-tags text-sm"></i>
               <span>{{ selectedTags.length > 0 ? `Tags (${selectedTags.length})` : 'Tags' }}</span>
-              <i :class="showTagFilter ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ml-1"></i>
+              <i :class="showTagFilter ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ms-1"></i>
             </button>
 
             <!-- Click outside to close (must be before dropdown) -->
@@ -1998,16 +1998,16 @@ onUnmounted(() => {
             <!-- Dropdown Menu -->
             <div
               v-if="showTagFilter"
-              class="absolute left-0 top-full mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
+              class="absolute start-0 top-full mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
             >
-              <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Select Tags</div>
+              <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">{{ $t('articles.selectTags') }}</div>
               <div class="max-h-48 overflow-y-auto">
                 <button
                   v-for="tag in allTags"
                   :key="tag"
                   @click="toggleTagFilter(tag)"
                   :class="[
-                    'w-full px-3 py-2 text-left text-sm flex items-center gap-3 transition-colors',
+                    'w-full px-3 py-2 text-start text-sm flex items-center gap-3 transition-colors',
                     isTagSelected(tag) ? 'bg-teal-50 text-teal-700' : 'text-gray-700 hover:bg-gray-50'
                   ]"
                 >
@@ -2052,7 +2052,7 @@ onUnmounted(() => {
             >
               <i class="fas fa-bookmark text-sm"></i>
               <span>{{ selectedStatusFilters.length > 0 ? `${selectedStatusFilters.length} Saved & Shared` : 'Saved & Shared' }}</span>
-              <i :class="showStatusFilter ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ml-1"></i>
+              <i :class="showStatusFilter ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ms-1"></i>
             </button>
 
             <!-- Click outside to close -->
@@ -2061,16 +2061,16 @@ onUnmounted(() => {
             <!-- Dropdown Menu -->
             <div
               v-if="showStatusFilter"
-              class="absolute left-0 top-full mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
+              class="absolute start-0 top-full mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
             >
-              <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Filter by Status</div>
+              <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">{{ $t('articles.filterByStatus') }}</div>
               <div class="max-h-48 overflow-y-auto">
                 <button
                   v-for="option in statusFilterOptions"
                   :key="option.id"
                   @click="toggleStatusFilter(option.id)"
                   :class="[
-                    'w-full px-3 py-2 text-left text-sm flex items-center gap-3 transition-colors',
+                    'w-full px-3 py-2 text-start text-sm flex items-center gap-3 transition-colors',
                     isStatusSelected(option.id) ? 'bg-teal-50 text-teal-700' : 'text-gray-700 hover:bg-gray-50'
                   ]"
                 >
@@ -2105,18 +2105,18 @@ onUnmounted(() => {
           </div>
 
           <!-- Sort Options with Order Toggle -->
-          <div class="relative ml-auto flex items-center">
+          <div class="relative ms-auto flex items-center">
             <button
               @click="showSortDropdown = !showSortDropdown"
-              class="flex items-center gap-2 px-3 py-1.5 rounded-l-lg text-xs font-medium transition-all border border-r-0 bg-white border-gray-200 text-gray-600 hover:bg-gray-50"
+              class="flex items-center gap-2 px-3 py-1.5 rounded-s-lg text-xs font-medium transition-all border border-e-0 bg-white border-gray-200 text-gray-600 hover:bg-gray-50"
             >
               <i :class="[currentSortOption.icon, 'text-sm text-teal-500']"></i>
               <span>{{ currentSortOption.label }}</span>
-              <i :class="showSortDropdown ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ml-1"></i>
+              <i :class="showSortDropdown ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ms-1"></i>
             </button>
             <button
               @click="sortOrder = sortOrder === 'asc' ? 'desc' : 'asc'; filterArticles()"
-              class="flex items-center justify-center w-8 h-8 rounded-r-lg text-xs font-medium transition-all border bg-white border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-teal-600"
+              class="flex items-center justify-center w-8 h-8 rounded-e-lg text-xs font-medium transition-all border bg-white border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-teal-600"
               :title="sortOrder === 'asc' ? 'Ascending order - Click for descending' : 'Descending order - Click for ascending'"
             >
               <i :class="sortOrder === 'asc' ? 'fas fa-arrow-up' : 'fas fa-arrow-down'" class="text-sm text-teal-500"></i>
@@ -2125,16 +2125,16 @@ onUnmounted(() => {
             <!-- Dropdown Menu -->
             <div
               v-if="showSortDropdown"
-              class="absolute left-0 top-full mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
+              class="absolute start-0 top-full mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
             >
-              <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Sort By</div>
+              <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">{{ $t('articles.sortBy') }}</div>
               <div class="max-h-64 overflow-y-auto">
                 <button
                   v-for="option in sortOptions"
                   :key="option.value"
                   @click="selectSortOption(option.value)"
                   :class="[
-                    'w-full px-3 py-2 text-left text-sm flex items-center gap-3 transition-colors',
+                    'w-full px-3 py-2 text-start text-sm flex items-center gap-3 transition-colors',
                     sortBy === option.value ? 'bg-teal-50 text-teal-700' : 'text-gray-700 hover:bg-gray-50'
                   ]"
                 >
@@ -2171,14 +2171,14 @@ onUnmounted(() => {
       <div v-if="activeFiltersCount > 0" class="flex items-center gap-3 mb-4 p-3 bg-white rounded-xl border border-gray-100 shadow-sm">
         <div class="flex items-center gap-2 px-2 py-1 bg-gray-100 rounded-lg">
           <i class="fas fa-filter text-gray-400 text-xs"></i>
-          <span class="text-xs font-medium text-gray-600">Active Filters</span>
+          <span class="text-xs font-medium text-gray-600">{{ $t('articles.activeFilters') }}</span>
         </div>
         <div class="flex flex-wrap gap-2 flex-1">
           <!-- Search Filter -->
           <span v-if="searchQuery" class="px-2.5 py-1 bg-gray-100 text-gray-700 rounded-lg text-xs font-medium flex items-center gap-1.5 border border-gray-200">
             <i class="fas fa-search text-[10px]"></i>
             "{{ searchQuery }}"
-            <button @click="searchQuery = ''; filterArticles()" class="ml-1 hover:text-gray-900 hover:bg-gray-200 rounded-full w-4 h-4 flex items-center justify-center"><i class="fas fa-times text-[10px]"></i></button>
+            <button @click="searchQuery = ''; filterArticles()" class="ms-1 hover:text-gray-900 hover:bg-gray-200 rounded-full w-4 h-4 flex items-center justify-center"><i class="fas fa-times text-[10px]"></i></button>
           </span>
           <!-- Category Filters (multiple) -->
           <span
@@ -2188,7 +2188,7 @@ onUnmounted(() => {
           >
             <i class="fas fa-layer-group text-[10px]"></i>
             {{ getCategoryName(catId) }}
-            <button @click="toggleCategoryFilter(catId)" class="ml-1 hover:text-teal-900 hover:bg-teal-100 rounded-full w-4 h-4 flex items-center justify-center"><i class="fas fa-times text-[10px]"></i></button>
+            <button @click="toggleCategoryFilter(catId)" class="ms-1 hover:text-teal-900 hover:bg-teal-100 rounded-full w-4 h-4 flex items-center justify-center"><i class="fas fa-times text-[10px]"></i></button>
           </span>
           <!-- Type Filters (multiple) -->
           <span
@@ -2198,7 +2198,7 @@ onUnmounted(() => {
           >
             <i class="fas fa-file-alt text-[10px]"></i>
             {{ getTypeName(typeId) }}
-            <button @click="toggleTypeFilter(typeId)" class="ml-1 hover:text-teal-900 hover:bg-teal-100 rounded-full w-4 h-4 flex items-center justify-center"><i class="fas fa-times text-[10px]"></i></button>
+            <button @click="toggleTypeFilter(typeId)" class="ms-1 hover:text-teal-900 hover:bg-teal-100 rounded-full w-4 h-4 flex items-center justify-center"><i class="fas fa-times text-[10px]"></i></button>
           </span>
           <!-- Tag Filters (multiple) -->
           <span
@@ -2208,7 +2208,7 @@ onUnmounted(() => {
           >
             <i class="fas fa-tag text-[10px]"></i>
             {{ tag }}
-            <button @click="toggleTagFilter(tag)" class="ml-1 hover:text-teal-900 hover:bg-teal-100 rounded-full w-4 h-4 flex items-center justify-center"><i class="fas fa-times text-[10px]"></i></button>
+            <button @click="toggleTagFilter(tag)" class="ms-1 hover:text-teal-900 hover:bg-teal-100 rounded-full w-4 h-4 flex items-center justify-center"><i class="fas fa-times text-[10px]"></i></button>
           </span>
           <!-- Status Filters (Saved & Shared) -->
           <span
@@ -2218,7 +2218,7 @@ onUnmounted(() => {
           >
             <i :class="[status === 'saved' ? 'fas fa-bookmark' : 'fas fa-share-alt', 'text-[10px]']"></i>
             {{ status === 'saved' ? 'My Saved' : 'Shared with me' }}
-            <button @click="toggleStatusFilter(status)" class="ml-1 hover:text-amber-900 hover:bg-amber-100 rounded-full w-4 h-4 flex items-center justify-center"><i class="fas fa-times text-[10px]"></i></button>
+            <button @click="toggleStatusFilter(status)" class="ms-1 hover:text-amber-900 hover:bg-amber-100 rounded-full w-4 h-4 flex items-center justify-center"><i class="fas fa-times text-[10px]"></i></button>
           </span>
         </div>
         <button @click="clearFilters" class="px-3 py-1.5 text-xs font-medium text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors flex items-center gap-1.5">
@@ -2260,11 +2260,11 @@ onUnmounted(() => {
                 <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
 
                 <!-- Top Badges -->
-                <div class="absolute top-3 left-3 right-3 flex items-start justify-between">
+                <div class="absolute top-3 start-3 end-3 flex items-start justify-between">
                   <div class="flex flex-wrap gap-1.5">
                     <!-- Featured Badge -->
                     <span v-if="article.featured" class="article-category-tag featured">
-                      <i class="fas fa-star text-[8px]"></i> Featured
+                      <i class="fas fa-star text-[8px]"></i> {{ $t('articles.featured') }}
                     </span>
                     <!-- AI Sentiment Badge -->
                     <AISentimentBadge
@@ -2303,16 +2303,16 @@ onUnmounted(() => {
                 </div>
 
                 <!-- Category Badge (Bottom) -->
-                <div class="absolute bottom-3 left-3">
+                <div class="absolute bottom-3 start-3">
                   <span :class="['article-category-tag', article.categoryId]">
                     {{ article.category }}
                   </span>
                 </div>
 
                 <!-- Read Button (Hover) -->
-                <div class="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0">
+                <div class="absolute bottom-3 end-3 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0">
                   <button @click.stop="goToArticle(article.id)" class="px-3 py-1.5 bg-white text-teal-600 text-xs font-semibold rounded-full flex items-center gap-1.5 shadow-md hover:bg-teal-500 hover:text-white transition-colors">
-                    <span>Read</span>
+                    <span>{{ $t('articles.read') }}</span>
                     <i class="fas fa-arrow-right text-[10px]"></i>
                   </button>
                 </div>
@@ -2404,7 +2404,7 @@ onUnmounted(() => {
                   <i :class="[article.icon || 'fas fa-newspaper', 'text-2xl text-teal-300']"></i>
                 </div>
                 <!-- Featured Star -->
-                <div v-if="article.featured" class="absolute top-1.5 left-1.5">
+                <div v-if="article.featured" class="absolute top-1.5 start-1.5">
                   <span class="w-5 h-5 bg-amber-500 rounded-full flex items-center justify-center shadow-sm">
                     <i class="fas fa-star text-white text-[8px]"></i>
                   </span>
@@ -2535,14 +2535,16 @@ onUnmounted(() => {
               <!-- Left: Stats & Items Per Page -->
               <div class="flex items-center gap-4 flex-wrap">
                 <span class="text-xs text-gray-500">
-                  Showing <span class="font-semibold text-gray-700">{{ Math.min((currentPage - 1) * itemsPerPage + 1, filteredArticles.length) }}</span>
-                  to <span class="font-semibold text-gray-700">{{ Math.min(currentPage * itemsPerPage, filteredArticles.length) }}</span>
-                  of <span class="font-semibold text-gray-700">{{ filteredArticles.length }}</span> articles
+                  {{ $t('articles.showingRange', {
+                    from: Math.min((currentPage - 1) * itemsPerPage + 1, filteredArticles.length),
+                    to: Math.min(currentPage * itemsPerPage, filteredArticles.length),
+                    total: filteredArticles.length
+                  }) }}
                 </span>
 
                 <!-- Items Per Page Selector -->
                 <div class="flex items-center gap-2">
-                  <span class="text-xs text-gray-500">Show:</span>
+                  <span class="text-xs text-gray-500">{{ $t('common.show') }}:</span>
                   <select
                     v-model="itemsPerPage"
                     @change="changeItemsPerPage(Number(($event.target as HTMLSelectElement).value))"
@@ -2604,7 +2606,7 @@ onUnmounted(() => {
                       : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100 border-gray-200'
                   ]"
                 >
-                  Next
+                  {{ $t('articles.next') }}
                   <i class="fas fa-chevron-right text-[10px]"></i>
                 </button>
               </div>
@@ -2617,11 +2619,11 @@ onUnmounted(() => {
           <div class="empty-state-icon">
             <i class="fas fa-search"></i>
           </div>
-          <h3 class="empty-state-title">No articles found</h3>
-          <p class="empty-state-text">Try adjusting your search or filters</p>
+          <h3 class="empty-state-title">{{ $t('articles.noArticles') }}</h3>
+          <p class="empty-state-text">{{ $t('articles.tryAdjustingFilters') }}</p>
           <button @click="clearFilters" class="empty-state-btn">
             <i class="fas fa-rotate"></i>
-            Clear Filters
+            {{ $t('articles.clearFilters') }}
           </button>
         </div>
       </div>

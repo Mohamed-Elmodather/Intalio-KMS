@@ -523,10 +523,10 @@ function navigateToArticle(slug: string) {
       <div class="bg-white rounded-2xl shadow-sm p-12">
         <i class="fas fa-exclamation-triangle text-5xl text-red-300 mb-4"></i>
         <h3 class="text-xl font-semibold text-gray-700 mb-2">{{ error }}</h3>
-        <p class="text-gray-500 mb-6">The article you're looking for doesn't exist or has been removed.</p>
+        <p class="text-gray-500 mb-6">{{ $t('errors.articleNotFound') }}</p>
         <button @click="goBack" class="px-6 py-3 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-colors">
-          <i class="fas fa-arrow-left mr-2"></i>
-          Back to Articles
+          <i class="fas fa-arrow-left me-2"></i>
+          {{ $t('common.backToArticles') }}
         </button>
       </div>
     </div>
@@ -546,18 +546,18 @@ function navigateToArticle(slug: string) {
         <div v-else class="h-[300px] w-full bg-gradient-to-br from-teal-500 to-teal-700"></div>
 
         <!-- Header Content -->
-        <div class="absolute bottom-0 left-0 right-0 px-6 py-8">
+        <div class="absolute bottom-0 start-0 end-0 px-6 py-8">
           <div>
             <!-- Navigation Row -->
             <div class="header-nav">
               <button @click="goBack" class="back-btn">
                 <i class="fas fa-arrow-left"></i>
-                <span>Back</span>
+                <span>{{ $t('common.back') }}</span>
               </button>
               <div class="breadcrumb">
                 <router-link to="/articles" class="breadcrumb-link">
                   <i class="fas fa-newspaper"></i>
-                  Articles
+                  {{ $t('nav.articles') }}
                 </router-link>
                 <i class="fas fa-chevron-right breadcrumb-sep"></i>
                 <span class="breadcrumb-current">{{ article.title }}</span>
@@ -605,10 +605,10 @@ function navigateToArticle(slug: string) {
                 </div>
               </div>
 
-              <div class="hidden md:flex items-center gap-4 pl-4 border-l border-gray-200 text-sm text-gray-500">
-                <span><i class="fas fa-eye mr-1"></i> {{ article.viewCount }}</span>
-                <span><i class="fas fa-heart mr-1"></i> {{ article.likeCount }}</span>
-                <span><i class="fas fa-comment mr-1"></i> {{ article.commentCount }}</span>
+              <div class="hidden md:flex items-center gap-4 ps-4 border-s border-gray-200 text-sm text-gray-500">
+                <span><i class="fas fa-eye me-1"></i> {{ article.viewCount }}</span>
+                <span><i class="fas fa-heart me-1"></i> {{ article.likeCount }}</span>
+                <span><i class="fas fa-comment me-1"></i> {{ article.commentCount }}</span>
               </div>
             </div>
 
@@ -624,16 +624,16 @@ function navigateToArticle(slug: string) {
                 class="px-3 py-2 rounded-lg text-sm font-medium bg-gray-100 text-gray-600 hover:bg-teal-50 hover:text-teal-600 transition-all"
                 title="Add to Collection"
               >
-                <i class="fas fa-folder-plus mr-1"></i>
-                <span class="hidden sm:inline">Collection</span>
+                <i class="fas fa-folder-plus me-1"></i>
+                <span class="hidden sm:inline">{{ $t('articles.collection') }}</span>
               </button>
               <button
                 @click="toggleAIPanel"
                 class="px-3 py-2 rounded-lg text-sm font-medium transition-all"
                 :class="showAIPanel ? 'bg-teal-100 text-teal-700' : 'bg-gray-100 text-gray-600 hover:bg-teal-50 hover:text-teal-600'"
               >
-                <i class="fas fa-wand-magic-sparkles mr-1"></i>
-                AI Assist
+                <i class="fas fa-wand-magic-sparkles me-1"></i>
+                {{ $t('ai.aiAssist') }}
               </button>
               <SocialShareButtons
                 :title="article.title"
@@ -654,7 +654,7 @@ function navigateToArticle(slug: string) {
             <div class="sticky top-24">
               <div class="bg-white rounded-xl border border-gray-200 p-4">
                 <div class="flex items-center justify-between mb-4">
-                  <h3 class="font-semibold text-gray-900 text-sm">Table of Contents</h3>
+                  <h3 class="font-semibold text-gray-900 text-sm">{{ $t('articles.tableOfContents') }}</h3>
                   <button @click="showToc = false" class="p-1 hover:bg-gray-100 rounded">
                     <i class="fas fa-times text-gray-400 text-xs"></i>
                   </button>
@@ -665,10 +665,10 @@ function navigateToArticle(slug: string) {
                     :key="item.id"
                     @click="scrollToHeading(item.id)"
                     :class="[
-                      'block w-full text-left text-sm py-1 transition-colors',
+                      'block w-full text-start text-sm py-1 transition-colors',
                       item.level === 1 ? 'font-medium' : '',
-                      item.level === 2 ? 'pl-3' : '',
-                      item.level === 3 ? 'pl-6 text-xs' : '',
+                      item.level === 2 ? 'ps-3' : '',
+                      item.level === 3 ? 'ps-6 text-xs' : '',
                       activeTocId === item.id ? 'text-teal-600' : 'text-gray-600 hover:text-gray-900'
                     ]"
                   >
@@ -681,7 +681,7 @@ function navigateToArticle(slug: string) {
               <div v-if="keyTakeaways.length > 0" class="mt-4 bg-gradient-to-br from-teal-50 to-white rounded-xl border border-teal-100 p-4">
                 <div class="flex items-center gap-2 mb-3">
                   <i class="fas fa-lightbulb text-teal-600"></i>
-                  <h3 class="font-semibold text-gray-900 text-sm">Key Takeaways</h3>
+                  <h3 class="font-semibold text-gray-900 text-sm">{{ $t('articles.keyTakeaways') }}</h3>
                 </div>
                 <ul class="space-y-2">
                   <li v-for="(point, idx) in keyTakeaways.slice(0, 4)" :key="idx" class="flex items-start gap-2 text-xs text-gray-700">
@@ -708,8 +708,8 @@ function navigateToArticle(slug: string) {
               <div class="border-t border-gray-200 px-8 py-6 bg-gray-50">
                 <div class="flex items-center justify-between">
                   <div>
-                    <h4 class="font-semibold text-gray-900 mb-1">Was this article helpful?</h4>
-                    <p class="text-sm text-gray-500">Rate this article to help others find quality content</p>
+                    <h4 class="font-semibold text-gray-900 mb-1">{{ $t('articles.wasThisHelpful') }}</h4>
+                    <p class="text-sm text-gray-500">{{ $t('articles.rateToHelp') }}</p>
                   </div>
                   <RatingStars
                     :model-value="rating?.userRating || 0"
@@ -725,7 +725,7 @@ function navigateToArticle(slug: string) {
 
             <!-- Author Card -->
             <div v-if="articleAuthor" class="mt-8">
-              <h3 class="font-semibold text-gray-900 mb-4">About the Author</h3>
+              <h3 class="font-semibold text-gray-900 mb-4">{{ $t('articles.aboutAuthor') }}</h3>
               <AuthorCard :author="articleAuthor" variant="full" />
             </div>
 
@@ -744,11 +744,11 @@ function navigateToArticle(slug: string) {
               <button
                 v-if="previousArticle"
                 @click="navigateToArticle(previousArticle.slug)"
-                class="p-4 bg-white rounded-xl border border-gray-200 hover:border-teal-300 hover:shadow-md transition-all text-left group"
+                class="p-4 bg-white rounded-xl border border-gray-200 hover:border-teal-300 hover:shadow-md transition-all text-start group"
               >
                 <span class="text-sm text-gray-500 flex items-center gap-2">
-                  <i class="fas fa-arrow-left group-hover:-translate-x-1 transition-transform"></i>
-                  Previous Article
+                  <i class="fas fa-arrow-left rtl:rotate-180 group-hover:-translate-x-1 rtl:group-hover:translate-x-1 transition-transform"></i>
+                  {{ $t('common.previousArticle') }}
                 </span>
                 <p class="font-medium text-gray-900 mt-1 line-clamp-2">{{ previousArticle.title }}</p>
               </button>
@@ -757,11 +757,11 @@ function navigateToArticle(slug: string) {
               <button
                 v-if="nextArticle"
                 @click="navigateToArticle(nextArticle.slug)"
-                class="p-4 bg-white rounded-xl border border-gray-200 hover:border-teal-300 hover:shadow-md transition-all text-right group"
+                class="p-4 bg-white rounded-xl border border-gray-200 hover:border-teal-300 hover:shadow-md transition-all text-end group"
               >
                 <span class="text-sm text-gray-500 flex items-center justify-end gap-2">
-                  Next Article
-                  <i class="fas fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+                  {{ $t('common.nextArticle') }}
+                  <i class="fas fa-arrow-right rtl:rotate-180 group-hover:translate-x-1 rtl:group-hover:-translate-x-1 transition-transform"></i>
                 </span>
                 <p class="font-medium text-gray-900 mt-1 line-clamp-2">{{ nextArticle.title }}</p>
               </button>
@@ -817,7 +817,7 @@ function navigateToArticle(slug: string) {
                     class="flex-1 px-2 py-2.5 text-xs font-medium transition-colors"
                     :class="activeAITab === tab.id ? 'text-teal-600 border-b-2 border-teal-500 bg-teal-50' : 'text-gray-500 hover:text-gray-700'"
                   >
-                    <i :class="tab.icon" class="mr-1"></i>
+                    <i :class="tab.icon" class="me-1"></i>
                     {{ tab.label }}
                   </button>
                 </div>
@@ -856,24 +856,24 @@ function navigateToArticle(slug: string) {
                       </div>
                       <div class="flex gap-2">
                         <button @click="copyToClipboard(summaryResult.summary)" class="flex-1 px-3 py-1.5 text-xs bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors">
-                          <i class="fas fa-copy mr-1"></i> Copy
+                          <i class="fas fa-copy me-1"></i> {{ $t('common.copy') }}
                         </button>
                         <button @click="generateSummary()" class="flex-1 px-3 py-1.5 text-xs bg-teal-100 text-teal-700 rounded-lg hover:bg-teal-200 transition-colors">
-                          <i class="fas fa-sync-alt mr-1"></i> Regenerate
+                          <i class="fas fa-sync-alt me-1"></i> Regenerate
                         </button>
                       </div>
                     </div>
 
                     <div v-else class="text-center py-8">
                       <i class="fas fa-compress-alt text-3xl text-gray-300 mb-3"></i>
-                      <p class="text-sm text-gray-500">Click a summary type to generate</p>
+                      <p class="text-sm text-gray-500">{{ $t('articles.clickSummaryType') }}</p>
                     </div>
                   </div>
 
                   <!-- Translate Tab -->
                   <div v-if="activeAITab === 'translate'">
                     <div class="mb-4">
-                      <label class="block text-xs font-medium text-gray-600 mb-2">Translate to:</label>
+                      <label class="block text-xs font-medium text-gray-600 mb-2">{{ $t('ai.translateTo') }}:</label>
                       <select
                         v-model="targetLanguage"
                         @change="translateArticle()"
@@ -886,7 +886,7 @@ function navigateToArticle(slug: string) {
                     </div>
 
                     <div v-if="isTranslating" class="flex flex-col items-center py-8">
-                      <AILoadingIndicator variant="spinner" text="Translating..." />
+                      <AILoadingIndicator variant="spinner" :text="$t('ai.translating')" />
                     </div>
 
                     <div v-else-if="translationResult" class="space-y-3">
@@ -896,10 +896,10 @@ function navigateToArticle(slug: string) {
                       <AIConfidenceBar :value="translationResult.confidence" size="sm" />
                       <div class="flex gap-2">
                         <button @click="copyToClipboard(translationResult.translatedText)" class="flex-1 px-3 py-1.5 text-xs bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors">
-                          <i class="fas fa-copy mr-1"></i> Copy
+                          <i class="fas fa-copy me-1"></i> {{ $t('common.copy') }}
                         </button>
                         <button @click="translateArticle()" class="flex-1 px-3 py-1.5 text-xs bg-teal-100 text-teal-700 rounded-lg hover:bg-teal-200 transition-colors">
-                          <i class="fas fa-sync-alt mr-1"></i> Retranslate
+                          <i class="fas fa-sync-alt me-1"></i> {{ $t('ai.retranslate') }}
                         </button>
                       </div>
                     </div>
@@ -908,7 +908,7 @@ function navigateToArticle(slug: string) {
                   <!-- Entities Tab -->
                   <div v-if="activeAITab === 'entities'">
                     <div v-if="isExtractingEntities" class="flex flex-col items-center py-8">
-                      <AILoadingIndicator variant="pulse" text="Extracting entities..." />
+                      <AILoadingIndicator variant="pulse" :text="$t('ai.extractingEntities')" />
                     </div>
 
                     <div v-else-if="entitiesResult && entitiesResult.entities.length > 0" class="space-y-3">
@@ -931,15 +931,15 @@ function navigateToArticle(slug: string) {
                         <span class="text-xs text-gray-400">{{ Math.round(entity.confidence * 100) }}%</span>
                       </div>
                       <button @click="extractEntities()" class="w-full px-3 py-1.5 text-xs bg-teal-100 text-teal-700 rounded-lg hover:bg-teal-200 transition-colors">
-                        <i class="fas fa-sync-alt mr-1"></i> Re-extract
+                        <i class="fas fa-sync-alt me-1"></i> {{ $t('ai.reExtract') }}
                       </button>
                     </div>
 
                     <div v-else class="text-center py-8">
                       <i class="fas fa-tags text-3xl text-gray-300 mb-3"></i>
-                      <p class="text-sm text-gray-500">No entities found</p>
+                      <p class="text-sm text-gray-500">{{ $t('ai.noEntitiesFound') }}</p>
                       <button @click="extractEntities()" class="mt-2 px-3 py-1.5 text-xs bg-teal-100 text-teal-700 rounded-lg hover:bg-teal-200 transition-colors">
-                        Extract Entities
+                        {{ $t('ai.extractEntities') }}
                       </button>
                     </div>
                   </div>
@@ -947,12 +947,12 @@ function navigateToArticle(slug: string) {
                   <!-- Insights Tab -->
                   <div v-if="activeAITab === 'insights'">
                     <div v-if="isAnalyzingSentiment" class="flex flex-col items-center py-8">
-                      <AILoadingIndicator variant="shimmer" text="Analyzing content..." />
+                      <AILoadingIndicator variant="shimmer" :text="$t('ai.analyzingContent')" />
                     </div>
 
                     <div v-else-if="sentimentResult" class="space-y-4">
                       <div class="p-4 bg-gray-50 rounded-lg">
-                        <h4 class="text-xs font-semibold text-gray-500 uppercase mb-3">Content Sentiment</h4>
+                        <h4 class="text-xs font-semibold text-gray-500 uppercase mb-3">{{ $t('articles.contentTone') }}</h4>
                         <div class="flex items-center gap-3 mb-3">
                           <AISentimentBadge :sentiment="sentimentResult.overall" size="md" />
                           <span class="text-sm text-gray-600">
@@ -973,7 +973,7 @@ function navigateToArticle(slug: string) {
                       </div>
 
                       <button @click="analyzeSentiment()" class="w-full px-3 py-1.5 text-xs bg-teal-100 text-teal-700 rounded-lg hover:bg-teal-200 transition-colors">
-                        <i class="fas fa-sync-alt mr-1"></i> Re-analyze
+                        <i class="fas fa-sync-alt me-1"></i> Re-analyze
                       </button>
                     </div>
                   </div>
@@ -982,7 +982,7 @@ function navigateToArticle(slug: string) {
                 <!-- Panel Footer -->
                 <div class="px-4 py-3 bg-gray-50 border-t border-gray-200">
                   <p class="text-xs text-gray-400 text-center">
-                    <i class="fas fa-shield-alt mr-1"></i>
+                    <i class="fas fa-shield-alt me-1"></i>
                     Powered by Intalio AI Engine
                   </p>
                 </div>
@@ -1098,10 +1098,13 @@ function navigateToArticle(slug: string) {
 }
 
 .article-content :deep(blockquote) {
-  border-left-color: theme('colors.teal.500');
+  border-inline-start-color: theme('colors.teal.500');
   background-color: theme('colors.teal.50');
   padding: 1rem;
-  border-radius: 0 0.5rem 0.5rem 0;
+  border-start-start-radius: 0;
+  border-start-end-radius: 0.5rem;
+  border-end-start-radius: 0;
+  border-end-end-radius: 0.5rem;
 }
 
 .article-content :deep(code) {
