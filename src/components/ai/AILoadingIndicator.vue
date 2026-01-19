@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 interface Props {
   size?: 'sm' | 'md' | 'lg'
@@ -83,7 +86,7 @@ const textSizeClass = computed(() => {
       {{ text }}
     </span>
     <span v-else-if="showText" :class="[textSizeClass, 'text-gray-500 font-medium']">
-      AI is thinking...
+      {{ $t('ai.thinking') }}
     </span>
   </div>
 </template>

@@ -1,6 +1,9 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { AIOperationType } from '@/types/ai'
+
+const { t } = useI18n()
 
 export interface ToolbarTool {
   id: AIOperationType
@@ -36,37 +39,37 @@ const dropdownPosition = ref({ top: 0, left: 0 })
 const toolButtonRefs = ref<Record<string, HTMLElement | null>>({})
 
 // Toolbar tools configuration
-const toolbarTools: ToolbarTool[] = [
+const toolbarTools = computed<ToolbarTool[]>(() => [
   {
     id: 'extract-entities',
-    name: 'Entities',
+    name: t('ai.toolbar.entities'),
     icon: 'fas fa-tags',
     shortcut: 'E',
     color: 'blue'
   },
   {
     id: 'analyze-sentiment',
-    name: 'Sentiment',
+    name: t('ai.toolbar.sentiment'),
     icon: 'fas fa-smile',
     shortcut: 'S',
     color: 'pink'
   },
   {
     id: 'summarize',
-    name: 'Summarize',
+    name: t('ai.toolbar.summarize'),
     icon: 'fas fa-compress-alt',
     shortcut: 'M',
     color: 'teal',
     hasDropdown: true,
     dropdownOptions: [
-      { value: 'brief', label: 'Brief', icon: 'fas fa-minus' },
-      { value: 'detailed', label: 'Detailed', icon: 'fas fa-align-left' },
-      { value: 'bullet', label: 'Bullet Points', icon: 'fas fa-list-ul' }
+      { value: 'brief', label: t('ai.toolbar.brief'), icon: 'fas fa-minus' },
+      { value: 'detailed', label: t('ai.toolbar.detailed'), icon: 'fas fa-align-left' },
+      { value: 'bullet', label: t('ai.toolbar.bulletPoints'), icon: 'fas fa-list-ul' }
     ]
   },
   {
     id: 'classify',
-    name: 'Classify',
+    name: t('ai.toolbar.classify'),
     icon: 'fas fa-folder-tree',
     shortcut: 'C',
     color: 'purple'
@@ -80,47 +83,47 @@ const toolbarTools: ToolbarTool[] = [
   },
   {
     id: 'translate',
-    name: 'Translate',
+    name: t('ai.toolbar.translate'),
     icon: 'fas fa-language',
     shortcut: 'T',
     color: 'green',
     hasDropdown: true,
     dropdownOptions: [
-      { value: 'ar', label: 'Arabic', icon: '🇸🇦' },
-      { value: 'en', label: 'English', icon: '🇺🇸' },
-      { value: 'fr', label: 'French', icon: '🇫🇷' },
-      { value: 'es', label: 'Spanish', icon: '🇪🇸' },
-      { value: 'de', label: 'German', icon: '🇩🇪' },
-      { value: 'zh', label: 'Chinese', icon: '🇨🇳' }
+      { value: 'ar', label: t('languages.arabic'), icon: '🇸🇦' },
+      { value: 'en', label: t('languages.english'), icon: '🇺🇸' },
+      { value: 'fr', label: t('languages.french'), icon: '🇫🇷' },
+      { value: 'es', label: t('languages.spanish'), icon: '🇪🇸' },
+      { value: 'de', label: t('languages.german'), icon: '🇩🇪' },
+      { value: 'zh', label: t('languages.chinese'), icon: '🇨🇳' }
     ]
   },
   {
     id: 'generate-title',
-    name: 'Titles',
+    name: t('ai.toolbar.titles'),
     icon: 'fas fa-heading',
     color: 'indigo',
     hasDropdown: true,
     dropdownOptions: [
-      { value: 'formal', label: 'Formal', icon: 'fas fa-briefcase' },
-      { value: 'casual', label: 'Casual', icon: 'fas fa-smile' },
+      { value: 'formal', label: t('ai.toolbar.formal'), icon: 'fas fa-briefcase' },
+      { value: 'casual', label: t('ai.toolbar.casual'), icon: 'fas fa-smile' },
       { value: 'seo', label: 'SEO', icon: 'fas fa-search' },
-      { value: 'creative', label: 'Creative', icon: 'fas fa-lightbulb' }
+      { value: 'creative', label: t('ai.toolbar.creative'), icon: 'fas fa-lightbulb' }
     ]
   },
   {
     id: 'auto-tag',
-    name: 'Tags',
+    name: t('ai.toolbar.tags'),
     icon: 'fas fa-hashtag',
     color: 'cyan'
   },
   {
     id: 'smart-search',
-    name: 'Search',
+    name: t('common.search'),
     icon: 'fas fa-search',
     shortcut: 'F',
     color: 'orange'
   }
-]
+])
 
 function getToolBgColor(color: string, isActive: boolean): string {
   if (isActive) {
@@ -267,10 +270,10 @@ onUnmounted(() => {
           'toolbar-tool flex items-center gap-1.5 rounded-lg transition-all bg-gray-100 text-gray-600 hover:bg-gray-200',
           compact ? 'px-2 py-1.5' : 'px-3 py-2'
         ]"
-        title="All AI Tools (Ctrl+K)"
+        :title="$t('ai.toolbar.allAITools')"
       >
         <i :class="['fas fa-th-large', compact ? 'text-sm' : 'text-base']"></i>
-        <span v-if="showLabels && !compact" class="text-xs font-medium">More</span>
+        <span v-if="showLabels && !compact" class="text-xs font-medium">{{ $t('common.more') }}</span>
         <kbd class="px-1 py-0.5 bg-gray-200 rounded text-[9px] font-mono ml-1">⌘K</kbd>
       </button>
     </div>

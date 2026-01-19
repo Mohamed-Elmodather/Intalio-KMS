@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import AISentimentBadge from './AISentimentBadge.vue'
 import AIConfidenceBar from './AIConfidenceBar.vue'
 import type { Entity, SentimentResult, ClassificationResult, SummarizationResult } from '@/types/ai'
+
+const { t } = useI18n()
 
 interface MessageAnalysis {
   entities?: Entity[]
@@ -173,7 +176,7 @@ function copyCodeBlock(index: number, code: string) {
       <div v-if="analysis.entities?.length" class="analysis-block">
         <h4 class="analysis-title">
           <i class="fas fa-tags mr-2"></i>
-          Extracted Entities
+          {{ $t('ai.messageContent.extractedEntities') }}
         </h4>
         <div class="flex flex-wrap gap-2 mt-2">
           <button
@@ -195,7 +198,7 @@ function copyCodeBlock(index: number, code: string) {
       <div v-if="analysis.sentiment" class="analysis-block">
         <h4 class="analysis-title">
           <i class="fas fa-smile mr-2"></i>
-          Sentiment Analysis
+          {{ $t('ai.messageContent.sentimentAnalysis') }}
         </h4>
         <div class="mt-2">
           <AISentimentBadge
@@ -210,7 +213,7 @@ function copyCodeBlock(index: number, code: string) {
       <div v-if="analysis.classification" class="analysis-block">
         <h4 class="analysis-title">
           <i class="fas fa-folder-tree mr-2"></i>
-          Classification
+          {{ $t('ai.messageContent.classification') }}
         </h4>
         <div class="mt-2 flex items-center gap-3">
           <span class="classification-badge">
@@ -237,7 +240,7 @@ function copyCodeBlock(index: number, code: string) {
       <div v-if="analysis.keyPoints?.length" class="analysis-block">
         <h4 class="analysis-title">
           <i class="fas fa-list-check mr-2"></i>
-          Key Points
+          {{ $t('ai.messageContent.keyPoints') }}
         </h4>
         <ul class="key-points-list mt-2">
           <li v-for="point in analysis.keyPoints" :key="point" class="key-point-item">
@@ -253,7 +256,7 @@ function copyCodeBlock(index: number, code: string) {
       v-if="showCopyButton && !isStreaming"
       @click="copyContent"
       class="copy-content-btn"
-      title="Copy message"
+      :title="$t('ai.messageContent.copyMessage')"
     >
       <i class="fas fa-copy"></i>
     </button>

@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { SentimentType, EmotionScore } from '@/types/ai'
+
+const { t } = useI18n()
 
 interface Props {
   sentiment: SentimentType
@@ -27,7 +30,7 @@ const sentimentConfig = computed(() => {
     case 'positive':
       return {
         icon: 'fas fa-smile',
-        label: 'Positive',
+        label: t('comparison.positive'),
         bgClass: 'bg-green-100',
         textClass: 'text-green-700',
         borderClass: 'border-green-300',
@@ -36,7 +39,7 @@ const sentimentConfig = computed(() => {
     case 'negative':
       return {
         icon: 'fas fa-frown',
-        label: 'Negative',
+        label: t('comparison.negative'),
         bgClass: 'bg-red-100',
         textClass: 'text-red-700',
         borderClass: 'border-red-300',
@@ -45,7 +48,7 @@ const sentimentConfig = computed(() => {
     default:
       return {
         icon: 'fas fa-meh',
-        label: 'Neutral',
+        label: t('comparison.neutral'),
         bgClass: 'bg-gray-100',
         textClass: 'text-gray-700',
         borderClass: 'border-gray-300',
@@ -144,7 +147,7 @@ const emotionIcons: Record<string, string> = {
     <!-- Confidence indicator -->
     <div v-if="confidence !== undefined" class="mt-1">
       <span class="text-xs text-gray-400">
-        Confidence: {{ Math.round(confidence * 100) }}%
+        {{ $t('ai.aiConfidence') }}: {{ Math.round(confidence * 100) }}%
       </span>
     </div>
   </div>

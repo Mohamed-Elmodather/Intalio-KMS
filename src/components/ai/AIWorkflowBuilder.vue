@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useAIWorkflowsStore, type AIWorkflow, type WorkflowStep } from '@/stores/aiWorkflows'
 import type { AIOperationType } from '@/types/ai'
 import AIOperationProgress from './AIOperationProgress.vue'
+
+const { t } = useI18n()
 
 interface Props {
   modelValue: boolean
@@ -28,17 +31,17 @@ const runProgress = ref({ step: 0, total: 0 })
 const inputContent = ref('')
 
 // Available operations
-const availableOperations: { id: AIOperationType; name: string; icon: string; color: string }[] = [
-  { id: 'extract-entities', name: 'Extract Entities', icon: 'fas fa-tags', color: 'blue' },
-  { id: 'analyze-sentiment', name: 'Sentiment Analysis', icon: 'fas fa-smile', color: 'pink' },
-  { id: 'summarize', name: 'Summarize', icon: 'fas fa-compress-alt', color: 'teal' },
-  { id: 'classify', name: 'Classify', icon: 'fas fa-folder-tree', color: 'purple' },
-  { id: 'ocr', name: 'OCR', icon: 'fas fa-file-image', color: 'amber' },
-  { id: 'translate', name: 'Translate', icon: 'fas fa-language', color: 'green' },
-  { id: 'generate-title', name: 'Generate Titles', icon: 'fas fa-heading', color: 'indigo' },
-  { id: 'auto-tag', name: 'Auto-Tag', icon: 'fas fa-hashtag', color: 'cyan' },
-  { id: 'smart-search', name: 'Smart Search', icon: 'fas fa-search', color: 'orange' }
-]
+const availableOperations = computed(() => [
+  { id: 'extract-entities' as AIOperationType, name: t('ai.workflow.extractEntities'), icon: 'fas fa-tags', color: 'blue' },
+  { id: 'analyze-sentiment' as AIOperationType, name: t('ai.workflow.sentimentAnalysis'), icon: 'fas fa-smile', color: 'pink' },
+  { id: 'summarize' as AIOperationType, name: t('ai.toolbar.summarize'), icon: 'fas fa-compress-alt', color: 'teal' },
+  { id: 'classify' as AIOperationType, name: t('ai.toolbar.classify'), icon: 'fas fa-folder-tree', color: 'purple' },
+  { id: 'ocr' as AIOperationType, name: 'OCR', icon: 'fas fa-file-image', color: 'amber' },
+  { id: 'translate' as AIOperationType, name: t('ai.toolbar.translate'), icon: 'fas fa-language', color: 'green' },
+  { id: 'generate-title' as AIOperationType, name: t('ai.workflow.generateTitles'), icon: 'fas fa-heading', color: 'indigo' },
+  { id: 'auto-tag' as AIOperationType, name: t('ai.workflow.autoTag'), icon: 'fas fa-hashtag', color: 'cyan' },
+  { id: 'smart-search' as AIOperationType, name: t('ai.workflow.smartSearch'), icon: 'fas fa-search', color: 'orange' }
+])
 
 // Initialize store on mount
 workflowsStore.initialize()
@@ -114,7 +117,7 @@ function deleteWorkflow(id: string) {
 function addStep(operation: AIOperationType) {
   if (!editingWorkflow.value) return
 
-  const op = availableOperations.find(o => o.id === operation)
+  const op = availableOperations.value.find(o => o.id === operation)
   if (!op) return
 
   const step: WorkflowStep = {
@@ -164,7 +167,7 @@ async function runWorkflow(workflow: AIWorkflow) {
 }
 
 function getOperationMeta(operation: AIOperationType) {
-  return availableOperations.find(o => o.id === operation) || {
+  return availableOperations.value.find(o => o.id === operation) || {
     name: operation,
     icon: 'fas fa-cog',
     color: 'gray'
@@ -207,10 +210,10 @@ function getColorClass(color: string): string {
               </div>
               <div>
                 <h2 class="text-lg font-semibold text-gray-900">
-                  {{ mode === 'list' ? 'AI Workflows' : mode === 'edit' ? 'Edit Workflow' : 'Running Workflow' }}
+                  {{ mode === 'list' ? $t('ai.workflow.title') : mode === 'edit' ? $t('ai.workflow.editWorkflow') : $t('ai.workflow.runningWorkflow') }}
                 </h2>
                 <p class="text-sm text-gray-500">
-                  {{ mode === 'list' ? 'Chain AI operations together' : mode === 'edit' ? 'Configure workflow steps' : 'Executing operations...' }}
+                  {{ mode === 'list' ? $t('ai.workflow.subtitle') : mode === 'edit' ? $t('ai.workflow.configureSteps') : $t('ai.workflow.executingOperations') }}
                 </p>
               </div>
             </div>
@@ -221,7 +224,7 @@ function getColorClass(color: string): string {
                 @click="mode = 'list'"
                 class="px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
               >
-                Cancel
+                {{ $t('common.cancel') }}
               </button>
               <button
                 @click="close"
@@ -242,13 +245,13 @@ function getColorClass(color: string): string {
                 class="w-full p-4 rounded-xl border-2 border-dashed border-gray-200 hover:border-teal-300 hover:bg-teal-50/50 transition-all flex items-center justify-center gap-2 text-gray-500 hover:text-teal-600 mb-6"
               >
                 <i class="fas fa-plus"></i>
-                <span class="font-medium">Create New Workflow</span>
+                <span class="font-medium">{{ $t('ai.workflow.createNewWorkflow') }}</span>
               </button>
 
               <!-- Template Workflows -->
               <div v-if="workflowsStore.templateWorkflows.length" class="mb-6">
                 <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">
-                  Templates
+                  {{ $t('ai.workflow.templates') }}
                 </h3>
                 <div class="grid grid-cols-2 gap-3">
                   <div
@@ -265,7 +268,7 @@ function getColorClass(color: string): string {
                         <p class="text-xs text-gray-500 line-clamp-2">{{ workflow.description }}</p>
                         <div class="flex items-center gap-2 mt-2">
                           <span class="text-[10px] text-gray-400">
-                            {{ workflow.steps.length }} steps
+                            {{ $t('ai.workflow.stepsCount', { count: workflow.steps.length }) }}
                           </span>
                         </div>
                       </div>
@@ -276,14 +279,14 @@ function getColorClass(color: string): string {
                         class="flex-1 py-1.5 text-xs font-medium text-gray-600 hover:text-gray-800 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
                       >
                         <i class="fas fa-copy mr-1"></i>
-                        Use Template
+                        {{ $t('ai.workflow.useTemplate') }}
                       </button>
                       <button
                         @click="runWorkflow(workflow)"
                         class="flex-1 py-1.5 text-xs font-medium text-white bg-teal-500 hover:bg-teal-600 rounded-lg transition-colors"
                       >
                         <i class="fas fa-play mr-1"></i>
-                        Run
+                        {{ $t('common.run') }}
                       </button>
                     </div>
                   </div>
@@ -293,7 +296,7 @@ function getColorClass(color: string): string {
               <!-- Custom Workflows -->
               <div v-if="workflowsStore.customWorkflows.length">
                 <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">
-                  My Workflows
+                  {{ $t('ai.workflow.myWorkflows') }}
                 </h3>
                 <div class="space-y-2">
                   <div
@@ -306,27 +309,27 @@ function getColorClass(color: string): string {
                     </div>
                     <div class="flex-1 min-w-0 ml-3">
                       <h4 class="font-medium text-gray-800 truncate">{{ workflow.name }}</h4>
-                      <p class="text-xs text-gray-500 truncate">{{ workflow.steps.length }} steps • Run {{ workflow.runCount }} times</p>
+                      <p class="text-xs text-gray-500 truncate">{{ $t('ai.workflow.stepsCount', { count: workflow.steps.length }) }} • {{ $t('ai.workflow.runCount', { count: workflow.runCount }) }}</p>
                     </div>
                     <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                       <button
                         @click="editWorkflow(workflow)"
                         class="w-8 h-8 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 flex items-center justify-center transition-colors"
-                        title="Edit"
+                        :title="$t('common.edit')"
                       >
                         <i class="fas fa-edit text-sm"></i>
                       </button>
                       <button
                         @click="runWorkflow(workflow)"
                         class="w-8 h-8 rounded-lg text-teal-500 hover:text-teal-600 hover:bg-teal-50 flex items-center justify-center transition-colors"
-                        title="Run"
+                        :title="$t('common.run')"
                       >
                         <i class="fas fa-play text-sm"></i>
                       </button>
                       <button
                         @click="deleteWorkflow(workflow.id)"
                         class="w-8 h-8 rounded-lg text-red-400 hover:text-red-600 hover:bg-red-50 flex items-center justify-center transition-colors"
-                        title="Delete"
+                        :title="$t('common.delete')"
                       >
                         <i class="fas fa-trash text-sm"></i>
                       </button>
@@ -341,33 +344,33 @@ function getColorClass(color: string): string {
               <!-- Workflow Info -->
               <div class="grid grid-cols-2 gap-4 mb-6">
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">{{ $t('common.name') }}</label>
                   <input
                     v-model="editingWorkflow.name"
                     type="text"
                     class="w-full px-3 py-2 rounded-lg border border-gray-200 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 outline-none transition-all"
-                    placeholder="Workflow name"
+                    :placeholder="$t('ai.workflow.workflowName')"
                   />
                 </div>
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">{{ $t('common.description') }}</label>
                   <input
                     v-model="editingWorkflow.description"
                     type="text"
                     class="w-full px-3 py-2 rounded-lg border border-gray-200 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 outline-none transition-all"
-                    placeholder="What does this workflow do?"
+                    :placeholder="$t('ai.workflow.workflowDescription')"
                   />
                 </div>
               </div>
 
               <!-- Steps -->
               <div class="mb-6">
-                <h3 class="text-sm font-semibold text-gray-700 mb-3">Workflow Steps</h3>
+                <h3 class="text-sm font-semibold text-gray-700 mb-3">{{ $t('ai.workflow.workflowSteps') }}</h3>
 
                 <div v-if="editingWorkflow.steps.length === 0" class="text-center py-8 bg-gray-50 rounded-xl">
                   <i class="fas fa-layer-group text-3xl text-gray-300 mb-2"></i>
-                  <p class="text-gray-500">No steps added yet</p>
-                  <p class="text-xs text-gray-400">Add operations below to build your workflow</p>
+                  <p class="text-gray-500">{{ $t('ai.workflow.noStepsYet') }}</p>
+                  <p class="text-xs text-gray-400">{{ $t('ai.workflow.addOperationsHint') }}</p>
                 </div>
 
                 <div v-else class="space-y-2">
@@ -411,7 +414,7 @@ function getColorClass(color: string): string {
 
               <!-- Add Operations -->
               <div>
-                <h3 class="text-sm font-semibold text-gray-700 mb-3">Add Operation</h3>
+                <h3 class="text-sm font-semibold text-gray-700 mb-3">{{ $t('ai.workflow.addOperation') }}</h3>
                 <div class="grid grid-cols-3 gap-2">
                   <button
                     v-for="op in availableOperations"
@@ -436,7 +439,7 @@ function getColorClass(color: string): string {
                     <i class="fas fa-cogs text-2xl text-teal-600 animate-spin"></i>
                   </div>
                   <p class="text-gray-600">
-                    Processing step {{ runProgress.step }} of {{ runProgress.total }}
+                    {{ $t('ai.workflow.processingStep', { step: runProgress.step, total: runProgress.total }) }}
                   </p>
                 </div>
 
@@ -448,7 +451,7 @@ function getColorClass(color: string): string {
                   >
                     <div class="flex items-center gap-2">
                       <i class="fas fa-check-circle text-green-500"></i>
-                      <span class="font-medium text-green-700">Step {{ index + 1 }} Complete</span>
+                      <span class="font-medium text-green-700">{{ $t('ai.workflow.stepComplete', { step: index + 1 }) }}</span>
                     </div>
                     <p class="text-sm text-green-600 mt-1">{{ result.output }}</p>
                   </div>
@@ -463,7 +466,7 @@ function getColorClass(color: string): string {
               @click="mode = 'list'"
               class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
             >
-              Cancel
+              {{ $t('common.cancel') }}
             </button>
             <button
               @click="saveWorkflow"
@@ -471,7 +474,7 @@ function getColorClass(color: string): string {
               class="px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <i class="fas fa-save mr-2"></i>
-              Save Workflow
+              {{ $t('ai.workflow.saveWorkflow') }}
             </button>
           </div>
         </div>

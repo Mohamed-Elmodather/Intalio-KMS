@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useComparisonStore } from '@/stores/comparison'
 
+const { t } = useI18n()
 const comparisonStore = useComparisonStore()
 
 // Type icons mapping
@@ -50,9 +52,9 @@ const extraCount = computed(() => Math.max(0, comparisonStore.selectedItems.leng
           <div class="bg-gradient-to-r from-teal-500 to-teal-600 text-white px-4 py-3 flex items-center justify-between">
             <div class="flex items-center gap-2">
               <i class="fas fa-layer-group" />
-              <span class="font-semibold">Compare</span>
+              <span class="font-semibold">{{ $t('comparison.compare') }}</span>
               <span class="bg-white/20 rounded-full px-2 py-0.5 text-sm">
-                {{ comparisonStore.itemCount }} items
+                {{ $t('comparison.itemsCount', { count: comparisonStore.itemCount }) }}
               </span>
             </div>
             <button
@@ -102,7 +104,7 @@ const extraCount = computed(() => Math.max(0, comparisonStore.selectedItems.leng
               v-if="extraCount > 0"
               class="text-center text-sm text-gray-500 py-1"
             >
-              +{{ extraCount }} more item{{ extraCount > 1 ? 's' : '' }}
+              {{ $t('comparison.moreItems', { count: extraCount }) }}
             </div>
           </div>
 
@@ -126,7 +128,7 @@ const extraCount = computed(() => Math.max(0, comparisonStore.selectedItems.leng
               class="flex-1 px-4 py-2.5 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 transition-colors"
               @click="comparisonStore.clearSelection()"
             >
-              Clear All
+              {{ $t('common.clearAll') }}
             </button>
             <button
               class="flex-1 px-4 py-2.5 rounded-xl font-medium transition-all flex items-center justify-center gap-2"
@@ -137,7 +139,7 @@ const extraCount = computed(() => Math.max(0, comparisonStore.selectedItems.leng
               @click="comparisonStore.startComparison()"
             >
               <i class="fas fa-chart-bar" />
-              <span>Compare</span>
+              <span>{{ $t('comparison.compare') }}</span>
             </button>
           </div>
 
@@ -147,7 +149,7 @@ const extraCount = computed(() => Math.max(0, comparisonStore.selectedItems.leng
             class="px-3 pb-3"
           >
             <p class="text-xs text-center text-gray-400">
-              Select at least 2 items to compare
+              {{ $t('comparison.selectAtLeast2') }}
             </p>
           </div>
         </div>

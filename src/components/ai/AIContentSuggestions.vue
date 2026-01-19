@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 export interface ContentSuggestion {
   id: string
@@ -29,10 +32,11 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
   loading: false,
-  title: 'You might be interested in',
   maxVisible: 4,
   showRelevance: true
 })
+
+const displayTitle = computed(() => props.title || t('ai.suggestions.youMightBeInterestedIn'))
 
 const emit = defineEmits<{
   select: [suggestion: ContentSuggestion]
@@ -73,12 +77,12 @@ function getTypeColor(type: string): string {
 
 function getSuggestionTypeBadge(type: string): { label: string; color: string; icon: string } {
   const badges: Record<string, { label: string; color: string; icon: string }> = {
-    related: { label: 'Related', color: 'bg-teal-100 text-teal-700', icon: 'fas fa-link' },
-    referenced: { label: 'Referenced', color: 'bg-purple-100 text-purple-700', icon: 'fas fa-quote-right' },
-    similar: { label: 'Similar', color: 'bg-blue-100 text-blue-700', icon: 'fas fa-clone' },
-    trending: { label: 'Trending', color: 'bg-orange-100 text-orange-700', icon: 'fas fa-fire' }
+    related: { label: t('ai.suggestions.related'), color: 'bg-teal-100 text-teal-700', icon: 'fas fa-link' },
+    referenced: { label: t('ai.suggestions.referenced'), color: 'bg-purple-100 text-purple-700', icon: 'fas fa-quote-right' },
+    similar: { label: t('ai.suggestions.similar'), color: 'bg-blue-100 text-blue-700', icon: 'fas fa-clone' },
+    trending: { label: t('common.trending'), color: 'bg-orange-100 text-orange-700', icon: 'fas fa-fire' }
   }
-  return badges[type] || { label: 'Suggested', color: 'bg-gray-100 text-gray-700', icon: 'fas fa-lightbulb' }
+  return badges[type] || { label: t('ai.suggestions.suggested'), color: 'bg-gray-100 text-gray-700', icon: 'fas fa-lightbulb' }
 }
 
 function getRelevanceColor(score: number): string {
@@ -95,16 +99,16 @@ function getRelevanceColor(score: number): string {
     <div class="flex items-center justify-between mb-3">
       <h4 class="text-sm font-semibold text-gray-700 flex items-center gap-2">
         <i class="fas fa-lightbulb text-amber-500"></i>
-        {{ title }}
+        {{ displayTitle }}
       </h4>
       <button
         v-if="!loading"
         @click="emit('refresh')"
         class="text-xs text-gray-400 hover:text-teal-600 flex items-center gap-1 transition-colors"
-        title="Refresh suggestions"
+        :title="$t('ai.suggestions.refreshSuggestions')"
       >
         <i class="fas fa-sync-alt"></i>
-        Refresh
+        {{ $t('media.refresh') }}
       </button>
     </div>
 
@@ -126,8 +130,8 @@ function getRelevanceColor(score: number): string {
       <div class="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-3">
         <i class="fas fa-inbox text-gray-400"></i>
       </div>
-      <p class="text-sm text-gray-500">No suggestions available</p>
-      <p class="text-xs text-gray-400 mt-1">Continue the conversation to get recommendations</p>
+      <p class="text-sm text-gray-500">{{ $t('ai.suggestions.noSuggestions') }}</p>
+      <p class="text-xs text-gray-400 mt-1">{{ $t('ai.suggestions.continueConversation') }}</p>
     </div>
 
     <!-- Suggestions List -->
@@ -206,7 +210,7 @@ function getRelevanceColor(score: number): string {
                   :class="['text-[10px] font-medium flex items-center gap-1', getRelevanceColor(suggestion.relevanceScore)]"
                 >
                   <i class="fas fa-chart-line"></i>
-                  {{ Math.round(suggestion.relevanceScore * 100) }}% match
+                  {{ $t('search.matchPercent', { percent: Math.round(suggestion.relevanceScore * 100) }) }}
                 </span>
 
                 <!-- Category -->
@@ -227,14 +231,14 @@ function getRelevanceColor(score: number): string {
               <button
                 @click="emit('select', suggestion)"
                 class="w-7 h-7 rounded-lg bg-teal-100 text-teal-600 hover:bg-teal-200 flex items-center justify-center transition-colors"
-                title="View"
+                :title="$t('common.view')"
               >
                 <i class="fas fa-arrow-right text-xs"></i>
               </button>
               <button
                 @click.stop="emit('dismiss', suggestion.id)"
                 class="w-7 h-7 rounded-lg bg-gray-100 text-gray-400 hover:bg-gray-200 hover:text-gray-600 flex items-center justify-center transition-colors"
-                title="Dismiss"
+                :title="$t('ai.suggestions.dismiss')"
               >
                 <i class="fas fa-times text-xs"></i>
               </button>
@@ -249,7 +253,7 @@ function getRelevanceColor(score: number): string {
         @click="showAll = !showAll"
         class="w-full py-2 text-xs text-gray-500 hover:text-teal-600 flex items-center justify-center gap-1 transition-colors"
       >
-        <span>{{ showAll ? 'Show less' : `Show ${suggestions.length - maxVisible} more` }}</span>
+        <span>{{ showAll ? $t('common.showLess') : $t('ai.suggestions.showMore', { count: suggestions.length - maxVisible }) }}</span>
         <i :class="['fas', showAll ? 'fa-chevron-up' : 'fa-chevron-down', 'text-[10px]']"></i>
       </button>
     </div>

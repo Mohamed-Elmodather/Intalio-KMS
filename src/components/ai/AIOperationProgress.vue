@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { AIOperationType } from '@/types/ai'
+
+const { t } = useI18n()
 
 interface Props {
   operation: AIOperationType
@@ -20,21 +23,21 @@ const emit = defineEmits<{
 }>()
 
 // Operation metadata
-const operationMeta: Record<AIOperationType, { name: string; icon: string; color: string }> = {
-  'extract-entities': { name: 'Extracting Entities', icon: 'fas fa-tags', color: 'blue' },
-  'analyze-sentiment': { name: 'Analyzing Sentiment', icon: 'fas fa-smile', color: 'pink' },
-  'summarize': { name: 'Generating Summary', icon: 'fas fa-compress-alt', color: 'teal' },
-  'classify': { name: 'Classifying Content', icon: 'fas fa-folder-tree', color: 'purple' },
-  'ocr': { name: 'Extracting Text (OCR)', icon: 'fas fa-file-image', color: 'amber' },
-  'translate': { name: 'Translating', icon: 'fas fa-language', color: 'green' },
-  'generate-title': { name: 'Generating Titles', icon: 'fas fa-heading', color: 'indigo' },
-  'auto-tag': { name: 'Auto-Tagging', icon: 'fas fa-hashtag', color: 'cyan' },
-  'smart-search': { name: 'Searching', icon: 'fas fa-search', color: 'orange' },
-  'chat': { name: 'Chatting', icon: 'fas fa-comment', color: 'teal' }
-}
+const operationMeta = computed<Record<AIOperationType, { name: string; icon: string; color: string }>>(() => ({
+  'extract-entities': { name: t('ai.operations.extractingEntities'), icon: 'fas fa-tags', color: 'blue' },
+  'analyze-sentiment': { name: t('ai.operations.analyzingSentiment'), icon: 'fas fa-smile', color: 'pink' },
+  'summarize': { name: t('ai.operations.generatingSummary'), icon: 'fas fa-compress-alt', color: 'teal' },
+  'classify': { name: t('ai.operations.classifyingContent'), icon: 'fas fa-folder-tree', color: 'purple' },
+  'ocr': { name: t('ai.operations.extractingTextOCR'), icon: 'fas fa-file-image', color: 'amber' },
+  'translate': { name: t('ai.operations.translating'), icon: 'fas fa-language', color: 'green' },
+  'generate-title': { name: t('ai.operations.generatingTitles'), icon: 'fas fa-heading', color: 'indigo' },
+  'auto-tag': { name: t('ai.operations.autoTagging'), icon: 'fas fa-hashtag', color: 'cyan' },
+  'smart-search': { name: t('ai.operations.searching'), icon: 'fas fa-search', color: 'orange' },
+  'chat': { name: t('ai.operations.chatting'), icon: 'fas fa-comment', color: 'teal' }
+}))
 
-const meta = computed(() => operationMeta[props.operation] || {
-  name: 'Processing',
+const meta = computed(() => operationMeta.value[props.operation] || {
+  name: t('ai.operations.processing'),
   icon: 'fas fa-cog',
   color: 'gray'
 })
@@ -44,13 +47,13 @@ const statusMessage = computed(() => {
 
   switch (props.status) {
     case 'pending':
-      return 'Waiting to start...'
+      return t('ai.status.waitingToStart')
     case 'processing':
-      return props.progress > 0 ? `${props.progress}% complete` : 'Processing...'
+      return props.progress > 0 ? t('ai.status.percentComplete', { percent: props.progress }) : t('ai.status.processing')
     case 'success':
-      return 'Completed successfully'
+      return t('ai.status.completedSuccessfully')
     case 'error':
-      return 'An error occurred'
+      return t('ai.status.errorOccurred')
     default:
       return ''
   }
@@ -134,7 +137,7 @@ const colorClasses = computed(() => {
         v-if="showCancel && status === 'processing'"
         @click="emit('cancel')"
         class="w-8 h-8 rounded-lg bg-white/50 text-gray-400 hover:text-gray-600 hover:bg-white flex items-center justify-center transition-colors"
-        title="Cancel"
+        :title="$t('common.cancel')"
       >
         <i class="fas fa-times"></i>
       </button>

@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useComparisonStore } from '@/stores/comparison'
 import type { ComparisonItem } from '@/types'
 
+const { t, locale } = useI18n()
 const comparisonStore = useComparisonStore()
 
 // Type icons and colors
@@ -53,7 +55,7 @@ function formatDuration(duration?: number): string {
 
 function formatDate(date?: string): string {
   if (!date) return '-'
-  return new Date(date).toLocaleDateString('en-US', {
+  return new Date(date).toLocaleDateString(locale.value === 'ar' ? 'ar-SA' : 'en-US', {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
@@ -192,8 +194,8 @@ function formatDate(date?: string): string {
       <div class="w-16 h-16 rounded-full bg-gray-100 mx-auto mb-4 flex items-center justify-center">
         <i class="fas fa-columns text-2xl text-gray-400" />
       </div>
-      <h3 class="text-lg font-medium text-gray-700 mb-1">No items selected</h3>
-      <p class="text-gray-500">Select items from content pages to compare them</p>
+      <h3 class="text-lg font-medium text-gray-700 mb-1">{{ $t('comparison.noItemsSelected') }}</h3>
+      <p class="text-gray-500">{{ $t('comparison.selectItemsToCompare') }}</p>
     </div>
 
     <!-- Comparison Hint -->
@@ -206,11 +208,11 @@ function formatDate(date?: string): string {
           <i class="fas fa-lightbulb text-teal-600" />
         </div>
         <div>
-          <h4 class="font-medium text-teal-800 mb-1">Quick Comparison Tips</h4>
+          <h4 class="font-medium text-teal-800 mb-1">{{ $t('comparison.quickTips.title') }}</h4>
           <ul class="text-sm text-teal-700 space-y-1">
-            <li>Switch to "AI Insights" tab for automated analysis</li>
-            <li>View common entities and topics across all items</li>
-            <li>Compare sentiment scores side by side</li>
+            <li>{{ $t('comparison.quickTips.tip1') }}</li>
+            <li>{{ $t('comparison.quickTips.tip2') }}</li>
+            <li>{{ $t('comparison.quickTips.tip3') }}</li>
           </ul>
         </div>
       </div>

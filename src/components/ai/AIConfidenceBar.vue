@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 interface Props {
   value: number // 0 to 1
@@ -42,11 +45,11 @@ const sizeClasses = computed(() => {
 })
 
 const confidenceLabel = computed(() => {
-  if (props.value >= 0.9) return 'Very High'
-  if (props.value >= 0.75) return 'High'
-  if (props.value >= 0.6) return 'Moderate'
-  if (props.value >= 0.4) return 'Low'
-  return 'Very Low'
+  if (props.value >= 0.9) return t('ai.confidence.veryHigh')
+  if (props.value >= 0.75) return t('ai.confidence.high')
+  if (props.value >= 0.6) return t('ai.confidence.moderate')
+  if (props.value >= 0.4) return t('ai.confidence.low')
+  return t('ai.confidence.veryLow')
 })
 </script>
 
@@ -55,7 +58,7 @@ const confidenceLabel = computed(() => {
     <!-- Label row -->
     <div v-if="showLabel || showValue" class="flex items-center justify-between mb-1">
       <span v-if="showLabel" :class="[sizeClasses.text, 'text-gray-600 font-medium']">
-        {{ label || 'Confidence' }}
+        {{ label || $t('ai.aiConfidence') }}
       </span>
       <div v-if="showValue" class="flex items-center gap-1.5">
         <span :class="[sizeClasses.text, textColorClass, 'font-semibold']">
