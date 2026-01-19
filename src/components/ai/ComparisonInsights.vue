@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useComparisonStore } from '@/stores/comparison'
+
+const { t } = useI18n()
 
 interface Props {
   section: 'summary' | 'entities' | 'sentiment' | 'topics'
@@ -36,9 +39,9 @@ function getSentimentColor(score: number): string {
 }
 
 function getSentimentLabel(score: number): string {
-  if (score > 0.3) return 'Positive'
-  if (score < -0.3) return 'Negative'
-  return 'Neutral'
+  if (score > 0.3) return t('comparison.positive')
+  if (score < -0.3) return t('comparison.negative')
+  return t('comparison.neutral')
 }
 </script>
 
@@ -49,8 +52,8 @@ function getSentimentLabel(score: number): string {
       <div class="w-16 h-16 rounded-full bg-purple-100 mx-auto mb-4 flex items-center justify-center">
         <i class="fas fa-brain text-2xl text-purple-600 animate-pulse" />
       </div>
-      <h3 class="text-lg font-medium text-gray-700 mb-2">Analyzing Content</h3>
-      <p class="text-gray-500">Generating AI insights for your comparison...</p>
+      <h3 class="text-lg font-medium text-gray-700 mb-2">{{ $t('comparison.analyzingContent') }}</h3>
+      <p class="text-gray-500">{{ $t('comparison.generatingInsights') }}</p>
       <div class="mt-4 flex justify-center gap-1">
         <div class="w-2 h-2 rounded-full bg-purple-400 animate-bounce" style="animation-delay: 0s" />
         <div class="w-2 h-2 rounded-full bg-purple-400 animate-bounce" style="animation-delay: 0.1s" />
@@ -63,14 +66,14 @@ function getSentimentLabel(score: number): string {
       <div class="w-16 h-16 rounded-full bg-gray-100 mx-auto mb-4 flex items-center justify-center">
         <i class="fas fa-magic text-2xl text-gray-400" />
       </div>
-      <h3 class="text-lg font-medium text-gray-700 mb-2">No Analysis Yet</h3>
-      <p class="text-gray-500 mb-4">Click "Generate Analysis" to get AI-powered insights</p>
+      <h3 class="text-lg font-medium text-gray-700 mb-2">{{ $t('comparison.noAnalysisYet') }}</h3>
+      <p class="text-gray-500 mb-4">{{ $t('comparison.clickGenerateAnalysis') }}</p>
       <button
         class="px-6 py-2.5 bg-purple-500 text-white rounded-xl font-medium hover:bg-purple-600 transition-colors inline-flex items-center gap-2"
         @click="comparisonStore.generateAnalysis()"
       >
         <i class="fas fa-magic" />
-        <span>Generate Analysis</span>
+        <span>{{ $t('comparison.generateAnalysis') }}</span>
       </button>
     </div>
 
@@ -81,7 +84,7 @@ function getSentimentLabel(score: number): string {
         <!-- Similarity Score -->
         <div class="bg-gradient-to-r from-teal-50 to-cyan-50 rounded-xl p-6 border border-teal-100">
           <div class="flex items-center justify-between mb-4">
-            <h3 class="text-lg font-semibold text-gray-800">Similarity Score</h3>
+            <h3 class="text-lg font-semibold text-gray-800">{{ $t('comparison.similarityScore') }}</h3>
             <span class="text-3xl font-bold text-teal-600">{{ analysis.similarity }}%</span>
           </div>
           <div class="h-3 bg-white/50 rounded-full overflow-hidden">
@@ -91,7 +94,7 @@ function getSentimentLabel(score: number): string {
             />
           </div>
           <p class="mt-2 text-sm text-teal-700">
-            Based on content themes, entities, and topics
+            {{ $t('comparison.basedOnContentThemes') }}
           </p>
         </div>
 
@@ -101,7 +104,7 @@ function getSentimentLabel(score: number): string {
             <div class="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center">
               <i class="fas fa-brain text-purple-600" />
             </div>
-            <h3 class="text-lg font-semibold text-gray-800">AI Summary</h3>
+            <h3 class="text-lg font-semibold text-gray-800">{{ $t('comparison.aiSummary') }}</h3>
           </div>
           <p class="text-gray-700 leading-relaxed">{{ analysis.summary }}</p>
         </div>
@@ -112,7 +115,7 @@ function getSentimentLabel(score: number): string {
             <div class="w-10 h-10 rounded-lg bg-amber-100 flex items-center justify-center">
               <i class="fas fa-not-equal text-amber-600" />
             </div>
-            <h3 class="text-lg font-semibold text-gray-800">Key Differences</h3>
+            <h3 class="text-lg font-semibold text-gray-800">{{ $t('comparison.keyDifferences') }}</h3>
           </div>
           <ul class="space-y-2">
             <li
@@ -134,7 +137,7 @@ function getSentimentLabel(score: number): string {
             <div class="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
               <i class="fas fa-list-check text-blue-600" />
             </div>
-            <h3 class="text-lg font-semibold text-gray-800">Key Points</h3>
+            <h3 class="text-lg font-semibold text-gray-800">{{ $t('comparison.keyPoints') }}</h3>
           </div>
           <div class="space-y-4">
             <div
@@ -167,9 +170,9 @@ function getSentimentLabel(score: number): string {
             <div class="w-10 h-10 rounded-lg bg-teal-100 flex items-center justify-center">
               <i class="fas fa-tags text-teal-600" />
             </div>
-            <h3 class="text-lg font-semibold text-gray-800">Common Entities</h3>
+            <h3 class="text-lg font-semibold text-gray-800">{{ $t('comparison.commonEntities') }}</h3>
             <span class="ml-auto text-sm text-gray-500">
-              {{ analysis.commonEntities.length }} entities found
+              {{ $t('comparison.entitiesFound', { count: analysis.commonEntities.length }) }}
             </span>
           </div>
 
@@ -189,17 +192,17 @@ function getSentimentLabel(score: number): string {
               </div>
               <div class="text-right">
                 <div class="font-semibold">{{ entity.occurrences }}</div>
-                <div class="text-xs opacity-75">occurrences</div>
+                <div class="text-xs opacity-75">{{ $t('comparison.occurrences') }}</div>
               </div>
               <div class="text-right">
                 <div class="font-semibold">{{ entity.items.length }}</div>
-                <div class="text-xs opacity-75">items</div>
+                <div class="text-xs opacity-75">{{ $t('comparison.items') }}</div>
               </div>
             </div>
           </div>
 
           <div v-if="analysis.commonEntities.length === 0" class="text-center py-8 text-gray-500">
-            No common entities found across selected items
+            {{ $t('comparison.noCommonEntities') }}
           </div>
         </div>
       </div>
@@ -211,7 +214,7 @@ function getSentimentLabel(score: number): string {
             <div class="w-10 h-10 rounded-lg bg-pink-100 flex items-center justify-center">
               <i class="fas fa-smile text-pink-600" />
             </div>
-            <h3 class="text-lg font-semibold text-gray-800">Sentiment Comparison</h3>
+            <h3 class="text-lg font-semibold text-gray-800">{{ $t('comparison.sentimentComparison') }}</h3>
           </div>
 
           <div class="space-y-4">
@@ -253,7 +256,7 @@ function getSentimentLabel(score: number): string {
 
         <!-- Sentiment Summary -->
         <div class="bg-gradient-to-r from-pink-50 to-rose-50 rounded-xl p-6 border border-pink-100">
-          <h4 class="font-semibold text-gray-800 mb-3">Overall Sentiment</h4>
+          <h4 class="font-semibold text-gray-800 mb-3">{{ $t('comparison.overallSentiment') }}</h4>
           <div class="flex items-center gap-4">
             <div class="flex gap-2">
               <div class="text-center">
@@ -282,7 +285,7 @@ function getSentimentLabel(score: number): string {
               </div>
             </div>
             <div class="flex-1 text-sm text-gray-600">
-              The selected content is predominantly positive in tone, indicating favorable coverage of the topics.
+              {{ $t('comparison.sentimentSummary') }}
             </div>
           </div>
         </div>
@@ -295,7 +298,7 @@ function getSentimentLabel(score: number): string {
             <div class="w-10 h-10 rounded-lg bg-indigo-100 flex items-center justify-center">
               <i class="fas fa-lightbulb text-indigo-600" />
             </div>
-            <h3 class="text-lg font-semibold text-gray-800">Common Topics</h3>
+            <h3 class="text-lg font-semibold text-gray-800">{{ $t('comparison.commonTopics') }}</h3>
           </div>
 
           <div class="space-y-4">
@@ -331,7 +334,7 @@ function getSentimentLabel(score: number): string {
             <div class="w-10 h-10 rounded-lg bg-cyan-100 flex items-center justify-center">
               <i class="fas fa-layer-group text-cyan-600" />
             </div>
-            <h3 class="text-lg font-semibold text-gray-800">Content Classifications</h3>
+            <h3 class="text-lg font-semibold text-gray-800">{{ $t('comparison.contentClassifications') }}</h3>
           </div>
 
           <div class="grid gap-3 sm:grid-cols-2">

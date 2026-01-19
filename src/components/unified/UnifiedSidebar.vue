@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 // Types
 export interface NavItem {
@@ -43,7 +46,6 @@ const props = withDefaults(defineProps<Props>(), {
   navigationItems: () => [],
   workspaceItems: () => [],
   bottomActions: () => [],
-  workspacesTitle: 'Workspaces',
   isCollapsed: false,
   showWorkspaces: true,
   showBottomActions: true
@@ -128,7 +130,7 @@ function getHoverClass(effect?: string): string {
 
       <!-- Workspaces -->
       <div v-if="showWorkspaces && workspaceItems.length > 0" class="unified-sidebar__section">
-        <p v-show="!isCollapsed" class="unified-sidebar__section-title">{{ workspacesTitle }}</p>
+        <p v-show="!isCollapsed" class="unified-sidebar__section-title">{{ workspacesTitle || $t('nav.workspaces') }}</p>
         <div class="unified-sidebar__workspace-items">
           <component
             :is="item.route ? 'router-link' : 'a'"

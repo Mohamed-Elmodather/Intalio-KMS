@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import AIConfidenceBar from './AIConfidenceBar.vue'
+
+const { t } = useI18n()
 
 interface Props {
   title?: string
@@ -15,7 +18,6 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  title: 'AI Result',
   type: 'general',
   showCopy: true,
   showRegenerate: true,
@@ -32,13 +34,13 @@ const emit = defineEmits<{
 const typeConfig = computed(() => {
   switch (props.type) {
     case 'summary':
-      return { icon: 'fas fa-compress-alt', color: 'teal', label: 'AI Summary' }
+      return { icon: 'fas fa-compress-alt', color: 'teal', label: t('ai.aiSummary') }
     case 'translation':
-      return { icon: 'fas fa-language', color: 'blue', label: 'AI Translation' }
+      return { icon: 'fas fa-language', color: 'blue', label: t('ai.aiTranslation') }
     case 'classification':
-      return { icon: 'fas fa-tags', color: 'purple', label: 'AI Classification' }
+      return { icon: 'fas fa-tags', color: 'purple', label: t('ai.aiClassification') }
     default:
-      return { icon: 'fas fa-wand-magic-sparkles', color: 'teal', label: 'AI Result' }
+      return { icon: 'fas fa-wand-magic-sparkles', color: 'teal', label: t('ai.aiResult') }
   }
 })
 
@@ -66,7 +68,7 @@ async function copyToClipboard() {
           </div>
           <div>
             <h4 class="text-sm font-semibold text-gray-800">{{ title || typeConfig.label }}</h4>
-            <p class="text-xs text-gray-500">Powered by Intalio AI</p>
+            <p class="text-xs text-gray-500">{{ $t('ai.poweredByIntalioAI') }}</p>
           </div>
         </div>
 
@@ -109,7 +111,7 @@ async function copyToClipboard() {
             :value="confidence"
             size="sm"
             show-label
-            label="AI Confidence"
+            :label="$t('ai.aiConfidence')"
           />
         </div>
       </div>
@@ -124,7 +126,7 @@ async function copyToClipboard() {
         @click="copyToClipboard"
       >
         <i class="fas fa-copy" />
-        Copy
+        {{ $t('common.copy') }}
       </button>
 
       <button
@@ -134,7 +136,7 @@ async function copyToClipboard() {
         @click="emit('regenerate')"
       >
         <i class="fas fa-sync-alt" />
-        Regenerate
+        {{ $t('ai.regenerate') }}
       </button>
     </div>
   </div>
