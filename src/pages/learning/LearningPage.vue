@@ -2,6 +2,7 @@
 import { ref, computed, watch, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
+import PageHeroHeader from '@/components/common/PageHeroHeader.vue'
 import { useAIServicesStore } from '@/stores/aiServices'
 import { AILoadingIndicator, AIConfidenceBar, AISuggestionChip } from '@/components/ai'
 import type { ClassificationResult, NERResult } from '@/types/ai'
@@ -394,6 +395,14 @@ const totalCourses = ref(12)
 const learningHours = ref(45)
 const certificates = ref(5)
 const streak = ref(12)
+
+// Hero stats for PageHeroHeader component
+const heroStats = computed(() => [
+  { icon: 'fas fa-graduation-cap', value: `${completedCourses.value}/${totalCourses.value}`, label: t('common.completed') },
+  { icon: 'fas fa-clock', value: `${learningHours.value}h`, label: t('nav.learning') },
+  { icon: 'fas fa-certificate', value: certificates.value, label: t('learning.certificates') },
+  { icon: 'fas fa-fire', value: streak.value, label: t('learning.dayStreak') }
+])
 const totalEnrolled = ref(156)
 
 // View options (Collections style)
@@ -2221,78 +2230,37 @@ function resumeFeaturedAutoPlay() {
 <template>
   <div class="page-view">
     <!-- Hero Section -->
-    <div class="hero-gradient relative overflow-hidden">
-      <!-- Decorative elements with animations -->
-      <div class="circle-drift-1 absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full"></div>
-      <div class="circle-drift-2 absolute bottom-0 left-0 w-64 h-64 bg-white/5 rounded-full"></div>
-      <div class="circle-drift-3 absolute top-1/2 right-1/4 w-32 h-32 bg-white/10 rounded-full"></div>
-
-      <!-- Stats - Absolute Top Right -->
-      <div class="stats-top-right">
-        <div class="stat-card-square">
-          <div class="stat-icon-box">
-            <i class="fas fa-graduation-cap"></i>
-          </div>
-          <p class="stat-value-mini">{{ completedCourses }}/{{ totalCourses }}</p>
-          <p class="stat-label-mini">{{ $t('common.completed') }}</p>
-        </div>
-        <div class="stat-card-square">
-          <div class="stat-icon-box">
-            <i class="fas fa-clock"></i>
-          </div>
-          <p class="stat-value-mini">{{ learningHours }}h</p>
-          <p class="stat-label-mini">{{ $t('nav.learning') }}</p>
-        </div>
-        <div class="stat-card-square">
-          <div class="stat-icon-box">
-            <i class="fas fa-certificate"></i>
-          </div>
-          <p class="stat-value-mini">{{ certificates }}</p>
-          <p class="stat-label-mini">{{ $t('learning.certificates') }}</p>
-        </div>
-        <div class="stat-card-square">
-          <div class="stat-icon-box">
-            <i class="fas fa-fire"></i>
-          </div>
-          <p class="stat-value-mini">{{ streak }}</p>
-          <p class="stat-label-mini">{{ $t('learning.dayStreak') }}</p>
-        </div>
-      </div>
-
-      <div class="relative px-8 py-8">
-        <div class="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-white text-xs font-semibold inline-flex items-center gap-2 mb-4">
-          <i class="fas fa-graduation-cap"></i>
-          {{ $t('app.name') }}
-        </div>
-
-        <h1 class="text-3xl font-bold text-white mb-2">{{ $t('learning.title') }}</h1>
-        <p class="text-teal-100 max-w-lg">{{ $t('learning.subtitle') }}</p>
-
-        <div class="flex flex-wrap gap-3 mt-6">
-          <button v-if="currentCourse" @click="navigateToCourse(currentCourse.id)" class="px-5 py-2.5 bg-white text-teal-600 rounded-xl font-semibold text-sm flex items-center gap-2 hover:bg-teal-50 transition-all shadow-lg">
-            <i class="fas fa-play"></i>
-            {{ $t('learning.continueLearning') }}
-          </button>
-          <!-- AI Action Buttons -->
-          <button
-            @click="analyzeSkillGaps"
-            :disabled="isAnalyzingSkillGaps"
-            class="px-5 py-2.5 bg-gradient-to-r from-purple-500 to-indigo-500 text-white rounded-xl font-semibold text-sm flex items-center gap-2 hover:from-purple-600 hover:to-indigo-600 transition-all shadow-lg disabled:opacity-50"
-          >
-            <i :class="isAnalyzingSkillGaps ? 'fas fa-spinner fa-spin' : 'fas fa-wand-magic-sparkles'"></i>
-            {{ isAnalyzingSkillGaps ? $t('learning.analyzing') : $t('learning.skillGapAnalysis') }}
-          </button>
-          <button
-            @click="generateAILearningPaths"
-            :disabled="isGeneratingLearningPath"
-            class="px-5 py-2.5 bg-gradient-to-r from-teal-500 to-cyan-500 text-white rounded-xl font-semibold text-sm flex items-center gap-2 hover:from-teal-600 hover:to-cyan-600 transition-all shadow-lg disabled:opacity-50"
-          >
-            <i :class="isGeneratingLearningPath ? 'fas fa-spinner fa-spin' : 'fas fa-route'"></i>
-            {{ isGeneratingLearningPath ? $t('learning.generating') : $t('learning.aiLearningPaths') }}
-          </button>
-        </div>
-      </div>
-    </div>
+    <PageHeroHeader
+      :stats="heroStats"
+      badge-icon="fas fa-graduation-cap"
+      :badge-text="$t('app.name')"
+      :title="$t('learning.title')"
+      :subtitle="$t('learning.subtitle')"
+    >
+      <template #actions>
+        <button v-if="currentCourse" @click="navigateToCourse(currentCourse.id)" class="px-5 py-2.5 bg-white text-teal-600 rounded-xl font-semibold text-sm flex items-center gap-2 hover:bg-teal-50 transition-all shadow-lg">
+          <i class="fas fa-play"></i>
+          {{ $t('learning.continueLearning') }}
+        </button>
+        <!-- AI Action Buttons -->
+        <button
+          @click="analyzeSkillGaps"
+          :disabled="isAnalyzingSkillGaps"
+          class="px-5 py-2.5 bg-gradient-to-r from-purple-500 to-indigo-500 text-white rounded-xl font-semibold text-sm flex items-center gap-2 hover:from-purple-600 hover:to-indigo-600 transition-all shadow-lg disabled:opacity-50"
+        >
+          <i :class="isAnalyzingSkillGaps ? 'fas fa-spinner fa-spin' : 'fas fa-wand-magic-sparkles'"></i>
+          {{ isAnalyzingSkillGaps ? $t('learning.analyzing') : $t('learning.skillGapAnalysis') }}
+        </button>
+        <button
+          @click="generateAILearningPaths"
+          :disabled="isGeneratingLearningPath"
+          class="px-5 py-2.5 bg-gradient-to-r from-teal-500 to-cyan-500 text-white rounded-xl font-semibold text-sm flex items-center gap-2 hover:from-teal-600 hover:to-cyan-600 transition-all shadow-lg disabled:opacity-50"
+        >
+          <i :class="isGeneratingLearningPath ? 'fas fa-spinner fa-spin' : 'fas fa-route'"></i>
+          {{ isGeneratingLearningPath ? $t('learning.generating') : $t('learning.aiLearningPaths') }}
+        </button>
+      </template>
+    </PageHeroHeader>
 
     <!-- AI Insights Panel -->
     <div v-if="aiInsights.length > 0" class="ai-insights-bar">
@@ -5687,114 +5655,6 @@ function resumeFeaturedAutoPlay() {
   background: linear-gradient(180deg, #f0fdfa 0%, #f8fafc 15%, #ffffff 100%);
 }
 
-/* Hero Section */
-.hero-gradient {
-  background: linear-gradient(135deg, #0d9488 0%, #14b8a6 50%, #10b981 100%);
-}
-
-.stats-top-right {
-  position: absolute;
-  top: 24px;
-  right: 32px;
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  z-index: 10;
-}
-
-.stat-card-square {
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(8px);
-  border-radius: 16px;
-  width: 115px;
-  height: 115px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  text-align: center;
-  transition: all 0.3s ease;
-}
-
-.stat-card-square:hover {
-  background: rgba(255, 255, 255, 0.25);
-  transform: translateY(-4px) scale(1.02);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-}
-
-.stat-card-square:hover .stat-icon-box {
-  transform: scale(1.1);
-}
-
-.stat-icon-box {
-  color: white;
-  font-size: 20px;
-  transition: transform 0.3s ease;
-}
-
-.stat-value-mini {
-  font-size: 24px;
-  font-weight: 700;
-  color: white;
-  line-height: 1;
-}
-
-.stat-label-mini {
-  font-size: 11px;
-  color: rgba(255, 255, 255, 0.7);
-  line-height: 1;
-}
-
-/* Animated Circles */
-.circle-drift-1 {
-  animation: drift-1 20s ease-in-out infinite;
-}
-
-.circle-drift-2 {
-  animation: drift-2 25s ease-in-out infinite;
-}
-
-.circle-drift-3 {
-  animation: drift-3 18s ease-in-out infinite;
-}
-
-@keyframes drift-1 {
-  0%, 100% {
-    transform: translate(33%, -50%);
-  }
-  25% {
-    transform: translate(28%, -45%);
-  }
-  50% {
-    transform: translate(35%, -55%);
-  }
-  75% {
-    transform: translate(30%, -48%);
-  }
-}
-
-@keyframes drift-2 {
-  0%, 100% {
-    transform: translate(-30%, 50%);
-  }
-  33% {
-    transform: translate(-25%, 45%);
-  }
-  66% {
-    transform: translate(-35%, 55%);
-  }
-}
-
-@keyframes drift-3 {
-  0%, 100% {
-    transform: translate(0, -50%);
-  }
-  50% {
-    transform: translate(10%, -45%);
-  }
-}
-
 /* Continue Learning Section */
 .continue-learning-section {
   background: linear-gradient(135deg, #f0fdfa 0%, #f8fafc 100%);
@@ -6333,7 +6193,7 @@ function resumeFeaturedAutoPlay() {
   .stats-top-right {
     position: relative;
     top: auto;
-    right: auto;
+    inset-inline-end: auto;
     margin: 24px 32px 0;
     display: grid;
     grid-template-columns: repeat(4, 1fr);

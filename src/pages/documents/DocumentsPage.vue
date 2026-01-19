@@ -2,6 +2,7 @@
 import { ref, computed, watch, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
+import PageHeroHeader from '@/components/common/PageHeroHeader.vue'
 import AddToCollectionModal from '@/components/common/AddToCollectionModal.vue'
 import { useAIServicesStore } from '@/stores/aiServices'
 import { useComparisonStore } from '@/stores/comparison'
@@ -35,16 +36,16 @@ const showStatusFilter = ref(false)
 const selectedStatusFilters = ref<string[]>([])
 
 // Status filter options
-const statusFilterOptions = [
-  { id: 'starred', label: 'My Saved', icon: 'fas fa-bookmark', color: 'text-amber-500' },
-  { id: 'shared', label: 'Shared with me', icon: 'fas fa-share-alt', color: 'text-purple-500' }
-]
+const statusFilterOptions = computed(() => [
+  { id: 'starred', label: t('documents.mySaved'), icon: 'fas fa-bookmark', color: 'text-amber-500' },
+  { id: 'shared', label: t('documents.sharedWithMe'), icon: 'fas fa-share-alt', color: 'text-purple-500' }
+])
 
 // Sort options with icons
-const sortOptionsList = ref([
-  { value: 'date', label: 'Date Modified', icon: 'fas fa-clock' },
-  { value: 'name', label: 'Name', icon: 'fas fa-font' },
-  { value: 'size', label: 'Size', icon: 'fas fa-weight-hanging' }
+const sortOptionsList = computed(() => [
+  { value: 'date', label: t('documents.dateModified'), icon: 'fas fa-clock' },
+  { value: 'name', label: t('documents.name'), icon: 'fas fa-font' },
+  { value: 'size', label: t('documents.size'), icon: 'fas fa-weight-hanging' }
 ])
 
 const currentSortOption = computed(() => {
@@ -175,13 +176,13 @@ const itemsPerPage = ref(10)
 const itemsPerPageOptions = [5, 10, 20, 50, 100]
 
 // View Navigation Items
-const viewNavItems = [
-  { id: 'all', name: 'All Files', icon: 'fas fa-folder', color: 'text-teal-500' },
-  { id: 'shared', name: 'Shared with me', icon: 'fas fa-share-alt', color: 'text-blue-500' },
-  { id: 'team', name: 'Team Files', icon: 'fas fa-users', color: 'text-purple-500' },
-  { id: 'starred', name: 'Starred', icon: 'fas fa-star', color: 'text-amber-500' },
-  { id: 'trash', name: 'Trash', icon: 'fas fa-trash-alt', color: 'text-red-500' }
-]
+const viewNavItems = computed(() => [
+  { id: 'all', name: t('documents.allFiles'), icon: 'fas fa-folder', color: 'text-teal-500' },
+  { id: 'shared', name: t('documents.sharedWithMe'), icon: 'fas fa-share-alt', color: 'text-blue-500' },
+  { id: 'team', name: t('documents.teamFiles'), icon: 'fas fa-users', color: 'text-purple-500' },
+  { id: 'starred', name: t('documents.starred'), icon: 'fas fa-star', color: 'text-amber-500' },
+  { id: 'trash', name: t('documents.trash'), icon: 'fas fa-trash-alt', color: 'text-red-500' }
+])
 
 // Folder Tree Structure
 const folderTree = ref([
@@ -542,15 +543,15 @@ const documents = ref([
 ])
 
 // File type filters
-const fileTypes = [
-  { id: 'pdf', label: 'PDF', icon: 'fas fa-file-pdf', color: 'text-red-500' },
-  { id: 'word', label: 'Word', icon: 'fas fa-file-word', color: 'text-blue-500' },
-  { id: 'excel', label: 'Excel', icon: 'fas fa-file-excel', color: 'text-green-500' },
-  { id: 'powerpoint', label: 'PowerPoint', icon: 'fas fa-file-powerpoint', color: 'text-orange-500' },
-  { id: 'image', label: 'Images', icon: 'fas fa-file-image', color: 'text-purple-500' },
-  { id: 'audio', label: 'Audio', icon: 'fas fa-file-audio', color: 'text-indigo-500' },
-  { id: 'archive', label: 'Archives', icon: 'fas fa-file-archive', color: 'text-yellow-600' }
-]
+const fileTypes = computed(() => [
+  { id: 'pdf', label: t('documents.pdf'), icon: 'fas fa-file-pdf', color: 'text-red-500' },
+  { id: 'word', label: t('documents.word'), icon: 'fas fa-file-word', color: 'text-blue-500' },
+  { id: 'excel', label: t('documents.excel'), icon: 'fas fa-file-excel', color: 'text-green-500' },
+  { id: 'powerpoint', label: t('documents.powerpoint'), icon: 'fas fa-file-powerpoint', color: 'text-orange-500' },
+  { id: 'image', label: t('documents.images'), icon: 'fas fa-file-image', color: 'text-purple-500' },
+  { id: 'audio', label: t('documents.audio'), icon: 'fas fa-file-audio', color: 'text-indigo-500' },
+  { id: 'archive', label: t('documents.archives'), icon: 'fas fa-file-archive', color: 'text-yellow-600' }
+])
 
 // Computed - All unique tags from documents
 const allTags = computed(() => {
@@ -710,6 +711,14 @@ const documentStats = computed(() => ({
     return uploadDate > weekAgo
   }).length
 }))
+
+// Hero stats for PageHeroHeader component
+const heroStats = computed(() => [
+  { icon: 'fas fa-file-alt', value: documentStats.value.totalDocuments, label: t('documents.title') },
+  { icon: 'fas fa-folder', value: documentStats.value.totalLibraries, label: t('documents.libraries') },
+  { icon: 'fas fa-hdd', value: formatTotalSize(documentStats.value.totalSize), label: t('documents.totalSize') },
+  { icon: 'fas fa-clock', value: documentStats.value.recentUploads, label: t('common.thisWeek') }
+])
 
 const selectedLibraryInfo = computed(() => {
   if (!selectedLibrary.value) return null
@@ -893,7 +902,7 @@ function addToComparison(doc: typeof documents.value[0]) {
     thumbnail: doc.thumbnail || undefined,
     description: `${doc.type.toUpperCase()} document - ${formatFileSize(doc.size)}`,
     metadata: {
-      author: doc.author?.name || 'Unknown',
+      author: doc.author?.name || t('documents.unknown'),
       date: doc.updatedAt,
       size: doc.size,
       category: doc.libraryId,
@@ -1262,65 +1271,23 @@ function getCategoryColor(category: string): string {
 <template>
   <div class="min-h-screen bg-gray-50">
     <!-- Hero Section -->
-    <div class="hero-gradient relative overflow-hidden">
-      <!-- Decorative elements with animations -->
-      <div class="circle-drift-1 absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full"></div>
-      <div class="circle-drift-2 absolute bottom-0 left-0 w-64 h-64 bg-white/5 rounded-full"></div>
-      <div class="circle-drift-3 absolute top-1/2 right-1/4 w-32 h-32 bg-white/10 rounded-full"></div>
-
-      <!-- Stats - Absolute Top Right -->
-      <div class="stats-top-right">
-        <div class="stat-card-square">
-          <div class="stat-icon-box">
-            <i class="fas fa-file-alt"></i>
-          </div>
-          <p class="stat-value-mini">{{ documentStats.totalDocuments }}</p>
-          <p class="stat-label-mini">{{ $t('documents.title') }}</p>
-        </div>
-        <div class="stat-card-square">
-          <div class="stat-icon-box">
-            <i class="fas fa-folder"></i>
-          </div>
-          <p class="stat-value-mini">{{ documentStats.totalLibraries }}</p>
-          <p class="stat-label-mini">{{ $t('documents.libraries') }}</p>
-        </div>
-        <div class="stat-card-square">
-          <div class="stat-icon-box">
-            <i class="fas fa-hdd"></i>
-          </div>
-          <p class="stat-value-mini">{{ formatTotalSize(documentStats.totalSize) }}</p>
-          <p class="stat-label-mini">{{ $t('documents.totalSize') }}</p>
-        </div>
-        <div class="stat-card-square">
-          <div class="stat-icon-box">
-            <i class="fas fa-clock"></i>
-          </div>
-          <p class="stat-value-mini">{{ documentStats.recentUploads }}</p>
-          <p class="stat-label-mini">{{ $t('common.thisWeek') }}</p>
-        </div>
-      </div>
-
-      <div class="relative px-8 py-8">
-        <div class="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-white text-xs font-semibold inline-flex items-center gap-2 mb-4">
-          <i class="fas fa-folder-open"></i>
-          AFC Asian Cup 2027
-        </div>
-
-        <h1 class="text-3xl font-bold text-white mb-2">{{ $t('documents.documentLibrary') }}</h1>
-        <p class="text-teal-100 max-w-lg">{{ $t('documents.subtitle') }}</p>
-
-        <div class="flex flex-wrap gap-3 mt-6">
-          <button class="px-5 py-2.5 bg-white text-teal-600 rounded-xl font-semibold text-sm flex items-center gap-2 hover:bg-teal-50 transition-all shadow-lg">
-            <i class="fas fa-upload"></i>
-            {{ $t('documents.uploadDocument') }}
-          </button>
-          <button class="px-5 py-2.5 bg-white/20 backdrop-blur-sm border border-white/30 text-white rounded-xl font-semibold text-sm hover:bg-white/30 transition-all flex items-center gap-2">
-            <i class="fas fa-folder-plus"></i>
-            {{ $t('documents.newFolder') }}
-          </button>
-        </div>
-      </div>
-    </div>
+    <PageHeroHeader
+      :stats="heroStats"
+      badge-icon="fas fa-folder-open"
+      :title="$t('documents.documentLibrary')"
+      :subtitle="$t('documents.subtitle')"
+    >
+      <template #actions>
+        <button class="px-5 py-2.5 bg-white text-teal-600 rounded-xl font-semibold text-sm flex items-center gap-2 hover:bg-teal-50 transition-all shadow-lg">
+          <i class="fas fa-upload"></i>
+          {{ $t('documents.uploadDocument') }}
+        </button>
+        <button class="px-5 py-2.5 bg-white/20 backdrop-blur-sm border border-white/30 text-white rounded-xl font-semibold text-sm hover:bg-white/30 transition-all flex items-center gap-2">
+          <i class="fas fa-folder-plus"></i>
+          {{ $t('documents.newFolder') }}
+        </button>
+      </template>
+    </PageHeroHeader>
 
     <div class="px-8 py-6 space-y-6">
       <!-- Quick Access & Recent Files Row -->
@@ -1368,21 +1335,21 @@ function getCategoryColor(category: string): string {
                 <button
                   @click.stop="toggleStar(doc)"
                   class="w-7 h-7 rounded-lg bg-amber-100 text-amber-600 hover:bg-amber-200 flex items-center justify-center transition-all"
-                  title="Remove from Starred"
+                  :title="$t('documents.removeFromStarred')"
                 >
                   <i class="fas fa-star text-xs"></i>
                 </button>
                 <button
                   @click.stop="shareDocument(doc)"
                   class="w-7 h-7 rounded-lg bg-gray-100 text-gray-400 hover:bg-blue-100 hover:text-blue-600 flex items-center justify-center transition-all"
-                  title="Share"
+                  :title="$t('documents.share')"
                 >
                   <i class="fas fa-share-alt text-xs"></i>
                 </button>
                 <button
                   @click.stop="downloadDocument(doc)"
                   class="w-7 h-7 rounded-lg bg-gray-100 text-gray-400 hover:bg-teal-100 hover:text-teal-600 flex items-center justify-center transition-all"
-                  title="Download"
+                  :title="$t('documents.download')"
                 >
                   <i class="fas fa-download text-xs"></i>
                 </button>
@@ -1437,21 +1404,21 @@ function getCategoryColor(category: string): string {
                     'w-7 h-7 rounded-lg flex items-center justify-center transition-all',
                     doc.isStarred ? 'bg-amber-100 text-amber-600 hover:bg-amber-200' : 'bg-gray-100 text-gray-400 hover:bg-amber-100 hover:text-amber-600'
                   ]"
-                  :title="doc.isStarred ? 'Remove from Starred' : 'Add to Starred'"
+                  :title="doc.isStarred ? $t('documents.removeFromStarred') : $t('documents.addToStarred')"
                 >
                   <i class="fas fa-star text-xs"></i>
                 </button>
                 <button
                   @click.stop="shareDocument(doc)"
                   class="w-7 h-7 rounded-lg bg-gray-100 text-gray-400 hover:bg-blue-100 hover:text-blue-600 flex items-center justify-center transition-all"
-                  title="Share"
+                  :title="$t('documents.share')"
                 >
                   <i class="fas fa-share-alt text-xs"></i>
                 </button>
                 <button
                   @click.stop="downloadDocument(doc)"
                   class="w-7 h-7 rounded-lg bg-gray-100 text-gray-400 hover:bg-teal-100 hover:text-teal-600 flex items-center justify-center transition-all"
-                  title="Download"
+                  :title="$t('documents.download')"
                 >
                   <i class="fas fa-download text-xs"></i>
                 </button>
@@ -1469,14 +1436,14 @@ function getCategoryColor(category: string): string {
               <i class="fas fa-wand-magic-sparkles text-white text-sm"></i>
             </div>
             <div>
-              <span class="block">AI Organization Suggestions</span>
-              <span class="text-xs font-medium text-gray-500">Smart folder recommendations</span>
+              <span class="block">{{ $t('documents.aiOrganizationSuggestions') }}</span>
+              <span class="text-xs font-medium text-gray-500">{{ $t('documents.smartFolderRecommendations') }}</span>
             </div>
-            <span class="ai-powered-badge-doc">AI Powered</span>
+            <span class="ai-powered-badge-doc">{{ $t('documents.aiPowered') }}</span>
           </h2>
           <div class="flex items-center gap-2">
             <button @click="dismissAllFolderSuggestions" class="text-xs text-gray-500 hover:text-gray-700 px-2 py-1">
-              Dismiss all
+              {{ $t('documents.dismissAll') }}
             </button>
             <button @click="toggleAIFeatures" class="w-7 h-7 rounded-lg bg-gray-100 text-gray-400 hover:bg-red-50 hover:text-red-500 flex items-center justify-center transition-all">
               <i class="fas fa-times text-xs"></i>
@@ -1514,7 +1481,7 @@ function getCategoryColor(category: string): string {
               <!-- Confidence & Actions -->
               <div class="flex items-center gap-3">
                 <div class="text-right">
-                  <span class="text-xs text-gray-400">Confidence</span>
+                  <span class="text-xs text-gray-400">{{ $t('documents.confidence') }}</span>
                   <div class="flex items-center gap-1">
                     <div class="w-16 h-1.5 bg-gray-200 rounded-full overflow-hidden">
                       <div
@@ -1531,7 +1498,7 @@ function getCategoryColor(category: string): string {
                     class="px-3 py-1.5 bg-teal-500 text-white text-xs font-medium rounded-lg hover:bg-teal-600 transition-all flex items-center gap-1"
                   >
                     <i class="fas fa-check"></i>
-                    Apply
+                    {{ $t('documents.apply') }}
                   </button>
                   <button
                     @click="dismissFolderSuggestion(suggestion.documentId)"
@@ -1557,26 +1524,26 @@ function getCategoryColor(category: string): string {
                 <i class="fas fa-folder-tree text-white text-sm"></i>
               </div>
               <div>
-                <span class="block">All Files</span>
-                <span class="text-xs font-medium text-gray-500">{{ filteredDocuments.length }} items • {{ formatTotalSize(documentStats.totalSize) }}</span>
+                <span class="block">{{ $t('documents.allFiles') }}</span>
+                <span class="text-xs font-medium text-gray-500">{{ filteredDocuments.length }} {{ $t('documents.items') }} • {{ formatTotalSize(documentStats.totalSize) }}</span>
               </div>
             </h2>
             <div class="flex items-center gap-2">
               <!-- Primary Actions -->
               <button class="px-4 py-2 bg-gradient-to-r from-teal-500 to-teal-600 text-white rounded-lg text-sm font-medium hover:from-teal-600 hover:to-teal-700 transition-all flex items-center gap-2 shadow-sm shadow-teal-200">
                 <i class="fas fa-cloud-arrow-up"></i>
-                Upload Files
+                {{ $t('documents.uploadFiles') }}
               </button>
               <button class="px-3 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 hover:border-gray-300 transition-all flex items-center gap-2">
                 <i class="fas fa-folder-plus text-amber-500"></i>
-                New Folder
+                {{ $t('documents.newFolder') }}
               </button>
 
               <!-- Divider -->
               <div class="w-px h-8 bg-gray-200 mx-1"></div>
 
               <!-- Secondary Actions -->
-              <button class="w-9 h-9 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-800 flex items-center justify-center transition-all" title="Refresh">
+              <button class="w-9 h-9 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-800 flex items-center justify-center transition-all" :title="$t('documents.refresh')">
                 <i class="fas fa-sync-alt text-sm"></i>
               </button>
             </div>
@@ -1597,7 +1564,7 @@ function getCategoryColor(category: string): string {
                       ? 'bg-gradient-to-r from-teal-500 to-cyan-500 border-teal-500 text-white'
                       : 'bg-gray-100 border-gray-200 text-gray-500 hover:bg-gray-200'
                   ]"
-                  title="Toggle AI Search"
+                  :title="$t('documents.toggleAISearch')"
                 >
                   <i class="fas fa-wand-magic-sparkles"></i>
                   <span class="hidden sm:inline">AI</span>
@@ -1612,7 +1579,7 @@ function getCategoryColor(category: string): string {
                   <input
                     v-model="unifiedSearchQuery"
                     type="text"
-                    :placeholder="isAISearchMode ? 'Ask AI: Find tournament regulations...' : 'Search files and folders...'"
+                    :placeholder="isAISearchMode ? $t('documents.askAIPlaceholder') : $t('documents.searchFilesPlaceholder')"
                     @keyup.enter="handleUnifiedSearch"
                     @input="handleSearchInput"
                     @focus="unifiedSearchQuery.length >= 2 && (showSearchSuggestions = true)"
@@ -1654,7 +1621,7 @@ function getCategoryColor(category: string): string {
               >
                 <div class="px-3 py-1.5 text-xs font-semibold text-teal-500 flex items-center gap-2">
                   <i class="fas fa-lightbulb"></i>
-                  Try asking:
+                  {{ $t('documents.tryAsking') }}
                 </div>
                 <button
                   v-for="suggestion in nlSearchSuggestions"
@@ -1674,7 +1641,7 @@ function getCategoryColor(category: string): string {
               >
                 <div class="ai-suggestions-header-doc">
                   <i class="fas fa-wand-magic-sparkles text-teal-500"></i>
-                  <span>AI Suggestions</span>
+                  <span>{{ $t('documents.aiSuggestions') }}</span>
                 </div>
                 <div class="ai-suggestions-list-doc">
                   <button
@@ -1700,8 +1667,8 @@ function getCategoryColor(category: string): string {
                     <i class="fas fa-brain text-white text-sm animate-pulse"></i>
                   </div>
                   <div>
-                    <div class="text-sm font-medium text-teal-700">AI is searching...</div>
-                    <div class="text-xs text-teal-500">Analyzing your query</div>
+                    <div class="text-sm font-medium text-teal-700">{{ $t('documents.aiSearching') }}</div>
+                    <div class="text-xs text-teal-500">{{ $t('documents.analyzingQuery') }}</div>
                   </div>
                 </div>
               </div>
@@ -1717,7 +1684,7 @@ function getCategoryColor(category: string): string {
                 ]"
               >
                 <i class="fas fa-file text-sm"></i>
-                <span>{{ selectedFileTypes.length > 0 ? `${selectedFileTypes.length} Types` : 'File Type' }}</span>
+                <span>{{ selectedFileTypes.length > 0 ? `${selectedFileTypes.length} ${$t('documents.fileTypes')}` : $t('documents.fileType') }}</span>
                 <i :class="showFileTypeFilter ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ml-1"></i>
               </button>
 
@@ -1726,7 +1693,7 @@ function getCategoryColor(category: string): string {
                 v-if="showFileTypeFilter"
                 class="absolute left-0 top-full mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
               >
-                <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Select File Types</div>
+                <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">{{ $t('documents.selectFileTypes') }}</div>
                 <div class="max-h-48 overflow-y-auto">
                   <button
                     v-for="type in fileTypes"
@@ -1755,13 +1722,13 @@ function getCategoryColor(category: string): string {
                     @click="selectedFileTypes = []; showFileTypeFilter = false"
                     class="flex-1 px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
                   >
-                    Clear All
+                    {{ $t('documents.clearAll') }}
                   </button>
                   <button
                     @click="showFileTypeFilter = false"
                     class="flex-1 px-3 py-1.5 text-xs font-medium text-white bg-teal-500 rounded-lg hover:bg-teal-600 transition-colors"
                   >
-                    Apply
+                    {{ $t('documents.apply') }}
                   </button>
                 </div>
               </div>
@@ -1780,7 +1747,7 @@ function getCategoryColor(category: string): string {
                 ]"
               >
                 <i class="fas fa-layer-group text-sm"></i>
-                <span>{{ selectedCategories.length > 0 ? `${selectedCategories.length} Categories` : 'Category' }}</span>
+                <span>{{ selectedCategories.length > 0 ? `${selectedCategories.length} ${$t('documents.categories')}` : $t('documents.category') }}</span>
                 <i :class="showCategoryFilter ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ml-1"></i>
               </button>
 
@@ -1789,7 +1756,7 @@ function getCategoryColor(category: string): string {
                 v-if="showCategoryFilter"
                 class="absolute left-0 top-full mt-2 w-64 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
               >
-                <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Select Categories</div>
+                <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">{{ $t('documents.selectCategories') }}</div>
                 <div class="max-h-48 overflow-y-auto">
                   <button
                     v-for="lib in libraries"
@@ -1824,13 +1791,13 @@ function getCategoryColor(category: string): string {
                     @click="selectedCategories = []; showCategoryFilter = false"
                     class="flex-1 px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
                   >
-                    Clear All
+                    {{ $t('documents.clearAll') }}
                   </button>
                   <button
                     @click="showCategoryFilter = false"
                     class="flex-1 px-3 py-1.5 text-xs font-medium text-white bg-teal-500 rounded-lg hover:bg-teal-600 transition-colors"
                   >
-                    Apply
+                    {{ $t('documents.apply') }}
                   </button>
                 </div>
               </div>
@@ -1849,7 +1816,7 @@ function getCategoryColor(category: string): string {
                 ]"
               >
                 <i class="fas fa-tags text-sm"></i>
-                <span>{{ selectedTags.length > 0 ? `${selectedTags.length} Tags` : 'Tags' }}</span>
+                <span>{{ selectedTags.length > 0 ? `${selectedTags.length} ${$t('documents.tags')}` : $t('documents.tags') }}</span>
                 <i :class="showTagFilter ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ml-1"></i>
               </button>
 
@@ -1858,7 +1825,7 @@ function getCategoryColor(category: string): string {
                 v-if="showTagFilter"
                 class="absolute left-0 top-full mt-2 w-64 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
               >
-                <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Select Tags</div>
+                <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">{{ $t('documents.selectTags') }}</div>
                 <div class="max-h-48 overflow-y-auto">
                   <button
                     v-for="tag in allTags"
@@ -1886,13 +1853,13 @@ function getCategoryColor(category: string): string {
                     @click="selectedTags = []; showTagFilter = false"
                     class="flex-1 px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
                   >
-                    Clear All
+                    {{ $t('documents.clearAll') }}
                   </button>
                   <button
                     @click="showTagFilter = false"
                     class="flex-1 px-3 py-1.5 text-xs font-medium text-white bg-teal-500 rounded-lg hover:bg-teal-600 transition-colors"
                   >
-                    Apply
+                    {{ $t('documents.apply') }}
                   </button>
                 </div>
               </div>
@@ -1911,7 +1878,7 @@ function getCategoryColor(category: string): string {
                 ]"
               >
                 <i class="fas fa-bookmark text-sm"></i>
-                <span>{{ selectedStatusFilters.length > 0 ? `${selectedStatusFilters.length} Saved & Shared` : 'Saved & Shared' }}</span>
+                <span>{{ selectedStatusFilters.length > 0 ? `${selectedStatusFilters.length} ${$t('documents.savedAndShared')}` : $t('documents.savedAndShared') }}</span>
                 <i :class="showStatusFilter ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ml-1"></i>
               </button>
 
@@ -1920,7 +1887,7 @@ function getCategoryColor(category: string): string {
                 v-if="showStatusFilter"
                 class="absolute left-0 top-full mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
               >
-                <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Filter by Status</div>
+                <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">{{ $t('documents.filterByStatus') }}</div>
                 <div class="max-h-48 overflow-y-auto">
                   <button
                     v-for="option in statusFilterOptions"
@@ -1949,13 +1916,13 @@ function getCategoryColor(category: string): string {
                     @click="selectedStatusFilters = []; showStatusFilter = false"
                     class="flex-1 px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
                   >
-                    Clear All
+                    {{ $t('documents.clearAll') }}
                   </button>
                   <button
                     @click="showStatusFilter = false"
                     class="flex-1 px-3 py-1.5 text-xs font-medium text-white bg-teal-500 rounded-lg hover:bg-teal-600 transition-colors"
                   >
-                    Apply
+                    {{ $t('documents.apply') }}
                   </button>
                 </div>
               </div>
@@ -1977,7 +1944,7 @@ function getCategoryColor(category: string): string {
               <button
                 @click="sortOrder = sortOrder === 'asc' ? 'desc' : 'asc'"
                 class="flex items-center justify-center w-8 h-8 rounded-r-lg text-xs font-medium transition-all border bg-white border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-teal-600"
-                :title="sortOrder === 'asc' ? 'Ascending order - Click for descending' : 'Descending order - Click for ascending'"
+                :title="sortOrder === 'asc' ? $t('documents.ascendingOrder') : $t('documents.descendingOrder')"
               >
                 <i :class="sortOrder === 'asc' ? 'fas fa-arrow-up' : 'fas fa-arrow-down'" class="text-sm text-teal-500"></i>
               </button>
@@ -1987,7 +1954,7 @@ function getCategoryColor(category: string): string {
                 v-if="showSortDropdown"
                 class="absolute left-0 top-full mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
               >
-                <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Sort By</div>
+                <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">{{ $t('documents.sortBy') }}</div>
                 <div class="max-h-64 overflow-y-auto">
                   <button
                     v-for="option in sortOptionsList"
@@ -2012,14 +1979,14 @@ function getCategoryColor(category: string): string {
               <button
                 @click="viewMode = 'grid'"
                 :class="['px-2.5 py-1 rounded-md transition-all', viewMode === 'grid' ? 'bg-teal-500 text-white' : 'text-gray-500 hover:bg-gray-100']"
-                title="Grid view"
+                :title="$t('documents.gridView')"
               >
                 <i class="fas fa-th-large text-xs"></i>
               </button>
               <button
                 @click="viewMode = 'list'"
                 :class="['px-2.5 py-1 rounded-md transition-all', viewMode === 'list' ? 'bg-teal-500 text-white' : 'text-gray-500 hover:bg-gray-100']"
-                title="List view"
+                :title="$t('documents.listView')"
               >
                 <i class="fas fa-list text-xs"></i>
               </button>
@@ -2039,7 +2006,7 @@ function getCategoryColor(category: string): string {
             <button
               @click="isSidebarCollapsed = !isSidebarCollapsed"
               class="absolute -right-3 top-4 w-6 h-6 bg-white border border-gray-200 rounded-full shadow-sm flex items-center justify-center text-gray-500 hover:text-teal-600 hover:border-teal-300 transition-all z-10"
-              :title="isSidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'"
+              :title="isSidebarCollapsed ? $t('documents.expandSidebar') : $t('documents.collapseSidebar')"
             >
               <i :class="isSidebarCollapsed ? 'fas fa-chevron-right' : 'fas fa-chevron-left'" class="text-[10px]"></i>
             </button>
@@ -2078,7 +2045,7 @@ function getCategoryColor(category: string): string {
             <!-- Expanded State - Full Tree -->
             <div v-else class="p-4">
               <!-- View Navigation -->
-              <div class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Views</div>
+              <div class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">{{ $t('documents.views') }}</div>
               <div class="space-y-1 mb-4">
                 <button
                   v-for="view in viewNavItems"
@@ -2104,7 +2071,7 @@ function getCategoryColor(category: string): string {
 
               <div class="border-t border-gray-200 my-4"></div>
 
-              <div class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Folders</div>
+              <div class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">{{ $t('documents.folders') }}</div>
 
               <!-- Recursive Folder Tree -->
               <div class="space-y-1">
@@ -2178,11 +2145,11 @@ function getCategoryColor(category: string): string {
 
               <!-- Storage Info -->
               <div class="mt-6 pt-4 border-t border-gray-200">
-                <div class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Storage</div>
+                <div class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">{{ $t('documents.storage') }}</div>
                 <div class="bg-gray-200 rounded-full h-2 overflow-hidden">
                   <div class="bg-gradient-to-r from-teal-500 to-teal-400 h-full rounded-full" style="width: 45%"></div>
                 </div>
-                <p class="text-xs text-gray-500 mt-2">{{ formatTotalSize(documentStats.totalSize) }} used</p>
+                <p class="text-xs text-gray-500 mt-2">{{ formatTotalSize(documentStats.totalSize) }} {{ $t('documents.used') }}</p>
               </div>
             </div>
           </div>
@@ -2193,7 +2160,7 @@ function getCategoryColor(category: string): string {
             <div v-if="selectedFolder || selectedFileTypes.length > 0 || searchQuery || selectedCategories.length > 0 || selectedTags.length > 0" class="flex items-center gap-3 mb-5 p-3 bg-white rounded-xl border border-gray-100 shadow-sm">
               <div class="flex items-center gap-2 px-2 py-1 bg-gray-100 rounded-lg">
                 <i class="fas fa-filter text-gray-400 text-xs"></i>
-                <span class="text-xs font-medium text-gray-600">Active Filters</span>
+                <span class="text-xs font-medium text-gray-600">{{ $t('documents.activeFilters') }}</span>
               </div>
               <div class="flex flex-wrap gap-2 flex-1">
                 <span v-if="selectedFolder" class="px-2.5 py-1 bg-teal-50 text-teal-700 rounded-lg text-xs font-medium flex items-center gap-1.5 border border-teal-100">
@@ -2259,7 +2226,7 @@ function getCategoryColor(category: string): string {
               <div class="flex items-center gap-2 text-xs text-gray-500 bg-white px-3 py-2 rounded-lg border border-gray-100">
                 <i class="fas fa-file-alt text-teal-500"></i>
                 <span class="font-medium">{{ filteredDocuments.length }}</span>
-                <span>items</span>
+                <span>{{ $t('documents.itemsCount') }}</span>
               </div>
             </div>
 
@@ -2278,13 +2245,13 @@ function getCategoryColor(category: string): string {
                     <i v-if="isAllSelected" class="fas fa-check text-teal-600 text-[10px]"></i>
                     <i v-else-if="isSomeSelected" class="fas fa-minus text-teal-600 text-[10px]"></i>
                   </div>
-                  <span class="text-sm font-medium">{{ isAllSelected ? 'Deselect all' : 'Select all' }}</span>
+                  <span class="text-sm font-medium">{{ isAllSelected ? $t('documents.deselectAll') : $t('documents.selectAll') }}</span>
                 </button>
 
                 <!-- Selected Count -->
                 <div class="flex items-center gap-2 px-3 py-1.5 bg-white/20 rounded-lg">
                   <i class="fas fa-check-circle text-white/80"></i>
-                  <span class="text-white text-sm font-semibold">{{ selectedCount }} selected</span>
+                  <span class="text-white text-sm font-semibold">{{ selectedCount }} {{ $t('documents.selected') }}</span>
                 </div>
               </div>
 
@@ -2294,61 +2261,61 @@ function getCategoryColor(category: string): string {
                   <button
                     @click="bulkStar"
                     class="flex items-center gap-2 px-3 py-2 bg-white/20 hover:bg-white/30 text-white rounded-lg transition-all text-sm font-medium"
-                    title="Star selected"
+                    :title="$t('documents.starSelected')"
                   >
                     <i class="fas fa-star"></i>
-                    <span class="hidden sm:inline">Star</span>
+                    <span class="hidden sm:inline">{{ $t('documents.star') }}</span>
                   </button>
                   <button
                     @click="bulkDownload"
                     class="flex items-center gap-2 px-3 py-2 bg-white/20 hover:bg-white/30 text-white rounded-lg transition-all text-sm font-medium"
-                    title="Download selected"
+                    :title="$t('documents.downloadSelected')"
                   >
                     <i class="fas fa-download"></i>
-                    <span class="hidden sm:inline">Download</span>
+                    <span class="hidden sm:inline">{{ $t('documents.download') }}</span>
                   </button>
                   <button
                     @click="bulkShare"
                     class="flex items-center gap-2 px-3 py-2 bg-white/20 hover:bg-white/30 text-white rounded-lg transition-all text-sm font-medium"
-                    title="Share selected"
+                    :title="$t('documents.shareSelected')"
                   >
                     <i class="fas fa-share-alt"></i>
-                    <span class="hidden sm:inline">Share</span>
+                    <span class="hidden sm:inline">{{ $t('documents.share') }}</span>
                   </button>
                   <button
                     @click="bulkExport"
                     class="flex items-center gap-2 px-3 py-2 bg-white/20 hover:bg-white/30 text-white rounded-lg transition-all text-sm font-medium"
-                    title="Export selected"
+                    :title="$t('documents.exportSelected')"
                   >
                     <i class="fas fa-file-export"></i>
-                    <span class="hidden sm:inline">Export</span>
+                    <span class="hidden sm:inline">{{ $t('documents.export') }}</span>
                   </button>
                   <div class="w-px h-6 bg-white/30 mx-1"></div>
                   <button
                     @click="bulkMoveToTrash"
                     class="flex items-center gap-2 px-3 py-2 bg-red-500/80 hover:bg-red-500 text-white rounded-lg transition-all text-sm font-medium"
-                    title="Move to trash"
+                    :title="$t('documents.moveToTrash')"
                   >
                     <i class="fas fa-trash-alt"></i>
-                    <span class="hidden sm:inline">Delete</span>
+                    <span class="hidden sm:inline">{{ $t('documents.delete') }}</span>
                   </button>
                 </template>
                 <template v-else>
                   <button
                     @click="bulkRestore"
                     class="flex items-center gap-2 px-3 py-2 bg-white/20 hover:bg-white/30 text-white rounded-lg transition-all text-sm font-medium"
-                    title="Restore selected"
+                    :title="$t('documents.restoreSelected')"
                   >
                     <i class="fas fa-undo"></i>
-                    <span class="hidden sm:inline">Restore</span>
+                    <span class="hidden sm:inline">{{ $t('documents.restore') }}</span>
                   </button>
                   <button
                     @click="bulkPermanentDelete"
                     class="flex items-center gap-2 px-3 py-2 bg-red-500/80 hover:bg-red-500 text-white rounded-lg transition-all text-sm font-medium"
-                    title="Delete permanently"
+                    :title="$t('documents.deletePermanently')"
                   >
                     <i class="fas fa-trash"></i>
-                    <span class="hidden sm:inline">Delete Forever</span>
+                    <span class="hidden sm:inline">{{ $t('documents.deleteForever') }}</span>
                   </button>
                 </template>
 
@@ -2358,7 +2325,7 @@ function getCategoryColor(category: string): string {
                   class="flex items-center gap-2 px-3 py-2 bg-white text-teal-600 hover:bg-gray-100 rounded-lg transition-all text-sm font-medium ml-2"
                 >
                   <i class="fas fa-times"></i>
-                  <span class="hidden sm:inline">Cancel</span>
+                  <span class="hidden sm:inline">{{ $t('documents.cancel') }}</span>
                 </button>
               </div>
             </div>
@@ -2369,7 +2336,7 @@ function getCategoryColor(category: string): string {
                 <div class="w-16 h-16 border-4 border-teal-100 rounded-full"></div>
                 <div class="w-16 h-16 border-4 border-teal-500 border-t-transparent rounded-full animate-spin absolute top-0 left-0"></div>
               </div>
-              <p class="text-gray-500 text-sm mt-4 font-medium">Loading documents...</p>
+              <p class="text-gray-500 text-sm mt-4 font-medium">{{ $t('documents.loadingDocuments') }}</p>
             </div>
 
             <!-- Empty State -->
@@ -2377,16 +2344,16 @@ function getCategoryColor(category: string): string {
               <div class="w-24 h-24 bg-gradient-to-br from-gray-100 to-gray-50 rounded-3xl flex items-center justify-center mb-6 shadow-inner">
                 <i class="fas fa-folder-open text-4xl text-gray-300"></i>
               </div>
-              <h3 class="text-lg font-semibold text-gray-700 mb-2">No files found</h3>
-              <p class="text-gray-500 text-sm mb-6 max-w-xs text-center">Try adjusting your filters or upload a new file to get started</p>
+              <h3 class="text-lg font-semibold text-gray-700 mb-2">{{ $t('documents.noFilesFound') }}</h3>
+              <p class="text-gray-500 text-sm mb-6 max-w-xs text-center">{{ $t('documents.noFilesDescription') }}</p>
               <div class="flex items-center gap-3">
                 <button @click="clearFilters; selectedFolder = null" class="px-5 py-2.5 bg-gray-100 text-gray-700 rounded-xl text-sm font-medium hover:bg-gray-200 transition-colors flex items-center gap-2">
                   <i class="fas fa-filter-circle-xmark"></i>
-                  Clear Filters
+                  {{ $t('documents.clearAll') }}
                 </button>
                 <button class="px-5 py-2.5 bg-gradient-to-r from-teal-500 to-teal-600 text-white rounded-xl text-sm font-medium hover:from-teal-600 hover:to-teal-700 transition-all shadow-sm shadow-teal-200 flex items-center gap-2">
                   <i class="fas fa-cloud-arrow-up"></i>
-                  Upload Files
+                  {{ $t('documents.uploadFiles') }}
                 </button>
               </div>
             </div>
@@ -2447,7 +2414,7 @@ function getCategoryColor(category: string): string {
                         'w-7 h-7 rounded-lg flex items-center justify-center transition-all shadow-sm backdrop-blur-sm',
                         doc.isStarred ? 'bg-amber-400 text-white' : 'bg-white/95 text-gray-500 hover:bg-amber-400 hover:text-white'
                       ]"
-                      :title="doc.isStarred ? 'Remove from Starred' : 'Add to Starred'"
+                      :title="doc.isStarred ? $t('documents.removeFromStarred') : $t('documents.addToStarred')"
                     >
                       <i class="fas fa-star text-xs"></i>
                     </button>
@@ -2455,7 +2422,7 @@ function getCategoryColor(category: string): string {
                       v-if="currentView === 'trash'"
                       @click.stop="restoreFromTrash(doc)"
                       class="w-7 h-7 rounded-lg bg-teal-500 text-white hover:bg-teal-600 flex items-center justify-center transition-all shadow-sm"
-                      title="Restore"
+                      :title="$t('documents.restore')"
                     >
                       <i class="fas fa-undo text-xs"></i>
                     </button>
@@ -2463,7 +2430,7 @@ function getCategoryColor(category: string): string {
                       v-if="currentView === 'trash'"
                       @click.stop="permanentlyDelete(doc)"
                       class="w-7 h-7 rounded-lg bg-red-500 text-white hover:bg-red-600 flex items-center justify-center transition-all shadow-sm"
-                      title="Delete permanently"
+                      :title="$t('documents.deletePermanently')"
                     >
                       <i class="fas fa-trash text-xs"></i>
                     </button>
@@ -2471,7 +2438,7 @@ function getCategoryColor(category: string): string {
                       v-if="currentView !== 'trash'"
                       @click.stop="downloadDocument(doc)"
                       class="w-7 h-7 rounded-lg bg-white/95 text-gray-500 hover:bg-teal-500 hover:text-white flex items-center justify-center transition-all shadow-sm backdrop-blur-sm"
-                      title="Download"
+                      :title="$t('documents.download')"
                     >
                       <i class="fas fa-download text-xs"></i>
                     </button>
@@ -2479,7 +2446,7 @@ function getCategoryColor(category: string): string {
                       v-if="currentView !== 'trash'"
                       @click.stop="shareDocument(doc)"
                       class="w-7 h-7 rounded-lg bg-white/95 text-gray-500 hover:bg-blue-500 hover:text-white flex items-center justify-center transition-all shadow-sm backdrop-blur-sm"
-                      title="Share"
+                      :title="$t('documents.share')"
                     >
                       <i class="fas fa-share-alt text-xs"></i>
                     </button>
@@ -2492,7 +2459,7 @@ function getCategoryColor(category: string): string {
                           ? 'bg-purple-500 text-white'
                           : 'bg-white/95 text-gray-500 hover:bg-purple-500 hover:text-white'
                       ]"
-                      :title="isInComparison(doc.id) ? 'Remove from Compare' : 'Add to Compare'"
+                      :title="isInComparison(doc.id) ? $t('documents.removeFromCompare') : $t('documents.addToCompare')"
                     >
                       <i class="fas fa-layer-group text-xs"></i>
                     </button>
@@ -2550,14 +2517,14 @@ function getCategoryColor(category: string): string {
                   <!-- Left: Stats & Items Per Page -->
                   <div class="flex items-center gap-4 flex-wrap">
                     <span class="text-xs text-gray-500">
-                      Showing <span class="font-semibold text-gray-700">{{ Math.min((currentPage - 1) * itemsPerPage + 1, filteredDocuments.length) }}</span>
-                      to <span class="font-semibold text-gray-700">{{ Math.min(currentPage * itemsPerPage, filteredDocuments.length) }}</span>
-                      of <span class="font-semibold text-gray-700">{{ filteredDocuments.length }}</span> files
+                      {{ $t('documents.showing') }} <span class="font-semibold text-gray-700">{{ Math.min((currentPage - 1) * itemsPerPage + 1, filteredDocuments.length) }}</span>
+                      {{ $t('documents.to') }} <span class="font-semibold text-gray-700">{{ Math.min(currentPage * itemsPerPage, filteredDocuments.length) }}</span>
+                      {{ $t('documents.of') }} <span class="font-semibold text-gray-700">{{ filteredDocuments.length }}</span> {{ $t('documents.filesLower') }}
                     </span>
 
                     <!-- Items Per Page Selector -->
                     <div class="flex items-center gap-2">
-                      <span class="text-xs text-gray-500">Show:</span>
+                      <span class="text-xs text-gray-500">{{ $t('documents.show') }}</span>
                       <select
                         v-model="itemsPerPage"
                         @change="changeItemsPerPage(Number(($event.target as HTMLSelectElement).value))"
@@ -2567,7 +2534,7 @@ function getCategoryColor(category: string): string {
                           {{ option }}
                         </option>
                       </select>
-                      <span class="text-xs text-gray-500">per page</span>
+                      <span class="text-xs text-gray-500">{{ $t('documents.perPage') }}</span>
                     </div>
                   </div>
 
@@ -2771,7 +2738,7 @@ function getCategoryColor(category: string): string {
                       <div class="w-7 h-7 bg-teal-100 rounded-lg flex items-center justify-center">
                         <i class="fas fa-folder text-teal-500 text-xs"></i>
                       </div>
-                      <span class="text-sm text-teal-700 font-medium truncate">{{ (doc as any).category || 'General' }}</span>
+                      <span class="text-sm text-teal-700 font-medium truncate">{{ (doc as any).category || $t('documents.general') }}</span>
                     </div>
                   </div>
 
@@ -2839,21 +2806,21 @@ function getCategoryColor(category: string): string {
                             'w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-200 shadow-sm',
                             doc.isStarred ? 'bg-amber-100 text-amber-600 hover:bg-amber-200 hover:shadow-md' : 'bg-gray-100 text-gray-500 hover:bg-amber-100 hover:text-amber-600 hover:shadow-md'
                           ]"
-                          :title="doc.isStarred ? 'Remove from Starred' : 'Add to Starred'"
+                          :title="doc.isStarred ? $t('documents.removeFromStarred') : $t('documents.addToStarred')"
                         >
                           <i class="fas fa-star text-sm"></i>
                         </button>
                         <button
                           @click.stop="downloadDocument(doc)"
                           class="w-9 h-9 rounded-xl bg-gray-100 text-gray-500 hover:bg-teal-100 hover:text-teal-600 flex items-center justify-center transition-all duration-200 shadow-sm hover:shadow-md"
-                          title="Download"
+                          :title="$t('documents.download')"
                         >
                           <i class="fas fa-download text-sm"></i>
                         </button>
                         <button
                           @click.stop="shareDocument(doc)"
                           class="w-9 h-9 rounded-xl bg-gray-100 text-gray-500 hover:bg-blue-100 hover:text-blue-600 flex items-center justify-center transition-all duration-200 shadow-sm hover:shadow-md"
-                          title="Share"
+                          :title="$t('documents.share')"
                         >
                           <i class="fas fa-share-alt text-sm"></i>
                         </button>
@@ -2865,7 +2832,7 @@ function getCategoryColor(category: string): string {
                               ? 'bg-purple-500 text-white'
                               : 'bg-gray-100 text-gray-500 hover:bg-purple-100 hover:text-purple-600'
                           ]"
-                          :title="isInComparison(doc.id) ? 'Remove from Compare' : 'Add to Compare'"
+                          :title="isInComparison(doc.id) ? $t('documents.removeFromCompare') : $t('documents.addToCompare')"
                         >
                           <i class="fas fa-layer-group text-sm"></i>
                         </button>
@@ -2874,14 +2841,14 @@ function getCategoryColor(category: string): string {
                         <button
                           @click.stop="restoreFromTrash(doc)"
                           class="w-9 h-9 rounded-xl bg-teal-100 text-teal-600 hover:bg-teal-200 flex items-center justify-center transition-all duration-200 shadow-sm hover:shadow-md"
-                          title="Restore"
+                          :title="$t('documents.restore')"
                         >
                           <i class="fas fa-undo text-sm"></i>
                         </button>
                         <button
                           @click.stop="permanentlyDelete(doc)"
                           class="w-9 h-9 rounded-xl bg-red-100 text-red-600 hover:bg-red-200 flex items-center justify-center transition-all duration-200 shadow-sm hover:shadow-md"
-                          title="Delete permanently"
+                          :title="$t('documents.deletePermanently')"
                         >
                           <i class="fas fa-trash text-sm"></i>
                         </button>
@@ -2891,7 +2858,7 @@ function getCategoryColor(category: string): string {
                     <button
                       @click.stop="viewDocument(doc)"
                       class="w-9 h-9 rounded-xl bg-gradient-to-br from-teal-50 to-teal-100 text-teal-600 hover:from-teal-100 hover:to-teal-200 flex items-center justify-center transition-all duration-200 shadow-sm hover:shadow-md"
-                      title="Quick Preview"
+                      :title="$t('documents.quickPreview')"
                     >
                       <i class="fas fa-eye text-sm"></i>
                     </button>
@@ -2905,14 +2872,14 @@ function getCategoryColor(category: string): string {
                   <!-- Left: Stats & Items Per Page -->
                   <div class="flex items-center gap-4 flex-wrap">
                     <span class="text-xs text-gray-500">
-                      Showing <span class="font-semibold text-gray-700">{{ Math.min((currentPage - 1) * itemsPerPage + 1, filteredDocuments.length) }}</span>
-                      to <span class="font-semibold text-gray-700">{{ Math.min(currentPage * itemsPerPage, filteredDocuments.length) }}</span>
-                      of <span class="font-semibold text-gray-700">{{ filteredDocuments.length }}</span> files
+                      {{ $t('documents.showing') }} <span class="font-semibold text-gray-700">{{ Math.min((currentPage - 1) * itemsPerPage + 1, filteredDocuments.length) }}</span>
+                      {{ $t('documents.to') }} <span class="font-semibold text-gray-700">{{ Math.min(currentPage * itemsPerPage, filteredDocuments.length) }}</span>
+                      {{ $t('documents.of') }} <span class="font-semibold text-gray-700">{{ filteredDocuments.length }}</span> {{ $t('documents.filesLower') }}
                     </span>
 
                     <!-- Items Per Page Selector -->
                     <div class="flex items-center gap-2">
-                      <span class="text-xs text-gray-500">Show:</span>
+                      <span class="text-xs text-gray-500">{{ $t('documents.show') }}</span>
                       <select
                         v-model="itemsPerPage"
                         @change="changeItemsPerPage(Number(($event.target as HTMLSelectElement).value))"
@@ -2922,7 +2889,7 @@ function getCategoryColor(category: string): string {
                           {{ option }}
                         </option>
                       </select>
-                      <span class="text-xs text-gray-500">per page</span>
+                      <span class="text-xs text-gray-500">{{ $t('documents.perPage') }}</span>
                     </div>
 
                     <div class="hidden sm:flex items-center gap-3 text-xs text-gray-400">
@@ -3015,143 +2982,6 @@ function getCategoryColor(category: string): string {
 </template>
 
 <style scoped>
-.hero-gradient {
-  background: linear-gradient(135deg, #0d9488 0%, #14b8a6 50%, #10b981 100%);
-}
-
-.stats-top-right {
-  position: absolute;
-  top: 24px;
-  right: 32px;
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  z-index: 10;
-}
-
-.stat-card-square {
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(8px);
-  border-radius: 16px;
-  width: 115px;
-  height: 115px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  text-align: center;
-  transition: all 0.3s ease;
-  cursor: pointer;
-}
-
-.stat-card-square:hover {
-  background: rgba(255, 255, 255, 0.25);
-  transform: translateY(-4px) scale(1.02);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-}
-
-.stat-card-square:hover .stat-icon-box {
-  transform: scale(1.1);
-}
-
-.stat-icon-box {
-  color: white;
-  font-size: 20px;
-  transition: transform 0.3s ease;
-}
-
-.stat-value-mini {
-  font-size: 24px;
-  font-weight: 700;
-  color: white;
-  line-height: 1;
-}
-
-.stat-label-mini {
-  font-size: 11px;
-  color: rgba(255, 255, 255, 0.7);
-  line-height: 1;
-}
-
-/* Circle Drift Animations */
-.circle-drift-1 {
-  animation: drift-1 20s ease-in-out infinite;
-}
-
-.circle-drift-2 {
-  animation: drift-2 25s ease-in-out infinite;
-}
-
-.circle-drift-3 {
-  animation: drift-3 18s ease-in-out infinite;
-}
-
-@keyframes drift-1 {
-  0%, 100% {
-    transform: translate(33%, -50%);
-  }
-  25% {
-    transform: translate(28%, -45%);
-  }
-  50% {
-    transform: translate(35%, -55%);
-  }
-  75% {
-    transform: translate(30%, -48%);
-  }
-}
-
-@keyframes drift-2 {
-  0%, 100% {
-    transform: translate(-33%, 50%);
-  }
-  33% {
-    transform: translate(-28%, 45%);
-  }
-  66% {
-    transform: translate(-38%, 55%);
-  }
-}
-
-@keyframes drift-3 {
-  0%, 100% {
-    transform: translate(0, 0) scale(1);
-  }
-  50% {
-    transform: translate(10px, -10px) scale(1.1);
-  }
-}
-
-@media (max-width: 1023px) {
-  .stats-top-right {
-    position: relative;
-    top: auto;
-    right: auto;
-    margin: 24px 32px 0;
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 8px;
-  }
-
-  .stat-card-square {
-    width: 100%;
-    height: 80px;
-  }
-
-  .stat-icon-box {
-    font-size: 14px;
-  }
-
-  .stat-value-mini {
-    font-size: 16px;
-  }
-
-  .stat-label-mini {
-    font-size: 8px;
-  }
-}
-
 /* Selection Mode Animations */
 @keyframes slideDown {
   from {
@@ -3212,7 +3042,7 @@ function getCategoryColor(category: string): string {
 .list-row-enhanced::before {
   content: '';
   position: absolute;
-  left: 0;
+  inset-inline-start: 0;
   top: 0;
   bottom: 0;
   width: 3px;

@@ -2,6 +2,7 @@
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
+import PageHeroHeader from '@/components/common/PageHeroHeader.vue'
 
 const router = useRouter()
 const { t } = useI18n()
@@ -303,6 +304,14 @@ const stats = computed(() => ({
   totalItems: collections.value.reduce((sum, c) => sum + c.itemCount, 0)
 }))
 
+// Hero stats for PageHeroHeader component
+const heroStats = computed(() => [
+  { icon: 'fas fa-layer-group', value: stats.value.total, label: t('collections.title') },
+  { icon: 'fas fa-user', value: stats.value.myCollections, label: t('collections.myCollections') },
+  { icon: 'fas fa-share-alt', value: stats.value.sharedWithMe, label: t('common.share') },
+  { icon: 'fas fa-file-alt', value: stats.value.totalItems, label: t('collections.totalItems') }
+])
+
 // Helper functions
 function formatDate(dateString: string): string {
   const date = new Date(dateString)
@@ -395,65 +404,23 @@ function saveNewCollection() {
 <template>
   <div class="min-h-screen bg-gray-50">
     <!-- Hero Section -->
-    <div class="hero-gradient relative overflow-hidden">
-      <!-- Decorative elements with animations -->
-      <div class="circle-drift-1 absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full"></div>
-      <div class="circle-drift-2 absolute bottom-0 left-0 w-64 h-64 bg-white/5 rounded-full"></div>
-      <div class="circle-drift-3 absolute top-1/2 right-1/4 w-32 h-32 bg-white/10 rounded-full"></div>
-
-      <!-- Stats - Absolute Top Right -->
-      <div class="stats-top-right">
-        <div class="stat-card-square">
-          <div class="stat-icon-box">
-            <i class="fas fa-layer-group"></i>
-          </div>
-          <p class="stat-value-mini">{{ stats.total }}</p>
-          <p class="stat-label-mini">{{ $t('collections.title') }}</p>
-        </div>
-        <div class="stat-card-square">
-          <div class="stat-icon-box">
-            <i class="fas fa-user"></i>
-          </div>
-          <p class="stat-value-mini">{{ stats.myCollections }}</p>
-          <p class="stat-label-mini">{{ $t('collections.myCollections') }}</p>
-        </div>
-        <div class="stat-card-square">
-          <div class="stat-icon-box">
-            <i class="fas fa-share-alt"></i>
-          </div>
-          <p class="stat-value-mini">{{ stats.sharedWithMe }}</p>
-          <p class="stat-label-mini">{{ $t('common.share') }}</p>
-        </div>
-        <div class="stat-card-square">
-          <div class="stat-icon-box">
-            <i class="fas fa-file-alt"></i>
-          </div>
-          <p class="stat-value-mini">{{ stats.totalItems }}</p>
-          <p class="stat-label-mini">{{ $t('collections.totalItems') }}</p>
-        </div>
-      </div>
-
-      <div class="relative px-8 py-8">
-        <div class="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-white text-xs font-semibold inline-flex items-center gap-2 mb-4">
-          <i class="fas fa-layer-group"></i>
-          AFC Asian Cup 2027
-        </div>
-
-        <h1 class="text-3xl font-bold text-white mb-2">{{ $t('collections.title') }}</h1>
-        <p class="text-teal-100 max-w-lg">{{ $t('collections.subtitle') }}</p>
-
-        <div class="flex flex-wrap gap-3 mt-6">
-          <button @click="createNewCollection" class="px-5 py-2.5 bg-white text-teal-600 rounded-xl font-semibold text-sm flex items-center gap-2 hover:bg-teal-50 transition-all shadow-lg">
-            <i class="fas fa-plus"></i>
-            {{ $t('collections.newCollection') }}
-          </button>
-          <button class="px-5 py-2.5 bg-white/20 backdrop-blur-sm border border-white/30 text-white rounded-xl font-semibold text-sm hover:bg-white/30 transition-all flex items-center gap-2">
-            <i class="fas fa-bookmark"></i>
-            {{ $t('collections.mySaved') }}
-          </button>
-        </div>
-      </div>
-    </div>
+    <PageHeroHeader
+      :stats="heroStats"
+      badge-icon="fas fa-layer-group"
+      :title="$t('collections.title')"
+      :subtitle="$t('collections.subtitle')"
+    >
+      <template #actions>
+        <button @click="createNewCollection" class="px-5 py-2.5 bg-white text-teal-600 rounded-xl font-semibold text-sm flex items-center gap-2 hover:bg-teal-50 transition-all shadow-lg">
+          <i class="fas fa-plus"></i>
+          {{ $t('collections.newCollection') }}
+        </button>
+        <button class="px-5 py-2.5 bg-white/20 backdrop-blur-sm border border-white/30 text-white rounded-xl font-semibold text-sm hover:bg-white/30 transition-all flex items-center gap-2">
+          <i class="fas fa-bookmark"></i>
+          {{ $t('collections.mySaved') }}
+        </button>
+      </template>
+    </PageHeroHeader>
 
     <!-- View Navigation -->
     <div class="view-nav">
@@ -764,123 +731,6 @@ function saveNewCollection() {
 </template>
 
 <style scoped>
-/* Hero Gradient */
-.hero-gradient {
-  background: linear-gradient(135deg, #0d9488 0%, #14b8a6 50%, #10b981 100%);
-}
-
-.stats-top-right {
-  position: absolute;
-  top: 24px;
-  right: 32px;
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-  z-index: 10;
-}
-
-.stat-card-square {
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(8px);
-  border-radius: 16px;
-  padding: 16px;
-  width: 100px;
-  height: 100px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  transition: all 0.3s ease;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  cursor: pointer;
-}
-
-.stat-card-square:hover {
-  background: rgba(255, 255, 255, 0.25);
-  transform: translateY(-4px) scale(1.02);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-}
-
-.stat-card-square:hover .stat-icon-box {
-  transform: scale(1.1);
-}
-
-.stat-icon-box {
-  width: 32px;
-  height: 32px;
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-size: 14px;
-  transition: transform 0.3s ease;
-}
-
-.stat-value-mini {
-  font-size: 18px;
-  font-weight: 700;
-  color: white;
-  margin: 0;
-}
-
-.stat-label-mini {
-  font-size: 10px;
-  color: rgba(255, 255, 255, 0.8);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin: 0;
-}
-
-/* Circle Drift Animations */
-.circle-drift-1 {
-  animation: drift-1 20s ease-in-out infinite;
-}
-
-.circle-drift-2 {
-  animation: drift-2 25s ease-in-out infinite;
-}
-
-.circle-drift-3 {
-  animation: drift-3 18s ease-in-out infinite;
-}
-
-@keyframes drift-1 {
-  0%, 100% { transform: translate(0, 0) rotate(0deg); }
-  25% { transform: translate(-30px, 20px) rotate(5deg); }
-  50% { transform: translate(-20px, -30px) rotate(-5deg); }
-  75% { transform: translate(20px, -10px) rotate(3deg); }
-}
-
-@keyframes drift-2 {
-  0%, 100% { transform: translate(0, 0) rotate(0deg); }
-  33% { transform: translate(40px, -20px) rotate(-8deg); }
-  66% { transform: translate(-30px, 30px) rotate(8deg); }
-}
-
-@keyframes drift-3 {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  50% { transform: translate(30px, -40px) scale(1.1); }
-}
-
-@media (max-width: 1023px) {
-  .stats-top-right {
-    position: relative;
-    top: auto;
-    right: auto;
-    margin: 1rem 2rem;
-    justify-content: center;
-    gap: 8px;
-  }
-
-  .stat-card-square {
-    width: 100%;
-    height: 80px;
-  }
-}
-
 /* View Navigation */
 .view-nav {
   display: flex;

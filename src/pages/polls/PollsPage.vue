@@ -2,6 +2,7 @@
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
+import PageHeroHeader from '@/components/common/PageHeroHeader.vue'
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
 import { useAIServicesStore } from '@/stores/aiServices'
 import { AILoadingIndicator, AISuggestionChip, AISentimentBadge } from '@/components/ai'
@@ -264,6 +265,14 @@ const stats = ref({
   created: 45,
   participation: 82
 })
+
+// Hero stats for PageHeroHeader component
+const heroStats = computed(() => [
+  { icon: 'fas fa-poll', value: stats.value.active, label: textConstants.activePolls },
+  { icon: 'fas fa-vote-yea', value: stats.value.responses.toLocaleString(), label: textConstants.responsesLabel },
+  { icon: 'fas fa-chart-pie', value: stats.value.created, label: textConstants.createdLabel },
+  { icon: 'fas fa-users', value: stats.value.participation + '%', label: textConstants.participationLabel }
+])
 
 // Tabs
 // Tabs - using textConstants
@@ -877,77 +886,36 @@ function getInsightTypeColor(type: string) {
     </div>
 
     <template v-else>
-      <!-- Hero Section - Documents Style -->
-      <div class="hero-gradient relative overflow-hidden">
-        <!-- Decorative elements with animations -->
-        <div class="circle-drift-1 absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full"></div>
-        <div class="circle-drift-2 absolute bottom-0 left-0 w-64 h-64 bg-white/5 rounded-full"></div>
-        <div class="circle-drift-3 absolute top-1/2 right-1/4 w-32 h-32 bg-white/10 rounded-full"></div>
-
-        <!-- Stats - Absolute Top Right -->
-        <div class="stats-top-right">
-          <div class="stat-card-square">
-            <div class="stat-icon-box">
-              <i class="fas fa-poll"></i>
-            </div>
-            <p class="stat-value-mini">{{ stats.active }}</p>
-            <p class="stat-label-mini">{{ textConstants.activePolls }}</p>
-          </div>
-          <div class="stat-card-square">
-            <div class="stat-icon-box">
-              <i class="fas fa-vote-yea"></i>
-            </div>
-            <p class="stat-value-mini">{{ stats.responses.toLocaleString() }}</p>
-            <p class="stat-label-mini">{{ textConstants.responsesLabel }}</p>
-          </div>
-          <div class="stat-card-square">
-            <div class="stat-icon-box">
-              <i class="fas fa-chart-pie"></i>
-            </div>
-            <p class="stat-value-mini">{{ stats.created }}</p>
-            <p class="stat-label-mini">{{ textConstants.createdLabel }}</p>
-          </div>
-          <div class="stat-card-square">
-            <div class="stat-icon-box">
-              <i class="fas fa-users"></i>
-            </div>
-            <p class="stat-value-mini">{{ stats.participation }}%</p>
-            <p class="stat-label-mini">{{ textConstants.participationLabel }}</p>
-          </div>
-        </div>
-
-        <div class="relative px-8 py-8">
-          <div class="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-white text-xs font-semibold inline-flex items-center gap-2 mb-4">
-            <i class="fas fa-poll"></i>
-            {{ textConstants.appBadge }}
-          </div>
-
-          <h1 class="text-3xl font-bold text-white mb-2">{{ textConstants.pageTitle }}</h1>
-          <p class="text-teal-100 max-w-lg">{{ textConstants.pageDescription }}</p>
-
-          <div class="flex flex-wrap gap-3 mt-6">
-            <button @click="goToCreatePoll" class="px-5 py-2.5 bg-white text-teal-600 rounded-xl font-semibold text-sm flex items-center gap-2 hover:bg-teal-50 transition-all shadow-lg">
-              <i class="fas fa-plus"></i>
-              {{ textConstants.createNewPoll }}
-            </button>
-            <button @click="showQuickPollModal = true" class="px-5 py-2.5 bg-white/20 backdrop-blur-sm border border-white/30 text-white rounded-xl font-semibold text-sm hover:bg-white/30 transition-all flex items-center gap-2">
-              <i class="fas fa-bolt"></i>
-              {{ textConstants.quickPoll }}
-            </button>
-            <!-- AI Action Buttons -->
-            <button @click="fetchAIInsights"
-                    class="px-5 py-2.5 bg-gradient-to-r from-teal-500/20 to-emerald-500/20 backdrop-blur-sm text-white rounded-xl font-semibold text-sm flex items-center gap-2 hover:from-teal-500/30 hover:to-emerald-500/30 transition-all border border-white/20">
-              <i class="fas fa-wand-magic-sparkles"></i>
-              {{ textConstants.aiInsights }}
-            </button>
-            <button @click="analyzeResponsePatterns"
-                    class="px-5 py-2.5 bg-white/10 backdrop-blur-sm text-white rounded-xl font-semibold text-sm flex items-center gap-2 hover:bg-white/20 transition-all border border-white/20">
-              <i class="fas fa-chart-bar"></i>
-              {{ textConstants.patternAnalysis }}
-            </button>
-          </div>
-        </div>
-      </div>
+      <!-- Hero Section -->
+      <PageHeroHeader
+        :stats="heroStats"
+        badge-icon="fas fa-poll"
+        :badge-text="textConstants.appBadge"
+        :title="textConstants.pageTitle"
+        :subtitle="textConstants.pageDescription"
+      >
+        <template #actions>
+          <button @click="goToCreatePoll" class="px-5 py-2.5 bg-white text-teal-600 rounded-xl font-semibold text-sm flex items-center gap-2 hover:bg-teal-50 transition-all shadow-lg">
+            <i class="fas fa-plus"></i>
+            {{ textConstants.createNewPoll }}
+          </button>
+          <button @click="showQuickPollModal = true" class="px-5 py-2.5 bg-white/20 backdrop-blur-sm border border-white/30 text-white rounded-xl font-semibold text-sm hover:bg-white/30 transition-all flex items-center gap-2">
+            <i class="fas fa-bolt"></i>
+            {{ textConstants.quickPoll }}
+          </button>
+          <!-- AI Action Buttons -->
+          <button @click="fetchAIInsights"
+                  class="px-5 py-2.5 bg-gradient-to-r from-teal-500/20 to-emerald-500/20 backdrop-blur-sm text-white rounded-xl font-semibold text-sm flex items-center gap-2 hover:from-teal-500/30 hover:to-emerald-500/30 transition-all border border-white/20">
+            <i class="fas fa-wand-magic-sparkles"></i>
+            {{ textConstants.aiInsights }}
+          </button>
+          <button @click="analyzeResponsePatterns"
+                  class="px-5 py-2.5 bg-white/10 backdrop-blur-sm text-white rounded-xl font-semibold text-sm flex items-center gap-2 hover:bg-white/20 transition-all border border-white/20">
+            <i class="fas fa-chart-bar"></i>
+            {{ textConstants.patternAnalysis }}
+          </button>
+        </template>
+      </PageHeroHeader>
 
       <!-- Main Content Area -->
       <div class="px-8 py-6 space-y-6">
@@ -1888,152 +1856,6 @@ function getInsightTypeColor(type: string) {
 </template>
 
 <style scoped>
-/* ============================================
-   Hero Section - Documents Style
-   ============================================ */
-.hero-gradient {
-  background: linear-gradient(135deg, #0d9488 0%, #14b8a6 50%, #10b981 100%);
-}
-
-.stats-top-right {
-  position: absolute;
-  top: 24px;
-  right: 32px;
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  z-index: 10;
-}
-
-.stat-card-square {
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(8px);
-  border-radius: 16px;
-  width: 115px;
-  height: 115px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  transition: all 0.3s ease;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  cursor: default;
-}
-
-.stat-card-square:hover {
-  background: rgba(255, 255, 255, 0.25);
-  transform: translateY(-4px) scale(1.02);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-}
-
-.stat-card-square:hover .stat-icon-box {
-  transform: scale(1.1);
-}
-
-.stat-icon-box {
-  color: white;
-  font-size: 1.25rem;
-  transition: transform 0.3s ease;
-}
-
-.stat-value-mini {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: white;
-  line-height: 1;
-}
-
-.stat-label-mini {
-  font-size: 0.6875rem;
-  color: rgba(255, 255, 255, 0.8);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  font-weight: 500;
-}
-
-/* Circle drift animations */
-.circle-drift-1 {
-  animation: drift-1 20s ease-in-out infinite;
-}
-
-.circle-drift-2 {
-  animation: drift-2 25s ease-in-out infinite;
-}
-
-.circle-drift-3 {
-  animation: drift-3 18s ease-in-out infinite;
-}
-
-@keyframes drift-1 {
-  0%, 100% {
-    transform: translate(0, 0) scale(1);
-  }
-  25% {
-    transform: translate(-30px, 20px) scale(1.05);
-  }
-  50% {
-    transform: translate(-20px, 40px) scale(0.95);
-  }
-  75% {
-    transform: translate(10px, 20px) scale(1.02);
-  }
-}
-
-@keyframes drift-2 {
-  0%, 100% {
-    transform: translate(0, 0) scale(1);
-  }
-  33% {
-    transform: translate(40px, -30px) scale(1.1);
-  }
-  66% {
-    transform: translate(20px, -50px) scale(0.9);
-  }
-}
-
-@keyframes drift-3 {
-  0%, 100% {
-    transform: translate(0, 0) scale(1);
-  }
-  50% {
-    transform: translate(-20px, -20px) scale(1.15);
-  }
-}
-
-/* Responsive adjustments */
-@media (max-width: 1024px) {
-  .stats-top-right {
-    position: relative;
-    top: auto;
-    right: auto;
-    margin: 24px 32px 0;
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 12px;
-  }
-
-  .stat-card-square {
-    width: 100%;
-    height: 80px;
-  }
-
-  .stat-icon-box {
-    font-size: 1rem;
-  }
-
-  .stat-value-mini {
-    font-size: 1.25rem;
-  }
-}
-
-@media (max-width: 640px) {
-  .stats-top-right {
-    grid-template-columns: repeat(2, 1fr);
-    margin: 16px 24px 0;
-  }
-}
-
 /* ============================================
    Featured Poll - Premium Design
    ============================================ */

@@ -2,6 +2,7 @@
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
+import PageHeroHeader from '@/components/common/PageHeroHeader.vue'
 import ContentActionsDropdown from '@/components/common/ContentActionsDropdown.vue'
 
 const { t } = useI18n()
@@ -462,6 +463,14 @@ const mediaStats = computed(() => ({
   audio: mediaItemsData.value.filter(m => m.type === 'audio').length,
   images: mediaItemsData.value.filter(m => m.type === 'image').length
 }))
+
+// Hero stats for PageHeroHeader component
+const heroStats = computed(() => [
+  { icon: 'fas fa-video', value: mediaStats.value.totalVideos, label: t('media.videos') },
+  { icon: 'fas fa-music', value: mediaStats.value.audio, label: t('media.audio') },
+  { icon: 'fas fa-images', value: mediaStats.value.images, label: t('media.images') },
+  { icon: 'fas fa-th-large', value: mediaStats.value.galleries, label: t('media.galleries') }
+])
 
 // Computed Category Cards with dynamic counts
 const categoryCards = computed(() => {
@@ -1834,66 +1843,24 @@ onUnmounted(() => {
     <!-- Particles Background -->
     <div class="particles" id="media-particles"></div>
 
-    <!-- Hero Section (Matching Articles Page) -->
-    <div class="hero-gradient relative overflow-hidden">
-      <!-- Decorative elements with animations -->
-      <div class="circle-drift-1 absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full"></div>
-      <div class="circle-drift-2 absolute bottom-0 left-0 w-64 h-64 bg-white/5 rounded-full"></div>
-      <div class="circle-drift-3 absolute top-1/2 right-1/4 w-32 h-32 bg-white/10 rounded-full"></div>
-
-      <!-- Stats - Absolute Top Right -->
-      <div class="stats-top-right">
-        <div class="stat-card-square">
-          <div class="stat-icon-box">
-            <i class="fas fa-video"></i>
-          </div>
-          <p class="stat-value-mini">{{ mediaStats.totalVideos }}</p>
-          <p class="stat-label-mini">{{ $t('media.videos') }}</p>
-        </div>
-        <div class="stat-card-square">
-          <div class="stat-icon-box">
-            <i class="fas fa-headphones"></i>
-          </div>
-          <p class="stat-value-mini">{{ mediaStats.audio }}</p>
-          <p class="stat-label-mini">{{ $t('media.audio') }}</p>
-        </div>
-        <div class="stat-card-square">
-          <div class="stat-icon-box">
-            <i class="fas fa-image"></i>
-          </div>
-          <p class="stat-value-mini">{{ mediaStats.images }}</p>
-          <p class="stat-label-mini">{{ $t('media.images') }}</p>
-        </div>
-        <div class="stat-card-square">
-          <div class="stat-icon-box">
-            <i class="fas fa-images"></i>
-          </div>
-          <p class="stat-value-mini">{{ mediaStats.galleries }}</p>
-          <p class="stat-label-mini">{{ $t('media.galleries') }}</p>
-        </div>
-      </div>
-
-      <div class="relative px-8 py-8">
-        <div class="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-white text-xs font-semibold inline-flex items-center gap-2 mb-4">
-          <i class="fas fa-photo-video"></i>
-          AFC Asian Cup 2027
-        </div>
-
-        <h1 class="text-3xl font-bold text-white mb-2">{{ $t('media.title') }}</h1>
-        <p class="text-teal-100 max-w-lg">{{ $t('media.subtitle') }}</p>
-
-        <div class="flex flex-wrap gap-3 mt-6">
-          <button @click="showUploadModal = true" class="px-5 py-2.5 bg-white text-teal-600 rounded-xl font-semibold text-sm flex items-center gap-2 hover:bg-teal-50 transition-all shadow-lg">
-            <i class="fas fa-cloud-upload-alt"></i>
-            {{ $t('media.uploadMedia') }}
-          </button>
-          <button @click="playFeatured" class="px-5 py-2.5 bg-white/20 backdrop-blur-sm border border-white/30 text-white rounded-xl font-semibold text-sm hover:bg-white/30 transition-all flex items-center gap-2">
-            <i class="fas fa-play-circle"></i>
-            {{ $t('media.watchFeatured') }}
-          </button>
-        </div>
-      </div>
-    </div>
+    <!-- Hero Section -->
+    <PageHeroHeader
+      :stats="heroStats"
+      badge-icon="fas fa-photo-video"
+      :title="$t('media.title')"
+      :subtitle="$t('media.subtitle')"
+    >
+      <template #actions>
+        <button @click="showUploadModal = true" class="px-5 py-2.5 bg-white text-teal-600 rounded-xl font-semibold text-sm flex items-center gap-2 hover:bg-teal-50 transition-all shadow-lg">
+          <i class="fas fa-cloud-upload-alt"></i>
+          {{ $t('media.uploadMedia') }}
+        </button>
+        <button @click="playFeatured" class="px-5 py-2.5 bg-white/20 backdrop-blur-sm border border-white/30 text-white rounded-xl font-semibold text-sm hover:bg-white/30 transition-all flex items-center gap-2">
+          <i class="fas fa-play-circle"></i>
+          {{ $t('media.watchFeatured') }}
+        </button>
+      </template>
+    </PageHeroHeader>
 
     <!-- Content Area with Padding -->
     <div class="px-6 py-6">
@@ -4086,136 +4053,6 @@ onUnmounted(() => {
   min-height: 100vh;
   background: linear-gradient(180deg, #f0fdfa 0%, #f8fafc 15%, #ffffff 100%);
   position: relative;
-}
-
-/* ============================================
-   HERO SECTION (Matching Articles Page)
-   ============================================ */
-.hero-gradient {
-  background: linear-gradient(135deg, #0d9488 0%, #14b8a6 50%, #10b981 100%);
-}
-
-.stats-top-right {
-  position: absolute;
-  top: 24px;
-  right: 32px;
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  z-index: 10;
-}
-
-.stat-card-square {
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(8px);
-  border-radius: 16px;
-  width: 115px;
-  height: 115px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  text-align: center;
-  transition: all 0.3s ease;
-  cursor: pointer;
-}
-
-.stat-card-square:hover {
-  background: rgba(255, 255, 255, 0.25);
-  transform: translateY(-4px) scale(1.02);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-}
-
-.stat-card-square:hover .stat-icon-box {
-  transform: scale(1.1);
-}
-
-.stat-icon-box {
-  color: white;
-  font-size: 20px;
-  transition: transform 0.3s ease;
-}
-
-.stat-value-mini {
-  font-size: 24px;
-  font-weight: 700;
-  color: white;
-  line-height: 1;
-  margin: 0;
-}
-
-.stat-label-mini {
-  font-size: 11px;
-  color: rgba(255, 255, 255, 0.7);
-  line-height: 1;
-  margin: 0;
-}
-
-/* Circle Drift Animations */
-.circle-drift-1 {
-  animation: drift-1 20s ease-in-out infinite;
-}
-
-.circle-drift-2 {
-  animation: drift-2 25s ease-in-out infinite;
-}
-
-.circle-drift-3 {
-  animation: drift-3 18s ease-in-out infinite;
-}
-
-@keyframes drift-1 {
-  0%, 100% { transform: translate(33%, -50%); }
-  25% { transform: translate(28%, -45%); }
-  50% { transform: translate(35%, -55%); }
-  75% { transform: translate(30%, -48%); }
-}
-
-@keyframes drift-2 {
-  0%, 100% { transform: translate(-33%, 50%); }
-  33% { transform: translate(-28%, 45%); }
-  66% { transform: translate(-38%, 55%); }
-}
-
-@keyframes drift-3 {
-  0%, 100% { transform: translate(0, -50%); }
-  50% { transform: translate(10%, -40%); }
-}
-
-/* Responsive Hero */
-@media (max-width: 1024px) {
-  .stats-top-right {
-    position: relative;
-    top: 0;
-    right: 0;
-    flex-wrap: wrap;
-    justify-content: center;
-    padding: 16px;
-    gap: 8px;
-  }
-
-  .stat-card-square {
-    width: 100px;
-    height: 100px;
-  }
-
-  .stat-value-mini {
-    font-size: 20px;
-  }
-}
-
-@media (max-width: 640px) {
-  .stats-top-right {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 8px;
-  }
-
-  .stat-card-square {
-    width: 100%;
-    height: 90px;
-  }
 }
 
 /* Particles Effect */

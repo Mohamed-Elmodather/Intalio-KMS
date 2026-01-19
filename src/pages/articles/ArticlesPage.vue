@@ -2,6 +2,7 @@
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
+import PageHeroHeader from '@/components/common/PageHeroHeader.vue'
 import ContentActionsDropdown from '@/components/common/ContentActionsDropdown.vue'
 import AddToCollectionModal from '@/components/common/AddToCollectionModal.vue'
 import { useAIServicesStore } from '@/stores/aiServices'
@@ -418,6 +419,14 @@ const totalViews = computed(() => {
 })
 
 const contributors = ref(24)
+
+// Hero stats for PageHeroHeader component
+const heroStats = computed(() => [
+  { icon: 'fas fa-newspaper', value: articles.value.length, label: t('nav.articles') },
+  { icon: 'fas fa-layer-group', value: categories.value.length, label: t('common.categories') },
+  { icon: 'fas fa-eye', value: totalViews.value, label: t('articles.totalViews') },
+  { icon: 'fas fa-users', value: contributors.value, label: t('articles.contributors') }
+])
 
 // ============================================
 // PERSONALIZATION DATA
@@ -1236,65 +1245,24 @@ onUnmounted(() => {
 <template>
   <div class="page-view">
     <!-- Hero Section -->
-    <div class="hero-gradient relative overflow-hidden">
-      <!-- Decorative elements with animations -->
-      <div class="circle-drift-1 absolute top-0 end-0 w-96 h-96 bg-white/5 rounded-full"></div>
-      <div class="circle-drift-2 absolute bottom-0 start-0 w-64 h-64 bg-white/5 rounded-full"></div>
-      <div class="circle-drift-3 absolute top-1/2 end-1/4 w-32 h-32 bg-white/10 rounded-full"></div>
-
-      <!-- Stats - Absolute Top Right -->
-      <div class="stats-top-right">
-        <div class="stat-card-square">
-          <div class="stat-icon-box">
-            <i class="fas fa-newspaper"></i>
-          </div>
-          <p class="stat-value-mini">{{ articles.length }}</p>
-          <p class="stat-label-mini">{{ $t('nav.articles') }}</p>
-        </div>
-        <div class="stat-card-square">
-          <div class="stat-icon-box">
-            <i class="fas fa-layer-group"></i>
-          </div>
-          <p class="stat-value-mini">{{ categories.length }}</p>
-          <p class="stat-label-mini">{{ $t('common.categories') }}</p>
-        </div>
-        <div class="stat-card-square">
-          <div class="stat-icon-box">
-            <i class="fas fa-eye"></i>
-          </div>
-          <p class="stat-value-mini">{{ totalViews }}</p>
-          <p class="stat-label-mini">{{ $t('articles.totalViews') }}</p>
-        </div>
-        <div class="stat-card-square">
-          <div class="stat-icon-box">
-            <i class="fas fa-users"></i>
-          </div>
-          <p class="stat-value-mini">{{ contributors }}</p>
-          <p class="stat-label-mini">{{ $t('articles.contributors') }}</p>
-        </div>
-      </div>
-
-      <div class="relative px-8 py-8">
-        <div class="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-white text-xs font-semibold inline-flex items-center gap-2 mb-4">
-          <i class="fas fa-book-open"></i>
-          {{ $t('app.name') }}
-        </div>
-
-        <h1 class="text-3xl font-bold text-white mb-2">{{ $t('articles.title') }}</h1>
-        <p class="text-teal-100 max-w-lg">{{ $t('articles.subtitle') }}</p>
-
-        <div class="flex flex-wrap gap-3 mt-6">
-          <button @click="navigateToEditor" class="px-5 py-2.5 bg-white text-teal-600 rounded-xl font-semibold text-sm flex items-center gap-2 hover:bg-teal-50 transition-all shadow-lg">
-            <i class="fas fa-plus"></i>
-            {{ $t('articles.newArticle') }}
-          </button>
-          <button @click="scrollToBookmarks" class="px-5 py-2.5 bg-white/20 backdrop-blur-sm border border-white/30 text-white rounded-xl font-semibold text-sm hover:bg-white/30 transition-all flex items-center gap-2">
-            <i class="fas fa-bookmark"></i>
-            {{ $t('articles.myBookmarks') }}
-          </button>
-        </div>
-      </div>
-    </div>
+    <PageHeroHeader
+      :stats="heroStats"
+      badge-icon="fas fa-book-open"
+      :badge-text="$t('app.name')"
+      :title="$t('articles.title')"
+      :subtitle="$t('articles.subtitle')"
+    >
+      <template #actions>
+        <button @click="navigateToEditor" class="px-5 py-2.5 bg-white text-teal-600 rounded-xl font-semibold text-sm flex items-center gap-2 hover:bg-teal-50 transition-all shadow-lg">
+          <i class="fas fa-plus"></i>
+          {{ $t('articles.newArticle') }}
+        </button>
+        <button @click="scrollToBookmarks" class="px-5 py-2.5 bg-white/20 backdrop-blur-sm border border-white/30 text-white rounded-xl font-semibold text-sm hover:bg-white/30 transition-all flex items-center gap-2">
+          <i class="fas fa-bookmark"></i>
+          {{ $t('articles.myBookmarks') }}
+        </button>
+      </template>
+    </PageHeroHeader>
 
     <!-- ============================================
          PERSONALIZATION SECTION
@@ -1397,7 +1365,7 @@ onUnmounted(() => {
           <div class="flex items-center gap-2">
             <button @click="refreshRecommendations" class="ai-refresh-btn" :disabled="isLoadingRecommendations">
               <i :class="['fas fa-sync-alt', isLoadingRecommendations && 'fa-spin']"></i>
-              Refresh
+              {{ $t('common.refresh') }}
             </button>
             <button @click="toggleAIRecommendations" class="ai-toggle-btn">
               <i class="fas fa-times"></i>
@@ -1406,7 +1374,7 @@ onUnmounted(() => {
         </div>
 
         <div v-if="isLoadingRecommendations" class="ai-recommendations-loading">
-          <AILoadingIndicator variant="shimmer" text="Analyzing your preferences..." />
+          <AILoadingIndicator variant="shimmer" :text="$t('common.analyzingPreferences')" />
         </div>
 
         <div v-else class="ai-recommendations-grid">
@@ -1420,7 +1388,7 @@ onUnmounted(() => {
               <div class="ai-rec-header">
                 <span class="ai-rec-type-badge">
                   <i class="fas fa-newspaper"></i>
-                  Article
+                  {{ $t('common.article') }}
                 </span>
                 <button @click.stop="dismissRecommendation(rec.id)" class="ai-rec-dismiss">
                   <i class="fas fa-times"></i>
@@ -1584,10 +1552,10 @@ onUnmounted(() => {
           <div class="section-header-row">
             <h2 class="section-title-sm">
               <i class="fas fa-fire text-red-500"></i>
-              Trending
+              {{ $t('common.trendingNow') }}
             </h2>
             <button @click="scrollToAllArticles" class="view-all-link">
-              View All <i class="fas fa-arrow-right"></i>
+              {{ $t('common.viewAll') }} <i class="fas fa-arrow-right"></i>
             </button>
           </div>
           <div class="trending-scroll scrollbar-elegant">
@@ -1612,7 +1580,7 @@ onUnmounted(() => {
                 </div>
                 <div v-if="index < 3" class="absolute top-2 start-2 flex gap-1">
                   <span class="new-badge bg-orange-500">
-                    <i class="fas fa-fire"></i> Hot
+                    <i class="fas fa-fire"></i> {{ $t('common.hot') }}
                   </span>
                 </div>
                 <div class="absolute bottom-2 end-2 px-2 py-0.5 rounded bg-black/70 text-white text-xs font-medium backdrop-blur-sm">
@@ -2656,136 +2624,6 @@ onUnmounted(() => {
   padding: 0;
   min-height: 100vh;
   background: linear-gradient(180deg, #f0fdfa 0%, #f8fafc 15%, #ffffff 100%);
-}
-
-/* ============================================
-   HERO SECTION (Matching Documents Page)
-   ============================================ */
-.hero-gradient {
-  background: linear-gradient(135deg, #0d9488 0%, #14b8a6 50%, #10b981 100%);
-}
-
-.stats-top-right {
-  position: absolute;
-  top: 24px;
-  right: 32px;
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  z-index: 10;
-}
-
-.stat-card-square {
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(8px);
-  border-radius: 16px;
-  width: 115px;
-  height: 115px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  text-align: center;
-  transition: all 0.3s ease;
-  cursor: pointer;
-}
-
-.stat-card-square:hover {
-  background: rgba(255, 255, 255, 0.25);
-  transform: translateY(-4px) scale(1.02);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-}
-
-.stat-card-square:hover .stat-icon-box {
-  transform: scale(1.1);
-}
-
-.stat-icon-box {
-  color: white;
-  font-size: 20px;
-  transition: transform 0.3s ease;
-}
-
-.stat-value-mini {
-  font-size: 24px;
-  font-weight: 700;
-  color: white;
-  line-height: 1;
-  margin: 0;
-}
-
-.stat-label-mini {
-  font-size: 11px;
-  color: rgba(255, 255, 255, 0.7);
-  line-height: 1;
-  margin: 0;
-}
-
-/* Circle Drift Animations */
-.circle-drift-1 {
-  animation: drift-1 20s ease-in-out infinite;
-}
-
-.circle-drift-2 {
-  animation: drift-2 25s ease-in-out infinite;
-}
-
-.circle-drift-3 {
-  animation: drift-3 18s ease-in-out infinite;
-}
-
-@keyframes drift-1 {
-  0%, 100% { transform: translate(33%, -50%); }
-  25% { transform: translate(28%, -45%); }
-  50% { transform: translate(35%, -55%); }
-  75% { transform: translate(30%, -48%); }
-}
-
-@keyframes drift-2 {
-  0%, 100% { transform: translate(-33%, 50%); }
-  33% { transform: translate(-28%, 45%); }
-  66% { transform: translate(-38%, 55%); }
-}
-
-@keyframes drift-3 {
-  0%, 100% { transform: translate(0, -50%); }
-  50% { transform: translate(10%, -40%); }
-}
-
-/* Responsive Hero */
-@media (max-width: 1024px) {
-  .stats-top-right {
-    position: relative;
-    top: 0;
-    right: 0;
-    flex-wrap: wrap;
-    justify-content: center;
-    padding: 16px;
-    gap: 8px;
-  }
-
-  .stat-card-square {
-    width: 100px;
-    height: 100px;
-  }
-
-  .stat-value-mini {
-    font-size: 20px;
-  }
-}
-
-@media (max-width: 640px) {
-  .stats-top-right {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 8px;
-  }
-
-  .stat-card-square {
-    width: 100%;
-    height: 90px;
-  }
 }
 
 /* ============================================

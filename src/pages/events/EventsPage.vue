@@ -2,6 +2,7 @@
 import { ref, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
+import PageHeroHeader from '@/components/common/PageHeroHeader.vue'
 import { useAIServicesStore } from '@/stores/aiServices'
 import { useComparisonStore } from '@/stores/comparison'
 import { AILoadingIndicator, AISuggestionChip, AIConfidenceBar } from '@/components/ai'
@@ -173,6 +174,14 @@ const todayEventsCount = computed(() => {
   const today = new Date().toISOString().split('T')[0]
   return events.value.filter(e => e.date === today).length
 })
+
+// Hero stats for PageHeroHeader component
+const heroStats = computed(() => [
+  { icon: 'fas fa-calendar-alt', value: eventStats.value.total, label: t('events.totalEvents') },
+  { icon: 'fas fa-calendar-week', value: eventStats.value.thisWeek, label: t('events.thisWeek') },
+  { icon: 'fas fa-check-circle', value: eventStats.value.yourRsvps, label: t('events.yourRsvps') },
+  { icon: 'fas fa-sun', value: todayEventsCount.value, label: t('common.today') }
+])
 
 const featuredEvent = computed(() => {
   const upcoming = events.value
@@ -1051,73 +1060,31 @@ function getCategoryColor(category: string) {
 
 <template>
   <div class="events-page">
-    <!-- Hero Section (Documents Style) -->
-    <div class="hero-gradient relative overflow-hidden">
-      <!-- Decorative elements with animations -->
-      <div class="circle-drift-1 absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full"></div>
-      <div class="circle-drift-2 absolute bottom-0 left-0 w-64 h-64 bg-white/5 rounded-full"></div>
-      <div class="circle-drift-3 absolute top-1/2 right-1/4 w-32 h-32 bg-white/10 rounded-full"></div>
-
-      <!-- Stats - Absolute Top Right -->
-      <div class="stats-top-right">
-        <div class="stat-card-square">
-          <div class="stat-icon-box">
-            <i class="fas fa-calendar-alt"></i>
-          </div>
-          <p class="stat-value-mini">{{ eventStats.total }}</p>
-          <p class="stat-label-mini">{{ $t('events.totalEvents') }}</p>
-        </div>
-        <div class="stat-card-square">
-          <div class="stat-icon-box">
-            <i class="fas fa-calendar-week"></i>
-          </div>
-          <p class="stat-value-mini">{{ eventStats.thisWeek }}</p>
-          <p class="stat-label-mini">{{ $t('events.thisWeek') }}</p>
-        </div>
-        <div class="stat-card-square">
-          <div class="stat-icon-box">
-            <i class="fas fa-check-circle"></i>
-          </div>
-          <p class="stat-value-mini">{{ eventStats.yourRsvps }}</p>
-          <p class="stat-label-mini">{{ $t('events.yourRsvps') }}</p>
-        </div>
-        <div class="stat-card-square">
-          <div class="stat-icon-box">
-            <i class="fas fa-sun"></i>
-          </div>
-          <p class="stat-value-mini">{{ todayEventsCount }}</p>
-          <p class="stat-label-mini">{{ $t('common.today') }}</p>
-        </div>
-      </div>
-
-      <div class="relative px-8 py-8">
-        <div class="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-white text-xs font-semibold inline-flex items-center gap-2 mb-4">
-          <i class="fas fa-calendar-alt"></i>
-          AFC Asian Cup 2027
-        </div>
-
-        <h1 class="text-3xl font-bold text-white mb-2">{{ $t('events.title') }}</h1>
-        <p class="text-teal-100 max-w-lg">{{ $t('events.subtitle') }}</p>
-
-        <div class="flex flex-wrap gap-3 mt-6">
-          <button @click="showCreateModal = true" class="px-5 py-2.5 bg-white text-teal-600 rounded-xl font-semibold text-sm flex items-center gap-2 hover:bg-teal-50 transition-all shadow-lg">
-            <i class="fas fa-plus"></i>
-            {{ $t('events.createEvent') }}
-          </button>
-          <!-- AI Action Buttons -->
-          <button @click="analyzeSmartSchedule"
-                  class="px-5 py-2.5 bg-gradient-to-r from-teal-500/20 to-emerald-500/20 backdrop-blur-sm text-white rounded-xl font-semibold text-sm flex items-center gap-2 hover:from-teal-500/30 hover:to-emerald-500/30 transition-all border border-white/20">
-            <i class="fas fa-wand-magic-sparkles"></i>
-            {{ $t('events.smartScheduling') }}
-          </button>
-          <button @click="fetchRelatedEvents()"
-                  class="px-5 py-2.5 bg-white/10 backdrop-blur-sm text-white rounded-xl font-semibold text-sm flex items-center gap-2 hover:bg-white/20 transition-all border border-white/20">
-            <i class="fas fa-robot"></i>
-            {{ $t('ai.aiSuggestions') }}
-          </button>
-        </div>
-      </div>
-    </div>
+    <!-- Hero Section -->
+    <PageHeroHeader
+      :stats="heroStats"
+      badge-icon="fas fa-calendar-alt"
+      :title="$t('events.title')"
+      :subtitle="$t('events.subtitle')"
+    >
+      <template #actions>
+        <button @click="showCreateModal = true" class="px-5 py-2.5 bg-white text-teal-600 rounded-xl font-semibold text-sm flex items-center gap-2 hover:bg-teal-50 transition-all shadow-lg">
+          <i class="fas fa-plus"></i>
+          {{ $t('events.createEvent') }}
+        </button>
+        <!-- AI Action Buttons -->
+        <button @click="analyzeSmartSchedule"
+                class="px-5 py-2.5 bg-gradient-to-r from-teal-500/20 to-emerald-500/20 backdrop-blur-sm text-white rounded-xl font-semibold text-sm flex items-center gap-2 hover:from-teal-500/30 hover:to-emerald-500/30 transition-all border border-white/20">
+          <i class="fas fa-wand-magic-sparkles"></i>
+          {{ $t('events.smartScheduling') }}
+        </button>
+        <button @click="fetchRelatedEvents()"
+                class="px-5 py-2.5 bg-white/10 backdrop-blur-sm text-white rounded-xl font-semibold text-sm flex items-center gap-2 hover:bg-white/20 transition-all border border-white/20">
+          <i class="fas fa-robot"></i>
+          {{ $t('ai.aiSuggestions') }}
+        </button>
+      </template>
+    </PageHeroHeader>
 
     <!-- Main Content Area -->
     <div class="events-content">
@@ -2614,155 +2581,6 @@ function getCategoryColor(category: string) {
 </template>
 
 <style scoped>
-/* ===============================================
-   HERO SECTION (Documents Style)
-   =============================================== */
-
-.hero-gradient {
-  background: linear-gradient(135deg, #0d9488 0%, #14b8a6 50%, #10b981 100%);
-}
-
-.stats-top-right {
-  position: absolute;
-  top: 24px;
-  right: 32px;
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  z-index: 10;
-}
-
-.stat-card-square {
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(8px);
-  border-radius: 16px;
-  width: 115px;
-  height: 115px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  text-align: center;
-  transition: all 0.3s ease;
-  cursor: pointer;
-}
-
-.stat-card-square:hover {
-  background: rgba(255, 255, 255, 0.25);
-  transform: translateY(-4px) scale(1.02);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-}
-
-.stat-card-square:hover .stat-icon-box {
-  transform: scale(1.1);
-}
-
-.stat-icon-box {
-  color: white;
-  font-size: 20px;
-  transition: transform 0.3s ease;
-}
-
-.stat-value-mini {
-  font-size: 24px;
-  font-weight: 700;
-  color: white;
-  line-height: 1;
-  margin: 0;
-}
-
-.stat-label-mini {
-  font-size: 11px;
-  color: rgba(255, 255, 255, 0.7);
-  line-height: 1;
-  margin: 0;
-}
-
-/* Circle Drift Animations */
-.circle-drift-1 {
-  animation: drift1 20s ease-in-out infinite;
-}
-
-.circle-drift-2 {
-  animation: drift2 25s ease-in-out infinite;
-}
-
-.circle-drift-3 {
-  animation: drift3 18s ease-in-out infinite;
-}
-
-@keyframes drift1 {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  25% { transform: translate(-30px, 20px) scale(1.1); }
-  50% { transform: translate(-20px, -30px) scale(0.95); }
-  75% { transform: translate(20px, 10px) scale(1.05); }
-}
-
-@keyframes drift2 {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  33% { transform: translate(40px, -20px) scale(1.15); }
-  66% { transform: translate(-30px, 30px) scale(0.9); }
-}
-
-@keyframes drift3 {
-  0%, 100% { transform: translate(0, 0) rotate(0deg); }
-  50% { transform: translate(30px, -40px) rotate(180deg); }
-}
-
-/* Responsive Hero */
-@media (max-width: 1280px) {
-  .stats-top-right {
-    position: relative;
-    top: auto;
-    right: auto;
-    margin: 24px 32px 0;
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 8px;
-  }
-
-  .stat-card-square {
-    width: 100%;
-    height: 90px;
-  }
-
-  .stat-icon-box {
-    font-size: 16px;
-  }
-
-  .stat-value-mini {
-    font-size: 20px;
-  }
-
-  .stat-label-mini {
-    font-size: 10px;
-  }
-}
-
-@media (max-width: 768px) {
-  .stats-top-right {
-    grid-template-columns: repeat(2, 1fr);
-    margin: 16px 24px 0;
-  }
-
-  .stat-card-square {
-    height: 80px;
-  }
-
-  .stat-icon-box {
-    font-size: 14px;
-  }
-
-  .stat-value-mini {
-    font-size: 18px;
-  }
-
-  .stat-label-mini {
-    font-size: 9px;
-  }
-}
-
 /* Events Page Container */
 .events-page {
   min-height: 100vh;
