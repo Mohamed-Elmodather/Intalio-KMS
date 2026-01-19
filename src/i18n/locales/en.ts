@@ -150,6 +150,7 @@ export default {
     removedFromSaved: 'Removed from saved',
     relatedContent: 'Related Content',
     noRelatedContent: 'No related content found',
+    done: 'Done',
   },
 
   // App
@@ -1128,6 +1129,10 @@ export default {
     popularSearches: 'Popular Searches',
     filters: 'Filters',
     clearFilters: 'Clear Filters',
+    aiPoweredSuggestions: 'AI-Powered Suggestions',
+    matchPercent: '{percent}% match',
+    recent: 'Recent',
+    keyboardHint: 'Use arrow keys to navigate, Enter to select',
   },
 
   // Create Menu
@@ -1158,6 +1163,29 @@ export default {
     leadership: 'Leadership',
     project: 'Project',
     other: 'Other',
+  },
+
+  // Comparison
+  comparison: {
+    sideBySide: 'Side by Side',
+    aiInsights: 'AI Insights',
+    entities: 'Entities',
+    sentiment: 'Sentiment',
+    topics: 'Topics',
+    compareItems: 'Compare {count} Items',
+    analyzeAndCompare: 'Analyze and compare selected content',
+    analyzing: 'Analyzing...',
+    generateAnalysis: 'Generate Analysis',
+    aiAnalysisNote: 'AI analysis is generated based on available content metadata',
+    clearSelection: 'Clear Selection',
+  },
+
+  // Voice Input
+  voice: {
+    stopListening: 'Stop listening',
+    startVoiceInput: 'Start voice input',
+    listening: 'Listening...',
+    confidence: 'Confidence',
   },
 
   // Validation

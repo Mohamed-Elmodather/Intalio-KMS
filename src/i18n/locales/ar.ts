@@ -150,6 +150,7 @@ export default {
     removedFromSaved: 'تمت الإزالة من المحفوظات',
     relatedContent: 'المحتوى ذو الصلة',
     noRelatedContent: 'لم يتم العثور على محتوى ذي صلة',
+    done: 'تم',
   },
 
   // App
@@ -1128,6 +1129,10 @@ export default {
     popularSearches: 'عمليات البحث الشائعة',
     filters: 'الفلاتر',
     clearFilters: 'مسح الفلاتر',
+    aiPoweredSuggestions: 'اقتراحات مدعومة بالذكاء الاصطناعي',
+    matchPercent: '{percent}% تطابق',
+    recent: 'حديث',
+    keyboardHint: 'استخدم مفاتيح الأسهم للتنقل، Enter للاختيار',
   },
 
   // Create Menu
@@ -1158,6 +1163,29 @@ export default {
     leadership: 'قيادة',
     project: 'مشروع',
     other: 'أخرى',
+  },
+
+  // Comparison
+  comparison: {
+    sideBySide: 'جنباً إلى جنب',
+    aiInsights: 'رؤى الذكاء الاصطناعي',
+    entities: 'الكيانات',
+    sentiment: 'المشاعر',
+    topics: 'المواضيع',
+    compareItems: 'مقارنة {count} عناصر',
+    analyzeAndCompare: 'تحليل ومقارنة المحتوى المحدد',
+    analyzing: 'جاري التحليل...',
+    generateAnalysis: 'توليد التحليل',
+    aiAnalysisNote: 'يتم إنشاء تحليل الذكاء الاصطناعي بناءً على البيانات الوصفية المتاحة',
+    clearSelection: 'مسح التحديد',
+  },
+
+  // Voice Input
+  voice: {
+    stopListening: 'إيقاف الاستماع',
+    startVoiceInput: 'بدء الإدخال الصوتي',
+    listening: 'جاري الاستماع...',
+    confidence: 'الثقة',
   },
 
   // Validation

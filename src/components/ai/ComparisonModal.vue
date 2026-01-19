@@ -1,18 +1,20 @@
 <script setup lang="ts">
-import { watch, onMounted, onUnmounted } from 'vue'
+import { computed, watch, onMounted, onUnmounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useComparisonStore } from '@/stores/comparison'
 import ComparisonSideBySide from './ComparisonSideBySide.vue'
 import ComparisonInsights from './ComparisonInsights.vue'
 
+const { t } = useI18n()
 const comparisonStore = useComparisonStore()
 
-const tabs = [
-  { id: 'side-by-side', label: 'Side by Side', icon: 'fas fa-columns' },
-  { id: 'insights', label: 'AI Insights', icon: 'fas fa-brain' },
-  { id: 'entities', label: 'Entities', icon: 'fas fa-tags' },
-  { id: 'sentiment', label: 'Sentiment', icon: 'fas fa-smile' },
-  { id: 'topics', label: 'Topics', icon: 'fas fa-lightbulb' },
-] as const
+const tabs = computed(() => [
+  { id: 'side-by-side', label: t('comparison.sideBySide'), icon: 'fas fa-columns' },
+  { id: 'insights', label: t('comparison.aiInsights'), icon: 'fas fa-brain' },
+  { id: 'entities', label: t('comparison.entities'), icon: 'fas fa-tags' },
+  { id: 'sentiment', label: t('comparison.sentiment'), icon: 'fas fa-smile' },
+  { id: 'topics', label: t('comparison.topics'), icon: 'fas fa-lightbulb' },
+] as const)
 
 // Handle ESC key
 function handleKeydown(e: KeyboardEvent) {
@@ -63,10 +65,10 @@ onUnmounted(() => {
               </div>
               <div>
                 <h2 class="text-lg font-semibold text-gray-900">
-                  Compare {{ comparisonStore.itemCount }} Items
+                  {{ $t('comparison.compareItems', { count: comparisonStore.itemCount }) }}
                 </h2>
                 <p class="text-sm text-gray-500">
-                  Analyze and compare selected content
+                  {{ $t('comparison.analyzeAndCompare') }}
                 </p>
               </div>
             </div>
@@ -102,7 +104,7 @@ onUnmounted(() => {
               @click="comparisonStore.generateAnalysis()"
             >
               <i :class="comparisonStore.isAnalyzing ? 'fas fa-spinner fa-spin' : 'fas fa-magic'" />
-              <span>{{ comparisonStore.isAnalyzing ? 'Analyzing...' : 'Generate Analysis' }}</span>
+              <span>{{ comparisonStore.isAnalyzing ? $t('comparison.analyzing') : $t('comparison.generateAnalysis') }}</span>
             </button>
           </div>
 
@@ -139,21 +141,21 @@ onUnmounted(() => {
           <!-- Footer -->
           <div class="flex items-center justify-between px-6 py-4 border-t border-gray-100 bg-gray-50/50">
             <div class="text-sm text-gray-500">
-              <i class="fas fa-info-circle mr-1" />
-              AI analysis is generated based on available content metadata
+              <i class="fas fa-info-circle me-1" />
+              {{ $t('comparison.aiAnalysisNote') }}
             </div>
             <div class="flex gap-2">
               <button
                 class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
                 @click="comparisonStore.clearSelection()"
               >
-                Clear Selection
+                {{ $t('comparison.clearSelection') }}
               </button>
               <button
                 class="px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors"
                 @click="comparisonStore.closeComparison()"
               >
-                Done
+                {{ $t('common.done') }}
               </button>
             </div>
           </div>

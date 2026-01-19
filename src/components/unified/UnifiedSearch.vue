@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useAIServicesStore } from '@/stores/aiServices'
 
+const { t } = useI18n()
 const aiStore = useAIServicesStore()
 
 // Props
@@ -19,9 +21,7 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
   modelValue: '',
-  placeholder: 'Search anything...',
   showAiButton: true,
-  aiButtonText: 'Ask AI',
   showKeyboardShortcut: true,
   keyboardShortcut: '⌘K',
   size: 'md',
@@ -196,12 +196,12 @@ function detectQueryCategory(query: string) {
   const queryLower = query.toLowerCase()
 
   const categories: Record<string, QueryCategory> = {
-    'document|file|pdf|template': { name: 'Documents', icon: 'fas fa-file-alt', color: 'bg-blue-100 text-blue-700' },
-    'article|news|blog|post': { name: 'Articles', icon: 'fas fa-newspaper', color: 'bg-purple-100 text-purple-700' },
-    'video|media|watch': { name: 'Media', icon: 'fas fa-video', color: 'bg-red-100 text-red-700' },
-    'course|learn|training': { name: 'Learning', icon: 'fas fa-graduation-cap', color: 'bg-green-100 text-green-700' },
-    'event|schedule|calendar': { name: 'Events', icon: 'fas fa-calendar', color: 'bg-amber-100 text-amber-700' },
-    'policy|rule|regulation': { name: 'Policies', icon: 'fas fa-gavel', color: 'bg-indigo-100 text-indigo-700' }
+    'document|file|pdf|template': { name: t('nav.documents'), icon: 'fas fa-file-alt', color: 'bg-blue-100 text-blue-700' },
+    'article|news|blog|post': { name: t('nav.articles'), icon: 'fas fa-newspaper', color: 'bg-purple-100 text-purple-700' },
+    'video|media|watch': { name: t('nav.mediaCenter'), icon: 'fas fa-video', color: 'bg-red-100 text-red-700' },
+    'course|learn|training': { name: t('nav.learning'), icon: 'fas fa-graduation-cap', color: 'bg-green-100 text-green-700' },
+    'event|schedule|calendar': { name: t('nav.events'), icon: 'fas fa-calendar', color: 'bg-amber-100 text-amber-700' },
+    'policy|rule|regulation': { name: t('nav.policies'), icon: 'fas fa-gavel', color: 'bg-indigo-100 text-indigo-700' }
   }
 
   for (const [pattern, category] of Object.entries(categories)) {
@@ -319,7 +319,7 @@ function handleKeyDown(event: KeyboardEvent) {
         <input
           type="text"
           v-model="inputValue"
-          :placeholder="placeholder"
+          :placeholder="placeholder || $t('common.searchPlaceholder')"
           :class="['unified-search__input', sizeClasses]"
           @keyup.enter="handleSearch"
           @keydown="handleKeyDown"
@@ -348,7 +348,7 @@ function handleKeyDown(event: KeyboardEvent) {
             type="button"
           >
             <i class="fas fa-wand-magic-sparkles"></i>
-            <span>{{ aiButtonText }}</span>
+            <span>{{ aiButtonText || $t('header.askAI') }}</span>
           </button>
         </div>
       </div>
@@ -360,7 +360,7 @@ function handleKeyDown(event: KeyboardEvent) {
         <div class="unified-search__suggestions-header">
           <div class="flex items-center gap-2">
             <i class="fas fa-wand-magic-sparkles text-teal-500"></i>
-            <span class="text-xs font-medium text-gray-500">AI-Powered Suggestions</span>
+            <span class="text-xs font-medium text-gray-500">{{ $t('search.aiPoweredSuggestions') }}</span>
           </div>
         </div>
 
@@ -378,19 +378,19 @@ function handleKeyDown(event: KeyboardEvent) {
             <div class="unified-search__suggestion-content">
               <span class="unified-search__suggestion-text">{{ suggestion.text }}</span>
               <span v-if="suggestion.confidence" class="unified-search__suggestion-confidence">
-                {{ Math.round(suggestion.confidence * 100) }}% match
+                {{ $t('search.matchPercent', { percent: Math.round(suggestion.confidence * 100) }) }}
               </span>
             </div>
             <span :class="['unified-search__suggestion-type', getSuggestionTypeColor(suggestion.type)]">
-              {{ suggestion.type === 'ai_enhanced' ? 'AI' : suggestion.type === 'trending' ? 'Trending' : suggestion.type === 'recent' ? 'Recent' : '' }}
+              {{ suggestion.type === 'ai_enhanced' ? 'AI' : suggestion.type === 'trending' ? $t('common.trending') : suggestion.type === 'recent' ? $t('search.recent') : '' }}
             </span>
           </button>
         </div>
 
         <div class="unified-search__suggestions-footer">
           <span class="text-xs text-gray-400">
-            <i class="fas fa-keyboard mr-1"></i>
-            Use arrow keys to navigate, Enter to select
+            <i class="fas fa-keyboard me-1"></i>
+            {{ $t('search.keyboardHint') }}
           </span>
         </div>
       </div>

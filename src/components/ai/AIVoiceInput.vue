@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useVoiceInput } from '@/composables/useVoiceInput'
+
+const { t } = useI18n()
 
 interface Props {
   language?: string
@@ -87,7 +90,7 @@ const pulseClasses = {
     <div
       v-if="!isSupported"
       class="voice-not-supported"
-      title="Voice input is not supported in this browser"
+      :title="$t('ai.voiceInputNotSupported')"
     >
       <i class="fas fa-microphone-slash text-gray-400"></i>
     </div>
@@ -114,7 +117,7 @@ const pulseClasses = {
             ? 'bg-red-500 text-white shadow-lg shadow-red-200 scale-110'
             : 'bg-gray-100 text-gray-500 hover:bg-teal-100 hover:text-teal-600'
         ]"
-        :title="isListening ? 'Stop listening' : 'Start voice input'"
+        :title="isListening ? $t('voice.stopListening') : $t('voice.startVoiceInput')"
       >
         <i :class="isListening ? 'fas fa-stop' : 'fas fa-microphone'"></i>
       </button>
@@ -160,7 +163,7 @@ const pulseClasses = {
     >
       <span class="flex items-center gap-1.5 text-xs text-red-500 font-medium">
         <span class="listening-dot"></span>
-        Listening...
+        {{ $t('voice.listening') }}
       </span>
     </div>
 
@@ -186,7 +189,7 @@ const pulseClasses = {
         <span v-if="interimTranscript" class="text-gray-400 italic">{{ interimTranscript }}</span>
       </p>
       <div v-if="confidence > 0" class="flex items-center gap-2 mt-1">
-        <span class="text-[10px] text-gray-400">Confidence:</span>
+        <span class="text-[10px] text-gray-400">{{ $t('voice.confidence') }}:</span>
         <div class="flex-1 h-1 bg-gray-100 rounded-full overflow-hidden">
           <div
             class="h-full bg-teal-500 rounded-full transition-all"
