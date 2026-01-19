@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import type { Author } from '@/types/detail-pages'
+
+const { t } = useI18n()
 
 const props = withDefaults(defineProps<{
   author: Author
@@ -98,10 +101,10 @@ function getInitialsColor(initials: string): string {
           : 'bg-teal-500 text-white hover:bg-teal-600'
       ]"
     >
-      <i v-if="isLoading" class="fas fa-spinner fa-spin mr-1"></i>
+      <i v-if="isLoading" class="fas fa-spinner fa-spin me-1"></i>
       <template v-else>
-        <i :class="isFollowing ? 'fas fa-check' : 'fas fa-plus'" class="mr-1"></i>
-        {{ isFollowing ? 'Following' : 'Follow' }}
+        <i :class="isFollowing ? 'fas fa-check' : 'fas fa-plus'" class="me-1"></i>
+        {{ isFollowing ? $t('user.following') : $t('user.follow') }}
       </template>
     </button>
   </div>
@@ -143,10 +146,10 @@ function getInitialsColor(initials: string): string {
                 : 'bg-teal-500 text-white hover:bg-teal-600'
             ]"
           >
-            <i v-if="isLoading" class="fas fa-spinner fa-spin mr-1"></i>
+            <i v-if="isLoading" class="fas fa-spinner fa-spin me-1"></i>
             <template v-else>
-              <i :class="isFollowing ? 'fas fa-check' : 'fas fa-plus'" class="mr-1"></i>
-              {{ isFollowing ? 'Following' : 'Follow' }}
+              <i :class="isFollowing ? 'fas fa-check' : 'fas fa-plus'" class="me-1"></i>
+              {{ isFollowing ? $t('user.following') : $t('user.follow') }}
             </template>
           </button>
         </div>
@@ -160,17 +163,17 @@ function getInitialsColor(initials: string): string {
         <div v-if="showStats" class="flex items-center gap-6 mt-4">
           <div v-if="author.articlesCount" class="text-center">
             <p class="text-lg font-semibold text-gray-900">{{ author.articlesCount }}</p>
-            <p class="text-xs text-gray-500">Articles</p>
+            <p class="text-xs text-gray-500">{{ $t('nav.articles') }}</p>
           </div>
           <div v-if="author.followersCount" class="text-center">
             <p class="text-lg font-semibold text-gray-900">{{ author.followersCount }}</p>
-            <p class="text-xs text-gray-500">Followers</p>
+            <p class="text-xs text-gray-500">{{ $t('user.followers') }}</p>
           </div>
           <button
             @click="viewProfile"
-            class="text-teal-600 hover:text-teal-700 text-sm font-medium ml-auto"
+            class="text-teal-600 hover:text-teal-700 text-sm font-medium ms-auto"
           >
-            View Profile <i class="fas fa-arrow-right ml-1"></i>
+            {{ $t('user.viewProfile') }} <i class="fas fa-arrow-right ms-1"></i>
           </button>
         </div>
       </div>

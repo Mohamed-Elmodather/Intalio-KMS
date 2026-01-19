@@ -1,6 +1,9 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useSharing } from '@/composables/useSharing'
+
+const { t } = useI18n()
 
 const props = withDefaults(defineProps<{
   title: string
@@ -23,7 +26,7 @@ const shareData = {
   url: props.url || window.location.href
 }
 
-const shareOptions = [
+const shareOptions = computed(() => [
   {
     id: 'twitter',
     name: 'Twitter',
@@ -50,13 +53,13 @@ const shareOptions = [
   },
   {
     id: 'email',
-    name: 'Email',
+    name: t('common.email'),
     icon: 'fas fa-envelope',
     color: 'hover:bg-gray-200 hover:text-gray-700',
     bgColor: 'bg-gray-600',
     action: () => shareViaEmail(shareData)
   }
-]
+])
 
 const sizeClasses = {
   sm: 'w-8 h-8 text-sm',
@@ -81,7 +84,7 @@ function handleCopyLink() {
       v-for="option in shareOptions"
       :key="option.id"
       @click="option.action"
-      :title="`Share on ${option.name}`"
+      :title="$t('common.shareOn', { name: option.name })"
       :class="[
         'rounded-full flex items-center justify-center transition-all duration-200 text-gray-500',
         sizeClasses[size],
@@ -89,7 +92,7 @@ function handleCopyLink() {
       ]"
     >
       <i :class="option.icon"></i>
-      <span v-if="showLabels" class="ml-2 text-sm">{{ option.name }}</span>
+      <span v-if="showLabels" class="ms-2 text-sm">{{ option.name }}</span>
     </button>
 
     <!-- Divider -->
@@ -103,7 +106,7 @@ function handleCopyLink() {
     <!-- Copy Link Button -->
     <button
       @click="handleCopyLink"
-      :title="copySuccess ? 'Copied!' : 'Copy link'"
+      :title="copySuccess ? $t('common.copied') : $t('common.copyLink')"
       :class="[
         'rounded-full flex items-center justify-center transition-all duration-200',
         sizeClasses[size],
@@ -113,7 +116,7 @@ function handleCopyLink() {
       ]"
     >
       <i :class="copySuccess ? 'fas fa-check' : 'fas fa-link'"></i>
-      <span v-if="showLabels" class="ml-2 text-sm">{{ copySuccess ? 'Copied!' : 'Copy' }}</span>
+      <span v-if="showLabels" class="ms-2 text-sm">{{ copySuccess ? $t('common.copied') : $t('common.copy') }}</span>
     </button>
   </div>
 </template>

@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 interface Props {
   showDownload?: boolean
@@ -70,7 +73,7 @@ onUnmounted(() => {
       @click.stop="toggleDropdown"
       class="trigger-btn"
       :class="{ 'active': showDropdown }"
-      title="More actions"
+      :title="$t('common.moreActions')"
     >
       <i class="fas fa-ellipsis-v"></i>
     </button>
@@ -79,24 +82,24 @@ onUnmounted(() => {
       <div v-if="showDropdown" class="dropdown-menu">
         <button @click.stop="handleAction('addToCollection')" class="dropdown-item">
           <i class="fas fa-layer-group"></i>
-          <span>Add to Collection</span>
+          <span>{{ $t('collections.addToCollection') }}</span>
         </button>
         <button @click.stop="handleAction('share')" class="dropdown-item">
           <i class="fas fa-share-alt"></i>
-          <span>Share</span>
+          <span>{{ $t('common.share') }}</span>
         </button>
         <button v-if="showDownload" @click.stop="handleAction('download')" class="dropdown-item">
           <i class="fas fa-download"></i>
-          <span>Download</span>
+          <span>{{ $t('common.download') }}</span>
         </button>
         <button v-if="showCopyLink" @click.stop="handleAction('copyLink')" class="dropdown-item">
           <i class="fas fa-link"></i>
-          <span>Copy Link</span>
+          <span>{{ $t('common.copyLink') }}</span>
         </button>
         <div v-if="showReport" class="dropdown-divider"></div>
         <button v-if="showReport" @click.stop="handleAction('report')" class="dropdown-item danger">
           <i class="fas fa-flag"></i>
-          <span>Report</span>
+          <span>{{ $t('common.report') }}</span>
         </button>
       </div>
     </Transition>

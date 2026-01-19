@@ -139,6 +139,15 @@ export default {
     notifications: 'Notifications',
     messages: 'Messages',
     noNotifications: 'No notifications',
+    moreActions: 'More actions',
+    copyLink: 'Copy Link',
+    report: 'Report',
+    email: 'Email',
+    shareOn: 'Share on {name}',
+    removeFromSaved: 'Remove from saved',
+    saveForLater: 'Save for later',
+    saved: 'Saved',
+    removedFromSaved: 'Removed from saved',
   },
 
   // App
@@ -263,6 +272,9 @@ export default {
     offline: 'Offline',
     away: 'Away',
     busy: 'Busy',
+    follow: 'Follow',
+    following: 'Following',
+    followers: 'Followers',
   },
 
   // Profile

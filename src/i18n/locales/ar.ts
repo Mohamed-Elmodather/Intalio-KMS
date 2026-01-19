@@ -139,6 +139,15 @@ export default {
     notifications: 'الإشعارات',
     messages: 'الرسائل',
     noNotifications: 'لا توجد إشعارات',
+    moreActions: 'المزيد من الإجراءات',
+    copyLink: 'نسخ الرابط',
+    report: 'إبلاغ',
+    email: 'البريد الإلكتروني',
+    shareOn: 'مشاركة على {name}',
+    removeFromSaved: 'إزالة من المحفوظات',
+    saveForLater: 'حفظ لوقت لاحق',
+    saved: 'تم الحفظ',
+    removedFromSaved: 'تمت الإزالة من المحفوظات',
   },
 
   // App
@@ -263,6 +272,9 @@ export default {
     offline: 'غير متصل',
     away: 'بعيد',
     busy: 'مشغول',
+    follow: 'متابعة',
+    following: 'متابَع',
+    followers: 'المتابعون',
   },
 
   // Profile

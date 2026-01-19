@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useBookmarks } from '@/composables/useBookmarks'
 import type { Bookmark } from '@/types/detail-pages'
+
+const { t } = useI18n()
 
 const props = withDefaults(defineProps<{
   contentId: string
@@ -64,7 +67,7 @@ async function handleToggle() {
     <button
       @click="handleToggle"
       :disabled="isLoading"
-      :title="bookmarked ? 'Remove from saved' : 'Save for later'"
+      :title="bookmarked ? $t('common.removeFromSaved') : $t('common.saveForLater')"
       :class="[
         'rounded-full flex items-center justify-center transition-all duration-200',
         sizeClasses,
@@ -83,7 +86,7 @@ async function handleToggle() {
         v-if="showTooltip"
         class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 bg-gray-900 text-white text-xs rounded-lg whitespace-nowrap"
       >
-        {{ bookmarked ? 'Saved!' : 'Removed from saved' }}
+        {{ bookmarked ? $t('common.saved') : $t('common.removedFromSaved') }}
         <div class="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-gray-900"></div>
       </div>
     </transition>
@@ -104,7 +107,7 @@ async function handleToggle() {
   >
     <i v-if="isLoading" class="fas fa-spinner fa-spin"></i>
     <i v-else :class="bookmarked ? 'fas fa-bookmark' : 'far fa-bookmark'"></i>
-    <span v-if="showLabel">{{ bookmarked ? 'Saved' : 'Save' }}</span>
+    <span v-if="showLabel">{{ bookmarked ? $t('common.saved') : $t('common.save') }}</span>
   </button>
 </template>
 
