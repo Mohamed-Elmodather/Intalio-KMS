@@ -1559,7 +1559,7 @@ function getCategoryColor(category: string): string {
                   v-if="showAIFeatures"
                   @click="isAISearchMode = !isAISearchMode"
                   :class="[
-                    'px-3 rounded-l-lg border border-r-0 flex items-center gap-1.5 text-xs font-medium transition-all',
+                    'px-3 rounded-s-lg border border-e-0 flex items-center gap-1.5 text-xs font-medium transition-all',
                     isAISearchMode
                       ? 'bg-gradient-to-r from-teal-500 to-cyan-500 border-teal-500 text-white'
                       : 'bg-gray-100 border-gray-200 text-gray-500 hover:bg-gray-200'
@@ -1573,7 +1573,7 @@ function getCategoryColor(category: string): string {
                 <!-- Search Input -->
                 <div class="relative flex-1">
                   <i :class="[
-                    'absolute left-3 top-1/2 -translate-y-1/2 text-sm transition-colors',
+                    'absolute start-3 top-1/2 -translate-y-1/2 text-sm transition-colors',
                     isAISearchMode ? 'fas fa-brain text-teal-500' : 'fas fa-search text-gray-400'
                   ]"></i>
                   <input
@@ -1585,16 +1585,16 @@ function getCategoryColor(category: string): string {
                     @focus="unifiedSearchQuery.length >= 2 && (showSearchSuggestions = true)"
                     @blur="hideSearchSuggestions"
                     :class="[
-                      'w-full pl-9 pr-20 py-2 text-sm focus:outline-none transition-all',
-                      showAIFeatures ? 'rounded-r-lg' : 'rounded-lg',
+                      'w-full ps-9 pe-20 py-2 text-sm focus:outline-none transition-all',
+                      showAIFeatures ? 'rounded-e-lg' : 'rounded-lg',
                       isAISearchMode
                         ? 'bg-gradient-to-r from-teal-50 to-cyan-50 border border-teal-200 focus:ring-2 focus:ring-teal-400 focus:border-transparent placeholder:text-teal-400'
                         : 'bg-white border border-gray-200 focus:ring-2 focus:ring-teal-500 focus:border-transparent',
-                      !showAIFeatures && 'rounded-l-lg'
+                      !showAIFeatures && 'rounded-s-lg'
                     ]"
                   >
                   <!-- Clear & Search Buttons -->
-                  <div class="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                  <div class="absolute end-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
                     <button
                       v-if="unifiedSearchQuery"
                       @click="clearUnifiedSearch"
@@ -1617,7 +1617,7 @@ function getCategoryColor(category: string): string {
               <!-- AI Search Suggestions Dropdown -->
               <div
                 v-if="showAIFeatures && isAISearchMode && showAISuggestions && !unifiedSearchQuery"
-                class="absolute left-0 top-full mt-2 w-full bg-white rounded-xl shadow-lg border border-teal-100 py-2 z-50"
+                class="absolute start-0 top-full mt-2 w-full bg-white rounded-xl shadow-lg border border-teal-100 py-2 z-50"
               >
                 <div class="px-3 py-1.5 text-xs font-semibold text-teal-500 flex items-center gap-2">
                   <i class="fas fa-lightbulb"></i>
@@ -1660,7 +1660,7 @@ function getCategoryColor(category: string): string {
               <!-- AI Processing Indicator -->
               <div
                 v-if="isProcessingNLSearch"
-                class="absolute left-0 top-full mt-2 w-full bg-gradient-to-r from-teal-50 to-cyan-50 rounded-xl shadow-lg border border-teal-100 p-4 z-50"
+                class="absolute start-0 top-full mt-2 w-full bg-gradient-to-r from-teal-50 to-cyan-50 rounded-xl shadow-lg border border-teal-100 p-4 z-50"
               >
                 <div class="flex items-center gap-3">
                   <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-teal-500 to-cyan-500 flex items-center justify-center">
@@ -1685,13 +1685,13 @@ function getCategoryColor(category: string): string {
               >
                 <i class="fas fa-file text-sm"></i>
                 <span>{{ selectedFileTypes.length > 0 ? `${selectedFileTypes.length} ${$t('documents.fileTypes')}` : $t('documents.fileType') }}</span>
-                <i :class="showFileTypeFilter ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ml-1"></i>
+                <i :class="showFileTypeFilter ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ms-1"></i>
               </button>
 
               <!-- Dropdown Menu -->
               <div
                 v-if="showFileTypeFilter"
-                class="absolute left-0 top-full mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
+                class="absolute start-0 top-full mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
               >
                 <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">{{ $t('documents.selectFileTypes') }}</div>
                 <div class="max-h-48 overflow-y-auto">
@@ -1748,13 +1748,13 @@ function getCategoryColor(category: string): string {
               >
                 <i class="fas fa-layer-group text-sm"></i>
                 <span>{{ selectedCategories.length > 0 ? `${selectedCategories.length} ${$t('documents.categories')}` : $t('documents.category') }}</span>
-                <i :class="showCategoryFilter ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ml-1"></i>
+                <i :class="showCategoryFilter ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ms-1"></i>
               </button>
 
               <!-- Dropdown Menu -->
               <div
                 v-if="showCategoryFilter"
-                class="absolute left-0 top-full mt-2 w-64 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
+                class="absolute start-0 top-full mt-2 w-64 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
               >
                 <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">{{ $t('documents.selectCategories') }}</div>
                 <div class="max-h-48 overflow-y-auto">
@@ -1817,13 +1817,13 @@ function getCategoryColor(category: string): string {
               >
                 <i class="fas fa-tags text-sm"></i>
                 <span>{{ selectedTags.length > 0 ? `${selectedTags.length} ${$t('documents.tags')}` : $t('documents.tags') }}</span>
-                <i :class="showTagFilter ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ml-1"></i>
+                <i :class="showTagFilter ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ms-1"></i>
               </button>
 
               <!-- Dropdown Menu -->
               <div
                 v-if="showTagFilter"
-                class="absolute left-0 top-full mt-2 w-64 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
+                class="absolute start-0 top-full mt-2 w-64 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
               >
                 <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">{{ $t('documents.selectTags') }}</div>
                 <div class="max-h-48 overflow-y-auto">
@@ -1879,13 +1879,13 @@ function getCategoryColor(category: string): string {
               >
                 <i class="fas fa-bookmark text-sm"></i>
                 <span>{{ selectedStatusFilters.length > 0 ? `${selectedStatusFilters.length} ${$t('documents.savedAndShared')}` : $t('documents.savedAndShared') }}</span>
-                <i :class="showStatusFilter ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ml-1"></i>
+                <i :class="showStatusFilter ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ms-1"></i>
               </button>
 
               <!-- Dropdown Menu -->
               <div
                 v-if="showStatusFilter"
-                class="absolute left-0 top-full mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
+                class="absolute start-0 top-full mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
               >
                 <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">{{ $t('documents.filterByStatus') }}</div>
                 <div class="max-h-48 overflow-y-auto">
@@ -1932,18 +1932,18 @@ function getCategoryColor(category: string): string {
             </div>
 
             <!-- Sort Options with Order Toggle -->
-            <div class="relative ml-auto flex items-center">
+            <div class="relative ms-auto flex items-center">
               <button
                 @click="showSortDropdown = !showSortDropdown"
-                class="flex items-center gap-2 px-3 py-1.5 rounded-l-lg text-xs font-medium transition-all border border-r-0 bg-white border-gray-200 text-gray-600 hover:bg-gray-50"
+                class="flex items-center gap-2 px-3 py-1.5 rounded-s-lg text-xs font-medium transition-all border border-e-0 bg-white border-gray-200 text-gray-600 hover:bg-gray-50"
               >
                 <i :class="[currentSortOption.icon, 'text-sm text-teal-500']"></i>
                 <span>{{ currentSortOption.label }}</span>
-                <i :class="showSortDropdown ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ml-1"></i>
+                <i :class="showSortDropdown ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ms-1"></i>
               </button>
               <button
                 @click="sortOrder = sortOrder === 'asc' ? 'desc' : 'asc'"
-                class="flex items-center justify-center w-8 h-8 rounded-r-lg text-xs font-medium transition-all border bg-white border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-teal-600"
+                class="flex items-center justify-center w-8 h-8 rounded-e-lg text-xs font-medium transition-all border bg-white border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-teal-600"
                 :title="sortOrder === 'asc' ? $t('documents.ascendingOrder') : $t('documents.descendingOrder')"
               >
                 <i :class="sortOrder === 'asc' ? 'fas fa-arrow-up' : 'fas fa-arrow-down'" class="text-sm text-teal-500"></i>
@@ -1952,7 +1952,7 @@ function getCategoryColor(category: string): string {
               <!-- Dropdown Menu -->
               <div
                 v-if="showSortDropdown"
-                class="absolute left-0 top-full mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
+                class="absolute start-0 top-full mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
               >
                 <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">{{ $t('documents.sortBy') }}</div>
                 <div class="max-h-64 overflow-y-auto">
@@ -2166,7 +2166,7 @@ function getCategoryColor(category: string): string {
                 <span v-if="selectedFolder" class="px-2.5 py-1 bg-teal-50 text-teal-700 rounded-lg text-xs font-medium flex items-center gap-1.5 border border-teal-100">
                   <i class="fas fa-folder text-[10px]"></i>
                   {{ selectedFolder }}
-                  <button @click="selectedFolder = null" class="ml-1 hover:text-teal-900 hover:bg-teal-100 rounded-full w-4 h-4 flex items-center justify-center"><i class="fas fa-times text-[10px]"></i></button>
+                  <button @click="selectedFolder = null" class="ms-1 hover:text-teal-900 hover:bg-teal-100 rounded-full w-4 h-4 flex items-center justify-center"><i class="fas fa-times text-[10px]"></i></button>
                 </span>
                 <span
                   v-for="categoryId in selectedCategories"
@@ -2175,7 +2175,7 @@ function getCategoryColor(category: string): string {
                 >
                   <i class="fas fa-layer-group text-[10px]"></i>
                   {{ libraries.find(l => l.id === categoryId)?.name }}
-                  <button @click="toggleCategory(categoryId)" class="ml-1 hover:text-purple-900 hover:bg-purple-100 rounded-full w-4 h-4 flex items-center justify-center"><i class="fas fa-times text-[10px]"></i></button>
+                  <button @click="toggleCategory(categoryId)" class="ms-1 hover:text-purple-900 hover:bg-purple-100 rounded-full w-4 h-4 flex items-center justify-center"><i class="fas fa-times text-[10px]"></i></button>
                 </span>
                 <span
                   v-for="typeId in selectedFileTypes"
@@ -2184,7 +2184,7 @@ function getCategoryColor(category: string): string {
                 >
                   <i :class="[fileTypes.find(t => t.id === typeId)?.icon, 'text-[10px]']"></i>
                   {{ fileTypes.find(t => t.id === typeId)?.label }}
-                  <button @click="toggleFileType(typeId)" class="ml-1 hover:text-blue-900 hover:bg-blue-100 rounded-full w-4 h-4 flex items-center justify-center"><i class="fas fa-times text-[10px]"></i></button>
+                  <button @click="toggleFileType(typeId)" class="ms-1 hover:text-blue-900 hover:bg-blue-100 rounded-full w-4 h-4 flex items-center justify-center"><i class="fas fa-times text-[10px]"></i></button>
                 </span>
                 <span
                   v-for="tag in selectedTags"
@@ -2193,12 +2193,12 @@ function getCategoryColor(category: string): string {
                 >
                   <i class="fas fa-tag text-[10px]"></i>
                   {{ tag }}
-                  <button @click="toggleTag(tag)" class="ml-1 hover:text-amber-900 hover:bg-amber-100 rounded-full w-4 h-4 flex items-center justify-center"><i class="fas fa-times text-[10px]"></i></button>
+                  <button @click="toggleTag(tag)" class="ms-1 hover:text-amber-900 hover:bg-amber-100 rounded-full w-4 h-4 flex items-center justify-center"><i class="fas fa-times text-[10px]"></i></button>
                 </span>
                 <span v-if="searchQuery" class="px-2.5 py-1 bg-gray-100 text-gray-700 rounded-lg text-xs font-medium flex items-center gap-1.5 border border-gray-200">
                   <i class="fas fa-search text-[10px]"></i>
                   "{{ searchQuery }}"
-                  <button @click="searchQuery = ''" class="ml-1 hover:text-gray-900 hover:bg-gray-200 rounded-full w-4 h-4 flex items-center justify-center"><i class="fas fa-times text-[10px]"></i></button>
+                  <button @click="searchQuery = ''" class="ms-1 hover:text-gray-900 hover:bg-gray-200 rounded-full w-4 h-4 flex items-center justify-center"><i class="fas fa-times text-[10px]"></i></button>
                 </span>
               </div>
               <button @click="clearFilters(); selectedFolder = null" class="px-3 py-1.5 text-xs font-medium text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors flex items-center gap-1.5">
@@ -2322,7 +2322,7 @@ function getCategoryColor(category: string): string {
                 <!-- Cancel -->
                 <button
                   @click="toggleSelectionMode"
-                  class="flex items-center gap-2 px-3 py-2 bg-white text-teal-600 hover:bg-gray-100 rounded-lg transition-all text-sm font-medium ml-2"
+                  class="flex items-center gap-2 px-3 py-2 bg-white text-teal-600 hover:bg-gray-100 rounded-lg transition-all text-sm font-medium ms-2"
                 >
                   <i class="fas fa-times"></i>
                   <span class="hidden sm:inline">{{ $t('documents.cancel') }}</span>
