@@ -3,6 +3,8 @@ import { ref, computed, watch, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import PageHeroHeader from '@/components/common/PageHeroHeader.vue'
+import PageFilterBar from '@/components/common/PageFilterBar.vue'
+import FilterDropdown from '@/components/common/FilterDropdown.vue'
 import AddToCollectionModal from '@/components/common/AddToCollectionModal.vue'
 import { useAIServicesStore } from '@/stores/aiServices'
 import { useComparisonStore } from '@/stores/comparison'
@@ -561,6 +563,25 @@ const allTags = computed(() => {
   })
   return Array.from(tags).sort()
 })
+
+// Category options for FilterDropdown
+const categoryOptions = computed(() =>
+  libraries.value.map(lib => ({
+    id: lib.id,
+    label: lib.name,
+    icon: lib.icon,
+    bgColor: lib.color,
+    count: lib.documentCount
+  }))
+)
+
+// Tag options for FilterDropdown
+const tagOptions = computed(() =>
+  allTags.value.map(tag => ({
+    id: tag,
+    label: tag
+  }))
+)
 
 // View counts for sidebar navigation
 const viewCounts = computed(() => ({
@@ -1675,261 +1696,56 @@ function getCategoryColor(category: string): string {
             </div>
 
             <!-- File Type Filter -->
-            <div class="relative">
-              <button
-                @click="showFileTypeFilter = !showFileTypeFilter"
-                :class="[
-                  'flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border',
-                  selectedFileTypes.length > 0 ? 'bg-teal-50 border-teal-200 text-teal-700' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
-                ]"
-              >
-                <i class="fas fa-file text-sm"></i>
-                <span>{{ selectedFileTypes.length > 0 ? `${selectedFileTypes.length} ${$t('documents.fileTypes')}` : $t('documents.fileType') }}</span>
-                <i :class="showFileTypeFilter ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ms-1"></i>
-              </button>
-
-              <!-- Dropdown Menu -->
-              <div
-                v-if="showFileTypeFilter"
-                class="absolute start-0 top-full mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
-              >
-                <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">{{ $t('documents.selectFileTypes') }}</div>
-                <div class="max-h-48 overflow-y-auto">
-                  <button
-                    v-for="type in fileTypes"
-                    :key="type.id"
-                    @click="toggleFileType(type.id)"
-                    :class="[
-                      'w-full px-3 py-2 text-left text-sm flex items-center gap-3 transition-colors',
-                      isFileTypeSelected(type.id) ? 'bg-teal-50 text-teal-700' : 'text-gray-700 hover:bg-gray-50'
-                    ]"
-                  >
-                    <div :class="[
-                      'w-4 h-4 rounded border-2 flex items-center justify-center transition-all',
-                      isFileTypeSelected(type.id) ? 'bg-teal-500 border-teal-500' : 'border-gray-300'
-                    ]">
-                      <i v-if="isFileTypeSelected(type.id)" class="fas fa-check text-white text-[8px]"></i>
-                    </div>
-                    <i :class="[type.icon, type.color, 'text-sm']"></i>
-                    <span class="flex-1">{{ type.label }}</span>
-                  </button>
-                </div>
-
-                <div class="my-2 border-t border-gray-100"></div>
-
-                <div class="px-3 flex gap-2">
-                  <button
-                    @click="selectedFileTypes = []; showFileTypeFilter = false"
-                    class="flex-1 px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
-                  >
-                    {{ $t('documents.clearAll') }}
-                  </button>
-                  <button
-                    @click="showFileTypeFilter = false"
-                    class="flex-1 px-3 py-1.5 text-xs font-medium text-white bg-teal-500 rounded-lg hover:bg-teal-600 transition-colors"
-                  >
-                    {{ $t('documents.apply') }}
-                  </button>
-                </div>
-              </div>
-
-              <!-- Click outside to close -->
-              <div v-if="showFileTypeFilter" @click="showFileTypeFilter = false" class="fixed inset-0 z-40"></div>
-            </div>
+            <FilterDropdown
+              v-model="selectedFileTypes"
+              icon="fas fa-file"
+              :label="$t('documents.fileType')"
+              :selected-label="$t('documents.fileTypes')"
+              :header-label="$t('documents.selectFileTypes')"
+              :options="fileTypes"
+              :clear-all-label="$t('documents.clearAll')"
+              :apply-label="$t('documents.apply')"
+            />
 
             <!-- Category Filter -->
-            <div class="relative">
-              <button
-                @click="showCategoryFilter = !showCategoryFilter"
-                :class="[
-                  'flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border',
-                  selectedCategories.length > 0 ? 'bg-teal-50 border-teal-200 text-teal-700' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
-                ]"
-              >
-                <i class="fas fa-layer-group text-sm"></i>
-                <span>{{ selectedCategories.length > 0 ? `${selectedCategories.length} ${$t('documents.categories')}` : $t('documents.category') }}</span>
-                <i :class="showCategoryFilter ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ms-1"></i>
-              </button>
-
-              <!-- Dropdown Menu -->
-              <div
-                v-if="showCategoryFilter"
-                class="absolute start-0 top-full mt-2 w-64 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
-              >
-                <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">{{ $t('documents.selectCategories') }}</div>
-                <div class="max-h-48 overflow-y-auto">
-                  <button
-                    v-for="lib in libraries"
-                    :key="lib.id"
-                    @click="toggleCategory(lib.id)"
-                    :class="[
-                      'w-full px-3 py-2 text-left text-sm flex items-center gap-3 transition-colors',
-                      isCategorySelected(lib.id) ? 'bg-teal-50 text-teal-700' : 'text-gray-700 hover:bg-gray-50'
-                    ]"
-                  >
-                    <div :class="[
-                      'w-4 h-4 rounded border-2 flex items-center justify-center transition-all',
-                      isCategorySelected(lib.id) ? 'bg-teal-500 border-teal-500' : 'border-gray-300'
-                    ]">
-                      <i v-if="isCategorySelected(lib.id)" class="fas fa-check text-white text-[8px]"></i>
-                    </div>
-                    <div
-                      class="w-6 h-6 rounded-lg flex items-center justify-center text-white text-xs"
-                      :style="{ backgroundColor: lib.color }"
-                    >
-                      <i :class="lib.icon"></i>
-                    </div>
-                    <span class="flex-1">{{ lib.name }}</span>
-                    <span class="text-xs text-gray-400">{{ lib.documentCount }}</span>
-                  </button>
-                </div>
-
-                <div class="my-2 border-t border-gray-100"></div>
-
-                <div class="px-3 flex gap-2">
-                  <button
-                    @click="selectedCategories = []; showCategoryFilter = false"
-                    class="flex-1 px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
-                  >
-                    {{ $t('documents.clearAll') }}
-                  </button>
-                  <button
-                    @click="showCategoryFilter = false"
-                    class="flex-1 px-3 py-1.5 text-xs font-medium text-white bg-teal-500 rounded-lg hover:bg-teal-600 transition-colors"
-                  >
-                    {{ $t('documents.apply') }}
-                  </button>
-                </div>
-              </div>
-
-              <!-- Click outside to close -->
-              <div v-if="showCategoryFilter" @click="showCategoryFilter = false" class="fixed inset-0 z-40"></div>
-            </div>
+            <FilterDropdown
+              v-model="selectedCategories"
+              icon="fas fa-layer-group"
+              :label="$t('documents.category')"
+              :selected-label="$t('documents.categories')"
+              :header-label="$t('documents.selectCategories')"
+              :options="categoryOptions"
+              dropdown-width="w-64"
+              :clear-all-label="$t('documents.clearAll')"
+              :apply-label="$t('documents.apply')"
+              :show-count="true"
+              :show-color-badge="true"
+            />
 
             <!-- Tags Filter -->
-            <div class="relative">
-              <button
-                @click="showTagFilter = !showTagFilter"
-                :class="[
-                  'flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border',
-                  selectedTags.length > 0 ? 'bg-teal-50 border-teal-200 text-teal-700' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
-                ]"
-              >
-                <i class="fas fa-tags text-sm"></i>
-                <span>{{ selectedTags.length > 0 ? `${selectedTags.length} ${$t('documents.tags')}` : $t('documents.tags') }}</span>
-                <i :class="showTagFilter ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ms-1"></i>
-              </button>
-
-              <!-- Dropdown Menu -->
-              <div
-                v-if="showTagFilter"
-                class="absolute start-0 top-full mt-2 w-64 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
-              >
-                <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">{{ $t('documents.selectTags') }}</div>
-                <div class="max-h-48 overflow-y-auto">
-                  <button
-                    v-for="tag in allTags"
-                    :key="tag"
-                    @click="toggleTag(tag)"
-                    :class="[
-                      'w-full px-3 py-2 text-left text-sm flex items-center gap-3 transition-colors',
-                      isTagSelected(tag) ? 'bg-teal-50 text-teal-700' : 'text-gray-700 hover:bg-gray-50'
-                    ]"
-                  >
-                    <div :class="[
-                      'w-4 h-4 rounded border-2 flex items-center justify-center transition-all',
-                      isTagSelected(tag) ? 'bg-teal-500 border-teal-500' : 'border-gray-300'
-                    ]">
-                      <i v-if="isTagSelected(tag)" class="fas fa-check text-white text-[8px]"></i>
-                    </div>
-                    <span class="flex-1">{{ tag }}</span>
-                  </button>
-                </div>
-
-                <div class="my-2 border-t border-gray-100"></div>
-
-                <div class="px-3 flex gap-2">
-                  <button
-                    @click="selectedTags = []; showTagFilter = false"
-                    class="flex-1 px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
-                  >
-                    {{ $t('documents.clearAll') }}
-                  </button>
-                  <button
-                    @click="showTagFilter = false"
-                    class="flex-1 px-3 py-1.5 text-xs font-medium text-white bg-teal-500 rounded-lg hover:bg-teal-600 transition-colors"
-                  >
-                    {{ $t('documents.apply') }}
-                  </button>
-                </div>
-              </div>
-
-              <!-- Click outside to close -->
-              <div v-if="showTagFilter" @click="showTagFilter = false" class="fixed inset-0 z-40"></div>
-            </div>
+            <FilterDropdown
+              v-model="selectedTags"
+              icon="fas fa-tags"
+              :label="$t('documents.tags')"
+              :selected-label="$t('documents.tags')"
+              :header-label="$t('documents.selectTags')"
+              :options="tagOptions"
+              dropdown-width="w-64"
+              :clear-all-label="$t('documents.clearAll')"
+              :apply-label="$t('documents.apply')"
+            />
 
             <!-- Saved & Shared Filter Dropdown -->
-            <div class="relative">
-              <button
-                @click="showStatusFilter = !showStatusFilter"
-                :class="[
-                  'flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border',
-                  selectedStatusFilters.length > 0 ? 'bg-teal-50 border-teal-200 text-teal-700' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
-                ]"
-              >
-                <i class="fas fa-bookmark text-sm"></i>
-                <span>{{ selectedStatusFilters.length > 0 ? `${selectedStatusFilters.length} ${$t('documents.savedAndShared')}` : $t('documents.savedAndShared') }}</span>
-                <i :class="showStatusFilter ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ms-1"></i>
-              </button>
-
-              <!-- Dropdown Menu -->
-              <div
-                v-if="showStatusFilter"
-                class="absolute start-0 top-full mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
-              >
-                <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">{{ $t('documents.filterByStatus') }}</div>
-                <div class="max-h-48 overflow-y-auto">
-                  <button
-                    v-for="option in statusFilterOptions"
-                    :key="option.id"
-                    @click="toggleStatusFilter(option.id)"
-                    :class="[
-                      'w-full px-3 py-2 text-left text-sm flex items-center gap-3 transition-colors',
-                      isStatusSelected(option.id) ? 'bg-teal-50 text-teal-700' : 'text-gray-700 hover:bg-gray-50'
-                    ]"
-                  >
-                    <div :class="[
-                      'w-4 h-4 rounded border-2 flex items-center justify-center transition-all',
-                      isStatusSelected(option.id) ? 'bg-teal-500 border-teal-500' : 'border-gray-300'
-                    ]">
-                      <i v-if="isStatusSelected(option.id)" class="fas fa-check text-white text-[8px]"></i>
-                    </div>
-                    <i :class="[option.icon, option.color]"></i>
-                    <span class="flex-1">{{ option.label }}</span>
-                  </button>
-                </div>
-
-                <div class="my-2 border-t border-gray-100"></div>
-
-                <div class="px-3 flex gap-2">
-                  <button
-                    @click="selectedStatusFilters = []; showStatusFilter = false"
-                    class="flex-1 px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
-                  >
-                    {{ $t('documents.clearAll') }}
-                  </button>
-                  <button
-                    @click="showStatusFilter = false"
-                    class="flex-1 px-3 py-1.5 text-xs font-medium text-white bg-teal-500 rounded-lg hover:bg-teal-600 transition-colors"
-                  >
-                    {{ $t('documents.apply') }}
-                  </button>
-                </div>
-              </div>
-
-              <!-- Click outside to close -->
-              <div v-if="showStatusFilter" @click="showStatusFilter = false" class="fixed inset-0 z-40"></div>
-            </div>
+            <FilterDropdown
+              v-model="selectedStatusFilters"
+              icon="fas fa-bookmark"
+              :label="$t('documents.savedAndShared')"
+              :selected-label="$t('documents.savedAndShared')"
+              :header-label="$t('documents.filterByStatus')"
+              :options="statusFilterOptions"
+              :clear-all-label="$t('documents.clearAll')"
+              :apply-label="$t('documents.apply')"
+            />
 
             <!-- Sort Options with Order Toggle -->
             <div class="relative ms-auto flex items-center">
