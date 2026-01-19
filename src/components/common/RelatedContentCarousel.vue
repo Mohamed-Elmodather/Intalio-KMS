@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { useRelatedContent } from '@/composables/useRelatedContent'
 import type { RelatedItem } from '@/types/detail-pages'
+
+const { t } = useI18n()
 
 const props = withDefaults(defineProps<{
   contentType: string
@@ -11,7 +14,6 @@ const props = withDefaults(defineProps<{
   limit?: number
   mixed?: boolean
 }>(), {
-  title: 'Related Content',
   limit: 4,
   mixed: false
 })
@@ -79,7 +81,7 @@ function navigateToItem(item: RelatedItem) {
   <div class="related-content-carousel">
     <!-- Header -->
     <div class="flex items-center justify-between mb-4">
-      <h3 class="text-lg font-semibold text-gray-900">{{ title }}</h3>
+      <h3 class="text-lg font-semibold text-gray-900">{{ title || $t('common.relatedContent') }}</h3>
       <div class="flex gap-2">
         <button
           @click="scrollLeft"
@@ -168,7 +170,7 @@ function navigateToItem(item: RelatedItem) {
     <!-- Empty State -->
     <div v-else class="text-center py-8 bg-gray-50 rounded-xl">
       <i class="fas fa-folder-open text-3xl text-gray-300 mb-2"></i>
-      <p class="text-gray-500">No related content found</p>
+      <p class="text-gray-500">{{ $t('common.noRelatedContent') }}</p>
     </div>
   </div>
 </template>

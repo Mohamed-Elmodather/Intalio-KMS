@@ -148,6 +148,8 @@ export default {
     saveForLater: 'حفظ لوقت لاحق',
     saved: 'تم الحفظ',
     removedFromSaved: 'تمت الإزالة من المحفوظات',
+    relatedContent: 'المحتوى ذو الصلة',
+    noRelatedContent: 'لم يتم العثور على محتوى ذي صلة',
   },
 
   // App
@@ -972,6 +974,9 @@ export default {
     suggestedFollowUps: 'متابعات مقترحة:',
     attachPlatformContent: 'إرفاق محتوى المنصة',
     voiceInputNotSupported: 'الإدخال الصوتي غير مدعوم',
+    selectLanguage: 'اختر اللغة',
+    searchLanguages: 'بحث في اللغات...',
+    noLanguagesFound: 'لم يتم العثور على لغات',
     // Messages
     sources: 'المصادر',
     analyzingContent: 'جاري تحليل المحتوى...',

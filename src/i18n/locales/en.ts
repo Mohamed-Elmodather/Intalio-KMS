@@ -148,6 +148,8 @@ export default {
     saveForLater: 'Save for later',
     saved: 'Saved',
     removedFromSaved: 'Removed from saved',
+    relatedContent: 'Related Content',
+    noRelatedContent: 'No related content found',
   },
 
   // App
@@ -972,6 +974,9 @@ export default {
     suggestedFollowUps: 'Suggested follow-ups:',
     attachPlatformContent: 'Attach platform content',
     voiceInputNotSupported: 'Voice input not supported',
+    selectLanguage: 'Select language',
+    searchLanguages: 'Search languages...',
+    noLanguagesFound: 'No languages found',
     // Messages
     sources: 'Sources',
     analyzingContent: 'Analyzing content...',

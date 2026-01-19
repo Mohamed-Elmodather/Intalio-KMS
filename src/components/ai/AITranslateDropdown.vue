@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { SUPPORTED_LANGUAGES, type SupportedLanguage, type LanguageOption } from '@/types/ai'
+
+const { t } = useI18n()
 
 interface Props {
   modelValue?: SupportedLanguage
@@ -11,7 +14,6 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  placeholder: 'Select language',
   disabled: false,
   showFlags: true,
   excludeLanguages: () => [],
@@ -81,7 +83,7 @@ function closeDropdown() {
           <span class="text-gray-700">{{ selectedLanguage.name }}</span>
           <span class="text-gray-400 text-xs">({{ selectedLanguage.nativeName }})</span>
         </span>
-        <span v-else class="text-gray-400">{{ placeholder }}</span>
+        <span v-else class="text-gray-400">{{ placeholder || $t('ai.selectLanguage') }}</span>
       </div>
       <i
         class="fas fa-chevron-down text-gray-400 transition-transform"
@@ -109,7 +111,7 @@ function closeDropdown() {
             <input
               v-model="searchQuery"
               type="text"
-              placeholder="Search languages..."
+              :placeholder="$t('ai.searchLanguages')"
               class="w-full pl-9 pr-3 py-2 text-sm border border-gray-200 rounded-lg focus:border-teal-500 focus:ring-1 focus:ring-teal-200 outline-none"
             />
           </div>
@@ -142,7 +144,7 @@ function closeDropdown() {
           <!-- Empty state -->
           <div v-if="filteredLanguages.length === 0" class="px-3 py-6 text-center">
             <i class="fas fa-search text-gray-300 text-2xl mb-2" />
-            <p class="text-sm text-gray-500">No languages found</p>
+            <p class="text-sm text-gray-500">{{ $t('ai.noLanguagesFound') }}</p>
           </div>
         </div>
       </div>
