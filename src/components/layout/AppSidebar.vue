@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { useUIStore } from '@/stores/ui'
 
+const { t } = useI18n()
 const route = useRoute()
 const uiStore = useUIStore()
 
@@ -22,23 +24,23 @@ interface WorkspaceItem {
   color: string
 }
 
-const navigationItems: NavItem[] = [
-  { id: 'dashboard', icon: 'fas fa-th-large', label: 'Dashboard', route: '/' },
-  { id: 'articles', icon: 'fas fa-book-open', label: 'Articles', route: '/articles', badge: '24', badgeClass: 'bg-teal-200 text-teal-700' },
-  { id: 'documents', icon: 'fas fa-folder', label: 'Documents', route: '/documents' },
-  { id: 'media', icon: 'fas fa-photo-video', label: 'Media Center', route: '/media' },
-  { id: 'learning', icon: 'fas fa-graduation-cap', label: 'Learning', route: '/learning', badge: '2', badgeClass: 'bg-blue-200 text-blue-700' },
-  { id: 'events', icon: 'fas fa-calendar-alt', label: 'Events', route: '/events' },
-  { id: 'collaboration', icon: 'fas fa-users', label: 'Collaboration', route: '/collaboration' },
-  { id: 'polls', icon: 'fas fa-poll', label: 'Polls & Surveys', route: '/polls', badge: '3', badgeClass: 'bg-orange-200 text-orange-700' },
-  { id: 'services', icon: 'fas fa-concierge-bell', label: 'Self-Services', route: '/self-services' },
-]
+const navigationItems = computed<NavItem[]>(() => [
+  { id: 'dashboard', icon: 'fas fa-th-large', label: t('nav.dashboard'), route: '/' },
+  { id: 'articles', icon: 'fas fa-book-open', label: t('nav.articles'), route: '/articles', badge: '24', badgeClass: 'bg-teal-200 text-teal-700' },
+  { id: 'documents', icon: 'fas fa-folder', label: t('nav.documents'), route: '/documents' },
+  { id: 'media', icon: 'fas fa-photo-video', label: t('nav.mediaCenter'), route: '/media' },
+  { id: 'learning', icon: 'fas fa-graduation-cap', label: t('nav.learning'), route: '/learning', badge: '2', badgeClass: 'bg-blue-200 text-blue-700' },
+  { id: 'events', icon: 'fas fa-calendar-alt', label: t('nav.events'), route: '/events' },
+  { id: 'collaboration', icon: 'fas fa-users', label: t('nav.collaboration'), route: '/collaboration' },
+  { id: 'polls', icon: 'fas fa-poll', label: t('nav.pollsSurveys'), route: '/polls', badge: '3', badgeClass: 'bg-orange-200 text-orange-700' },
+  { id: 'services', icon: 'fas fa-concierge-bell', label: t('nav.selfServices'), route: '/self-services' },
+])
 
-const workspaceItems: WorkspaceItem[] = [
-  { id: 'ws-hr', label: 'HR Portal', initials: 'HR', color: '#8B5CF6' },
-  { id: 'ws-it', label: 'IT Knowledge', initials: 'IT', color: '#3B82F6' },
-  { id: 'ws-sales', label: 'Sales Enablement', initials: 'SE', color: '#10B981' },
-]
+const workspaceItems = computed<WorkspaceItem[]>(() => [
+  { id: 'ws-hr', label: t('nav.workspaces.hrPortal'), initials: 'HR', color: '#8B5CF6' },
+  { id: 'ws-it', label: t('nav.workspaces.itKnowledge'), initials: 'IT', color: '#3B82F6' },
+  { id: 'ws-sales', label: t('nav.workspaces.salesEnablement'), initials: 'SE', color: '#10B981' },
+])
 
 const isCollapsed = computed(() => uiStore.sidebarCollapsed)
 
@@ -76,7 +78,7 @@ function isActive(item: NavItem): boolean {
 
       <!-- Workspaces -->
       <div class="mt-6 pt-6 border-t border-gray-100">
-        <p v-show="!isCollapsed" class="px-3 mb-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">Workspaces</p>
+        <p v-show="!isCollapsed" class="px-3 mb-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">{{ $t('nav.workspaces.title') }}</p>
         <div class="space-y-1">
           <router-link
             v-for="workspace in workspaceItems"
@@ -98,13 +100,13 @@ function isActive(item: NavItem): boolean {
           <div class="sidebar-item-icon group-hover:bg-teal-100 group-hover:text-teal-600 group-hover:rotate-90 transition-all duration-500">
             <i class="fas fa-cog"></i>
           </div>
-          <span v-show="!isCollapsed" class="sidebar-item-label">Settings</span>
+          <span v-show="!isCollapsed" class="sidebar-item-label">{{ $t('nav.settings') }}</span>
         </router-link>
         <router-link to="/ai-assistant" class="sidebar-item group">
           <div class="sidebar-item-icon group-hover:bg-teal-100 group-hover:text-teal-600 group-hover:scale-110 transition-all">
             <i class="fas fa-wand-magic-sparkles"></i>
           </div>
-          <span v-show="!isCollapsed" class="sidebar-item-label">AI Assistant</span>
+          <span v-show="!isCollapsed" class="sidebar-item-label">{{ $t('nav.aiAssistant') }}</span>
         </router-link>
       </div>
     </nav>

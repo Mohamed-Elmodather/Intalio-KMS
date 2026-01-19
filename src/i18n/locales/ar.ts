@@ -50,7 +50,8 @@ export default {
     comments: 'التعليقات',
     reply: 'رد',
     replies: 'الردود',
-    rating: 'التقييم',
+    rating: 'تقييم',
+    ratings: 'تقييمات',
     views: 'المشاهدات',
     view: 'عرض',
     today: 'اليوم',
@@ -194,7 +195,12 @@ export default {
     settings: 'الإعدادات',
     aiAssistant: 'المساعد الذكي',
     lessonsLearned: 'الدروس المستفادة',
-    workspaces: 'مساحات العمل',
+    workspaces: {
+      title: 'مساحات العمل',
+      hrPortal: 'بوابة الموارد البشرية',
+      itKnowledge: 'قاعدة معرفة تقنية المعلومات',
+      salesEnablement: 'تمكين المبيعات',
+    },
     profile: 'الملف الشخصي',
     logout: 'تسجيل الخروج',
   },
@@ -1037,11 +1043,23 @@ export default {
     },
     // Confidence levels
     confidence: {
+      label: 'ثقة',
       veryHigh: 'عالية جداً',
       high: 'عالية',
       moderate: 'متوسطة',
       low: 'منخفضة',
       veryLow: 'منخفضة جداً',
+    },
+    // Entity Types
+    entityTypes: {
+      person: 'شخص',
+      organization: 'منظمة',
+      location: 'موقع',
+      date: 'تاريخ',
+      event: 'حدث',
+      product: 'منتج',
+      amount: 'كمية',
+      money: 'مبلغ مالي',
     },
     // Message Content
     messageContent: {

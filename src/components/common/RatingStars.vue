@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const props = withDefaults(defineProps<{
   modelValue?: number
@@ -99,7 +102,7 @@ function getStarClass(index: number) {
     </span>
 
     <span v-if="showCount && count > 0" class="ml-1 text-gray-500 text-sm">
-      ({{ count.toLocaleString() }} {{ count === 1 ? 'rating' : 'ratings' }})
+      ({{ count.toLocaleString() }} {{ count === 1 ? $t('common.rating') : $t('common.ratings') }})
     </span>
   </div>
 </template>

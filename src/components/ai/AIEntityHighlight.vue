@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { Entity, EntityType } from '@/types/ai'
+
+const { t } = useI18n()
 
 interface Props {
   text: string
@@ -105,6 +108,16 @@ function handleEntityClick(entity: Entity) {
     emit('entityClick', entity)
   }
 }
+
+function getEntityTypeLabel(type: EntityType): string {
+  return t(`ai.entityTypes.${type}`)
+}
+
+function getEntityTooltip(entity: Entity): string {
+  const typeLabel = getEntityTypeLabel(entity.type)
+  const confidencePercent = Math.round(entity.confidence * 100)
+  return `${typeLabel}: ${entity.text} (${confidencePercent}% ${t('ai.confidence.label')})`
+}
 </script>
 
 <template>
@@ -123,7 +136,7 @@ function handleEntityClick(entity: Entity) {
           entityColors[segment.entity!.type].border,
           interactive ? 'cursor-pointer hover:shadow-sm' : '',
         ]"
-        :title="showTooltips ? `${segment.entity!.type}: ${segment.entity!.text} (${Math.round(segment.entity!.confidence * 100)}% confidence)` : undefined"
+        :title="showTooltips ? getEntityTooltip(segment.entity!) : undefined"
         @click="handleEntityClick(segment.entity!)"
       >
         <i :class="[entityIcons[segment.entity!.type], 'text-xs opacity-70']" />

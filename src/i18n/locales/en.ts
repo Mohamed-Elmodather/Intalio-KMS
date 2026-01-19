@@ -51,6 +51,7 @@ export default {
     reply: 'Reply',
     replies: 'Replies',
     rating: 'Rating',
+    ratings: 'Ratings',
     views: 'Views',
     view: 'View',
     today: 'Today',
@@ -194,7 +195,12 @@ export default {
     settings: 'Settings',
     aiAssistant: 'AI Assistant',
     lessonsLearned: 'Lessons Learned',
-    workspaces: 'Workspaces',
+    workspaces: {
+      title: 'Workspaces',
+      hrPortal: 'HR Portal',
+      itKnowledge: 'IT Knowledge',
+      salesEnablement: 'Sales Enablement',
+    },
     profile: 'Profile',
     logout: 'Logout',
   },
@@ -1037,11 +1043,23 @@ export default {
     },
     // Confidence levels
     confidence: {
+      label: 'confidence',
       veryHigh: 'Very High',
       high: 'High',
       moderate: 'Moderate',
       low: 'Low',
       veryLow: 'Very Low',
+    },
+    // Entity Types
+    entityTypes: {
+      person: 'Person',
+      organization: 'Organization',
+      location: 'Location',
+      date: 'Date',
+      event: 'Event',
+      product: 'Product',
+      amount: 'Amount',
+      money: 'Money',
     },
     // Message Content
     messageContent: {
