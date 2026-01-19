@@ -319,6 +319,79 @@ export default {
     createContent: 'Create Content',
     viewEvents: 'View Events',
     forYou: 'For You',
+    // Latest Updates Section
+    latestUpdates: 'Latest Updates',
+    afcAsianCup: 'AFC Asian Cup Saudi Arabia 2027',
+    afcAsianCupShort: 'AFC Asian Cup 2027',
+    trending: 'Trending',
+    featured: 'Featured',
+    readArticle: 'Read Article',
+    upNext: 'Up Next',
+    // AI Anomaly Section
+    aiDetectedAnomalies: 'AI Detected Anomalies',
+    anomalyPatternsDetected: '{count} unusual activity patterns detected',
+    actual: 'Actual',
+    expected: 'Expected',
+    // Recent Sections
+    recentArticles: 'Recent Articles',
+    latestNewsUpdates: 'Latest news & updates',
+    recentDocuments: 'Recent Documents',
+    filesResources: 'Files & resources',
+    uploadNewDocument: 'Upload New Document',
+    new: 'NEW',
+    recentMedia: 'Recent Media',
+    videosPodcasts: 'Videos & podcasts',
+    podcast: 'Podcast',
+    watched: 'Watched',
+    // Polls Section
+    activePolls: 'Active Polls',
+    castYourVote: 'Cast your vote',
+    readyToVote: 'Ready to vote',
+    selectAnOption: 'Select an option',
+    // Learning Section
+    myLearning: 'My Learning',
+    continueYourJourney: 'Continue your journey',
+    inProgress: 'In Progress',
+    completed: 'Completed',
+    hours: 'Hours',
+    certificates: 'Certificates',
+    lessonsProgress: '{completed}/{total} lessons',
+    // Team Activity Section
+    teamActivity: 'Team Activity',
+    recentUpdates: 'Recent updates',
+    // Quick Services Section
+    quickServices: 'Quick Services',
+    popular: 'POPULAR',
+    // AI Insights Section
+    aiInsightsTitle: 'AI Insights',
+    intelligentAnalysis: 'Intelligent analysis of platform activity',
+    analyzingPlatformData: 'Analyzing platform data...',
+    confidence: 'Confidence',
+    recommendedForYou: 'Recommended For You',
+    personalizedSuggestions: 'Personalized content suggestions',
+    findingContentForYou: 'Finding content for you...',
+    // Stats
+    totalArticles: 'Total Articles',
+    activeUsers: 'Active Users',
+    documents: 'Documents',
+    coursesCompleted: 'Courses Completed',
+    viewArticles: 'View Articles',
+    viewUsers: 'View Users',
+    viewDocuments: 'View Documents',
+    viewCourses: 'View Courses',
+    // Media
+    audio: 'Audio',
+    // Polls
+    votes: 'votes',
+    youVoted: 'You voted',
+    youVotedFor: 'You voted for: {option}',
+    selectOptionFirst: 'Please select an option first',
+    // Learning
+    lessons: 'lessons',
+    // AI Panel
+    insightsGenerated: 'Insights generated based on last 30 days of activity',
+    basedOnActivity: 'Based on your activity and role',
+    match: 'match',
   },
 
   // Articles

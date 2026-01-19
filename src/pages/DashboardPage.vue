@@ -314,12 +314,12 @@ function votePoll(poll: any) {
   if (!poll.hasVoted && selectedOption) {
     // Submit vote
     poll.hasVoted = true
-    alert(`You voted for: ${selectedOption}`)
+    alert(t('dashboard.youVotedFor', { option: selectedOption }))
   } else if (poll.hasVoted) {
     // View results - navigate to poll page
     router.push(`/polls/${poll.id}`)
   } else {
-    alert('Please select an option first')
+    alert(t('dashboard.selectOptionFirst'))
   }
 }
 
@@ -1328,12 +1328,12 @@ onUnmounted(() => {
     <!-- Welcome Section - Enhanced -->
     <div class="welcome-hero rounded-2xl mb-8 relative overflow-hidden stagger-1">
       <!-- Decorative elements with drift animations -->
-      <div class="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full circle-drift-1"></div>
-      <div class="absolute bottom-0 left-0 w-64 h-64 bg-white/5 rounded-full circle-drift-2"></div>
-      <div class="absolute top-1/2 right-1/4 w-32 h-32 bg-white/10 rounded-full circle-drift-3"></div>
+      <div class="absolute top-0 end-0 w-96 h-96 bg-white/5 rounded-full circle-drift-1"></div>
+      <div class="absolute bottom-0 start-0 w-64 h-64 bg-white/5 rounded-full circle-drift-2"></div>
+      <div class="absolute top-1/2 end-1/4 w-32 h-32 bg-white/10 rounded-full circle-drift-3"></div>
 
       <!-- Trophy Icon - Top Right with glow animation -->
-      <div class="absolute top-6 right-6 w-20 h-20 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center trophy-glow">
+      <div class="absolute top-6 end-6 w-20 h-20 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center trophy-glow">
         <i class="fas fa-trophy text-white text-3xl"></i>
       </div>
 
@@ -1341,7 +1341,7 @@ onUnmounted(() => {
         <div class="flex items-center gap-3 mb-4">
           <div class="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-white text-xs font-semibold flex items-center gap-2">
             <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-            AFC Asian Cup Saudi Arabia 2027
+            {{ $t('dashboard.afcAsianCup') }}
           </div>
         </div>
 
@@ -1385,7 +1385,7 @@ onUnmounted(() => {
             <i class="fas fa-robot text-emerald-300"></i>
             <span class="text-sm text-white/90">{{ quickAIInsight.text }}</span>
             <span class="flex items-center gap-1 text-xs text-emerald-300 font-semibold">
-              <i class="fas fa-arrow-up"></i> Trending
+              <i class="fas fa-arrow-up"></i> {{ $t('dashboard.trending') }}
             </span>
           </div>
         </div>
@@ -1401,8 +1401,8 @@ onUnmounted(() => {
               <i class="fas fa-exclamation-triangle text-white"></i>
             </div>
             <div>
-              <h3 class="font-semibold text-gray-900">AI Detected Anomalies</h3>
-              <p class="text-xs text-gray-500">{{ activityAnomalies.length }} unusual activity patterns detected</p>
+              <h3 class="font-semibold text-gray-900">{{ $t('dashboard.aiDetectedAnomalies') }}</h3>
+              <p class="text-xs text-gray-500">{{ $t('dashboard.anomalyPatternsDetected', { count: activityAnomalies.length }) }}</p>
             </div>
           </div>
           <button @click="showAnomalyAlert = false" class="p-2 hover:bg-amber-100 rounded-lg transition-colors">
@@ -1419,8 +1419,8 @@ onUnmounted(() => {
               <p class="font-medium text-sm">{{ anomaly.metric }}</p>
               <p class="text-xs opacity-80">{{ anomaly.description }}</p>
               <div class="flex items-center gap-3 mt-2 text-xs">
-                <span>Actual: <strong>{{ anomaly.value }}</strong></span>
-                <span>Expected: {{ anomaly.expectedValue }}</span>
+                <span>{{ $t('dashboard.actual') }}: <strong>{{ anomaly.value }}</strong></span>
+                <span>{{ $t('dashboard.expected') }}: {{ anomaly.expectedValue }}</span>
                 <span class="opacity-60">{{ anomaly.detectedAt }}</span>
               </div>
             </div>
@@ -1440,12 +1440,12 @@ onUnmounted(() => {
             <i class="fas fa-fire text-white"></i>
           </div>
           <div>
-            <span class="block">Latest Updates</span>
-            <span class="text-xs font-medium text-orange-600">AFC Asian Cup 2027</span>
+            <span class="block">{{ $t('dashboard.latestUpdates') }}</span>
+            <span class="text-xs font-medium text-orange-600">{{ $t('dashboard.afcAsianCupShort') }}</span>
           </div>
         </h2>
         <router-link to="/articles" class="px-3 py-1.5 text-sm text-teal-600 hover:text-white bg-teal-50 hover:bg-teal-500 rounded-lg font-medium flex items-center gap-1.5 transition-all">
-          View All <i class="fas fa-arrow-right text-xs"></i>
+          {{ $t('common.viewAll') }} <i class="fas fa-arrow-right text-xs"></i>
         </router-link>
       </div>
 
@@ -1460,14 +1460,14 @@ onUnmounted(() => {
             <div class="featured-main-overlay"></div>
             <!-- Badges -->
             <div class="featured-main-badges">
-              <span class="badge-featured"><i class="fas fa-star"></i> Featured</span>
+              <span class="badge-featured"><i class="fas fa-star"></i> {{ $t('dashboard.featured') }}</span>
               <span class="badge-category">{{ featuredUpdate.typeLabel }}</span>
             </div>
             <!-- Hover Actions -->
             <div class="featured-hover-actions">
               <router-link :to="featuredUpdate.link" class="featured-hover-btn primary">
                 <i class="fas fa-book-open"></i>
-                <span>Read Article</span>
+                <span>{{ $t('dashboard.readArticle') }}</span>
               </router-link>
               <div class="featured-hover-icons">
                 <button class="hover-icon-btn" @click.stop="toggleLikeUpdate(featuredUpdate.id)" :class="{ active: isUpdateLiked(featuredUpdate.id) }">
@@ -1518,7 +1518,7 @@ onUnmounted(() => {
 
         <!-- Up Next Column -->
         <div class="up-next-column">
-          <h3 class="up-next-title"><i class="fas fa-list"></i> Up Next</h3>
+          <h3 class="up-next-title"><i class="fas fa-list"></i> {{ $t('dashboard.upNext') }}</h3>
           <div class="up-next-list">
             <div
               v-for="update in upNextUpdates"
@@ -1609,12 +1609,12 @@ onUnmounted(() => {
               <i class="fas fa-newspaper text-white"></i>
             </div>
             <div>
-              <span class="block">Recent Articles</span>
-              <span class="text-xs font-medium text-teal-600">Latest news & updates</span>
+              <span class="block">{{ $t('dashboard.recentArticles') }}</span>
+              <span class="text-xs font-medium text-teal-600">{{ $t('dashboard.latestNewsUpdates') }}</span>
             </div>
           </h2>
           <router-link to="/articles" class="px-3 py-1.5 text-sm text-teal-600 hover:text-white bg-teal-50 hover:bg-teal-500 rounded-lg font-medium flex items-center gap-1.5 transition-all">
-            View All <i class="fas fa-arrow-right text-xs"></i>
+            {{ $t('common.viewAll') }} <i class="fas fa-arrow-right text-xs"></i>
           </router-link>
         </div>
         <div class="space-y-2.5">
@@ -1629,8 +1629,8 @@ onUnmounted(() => {
                   <i :class="[article.icon, 'text-base', article.iconColor]"></i>
                 </div>
               </div>
-              <div v-if="index === 0" class="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center">
-                <span class="text-white text-[8px] font-bold">NEW</span>
+              <div v-if="index === 0" class="absolute -top-1 -end-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center">
+                <span class="text-white text-[8px] font-bold">{{ $t('dashboard.new') }}</span>
               </div>
             </div>
             <!-- Article Content -->
@@ -1643,7 +1643,7 @@ onUnmounted(() => {
                   {{ article.category }}
                 </span>
                 <span class="text-[10px] text-gray-400">{{ article.readTime }}</span>
-                <span class="text-[10px] text-gray-400"><i class="fas fa-eye mr-0.5"></i>{{ article.views }}</span>
+                <span class="text-[10px] text-gray-400"><i class="fas fa-eye me-0.5"></i>{{ article.views }}</span>
               </div>
             </div>
             <!-- Actions -->
@@ -1667,12 +1667,12 @@ onUnmounted(() => {
               <i class="fas fa-folder-open text-white"></i>
             </div>
             <div>
-              <span class="block">Recent Documents</span>
-              <span class="text-xs font-medium text-teal-600">Files & resources</span>
+              <span class="block">{{ $t('dashboard.recentDocuments') }}</span>
+              <span class="text-xs font-medium text-teal-600">{{ $t('dashboard.filesResources') }}</span>
             </div>
           </h2>
           <router-link to="/documents" class="px-3 py-1.5 text-sm text-teal-600 hover:text-white bg-teal-50 hover:bg-teal-500 rounded-lg font-medium flex items-center gap-1.5 transition-all">
-            View All <i class="fas fa-arrow-right text-xs"></i>
+            {{ $t('common.viewAll') }} <i class="fas fa-arrow-right text-xs"></i>
           </router-link>
         </div>
         <div class="space-y-2.5">
@@ -1684,7 +1684,7 @@ onUnmounted(() => {
               <div :class="['w-12 h-12 rounded-xl flex items-center justify-center transition-all group-hover:scale-110 group-hover:shadow-md', doc.iconBg]">
                 <i :class="[doc.icon, doc.iconColor, 'text-xl']"></i>
               </div>
-              <div v-if="index === 0" class="absolute -top-1 -right-1 w-4 h-4 bg-teal-500 rounded-full flex items-center justify-center">
+              <div v-if="index === 0" class="absolute -top-1 -end-1 w-4 h-4 bg-teal-500 rounded-full flex items-center justify-center">
                 <i class="fas fa-arrow-up text-white text-[8px]"></i>
               </div>
             </div>
@@ -1712,7 +1712,7 @@ onUnmounted(() => {
         <!-- Upload Button -->
         <button @click="openUploadDocument" class="w-full mt-4 py-3 text-sm font-semibold text-teal-600 bg-teal-50 hover:bg-teal-100 border-2 border-dashed border-teal-200 hover:border-teal-300 rounded-xl transition-all flex items-center justify-center gap-2">
           <i class="fas fa-cloud-upload-alt"></i>
-          Upload New Document
+          {{ $t('dashboard.uploadNewDocument') }}
         </button>
       </div>
     </div>
@@ -1725,12 +1725,12 @@ onUnmounted(() => {
             <i class="fas fa-photo-film text-white text-sm"></i>
           </div>
           <div>
-            <span class="block">Recent Media</span>
-            <span class="text-xs font-medium text-teal-600">Videos & podcasts</span>
+            <span class="block">{{ $t('dashboard.recentMedia') }}</span>
+            <span class="text-xs font-medium text-teal-600">{{ $t('dashboard.videosPodcasts') }}</span>
           </div>
         </h2>
         <router-link to="/media" class="px-3 py-1.5 text-sm text-teal-600 hover:text-white bg-teal-50 hover:bg-teal-500 rounded-lg font-medium flex items-center gap-1.5 transition-all">
-          View All <i class="fas fa-arrow-right text-xs"></i>
+          {{ $t('common.viewAll') }} <i class="fas fa-arrow-right text-xs"></i>
         </router-link>
       </div>
       <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
@@ -1746,31 +1746,31 @@ onUnmounted(() => {
             <!-- Play Button -->
             <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
               <div class="w-10 h-10 rounded-full bg-white/95 flex items-center justify-center shadow-lg transform scale-75 group-hover:scale-100 transition-transform">
-                <i :class="media.type === 'audio' ? 'fas fa-headphones text-violet-600' : 'fas fa-play text-teal-600 ml-0.5'" class="text-sm"></i>
+                <i :class="media.type === 'audio' ? 'fas fa-headphones text-violet-600' : 'fas fa-play text-teal-600 ms-0.5'" class="text-sm"></i>
               </div>
             </div>
 
             <!-- Duration Badge -->
-            <div class="absolute bottom-1.5 right-1.5 px-1.5 py-0.5 rounded bg-black/80 text-white text-[10px] font-semibold backdrop-blur-sm">
+            <div class="absolute bottom-1.5 end-1.5 px-1.5 py-0.5 rounded bg-black/80 text-white text-[10px] font-semibold backdrop-blur-sm">
               {{ media.duration }}
             </div>
 
             <!-- Type Badge -->
-            <div v-if="media.type === 'audio'" class="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded-full bg-violet-500 text-white text-[9px] font-semibold flex items-center gap-1">
-              <i class="fas fa-podcast"></i> Audio
+            <div v-if="media.type === 'audio'" class="absolute top-1.5 start-1.5 px-1.5 py-0.5 rounded-full bg-violet-500 text-white text-[9px] font-semibold flex items-center gap-1">
+              <i class="fas fa-podcast"></i> {{ $t('dashboard.audio') }}
             </div>
-            <div v-else-if="media.progress === 100" class="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded-full bg-green-500 text-white text-[9px] font-semibold flex items-center gap-1">
-              <i class="fas fa-check"></i> Watched
+            <div v-else-if="media.progress === 100" class="absolute top-1.5 start-1.5 px-1.5 py-0.5 rounded-full bg-green-500 text-white text-[9px] font-semibold flex items-center gap-1">
+              <i class="fas fa-check"></i> {{ $t('dashboard.watched') }}
             </div>
 
             <!-- Progress Bar -->
-            <div v-if="media.progress > 0 && media.progress < 100" class="absolute bottom-0 left-0 right-0 h-1 bg-black/30">
+            <div v-if="media.progress > 0 && media.progress < 100" class="absolute bottom-0 start-0 end-0 h-1 bg-black/30">
               <div class="h-full bg-teal-500" :style="{ width: media.progress + '%' }"></div>
             </div>
 
             <!-- Save Button -->
             <button @click="saveMedia(media.id, $event)"
-                    :class="['absolute top-1.5 right-1.5 w-6 h-6 rounded-full flex items-center justify-center transition-all backdrop-blur-sm', isMediaSaved(media.id) ? 'bg-teal-500 opacity-100' : 'bg-black/50 hover:bg-teal-500 opacity-0 group-hover:opacity-100']">
+                    :class="['absolute top-1.5 end-1.5 w-6 h-6 rounded-full flex items-center justify-center transition-all backdrop-blur-sm', isMediaSaved(media.id) ? 'bg-teal-500 opacity-100' : 'bg-black/50 hover:bg-teal-500 opacity-0 group-hover:opacity-100']">
               <i :class="[isMediaSaved(media.id) ? 'fas' : 'far', 'fa-bookmark text-white text-[10px]']"></i>
             </button>
           </div>
@@ -1782,7 +1782,7 @@ onUnmounted(() => {
             </div>
             <h4 class="font-semibold text-gray-900 text-xs leading-tight line-clamp-2 group-hover:text-teal-600 transition-colors mb-1">{{ media.title }}</h4>
             <div class="flex items-center gap-2 text-[10px] text-gray-400">
-              <span><i class="fas fa-eye mr-0.5"></i>{{ media.views }}</span>
+              <span><i class="fas fa-eye me-0.5"></i>{{ media.views }}</span>
               <span>•</span>
               <span>{{ media.date }}</span>
             </div>
@@ -1801,12 +1801,12 @@ onUnmounted(() => {
               <i class="fas fa-calendar-alt text-white text-sm"></i>
             </div>
             <div>
-              <span class="block">Upcoming Events</span>
-              <span class="text-xs font-medium text-teal-600">AFC Asian Cup 2027</span>
+              <span class="block">{{ $t('dashboard.upcomingEvents') }}</span>
+              <span class="text-xs font-medium text-teal-600">{{ $t('dashboard.afcAsianCupShort') }}</span>
             </div>
           </h2>
           <router-link to="/events" class="px-3 py-1.5 text-sm text-teal-600 hover:text-white bg-teal-50 hover:bg-teal-500 rounded-lg font-medium flex items-center gap-1.5 transition-all">
-            View All <i class="fas fa-arrow-right text-xs"></i>
+            {{ $t('common.viewAll') }} <i class="fas fa-arrow-right text-xs"></i>
           </router-link>
         </div>
 
@@ -1817,9 +1817,9 @@ onUnmounted(() => {
                :class="event.isFeatured ? 'bg-gradient-to-r from-teal-50 to-emerald-50' : 'bg-white'">
 
             <!-- Featured Badge -->
-            <div v-if="event.isFeatured" class="absolute top-0 right-0">
-              <div class="bg-gradient-to-r from-amber-400 to-orange-500 text-white text-[9px] font-bold px-2 py-0.5 rounded-bl-lg">
-                <i class="fas fa-star mr-0.5"></i> FEATURED
+            <div v-if="event.isFeatured" class="absolute top-0 end-0">
+              <div class="bg-gradient-to-r from-amber-400 to-orange-500 text-white text-[9px] font-bold px-2 py-0.5 rounded-es-lg rtl:rounded-es-none rtl:rounded-ee-lg">
+                <i class="fas fa-star me-0.5"></i> {{ $t('dashboard.featured').toUpperCase() }}
               </div>
             </div>
 
@@ -1908,12 +1908,12 @@ onUnmounted(() => {
               <i class="fas fa-chart-pie text-white text-sm"></i>
             </div>
             <div>
-              <span class="block">Active Polls</span>
-              <span class="text-xs font-medium text-teal-600">Cast your vote</span>
+              <span class="block">{{ $t('dashboard.activePolls') }}</span>
+              <span class="text-xs font-medium text-teal-600">{{ $t('dashboard.castYourVote') }}</span>
             </div>
           </h2>
           <router-link to="/polls" class="px-3 py-1.5 text-sm text-teal-600 hover:text-white bg-teal-50 hover:bg-teal-500 rounded-lg font-medium flex items-center gap-1.5 transition-all">
-            View All <i class="fas fa-arrow-right text-xs"></i>
+            {{ $t('common.viewAll') }} <i class="fas fa-arrow-right text-xs"></i>
           </router-link>
         </div>
         <div class="space-y-5">
@@ -1926,9 +1926,9 @@ onUnmounted(() => {
               <div class="flex-1 min-w-0">
                 <h4 class="font-semibold text-gray-900 text-sm leading-tight group-hover:text-teal-600 transition-colors">{{ poll.question }}</h4>
                 <div class="flex items-center gap-2 mt-1">
-                  <span class="text-xs text-gray-500">{{ poll.totalVotes.toLocaleString() }} votes</span>
+                  <span class="text-xs text-gray-500">{{ poll.totalVotes.toLocaleString() }} {{ $t('dashboard.votes') }}</span>
                   <span class="w-1 h-1 rounded-full bg-gray-300"></span>
-                  <span class="text-xs text-amber-600 font-medium"><i class="fas fa-clock mr-1"></i>{{ poll.endsIn }}</span>
+                  <span class="text-xs text-amber-600 font-medium"><i class="fas fa-clock me-1"></i>{{ poll.endsIn }}</span>
                 </div>
               </div>
             </div>
@@ -1962,7 +1962,7 @@ onUnmounted(() => {
                       <div class="h-full rounded-full transition-all duration-500"
                            :style="{ width: option.votes + '%', backgroundColor: option.color || '#14b8a6' }"></div>
                     </div>
-                    <span class="text-sm font-bold min-w-[40px] text-right" :style="{ color: option.color || '#14b8a6' }">{{ option.votes }}%</span>
+                    <span class="text-sm font-bold min-w-[40px] text-end" :style="{ color: option.color || '#14b8a6' }">{{ option.votes }}%</span>
                   </div>
                 </div>
               </div>
@@ -1972,10 +1972,10 @@ onUnmounted(() => {
             <div class="flex items-center justify-between mt-4 pt-4 border-t border-gray-100">
               <div v-if="poll.hasVoted" class="flex items-center gap-1.5 text-xs text-green-600 font-medium">
                 <i class="fas fa-check-circle"></i>
-                <span>You voted</span>
+                <span>{{ $t('dashboard.youVoted') }}</span>
               </div>
               <div v-else class="text-xs text-gray-500">
-                <i class="fas fa-users mr-1"></i> {{ selectedPollOptions[poll.id] ? 'Ready to vote' : 'Select an option' }}
+                <i class="fas fa-users me-1"></i> {{ selectedPollOptions[poll.id] ? $t('dashboard.readyToVote') : $t('dashboard.selectAnOption') }}
               </div>
               <button @click="votePoll(poll)"
                       class="px-4 py-2 text-xs font-semibold rounded-lg transition-all"
@@ -2000,12 +2000,12 @@ onUnmounted(() => {
               <i class="fas fa-graduation-cap text-white text-sm"></i>
             </div>
             <div>
-              <span class="block">My Learning</span>
-              <span class="text-xs font-medium text-teal-600">Continue your journey</span>
+              <span class="block">{{ $t('dashboard.myLearning') }}</span>
+              <span class="text-xs font-medium text-teal-600">{{ $t('dashboard.continueYourJourney') }}</span>
             </div>
           </h2>
           <router-link to="/learning" class="px-3 py-1.5 text-sm text-teal-600 hover:text-white bg-teal-50 hover:bg-teal-500 rounded-lg font-medium flex items-center gap-1.5 transition-all">
-            Browse <i class="fas fa-arrow-right text-xs"></i>
+            {{ $t('common.explore') }} <i class="fas fa-arrow-right text-xs"></i>
           </router-link>
         </div>
 
@@ -2013,19 +2013,19 @@ onUnmounted(() => {
         <div class="grid grid-cols-4 gap-2 mb-4">
           <div class="text-center p-2 rounded-lg bg-white border border-gray-100">
             <p class="text-lg font-bold text-teal-600">{{ learningStats.inProgress }}</p>
-            <p class="text-[9px] text-gray-500 font-medium">In Progress</p>
+            <p class="text-[9px] text-gray-500 font-medium">{{ $t('dashboard.inProgress') }}</p>
           </div>
           <div class="text-center p-2 rounded-lg bg-white border border-gray-100">
             <p class="text-lg font-bold text-green-600">{{ learningStats.completed }}</p>
-            <p class="text-[9px] text-gray-500 font-medium">Completed</p>
+            <p class="text-[9px] text-gray-500 font-medium">{{ $t('dashboard.completed') }}</p>
           </div>
           <div class="text-center p-2 rounded-lg bg-white border border-gray-100">
             <p class="text-lg font-bold text-blue-600">{{ learningStats.totalHours }}</p>
-            <p class="text-[9px] text-gray-500 font-medium">Hours</p>
+            <p class="text-[9px] text-gray-500 font-medium">{{ $t('dashboard.hours') }}</p>
           </div>
           <div class="text-center p-2 rounded-lg bg-white border border-gray-100">
             <p class="text-lg font-bold text-amber-600">{{ learningStats.certificates }}</p>
-            <p class="text-[9px] text-gray-500 font-medium">Certificates</p>
+            <p class="text-[9px] text-gray-500 font-medium">{{ $t('dashboard.certificates') }}</p>
           </div>
         </div>
 
@@ -2046,7 +2046,7 @@ onUnmounted(() => {
                     </div>
                   </div>
                   <!-- Progress Ring -->
-                  <div class="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-white shadow-md flex items-center justify-center">
+                  <div class="absolute -bottom-1 -end-1 w-7 h-7 rounded-full bg-white shadow-md flex items-center justify-center">
                     <svg class="w-5 h-5 -rotate-90">
                       <circle cx="10" cy="10" r="8" fill="none" stroke="#e5e7eb" stroke-width="2"/>
                       <circle cx="10" cy="10" r="8" fill="none" stroke="#14b8a6" stroke-width="2"
@@ -2109,8 +2109,8 @@ onUnmounted(() => {
               <div class="mt-auto pt-3 border-t border-gray-100">
                 <div class="flex items-center justify-between mb-1.5">
                   <div class="flex items-center gap-3 text-[10px] text-gray-500">
-                    <span><i class="fas fa-book-open mr-1 text-teal-400"></i>{{ course.lessonsCompleted }}/{{ course.totalLessons }} lessons</span>
-                    <span><i class="fas fa-clock mr-1 text-teal-400"></i>{{ course.duration }}</span>
+                    <span><i class="fas fa-book-open me-1 text-teal-400"></i>{{ course.lessonsCompleted }}/{{ course.totalLessons }} {{ $t('dashboard.lessons') }}</span>
+                    <span><i class="fas fa-clock me-1 text-teal-400"></i>{{ course.duration }}</span>
                   </div>
                   <span class="text-[10px] text-gray-400">{{ course.lastAccessed }}</span>
                 </div>
@@ -2135,16 +2135,16 @@ onUnmounted(() => {
               <i class="fas fa-users text-white text-sm"></i>
             </div>
             <div>
-              <span class="block">Team Activity</span>
-              <span class="text-xs font-medium text-teal-600">Recent updates</span>
+              <span class="block">{{ $t('dashboard.teamActivity') }}</span>
+              <span class="text-xs font-medium text-teal-600">{{ $t('dashboard.recentUpdates') }}</span>
             </div>
           </h2>
           <router-link to="/collaboration" class="px-3 py-1.5 text-sm text-teal-600 hover:text-white bg-teal-50 hover:bg-teal-500 rounded-lg font-medium flex items-center gap-1.5 transition-all">
-            View All <i class="fas fa-arrow-right text-xs"></i>
+            {{ $t('common.viewAll') }} <i class="fas fa-arrow-right text-xs"></i>
           </router-link>
         </div>
 
-        <div class="space-y-3 max-h-[400px] overflow-y-auto pr-1 custom-scrollbar">
+        <div class="space-y-3 max-h-[400px] overflow-y-auto pe-1 custom-scrollbar">
           <div v-for="activity in teamActivities" :key="activity.id"
                @click="viewActivityTarget(activity)"
                class="activity-card p-3 rounded-xl bg-white border border-gray-100 hover:border-teal-200 hover:shadow-lg cursor-pointer transition-all group">
@@ -2159,7 +2159,7 @@ onUnmounted(() => {
                   {{ activity.user.initials }}
                 </div>
                 <!-- Action Icon Badge -->
-                <div :class="['absolute -bottom-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center border-2 border-white', activity.actionBg]">
+                <div :class="['absolute -bottom-1 -end-1 w-5 h-5 rounded-full flex items-center justify-center border-2 border-white', activity.actionBg]">
                   <i :class="[activity.actionIcon, 'text-[8px]', activity.actionColor]"></i>
                 </div>
               </div>
@@ -2211,12 +2211,12 @@ onUnmounted(() => {
               <i class="fas fa-th-large text-white text-sm"></i>
             </div>
             <div>
-              <span class="block">Quick Services</span>
-              <span class="text-xs font-medium text-teal-600">AFC Asian Cup 2027</span>
+              <span class="block">{{ $t('dashboard.quickServices') }}</span>
+              <span class="text-xs font-medium text-teal-600">{{ $t('dashboard.afcAsianCupShort') }}</span>
             </div>
           </h2>
           <router-link to="/self-services" class="px-3 py-1.5 text-sm text-teal-600 hover:text-white bg-teal-50 hover:bg-teal-500 rounded-lg font-medium flex items-center gap-1.5 transition-all">
-            View All <i class="fas fa-arrow-right text-xs"></i>
+            {{ $t('common.viewAll') }} <i class="fas fa-arrow-right text-xs"></i>
           </router-link>
         </div>
 
@@ -2226,14 +2226,14 @@ onUnmounted(() => {
                   class="service-card relative flex flex-col items-center gap-3 p-4 rounded-xl bg-white border border-gray-100 hover:border-teal-200 hover:shadow-lg transition-all group overflow-hidden">
 
             <!-- Popular/New Badge -->
-            <div v-if="service.isNew" class="absolute top-0 right-0">
-              <div class="bg-gradient-to-r from-green-400 to-emerald-500 text-white text-[8px] font-bold px-2 py-0.5 rounded-bl-lg">
-                NEW
+            <div v-if="service.isNew" class="absolute top-0 end-0">
+              <div class="bg-gradient-to-r from-green-400 to-emerald-500 text-white text-[8px] font-bold px-2 py-0.5 rounded-es-lg rtl:rounded-es-none rtl:rounded-ee-lg">
+                {{ $t('dashboard.new') }}
               </div>
             </div>
-            <div v-else-if="service.isPopular" class="absolute top-0 right-0">
-              <div class="bg-gradient-to-r from-amber-400 to-orange-500 text-white text-[8px] font-bold px-2 py-0.5 rounded-bl-lg">
-                <i class="fas fa-fire mr-0.5"></i>POPULAR
+            <div v-else-if="service.isPopular" class="absolute top-0 end-0">
+              <div class="bg-gradient-to-r from-amber-400 to-orange-500 text-white text-[8px] font-bold px-2 py-0.5 rounded-es-lg rtl:rounded-es-none rtl:rounded-ee-lg">
+                <i class="fas fa-fire me-0.5"></i>{{ $t('dashboard.popular') }}
               </div>
             </div>
 
@@ -2270,7 +2270,7 @@ onUnmounted(() => {
                 </div>
                 <div>
                   <h3 class="font-semibold text-white">AI-Powered Insights</h3>
-                  <p class="text-xs text-white/80">Intelligent analysis of platform activity</p>
+                  <p class="text-xs text-white/80">{{ $t('dashboard.intelligentAnalysis') }}</p>
                 </div>
               </div>
               <button @click="showAIInsightsPanel = false" class="p-2 hover:bg-white/20 rounded-lg transition-colors">
@@ -2282,7 +2282,7 @@ onUnmounted(() => {
           <div class="p-5 overflow-y-auto max-h-[60vh]">
             <div v-if="isLoadingInsights" class="text-center py-12">
               <i class="fas fa-circle-notch fa-spin text-teal-500 text-3xl mb-3"></i>
-              <p class="text-gray-500">Analyzing platform data...</p>
+              <p class="text-gray-500">{{ $t('dashboard.analyzingPlatformData') }}</p>
             </div>
 
             <div v-else class="space-y-4">
@@ -2303,7 +2303,7 @@ onUnmounted(() => {
                     <p class="text-sm text-gray-600 mb-2">{{ insight.description }}</p>
                     <div class="flex items-center gap-4">
                       <div class="flex items-center gap-1.5">
-                        <span class="text-xs text-gray-400">Confidence:</span>
+                        <span class="text-xs text-gray-400">{{ $t('dashboard.confidence') }}:</span>
                         <div class="w-20 h-1.5 bg-gray-200 rounded-full overflow-hidden">
                           <div class="h-full bg-teal-500 rounded-full" :style="{ width: `${insight.confidence * 100}%` }"></div>
                         </div>
@@ -2321,8 +2321,8 @@ onUnmounted(() => {
 
           <div class="p-4 border-t border-gray-100 bg-gray-50 flex justify-between items-center">
             <p class="text-xs text-gray-500">
-              <i class="fas fa-info-circle mr-1"></i>
-              Insights generated based on last 30 days of activity
+              <i class="fas fa-info-circle me-1"></i>
+              {{ $t('dashboard.insightsGenerated') }}
             </p>
             <button @click="showAIInsightsPanel = false"
                     class="px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-colors text-sm font-medium">
@@ -2344,8 +2344,8 @@ onUnmounted(() => {
                   <i class="fas fa-compass text-white"></i>
                 </div>
                 <div>
-                  <h3 class="font-semibold text-white">Recommended For You</h3>
-                  <p class="text-xs text-white/80">Personalized content suggestions</p>
+                  <h3 class="font-semibold text-white">{{ $t('dashboard.recommendedForYou') }}</h3>
+                  <p class="text-xs text-white/80">{{ $t('dashboard.personalizedSuggestions') }}</p>
                 </div>
               </div>
               <button @click="showRecommendationsModal = false" class="p-2 hover:bg-white/20 rounded-lg transition-colors">
@@ -2357,7 +2357,7 @@ onUnmounted(() => {
           <div class="p-4 overflow-y-auto max-h-[55vh]">
             <div v-if="isLoadingRecommendations" class="text-center py-12">
               <i class="fas fa-circle-notch fa-spin text-purple-500 text-3xl mb-3"></i>
-              <p class="text-gray-500">Finding content for you...</p>
+              <p class="text-gray-500">{{ $t('dashboard.findingContentForYou') }}</p>
             </div>
 
             <div v-else class="space-y-3">
@@ -2375,7 +2375,7 @@ onUnmounted(() => {
                     </div>
                     <p class="text-xs text-gray-500">{{ rec.reason }}</p>
                     <span class="inline-block mt-2 text-xs text-gray-400 capitalize">
-                      <i :class="rec.icon" class="mr-1"></i>{{ rec.type }}
+                      <i :class="rec.icon" class="me-1"></i>{{ rec.type }}
                     </span>
                   </div>
                 </div>
@@ -2385,8 +2385,8 @@ onUnmounted(() => {
 
           <div class="p-4 border-t border-gray-100 bg-gray-50 flex justify-between items-center">
             <p class="text-xs text-gray-500">
-              <i class="fas fa-robot mr-1"></i>
-              Based on your activity and role
+              <i class="fas fa-robot me-1"></i>
+              {{ $t('dashboard.basedOnActivity') }}
             </p>
             <button @click="showRecommendationsModal = false"
                     class="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors text-sm font-medium">

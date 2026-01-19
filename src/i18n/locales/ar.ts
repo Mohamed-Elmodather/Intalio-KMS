@@ -319,6 +319,79 @@ export default {
     createContent: 'إنشاء محتوى',
     viewEvents: 'عرض الفعاليات',
     forYou: 'مخصص لك',
+    // Latest Updates Section
+    latestUpdates: 'آخر التحديثات',
+    afcAsianCup: 'كأس آسيا AFC السعودية 2027',
+    afcAsianCupShort: 'كأس آسيا AFC 2027',
+    trending: 'رائج',
+    featured: 'مميز',
+    readArticle: 'قراءة المقال',
+    upNext: 'التالي',
+    // AI Anomaly Section
+    aiDetectedAnomalies: 'اكتشف الذكاء الاصطناعي شذوذات',
+    anomalyPatternsDetected: 'تم اكتشاف {count} أنماط نشاط غير عادية',
+    actual: 'الفعلي',
+    expected: 'المتوقع',
+    // Recent Sections
+    recentArticles: 'المقالات الأخيرة',
+    latestNewsUpdates: 'آخر الأخبار والتحديثات',
+    recentDocuments: 'المستندات الأخيرة',
+    filesResources: 'الملفات والموارد',
+    uploadNewDocument: 'رفع مستند جديد',
+    new: 'جديد',
+    recentMedia: 'الوسائط الأخيرة',
+    videosPodcasts: 'الفيديوهات والبودكاست',
+    podcast: 'بودكاست',
+    watched: 'تمت المشاهدة',
+    // Polls Section
+    activePolls: 'الاستطلاعات النشطة',
+    castYourVote: 'أدلِ بصوتك',
+    readyToVote: 'جاهز للتصويت',
+    selectAnOption: 'اختر خياراً',
+    // Learning Section
+    myLearning: 'تعلمي',
+    continueYourJourney: 'تابع رحلتك',
+    inProgress: 'قيد التنفيذ',
+    completed: 'مكتمل',
+    hours: 'ساعات',
+    certificates: 'شهادات',
+    lessonsProgress: '{completed}/{total} درس',
+    // Team Activity Section
+    teamActivity: 'نشاط الفريق',
+    recentUpdates: 'التحديثات الأخيرة',
+    // Quick Services Section
+    quickServices: 'الخدمات السريعة',
+    popular: 'شائع',
+    // AI Insights Section
+    aiInsightsTitle: 'رؤى الذكاء الاصطناعي',
+    intelligentAnalysis: 'تحليل ذكي لنشاط المنصة',
+    analyzingPlatformData: 'جاري تحليل بيانات المنصة...',
+    confidence: 'الثقة',
+    recommendedForYou: 'موصى به لك',
+    personalizedSuggestions: 'اقتراحات محتوى مخصصة',
+    findingContentForYou: 'جاري البحث عن محتوى لك...',
+    // Stats
+    totalArticles: 'إجمالي المقالات',
+    activeUsers: 'المستخدمين النشطين',
+    documents: 'المستندات',
+    coursesCompleted: 'الدورات المكتملة',
+    viewArticles: 'عرض المقالات',
+    viewUsers: 'عرض المستخدمين',
+    viewDocuments: 'عرض المستندات',
+    viewCourses: 'عرض الدورات',
+    // Media
+    audio: 'صوت',
+    // Polls
+    votes: 'أصوات',
+    youVoted: 'لقد صوتت',
+    youVotedFor: 'لقد صوتت لـ: {option}',
+    selectOptionFirst: 'يرجى اختيار خيار أولاً',
+    // Learning
+    lessons: 'دروس',
+    // AI Panel
+    insightsGenerated: 'تم إنشاء الرؤى بناءً على آخر 30 يومًا من النشاط',
+    basedOnActivity: 'بناءً على نشاطك ودورك',
+    match: 'تطابق',
   },
 
   // Articles
