@@ -774,6 +774,23 @@ export default {
     // Sidebar
     expandSidebar: 'توسيع الشريط الجانبي',
     collapseSidebar: 'طي الشريط الجانبي',
+    // Libraries/Categories
+    libraryTournamentDocs: 'مستندات البطولة',
+    libraryTournamentDocsDesc: 'مستندات كأس آسيا 2027 الرسمية',
+    libraryMediaAssets: 'الأصول الإعلامية',
+    libraryMediaAssetsDesc: 'حزم صحفية وشعارات وأصول العلامة التجارية',
+    libraryVenueInfo: 'معلومات الملاعب',
+    libraryVenueInfoDesc: 'أدلة الملاعب وخرائط المرافق',
+    libraryTeamResources: 'موارد الفرق',
+    libraryTeamResourcesDesc: 'قوائم الفرق وملفات اللاعبين',
+    libraryOperations: 'دليل العمليات',
+    libraryOperationsDesc: 'إجراءات التشغيل القياسية',
+    libraryAccreditation: 'الاعتماد',
+    libraryAccreditationDesc: 'تصاريح الدخول وبيانات الاعتماد',
+    // Time ago
+    hoursAgo: 'منذ {count} ساعات',
+    daysAgo: 'منذ {count} أيام',
+    weekAgo: 'منذ أسبوع',
   },
 
   // Learning

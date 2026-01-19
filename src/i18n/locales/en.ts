@@ -772,6 +772,23 @@ export default {
     // Sidebar
     expandSidebar: 'Expand sidebar',
     collapseSidebar: 'Collapse sidebar',
+    // Libraries/Categories
+    libraryTournamentDocs: 'Tournament Documents',
+    libraryTournamentDocsDesc: 'Official AFC Asian Cup 2027 documents',
+    libraryMediaAssets: 'Media Assets',
+    libraryMediaAssetsDesc: 'Press kits, logos, and brand assets',
+    libraryVenueInfo: 'Venue Information',
+    libraryVenueInfoDesc: 'Stadium guides and facility maps',
+    libraryTeamResources: 'Team Resources',
+    libraryTeamResourcesDesc: 'Team rosters and player profiles',
+    libraryOperations: 'Operations Manual',
+    libraryOperationsDesc: 'Standard operating procedures',
+    libraryAccreditation: 'Accreditation',
+    libraryAccreditationDesc: 'Access passes and credentials',
+    // Time ago
+    hoursAgo: '{count} hours ago',
+    daysAgo: '{count} days ago',
+    weekAgo: '1 week ago',
   },
 
   // Learning

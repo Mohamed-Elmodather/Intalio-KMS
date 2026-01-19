@@ -265,60 +265,60 @@ function isFolderExpanded(folderId: string): boolean {
 }
 
 // Mock Libraries Data
-const libraries = ref([
+const libraries = computed(() => [
   {
     id: 'tournament-docs',
-    name: 'Tournament Documents',
+    name: t('documents.libraryTournamentDocs'),
     icon: 'fas fa-trophy',
     color: '#14b8a6',
     documentCount: 45,
-    description: 'Official AFC Asian Cup 2027 documents',
-    lastUpdated: '2 hours ago'
+    description: t('documents.libraryTournamentDocsDesc'),
+    lastUpdated: t('documents.hoursAgo', { count: 2 })
   },
   {
     id: 'media-assets',
-    name: 'Media Assets',
+    name: t('documents.libraryMediaAssets'),
     icon: 'fas fa-photo-film',
     color: '#8b5cf6',
     documentCount: 128,
-    description: 'Press kits, logos, and brand assets',
-    lastUpdated: '1 day ago'
+    description: t('documents.libraryMediaAssetsDesc'),
+    lastUpdated: t('documents.daysAgo', { count: 1 })
   },
   {
     id: 'venue-info',
-    name: 'Venue Information',
+    name: t('documents.libraryVenueInfo'),
     icon: 'fas fa-stadium',
     color: '#f59e0b',
     documentCount: 32,
-    description: 'Stadium guides and facility maps',
-    lastUpdated: '3 days ago'
+    description: t('documents.libraryVenueInfoDesc'),
+    lastUpdated: t('documents.daysAgo', { count: 3 })
   },
   {
     id: 'team-resources',
-    name: 'Team Resources',
+    name: t('documents.libraryTeamResources'),
     icon: 'fas fa-users',
     color: '#ef4444',
     documentCount: 67,
-    description: 'Team rosters and player profiles',
-    lastUpdated: '5 hours ago'
+    description: t('documents.libraryTeamResourcesDesc'),
+    lastUpdated: t('documents.hoursAgo', { count: 5 })
   },
   {
     id: 'operations',
-    name: 'Operations Manual',
+    name: t('documents.libraryOperations'),
     icon: 'fas fa-cogs',
     color: '#3b82f6',
     documentCount: 24,
-    description: 'Standard operating procedures',
-    lastUpdated: '1 week ago'
+    description: t('documents.libraryOperationsDesc'),
+    lastUpdated: t('documents.weekAgo')
   },
   {
     id: 'accreditation',
-    name: 'Accreditation',
+    name: t('documents.libraryAccreditation'),
     icon: 'fas fa-id-badge',
     color: '#10b981',
     documentCount: 18,
-    description: 'Access passes and credentials',
-    lastUpdated: '4 days ago'
+    description: t('documents.libraryAccreditationDesc'),
+    lastUpdated: t('documents.daysAgo', { count: 4 })
   }
 ])
 
