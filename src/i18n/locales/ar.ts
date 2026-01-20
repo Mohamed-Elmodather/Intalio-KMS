@@ -566,6 +566,9 @@ export default {
     activeFilters: 'الفلاتر النشطة',
     mySaved: 'المحفوظة',
     sharedWithMe: 'مشاركة معي',
+    savedAndShared: 'المحفوظات والمشاركات',
+    type: 'النوع',
+    types: 'أنواع',
     match: 'تطابق',
     analyzingQuery: 'جاري تحليل استفسارك',
     aiSearching: 'الذكاء الاصطناعي يبحث...',
@@ -917,6 +920,13 @@ export default {
     listView: 'عرض القائمة',
     going: 'سأحضر',
     notGoing: 'لن أحضر',
+    // Filter labels
+    eventType: 'نوع الفعالية',
+    types: 'أنواع',
+    format: 'الصيغة',
+    formats: 'الصيغ',
+    selectEventTypes: 'اختر أنواع الفعاليات',
+    selectFormat: 'اختر الصيغة',
   },
 
   // Polls
@@ -1041,6 +1051,7 @@ export default {
     selectTags: 'اختر الوسوم',
     savedAndShared: 'المحفوظات والمشاركات',
     mediaType: 'نوع الوسائط',
+    types: 'أنواع',
     nTypes: '{n} أنواع',
     nCategories: '{n} فئات',
     nTags: '{n} وسوم',

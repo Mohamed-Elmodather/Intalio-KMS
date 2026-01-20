@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import PageHeroHeader from '@/components/common/PageHeroHeader.vue'
 import ContentActionsDropdown from '@/components/common/ContentActionsDropdown.vue'
+import FilterDropdown from '@/components/common/FilterDropdown.vue'
 
 const { t } = useI18n()
 import AddToCollectionModal from '@/components/common/AddToCollectionModal.vue'
@@ -57,11 +58,7 @@ const selectedItemForCollection = ref<{
 } | null>(null)
 
 // Dropdown filter states
-const showMediaTypeFilter = ref(false)
-const showCategoryFilter = ref(false)
-const showTagFilter = ref(false)
 const showSortDropdown = ref(false)
-const showStatusFilter = ref(false)
 const selectedMediaTypes = ref<string[]>([])
 const selectedCategories = ref<string[]>([])
 const selectedTags = ref<string[]>([])
@@ -489,6 +486,21 @@ const allTags = computed(() => {
   return Array.from(tags).sort()
 })
 
+// Filter options for FilterDropdown
+const categoryFilterOptions = computed(() =>
+  categories.value.map(cat => ({
+    id: cat,
+    label: cat
+  }))
+)
+
+const tagFilterOptions = computed(() =>
+  allTags.value.map(tag => ({
+    id: tag,
+    label: tag
+  }))
+)
+
 /// Computed: Active Filters Count
 const activeFiltersCount = computed(() => {
   let count = 0
@@ -871,68 +883,6 @@ function bulkPermanentDelete() {
     alert(`Deleted ${selected.length} items permanently`)
     selectedMedia.value.clear()
     isSelectionMode.value = false
-  }
-}
-
-// Dropdown filter functions
-function toggleMediaType(type: string) {
-  const index = selectedMediaTypes.value.indexOf(type)
-  if (index > -1) {
-    selectedMediaTypes.value.splice(index, 1)
-  } else {
-    selectedMediaTypes.value.push(type)
-  }
-}
-
-function isMediaTypeSelected(type: string): boolean {
-  return selectedMediaTypes.value.includes(type)
-}
-
-function toggleCategorySelection(cat: string) {
-  const index = selectedCategories.value.indexOf(cat)
-  if (index > -1) {
-    selectedCategories.value.splice(index, 1)
-  } else {
-    selectedCategories.value.push(cat)
-  }
-}
-
-function isCategorySelected(cat: string): boolean {
-  return selectedCategories.value.includes(cat)
-}
-
-function toggleTagFilter(tag: string) {
-  const index = selectedTags.value.indexOf(tag)
-  if (index > -1) {
-    selectedTags.value.splice(index, 1)
-  } else {
-    selectedTags.value.push(tag)
-  }
-}
-
-function isTagSelected(tag: string): boolean {
-  return selectedTags.value.includes(tag)
-}
-
-function toggleStatusFilter(status: string) {
-  const index = selectedStatusFilters.value.indexOf(status)
-  if (index > -1) {
-    selectedStatusFilters.value.splice(index, 1)
-  } else {
-    selectedStatusFilters.value.push(status)
-  }
-}
-
-function isStatusSelected(status: string): boolean {
-  return selectedStatusFilters.value.includes(status)
-}
-
-function toggleMediaTypeFilter(typeId: string) {
-  const index = selectedMediaTypes.value.indexOf(typeId)
-  if (index > -1) {
-    selectedMediaTypes.value.splice(index, 1)
-  } else {
-    selectedMediaTypes.value.push(typeId)
   }
 }
 
@@ -2311,246 +2261,54 @@ onUnmounted(() => {
             </div>
 
             <!-- Media Type Filter Dropdown -->
-            <div class="relative">
-              <button
-                @click="showMediaTypeFilter = !showMediaTypeFilter"
-                :class="[
-                  'flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border',
-                  selectedMediaTypes.length > 0 ? 'bg-teal-50 border-teal-200 text-teal-700' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
-                ]"
-              >
-                <i class="fas fa-video text-sm"></i>
-                <span>{{ selectedMediaTypes.length > 0 ? $t('media.nTypes', { n: selectedMediaTypes.length }) : $t('media.mediaType') }}</span>
-                <i :class="showMediaTypeFilter ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ml-1"></i>
-              </button>
-
-              <!-- Dropdown Menu -->
-              <div
-                v-if="showMediaTypeFilter"
-                class="absolute left-0 top-full mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
-              >
-                <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">{{ $t('media.selectMediaTypes') }}</div>
-                <div class="max-h-48 overflow-y-auto">
-                  <button
-                    v-for="type in mediaTypeOptions"
-                    :key="type.id"
-                    @click="toggleMediaType(type.id)"
-                    :class="[
-                      'w-full px-3 py-2 text-left text-sm flex items-center gap-3 transition-colors',
-                      isMediaTypeSelected(type.id) ? 'bg-teal-50 text-teal-700' : 'text-gray-700 hover:bg-gray-50'
-                    ]"
-                  >
-                    <div :class="[
-                      'w-4 h-4 rounded border-2 flex items-center justify-center transition-all',
-                      isMediaTypeSelected(type.id) ? 'bg-teal-500 border-teal-500' : 'border-gray-300'
-                    ]">
-                      <i v-if="isMediaTypeSelected(type.id)" class="fas fa-check text-white text-[8px]"></i>
-                    </div>
-                    <i :class="[type.icon, type.color, 'text-sm']"></i>
-                    <span class="flex-1">{{ type.label }}</span>
-                  </button>
-                </div>
-                <div class="my-2 border-t border-gray-100"></div>
-                <div class="px-3 flex gap-2">
-                  <button
-                    @click="selectedMediaTypes = []; showMediaTypeFilter = false"
-                    class="flex-1 px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
-                  >
-                    {{ $t('common.clearAll') }}
-                  </button>
-                  <button
-                    @click="showMediaTypeFilter = false"
-                    class="flex-1 px-3 py-1.5 text-xs font-medium text-white bg-teal-500 rounded-lg hover:bg-teal-600 transition-colors"
-                  >
-                    {{ $t('common.apply') }}
-                  </button>
-                </div>
-              </div>
-              <div v-if="showMediaTypeFilter" @click="showMediaTypeFilter = false" class="fixed inset-0 z-40"></div>
-            </div>
+            <FilterDropdown
+              v-model="selectedMediaTypes"
+              icon="fas fa-video"
+              :label="$t('media.mediaType')"
+              :selected-label="$t('media.types')"
+              :header-label="$t('media.selectMediaTypes')"
+              :options="mediaTypeOptions"
+              :clear-all-label="$t('common.clear')"
+              :apply-label="$t('common.apply')"
+            />
 
             <!-- Category Filter Dropdown -->
-            <div class="relative">
-              <button
-                @click="showCategoryFilter = !showCategoryFilter"
-                :class="[
-                  'flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border',
-                  selectedCategories.length > 0 ? 'bg-teal-50 border-teal-200 text-teal-700' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
-                ]"
-              >
-                <i class="fas fa-layer-group text-sm"></i>
-                <span>{{ selectedCategories.length > 0 ? $t('media.nCategories', { n: selectedCategories.length }) : $t('common.category') }}</span>
-                <i :class="showCategoryFilter ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ml-1"></i>
-              </button>
-
-              <!-- Dropdown Menu -->
-              <div
-                v-if="showCategoryFilter"
-                class="absolute left-0 top-full mt-2 w-64 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
-              >
-                <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">{{ $t('media.selectCategories') }}</div>
-                <div class="max-h-48 overflow-y-auto">
-                  <button
-                    v-for="cat in categories"
-                    :key="cat"
-                    @click="toggleCategorySelection(cat)"
-                    :class="[
-                      'w-full px-3 py-2 text-left text-sm flex items-center gap-3 transition-colors',
-                      isCategorySelected(cat) ? 'bg-teal-50 text-teal-700' : 'text-gray-700 hover:bg-gray-50'
-                    ]"
-                  >
-                    <div :class="[
-                      'w-4 h-4 rounded border-2 flex items-center justify-center transition-all',
-                      isCategorySelected(cat) ? 'bg-teal-500 border-teal-500' : 'border-gray-300'
-                    ]">
-                      <i v-if="isCategorySelected(cat)" class="fas fa-check text-white text-[8px]"></i>
-                    </div>
-                    <span class="flex-1">{{ cat }}</span>
-                  </button>
-                </div>
-                <div class="my-2 border-t border-gray-100"></div>
-                <div class="px-3 flex gap-2">
-                  <button
-                    @click="selectedCategories = []; showCategoryFilter = false"
-                    class="flex-1 px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
-                  >
-                    {{ $t('common.clearAll') }}
-                  </button>
-                  <button
-                    @click="showCategoryFilter = false"
-                    class="flex-1 px-3 py-1.5 text-xs font-medium text-white bg-teal-500 rounded-lg hover:bg-teal-600 transition-colors"
-                  >
-                    {{ $t('common.apply') }}
-                  </button>
-                </div>
-              </div>
-              <div v-if="showCategoryFilter" @click="showCategoryFilter = false" class="fixed inset-0 z-40"></div>
-            </div>
+            <FilterDropdown
+              v-model="selectedCategories"
+              icon="fas fa-layer-group"
+              :label="$t('common.category')"
+              :selected-label="$t('common.categories')"
+              :header-label="$t('media.selectCategories')"
+              :options="categoryFilterOptions"
+              :clear-all-label="$t('common.clear')"
+              :apply-label="$t('common.apply')"
+              dropdown-width="w-64"
+            />
 
             <!-- Tags Filter -->
-            <div class="relative">
-              <button
-                @click="showTagFilter = !showTagFilter"
-                :class="[
-                  'flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border',
-                  selectedTags.length > 0 ? 'bg-teal-50 border-teal-200 text-teal-700' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
-                ]"
-              >
-                <i class="fas fa-tags text-sm"></i>
-                <span>{{ selectedTags.length > 0 ? $t('media.nTags', { n: selectedTags.length }) : $t('common.tags') }}</span>
-                <i :class="showTagFilter ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ml-1"></i>
-              </button>
-
-              <!-- Dropdown Menu -->
-              <div
-                v-if="showTagFilter"
-                class="absolute left-0 top-full mt-2 w-64 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
-              >
-                <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">{{ $t('media.selectTags') }}</div>
-                <div class="max-h-48 overflow-y-auto">
-                  <button
-                    v-for="tag in allTags"
-                    :key="tag"
-                    @click="toggleTagFilter(tag)"
-                    :class="[
-                      'w-full px-3 py-2 text-left text-sm flex items-center gap-3 transition-colors',
-                      isTagSelected(tag) ? 'bg-teal-50 text-teal-700' : 'text-gray-700 hover:bg-gray-50'
-                    ]"
-                  >
-                    <div :class="[
-                      'w-4 h-4 rounded border-2 flex items-center justify-center transition-all',
-                      isTagSelected(tag) ? 'bg-teal-500 border-teal-500' : 'border-gray-300'
-                    ]">
-                      <i v-if="isTagSelected(tag)" class="fas fa-check text-white text-[8px]"></i>
-                    </div>
-                    <span class="flex-1">{{ tag }}</span>
-                  </button>
-                </div>
-
-                <div class="my-2 border-t border-gray-100"></div>
-
-                <div class="px-3 flex gap-2">
-                  <button
-                    @click="selectedTags = []; showTagFilter = false"
-                    class="flex-1 px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
-                  >
-                    {{ $t('common.clearAll') }}
-                  </button>
-                  <button
-                    @click="showTagFilter = false"
-                    class="flex-1 px-3 py-1.5 text-xs font-medium text-white bg-teal-500 rounded-lg hover:bg-teal-600 transition-colors"
-                  >
-                    {{ $t('common.apply') }}
-                  </button>
-                </div>
-              </div>
-
-              <!-- Click outside to close -->
-              <div v-if="showTagFilter" @click="showTagFilter = false" class="fixed inset-0 z-40"></div>
-            </div>
+            <FilterDropdown
+              v-model="selectedTags"
+              icon="fas fa-tags"
+              :label="$t('common.tags')"
+              :selected-label="$t('common.tags')"
+              :header-label="$t('media.selectTags')"
+              :options="tagFilterOptions"
+              :clear-all-label="$t('common.clear')"
+              :apply-label="$t('common.apply')"
+              dropdown-width="w-64"
+            />
 
             <!-- Saved & Shared Filter Dropdown -->
-            <div class="relative">
-              <button
-                @click="showStatusFilter = !showStatusFilter"
-                :class="[
-                  'flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border',
-                  selectedStatusFilters.length > 0 ? 'bg-teal-50 border-teal-200 text-teal-700' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
-                ]"
-              >
-                <i class="fas fa-bookmark text-sm"></i>
-                <span>{{ selectedStatusFilters.length > 0 ? $t('media.nSavedShared', { n: selectedStatusFilters.length }) : $t('media.savedAndShared') }}</span>
-                <i :class="showStatusFilter ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ml-1"></i>
-              </button>
-
-              <!-- Dropdown Menu -->
-              <div
-                v-if="showStatusFilter"
-                class="absolute left-0 top-full mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
-              >
-                <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">{{ $t('media.savedAndShared') }}</div>
-                <div class="max-h-48 overflow-y-auto">
-                  <button
-                    v-for="option in statusFilterOptions"
-                    :key="option.id"
-                    @click="toggleStatusFilter(option.id)"
-                    :class="[
-                      'w-full px-3 py-2 text-left text-sm flex items-center gap-3 transition-colors',
-                      isStatusSelected(option.id) ? 'bg-teal-50 text-teal-700' : 'text-gray-700 hover:bg-gray-50'
-                    ]"
-                  >
-                    <div :class="[
-                      'w-4 h-4 rounded border-2 flex items-center justify-center transition-all',
-                      isStatusSelected(option.id) ? 'bg-teal-500 border-teal-500' : 'border-gray-300'
-                    ]">
-                      <i v-if="isStatusSelected(option.id)" class="fas fa-check text-white text-[8px]"></i>
-                    </div>
-                    <i :class="[option.icon, option.color]"></i>
-                    <span class="flex-1">{{ option.label }}</span>
-                  </button>
-                </div>
-
-                <div class="my-2 border-t border-gray-100"></div>
-
-                <div class="px-3 flex gap-2">
-                  <button
-                    @click="selectedStatusFilters = []; showStatusFilter = false"
-                    class="flex-1 px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
-                  >
-                    {{ $t('common.clearAll') }}
-                  </button>
-                  <button
-                    @click="showStatusFilter = false"
-                    class="flex-1 px-3 py-1.5 text-xs font-medium text-white bg-teal-500 rounded-lg hover:bg-teal-600 transition-colors"
-                  >
-                    {{ $t('common.apply') }}
-                  </button>
-                </div>
-              </div>
-
-              <!-- Click outside to close -->
-              <div v-if="showStatusFilter" @click="showStatusFilter = false" class="fixed inset-0 z-40"></div>
-            </div>
+            <FilterDropdown
+              v-model="selectedStatusFilters"
+              icon="fas fa-bookmark"
+              :label="$t('media.savedAndShared')"
+              :selected-label="$t('media.savedAndShared')"
+              :header-label="$t('media.savedAndShared')"
+              :options="statusFilterOptions"
+              :clear-all-label="$t('common.clear')"
+              :apply-label="$t('common.apply')"
+            />
 
               <!-- Sort Options with Order Toggle -->
               <div class="relative ml-auto flex items-center">

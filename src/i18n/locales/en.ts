@@ -566,6 +566,9 @@ export default {
     activeFilters: 'Active Filters',
     mySaved: 'My Saved',
     sharedWithMe: 'Shared with me',
+    savedAndShared: 'Saved & Shared',
+    type: 'Type',
+    types: 'Types',
     match: 'Match',
     analyzingQuery: 'Analyzing your query',
     aiSearching: 'AI is searching...',
@@ -915,6 +918,13 @@ export default {
     listView: 'List View',
     going: 'Going',
     notGoing: 'Not Going',
+    // Filter labels
+    eventType: 'Event Type',
+    types: 'Types',
+    format: 'Format',
+    formats: 'Formats',
+    selectEventTypes: 'Select Event Types',
+    selectFormat: 'Select Format',
   },
 
   // Polls
@@ -1039,6 +1049,7 @@ export default {
     selectTags: 'Select Tags',
     savedAndShared: 'Saved & Shared',
     mediaType: 'Media Type',
+    types: 'Types',
     nTypes: '{n} Types',
     nCategories: '{n} Categories',
     nTags: '{n} Tags',

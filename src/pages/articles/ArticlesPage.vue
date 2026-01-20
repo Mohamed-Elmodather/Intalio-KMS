@@ -3,6 +3,7 @@ import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import PageHeroHeader from '@/components/common/PageHeroHeader.vue'
+import FilterDropdown from '@/components/common/FilterDropdown.vue'
 import ContentActionsDropdown from '@/components/common/ContentActionsDropdown.vue'
 import AddToCollectionModal from '@/components/common/AddToCollectionModal.vue'
 import { useAIServicesStore } from '@/stores/aiServices'
@@ -29,18 +30,8 @@ const sortBy = ref('recent')
 const sortOrder = ref<'asc' | 'desc'>('desc')
 const viewMode = ref<'grid' | 'list'>('grid')
 const showFilters = ref(false)
-const showCategoryFilter = ref(false)
-const showTypeFilter = ref(false)
-const showTagFilter = ref(false)
 const showSortDropdown = ref(false)
-const showStatusFilter = ref(false)
 const selectedStatusFilters = ref<string[]>([])
-
-// Status filter options
-const statusFilterOptions = [
-  { id: 'saved', label: 'My Saved', icon: 'fas fa-bookmark', color: 'text-amber-500' },
-  { id: 'shared', label: 'Shared with me', icon: 'fas fa-share-alt', color: 'text-purple-500' }
-]
 const currentPage = ref(1)
 const itemsPerPage = ref(10)
 const itemsPerPageOptions = [5, 10, 20, 50, 100]
@@ -199,6 +190,38 @@ const allTags = computed(() => {
   })
   return Array.from(tags).sort()
 })
+
+// Filter options for FilterDropdown
+const typeFilterOptions = computed(() =>
+  articleTypes.value.map(type => ({
+    id: type.id,
+    label: type.name,
+    icon: type.icon,
+    color: type.color
+  }))
+)
+
+const categoryFilterOptions = computed(() =>
+  categories.value.map(cat => ({
+    id: cat.id,
+    label: cat.name,
+    icon: cat.icon,
+    bgColor: cat.color,
+    count: cat.count
+  }))
+)
+
+const tagFilterOptions = computed(() =>
+  allTags.value.map(tag => ({
+    id: tag,
+    label: tag
+  }))
+)
+
+const statusFilterOptionsComputed = computed(() => [
+  { id: 'saved', label: t('articles.mySaved'), icon: 'fas fa-bookmark', color: 'text-amber-500' },
+  { id: 'shared', label: t('articles.sharedWithMe'), icon: 'fas fa-share-alt', color: 'text-purple-500' }
+])
 
 const articles = ref([
   {
@@ -761,64 +784,6 @@ function filterArticles() {
   }
 
   filteredArticles.value = result
-}
-
-// Toggle functions for multi-select filters
-function toggleCategoryFilter(categoryId: string) {
-  const index = selectedCategories.value.indexOf(categoryId)
-  if (index > -1) {
-    selectedCategories.value.splice(index, 1)
-  } else {
-    selectedCategories.value.push(categoryId)
-  }
-  filterArticles()
-}
-
-function toggleTypeFilter(typeId: string) {
-  const index = selectedTypes.value.indexOf(typeId)
-  if (index > -1) {
-    selectedTypes.value.splice(index, 1)
-  } else {
-    selectedTypes.value.push(typeId)
-  }
-  filterArticles()
-}
-
-function toggleTagFilter(tag: string) {
-  const index = selectedTags.value.indexOf(tag)
-  if (index > -1) {
-    selectedTags.value.splice(index, 1)
-  } else {
-    selectedTags.value.push(tag)
-  }
-  filterArticles()
-}
-
-// Check functions for filter state
-function isCategorySelected(categoryId: string) {
-  return selectedCategories.value.includes(categoryId)
-}
-
-function isTypeSelected(typeId: string) {
-  return selectedTypes.value.includes(typeId)
-}
-
-function isTagSelected(tag: string) {
-  return selectedTags.value.includes(tag)
-}
-
-function toggleStatusFilter(status: string) {
-  const index = selectedStatusFilters.value.indexOf(status)
-  if (index > -1) {
-    selectedStatusFilters.value.splice(index, 1)
-  } else {
-    selectedStatusFilters.value.push(status)
-  }
-  filterArticles()
-}
-
-function isStatusSelected(status: string) {
-  return selectedStatusFilters.value.includes(status)
 }
 
 function clearFilters() {
@@ -1797,280 +1762,55 @@ onUnmounted(() => {
           </div>
 
           <!-- Type Filter -->
-          <div class="relative">
-            <button
-              @click="showTypeFilter = !showTypeFilter"
-              :class="[
-                'flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border',
-                selectedTypes.length > 0 ? 'bg-teal-50 border-teal-200 text-teal-700' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
-              ]"
-            >
-              <i class="fas fa-file-alt text-sm"></i>
-              <span>{{ selectedTypes.length > 0 ? `Type (${selectedTypes.length})` : 'Type' }}</span>
-              <i :class="showTypeFilter ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ms-1"></i>
-            </button>
-
-            <!-- Click outside to close (must be before dropdown) -->
-            <div v-if="showTypeFilter" @click="showTypeFilter = false" class="fixed inset-0 z-40"></div>
-
-            <!-- Dropdown Menu -->
-            <div
-              v-if="showTypeFilter"
-              class="absolute start-0 top-full mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
-            >
-              <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">{{ $t('articles.selectTypes') }}</div>
-              <div class="max-h-48 overflow-y-auto">
-                <button
-                  v-for="type in articleTypes"
-                  :key="type.id"
-                  @click="toggleTypeFilter(type.id)"
-                  :class="[
-                    'w-full px-3 py-2 text-start text-sm flex items-center gap-3 transition-colors',
-                    isTypeSelected(type.id) ? 'bg-teal-50 text-teal-700' : 'text-gray-700 hover:bg-gray-50'
-                  ]"
-                >
-                  <div :class="[
-                    'w-4 h-4 rounded border-2 flex items-center justify-center transition-all',
-                    isTypeSelected(type.id) ? 'bg-teal-500 border-teal-500' : 'border-gray-300'
-                  ]">
-                    <i v-if="isTypeSelected(type.id)" class="fas fa-check text-white text-[8px]"></i>
-                  </div>
-                  <i :class="[type.icon, 'text-teal-500 text-sm']"></i>
-                  <span class="flex-1">{{ type.name }}</span>
-                </button>
-              </div>
-
-              <div class="my-2 border-t border-gray-100"></div>
-
-              <div class="px-3 flex gap-2">
-                <button
-                  @click="selectedTypes = []; filterArticles(); showTypeFilter = false"
-                  class="flex-1 px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
-                >
-                  Clear
-                </button>
-                <button
-                  @click="showTypeFilter = false"
-                  class="flex-1 px-3 py-1.5 text-xs font-medium text-white bg-teal-500 rounded-lg hover:bg-teal-600 transition-colors"
-                >
-                  Apply
-                </button>
-              </div>
-            </div>
-          </div>
+          <FilterDropdown
+            v-model="selectedTypes"
+            icon="fas fa-file-alt"
+            :label="$t('articles.type')"
+            :selected-label="$t('articles.types')"
+            :header-label="$t('articles.selectTypes')"
+            :options="typeFilterOptions"
+            :clear-all-label="$t('common.clear')"
+            :apply-label="$t('common.apply')"
+          />
 
           <!-- Category Filter -->
-          <div class="relative">
-            <button
-              @click="showCategoryFilter = !showCategoryFilter"
-              :class="[
-                'flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border',
-                selectedCategories.length > 0 ? 'bg-teal-50 border-teal-200 text-teal-700' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
-              ]"
-            >
-              <i class="fas fa-layer-group text-sm"></i>
-              <span>{{ selectedCategories.length > 0 ? `Category (${selectedCategories.length})` : 'Category' }}</span>
-              <i :class="showCategoryFilter ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ms-1"></i>
-            </button>
-
-            <!-- Click outside to close (must be before dropdown) -->
-            <div v-if="showCategoryFilter" @click="showCategoryFilter = false" class="fixed inset-0 z-40"></div>
-
-            <!-- Dropdown Menu -->
-            <div
-              v-if="showCategoryFilter"
-              class="absolute start-0 top-full mt-2 w-64 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
-            >
-              <!-- Featured Option (Special) -->
-              <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">{{ $t('articles.specialFilter') }}</div>
-              <button
-                @click="toggleCategoryFilter('featured')"
-                :class="[
-                  'w-full px-3 py-2 text-start text-sm flex items-center gap-3 transition-colors',
-                  isCategorySelected('featured') ? 'bg-amber-50 text-amber-700' : 'text-gray-700 hover:bg-gray-50'
-                ]"
-              >
-                <div :class="[
-                  'w-4 h-4 rounded border-2 flex items-center justify-center transition-all',
-                  isCategorySelected('featured') ? 'bg-amber-500 border-amber-500' : 'border-gray-300'
-                ]">
-                  <i v-if="isCategorySelected('featured')" class="fas fa-check text-white text-[8px]"></i>
-                </div>
-                <i class="fas fa-star text-amber-500 text-sm"></i>
-                <span class="flex-1">{{ $t('articles.featured') }}</span>
-                <span class="text-xs text-gray-400">{{ categories.find(c => c.id === 'featured')?.count }}</span>
-              </button>
-
-              <div class="my-2 border-t border-gray-100"></div>
-
-              <!-- Regular Categories -->
-              <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">{{ $t('common.categories') }}</div>
-              <div class="max-h-48 overflow-y-auto">
-                <button
-                  v-for="cat in categories.filter(c => c.id !== 'featured')"
-                  :key="cat.id"
-                  @click="toggleCategoryFilter(cat.id)"
-                  :class="[
-                    'w-full px-3 py-2 text-start text-sm flex items-center gap-3 transition-colors',
-                    isCategorySelected(cat.id) ? 'bg-teal-50 text-teal-700' : 'text-gray-700 hover:bg-gray-50'
-                  ]"
-                >
-                  <div :class="[
-                    'w-4 h-4 rounded border-2 flex items-center justify-center transition-all',
-                    isCategorySelected(cat.id) ? 'bg-teal-500 border-teal-500' : 'border-gray-300'
-                  ]">
-                    <i v-if="isCategorySelected(cat.id)" class="fas fa-check text-white text-[8px]"></i>
-                  </div>
-                  <i :class="[cat.icon, 'text-teal-500 text-sm']"></i>
-                  <span class="flex-1">{{ cat.name }}</span>
-                  <span class="text-xs text-gray-400">{{ cat.count }}</span>
-                </button>
-              </div>
-
-              <div class="my-2 border-t border-gray-100"></div>
-
-              <div class="px-3 flex gap-2">
-                <button
-                  @click="selectedCategories = []; filterArticles(); showCategoryFilter = false"
-                  class="flex-1 px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
-                >
-                  Clear
-                </button>
-                <button
-                  @click="showCategoryFilter = false"
-                  class="flex-1 px-3 py-1.5 text-xs font-medium text-white bg-teal-500 rounded-lg hover:bg-teal-600 transition-colors"
-                >
-                  Apply
-                </button>
-              </div>
-            </div>
-          </div>
+          <FilterDropdown
+            v-model="selectedCategories"
+            icon="fas fa-layer-group"
+            :label="$t('common.category')"
+            :selected-label="$t('common.categories')"
+            :header-label="$t('common.categories')"
+            :options="categoryFilterOptions"
+            :clear-all-label="$t('common.clear')"
+            :apply-label="$t('common.apply')"
+            :show-count="true"
+            :show-color-badge="true"
+            dropdown-width="w-64"
+          />
 
           <!-- Tags Filter -->
-          <div class="relative">
-            <button
-              @click="showTagFilter = !showTagFilter"
-              :class="[
-                'flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border',
-                selectedTags.length > 0 ? 'bg-teal-50 border-teal-200 text-teal-700' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
-              ]"
-            >
-              <i class="fas fa-tags text-sm"></i>
-              <span>{{ selectedTags.length > 0 ? `Tags (${selectedTags.length})` : 'Tags' }}</span>
-              <i :class="showTagFilter ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ms-1"></i>
-            </button>
-
-            <!-- Click outside to close (must be before dropdown) -->
-            <div v-if="showTagFilter" @click="showTagFilter = false" class="fixed inset-0 z-40"></div>
-
-            <!-- Dropdown Menu -->
-            <div
-              v-if="showTagFilter"
-              class="absolute start-0 top-full mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
-            >
-              <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">{{ $t('articles.selectTags') }}</div>
-              <div class="max-h-48 overflow-y-auto">
-                <button
-                  v-for="tag in allTags"
-                  :key="tag"
-                  @click="toggleTagFilter(tag)"
-                  :class="[
-                    'w-full px-3 py-2 text-start text-sm flex items-center gap-3 transition-colors',
-                    isTagSelected(tag) ? 'bg-teal-50 text-teal-700' : 'text-gray-700 hover:bg-gray-50'
-                  ]"
-                >
-                  <div :class="[
-                    'w-4 h-4 rounded border-2 flex items-center justify-center transition-all',
-                    isTagSelected(tag) ? 'bg-teal-500 border-teal-500' : 'border-gray-300'
-                  ]">
-                    <i v-if="isTagSelected(tag)" class="fas fa-check text-white text-[8px]"></i>
-                  </div>
-                  <i class="fas fa-tag text-teal-500 text-sm"></i>
-                  <span class="flex-1">{{ tag }}</span>
-                </button>
-              </div>
-
-              <div class="my-2 border-t border-gray-100"></div>
-
-              <div class="px-3 flex gap-2">
-                <button
-                  @click="selectedTags = []; filterArticles(); showTagFilter = false"
-                  class="flex-1 px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
-                >
-                  Clear
-                </button>
-                <button
-                  @click="showTagFilter = false"
-                  class="flex-1 px-3 py-1.5 text-xs font-medium text-white bg-teal-500 rounded-lg hover:bg-teal-600 transition-colors"
-                >
-                  Apply
-                </button>
-              </div>
-            </div>
-          </div>
+          <FilterDropdown
+            v-model="selectedTags"
+            icon="fas fa-tags"
+            :label="$t('common.tags')"
+            :selected-label="$t('common.tags')"
+            :header-label="$t('articles.selectTags')"
+            :options="tagFilterOptions"
+            :clear-all-label="$t('common.clear')"
+            :apply-label="$t('common.apply')"
+          />
 
           <!-- Saved & Shared Filter Dropdown -->
-          <div class="relative">
-            <button
-              @click="showStatusFilter = !showStatusFilter"
-              :class="[
-                'flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border',
-                selectedStatusFilters.length > 0 ? 'bg-teal-50 border-teal-200 text-teal-700' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
-              ]"
-            >
-              <i class="fas fa-bookmark text-sm"></i>
-              <span>{{ selectedStatusFilters.length > 0 ? `${selectedStatusFilters.length} Saved & Shared` : 'Saved & Shared' }}</span>
-              <i :class="showStatusFilter ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ms-1"></i>
-            </button>
-
-            <!-- Click outside to close -->
-            <div v-if="showStatusFilter" @click="showStatusFilter = false" class="fixed inset-0 z-40"></div>
-
-            <!-- Dropdown Menu -->
-            <div
-              v-if="showStatusFilter"
-              class="absolute start-0 top-full mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
-            >
-              <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">{{ $t('articles.filterByStatus') }}</div>
-              <div class="max-h-48 overflow-y-auto">
-                <button
-                  v-for="option in statusFilterOptions"
-                  :key="option.id"
-                  @click="toggleStatusFilter(option.id)"
-                  :class="[
-                    'w-full px-3 py-2 text-start text-sm flex items-center gap-3 transition-colors',
-                    isStatusSelected(option.id) ? 'bg-teal-50 text-teal-700' : 'text-gray-700 hover:bg-gray-50'
-                  ]"
-                >
-                  <div :class="[
-                    'w-4 h-4 rounded border-2 flex items-center justify-center transition-all',
-                    isStatusSelected(option.id) ? 'bg-teal-500 border-teal-500' : 'border-gray-300'
-                  ]">
-                    <i v-if="isStatusSelected(option.id)" class="fas fa-check text-white text-[8px]"></i>
-                  </div>
-                  <i :class="[option.icon, option.color]"></i>
-                  <span class="flex-1">{{ option.label }}</span>
-                </button>
-              </div>
-
-              <div class="my-2 border-t border-gray-100"></div>
-
-              <div class="px-3 flex gap-2">
-                <button
-                  @click="selectedStatusFilters = []; filterArticles(); showStatusFilter = false"
-                  class="flex-1 px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
-                >
-                  Clear
-                </button>
-                <button
-                  @click="showStatusFilter = false"
-                  class="flex-1 px-3 py-1.5 text-xs font-medium text-white bg-teal-500 rounded-lg hover:bg-teal-600 transition-colors"
-                >
-                  Apply
-                </button>
-              </div>
-            </div>
-          </div>
+          <FilterDropdown
+            v-model="selectedStatusFilters"
+            icon="fas fa-bookmark"
+            :label="$t('articles.savedAndShared')"
+            :selected-label="$t('articles.savedAndShared')"
+            :header-label="$t('articles.filterByStatus')"
+            :options="statusFilterOptionsComputed"
+            :clear-all-label="$t('common.clear')"
+            :apply-label="$t('common.apply')"
+          />
 
           <!-- Sort Options with Order Toggle -->
           <div class="relative ms-auto flex items-center">

@@ -3,6 +3,7 @@ import { ref, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import PageHeroHeader from '@/components/common/PageHeroHeader.vue'
+import FilterDropdown from '@/components/common/FilterDropdown.vue'
 import { useAIServicesStore } from '@/stores/aiServices'
 import { useComparisonStore } from '@/stores/comparison'
 import { AILoadingIndicator, AISuggestionChip, AIConfidenceBar } from '@/components/ai'
@@ -35,8 +36,6 @@ const currentPage = ref(1)
 const itemsPerPage = ref(6)
 
 // Filter dropdown states
-const showEventTypeFilter = ref(false)
-const showFormatFilter = ref(false)
 const showDateFilter = ref(false)
 const showSortDropdown = ref(false)
 const sortBy = ref('date')
@@ -112,6 +111,25 @@ const eventTypes = ref([
   { id: 'review', name: 'Reviews', icon: 'fas fa-clipboard-check', color: '#f59e0b' },
   { id: 'webinar', name: 'Webinars', icon: 'fas fa-video', color: '#6366f1' },
 ])
+
+// Filter options for FilterDropdown
+const eventTypeFilterOptions = computed(() =>
+  eventTypes.value.map(type => ({
+    id: type.id,
+    label: type.name,
+    icon: type.icon,
+    color: type.color
+  }))
+)
+
+const formatFilterOptions = computed(() =>
+  formatOptions.map(format => ({
+    id: format.id,
+    label: format.label,
+    icon: format.icon,
+    color: format.color
+  }))
+)
 
 interface Attendee {
   color: string
@@ -682,35 +700,6 @@ watch(isAISearchMode, (newValue) => {
     searchQuery.value = unifiedSearchQuery.value
   }
 })
-
-// Filter toggle methods
-function toggleEventType(typeId: string) {
-  const idx = selectedTypes.value.indexOf(typeId)
-  if (idx > -1) {
-    selectedTypes.value.splice(idx, 1)
-  } else {
-    selectedTypes.value.push(typeId)
-  }
-  currentPage.value = 1
-}
-
-function isEventTypeSelected(typeId: string) {
-  return selectedTypes.value.includes(typeId)
-}
-
-function toggleFormat(formatId: string) {
-  const idx = selectedFormats.value.indexOf(formatId)
-  if (idx > -1) {
-    selectedFormats.value.splice(idx, 1)
-  } else {
-    selectedFormats.value.push(formatId)
-  }
-  currentPage.value = 1
-}
-
-function isFormatSelected(formatId: string) {
-  return selectedFormats.value.includes(formatId)
-}
 
 function setSort(value: string) {
   if (sortBy.value === value) {
@@ -1396,122 +1385,29 @@ function getCategoryColor(category: string) {
             </div>
 
             <!-- Event Type Filter Dropdown -->
-            <div class="relative">
-              <button
-                @click="showEventTypeFilter = !showEventTypeFilter"
-                :class="[
-                  'flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border',
-                  selectedTypes.length > 0 ? 'bg-teal-50 border-teal-200 text-teal-700' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
-                ]"
-              >
-                <i class="fas fa-calendar-check text-sm"></i>
-                <span>{{ selectedTypes.length > 0 ? `${selectedTypes.length} Types` : 'Event Type' }}</span>
-                <i :class="showEventTypeFilter ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ml-1"></i>
-              </button>
-
-              <!-- Dropdown Menu -->
-              <div
-                v-if="showEventTypeFilter"
-                class="absolute left-0 top-full mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
-              >
-                <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Select Event Types</div>
-                <div class="max-h-48 overflow-y-auto">
-                  <button
-                    v-for="type in eventTypes"
-                    :key="type.id"
-                    @click="toggleEventType(type.id)"
-                    :class="[
-                      'w-full px-3 py-2 text-left text-sm flex items-center gap-3 transition-colors',
-                      isEventTypeSelected(type.id) ? 'bg-teal-50 text-teal-700' : 'text-gray-700 hover:bg-gray-50'
-                    ]"
-                  >
-                    <div :class="[
-                      'w-4 h-4 rounded border-2 flex items-center justify-center transition-all',
-                      isEventTypeSelected(type.id) ? 'bg-teal-500 border-teal-500' : 'border-gray-300'
-                    ]">
-                      <i v-if="isEventTypeSelected(type.id)" class="fas fa-check text-white text-[8px]"></i>
-                    </div>
-                    <i :class="[type.icon, 'text-sm']" :style="{ color: type.color }"></i>
-                    <span class="flex-1">{{ type.name }}</span>
-                  </button>
-                </div>
-                <div class="my-2 border-t border-gray-100"></div>
-                <div class="px-3 flex gap-2">
-                  <button
-                    @click="selectedTypes = []; showEventTypeFilter = false"
-                    class="flex-1 px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
-                  >
-                    Clear All
-                  </button>
-                  <button
-                    @click="showEventTypeFilter = false"
-                    class="flex-1 px-3 py-1.5 text-xs font-medium text-white bg-teal-500 rounded-lg hover:bg-teal-600 transition-colors"
-                  >
-                    Apply
-                  </button>
-                </div>
-              </div>
-              <div v-if="showEventTypeFilter" @click="showEventTypeFilter = false" class="fixed inset-0 z-40"></div>
-            </div>
+            <FilterDropdown
+              v-model="selectedTypes"
+              icon="fas fa-calendar-check"
+              :label="$t('events.eventType')"
+              :selected-label="$t('events.types')"
+              :header-label="$t('events.selectEventTypes')"
+              :options="eventTypeFilterOptions"
+              :clear-all-label="$t('common.clear')"
+              :apply-label="$t('common.apply')"
+            />
 
             <!-- Format Filter Dropdown -->
-            <div class="relative">
-              <button
-                @click="showFormatFilter = !showFormatFilter"
-                :class="[
-                  'flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border',
-                  selectedFormats.length > 0 ? 'bg-teal-50 border-teal-200 text-teal-700' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
-                ]"
-              >
-                <i class="fas fa-desktop text-sm"></i>
-                <span>{{ selectedFormats.length > 0 ? `${selectedFormats.length} Formats` : 'Format' }}</span>
-                <i :class="showFormatFilter ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ml-1"></i>
-              </button>
-
-              <!-- Dropdown Menu -->
-              <div
-                v-if="showFormatFilter"
-                class="absolute left-0 top-full mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
-              >
-                <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Select Format</div>
-                <div class="max-h-48 overflow-y-auto">
-                  <button
-                    v-for="format in formatOptions"
-                    :key="format.id"
-                    @click="toggleFormat(format.id)"
-                    :class="[
-                      'w-full px-3 py-2 text-left text-sm flex items-center gap-3 transition-colors',
-                      isFormatSelected(format.id) ? 'bg-teal-50 text-teal-700' : 'text-gray-700 hover:bg-gray-50'
-                    ]"
-                  >
-                    <div :class="[
-                      'w-4 h-4 rounded border-2 flex items-center justify-center transition-all',
-                      isFormatSelected(format.id) ? 'bg-teal-500 border-teal-500' : 'border-gray-300'
-                    ]">
-                      <i v-if="isFormatSelected(format.id)" class="fas fa-check text-white text-[8px]"></i>
-                    </div>
-                    <i :class="[format.icon, format.color, 'text-sm']"></i>
-                    <span class="flex-1">{{ format.label }}</span>
-                  </button>
-                </div>
-                <div class="my-2 border-t border-gray-100"></div>
-                <div class="px-3 flex gap-2">
-                  <button
-                    @click="selectedFormats = []; showFormatFilter = false"
-                    class="flex-1 px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
-                  >
-                    Clear All
-                  </button>
-                  <button
-                    @click="showFormatFilter = false"
-                    class="flex-1 px-3 py-1.5 text-xs font-medium text-white bg-teal-500 rounded-lg hover:bg-teal-600 transition-colors"
-                  >
-                    Apply
-                  </button>
-                </div>
-              </div>
-              <div v-if="showFormatFilter" @click="showFormatFilter = false" class="fixed inset-0 z-40"></div>
-            </div>
+            <FilterDropdown
+              v-model="selectedFormats"
+              icon="fas fa-desktop"
+              :label="$t('events.format')"
+              :selected-label="$t('events.formats')"
+              :header-label="$t('events.selectFormat')"
+              :options="formatFilterOptions"
+              :clear-all-label="$t('common.clear')"
+              :apply-label="$t('common.apply')"
+              dropdown-width="w-48"
+            />
 
             <!-- Featured Toggle -->
             <button
