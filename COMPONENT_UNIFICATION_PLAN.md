@@ -64,9 +64,11 @@ This plan outlines the systematic unification of duplicated UI components across
 ## Phase 2: Medium Effort Components
 
 ### Step 2.1: CardActionButtons Component
-**Status:** Pending
+**Status:** Component Created (Application Deferred)
 
 **New Component:** `src/components/common/CardActionButtons.vue`
+
+**Note:** Component created with support for like, bookmark, save, share, download, star, compare, ai-analyze, calendar, and reminder actions. Each page has highly customized CSS styling for action buttons - full application deferred to allow gradual adoption in new features.
 
 **Affected Pages:**
 - `src/pages/articles/ArticlesPage.vue`
@@ -75,7 +77,7 @@ This plan outlines the systematic unification of duplicated UI components across
 - `src/pages/events/EventsPage.vue`
 - `src/pages/learning/LearningPage.vue`
 
-**Reduction:** ~125-200 lines
+**Reduction:** ~125-200 lines (when fully applied)
 
 ---
 
