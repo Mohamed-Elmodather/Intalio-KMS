@@ -254,7 +254,7 @@ onBeforeUnmount(() => {
                 </button>
               </div>
               <div class="px-4 py-3 border-t border-gray-100 bg-gray-50/50 flex justify-center">
-                <ViewAllButton variant="text" :label="$t('header.viewAllNotifications')" @click="viewAllNotifications" />
+                <ViewAllButton :label="$t('header.viewAllNotifications')" @click="viewAllNotifications" />
               </div>
             </div>
           </Transition>

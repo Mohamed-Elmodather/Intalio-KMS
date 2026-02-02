@@ -1326,7 +1326,7 @@ function getCategoryColor(category: string): string {
                 <span class="text-xs font-medium text-gray-500">{{ $t('documents.quickAccess') }}</span>
               </div>
             </h2>
-            <ViewAllButton variant="text" size="sm" @click="currentView = 'starred'" />
+            <ViewAllButton size="sm" @click="currentView = 'starred'" />
           </div>
 
           <div class="space-y-2">
@@ -1389,7 +1389,7 @@ function getCategoryColor(category: string): string {
                 <span class="text-xs font-medium text-gray-500">{{ $t('documents.recentlyModified') }}</span>
               </div>
             </h2>
-            <ViewAllButton variant="text" size="sm" />
+            <ViewAllButton size="sm" />
           </div>
 
           <div class="space-y-2">

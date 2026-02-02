@@ -1825,7 +1825,7 @@ onUnmounted(() => {
               <i class="fas fa-star text-amber-500"></i>
               {{ $t('media.featuredContent') }}
             </h2>
-            <ViewAllButton to="/media" variant="text" size="sm" />
+            <ViewAllButton to="/media" size="sm" />
           </div>
           <!-- Featured Grid: Main + Up Next side by side -->
           <div class="featured-inner-grid">
@@ -1910,7 +1910,7 @@ onUnmounted(() => {
               <i class="fas fa-history text-teal-500"></i>
               Continue Watching
             </h2>
-            <ViewAllButton to="/media" variant="text" size="sm" :count="watchHistory.length" />
+            <ViewAllButton to="/media" size="sm" :count="watchHistory.length" />
           </div>
           <div class="continue-vertical-scroll">
             <div v-for="item in watchHistory.slice(0, 3)" :key="item.id"

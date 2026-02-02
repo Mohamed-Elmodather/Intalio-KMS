@@ -292,7 +292,7 @@ onBeforeUnmount(() => {
                 </a>
               </div>
               <div class="unified-header__dropdown-footer">
-                <ViewAllButton variant="text" :label="$t('header.viewAllNotifications')" @click="handleViewAllNotifications" />
+                <ViewAllButton :label="$t('header.viewAllNotifications')" @click="handleViewAllNotifications" />
               </div>
             </div>
           </Transition>
