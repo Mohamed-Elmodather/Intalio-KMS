@@ -6,6 +6,7 @@ import { useUIStore } from '@/stores/ui'
 import { useAIServicesStore } from '@/stores/aiServices'
 import { AIVoiceInput } from '@/components/ai'
 import EmptyState from '@/components/common/EmptyState.vue'
+import Pagination from '@/components/common/Pagination.vue'
 
 // Stores
 const uiStore = useUIStore()
@@ -1073,42 +1074,14 @@ function getIntentLabel(type: string): string {
             </div>
 
             <!-- Pagination -->
-            <div v-if="totalPages > 1" class="flex items-center justify-between mt-8">
-              <p class="text-sm text-gray-500">
-                {{ textConstants.showing }} {{ startResult }}-{{ endResult }} {{ textConstants.of }} {{ totalResults }} {{ textConstants.results }}
-              </p>
-              <div class="flex items-center gap-2">
-                <button
-                  @click="goToPage(currentPage - 1)"
-                  :disabled="currentPage === 1"
-                  class="p-2 rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <i class="fas fa-chevron-left"></i>
-                </button>
-                <template v-for="page in paginationPages" :key="page">
-                  <span v-if="page === '...'" class="text-gray-400 px-2">...</span>
-                  <button
-                    v-else
-                    @click="goToPage(page)"
-                    :class="[
-                      'w-10 h-10 rounded-lg font-medium',
-                      currentPage === page
-                        ? 'bg-teal-500 text-white'
-                        : 'border border-gray-200 text-gray-600 hover:bg-gray-50'
-                    ]"
-                  >
-                    {{ page }}
-                  </button>
-                </template>
-                <button
-                  @click="goToPage(currentPage + 1)"
-                  :disabled="currentPage === totalPages"
-                  class="p-2 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <i class="fas fa-chevron-right"></i>
-                </button>
-              </div>
-            </div>
+            <Pagination
+              v-if="totalPages > 1"
+              v-model:current-page="currentPage"
+              v-model:items-per-page="pageSize"
+              :total-items="totalResults"
+              :show-per-page-selector="false"
+              class="mt-8"
+            />
 
             <!-- Related Searches -->
             <div v-if="relatedSearches.length > 0" class="mt-8 p-5 bg-white rounded-2xl border border-gray-200 shadow-sm">

@@ -7,6 +7,7 @@ import PageFilterBar from '@/components/common/PageFilterBar.vue'
 import FilterDropdown from '@/components/common/FilterDropdown.vue'
 import AddToCollectionModal from '@/components/common/AddToCollectionModal.vue'
 import ViewAllButton from '@/components/common/ViewAllButton.vue'
+import Pagination from '@/components/common/Pagination.vue'
 import { useAIServicesStore } from '@/stores/aiServices'
 import { useComparisonStore } from '@/stores/comparison'
 import { AISuggestionChip, AILoadingIndicator, AIConfidenceBar } from '@/components/ai'
@@ -2323,86 +2324,13 @@ function getCategoryColor(category: string): string {
             </div>
 
             <!-- Grid View Pagination Footer -->
-              <div class="mt-4 px-4 py-3 bg-white rounded-2xl border border-gray-100 shadow-sm">
-                <div class="flex items-center justify-between flex-wrap gap-3">
-                  <!-- Left: Stats & Items Per Page -->
-                  <div class="flex items-center gap-4 flex-wrap">
-                    <span class="text-xs text-gray-500">
-                      {{ $t('documents.showing') }} <span class="font-semibold text-gray-700">{{ Math.min((currentPage - 1) * itemsPerPage + 1, filteredDocuments.length) }}</span>
-                      {{ $t('documents.to') }} <span class="font-semibold text-gray-700">{{ Math.min(currentPage * itemsPerPage, filteredDocuments.length) }}</span>
-                      {{ $t('documents.of') }} <span class="font-semibold text-gray-700">{{ filteredDocuments.length }}</span> {{ $t('documents.filesLower') }}
-                    </span>
-
-                    <!-- Items Per Page Selector -->
-                    <div class="flex items-center gap-2">
-                      <span class="text-xs text-gray-500">{{ $t('documents.show') }}</span>
-                      <select
-                        v-model="itemsPerPage"
-                        @change="changeItemsPerPage(Number(($event.target as HTMLSelectElement).value))"
-                        class="text-xs px-2 py-1.5 rounded-lg border border-gray-200 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 cursor-pointer"
-                      >
-                        <option v-for="option in itemsPerPageOptions" :key="option" :value="option">
-                          {{ option }}
-                        </option>
-                      </select>
-                      <span class="text-xs text-gray-500">{{ $t('documents.perPage') }}</span>
-                    </div>
-                  </div>
-
-                  <!-- Right: Pagination Controls -->
-                  <div class="flex items-center gap-2">
-                    <button
-                      @click="prevPage"
-                      :disabled="currentPage === 1"
-                      :class="[
-                        'px-3 py-1.5 text-xs rounded-lg transition-colors flex items-center gap-1.5 border',
-                        currentPage === 1
-                          ? 'text-gray-300 border-gray-100 cursor-not-allowed'
-                          : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100 border-gray-200'
-                      ]"
-                    >
-                      <i class="fas fa-chevron-left text-[10px]"></i>
-                      Previous
-                    </button>
-
-                    <!-- Page Numbers -->
-                    <div class="flex items-center gap-1">
-                      <template v-for="page in totalPages" :key="page">
-                        <button
-                          v-if="page === 1 || page === totalPages || (page >= currentPage - 1 && page <= currentPage + 1)"
-                          @click="goToPage(page)"
-                          :class="[
-                            'w-8 h-8 text-xs rounded-lg transition-colors flex items-center justify-center',
-                            page === currentPage
-                              ? 'font-medium text-teal-600 bg-teal-50'
-                              : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
-                          ]"
-                        >
-                          {{ page }}
-                        </button>
-                        <span
-                          v-else-if="page === currentPage - 2 || page === currentPage + 2"
-                          class="text-xs text-gray-400 px-1"
-                        >...</span>
-                      </template>
-                    </div>
-
-                    <button
-                      @click="nextPage"
-                      :disabled="currentPage === totalPages"
-                      :class="[
-                        'px-3 py-1.5 text-xs rounded-lg transition-colors flex items-center gap-1.5 border',
-                        currentPage === totalPages
-                          ? 'text-gray-300 border-gray-100 cursor-not-allowed'
-                          : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100 border-gray-200'
-                      ]"
-                    >
-                      Next
-                      <i class="fas fa-chevron-right text-[10px]"></i>
-                    </button>
-                  </div>
-                </div>
-              </div>
+            <Pagination
+              v-model:current-page="currentPage"
+              v-model:items-per-page="itemsPerPage"
+              :total-items="filteredDocuments.length"
+              :items-per-page-options="itemsPerPageOptions"
+              class="mt-4"
+            />
             </div>
 
             <!-- Documents List View (Enhanced) -->
@@ -2680,92 +2608,22 @@ function getCategoryColor(category: string): string {
               <!-- Table Footer with Stats & Pagination -->
               <div class="w-full px-4 py-3 bg-gradient-to-r from-gray-50 to-white border-t border-gray-100">
                 <div class="flex items-center justify-between flex-wrap gap-3">
-                  <!-- Left: Stats & Items Per Page -->
-                  <div class="flex items-center gap-4 flex-wrap">
-                    <span class="text-xs text-gray-500">
-                      {{ $t('documents.showing') }} <span class="font-semibold text-gray-700">{{ Math.min((currentPage - 1) * itemsPerPage + 1, filteredDocuments.length) }}</span>
-                      {{ $t('documents.to') }} <span class="font-semibold text-gray-700">{{ Math.min(currentPage * itemsPerPage, filteredDocuments.length) }}</span>
-                      {{ $t('documents.of') }} <span class="font-semibold text-gray-700">{{ filteredDocuments.length }}</span> {{ $t('documents.filesLower') }}
+                  <Pagination
+                    v-model:current-page="currentPage"
+                    v-model:items-per-page="itemsPerPage"
+                    :total-items="filteredDocuments.length"
+                    :items-per-page-options="itemsPerPageOptions"
+                    class="flex-1"
+                  />
+                  <div class="hidden sm:flex items-center gap-3 text-xs text-gray-400">
+                    <span class="flex items-center gap-1">
+                      <i class="fas fa-hdd text-amber-500"></i>
+                      {{ formatTotalSize(filteredDocuments.reduce((sum, d) => sum + d.size, 0)) }} total
                     </span>
-
-                    <!-- Items Per Page Selector -->
-                    <div class="flex items-center gap-2">
-                      <span class="text-xs text-gray-500">{{ $t('documents.show') }}</span>
-                      <select
-                        v-model="itemsPerPage"
-                        @change="changeItemsPerPage(Number(($event.target as HTMLSelectElement).value))"
-                        class="text-xs px-2 py-1.5 rounded-lg border border-gray-200 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 cursor-pointer"
-                      >
-                        <option v-for="option in itemsPerPageOptions" :key="option" :value="option">
-                          {{ option }}
-                        </option>
-                      </select>
-                      <span class="text-xs text-gray-500">{{ $t('documents.perPage') }}</span>
-                    </div>
-
-                    <div class="hidden sm:flex items-center gap-3 text-xs text-gray-400">
-                      <span class="flex items-center gap-1">
-                        <i class="fas fa-hdd text-amber-500"></i>
-                        {{ formatTotalSize(filteredDocuments.reduce((sum, d) => sum + d.size, 0)) }} total
-                      </span>
-                      <span class="flex items-center gap-1">
-                        <i class="fas fa-download text-green-500"></i>
-                        {{ filteredDocuments.reduce((sum, d) => sum + d.downloads, 0).toLocaleString() }} downloads
-                      </span>
-                    </div>
-                  </div>
-
-                  <!-- Right: Pagination Controls -->
-                  <div class="flex items-center gap-2">
-                    <button
-                      @click="prevPage"
-                      :disabled="currentPage === 1"
-                      :class="[
-                        'px-3 py-1.5 text-xs rounded-lg transition-colors flex items-center gap-1.5 border',
-                        currentPage === 1
-                          ? 'text-gray-300 border-gray-100 cursor-not-allowed'
-                          : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100 border-gray-200'
-                      ]"
-                    >
-                      <i class="fas fa-chevron-left text-[10px]"></i>
-                      Previous
-                    </button>
-
-                    <!-- Page Numbers -->
-                    <div class="flex items-center gap-1">
-                      <template v-for="page in totalPages" :key="page">
-                        <button
-                          v-if="page === 1 || page === totalPages || (page >= currentPage - 1 && page <= currentPage + 1)"
-                          @click="goToPage(page)"
-                          :class="[
-                            'w-8 h-8 text-xs rounded-lg transition-colors flex items-center justify-center',
-                            page === currentPage
-                              ? 'font-medium text-teal-600 bg-teal-50'
-                              : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
-                          ]"
-                        >
-                          {{ page }}
-                        </button>
-                        <span
-                          v-else-if="page === currentPage - 2 || page === currentPage + 2"
-                          class="text-xs text-gray-400 px-1"
-                        >...</span>
-                      </template>
-                    </div>
-
-                    <button
-                      @click="nextPage"
-                      :disabled="currentPage === totalPages"
-                      :class="[
-                        'px-3 py-1.5 text-xs rounded-lg transition-colors flex items-center gap-1.5 border',
-                        currentPage === totalPages
-                          ? 'text-gray-300 border-gray-100 cursor-not-allowed'
-                          : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100 border-gray-200'
-                      ]"
-                    >
-                      Next
-                      <i class="fas fa-chevron-right text-[10px]"></i>
-                    </button>
+                    <span class="flex items-center gap-1">
+                      <i class="fas fa-download text-green-500"></i>
+                      {{ filteredDocuments.reduce((sum, d) => sum + d.downloads, 0).toLocaleString() }} downloads
+                    </span>
                   </div>
                 </div>
               </div>

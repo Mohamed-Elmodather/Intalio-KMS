@@ -5,6 +5,7 @@ import { useI18n } from 'vue-i18n'
 import PageHeroHeader from '@/components/common/PageHeroHeader.vue'
 import ViewAllButton from '@/components/common/ViewAllButton.vue'
 import EmptyState from '@/components/common/EmptyState.vue'
+import Pagination from '@/components/common/Pagination.vue'
 import { useAIServicesStore } from '@/stores/aiServices'
 import { AILoadingIndicator, AIConfidenceBar, AISuggestionChip } from '@/components/ai'
 import type { ClassificationResult, NERResult } from '@/types/ai'
@@ -3349,86 +3350,14 @@ function resumeFeaturedAutoPlay() {
             </div>
 
             <!-- Pagination Footer -->
-            <div v-if="displayedCourses.length > 0" class="mt-4 px-4 py-3 bg-white rounded-2xl border border-gray-100 shadow-sm">
-              <div class="flex items-center justify-between flex-wrap gap-3">
-                <!-- Left: Stats & Items Per Page -->
-                <div class="flex items-center gap-4 flex-wrap">
-                  <span class="text-xs text-gray-500">
-                    Showing <span class="font-semibold text-gray-700">{{ coursesPaginationStart }}</span>
-                    to <span class="font-semibold text-gray-700">{{ coursesPaginationEnd }}</span>
-                    of <span class="font-semibold text-gray-700">{{ displayedCourses.length }}</span> courses
-                  </span>
-
-                  <!-- Items Per Page Selector -->
-                  <div class="flex items-center gap-2">
-                    <span class="text-xs text-gray-500">Show:</span>
-                    <select
-                      v-model="coursesItemsPerPage"
-                      @change="changeCoursesItemsPerPage(Number(($event.target as HTMLSelectElement).value))"
-                      class="text-xs px-2 py-1.5 rounded-lg border border-gray-200 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 cursor-pointer"
-                    >
-                      <option v-for="option in coursesItemsPerPageOptions" :key="option" :value="option">
-                        {{ option }}
-                      </option>
-                    </select>
-                    <span class="text-xs text-gray-500">per page</span>
-                  </div>
-                </div>
-
-                <!-- Right: Pagination Controls -->
-                <div class="flex items-center gap-2">
-                  <button
-                    @click="prevCoursesPage"
-                    :disabled="coursesCurrentPage === 1"
-                    :class="[
-                      'px-3 py-1.5 text-xs rounded-lg transition-colors flex items-center gap-1.5 border',
-                      coursesCurrentPage === 1
-                        ? 'text-gray-300 border-gray-100 cursor-not-allowed'
-                        : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100 border-gray-200'
-                    ]"
-                  >
-                    <i class="fas fa-chevron-left text-[10px]"></i>
-                    Previous
-                  </button>
-
-                  <!-- Page Numbers -->
-                  <div class="flex items-center gap-1">
-                    <template v-for="page in coursesTotalPages" :key="page">
-                      <button
-                        v-if="page === 1 || page === coursesTotalPages || (page >= coursesCurrentPage - 1 && page <= coursesCurrentPage + 1)"
-                        @click="goToCoursesPage(page)"
-                        :class="[
-                          'w-8 h-8 text-xs rounded-lg transition-colors flex items-center justify-center',
-                          page === coursesCurrentPage
-                            ? 'font-medium text-teal-600 bg-teal-50'
-                            : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
-                        ]"
-                      >
-                        {{ page }}
-                      </button>
-                      <span
-                        v-else-if="page === coursesCurrentPage - 2 || page === coursesCurrentPage + 2"
-                        class="text-xs text-gray-400 px-1"
-                      >...</span>
-                    </template>
-                  </div>
-
-                  <button
-                    @click="nextCoursesPage"
-                    :disabled="coursesCurrentPage === coursesTotalPages"
-                    :class="[
-                      'px-3 py-1.5 text-xs rounded-lg transition-colors flex items-center gap-1.5 border',
-                      coursesCurrentPage === coursesTotalPages
-                        ? 'text-gray-300 border-gray-100 cursor-not-allowed'
-                        : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100 border-gray-200'
-                    ]"
-                  >
-                    Next
-                    <i class="fas fa-chevron-right text-[10px]"></i>
-                  </button>
-                </div>
-              </div>
-            </div>
+            <Pagination
+              v-if="displayedCourses.length > 0"
+              v-model:current-page="coursesCurrentPage"
+              v-model:items-per-page="coursesItemsPerPage"
+              :total-items="displayedCourses.length"
+              :items-per-page-options="coursesItemsPerPageOptions"
+              class="mt-4"
+            />
           </div>
         </div>
       </div>
@@ -3916,86 +3845,14 @@ function resumeFeaturedAutoPlay() {
             />
 
             <!-- Pagination Footer -->
-            <div v-if="filteredPaths.length > 0" class="mt-4 px-4 py-3 bg-white rounded-2xl border border-gray-100 shadow-sm">
-              <div class="flex items-center justify-between flex-wrap gap-3">
-                <!-- Left: Stats & Items Per Page -->
-                <div class="flex items-center gap-4 flex-wrap">
-                  <span class="text-xs text-gray-500">
-                    Showing <span class="font-semibold text-gray-700">{{ pathsPaginationStart }}</span>
-                    to <span class="font-semibold text-gray-700">{{ pathsPaginationEnd }}</span>
-                    of <span class="font-semibold text-gray-700">{{ filteredPaths.length }}</span> paths
-                  </span>
-
-                  <!-- Items Per Page Selector -->
-                  <div class="flex items-center gap-2">
-                    <span class="text-xs text-gray-500">Show:</span>
-                    <select
-                      v-model="pathsItemsPerPage"
-                      @change="changePathsItemsPerPage(Number(($event.target as HTMLSelectElement).value))"
-                      class="text-xs px-2 py-1.5 rounded-lg border border-gray-200 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 cursor-pointer"
-                    >
-                      <option v-for="option in pathsItemsPerPageOptions" :key="option" :value="option">
-                        {{ option }}
-                      </option>
-                    </select>
-                    <span class="text-xs text-gray-500">per page</span>
-                  </div>
-                </div>
-
-                <!-- Right: Pagination Controls -->
-                <div class="flex items-center gap-2">
-                  <button
-                    @click="prevPathsPage"
-                    :disabled="pathsCurrentPage === 1"
-                    :class="[
-                      'px-3 py-1.5 text-xs rounded-lg transition-colors flex items-center gap-1.5 border',
-                      pathsCurrentPage === 1
-                        ? 'text-gray-300 border-gray-100 cursor-not-allowed'
-                        : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100 border-gray-200'
-                    ]"
-                  >
-                    <i class="fas fa-chevron-left text-[10px]"></i>
-                    Previous
-                  </button>
-
-                  <!-- Page Numbers -->
-                  <div class="flex items-center gap-1">
-                    <template v-for="page in pathsTotalPages" :key="page">
-                      <button
-                        v-if="page === 1 || page === pathsTotalPages || (page >= pathsCurrentPage - 1 && page <= pathsCurrentPage + 1)"
-                        @click="goToPathsPage(page)"
-                        :class="[
-                          'w-8 h-8 text-xs rounded-lg transition-colors flex items-center justify-center',
-                          page === pathsCurrentPage
-                            ? 'font-medium text-teal-600 bg-teal-50'
-                            : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
-                        ]"
-                      >
-                        {{ page }}
-                      </button>
-                      <span
-                        v-else-if="page === pathsCurrentPage - 2 || page === pathsCurrentPage + 2"
-                        class="text-xs text-gray-400 px-1"
-                      >...</span>
-                    </template>
-                  </div>
-
-                  <button
-                    @click="nextPathsPage"
-                    :disabled="pathsCurrentPage === pathsTotalPages"
-                    :class="[
-                      'px-3 py-1.5 text-xs rounded-lg transition-colors flex items-center gap-1.5 border',
-                      pathsCurrentPage === pathsTotalPages
-                        ? 'text-gray-300 border-gray-100 cursor-not-allowed'
-                        : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100 border-gray-200'
-                    ]"
-                  >
-                    Next
-                    <i class="fas fa-chevron-right text-[10px]"></i>
-                  </button>
-                </div>
-              </div>
-            </div>
+            <Pagination
+              v-if="filteredPaths.length > 0"
+              v-model:current-page="pathsCurrentPage"
+              v-model:items-per-page="pathsItemsPerPage"
+              :total-items="filteredPaths.length"
+              :items-per-page-options="pathsItemsPerPageOptions"
+              class="mt-4"
+            />
           </div>
         </div>
       </div>
@@ -4740,87 +4597,14 @@ function resumeFeaturedAutoPlay() {
                 </article>
               </div>
 
-              <!-- Pagination Footer (ArticlesPage Style) -->
-              <div class="mt-4 px-4 py-3 bg-white rounded-2xl border border-gray-100 shadow-sm">
-                <div class="flex items-center justify-between flex-wrap gap-3">
-                  <!-- Left: Stats & Items Per Page -->
-                  <div class="flex items-center gap-4 flex-wrap">
-                    <span class="text-xs text-gray-500">
-                      Showing <span class="font-semibold text-gray-700">{{ Math.min((lessonsCurrentPage - 1) * lessonsItemsPerPage + 1, filteredLessons.length) }}</span>
-                      to <span class="font-semibold text-gray-700">{{ Math.min(lessonsCurrentPage * lessonsItemsPerPage, filteredLessons.length) }}</span>
-                      of <span class="font-semibold text-gray-700">{{ filteredLessons.length }}</span> lessons
-                    </span>
-
-                    <!-- Items Per Page Selector -->
-                    <div class="flex items-center gap-2">
-                      <span class="text-xs text-gray-500">Show:</span>
-                      <select
-                        v-model="lessonsItemsPerPage"
-                        @change="changeLessonsItemsPerPage(Number(($event.target as HTMLSelectElement).value))"
-                        class="text-xs px-2 py-1.5 rounded-lg border border-gray-200 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 cursor-pointer"
-                      >
-                        <option v-for="option in lessonsItemsPerPageOptions" :key="option" :value="option">
-                          {{ option }}
-                        </option>
-                      </select>
-                      <span class="text-xs text-gray-500">per page</span>
-                    </div>
-                  </div>
-
-                  <!-- Right: Pagination Controls -->
-                  <div class="flex items-center gap-2">
-                    <button
-                      @click="lessonsPrevPage"
-                      :disabled="lessonsCurrentPage === 1"
-                      :class="[
-                        'px-3 py-1.5 text-xs rounded-lg transition-colors flex items-center gap-1.5 border',
-                        lessonsCurrentPage === 1
-                          ? 'text-gray-300 border-gray-100 cursor-not-allowed'
-                          : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100 border-gray-200'
-                      ]"
-                    >
-                      <i class="fas fa-chevron-left text-[10px]"></i>
-                      Previous
-                    </button>
-
-                    <!-- Page Numbers -->
-                    <div class="flex items-center gap-1">
-                      <template v-for="page in lessonsTotalPages" :key="page">
-                        <button
-                          v-if="page === 1 || page === lessonsTotalPages || (page >= lessonsCurrentPage - 1 && page <= lessonsCurrentPage + 1)"
-                          @click="lessonsGoToPage(page)"
-                          :class="[
-                            'w-8 h-8 text-xs rounded-lg transition-colors flex items-center justify-center',
-                            page === lessonsCurrentPage
-                              ? 'font-medium text-teal-600 bg-teal-50'
-                              : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
-                          ]"
-                        >
-                          {{ page }}
-                        </button>
-                        <span
-                          v-else-if="page === lessonsCurrentPage - 2 || page === lessonsCurrentPage + 2"
-                          class="text-xs text-gray-400 px-1"
-                        >...</span>
-                      </template>
-                    </div>
-
-                    <button
-                      @click="lessonsNextPage"
-                      :disabled="lessonsCurrentPage === lessonsTotalPages"
-                      :class="[
-                        'px-3 py-1.5 text-xs rounded-lg transition-colors flex items-center gap-1.5 border',
-                        lessonsCurrentPage === lessonsTotalPages
-                          ? 'text-gray-300 border-gray-100 cursor-not-allowed'
-                          : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100 border-gray-200'
-                      ]"
-                    >
-                      Next
-                      <i class="fas fa-chevron-right text-[10px]"></i>
-                    </button>
-                  </div>
-                </div>
-              </div>
+              <!-- Pagination Footer -->
+              <Pagination
+                v-model:current-page="lessonsCurrentPage"
+                v-model:items-per-page="lessonsItemsPerPage"
+                :total-items="filteredLessons.length"
+                :items-per-page-options="lessonsItemsPerPageOptions"
+                class="mt-4"
+              />
             </div>
 
             <!-- Empty State -->
@@ -5270,63 +5054,14 @@ function resumeFeaturedAutoPlay() {
             </div>
 
             <!-- Pagination Footer -->
-            <div v-if="filteredCertificates.length > 0" class="cert-pagination">
-              <div class="cert-pagination-info">
-                <span>
-                  Showing <strong>{{ certPaginationStart }}</strong>
-                  to <strong>{{ certPaginationEnd }}</strong>
-                  of <strong>{{ filteredCertificates.length }}</strong> certificates
-                </span>
-                <div class="cert-per-page">
-                  <span>Show:</span>
-                  <select
-                    v-model="certItemsPerPage"
-                    @change="changeCertItemsPerPage(Number(($event.target as HTMLSelectElement).value))"
-                  >
-                    <option v-for="option in certItemsPerPageOptions" :key="option" :value="option">
-                      {{ option }}
-                    </option>
-                  </select>
-                  <span>per page</span>
-                </div>
-              </div>
-
-              <div class="cert-pagination-controls">
-                <button
-                  @click="prevCertPage"
-                  :disabled="certCurrentPage === 1"
-                  class="cert-page-btn"
-                >
-                  <i class="fas fa-chevron-left"></i>
-                  Previous
-                </button>
-
-                <div class="cert-page-numbers">
-                  <template v-for="page in certTotalPages" :key="page">
-                    <button
-                      v-if="page === 1 || page === certTotalPages || (page >= certCurrentPage - 1 && page <= certCurrentPage + 1)"
-                      @click="goToCertPage(page)"
-                      :class="['cert-page-num', { active: page === certCurrentPage }]"
-                    >
-                      {{ page }}
-                    </button>
-                    <span
-                      v-else-if="page === certCurrentPage - 2 || page === certCurrentPage + 2"
-                      class="cert-page-dots"
-                    >...</span>
-                  </template>
-                </div>
-
-                <button
-                  @click="nextCertPage"
-                  :disabled="certCurrentPage === certTotalPages"
-                  class="cert-page-btn"
-                >
-                  Next
-                  <i class="fas fa-chevron-right"></i>
-                </button>
-              </div>
-            </div>
+            <Pagination
+              v-if="filteredCertificates.length > 0"
+              v-model:current-page="certCurrentPage"
+              v-model:items-per-page="certItemsPerPage"
+              :total-items="filteredCertificates.length"
+              :items-per-page-options="certItemsPerPageOptions"
+              class="mt-4"
+            />
           </div>
         </div>
       </div>

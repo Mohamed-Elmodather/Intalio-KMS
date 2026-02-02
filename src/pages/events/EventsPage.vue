@@ -5,6 +5,7 @@ import { useI18n } from 'vue-i18n'
 import PageHeroHeader from '@/components/common/PageHeroHeader.vue'
 import FilterDropdown from '@/components/common/FilterDropdown.vue'
 import EmptyState from '@/components/common/EmptyState.vue'
+import Pagination from '@/components/common/Pagination.vue'
 import { useAIServicesStore } from '@/stores/aiServices'
 import { useComparisonStore } from '@/stores/comparison'
 import { AILoadingIndicator, AISuggestionChip, AIConfidenceBar } from '@/components/ai'
@@ -1857,87 +1858,14 @@ function getCategoryColor(category: string) {
           />
 
           <!-- Pagination -->
-          <div v-if="filteredEvents.length > 0 && calendarView !== 'calendar'" class="mt-4 px-4 py-3 bg-white rounded-2xl border border-gray-100 shadow-sm">
-            <div class="flex items-center justify-between flex-wrap gap-3">
-              <!-- Left: Stats & Items Per Page -->
-              <div class="flex items-center gap-4 flex-wrap">
-                <span class="text-xs text-gray-500">
-                  Showing <span class="font-semibold text-gray-700">{{ Math.min((currentPage - 1) * itemsPerPage + 1, filteredEvents.length) }}</span>
-                  to <span class="font-semibold text-gray-700">{{ Math.min(currentPage * itemsPerPage, filteredEvents.length) }}</span>
-                  of <span class="font-semibold text-gray-700">{{ filteredEvents.length }}</span> events
-                </span>
-
-                <!-- Items Per Page Selector -->
-                <div class="flex items-center gap-2">
-                  <span class="text-xs text-gray-500">Show:</span>
-                  <select
-                    v-model="itemsPerPage"
-                    @change="handlePerPageChange(itemsPerPage)"
-                    class="text-xs px-2 py-1.5 rounded-lg border border-gray-200 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 cursor-pointer"
-                  >
-                    <option :value="6">6</option>
-                    <option :value="9">9</option>
-                    <option :value="12">12</option>
-                    <option :value="24">24</option>
-                  </select>
-                  <span class="text-xs text-gray-500">per page</span>
-                </div>
-              </div>
-
-              <!-- Right: Pagination Controls -->
-              <div class="flex items-center gap-2">
-                <button
-                  @click="handlePageChange(currentPage - 1)"
-                  :disabled="currentPage === 1"
-                  :class="[
-                    'px-3 py-1.5 text-xs rounded-lg transition-colors flex items-center gap-1.5 border',
-                    currentPage === 1
-                      ? 'text-gray-300 border-gray-100 cursor-not-allowed'
-                      : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100 border-gray-200'
-                  ]"
-                >
-                  <i class="fas fa-chevron-left text-[10px]"></i>
-                  Previous
-                </button>
-
-                <!-- Page Numbers -->
-                <div class="flex items-center gap-1">
-                  <template v-for="page in totalPages" :key="page">
-                    <button
-                      v-if="page === 1 || page === totalPages || (page >= currentPage - 1 && page <= currentPage + 1)"
-                      @click="handlePageChange(page)"
-                      :class="[
-                        'w-8 h-8 text-xs rounded-lg transition-colors flex items-center justify-center',
-                        page === currentPage
-                          ? 'font-medium text-teal-600 bg-teal-50'
-                          : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
-                      ]"
-                    >
-                      {{ page }}
-                    </button>
-                    <span
-                      v-else-if="page === currentPage - 2 || page === currentPage + 2"
-                      class="text-xs text-gray-400 px-1"
-                    >...</span>
-                  </template>
-                </div>
-
-                <button
-                  @click="handlePageChange(currentPage + 1)"
-                  :disabled="currentPage === totalPages"
-                  :class="[
-                    'px-3 py-1.5 text-xs rounded-lg transition-colors flex items-center gap-1.5 border',
-                    currentPage === totalPages
-                      ? 'text-gray-300 border-gray-100 cursor-not-allowed'
-                      : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100 border-gray-200'
-                  ]"
-                >
-                  Next
-                  <i class="fas fa-chevron-right text-[10px]"></i>
-                </button>
-              </div>
-            </div>
-          </div>
+          <Pagination
+            v-if="filteredEvents.length > 0 && calendarView !== 'calendar'"
+            v-model:current-page="currentPage"
+            v-model:items-per-page="itemsPerPage"
+            :total-items="filteredEvents.length"
+            :items-per-page-options="[6, 9, 12, 24]"
+            class="mt-4"
+          />
         </div>
 
         <!-- Sidebar -->
