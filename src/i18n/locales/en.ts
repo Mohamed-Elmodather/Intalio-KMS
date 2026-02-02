@@ -891,6 +891,15 @@ export default {
       dataScience: 'Data Science',
       security: 'Security',
     },
+    // View modes and actions
+    gridView: 'Grid view',
+    listView: 'List view',
+    save: 'Save',
+    enroll: 'Enroll',
+    bookmark: 'Bookmark',
+    activeFilters: 'Active Filters',
+    noLearningPathsFound: 'No learning paths found',
+    noLessonsFound: 'No lessons found',
   },
 
   // Events

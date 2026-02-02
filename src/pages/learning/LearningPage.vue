@@ -3105,14 +3105,14 @@ function resumeFeaturedAutoPlay() {
                 <button
                   @click="allCoursesViewMode = 'grid'"
                   :class="['px-2.5 py-1 rounded-md transition-all', allCoursesViewMode === 'grid' ? 'bg-teal-500 text-white' : 'text-gray-500 hover:bg-gray-100']"
-                  title="Grid view"
+                  :title="$t('learning.gridView')"
                 >
                   <i class="fas fa-th-large text-xs"></i>
                 </button>
                 <button
                   @click="allCoursesViewMode = 'list'"
                   :class="['px-2.5 py-1 rounded-md transition-all', allCoursesViewMode === 'list' ? 'bg-teal-500 text-white' : 'text-gray-500 hover:bg-gray-100']"
-                  title="List view"
+                  :title="$t('learning.listView')"
                 >
                   <i class="fas fa-list text-xs"></i>
                 </button>
@@ -3124,7 +3124,7 @@ function resumeFeaturedAutoPlay() {
           <div v-if="activeFiltersCount > 0" class="flex items-center gap-3 mb-4 p-3 bg-white rounded-xl border border-gray-100 shadow-sm mx-4 mt-4">
             <div class="flex items-center gap-2 px-2 py-1 bg-gray-100 rounded-lg">
               <i class="fas fa-filter text-gray-400 text-xs"></i>
-              <span class="text-xs font-medium text-gray-600">Active Filters</span>
+              <span class="text-xs font-medium text-gray-600">{{ $t('learning.activeFilters') }}</span>
             </div>
             <div class="flex flex-wrap gap-2 flex-1">
               <!-- Search Filter -->
@@ -3341,11 +3341,11 @@ function resumeFeaturedAutoPlay() {
                   <button
                     :class="['all-course-list-action-btn', { saved: course.saved }]"
                     @click.stop="toggleSaveAllCourse(course.id)"
-                    title="Save"
+                    :title="$t('learning.save')"
                   >
                     <i :class="course.saved ? 'fas fa-bookmark' : 'far fa-bookmark'"></i>
                   </button>
-                  <button v-if="!course.enrolled" class="all-course-list-action-btn" title="Enroll">
+                  <button v-if="!course.enrolled" class="all-course-list-action-btn" :title="$t('learning.enroll')">
                     <i class="fas fa-plus"></i>
                   </button>
                   <button v-else class="all-course-list-action-btn text-teal-500" :title="(course.progress ?? 0) > 0 && (course.progress ?? 0) < 100 ? 'Continue' : (course.progress ?? 0) === 100 ? 'Review' : 'Start'">
@@ -3692,14 +3692,14 @@ function resumeFeaturedAutoPlay() {
                 <button
                   @click="pathsViewMode = 'grid'"
                   :class="['px-2.5 py-1 rounded-md transition-all', pathsViewMode === 'grid' ? 'bg-teal-500 text-white' : 'text-gray-500 hover:bg-gray-100']"
-                  title="Grid view"
+                  :title="$t('learning.gridView')"
                 >
                   <i class="fas fa-th-large text-xs"></i>
                 </button>
                 <button
                   @click="pathsViewMode = 'list'"
                   :class="['px-2.5 py-1 rounded-md transition-all', pathsViewMode === 'list' ? 'bg-teal-500 text-white' : 'text-gray-500 hover:bg-gray-100']"
-                  title="List view"
+                  :title="$t('learning.listView')"
                 >
                   <i class="fas fa-list text-xs"></i>
                 </button>
@@ -3711,7 +3711,7 @@ function resumeFeaturedAutoPlay() {
           <div v-if="activePathsFiltersCount > 0" class="flex items-center gap-3 mb-4 p-3 bg-white rounded-xl border border-gray-100 shadow-sm mx-4 mt-4">
             <div class="flex items-center gap-2 px-2 py-1 bg-gray-100 rounded-lg">
               <i class="fas fa-filter text-gray-400 text-xs"></i>
-              <span class="text-xs font-medium text-gray-600">Active Filters</span>
+              <span class="text-xs font-medium text-gray-600">{{ $t('learning.activeFilters') }}</span>
             </div>
             <div class="flex flex-wrap gap-2 flex-1">
               <!-- Search Filter -->
@@ -3852,7 +3852,7 @@ function resumeFeaturedAutoPlay() {
             <EmptyState
               v-if="paginatedPaths.length === 0"
               icon="fas fa-route"
-              title="No learning paths found"
+              :title="$t('learning.noLearningPathsFound')"
               description="Try adjusting your filter selection"
               action-label="Reset Filters"
               action-icon="fas fa-redo"
@@ -4326,14 +4326,14 @@ function resumeFeaturedAutoPlay() {
                 <button
                   @click="lessonsViewMode = 'grid'"
                   :class="['px-2.5 py-1 rounded-md transition-all', lessonsViewMode === 'grid' ? 'bg-teal-500 text-white' : 'text-gray-500 hover:bg-gray-100']"
-                  title="Grid view"
+                  :title="$t('learning.gridView')"
                 >
                   <i class="fas fa-th-large text-xs"></i>
                 </button>
                 <button
                   @click="lessonsViewMode = 'list'"
                   :class="['px-2.5 py-1 rounded-md transition-all', lessonsViewMode === 'list' ? 'bg-teal-500 text-white' : 'text-gray-500 hover:bg-gray-100']"
-                  title="List view"
+                  :title="$t('learning.listView')"
                 >
                   <i class="fas fa-list text-xs"></i>
                 </button>
@@ -4345,7 +4345,7 @@ function resumeFeaturedAutoPlay() {
           <div v-if="activeLessonsFiltersCount > 0" class="flex items-center gap-3 mb-4 p-3 bg-white rounded-xl border border-gray-100 shadow-sm">
             <div class="flex items-center gap-2 px-2 py-1 bg-gray-100 rounded-lg">
               <i class="fas fa-filter text-gray-400 text-xs"></i>
-              <span class="text-xs font-medium text-gray-600">Active Filters</span>
+              <span class="text-xs font-medium text-gray-600">{{ $t('learning.activeFilters') }}</span>
             </div>
             <div class="flex flex-wrap gap-2 flex-1">
               <!-- Search Filter -->
@@ -4592,7 +4592,7 @@ function resumeFeaturedAutoPlay() {
                         'w-8 h-8 rounded-lg flex items-center justify-center transition-colors',
                         lesson.isBookmarked ? 'bg-teal-50 text-teal-600' : 'bg-gray-50 text-gray-400 hover:bg-teal-50 hover:text-teal-600'
                       ]"
-                      title="Bookmark"
+                      :title="$t('learning.bookmark')"
                     >
                       <i :class="lesson.isBookmarked ? 'fas fa-bookmark' : 'far fa-bookmark'" class="text-xs"></i>
                     </button>
@@ -4614,7 +4614,7 @@ function resumeFeaturedAutoPlay() {
             <EmptyState
               v-else
               icon="fas fa-search"
-              title="No lessons found"
+              :title="$t('learning.noLessonsFound')"
               description="Try adjusting your search or filters"
               action-label="Clear Filters"
               action-icon="fas fa-rotate"
@@ -4902,14 +4902,14 @@ function resumeFeaturedAutoPlay() {
               <button
                 @click="certViewMode = 'grid'"
                 :class="['cert-view-btn', { active: certViewMode === 'grid' }]"
-                title="Grid view"
+                :title="$t('learning.gridView')"
               >
                 <i class="fas fa-th-large"></i>
               </button>
               <button
                 @click="certViewMode = 'list'"
                 :class="['cert-view-btn', { active: certViewMode === 'list' }]"
-                title="List view"
+                :title="$t('learning.listView')"
               >
                 <i class="fas fa-list"></i>
               </button>
@@ -4920,7 +4920,7 @@ function resumeFeaturedAutoPlay() {
           <div v-if="activeCertFiltersCount > 0" class="cert-active-filters">
             <div class="cert-filter-label">
               <i class="fas fa-filter"></i>
-              <span>Active Filters</span>
+              <span>{{ $t('learning.activeFilters') }}</span>
             </div>
             <div class="cert-filter-tags">
               <span v-if="certSearch" class="cert-filter-tag search">
@@ -10990,8 +10990,9 @@ function resumeFeaturedAutoPlay() {
   gap: 0.5rem;
   padding: 0.5rem 0.875rem;
   border: 1px solid #e5e7eb;
-  border-right: none;
-  border-radius: 0.75rem 0 0 0.75rem;
+  border-inline-end: none;
+  border-start-start-radius: 0.75rem;
+  border-end-start-radius: 0.75rem;
   background: white;
   font-size: 0.75rem;
   font-weight: 500;
@@ -11020,7 +11021,8 @@ function resumeFeaturedAutoPlay() {
   width: 2rem;
   height: 2rem;
   border: 1px solid #e5e7eb;
-  border-radius: 0 0.75rem 0.75rem 0;
+  border-start-end-radius: 0.75rem;
+  border-end-end-radius: 0.75rem;
   background: white;
   color: #14b8a6;
   font-size: 0.75rem;

@@ -893,6 +893,15 @@ export default {
       dataScience: 'علوم البيانات',
       security: 'الأمن',
     },
+    // View modes and actions
+    gridView: 'عرض شبكي',
+    listView: 'عرض قائمة',
+    save: 'حفظ',
+    enroll: 'تسجيل',
+    bookmark: 'إضافة للمفضلة',
+    activeFilters: 'الفلاتر النشطة',
+    noLearningPathsFound: 'لم يتم العثور على مسارات تعليمية',
+    noLessonsFound: 'لم يتم العثور على دروس',
   },
 
   // Events
