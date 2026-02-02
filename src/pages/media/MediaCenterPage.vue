@@ -12,6 +12,7 @@ import ComparisonButton from '@/components/common/ComparisonButton.vue'
 import CategoryBadge from '@/components/common/CategoryBadge.vue'
 import StatusBadge from '@/components/common/StatusBadge.vue'
 import TagBadge from '@/components/common/TagBadge.vue'
+import ShareContentModal from '@/components/common/ShareContentModal.vue'
 
 const { t } = useI18n()
 import AddToCollectionModal from '@/components/common/AddToCollectionModal.vue'
@@ -60,6 +61,14 @@ const selectedItemForCollection = ref<{
   title: string
   thumbnail?: string
 } | null>(null)
+
+// Share modal
+const showShareModal = ref(false)
+const shareMediaData = ref<any>(null)
+const shareMediaUrl = computed(() => {
+  if (!shareMediaData.value) return ''
+  return `${window.location.origin}/media/${shareMediaData.value.id}`
+})
 
 // Dropdown filter states
 const showSortDropdown = ref(false)
@@ -666,16 +675,8 @@ function isMediaSaved(id: number): boolean {
 }
 
 function shareMedia(media: any) {
-  if (navigator.share) {
-    navigator.share({
-      title: media.title,
-      text: `Check out: ${media.title}`,
-      url: window.location.origin + '/media/' + media.id
-    })
-  } else {
-    navigator.clipboard.writeText(window.location.origin + '/media/' + media.id)
-    alert('Link copied to clipboard!')
-  }
+  shareMediaData.value = media
+  showShareModal.value = true
 }
 
 function openAddToCollection(media: any) {
@@ -3072,6 +3073,16 @@ onUnmounted(() => {
       :content-thumbnail="selectedItemForCollection?.thumbnail"
       @close="showAddToCollectionModal = false; selectedItemForCollection = null"
       @added="handleAddedToCollection"
+    />
+
+    <!-- Share Modal -->
+    <ShareContentModal
+      v-model="showShareModal"
+      :title="shareMediaData?.title || ''"
+      :description="shareMediaData?.description"
+      :image="shareMediaData?.thumbnail"
+      :url="shareMediaUrl"
+      content-type="Media"
     />
 
     <!-- AI Analysis Modal -->

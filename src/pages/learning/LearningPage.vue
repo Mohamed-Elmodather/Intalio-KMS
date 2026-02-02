@@ -9,6 +9,7 @@ import Pagination from '@/components/common/Pagination.vue'
 import CategoryBadge from '@/components/common/CategoryBadge.vue'
 import StatusBadge from '@/components/common/StatusBadge.vue'
 import TagBadge from '@/components/common/TagBadge.vue'
+import ShareContentModal from '@/components/common/ShareContentModal.vue'
 import { useAIServicesStore } from '@/stores/aiServices'
 import { AILoadingIndicator, AIConfidenceBar, AISuggestionChip } from '@/components/ai'
 import type { ClassificationResult, NERResult } from '@/types/ai'
@@ -393,6 +394,19 @@ const inProgressCourses = computed(() =>
 // View state
 const currentView = ref<'all' | 'my-courses' | 'paths' | 'lessons-learned' | 'certificates'>('all')
 const viewMode = ref<'grid' | 'list'>('grid')
+
+// Share modal
+const showShareModal = ref(false)
+const shareCourseData = ref<any>(null)
+const shareCourseUrl = computed(() => {
+  if (!shareCourseData.value) return ''
+  return `${window.location.origin}/learning/courses/${shareCourseData.value.id}`
+})
+
+function shareCourse(course: any) {
+  shareCourseData.value = course
+  showShareModal.value = true
+}
 
 // Stats
 const overallProgress = ref(68)
@@ -5356,6 +5370,16 @@ function resumeFeaturedAutoPlay() {
         </div>
       </div>
     </div>
+
+    <!-- Share Modal -->
+    <ShareContentModal
+      v-model="showShareModal"
+      :title="shareCourseData?.title || ''"
+      :description="shareCourseData?.description"
+      :image="shareCourseData?.thumbnail"
+      :url="shareCourseUrl"
+      content-type="Course"
+    />
   </div>
 </template>
 

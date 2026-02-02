@@ -82,7 +82,7 @@ This plan outlines the systematic unification of duplicated UI components across
 ---
 
 ### Step 2.2: ShareContentModal Component
-**Status:** In Progress (ArticlesPage, DocumentsPage done)
+**Status:** Complete
 
 **New Component:** `src/components/common/ShareContentModal.vue`
 
@@ -96,9 +96,9 @@ This plan outlines the systematic unification of duplicated UI components across
 **Affected Pages:**
 - `src/pages/articles/ArticlesPage.vue` ✓
 - `src/pages/documents/DocumentsPage.vue` ✓
-- `src/pages/media/MediaCenterPage.vue`
-- `src/pages/events/EventsPage.vue`
-- `src/pages/learning/LearningPage.vue`
+- `src/pages/media/MediaCenterPage.vue` ✓
+- `src/pages/events/EventsPage.vue` ✓
+- `src/pages/learning/LearningPage.vue` ✓
 
 **Reduction:** ~150-300 lines
 

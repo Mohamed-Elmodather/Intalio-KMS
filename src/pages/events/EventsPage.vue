@@ -9,6 +9,7 @@ import Pagination from '@/components/common/Pagination.vue'
 import ComparisonButton from '@/components/common/ComparisonButton.vue'
 import CategoryBadge from '@/components/common/CategoryBadge.vue'
 import StatusBadge from '@/components/common/StatusBadge.vue'
+import ShareContentModal from '@/components/common/ShareContentModal.vue'
 import { useAIServicesStore } from '@/stores/aiServices'
 import { usePagination } from '@/composables/usePagination'
 import { AILoadingIndicator, AISuggestionChip, AIConfidenceBar } from '@/components/ai'
@@ -33,7 +34,10 @@ const selectedFormats = ref<string[]>([])
 const quickFilter = ref<'all' | 'today' | 'week' | 'month' | 'custom' | 'myevents' | 'virtual' | 'inperson'>('all')
 const showShareModal = ref(false)
 const selectedEventForShare = ref<Event | null>(null)
-
+const shareEventUrl = computed(() => {
+  if (!selectedEventForShare.value) return ''
+  return `${window.location.origin}/events/${selectedEventForShare.value.id}`
+})
 
 // Filter dropdown states
 const showDateFilter = ref(false)
@@ -786,6 +790,11 @@ function toggleReserve(eventId: number) {
   }
 }
 
+function shareEvent(event: Event) {
+  selectedEventForShare.value = event
+  showShareModal.value = true
+}
+
 // ============================================================================
 // Comparison Functions
 // ============================================================================
@@ -1109,7 +1118,7 @@ function getCategoryColor(category: string) {
             <button class="featured-action-btn secondary" title="Set Reminder">
               <i class="fas fa-bell"></i>
             </button>
-            <button class="featured-action-btn secondary" title="Share Event">
+            <button class="featured-action-btn secondary" title="Share Event" @click="shareEvent(featuredEvent!)">
               <i class="fas fa-share-alt"></i>
             </button>
             <button class="featured-action-btn secondary" title="Add to Calendar">
@@ -1729,7 +1738,7 @@ function getCategoryColor(category: string) {
                   >
                     <i :class="event.interested ? 'fas fa-heart' : 'far fa-heart'"></i>
                   </button>
-                  <button class="card-action-btn" @click.stop title="Share">
+                  <button class="card-action-btn" @click.stop="shareEvent(event)" title="Share">
                     <i class="fas fa-share-alt"></i>
                   </button>
                   <ComparisonButton
@@ -1793,7 +1802,7 @@ function getCategoryColor(category: string) {
                   >
                     <i :class="event.interested ? 'fas fa-heart' : 'far fa-heart'"></i>
                   </button>
-                  <button class="list-action-btn" @click.stop title="Share">
+                  <button class="list-action-btn" @click.stop="shareEvent(event)" title="Share">
                     <i class="fas fa-share-alt"></i>
                   </button>
                   <button class="list-action-btn" @click.stop title="Add to Calendar">
@@ -2358,6 +2367,16 @@ function getCategoryColor(category: string) {
         </div>
       </div>
     </Teleport>
+
+    <!-- Share Modal -->
+    <ShareContentModal
+      v-model="showShareModal"
+      :title="selectedEventForShare?.title || ''"
+      :description="selectedEventForShare?.description"
+      :image="selectedEventForShare?.image"
+      :url="shareEventUrl"
+      content-type="Event"
+    />
 
     <!-- Comparison Components -->
     <ComparisonPanel />
