@@ -11,6 +11,7 @@ import EmptyState from '@/components/common/EmptyState.vue'
 import Pagination from '@/components/common/Pagination.vue'
 import ComparisonButton from '@/components/common/ComparisonButton.vue'
 import { useAIServicesStore } from '@/stores/aiServices'
+import { usePagination } from '@/composables/usePagination'
 import { AISuggestionChip, AISentimentBadge, AILoadingIndicator } from '@/components/ai'
 import ComparisonPanel from '@/components/ai/ComparisonPanel.vue'
 import ComparisonModal from '@/components/ai/ComparisonModal.vue'
@@ -33,9 +34,6 @@ const viewMode = ref<'grid' | 'list'>('grid')
 const showFilters = ref(false)
 const showSortDropdown = ref(false)
 const selectedStatusFilters = ref<string[]>([])
-const currentPage = ref(1)
-const itemsPerPage = ref(10)
-const itemsPerPageOptions = [5, 10, 20, 50, 100]
 const toasts = ref<Array<{ id: number; type: string; message: string }>>([])
 
 // Add to Collection modal
@@ -149,7 +147,7 @@ const currentSortOption = computed(() => {
 function selectSortOption(value: string) {
   sortBy.value = value
   showSortDropdown.value = false
-  filterArticles()
+  // filteredArticles computed auto-updates when sortBy changes
 }
 
 const currentUser = ref({
@@ -647,82 +645,10 @@ const bookmarkedArticles = computed(() => {
     .filter(Boolean)
 })
 
-const filteredArticles = ref([...articles.value])
-
-const activeFiltersCount = computed(() => {
-  let count = 0
-  if (searchQuery.value) count++
-  count += selectedCategories.value.length
-  count += selectedTypes.value.length
-  count += selectedTags.value.length
-  count += selectedStatusFilters.value.length
-  return count
-})
-
-const totalPages = computed(() => Math.ceil(filteredArticles.value.length / itemsPerPage.value))
-const paginatedArticles = computed(() => {
-  const start = (currentPage.value - 1) * itemsPerPage.value
-  return filteredArticles.value.slice(start, start + itemsPerPage.value)
-})
-const paginationStart = computed(() => (currentPage.value - 1) * itemsPerPage.value + 1)
-const paginationEnd = computed(() => Math.min(currentPage.value * itemsPerPage.value, filteredArticles.value.length))
-
-const paginationPages = computed(() => {
-  const pages: (number | string)[] = []
-  const total = totalPages.value
-  const current = currentPage.value
-  if (total <= 7) {
-    for (let i = 1; i <= total; i++) pages.push(i)
-  } else {
-    pages.push(1)
-    if (current > 3) pages.push('...')
-    for (let i = Math.max(2, current - 1); i <= Math.min(total - 1, current + 1); i++) {
-      pages.push(i)
-    }
-    if (current < total - 2) pages.push('...')
-    pages.push(total)
-  }
-  return pages
-})
-
-// ============================================
-// PAGINATION FUNCTIONS
-// ============================================
-
-function goToPage(page: number) {
-  if (page >= 1 && page <= totalPages.value) {
-    currentPage.value = page
-  }
-}
-
-function nextPage() {
-  if (currentPage.value < totalPages.value) {
-    currentPage.value++
-  }
-}
-
-function prevPage() {
-  if (currentPage.value > 1) {
-    currentPage.value--
-  }
-}
-
-function changeItemsPerPage(count: number) {
-  itemsPerPage.value = count
-  currentPage.value = 1
-}
-
-// ============================================
-// FUNCTIONS
-// ============================================
-
-function filterArticles() {
-  currentPage.value = 1
-
+const filteredArticles = computed(() => {
   // If AI search mode is active and has results, use those
   if (isAISearchMode.value && aiSearchResults.value.length > 0) {
-    filteredArticles.value = aiSearchResults.value
-    return
+    return aiSearchResults.value
   }
 
   let result = [...articles.value]
@@ -784,8 +710,43 @@ function filterArticles() {
       break
   }
 
-  filteredArticles.value = result
-}
+  return result
+})
+
+// Pagination
+const {
+  currentPage,
+  itemsPerPage,
+  itemsPerPageOptions,
+  paginatedItems: paginatedArticles,
+  totalItems,
+  resetPage
+} = usePagination(filteredArticles, {
+  defaultPerPage: 10,
+  perPageOptions: [5, 10, 20, 50, 100]
+})
+
+// Reset to first page when filters change
+watch(
+  [searchQuery, selectedCategories, selectedTypes, selectedTags, selectedStatusFilters, sortBy, sortOrder, isAISearchMode, aiSearchResults],
+  () => {
+    resetPage()
+  }
+)
+
+const activeFiltersCount = computed(() => {
+  let count = 0
+  if (searchQuery.value) count++
+  count += selectedCategories.value.length
+  count += selectedTypes.value.length
+  count += selectedTags.value.length
+  count += selectedStatusFilters.value.length
+  return count
+})
+
+// ============================================
+// FUNCTIONS
+// ============================================
 
 function clearFilters() {
   searchQuery.value = ''
@@ -795,7 +756,7 @@ function clearFilters() {
   selectedStatusFilters.value = []
   sortBy.value = 'recent'
   sortOrder.value = 'desc'
-  filterArticles()
+  // filteredArticles computed will auto-update, resetPage is called by watch
 }
 
 function getCategoryName(id: string) {
@@ -1005,9 +966,7 @@ function handleSearchInput() {
   }
   searchDebounceTimeout.value = setTimeout(() => {
     fetchSearchSuggestions(unifiedSearchQuery.value || searchQuery.value)
-    if (!isAISearchMode.value) {
-      filterArticles()
-    }
+    // filteredArticles computed auto-updates when searchQuery changes
   }, 300)
 }
 
@@ -1046,7 +1005,7 @@ async function processNaturalLanguageSearch() {
     }
 
     aiSearchResults.value = results.slice(0, 12)
-    filterArticles()
+    // filteredArticles computed auto-updates when aiSearchResults changes
   } finally {
     isProcessingNLSearch.value = false
   }
@@ -1063,7 +1022,7 @@ function handleUnifiedSearch() {
   } else {
     // Use normal text search
     searchQuery.value = unifiedSearchQuery.value
-    filterArticles()
+    // filteredArticles computed auto-updates when searchQuery changes
   }
   showAISuggestions.value = false
 }
@@ -1074,7 +1033,7 @@ function clearUnifiedSearch() {
   naturalLanguageQuery.value = ''
   aiSearchResults.value = []
   showAISuggestions.value = false
-  filterArticles()
+  // filteredArticles computed auto-updates when searchQuery/aiSearchResults change
 }
 
 // Watch for AI mode toggle to show suggestions
@@ -1087,7 +1046,7 @@ watch(isAISearchMode, (newValue) => {
   // Sync the search query when switching modes
   if (!newValue) {
     searchQuery.value = unifiedSearchQuery.value
-    filterArticles()
+    // filteredArticles computed auto-updates when isAISearchMode/searchQuery change
   }
 })
 
@@ -1097,7 +1056,7 @@ function selectSearchSuggestion(suggestion: string) {
   searchQuery.value = suggestion
   showSearchSuggestions.value = false
   showAISuggestions.value = false
-  filterArticles()
+  // filteredArticles computed auto-updates when searchQuery changes
 }
 
 // Hide search suggestions
@@ -1789,7 +1748,7 @@ onUnmounted(() => {
               <i :class="showSortDropdown ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ms-1"></i>
             </button>
             <button
-              @click="sortOrder = sortOrder === 'asc' ? 'desc' : 'asc'; filterArticles()"
+              @click="sortOrder = sortOrder === 'asc' ? 'desc' : 'asc'"
               class="flex items-center justify-center w-8 h-8 rounded-e-lg text-xs font-medium transition-all border bg-white border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-teal-600"
               :title="sortOrder === 'asc' ? 'Ascending order - Click for descending' : 'Descending order - Click for ascending'"
             >
@@ -1852,7 +1811,7 @@ onUnmounted(() => {
           <span v-if="searchQuery" class="px-2.5 py-1 bg-gray-100 text-gray-700 rounded-lg text-xs font-medium flex items-center gap-1.5 border border-gray-200">
             <i class="fas fa-search text-[10px]"></i>
             "{{ searchQuery }}"
-            <button @click="searchQuery = ''; filterArticles()" class="ms-1 hover:text-gray-900 hover:bg-gray-200 rounded-full w-4 h-4 flex items-center justify-center"><i class="fas fa-times text-[10px]"></i></button>
+            <button @click="searchQuery = ''" class="ms-1 hover:text-gray-900 hover:bg-gray-200 rounded-full w-4 h-4 flex items-center justify-center"><i class="fas fa-times text-[10px]"></i></button>
           </span>
           <!-- Category Filters (multiple) -->
           <span
@@ -2195,7 +2154,7 @@ onUnmounted(() => {
           <Pagination
             v-model:current-page="currentPage"
             v-model:items-per-page="itemsPerPage"
-            :total-items="filteredArticles.length"
+            :total-items="totalItems"
             :items-per-page-options="itemsPerPageOptions"
             class="mt-4"
           />

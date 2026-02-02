@@ -10,6 +10,7 @@ import ViewAllButton from '@/components/common/ViewAllButton.vue'
 import Pagination from '@/components/common/Pagination.vue'
 import ComparisonButton from '@/components/common/ComparisonButton.vue'
 import { useAIServicesStore } from '@/stores/aiServices'
+import { usePagination } from '@/composables/usePagination'
 import { AISuggestionChip, AILoadingIndicator, AIConfidenceBar } from '@/components/ai'
 import ComparisonPanel from '@/components/ai/ComparisonPanel.vue'
 import ComparisonModal from '@/components/ai/ComparisonModal.vue'
@@ -172,10 +173,6 @@ const folderSuggestions = ref<FolderSuggestion[]>([
   }
 ])
 
-// Pagination state
-const currentPage = ref(1)
-const itemsPerPage = ref(10)
-const itemsPerPageOptions = [5, 10, 20, 50, 100]
 
 // View Navigation Items
 const viewNavItems = computed(() => [
@@ -670,44 +667,24 @@ const filteredDocuments = computed(() => {
   return result
 })
 
-// Pagination computed properties
-const totalPages = computed(() => Math.ceil(filteredDocuments.value.length / itemsPerPage.value))
-
-const paginatedDocuments = computed(() => {
-  const start = (currentPage.value - 1) * itemsPerPage.value
-  const end = start + itemsPerPage.value
-  return filteredDocuments.value.slice(start, end)
+// Pagination
+const {
+  currentPage,
+  itemsPerPage,
+  itemsPerPageOptions,
+  paginatedItems: paginatedDocuments,
+  totalItems,
+  resetPage
+} = usePagination(filteredDocuments, {
+  defaultPerPage: 10,
+  perPageOptions: [5, 10, 20, 50, 100]
 })
-
-// Pagination functions
-function goToPage(page: number) {
-  if (page >= 1 && page <= totalPages.value) {
-    currentPage.value = page
-  }
-}
-
-function nextPage() {
-  if (currentPage.value < totalPages.value) {
-    currentPage.value++
-  }
-}
-
-function prevPage() {
-  if (currentPage.value > 1) {
-    currentPage.value--
-  }
-}
-
-function changeItemsPerPage(count: number) {
-  itemsPerPage.value = count
-  currentPage.value = 1 // Reset to first page when changing items per page
-}
 
 // Reset to first page when filters change
 watch(
   [searchQuery, selectedFileTypes, selectedCategories, selectedTags, selectedFolder, currentView, sortBy, sortOrder],
   () => {
-    currentPage.value = 1
+    resetPage()
   }
 )
 
@@ -2287,7 +2264,7 @@ function getCategoryColor(category: string): string {
             <Pagination
               v-model:current-page="currentPage"
               v-model:items-per-page="itemsPerPage"
-              :total-items="filteredDocuments.length"
+              :total-items="totalItems"
               :items-per-page-options="itemsPerPageOptions"
               class="mt-4"
             />
@@ -2565,7 +2542,7 @@ function getCategoryColor(category: string): string {
                   <Pagination
                     v-model:current-page="currentPage"
                     v-model:items-per-page="itemsPerPage"
-                    :total-items="filteredDocuments.length"
+                    :total-items="totalItems"
                     :items-per-page-options="itemsPerPageOptions"
                     class="flex-1"
                   />

@@ -13,6 +13,7 @@ import ComparisonButton from '@/components/common/ComparisonButton.vue'
 const { t } = useI18n()
 import AddToCollectionModal from '@/components/common/AddToCollectionModal.vue'
 import { useAIServicesStore } from '@/stores/aiServices'
+import { usePagination } from '@/composables/usePagination'
 import { AILoadingIndicator, AIConfidenceBar, AISuggestionChip } from '@/components/ai'
 import ComparisonPanel from '@/components/ai/ComparisonPanel.vue'
 import ComparisonModal from '@/components/ai/ComparisonModal.vue'
@@ -32,8 +33,6 @@ const showAISuggestions = ref(false)
 const categoryFilter = ref('')
 const sortBy = ref('recent')
 const sortOrder = ref<'asc' | 'desc'>('desc')
-const currentPage = ref(1)
-const itemsPerPage = ref(6)
 const showFilters = ref(false)
 const trendingScrollRef = ref<HTMLElement | null>(null)
 const likedMedia = ref(new Set<number>())
@@ -572,12 +571,26 @@ const filteredMedia = computed(() => {
   return result
 })
 
-// Computed: Paginated Media
-const paginatedMedia = computed(() => {
-  const start = (currentPage.value - 1) * itemsPerPage.value
-  const end = start + itemsPerPage.value
-  return filteredMedia.value.slice(start, end)
+// Pagination
+const {
+  currentPage,
+  itemsPerPage,
+  itemsPerPageOptions,
+  paginatedItems: paginatedMedia,
+  totalItems,
+  resetPage
+} = usePagination(filteredMedia, {
+  defaultPerPage: 6,
+  perPageOptions: [6, 9, 12, 24]
 })
+
+// Reset to first page when filters change
+watch(
+  [searchQuery, activeTab, selectedMediaTypes, selectedCategories, selectedTags, selectedStatusFilters, categoryFilter, selectedFolder, isAISearchMode, aiSearchResults],
+  () => {
+    resetPage()
+  }
+)
 
 // Computed: Trending Media (sorted by views)
 const trendingMedia = computed(() => {
@@ -588,11 +601,6 @@ const trendingMedia = computed(() => {
       return viewsB - viewsA
     })
     .slice(0, 6)
-})
-
-// Computed: Total Pages
-const totalPages = computed(() => {
-  return Math.ceil(filteredMedia.value.length / itemsPerPage.value)
 })
 
 // Computed: Total Views
@@ -2994,7 +3002,7 @@ onUnmounted(() => {
               v-if="filteredMedia.length > 0"
               v-model:current-page="currentPage"
               v-model:items-per-page="itemsPerPage"
-              :total-items="filteredMedia.length"
+              :total-items="totalItems"
               :items-per-page-options="[6, 9, 12, 24]"
               class="mt-4"
             />

@@ -8,6 +8,7 @@ import EmptyState from '@/components/common/EmptyState.vue'
 import Pagination from '@/components/common/Pagination.vue'
 import ComparisonButton from '@/components/common/ComparisonButton.vue'
 import { useAIServicesStore } from '@/stores/aiServices'
+import { usePagination } from '@/composables/usePagination'
 import { AILoadingIndicator, AISuggestionChip, AIConfidenceBar } from '@/components/ai'
 import ComparisonPanel from '@/components/ai/ComparisonPanel.vue'
 import ComparisonModal from '@/components/ai/ComparisonModal.vue'
@@ -31,9 +32,6 @@ const quickFilter = ref<'all' | 'today' | 'week' | 'month' | 'custom' | 'myevent
 const showShareModal = ref(false)
 const selectedEventForShare = ref<Event | null>(null)
 
-// Pagination state
-const currentPage = ref(1)
-const itemsPerPage = ref(6)
 
 // Filter dropdown states
 const showDateFilter = ref(false)
@@ -397,17 +395,26 @@ const filteredEvents = computed(() => {
   return result
 })
 
-// Paginated events
-const paginatedEvents = computed(() => {
-  const start = (currentPage.value - 1) * itemsPerPage.value
-  const end = start + itemsPerPage.value
-  return filteredEvents.value.slice(start, end)
+// Pagination
+const {
+  currentPage,
+  itemsPerPage,
+  itemsPerPageOptions,
+  paginatedItems: paginatedEvents,
+  totalItems,
+  resetPage
+} = usePagination(filteredEvents, {
+  defaultPerPage: 6,
+  perPageOptions: [6, 9, 12, 24]
 })
 
-// Total pages
-const totalPages = computed(() => {
-  return Math.ceil(filteredEvents.value.length / itemsPerPage.value)
-})
+// Reset to first page when filters change
+watch(
+  [searchQuery, quickFilter, customDateStart, customDateEnd, showMyEventsOnly, showFeaturedOnly, showInterestedOnly, selectedTypes, selectedFormats, sortBy, sortOrder, isAISearchMode, aiSearchResults],
+  () => {
+    resetPage()
+  }
+)
 
 const calendarDays = computed<CalendarDay[]>(() => {
   const days: CalendarDay[] = []
@@ -748,18 +755,6 @@ const customDateRangeLabel = computed(() => {
   }
   return null
 })
-
-// Pagination methods
-function handlePageChange(page: number) {
-  if (page >= 1 && page <= totalPages.value) {
-    currentPage.value = page
-  }
-}
-
-function handlePerPageChange(perPage: number) {
-  itemsPerPage.value = perPage
-  currentPage.value = 1
-}
 
 function getEventTypeIcon(category: string) {
   const type = eventTypes.value.find(t => t.id === category)
@@ -1828,7 +1823,7 @@ function getCategoryColor(category: string) {
             v-if="filteredEvents.length > 0 && calendarView !== 'calendar'"
             v-model:current-page="currentPage"
             v-model:items-per-page="itemsPerPage"
-            :total-items="filteredEvents.length"
+            :total-items="totalItems"
             :items-per-page-options="[6, 9, 12, 24]"
             class="mt-4"
           />
