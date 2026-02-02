@@ -13,6 +13,7 @@ import ComparisonButton from '@/components/common/ComparisonButton.vue'
 import CategoryBadge from '@/components/common/CategoryBadge.vue'
 import StatusBadge from '@/components/common/StatusBadge.vue'
 import TagBadge from '@/components/common/TagBadge.vue'
+import ShareContentModal from '@/components/common/ShareContentModal.vue'
 import { useAIServicesStore } from '@/stores/aiServices'
 import { usePagination } from '@/composables/usePagination'
 import { AISuggestionChip, AISentimentBadge, AILoadingIndicator } from '@/components/ai'
@@ -611,6 +612,10 @@ const topContributors = ref([
 
 const showShareModal = ref(false)
 const shareArticle = ref<typeof articles.value[0] | null>(null)
+const shareArticleUrl = computed(() => {
+  if (!shareArticle.value) return ''
+  return `${window.location.origin}/articles/${shareArticle.value.id}`
+})
 const showRequestModal = ref(false)
 const categorySubscriptions = ref(['tutorials', 'tech'])
 
@@ -2176,6 +2181,16 @@ onUnmounted(() => {
       :content-thumbnail="selectedItemForCollection?.thumbnail"
       @close="showAddToCollectionModal = false"
       @added="handleAddedToCollection"
+    />
+
+    <!-- Share Modal -->
+    <ShareContentModal
+      v-model="showShareModal"
+      :title="shareArticle?.title || ''"
+      :description="shareArticle?.excerpt"
+      :image="shareArticle?.image"
+      :url="shareArticleUrl"
+      content-type="Article"
     />
 
     <!-- Comparison Components -->

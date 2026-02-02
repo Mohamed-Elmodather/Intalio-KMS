@@ -11,6 +11,7 @@ import Pagination from '@/components/common/Pagination.vue'
 import ComparisonButton from '@/components/common/ComparisonButton.vue'
 import StatusBadge from '@/components/common/StatusBadge.vue'
 import TagBadge from '@/components/common/TagBadge.vue'
+import ShareContentModal from '@/components/common/ShareContentModal.vue'
 import { useAIServicesStore } from '@/stores/aiServices'
 import { usePagination } from '@/composables/usePagination'
 import { AISuggestionChip, AILoadingIndicator, AIConfidenceBar } from '@/components/ai'
@@ -74,6 +75,14 @@ const selectedItemForCollection = ref<{
   title: string
   thumbnail?: string
 } | null>(null)
+
+// Share modal
+const showShareModal = ref(false)
+const shareDocument_data = ref<any>(null)
+const shareDocumentUrl = computed(() => {
+  if (!shareDocument_data.value) return ''
+  return `${window.location.origin}/documents/${shareDocument_data.value.id}`
+})
 
 // ============================================
 // AI FEATURES STATE
@@ -745,9 +754,8 @@ function downloadDocument(doc: any) {
 }
 
 function shareDocument(doc: any) {
-  console.log('Sharing:', doc.name)
-  // Could open share modal or copy link
-  alert(`Share link copied for: ${doc.name}`)
+  shareDocument_data.value = doc
+  showShareModal.value = true
 }
 
 function copyDocumentLink(docId: string) {
@@ -2569,6 +2577,15 @@ function getCategoryColor(category: string): string {
       :content-thumbnail="selectedItemForCollection?.thumbnail"
       @close="showAddToCollectionModal = false; selectedItemForCollection = null"
       @added="handleAddedToCollection"
+    />
+
+    <!-- Share Modal -->
+    <ShareContentModal
+      v-model="showShareModal"
+      :title="shareDocument_data?.name || ''"
+      :description="shareDocument_data?.description"
+      :url="shareDocumentUrl"
+      content-type="Document"
     />
 
     <!-- Comparison Components -->

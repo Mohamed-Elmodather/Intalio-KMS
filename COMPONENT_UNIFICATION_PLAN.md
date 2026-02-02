@@ -82,13 +82,20 @@ This plan outlines the systematic unification of duplicated UI components across
 ---
 
 ### Step 2.2: ShareContentModal Component
-**Status:** Pending
+**Status:** In Progress (ArticlesPage, DocumentsPage done)
 
 **New Component:** `src/components/common/ShareContentModal.vue`
 
+**Features:**
+- Social sharing: Twitter, LinkedIn, Facebook, WhatsApp, Email
+- Copy link with success feedback
+- QR code generation toggle
+- Content preview with image
+- Built on existing useSharing composable
+
 **Affected Pages:**
-- `src/pages/articles/ArticlesPage.vue`
-- `src/pages/documents/DocumentsPage.vue`
+- `src/pages/articles/ArticlesPage.vue` ✓
+- `src/pages/documents/DocumentsPage.vue` ✓
 - `src/pages/media/MediaCenterPage.vue`
 - `src/pages/events/EventsPage.vue`
 - `src/pages/learning/LearningPage.vue`
