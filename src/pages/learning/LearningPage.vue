@@ -427,12 +427,12 @@ const heroStats = computed(() => [
 const totalEnrolled = ref(156)
 
 // View options (Collections style)
-const viewOptions = ref([
-  { id: 'all', name: 'All Courses', icon: 'fas fa-graduation-cap', color: 'text-teal-500' },
-  { id: 'my-courses', name: 'My Courses', icon: 'fas fa-book-reader', color: 'text-blue-500' },
-  { id: 'paths', name: 'Learning Paths', icon: 'fas fa-route', color: 'text-indigo-500' },
-  { id: 'lessons-learned', name: 'Lessons Learned', icon: 'fas fa-lightbulb', color: 'text-amber-500' },
-  { id: 'certificates', name: 'Certificates', icon: 'fas fa-certificate', color: 'text-teal-500' },
+const viewOptions = computed(() => [
+  { id: 'all', name: t('learning.allCourses'), icon: 'fas fa-graduation-cap', color: 'text-teal-500' },
+  { id: 'my-courses', name: t('learning.myCourses'), icon: 'fas fa-book-reader', color: 'text-blue-500' },
+  { id: 'paths', name: t('learning.learningPaths'), icon: 'fas fa-route', color: 'text-indigo-500' },
+  { id: 'lessons-learned', name: t('learning.lessonsLearned'), icon: 'fas fa-lightbulb', color: 'text-amber-500' },
+  { id: 'certificates', name: t('learning.certificates'), icon: 'fas fa-certificate', color: 'text-teal-500' },
 ])
 
 // Filtered courses based on current view
@@ -2485,7 +2485,7 @@ function resumeFeaturedAutoPlay() {
               </div>
               <div>
                 <h2 class="featured-courses-title">{{ $t('learning.featuredCourses') }}</h2>
-                <p class="featured-courses-subtitle">Explore our top recommended courses</p>
+                <p class="featured-courses-subtitle">{{ $t('learning.exploreTopCourses') }}</p>
               </div>
             </div>
             <div class="featured-courses-nav">
@@ -2653,7 +2653,7 @@ function resumeFeaturedAutoPlay() {
               </div>
               <div>
                 <h2 class="trending-title">{{ $t('learning.trendingNow') }}</h2>
-                <p class="trending-subtitle">Popular courses this week</p>
+                <p class="trending-subtitle">{{ $t('learning.popularThisWeek') }}</p>
               </div>
             </div>
             <ViewAllButton size="sm" />
@@ -2712,8 +2712,8 @@ function resumeFeaturedAutoPlay() {
                 <i class="fas fa-lightbulb"></i>
               </div>
               <div>
-                <h2 class="recommended-title">Recommended for You</h2>
-                <p class="recommended-subtitle">Based on your learning history and interests</p>
+                <h2 class="recommended-title">{{ $t('learning.recommendedForYou') }}</h2>
+                <p class="recommended-subtitle">{{ $t('learning.basedOnHistory') }}</p>
               </div>
             </div>
             <ViewAllButton size="sm" />
@@ -2730,7 +2730,7 @@ function resumeFeaturedAutoPlay() {
               </button>
               <!-- Match Badge -->
               <div class="recommended-match">
-                <i class="fas fa-bullseye"></i> {{ course.matchScore }}% Match
+                <i class="fas fa-bullseye"></i> {{ course.matchScore }}% {{ $t('learning.match') }}
               </div>
               <!-- Image -->
               <div class="recommended-image">
@@ -2778,7 +2778,7 @@ function resumeFeaturedAutoPlay() {
                   <i :class="currentView === 'my-courses' ? 'fas fa-book-reader text-white text-sm' : 'fas fa-graduation-cap text-white text-sm'"></i>
                 </div>
                 <div>
-                  <span class="block">{{ currentView === 'my-courses' ? 'My Courses' : 'All Courses' }}</span>
+                  <span class="block">{{ currentView === 'my-courses' ? $t('learning.myCourses') : $t('learning.allCourses') }}</span>
                   <span class="text-xs font-medium text-gray-500">{{ displayedCourses.length }} courses available</span>
                 </div>
               </h2>
@@ -3013,7 +3013,7 @@ function resumeFeaturedAutoPlay() {
                   v-if="showStatusFilter"
                   class="absolute start-0 top-full mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
                 >
-                  <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Filter by Status</div>
+                  <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">{{ $t('learning.filterByStatus') }}</div>
                   <div class="max-h-48 overflow-y-auto">
                     <button
                       v-for="option in statusFilterOptions"
@@ -3360,7 +3360,7 @@ function resumeFeaturedAutoPlay() {
               <div class="all-courses-empty-icon">
                 <i class="fas fa-search"></i>
               </div>
-              <h3 class="all-courses-empty-title">No courses found</h3>
+              <h3 class="all-courses-empty-title">{{ $t('learning.noCoursesFound') }}</h3>
               <p class="all-courses-empty-text">{{ currentView === 'my-courses' ? 'You haven\'t enrolled, saved, or been shared any courses yet' : 'Try adjusting your filters or search query' }}</p>
               <button @click="allCoursesSearch = ''; allCoursesLevelFilter = []; allCoursesCategoryFilter = []; allCoursesEnrollmentFilter = []; selectedStatusFilters = []" class="all-courses-clear-btn">
                 <i class="fas fa-undo me-2"></i> Clear Filters
@@ -3390,7 +3390,7 @@ function resumeFeaturedAutoPlay() {
                 <i class="fas fa-road"></i>
               </div>
               <div>
-                <h2 class="my-paths-title">My Learning Paths</h2>
+                <h2 class="my-paths-title">{{ $t('learning.myLearningPaths') }}</h2>
                 <p class="my-paths-subtitle">Continue your journey • {{ myEnrolledPaths.length }} active paths</p>
               </div>
             </div>
@@ -3491,7 +3491,7 @@ function resumeFeaturedAutoPlay() {
                   <i class="fas fa-route text-white text-sm"></i>
                 </div>
                 <div>
-                  <span class="block">Explore Learning Paths</span>
+                  <span class="block">{{ $t('learning.exploreLearningPaths') }}</span>
                   <span class="text-xs font-medium text-gray-500">{{ filteredPaths.length }} learning paths available</span>
                 </div>
               </h2>
@@ -3589,7 +3589,7 @@ function resumeFeaturedAutoPlay() {
                   v-if="showPathsEnrollmentFilter"
                   class="absolute start-0 top-full mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
                 >
-                  <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Filter by Status</div>
+                  <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">{{ $t('learning.filterByStatus') }}</div>
                   <div class="max-h-64 overflow-y-auto">
                     <button
                       @click="pathFilter = 'all'; showPathsEnrollmentFilter = false"
@@ -3885,7 +3885,7 @@ function resumeFeaturedAutoPlay() {
               </div>
               <div>
                 <h2 class="ll-featured-title">{{ $t('learning.featuredInsights') }}</h2>
-                <p class="ll-featured-subtitle">Discover top lessons from our knowledge base</p>
+                <p class="ll-featured-subtitle">{{ $t('learning.discoverTopLessons') }}</p>
               </div>
             </div>
             <div class="ll-featured-nav">
@@ -3974,7 +3974,7 @@ function resumeFeaturedAutoPlay() {
 
                   <!-- CTA Button -->
                   <button class="ll-main-cta">
-                    <span>Read Full Lesson</span>
+                    <span>{{ $t('learning.readFullLesson') }}</span>
                     <i class="fas fa-arrow-right"></i>
                   </button>
                 </div>
@@ -4034,7 +4034,7 @@ function resumeFeaturedAutoPlay() {
 
               <!-- View All Link -->
               <button class="ll-view-all-btn">
-                <span>View All Featured</span>
+                <span>{{ $t('learning.viewAllFeatured') }}</span>
                 <i class="fas fa-arrow-right"></i>
               </button>
             </div>
@@ -4750,7 +4750,7 @@ function resumeFeaturedAutoPlay() {
               </div>
               <div class="cert-stat-content">
                 <p class="cert-stat-value">{{ certificateStats.thisYear }}</p>
-                <p class="cert-stat-label">Earned This Year</p>
+                <p class="cert-stat-label">{{ $t('learning.earnedThisYear') }}</p>
               </div>
               <div class="cert-stat-badge">
                 <i class="fas fa-fire"></i>
@@ -4796,7 +4796,7 @@ function resumeFeaturedAutoPlay() {
               </div>
               <div>
                 <h2 class="cert-header-title">{{ $t('learning.myCertificates') }}</h2>
-                <p class="cert-header-subtitle">{{ filteredCertificates.length }} achievements earned</p>
+                <p class="cert-header-subtitle">{{ filteredCertificates.length }} {{ $t('learning.achievementsEarned') }}</p>
               </div>
             </div>
             <div class="cert-header-actions">
@@ -4960,7 +4960,7 @@ function resumeFeaturedAutoPlay() {
                     <div class="cert-icon-wrap">
                       <i :class="cert.icon"></i>
                     </div>
-                    <p class="cert-visual-label">Certificate of Completion</p>
+                    <p class="cert-visual-label">{{ $t('learning.certificateOfCompletion') }}</p>
                     <h3 class="cert-visual-title">{{ cert.title }}</h3>
                   </div>
 
@@ -5042,7 +5042,7 @@ function resumeFeaturedAutoPlay() {
               <div class="cert-empty-icon">
                 <i class="fas fa-certificate"></i>
               </div>
-              <h3 class="cert-empty-title">No certificates found</h3>
+              <h3 class="cert-empty-title">{{ $t('learning.noCertificatesFound') }}</h3>
               <p class="cert-empty-text">
                 {{ activeCertFiltersCount > 0 ? 'Try adjusting your filter selection' : 'Complete courses to earn certificates and showcase your achievements' }}
               </p>
@@ -5107,7 +5107,7 @@ function resumeFeaturedAutoPlay() {
           <div class="ai-rec-header">
             <div class="ai-match-score">
               <AIConfidenceBar :value="rec.matchScore / 100" size="sm" />
-              <span class="text-sm font-bold text-teal-600">{{ rec.matchScore }}% Match</span>
+              <span class="text-sm font-bold text-teal-600">{{ rec.matchScore }}% {{ $t('learning.match') }}</span>
             </div>
             <span :class="['ai-priority-badge', rec.priority === 'high' ? 'priority-high' : 'priority-medium']">
               <i :class="rec.priority === 'high' ? 'fas fa-fire' : 'fas fa-star'"></i>
@@ -5212,7 +5212,7 @@ function resumeFeaturedAutoPlay() {
 
           <!-- Skill Gaps List -->
           <div class="skill-gaps-list">
-            <h3 class="text-lg font-bold text-gray-900 mb-4">Skill Gap Details</h3>
+            <h3 class="text-lg font-bold text-gray-900 mb-4">{{ $t('learning.skillGapDetails') }}</h3>
             <div class="skill-gap-items">
               <div v-for="gap in skillGapAnalysis.gaps" :key="gap.skill" class="skill-gap-item">
                 <div class="gap-header">
@@ -5284,7 +5284,7 @@ function resumeFeaturedAutoPlay() {
               <i class="fas fa-route text-white text-xl"></i>
             </div>
             <div>
-              <h2 class="text-xl font-bold text-white">AI-Generated Learning Paths</h2>
+              <h2 class="text-xl font-bold text-white">{{ $t('learning.aiGeneratedLearningPaths') }}</h2>
               <p class="text-teal-100 text-sm">Personalized roadmaps to achieve your career goals</p>
             </div>
           </div>
