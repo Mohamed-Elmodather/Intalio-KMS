@@ -1918,8 +1918,16 @@ onUnmounted(() => {
                         'w-7 h-7 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center transition-all shadow-sm',
                         bookmarks.includes(article.id) ? 'text-teal-600' : 'text-gray-400 hover:text-teal-600 hover:bg-white'
                       ]"
+                      :title="$t('articles.bookmark')"
                     >
                       <i :class="bookmarks.includes(article.id) ? 'fas fa-bookmark' : 'far fa-bookmark'" class="text-xs"></i>
+                    </button>
+                    <button
+                      @click.stop="openShareModal(article)"
+                      class="w-7 h-7 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center transition-all shadow-sm text-gray-400 hover:text-blue-500 hover:bg-white"
+                      :title="$t('articles.share')"
+                    >
+                      <i class="fas fa-share-alt text-xs"></i>
                     </button>
                     <!-- Compare button -->
                     <ComparisonButton
