@@ -930,7 +930,6 @@ export default {
     ofLessons: 'من {total} درس',
     featuredCourses: 'الدورات المميزة',
     trendingNow: 'الأكثر رواجاً',
-    featuredInsights: 'رؤى مميزة',
     allLessonsTab: 'جميع الدروس',
     bookmarked: 'المحفوظات',
     myCertificates: 'شهاداتي',

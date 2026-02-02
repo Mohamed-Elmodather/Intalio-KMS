@@ -928,7 +928,6 @@ export default {
     ofLessons: 'of {total} lessons',
     featuredCourses: 'Featured Courses',
     trendingNow: 'Trending Now',
-    featuredInsights: 'Featured Insights',
     allLessonsTab: 'All Lessons',
     bookmarked: 'Bookmarked',
     myCertificates: 'My Certificates',
