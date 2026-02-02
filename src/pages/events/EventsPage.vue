@@ -47,26 +47,26 @@ const sortBy = ref('date')
 const sortOrder = ref<'asc' | 'desc'>('asc')
 
 // Sort options
-const sortOptions = [
-  { value: 'date', label: 'Date', icon: 'fas fa-calendar' },
-  { value: 'title', label: 'Title', icon: 'fas fa-font' },
-  { value: 'attendees', label: 'Attendees', icon: 'fas fa-users' }
-]
+const sortOptions = computed(() => [
+  { value: 'date', label: t('common.date'), icon: 'fas fa-calendar' },
+  { value: 'title', label: t('common.title'), icon: 'fas fa-font' },
+  { value: 'attendees', label: t('events.attendees'), icon: 'fas fa-users' }
+])
 
 // Format filter options
-const formatOptions = [
-  { id: 'virtual', label: 'Virtual', icon: 'fas fa-video', color: 'text-blue-500' },
-  { id: 'in-person', label: 'In-Person', icon: 'fas fa-building', color: 'text-amber-500' }
-]
+const formatOptions = computed(() => [
+  { id: 'virtual', label: t('events.virtual'), icon: 'fas fa-video', color: 'text-blue-500' },
+  { id: 'in-person', label: t('events.inPerson'), icon: 'fas fa-building', color: 'text-amber-500' }
+])
 
 // Date range options
-const dateRangeOptions = [
-  { id: 'all', label: 'All Dates', icon: 'fas fa-calendar' },
-  { id: 'today', label: 'Today', icon: 'fas fa-sun' },
-  { id: 'week', label: 'This Week', icon: 'fas fa-calendar-week' },
-  { id: 'month', label: 'This Month', icon: 'fas fa-calendar-alt' },
-  { id: 'custom', label: 'Custom Range', icon: 'fas fa-calendar-days' }
-]
+const dateRangeOptions = computed(() => [
+  { id: 'all', label: t('events.allDates'), icon: 'fas fa-calendar' },
+  { id: 'today', label: t('common.today'), icon: 'fas fa-sun' },
+  { id: 'week', label: t('common.thisWeek'), icon: 'fas fa-calendar-week' },
+  { id: 'month', label: t('common.thisMonth'), icon: 'fas fa-calendar-alt' },
+  { id: 'custom', label: t('events.customRange'), icon: 'fas fa-calendar-days' }
+])
 
 // My Events filter (separate from date range)
 const showMyEventsOnly = ref(false)
@@ -81,13 +81,13 @@ const showAISuggestions = ref(false)
 const naturalLanguageQuery = ref('')
 const aiSearchResults = ref<any[]>([])
 const isProcessingNLSearch = ref(false)
-const nlSearchSuggestions = [
-  'Find virtual meetings this week',
-  'Show me training sessions',
-  'Upcoming webinars',
-  'Events I registered for',
-  'Social events this month'
-]
+const nlSearchSuggestions = computed(() => [
+  t('events.aiSuggestion1'),
+  t('events.aiSuggestion2'),
+  t('events.aiSuggestion3'),
+  t('events.aiSuggestion4'),
+  t('events.aiSuggestion5')
+])
 
 // Custom date range state
 const customDateStart = ref('')
@@ -107,14 +107,22 @@ interface CalendarDay {
   events: Event[]
 }
 
-const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+const weekDays = computed(() => [
+  t('events.weekDays.sun'),
+  t('events.weekDays.mon'),
+  t('events.weekDays.tue'),
+  t('events.weekDays.wed'),
+  t('events.weekDays.thu'),
+  t('events.weekDays.fri'),
+  t('events.weekDays.sat')
+])
 
-const eventTypes = ref([
-  { id: 'meeting', name: 'Meetings', icon: 'fas fa-users', color: '#3b82f6' },
-  { id: 'training', name: 'Training', icon: 'fas fa-chalkboard-teacher', color: '#10b981' },
-  { id: 'social', name: 'Social', icon: 'fas fa-glass-cheers', color: '#ec4899' },
-  { id: 'review', name: 'Reviews', icon: 'fas fa-clipboard-check', color: '#f59e0b' },
-  { id: 'webinar', name: 'Webinars', icon: 'fas fa-video', color: '#6366f1' },
+const eventTypes = computed(() => [
+  { id: 'meeting', name: t('events.eventTypeNames.meetings'), icon: 'fas fa-users', color: '#3b82f6' },
+  { id: 'training', name: t('events.eventTypeNames.training'), icon: 'fas fa-chalkboard-teacher', color: '#10b981' },
+  { id: 'social', name: t('events.eventTypeNames.social'), icon: 'fas fa-glass-cheers', color: '#ec4899' },
+  { id: 'review', name: t('events.eventTypeNames.reviews'), icon: 'fas fa-clipboard-check', color: '#f59e0b' },
+  { id: 'webinar', name: t('events.eventTypeNames.webinars'), icon: 'fas fa-video', color: '#6366f1' },
 ])
 
 // Filter options for FilterDropdown
@@ -1190,17 +1198,17 @@ function getCategoryColor(category: string) {
                 <!-- Search Input -->
                 <div class="relative flex-1">
                   <i :class="[
-                    'absolute left-3 top-1/2 -translate-y-1/2 text-sm transition-colors',
+                    'absolute start-3 top-1/2 -translate-y-1/2 text-sm transition-colors',
                     isAISearchMode ? 'fas fa-brain text-teal-500' : 'fas fa-search text-gray-400'
                   ]"></i>
                   <input
                     v-model="unifiedSearchQuery"
                     type="text"
-                    :placeholder="isAISearchMode ? 'Ask AI: Find virtual meetings this week...' : 'Search events...'"
+                    :placeholder="isAISearchMode ? $t('events.aiSearchPlaceholder') : $t('events.searchEvents')"
                     @keyup.enter="handleUnifiedSearch"
                     @input="handleSearchInput"
                     :class="[
-                      'w-full pl-9 pr-20 py-2 text-sm focus:outline-none transition-all',
+                      'w-full ps-9 pe-20 py-2 text-sm focus:outline-none transition-all',
                       showAIFeatures ? 'rounded-r-lg' : 'rounded-lg',
                       isAISearchMode
                         ? 'bg-gradient-to-r from-teal-50 to-cyan-50 border border-teal-200 focus:ring-2 focus:ring-teal-400 focus:border-transparent placeholder:text-teal-400'
@@ -1209,7 +1217,7 @@ function getCategoryColor(category: string) {
                     ]"
                   >
                   <!-- Clear & Search Buttons -->
-                  <div class="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                  <div class="absolute end-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
                     <button
                       v-if="unifiedSearchQuery"
                       @click="clearUnifiedSearch"
@@ -1232,17 +1240,17 @@ function getCategoryColor(category: string) {
               <!-- AI Search Suggestions Dropdown -->
               <div
                 v-if="showAIFeatures && isAISearchMode && showAISuggestions && !unifiedSearchQuery"
-                class="absolute left-0 top-full mt-2 w-full bg-white rounded-xl shadow-lg border border-teal-100 py-2 z-50"
+                class="absolute start-0 top-full mt-2 w-full bg-white rounded-xl shadow-lg border border-teal-100 py-2 z-50"
               >
                 <div class="px-3 py-1.5 text-xs font-semibold text-teal-500 flex items-center gap-2">
                   <i class="fas fa-lightbulb"></i>
-                  Try asking:
+                  {{ $t('events.tryAsking') }}
                 </div>
                 <button
                   v-for="suggestion in nlSearchSuggestions"
                   :key="suggestion"
                   @click="unifiedSearchQuery = suggestion; handleUnifiedSearch()"
-                  class="w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-teal-50 flex items-center gap-2"
+                  class="w-full px-3 py-2 text-start text-sm text-gray-700 hover:bg-teal-50 flex items-center gap-2"
                 >
                   <i class="fas fa-search text-teal-400 text-xs"></i>
                   {{ suggestion }}
@@ -1252,15 +1260,15 @@ function getCategoryColor(category: string) {
               <!-- AI Processing Indicator -->
               <div
                 v-if="isProcessingNLSearch"
-                class="absolute left-0 top-full mt-2 w-full bg-gradient-to-r from-teal-50 to-cyan-50 rounded-xl shadow-lg border border-teal-100 p-4 z-50"
+                class="absolute start-0 top-full mt-2 w-full bg-gradient-to-r from-teal-50 to-cyan-50 rounded-xl shadow-lg border border-teal-100 p-4 z-50"
               >
                 <div class="flex items-center gap-3">
                   <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-teal-500 to-cyan-500 flex items-center justify-center">
                     <i class="fas fa-brain text-white text-sm animate-pulse"></i>
                   </div>
                   <div>
-                    <div class="text-sm font-medium text-teal-700">AI is searching...</div>
-                    <div class="text-xs text-teal-500">Analyzing your query</div>
+                    <div class="text-sm font-medium text-teal-700">{{ $t('events.aiSearching') }}</div>
+                    <div class="text-xs text-teal-500">{{ $t('events.analyzingQuery') }}</div>
                   </div>
                 </div>
               </div>
@@ -1276,25 +1284,25 @@ function getCategoryColor(category: string) {
                 ]"
               >
                 <i class="fas fa-calendar text-sm"></i>
-                <span>{{ customDateRangeLabel || dateRangeOptions.find(d => d.id === quickFilter)?.label || 'All Dates' }}</span>
-                <i :class="showDateFilter ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ml-1"></i>
+                <span>{{ customDateRangeLabel || dateRangeOptions.find(d => d.id === quickFilter)?.label || $t('events.allDates') }}</span>
+                <i :class="showDateFilter ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ms-1"></i>
               </button>
 
               <!-- Dropdown Menu -->
               <div
                 v-if="showDateFilter"
-                class="absolute left-0 top-full mt-2 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
+                class="absolute start-0 top-full mt-2 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
                 :class="showCustomDatePicker ? 'w-72' : 'w-48'"
               >
                 <!-- Preset Options -->
                 <div v-if="!showCustomDatePicker">
-                  <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Date Range</div>
+                  <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">{{ $t('events.dateRange') }}</div>
                   <button
                     v-for="option in dateRangeOptions"
                     :key="option.id"
                     @click="setDateRange(option.id)"
                     :class="[
-                      'w-full px-3 py-2 text-left text-sm flex items-center gap-3 transition-colors',
+                      'w-full px-3 py-2 text-start text-sm flex items-center gap-3 transition-colors',
                       quickFilter === option.id ? 'bg-teal-50 text-teal-700' : 'text-gray-700 hover:bg-gray-50'
                     ]"
                   >
@@ -1449,39 +1457,39 @@ function getCategoryColor(category: string) {
                 class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border bg-white border-gray-200 text-gray-600 hover:bg-gray-50"
               >
                 <i class="fas fa-sort text-sm"></i>
-                <span>{{ sortOptions.find(s => s.value === sortBy)?.label || 'Sort' }}</span>
-                <i :class="sortOrder === 'asc' ? 'fas fa-arrow-up' : 'fas fa-arrow-down'" class="text-[10px] ml-1"></i>
+                <span>{{ sortOptions.find(s => s.value === sortBy)?.label || $t('common.sort') }}</span>
+                <i :class="sortOrder === 'asc' ? 'fas fa-arrow-up' : 'fas fa-arrow-down'" class="text-[10px] ms-1"></i>
               </button>
               <!-- Dropdown Menu -->
-              <div v-if="showSortDropdown" class="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50">
-                <div class="px-3 py-1.5 text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Sort By</div>
+              <div v-if="showSortDropdown" class="absolute end-0 top-full mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50">
+                <div class="px-3 py-1.5 text-[10px] font-semibold text-gray-400 uppercase tracking-wider">{{ $t('common.sortBy') }}</div>
                 <button
                   v-for="option in sortOptions"
                   :key="option.value"
                   @click="sortBy = option.value; showSortDropdown = false"
-                  :class="['w-full px-3 py-2 text-left text-xs flex items-center gap-2 hover:bg-gray-50', sortBy === option.value ? 'text-teal-600 bg-teal-50' : 'text-gray-600']"
+                  :class="['w-full px-3 py-2 text-start text-xs flex items-center gap-2 hover:bg-gray-50', sortBy === option.value ? 'text-teal-600 bg-teal-50' : 'text-gray-600']"
                 >
                   <i :class="option.icon" class="w-4"></i>
                   {{ option.label }}
-                  <i v-if="sortBy === option.value" class="fas fa-check ml-auto text-teal-500"></i>
+                  <i v-if="sortBy === option.value" class="fas fa-check ms-auto text-teal-500"></i>
                 </button>
                 <div class="border-t border-gray-100 mt-2 pt-2">
-                  <div class="px-3 py-1.5 text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Order</div>
+                  <div class="px-3 py-1.5 text-[10px] font-semibold text-gray-400 uppercase tracking-wider">{{ $t('events.order') }}</div>
                   <button
                     @click="sortOrder = 'asc'; showSortDropdown = false"
-                    :class="['w-full px-3 py-2 text-left text-xs flex items-center gap-2 hover:bg-gray-50', sortOrder === 'asc' ? 'text-teal-600 bg-teal-50' : 'text-gray-600']"
+                    :class="['w-full px-3 py-2 text-start text-xs flex items-center gap-2 hover:bg-gray-50', sortOrder === 'asc' ? 'text-teal-600 bg-teal-50' : 'text-gray-600']"
                   >
                     <i class="fas fa-arrow-up w-4"></i>
-                    Ascending
-                    <i v-if="sortOrder === 'asc'" class="fas fa-check ml-auto text-teal-500"></i>
+                    {{ $t('common.ascending') }}
+                    <i v-if="sortOrder === 'asc'" class="fas fa-check ms-auto text-teal-500"></i>
                   </button>
                   <button
                     @click="sortOrder = 'desc'; showSortDropdown = false"
-                    :class="['w-full px-3 py-2 text-left text-xs flex items-center gap-2 hover:bg-gray-50', sortOrder === 'desc' ? 'text-teal-600 bg-teal-50' : 'text-gray-600']"
+                    :class="['w-full px-3 py-2 text-start text-xs flex items-center gap-2 hover:bg-gray-50', sortOrder === 'desc' ? 'text-teal-600 bg-teal-50' : 'text-gray-600']"
                   >
                     <i class="fas fa-arrow-down w-4"></i>
-                    Descending
-                    <i v-if="sortOrder === 'desc'" class="fas fa-check ml-auto text-teal-500"></i>
+                    {{ $t('common.descending') }}
+                    <i v-if="sortOrder === 'desc'" class="fas fa-check ms-auto text-teal-500"></i>
                   </button>
                 </div>
               </div>
@@ -2014,11 +2022,11 @@ function getCategoryColor(category: string) {
           <div class="modal-footer">
             <button @click="showCreateModal = false"
                     class="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">
-              Cancel
+              {{ $t('common.cancel') }}
             </button>
             <button @click="createEvent"
                     class="px-4 py-2 bg-gradient-to-r from-teal-500 to-teal-600 text-white rounded-lg hover:from-teal-600 hover:to-teal-700 transition-all">
-              <i class="fas fa-plus mr-2"></i> Create Event
+              <i class="fas fa-plus me-2"></i> {{ $t('events.createEvent') }}
             </button>
           </div>
         </div>
@@ -2055,10 +2063,10 @@ function getCategoryColor(category: string) {
                 <div class="empty-icon">
                   <i class="far fa-calendar-times"></i>
                 </div>
-                <p class="empty-text">No events scheduled</p>
+                <p class="empty-text">{{ $t('events.noEventsScheduled') }}</p>
                 <button @click="showCreateModal = true; closeDayDetailPopup()" class="popup-add-btn">
                   <i class="fas fa-plus"></i>
-                  Add Event
+                  {{ $t('events.addEvent') }}
                 </button>
               </div>
 
@@ -2093,7 +2101,7 @@ function getCategoryColor(category: string) {
                       <span v-if="event.attendees.length > 4" class="popup-more-attendees">
                         +{{ event.attendees.length - 4 }}
                       </span>
-                      <span class="popup-attendee-count">{{ event.attendees.length }} going</span>
+                      <span class="popup-attendee-count">{{ event.attendees.length }} {{ $t('events.going') }}</span>
                     </div>
                     <div class="popup-actions">
                       <button
@@ -2108,7 +2116,7 @@ function getCategoryColor(category: string) {
                         :class="['popup-rsvp-btn', event.isGoing ? 'going' : '']"
                       >
                         <i :class="event.isGoing ? 'fas fa-check-circle' : 'fas fa-plus-circle'"></i>
-                        {{ event.isGoing ? 'Going' : 'RSVP' }}
+                        {{ event.isGoing ? $t('events.going') : $t('events.rsvp') }}
                       </button>
                     </div>
                   </div>
@@ -2131,8 +2139,8 @@ function getCategoryColor(category: string) {
                   <i class="fas fa-wand-magic-sparkles text-white"></i>
                 </div>
                 <div>
-                  <h3 class="text-lg font-semibold text-gray-900">AI Smart Scheduling</h3>
-                  <p class="text-sm text-gray-500">Find the optimal time for your event</p>
+                  <h3 class="text-lg font-semibold text-gray-900">{{ $t('events.aiSmartScheduling') }}</h3>
+                  <p class="text-sm text-gray-500">{{ $t('events.findOptimalTime') }}</p>
                 </div>
               </div>
               <button @click="showSmartScheduleModal = false" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
@@ -2148,9 +2156,9 @@ function getCategoryColor(category: string) {
               <div class="bg-gradient-to-r from-teal-50 to-emerald-50 rounded-xl p-4 mb-4">
                 <div class="flex items-center gap-2 text-teal-700 font-medium mb-1">
                   <i class="fas fa-lightbulb"></i>
-                  AI Analysis Complete
+                  {{ $t('events.aiAnalysisComplete') }}
                 </div>
-                <p class="text-sm text-gray-600">Based on team availability, existing events, and meeting patterns, here are the best time slots:</p>
+                <p class="text-sm text-gray-600">{{ $t('events.aiAnalysisDescription') }}</p>
               </div>
 
               <div v-for="suggestion in scheduleSuggestions" :key="suggestion.id"
@@ -2165,20 +2173,20 @@ function getCategoryColor(category: string) {
                       <span class="text-lg font-semibold text-gray-900">{{ suggestion.timeSlot }}</span>
                     </div>
                     <div class="text-sm text-gray-600 mb-2">
-                      <i class="fas fa-calendar mr-1"></i>
+                      <i class="fas fa-calendar me-1"></i>
                       {{ new Date(suggestion.date).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' }) }}
                     </div>
                     <p class="text-sm text-gray-600">{{ suggestion.reason }}</p>
                     <div v-if="suggestion.conflicts.length > 0" class="mt-2 flex flex-wrap gap-2">
                       <span v-for="conflict in suggestion.conflicts" :key="conflict"
                             class="px-2 py-1 bg-amber-100 text-amber-700 rounded text-xs">
-                        <i class="fas fa-exclamation-triangle mr-1"></i>{{ conflict }}
+                        <i class="fas fa-exclamation-triangle me-1"></i>{{ conflict }}
                       </span>
                     </div>
                   </div>
-                  <div class="text-right">
+                  <div class="text-end">
                     <div class="text-2xl font-bold text-teal-600">{{ Math.round(suggestion.score * 100) }}%</div>
-                    <div class="text-xs text-gray-500">Match Score</div>
+                    <div class="text-xs text-gray-500">{{ $t('events.matchScore') }}</div>
                   </div>
                 </div>
               </div>
@@ -2188,11 +2196,11 @@ function getCategoryColor(category: string) {
           <div class="p-4 border-t border-gray-100 flex justify-end gap-3">
             <button @click="analyzeSmartSchedule"
                     class="px-4 py-2 text-teal-600 hover:bg-teal-50 rounded-lg transition-colors flex items-center gap-2">
-              <i class="fas fa-rotate"></i> Refresh
+              <i class="fas fa-rotate"></i> {{ $t('common.refresh') }}
             </button>
             <button @click="showSmartScheduleModal = false"
                     class="px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-colors">
-              Close
+              {{ $t('common.close') }}
             </button>
           </div>
         </div>
@@ -2341,12 +2349,12 @@ function getCategoryColor(category: string) {
                       <h4 class="font-semibold text-gray-900">{{ event.title }}</h4>
                     </div>
                     <div class="text-sm text-gray-600 mb-2">
-                      <i class="fas fa-calendar mr-1"></i>
+                      <i class="fas fa-calendar me-1"></i>
                       {{ new Date(event.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) }}
                     </div>
                     <p class="text-sm text-gray-500">{{ event.reason }}</p>
                   </div>
-                  <div class="text-right ml-4">
+                  <div class="text-end ms-4">
                     <div class="text-xl font-bold text-blue-600">{{ Math.round(event.similarity * 100) }}%</div>
                     <div class="text-xs text-gray-500">Match</div>
                   </div>
@@ -2446,8 +2454,8 @@ function getCategoryColor(category: string) {
 .search-input {
   width: 100%;
   height: 40px;
-  padding-left: 2.75rem;
-  padding-right: 1rem;
+  padding-inline-start: 2.75rem;
+  padding-inline-end: 1rem;
   border-radius: 0.75rem;
   border: 1.5px solid #e2e8f0;
   background: linear-gradient(135deg, #fafafa 0%, #f8fafc 100%);
@@ -2934,7 +2942,7 @@ function getCategoryColor(category: string) {
 
 .attendee-avatars {
   display: flex;
-  margin-left: -8px;
+  margin-inline-start: -8px;
 }
 
 .attendee-avatar {
@@ -2948,7 +2956,7 @@ function getCategoryColor(category: string) {
   font-size: 0.625rem;
   font-weight: 600;
   color: white;
-  margin-left: -8px;
+  margin-inline-start: -8px;
 }
 
 .attendee-count {
@@ -3566,7 +3574,7 @@ function getCategoryColor(category: string) {
 
 .featured-avatar-stack {
   display: flex;
-  margin-left: -8px;
+  margin-inline-start: -8px;
 }
 
 .featured-avatar {
@@ -3580,7 +3588,7 @@ function getCategoryColor(category: string) {
   font-size: 0.6875rem;
   font-weight: 700;
   color: white;
-  margin-left: -8px;
+  margin-inline-start: -8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
@@ -3778,7 +3786,7 @@ function getCategoryColor(category: string) {
 
 .attendee-avatars-premium {
   display: flex;
-  margin-left: -6px;
+  margin-inline-start: -6px;
 }
 
 .attendee-avatar-premium {
@@ -3792,7 +3800,7 @@ function getCategoryColor(category: string) {
   font-size: 0.625rem;
   font-weight: 700;
   color: white;
-  margin-left: -6px;
+  margin-inline-start: -6px;
   transition: transform 0.3s ease;
 }
 
@@ -3971,7 +3979,7 @@ function getCategoryColor(category: string) {
 
 .list-attendee-avatars {
   display: flex;
-  margin-left: -6px;
+  margin-inline-start: -6px;
 }
 
 .list-attendee-avatar {
@@ -3985,7 +3993,7 @@ function getCategoryColor(category: string) {
   font-size: 0.5625rem;
   font-weight: 700;
   color: white;
-  margin-left: -6px;
+  margin-inline-start: -6px;
 }
 
 .list-rsvp-btn {
@@ -4715,7 +4723,7 @@ function getCategoryColor(category: string) {
   border-radius: 0.625rem;
   cursor: pointer;
   transition: all 0.2s ease;
-  border-left: 3px solid;
+  border-inline-start: 3px solid;
 }
 
 .week-event-card:hover {
@@ -4725,27 +4733,27 @@ function getCategoryColor(category: string) {
 
 .week-event-card.meeting {
   background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
-  border-left-color: #3b82f6;
+  border-inline-start-color: #3b82f6;
 }
 
 .week-event-card.training {
   background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
-  border-left-color: #10b981;
+  border-inline-start-color: #10b981;
 }
 
 .week-event-card.social {
   background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%);
-  border-left-color: #ec4899;
+  border-inline-start-color: #ec4899;
 }
 
 .week-event-card.review {
   background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-  border-left-color: #f59e0b;
+  border-inline-start-color: #f59e0b;
 }
 
 .week-event-card.webinar {
   background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
-  border-left-color: #6366f1;
+  border-inline-start-color: #6366f1;
 }
 
 .week-event-header {
@@ -4815,14 +4823,14 @@ function getCategoryColor(category: string) {
   font-weight: 700;
   color: white;
   border: 1.5px solid white;
-  margin-right: -6px;
+  margin-inline-end: -6px;
 }
 
 .more-attendees {
   font-size: 0.5625rem;
   font-weight: 600;
   color: #64748b;
-  margin-left: 0.375rem;
+  margin-inline-start: 0.375rem;
 }
 
 .week-rsvp-btn {
@@ -5068,27 +5076,27 @@ function getCategoryColor(category: string) {
 
 .popup-event-card.meeting {
   background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
-  border-left-color: #3b82f6;
+  border-inline-start-color: #3b82f6;
 }
 
 .popup-event-card.training {
   background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
-  border-left-color: #10b981;
+  border-inline-start-color: #10b981;
 }
 
 .popup-event-card.social {
   background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%);
-  border-left-color: #ec4899;
+  border-inline-start-color: #ec4899;
 }
 
 .popup-event-card.review {
   background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-  border-left-color: #f59e0b;
+  border-inline-start-color: #f59e0b;
 }
 
 .popup-event-card.webinar {
   background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
-  border-left-color: #6366f1;
+  border-inline-start-color: #6366f1;
 }
 
 .popup-event-time {
@@ -5232,15 +5240,15 @@ function getCategoryColor(category: string) {
   font-weight: 700;
   color: white;
   border: 2px solid white;
-  margin-right: -8px;
+  margin-inline-end: -8px;
 }
 
 .popup-more-attendees {
   font-size: 0.6875rem;
   font-weight: 600;
   color: #64748b;
-  margin-left: 0.5rem;
-  margin-right: 0.5rem;
+  margin-inline-start: 0.5rem;
+  margin-inline-end: 0.5rem;
 }
 
 .popup-attendee-count {
@@ -5466,7 +5474,7 @@ function getCategoryColor(category: string) {
 }
 
 .my-event-meta i {
-  margin-right: 0.25rem;
+  margin-inline-end: 0.25rem;
   color: #8b5cf6;
 }
 

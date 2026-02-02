@@ -1889,7 +1889,7 @@ onUnmounted(() => {
           <div class="section-header-row">
             <h2 class="section-title-sm">
               <i class="fas fa-history text-teal-500"></i>
-              Continue Watching
+              {{ $t('media.continueWatching') }}
             </h2>
             <ViewAllButton to="/media" size="sm" :count="watchHistory.length" />
           </div>
@@ -1927,8 +1927,8 @@ onUnmounted(() => {
               <i class="fas fa-fire"></i>
             </div>
             <div>
-              <span class="block">Trending Now</span>
-              <span class="trending-subtitle">Most watched this week</span>
+              <span class="block">{{ $t('common.trendingNow') }}</span>
+              <span class="trending-subtitle">{{ $t('media.mostWatchedThisWeek') }}</span>
             </div>
           </h2>
           <div class="trending-nav">
@@ -1939,7 +1939,7 @@ onUnmounted(() => {
               <i class="fas fa-chevron-right"></i>
             </button>
             <router-link to="/media" class="trending-view-all">
-              View All <i class="fas fa-arrow-right"></i>
+              {{ $t('common.viewAll') }} <i class="fas fa-arrow-right"></i>
             </router-link>
           </div>
         </div>
@@ -1997,7 +1997,7 @@ onUnmounted(() => {
                 <div class="trending-info-header">
                   <span :class="['trending-type-badge', media.type]">
                     <i :class="media.type === 'video' ? 'fas fa-video' : media.type === 'audio' ? 'fas fa-headphones' : media.type === 'image' ? 'fas fa-image' : 'fas fa-images'"></i>
-                    {{ media.type === 'video' ? 'Video' : media.type === 'audio' ? 'Audio' : media.type === 'image' ? 'Image' : 'Gallery' }}
+                    {{ media.type === 'video' ? $t('media.video') : media.type === 'audio' ? $t('media.audio') : media.type === 'image' ? $t('media.image') : $t('media.gallery') }}
                   </span>
                   <span :class="['category-tag', media.category.toLowerCase().split(' ')[0]]">{{ media.category }}</span>
                 </div>
@@ -2035,13 +2035,13 @@ onUnmounted(() => {
                 <i class="fas fa-brain text-white text-sm"></i>
               </div>
               <div>
-                <h2 class="text-lg font-bold text-gray-800">AI Recommendations</h2>
-                <p class="text-xs text-gray-500">Personalized content suggestions powered by AI</p>
+                <h2 class="text-lg font-bold text-gray-800">{{ $t('media.aiRecommendations') }}</h2>
+                <p class="text-xs text-gray-500">{{ $t('media.aiRecommendationsDesc') }}</p>
               </div>
             </div>
             <div class="flex items-center gap-2">
               <button
-                v-for="type in [{ id: 'forYou', label: 'For You', icon: 'fas fa-user' }, { id: 'similar', label: 'Similar', icon: 'fas fa-clone' }, { id: 'trending', label: 'Trending', icon: 'fas fa-fire' }]"
+                v-for="type in [{ id: 'forYou', label: $t('media.forYou'), icon: 'fas fa-user' }, { id: 'similar', label: $t('media.similar'), icon: 'fas fa-clone' }, { id: 'trending', label: $t('common.trending'), icon: 'fas fa-fire' }]"
                 :key="type.id"
                 @click="recommendationType = type.id as any; loadAIRecommendations()"
                 :class="['px-3 py-1.5 rounded-lg text-xs font-medium transition-colors flex items-center gap-1.5', recommendationType === type.id ? 'bg-teal-500 text-white' : 'bg-white/80 text-gray-600 hover:bg-white']"
@@ -2070,31 +2070,31 @@ onUnmounted(() => {
                 <div class="relative aspect-video rounded-xl overflow-hidden bg-gray-100 mb-2">
                   <img :src="media.thumbnail" :alt="media.title" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
                   <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                  <div class="absolute bottom-2 right-2 px-1.5 py-0.5 bg-black/70 text-white text-[10px] font-medium rounded">
-                    {{ media.duration || (media.photoCount ? media.photoCount + ' photos' : 'View') }}
+                  <div class="absolute bottom-2 end-2 px-1.5 py-0.5 bg-black/70 text-white text-[10px] font-medium rounded">
+                    {{ media.duration || (media.photoCount ? media.photoCount + ' ' + $t('media.photos') : $t('common.view')) }}
                   </div>
                   <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                     <div class="w-10 h-10 rounded-full bg-white/90 flex items-center justify-center">
-                      <i class="fas fa-play text-teal-500 ml-0.5"></i>
+                      <i class="fas fa-play text-teal-500 ms-0.5"></i>
                     </div>
                   </div>
                   <!-- AI Match Badge -->
-                  <div class="absolute top-2 left-2 px-1.5 py-0.5 bg-teal-500 text-white text-[9px] font-medium rounded flex items-center gap-1">
+                  <div class="absolute top-2 start-2 px-1.5 py-0.5 bg-teal-500 text-white text-[9px] font-medium rounded flex items-center gap-1">
                     <i class="fas fa-sparkles text-[8px]"></i>
-                    {{ Math.floor(Math.random() * 15) + 85 }}% match
+                    {{ Math.floor(Math.random() * 15) + 85 }}% {{ $t('media.match') }}
                   </div>
                 </div>
                 <h4 class="text-xs font-medium text-gray-800 line-clamp-2 group-hover:text-teal-600 transition-colors">{{ media.title }}</h4>
-                <p class="text-[10px] text-gray-400 mt-0.5">{{ media.views }} views</p>
+                <p class="text-[10px] text-gray-400 mt-0.5">{{ media.views }} {{ $t('common.views') }}</p>
               </div>
             </div>
 
             <!-- Empty State -->
             <div v-else class="text-center py-12 text-gray-400">
               <i class="fas fa-brain text-4xl mb-3 opacity-30"></i>
-              <p class="text-sm">Select a recommendation type to get personalized suggestions</p>
+              <p class="text-sm">{{ $t('media.selectRecommendationType') }}</p>
               <button @click="loadAIRecommendations" class="mt-3 px-4 py-2 bg-teal-500 text-white text-sm rounded-lg hover:bg-teal-600 transition-colors">
-                Get Recommendations
+                {{ $t('media.getRecommendations') }}
               </button>
             </div>
           </div>
@@ -2150,7 +2150,7 @@ onUnmounted(() => {
                   v-if="showAIFeatures"
                   @click="isAISearchMode = !isAISearchMode"
                   :class="[
-                    'px-3 rounded-l-lg border border-r-0 flex items-center gap-1.5 text-xs font-medium transition-all',
+                    'px-3 rounded-s-lg border border-e-0 flex items-center gap-1.5 text-xs font-medium transition-all',
                     isAISearchMode
                       ? 'bg-gradient-to-r from-teal-500 to-cyan-500 border-teal-500 text-white'
                       : 'bg-gray-100 border-gray-200 text-gray-500 hover:bg-gray-200'
@@ -2164,7 +2164,7 @@ onUnmounted(() => {
                 <!-- Search Input -->
                 <div class="relative flex-1">
                   <i :class="[
-                    'absolute left-3 top-1/2 -translate-y-1/2 text-sm transition-colors',
+                    'absolute start-3 top-1/2 -translate-y-1/2 text-sm transition-colors',
                     isAISearchMode ? 'fas fa-brain text-teal-500' : 'fas fa-search text-gray-400'
                   ]"></i>
                   <input
@@ -2174,16 +2174,16 @@ onUnmounted(() => {
                     @keyup.enter="handleUnifiedSearch"
                     @input="handleSearchInput"
                     :class="[
-                      'w-full pl-9 pr-20 py-2 text-sm focus:outline-none transition-all',
-                      showAIFeatures ? 'rounded-r-lg' : 'rounded-lg',
+                      'w-full ps-9 pe-20 py-2 text-sm focus:outline-none transition-all',
+                      showAIFeatures ? 'rounded-e-lg' : 'rounded-lg',
                       isAISearchMode
                         ? 'bg-gradient-to-r from-teal-50 to-cyan-50 border border-teal-200 focus:ring-2 focus:ring-teal-400 focus:border-transparent placeholder:text-teal-400'
                         : 'bg-white border border-gray-200 focus:ring-2 focus:ring-teal-500 focus:border-transparent',
-                      !showAIFeatures && 'rounded-l-lg'
+                      !showAIFeatures && 'rounded-s-lg'
                     ]"
                   >
                   <!-- Clear & Search Buttons -->
-                  <div class="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                  <div class="absolute end-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
                     <button
                       v-if="unifiedSearchQuery"
                       @click="clearUnifiedSearch"
@@ -2206,7 +2206,7 @@ onUnmounted(() => {
               <!-- AI Search Suggestions Dropdown -->
               <div
                 v-if="showAIFeatures && isAISearchMode && showAISuggestions && !unifiedSearchQuery"
-                class="absolute left-0 top-full mt-2 w-full bg-white rounded-xl shadow-lg border border-teal-100 py-2 z-50"
+                class="absolute start-0 top-full mt-2 w-full bg-white rounded-xl shadow-lg border border-teal-100 py-2 z-50"
               >
                 <div class="px-3 py-1.5 text-xs font-semibold text-teal-500 flex items-center gap-2">
                   <i class="fas fa-lightbulb"></i>
@@ -2216,9 +2216,9 @@ onUnmounted(() => {
                   v-for="suggestion in nlSearchSuggestions"
                   :key="suggestion"
                   @click="unifiedSearchQuery = suggestion; handleUnifiedSearch()"
-                  class="w-full px-3 py-2 text-left text-sm text-gray-600 hover:bg-teal-50 hover:text-teal-700 transition-colors"
+                  class="w-full px-3 py-2 text-start text-sm text-gray-600 hover:bg-teal-50 hover:text-teal-700 transition-colors"
                 >
-                  <i class="fas fa-wand-magic-sparkles text-teal-400 mr-2 text-xs"></i>
+                  <i class="fas fa-wand-magic-sparkles text-teal-400 me-2 text-xs"></i>
                   {{ suggestion }}
                 </button>
               </div>
@@ -2226,7 +2226,7 @@ onUnmounted(() => {
               <!-- AI Processing Indicator -->
               <div
                 v-if="isProcessingNLSearch"
-                class="absolute left-0 top-full mt-2 w-full bg-white rounded-xl shadow-lg border border-teal-100 p-4 z-50"
+                class="absolute start-0 top-full mt-2 w-full bg-white rounded-xl shadow-lg border border-teal-100 p-4 z-50"
               >
                 <div class="flex items-center gap-3">
                   <div class="w-8 h-8 border-2 border-teal-500 border-t-transparent rounded-full animate-spin"></div>
@@ -2289,18 +2289,18 @@ onUnmounted(() => {
             />
 
               <!-- Sort Options with Order Toggle -->
-              <div class="relative ml-auto flex items-center">
+              <div class="relative ms-auto flex items-center">
                 <button
                   @click="showSortDropdown = !showSortDropdown"
-                  class="flex items-center gap-2 px-3 py-1.5 rounded-l-lg text-xs font-medium transition-all border border-r-0 bg-white border-gray-200 text-gray-600 hover:bg-gray-50"
+                  class="flex items-center gap-2 px-3 py-1.5 rounded-s-lg text-xs font-medium transition-all border border-e-0 bg-white border-gray-200 text-gray-600 hover:bg-gray-50"
                 >
                   <i :class="[currentSortOption.icon, 'text-sm text-teal-500']"></i>
                   <span>{{ currentSortOption.label }}</span>
-                  <i :class="showSortDropdown ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ml-1"></i>
+                  <i :class="showSortDropdown ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ms-1"></i>
                 </button>
                 <button
                   @click="sortOrder = sortOrder === 'asc' ? 'desc' : 'asc'"
-                  class="flex items-center justify-center w-8 h-8 rounded-r-lg text-xs font-medium transition-all border bg-white border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-teal-600"
+                  class="flex items-center justify-center w-8 h-8 rounded-e-lg text-xs font-medium transition-all border bg-white border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-teal-600"
                   :title="sortOrder === 'asc' ? $t('media.ascendingOrder') : $t('media.descendingOrder')"
                 >
                   <i :class="sortOrder === 'asc' ? 'fas fa-arrow-up' : 'fas fa-arrow-down'" class="text-sm text-teal-500"></i>
@@ -2309,7 +2309,7 @@ onUnmounted(() => {
                 <!-- Dropdown Menu -->
                 <div
                   v-if="showSortDropdown"
-                  class="absolute left-0 top-full mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
+                  class="absolute start-0 top-full mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
                 >
                   <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">{{ $t('common.sortBy') }}</div>
                   <div class="max-h-64 overflow-y-auto">
@@ -2318,7 +2318,7 @@ onUnmounted(() => {
                       :key="option.value"
                       @click="selectSortOption(option.value)"
                       :class="[
-                        'w-full px-3 py-2 text-left text-sm flex items-center gap-3 transition-colors',
+                        'w-full px-3 py-2 text-start text-sm flex items-center gap-3 transition-colors',
                         sortBy === option.value ? 'bg-teal-50 text-teal-700' : 'text-gray-700 hover:bg-gray-50'
                       ]"
                     >
@@ -2432,10 +2432,10 @@ onUnmounted(() => {
             <!-- Collapse/Expand Button -->
             <button
               @click="isSidebarCollapsed = !isSidebarCollapsed"
-              class="absolute -right-3 top-4 w-6 h-6 bg-white border border-gray-200 rounded-full shadow-sm flex items-center justify-center text-gray-500 hover:text-teal-600 hover:border-teal-300 transition-all z-10"
-              :title="isSidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'"
+              class="absolute -end-3 top-4 w-6 h-6 bg-white border border-gray-200 rounded-full shadow-sm flex items-center justify-center text-gray-500 hover:text-teal-600 hover:border-teal-300 transition-all z-10"
+              :title="isSidebarCollapsed ? $t('media.expandSidebar') : $t('media.collapseSidebar')"
             >
-              <i :class="isSidebarCollapsed ? 'fas fa-chevron-right' : 'fas fa-chevron-left'" class="text-[10px]"></i>
+              <i :class="isSidebarCollapsed ? 'fas fa-chevron-right rtl:fa-chevron-left' : 'fas fa-chevron-left rtl:fa-chevron-right'" class="text-[10px]"></i>
             </button>
 
             <!-- Collapsed State - Icons Only -->
@@ -2477,7 +2477,7 @@ onUnmounted(() => {
                   :key="view.id"
                   @click="currentView = view.id as any"
                   :class="[
-                    'w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-all text-left',
+                    'w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-all text-start',
                     currentView === view.id
                       ? 'bg-teal-100 text-teal-700'
                       : 'hover:bg-gray-100 text-gray-600'
@@ -2681,10 +2681,10 @@ onUnmounted(() => {
                 <!-- Cancel -->
                 <button
                   @click="toggleSelectionMode"
-                  class="flex items-center gap-2 px-3 py-2 bg-white text-teal-600 hover:bg-gray-100 rounded-lg transition-all text-sm font-medium ml-2"
+                  class="flex items-center gap-2 px-3 py-2 bg-white text-teal-600 hover:bg-gray-100 rounded-lg transition-all text-sm font-medium ms-2"
                 >
                   <i class="fas fa-times"></i>
-                  <span class="hidden sm:inline">Cancel</span>
+                  <span class="hidden sm:inline">{{ $t('common.cancel') }}</span>
                 </button>
               </div>
             </div>
@@ -2707,7 +2707,7 @@ onUnmounted(() => {
                   <div
                     @click.stop="toggleMediaSelection(media.id); if (!isSelectionMode) isSelectionMode = true"
                     :class="[
-                      'absolute top-2 left-2 w-6 h-6 rounded-lg border-2 flex items-center justify-center cursor-pointer transition-all z-30',
+                      'absolute top-2 start-2 w-6 h-6 rounded-lg border-2 flex items-center justify-center cursor-pointer transition-all z-30',
                       isMediaSelected(media.id)
                         ? 'bg-teal-500 border-teal-500 text-white'
                         : isSelectionMode
@@ -2719,7 +2719,7 @@ onUnmounted(() => {
                   </div>
 
                   <!-- Card Badges -->
-                  <div class="absolute bottom-3 left-3 flex gap-1.5 z-20">
+                  <div class="absolute bottom-3 start-3 flex gap-1.5 z-20">
                     <StatusBadge v-if="media.isNew" status="new" size="xs" variant="gradient" />
                     <span v-if="media.hasTranscript" class="transcript-badge">
                       <i class="fas fa-closed-captioning"></i> CC
@@ -2727,12 +2727,12 @@ onUnmounted(() => {
                   </div>
 
                   <!-- Duration/Photo Count Badge -->
-                  <div class="absolute bottom-3 right-3 media-duration-badge z-20">
+                  <div class="absolute bottom-3 end-3 media-duration-badge z-20">
                     <template v-if="media.type === 'gallery'">
-                      <i class="fas fa-images"></i> {{ media.photoCount }} photos
+                      <i class="fas fa-images"></i> {{ media.photoCount }} {{ $t('media.photos') }}
                     </template>
                     <template v-else-if="media.type === 'image'">
-                      <i class="fas fa-image"></i> Image
+                      <i class="fas fa-image"></i> {{ $t('media.image') }}
                     </template>
                     <template v-else>
                       <i :class="media.type === 'video' ? 'fas fa-play-circle' : 'fas fa-headphones'"></i> {{ media.duration }}
@@ -2791,14 +2791,14 @@ onUnmounted(() => {
                     type="media"
                     size="sm"
                     variant="overlay"
-                    class="absolute top-2 left-10 z-30"
+                    class="absolute top-2 start-10 z-30"
                   />
 
                   <!-- AI Analysis Badge -->
-                  <div v-if="showAIFeatures && hasAIAnalysis(media.id)" class="absolute top-2 right-2 z-30">
+                  <div v-if="showAIFeatures && hasAIAnalysis(media.id)" class="absolute top-2 end-2 z-30">
                     <span class="px-2 py-1 bg-teal-500 text-white text-[10px] font-medium rounded-full flex items-center gap-1 shadow-lg">
                       <i class="fas fa-wand-magic-sparkles text-[8px]"></i>
-                      AI Analyzed
+                      {{ $t('media.aiAnalyzed') }}
                     </span>
                   </div>
 
@@ -3057,8 +3057,8 @@ onUnmounted(() => {
               </div>
             </div>
             <div class="modal-footer">
-              <button @click="showUploadModal = false" class="btn btn-secondary ripple">Cancel</button>
-              <button class="btn-vibrant ripple"><i class="fas fa-upload mr-2"></i> Upload</button>
+              <button @click="showUploadModal = false" class="btn btn-secondary ripple">{{ $t('common.cancel') }}</button>
+              <button class="btn-vibrant ripple"><i class="fas fa-upload me-2"></i> {{ $t('common.upload') }}</button>
             </div>
           </div>
         </div>
@@ -3243,12 +3243,12 @@ onUnmounted(() => {
             <!-- Modal Footer -->
             <div class="px-6 py-4 bg-gray-50 border-t border-gray-100 flex items-center justify-between">
               <p class="text-xs text-gray-400">
-                <i class="fas fa-info-circle mr-1"></i>
-                AI analysis is for reference only
+                <i class="fas fa-info-circle me-1"></i>
+                {{ $t('media.aiAnalysisNote') }}
               </p>
               <div class="flex gap-2">
                 <button @click="closeAIModal" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg text-sm font-medium transition-colors">
-                  Close
+                  {{ $t('common.close') }}
                 </button>
               </div>
             </div>
@@ -3593,7 +3593,7 @@ onUnmounted(() => {
                   <button
                     @click="generateAICaptions"
                     :disabled="isGeneratingCaptions"
-                    class="p-3 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-xl text-left transition-colors disabled:opacity-50"
+                    class="p-3 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-xl text-start transition-colors disabled:opacity-50"
                   >
                     <div class="flex items-center gap-2 mb-1">
                       <i v-if="isGeneratingCaptions" class="fas fa-spinner animate-spin text-blue-500"></i>
@@ -3609,7 +3609,7 @@ onUnmounted(() => {
                   <button
                     @click="generateAudioDescription"
                     :disabled="isGeneratingAudioDesc"
-                    class="p-3 bg-purple-50 hover:bg-purple-100 border border-purple-200 rounded-xl text-left transition-colors disabled:opacity-50"
+                    class="p-3 bg-purple-50 hover:bg-purple-100 border border-purple-200 rounded-xl text-start transition-colors disabled:opacity-50"
                   >
                     <div class="flex items-center gap-2 mb-1">
                       <i v-if="isGeneratingAudioDesc" class="fas fa-spinner animate-spin text-purple-500"></i>
@@ -3642,7 +3642,7 @@ onUnmounted(() => {
                   <div class="flex items-center justify-between mb-2">
                     <span class="text-xs font-medium text-purple-700">Audio Description</span>
                     <button class="text-[10px] text-purple-500 hover:text-purple-700">
-                      <i class="fas fa-volume-up mr-1"></i> Play
+                      <i class="fas fa-volume-up me-1"></i> {{ $t('media.playNow') }}
                     </button>
                   </div>
                   <p class="text-xs text-gray-600 leading-relaxed line-clamp-4">{{ aiAudioDescription }}</p>

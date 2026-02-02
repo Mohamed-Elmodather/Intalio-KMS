@@ -644,13 +644,13 @@ const enrolledCourses = ref([
 ])
 
 // Categories
-const categories = ref([
-  { id: 'tech', name: 'Technology', icon: 'fas fa-laptop-code', color: '#0d9488', courseCount: 24 },
-  { id: 'leadership', name: 'Leadership', icon: 'fas fa-crown', color: '#f59e0b', courseCount: 18 },
-  { id: 'compliance', name: 'Compliance', icon: 'fas fa-clipboard-check', color: '#6366f1', courseCount: 12 },
-  { id: 'soft-skills', name: 'Soft Skills', icon: 'fas fa-brain', color: '#ec4899', courseCount: 15 },
-  { id: 'data', name: 'Data Science', icon: 'fas fa-chart-line', color: '#3b82f6', courseCount: 20 },
-  { id: 'security', name: 'Security', icon: 'fas fa-shield-alt', color: '#ef4444', courseCount: 8 },
+const categories = computed(() => [
+  { id: 'tech', name: t('learning.categories.technology'), icon: 'fas fa-laptop-code', color: '#0d9488', courseCount: 24 },
+  { id: 'leadership', name: t('learning.categories.leadership'), icon: 'fas fa-crown', color: '#f59e0b', courseCount: 18 },
+  { id: 'compliance', name: t('learning.categories.compliance'), icon: 'fas fa-clipboard-check', color: '#6366f1', courseCount: 12 },
+  { id: 'soft-skills', name: t('learning.categories.softSkills'), icon: 'fas fa-brain', color: '#ec4899', courseCount: 15 },
+  { id: 'data', name: t('learning.categories.dataScience'), icon: 'fas fa-chart-line', color: '#3b82f6', courseCount: 20 },
+  { id: 'security', name: t('learning.categories.security'), icon: 'fas fa-shield-alt', color: '#ef4444', courseCount: 8 },
 ])
 
 // Trending courses
@@ -828,37 +828,44 @@ const showEnrollmentFilter = ref(false)
 const selectedStatusFilters = ref<string[]>([])
 const showStatusFilter = ref(false)
 
-const courseEnrollmentOptions = [
-  { id: 'enrolled', label: 'My Enrolled', color: 'text-teal-500' },
-  { id: 'not-enrolled', label: 'Not Enrolled', color: 'text-gray-500' }
-]
+const courseEnrollmentOptions = computed(() => [
+  { id: 'enrolled', label: t('learning.myEnrolled'), color: 'text-teal-500' },
+  { id: 'not-enrolled', label: t('learning.notEnrolled'), color: 'text-gray-500' }
+])
 
-const courseProgressOptions = [
-  { id: 'in-progress', label: 'In Progress', color: 'text-blue-500' },
-  { id: 'completed', label: 'Completed', color: 'text-green-500' },
-  { id: 'not-started', label: 'Not Started', color: 'text-gray-500' }
-]
+const courseProgressOptions = computed(() => [
+  { id: 'in-progress', label: t('common.inProgress'), color: 'text-blue-500' },
+  { id: 'completed', label: t('common.completed'), color: 'text-green-500' },
+  { id: 'not-started', label: t('common.notStarted'), color: 'text-gray-500' }
+])
 
 // Status filter options (like Documents page)
-const statusFilterOptions = [
-  { id: 'saved', label: 'My Saved', icon: 'fas fa-bookmark', color: 'text-amber-500' },
-  { id: 'shared', label: 'Shared with me', icon: 'fas fa-share-alt', color: 'text-purple-500' }
-]
+const statusFilterOptions = computed(() => [
+  { id: 'saved', label: t('learning.mySaved'), icon: 'fas fa-bookmark', color: 'text-amber-500' },
+  { id: 'shared', label: t('learning.sharedWithMe'), icon: 'fas fa-share-alt', color: 'text-purple-500' }
+])
 
-const courseLevelOptions = [
-  { id: 'beginner', label: 'Beginner', color: 'text-green-500' },
-  { id: 'intermediate', label: 'Intermediate', color: 'text-blue-500' },
-  { id: 'advanced', label: 'Advanced', color: 'text-purple-500' }
-]
+const courseLevelOptions = computed(() => [
+  { id: 'beginner', label: t('learning.levels.beginner'), color: 'text-green-500' },
+  { id: 'intermediate', label: t('learning.levels.intermediate'), color: 'text-blue-500' },
+  { id: 'advanced', label: t('learning.levels.advanced'), color: 'text-purple-500' }
+])
 
-const courseCategoryOptions = ['Technology', 'Business', 'Soft Skills', 'Design', 'Finance', 'Marketing']
+const courseCategoryOptions = computed(() => [
+  t('learning.categories.technology'),
+  t('learning.categories.business'),
+  t('learning.categories.softSkills'),
+  t('learning.categories.design'),
+  t('learning.categories.finance'),
+  t('learning.categories.marketing')
+])
 
-const allCoursesSortOptions = [
-  { value: 'popular', label: 'Most Popular', icon: 'fas fa-fire' },
-  { value: 'rating', label: 'Highest Rated', icon: 'fas fa-star' },
-  { value: 'newest', label: 'Newest', icon: 'fas fa-clock' },
-  { value: 'title', label: 'Title A-Z', icon: 'fas fa-sort-alpha-down' }
-]
+const allCoursesSortOptions = computed(() => [
+  { value: 'popular', label: t('learning.mostPopular'), icon: 'fas fa-fire' },
+  { value: 'rating', label: t('learning.highestRated'), icon: 'fas fa-star' },
+  { value: 'newest', label: t('common.newest'), icon: 'fas fa-clock' },
+  { value: 'title', label: t('learning.titleAZ'), icon: 'fas fa-sort-alpha-down' }
+])
 
 // Active Filters Count
 const activeFiltersCount = computed(() => {
@@ -2781,14 +2788,14 @@ function resumeFeaturedAutoPlay() {
             <div class="px-4 py-2 bg-gray-50/50 flex flex-wrap items-center gap-3">
               <!-- Search -->
               <div class="min-w-[200px] max-w-md relative">
-                <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+                <i class="fas fa-search absolute start-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
                 <input
                   v-model="allCoursesSearch"
                   type="text"
                   placeholder="Search courses..."
-                  class="w-full pl-9 pr-4 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all"
+                  class="w-full ps-9 pe-4 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all"
                 >
-                <button v-if="allCoursesSearch" @click="allCoursesSearch = ''" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                <button v-if="allCoursesSearch" @click="allCoursesSearch = ''" class="absolute end-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
                   <i class="fas fa-times text-xs"></i>
                 </button>
               </div>
@@ -2804,13 +2811,13 @@ function resumeFeaturedAutoPlay() {
                 >
                   <i class="fas fa-layer-group text-sm"></i>
                   <span>{{ allCoursesLevelFilter.length > 0 ? `${allCoursesLevelFilter.length} Levels` : 'Level' }}</span>
-                  <i :class="showLevelFilter ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ml-1"></i>
+                  <i :class="showLevelFilter ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ms-1"></i>
                 </button>
 
                 <!-- Dropdown Menu -->
                 <div
                   v-if="showLevelFilter"
-                  class="absolute left-0 top-full mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
+                  class="absolute start-0 top-full mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
                 >
                   <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Select Levels</div>
                   <div class="max-h-48 overflow-y-auto">
@@ -2819,7 +2826,7 @@ function resumeFeaturedAutoPlay() {
                       :key="level.id"
                       @click="toggleLevelFilterOption(level.id)"
                       :class="[
-                        'w-full px-3 py-2 text-left text-sm flex items-center gap-3 transition-colors',
+                        'w-full px-3 py-2 text-start text-sm flex items-center gap-3 transition-colors',
                         allCoursesLevelFilter.includes(level.id) ? 'bg-teal-50 text-teal-700' : 'text-gray-700 hover:bg-gray-50'
                       ]"
                     >
@@ -2862,13 +2869,13 @@ function resumeFeaturedAutoPlay() {
                 >
                   <i class="fas fa-folder text-sm"></i>
                   <span>{{ allCoursesCategoryFilter.length > 0 ? `${allCoursesCategoryFilter.length} Categories` : 'Category' }}</span>
-                  <i :class="showCategoryFilterDropdown ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ml-1"></i>
+                  <i :class="showCategoryFilterDropdown ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ms-1"></i>
                 </button>
 
                 <!-- Dropdown Menu -->
                 <div
                   v-if="showCategoryFilterDropdown"
-                  class="absolute left-0 top-full mt-2 w-64 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
+                  class="absolute start-0 top-full mt-2 w-64 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
                 >
                   <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Select Categories</div>
                   <div class="max-h-48 overflow-y-auto">
@@ -2877,7 +2884,7 @@ function resumeFeaturedAutoPlay() {
                       :key="cat"
                       @click="toggleCategoryFilterOption(cat)"
                       :class="[
-                        'w-full px-3 py-2 text-left text-sm flex items-center gap-3 transition-colors',
+                        'w-full px-3 py-2 text-start text-sm flex items-center gap-3 transition-colors',
                         allCoursesCategoryFilter.includes(cat) ? 'bg-teal-50 text-teal-700' : 'text-gray-700 hover:bg-gray-50'
                       ]"
                     >
@@ -2920,13 +2927,13 @@ function resumeFeaturedAutoPlay() {
                 >
                   <i class="fas fa-user-graduate text-sm"></i>
                   <span>{{ allCoursesEnrollmentFilter.length > 0 ? `${allCoursesEnrollmentFilter.length} Enrollment` : 'Enrollment' }}</span>
-                  <i :class="showEnrollmentFilter ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ml-1"></i>
+                  <i :class="showEnrollmentFilter ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ms-1"></i>
                 </button>
 
                 <!-- Dropdown Menu -->
                 <div
                   v-if="showEnrollmentFilter"
-                  class="absolute left-0 top-full mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
+                  class="absolute start-0 top-full mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
                 >
                   <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Enrollment</div>
                   <div class="max-h-48 overflow-y-auto">
@@ -2935,7 +2942,7 @@ function resumeFeaturedAutoPlay() {
                       :key="option.id"
                       @click="toggleEnrollmentFilterOption(option.id)"
                       :class="[
-                        'w-full px-3 py-2 text-left text-sm flex items-center gap-3 transition-colors',
+                        'w-full px-3 py-2 text-start text-sm flex items-center gap-3 transition-colors',
                         allCoursesEnrollmentFilter.includes(option.id) ? 'bg-teal-50 text-teal-700' : 'text-gray-700 hover:bg-gray-50'
                       ]"
                     >
@@ -2955,7 +2962,7 @@ function resumeFeaturedAutoPlay() {
                       :key="option.id"
                       @click="toggleEnrollmentFilterOption(option.id)"
                       :class="[
-                        'w-full px-3 py-2 text-left text-sm flex items-center gap-3 transition-colors',
+                        'w-full px-3 py-2 text-start text-sm flex items-center gap-3 transition-colors',
                         allCoursesEnrollmentFilter.includes(option.id) ? 'bg-teal-50 text-teal-700' : 'text-gray-700 hover:bg-gray-50'
                       ]"
                     >
@@ -2998,13 +3005,13 @@ function resumeFeaturedAutoPlay() {
                 >
                   <i class="fas fa-bookmark text-sm"></i>
                   <span>{{ selectedStatusFilters.length > 0 ? `${selectedStatusFilters.length} Saved & Shared` : 'Saved & Shared' }}</span>
-                  <i :class="showStatusFilter ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ml-1"></i>
+                  <i :class="showStatusFilter ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ms-1"></i>
                 </button>
 
                 <!-- Dropdown Menu -->
                 <div
                   v-if="showStatusFilter"
-                  class="absolute left-0 top-full mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
+                  class="absolute start-0 top-full mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
                 >
                   <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Filter by Status</div>
                   <div class="max-h-48 overflow-y-auto">
@@ -3013,7 +3020,7 @@ function resumeFeaturedAutoPlay() {
                       :key="option.id"
                       @click="toggleStatusFilter(option.id)"
                       :class="[
-                        'w-full px-3 py-2 text-left text-sm flex items-center gap-3 transition-colors',
+                        'w-full px-3 py-2 text-start text-sm flex items-center gap-3 transition-colors',
                         isStatusSelected(option.id) ? 'bg-teal-50 text-teal-700' : 'text-gray-700 hover:bg-gray-50'
                       ]"
                     >
@@ -3051,14 +3058,14 @@ function resumeFeaturedAutoPlay() {
               </div>
 
               <!-- Sort Options with Order Toggle -->
-              <div class="relative ml-auto flex items-center">
+              <div class="relative ms-auto flex items-center">
                 <button
                   @click="showAllCoursesSortDropdown = !showAllCoursesSortDropdown"
                   class="flex items-center gap-2 px-3 py-1.5 rounded-l-lg text-xs font-medium transition-all border border-r-0 bg-white border-gray-200 text-gray-600 hover:bg-gray-50"
                 >
                   <i :class="[allCoursesSortOptions.find(o => o.value === allCoursesSortBy)?.icon, 'text-sm text-teal-500']"></i>
                   <span>{{ allCoursesSortOptions.find(o => o.value === allCoursesSortBy)?.label }}</span>
-                  <i :class="showAllCoursesSortDropdown ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ml-1"></i>
+                  <i :class="showAllCoursesSortDropdown ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ms-1"></i>
                 </button>
                 <button
                   @click="allCoursesSortOrder = allCoursesSortOrder === 'asc' ? 'desc' : 'asc'"
@@ -3071,7 +3078,7 @@ function resumeFeaturedAutoPlay() {
                 <!-- Dropdown Menu -->
                 <div
                   v-if="showAllCoursesSortDropdown"
-                  class="absolute left-0 top-full mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
+                  class="absolute start-0 top-full mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
                 >
                   <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Sort By</div>
                   <div class="max-h-64 overflow-y-auto">
@@ -3080,7 +3087,7 @@ function resumeFeaturedAutoPlay() {
                       :key="option.value"
                       @click="allCoursesSortBy = option.value; showAllCoursesSortDropdown = false"
                       :class="[
-                        'w-full px-3 py-2 text-left text-sm flex items-center gap-3 transition-colors',
+                        'w-full px-3 py-2 text-start text-sm flex items-center gap-3 transition-colors',
                         allCoursesSortBy === option.value ? 'bg-teal-50 text-teal-700' : 'text-gray-700 hover:bg-gray-50'
                       ]"
                     >
@@ -3124,7 +3131,7 @@ function resumeFeaturedAutoPlay() {
               <span v-if="allCoursesSearch" class="px-2.5 py-1 bg-gray-100 text-gray-700 rounded-lg text-xs font-medium flex items-center gap-1.5 border border-gray-200">
                 <i class="fas fa-search text-[10px]"></i>
                 "{{ allCoursesSearch }}"
-                <button @click="allCoursesSearch = ''" class="ml-1 hover:text-gray-900 hover:bg-gray-200 rounded-full w-4 h-4 flex items-center justify-center"><i class="fas fa-times text-[10px]"></i></button>
+                <button @click="allCoursesSearch = ''" class="ms-1 hover:text-gray-900 hover:bg-gray-200 rounded-full w-4 h-4 flex items-center justify-center"><i class="fas fa-times text-[10px]"></i></button>
               </span>
               <!-- Level Filters -->
               <span
@@ -3134,7 +3141,7 @@ function resumeFeaturedAutoPlay() {
               >
                 <i class="fas fa-signal text-[10px]"></i>
                 {{ level.charAt(0).toUpperCase() + level.slice(1) }}
-                <button @click="toggleLevelFilter(level)" class="ml-1 hover:text-teal-900 hover:bg-teal-100 rounded-full w-4 h-4 flex items-center justify-center"><i class="fas fa-times text-[10px]"></i></button>
+                <button @click="toggleLevelFilter(level)" class="ms-1 hover:text-teal-900 hover:bg-teal-100 rounded-full w-4 h-4 flex items-center justify-center"><i class="fas fa-times text-[10px]"></i></button>
               </span>
               <!-- Category Filters -->
               <span
@@ -3144,7 +3151,7 @@ function resumeFeaturedAutoPlay() {
               >
                 <i class="fas fa-layer-group text-[10px]"></i>
                 {{ cat }}
-                <button @click="toggleCategoryFilter(cat)" class="ml-1 hover:text-teal-900 hover:bg-teal-100 rounded-full w-4 h-4 flex items-center justify-center"><i class="fas fa-times text-[10px]"></i></button>
+                <button @click="toggleCategoryFilter(cat)" class="ms-1 hover:text-teal-900 hover:bg-teal-100 rounded-full w-4 h-4 flex items-center justify-center"><i class="fas fa-times text-[10px]"></i></button>
               </span>
               <!-- Enrollment/Progress Filters -->
               <span
@@ -3154,7 +3161,7 @@ function resumeFeaturedAutoPlay() {
               >
                 <i class="fas fa-tasks text-[10px]"></i>
                 {{ getEnrollmentLabel(option) }}
-                <button @click="toggleEnrollmentFilterOption(option)" class="ml-1 hover:text-blue-900 hover:bg-blue-100 rounded-full w-4 h-4 flex items-center justify-center"><i class="fas fa-times text-[10px]"></i></button>
+                <button @click="toggleEnrollmentFilterOption(option)" class="ms-1 hover:text-blue-900 hover:bg-blue-100 rounded-full w-4 h-4 flex items-center justify-center"><i class="fas fa-times text-[10px]"></i></button>
               </span>
               <!-- Status Filters (Saved & Shared) -->
               <span
@@ -3164,7 +3171,7 @@ function resumeFeaturedAutoPlay() {
               >
                 <i :class="[status === 'saved' ? 'fas fa-bookmark' : 'fas fa-share-alt', 'text-[10px]']"></i>
                 {{ status === 'saved' ? 'My Saved' : 'Shared with me' }}
-                <button @click="toggleStatusFilter(status)" class="ml-1 hover:text-amber-900 hover:bg-amber-100 rounded-full w-4 h-4 flex items-center justify-center"><i class="fas fa-times text-[10px]"></i></button>
+                <button @click="toggleStatusFilter(status)" class="ms-1 hover:text-amber-900 hover:bg-amber-100 rounded-full w-4 h-4 flex items-center justify-center"><i class="fas fa-times text-[10px]"></i></button>
               </span>
             </div>
             <button @click="clearAllFilters" class="px-3 py-1.5 text-xs font-medium text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors flex items-center gap-1.5">
@@ -3188,7 +3195,7 @@ function resumeFeaturedAutoPlay() {
                   <button
                     @click.stop="toggleSaveAllCourse(course.id)"
                     :class="[
-                      'absolute top-2 right-2 w-8 h-8 rounded-full flex items-center justify-center transition-all z-10',
+                      'absolute top-2 end-2 w-8 h-8 rounded-full flex items-center justify-center transition-all z-10',
                       course.saved
                         ? 'bg-teal-500 text-white'
                         : 'bg-white/90 text-gray-600 opacity-0 group-hover:opacity-100 hover:bg-teal-500 hover:text-white'
@@ -3198,7 +3205,7 @@ function resumeFeaturedAutoPlay() {
                   </button>
 
                   <!-- Badges -->
-                  <div class="absolute top-2 left-2 flex gap-1.5 z-10">
+                  <div class="absolute top-2 start-2 flex gap-1.5 z-10">
                     <StatusBadge v-if="course.enrolled && course.statusClass === 'completed'" status="completed" size="xs" />
                     <StatusBadge v-else-if="course.enrolled && course.statusClass === 'in-progress'" status="in-progress" size="xs" />
                     <StatusBadge v-else-if="course.enrolled" status="pending" :label="course.status" size="xs" />
@@ -3206,7 +3213,7 @@ function resumeFeaturedAutoPlay() {
                   </div>
 
                   <!-- Duration Badge -->
-                  <div class="absolute bottom-3 right-3 all-course-duration-badge z-10">
+                  <div class="absolute bottom-3 end-3 all-course-duration-badge z-10">
                     <i class="fas fa-clock"></i> {{ course.duration }}
                   </div>
 
@@ -3216,7 +3223,7 @@ function resumeFeaturedAutoPlay() {
                   </div>
 
                   <!-- Progress Bar for Enrolled Courses -->
-                  <div v-if="course.enrolled" class="absolute bottom-0 left-0 right-0 h-1.5 bg-black/30 z-10">
+                  <div v-if="course.enrolled" class="absolute bottom-0 start-0 end-0 h-1.5 bg-black/30 z-10">
                     <div class="h-full bg-gradient-to-r from-teal-400 to-teal-500 transition-all" :style="{ width: course.progress + '%' }"></div>
                   </div>
                 </div>
@@ -3297,7 +3304,7 @@ function resumeFeaturedAutoPlay() {
                   </div>
                   <div class="all-course-list-duration">{{ course.duration }}</div>
                   <!-- Progress Bar for Enrolled Courses -->
-                  <div v-if="course.enrolled" class="absolute bottom-0 left-0 right-0 h-1 bg-black/30 rounded-b-lg">
+                  <div v-if="course.enrolled" class="absolute bottom-0 start-0 end-0 h-1 bg-black/30 rounded-b-lg">
                     <div class="h-full bg-gradient-to-r from-teal-400 to-teal-500 transition-all rounded-bl-lg" :style="{ width: course.progress + '%' }"></div>
                   </div>
                 </div>
@@ -3356,7 +3363,7 @@ function resumeFeaturedAutoPlay() {
               <h3 class="all-courses-empty-title">No courses found</h3>
               <p class="all-courses-empty-text">{{ currentView === 'my-courses' ? 'You haven\'t enrolled, saved, or been shared any courses yet' : 'Try adjusting your filters or search query' }}</p>
               <button @click="allCoursesSearch = ''; allCoursesLevelFilter = []; allCoursesCategoryFilter = []; allCoursesEnrollmentFilter = []; selectedStatusFilters = []" class="all-courses-clear-btn">
-                <i class="fas fa-undo mr-2"></i> Clear Filters
+                <i class="fas fa-undo me-2"></i> Clear Filters
               </button>
             </div>
 
@@ -3494,14 +3501,14 @@ function resumeFeaturedAutoPlay() {
             <div class="px-4 py-2 bg-gray-50/50 flex flex-wrap items-center gap-3">
               <!-- Search -->
               <div class="min-w-[200px] max-w-md relative">
-                <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+                <i class="fas fa-search absolute start-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
                 <input
                   v-model="pathsSearch"
                   type="text"
                   placeholder="Search learning paths..."
-                  class="w-full pl-9 pr-4 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all"
+                  class="w-full ps-9 pe-4 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all"
                 >
-                <button v-if="pathsSearch" @click="pathsSearch = ''" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                <button v-if="pathsSearch" @click="pathsSearch = ''" class="absolute end-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
                   <i class="fas fa-times text-xs"></i>
                 </button>
               </div>
@@ -3517,13 +3524,13 @@ function resumeFeaturedAutoPlay() {
                 >
                   <i class="fas fa-layer-group text-sm"></i>
                   <span>{{ pathsLevelFilter.length > 0 ? `${pathsLevelFilter.length} Levels` : 'Level' }}</span>
-                  <i :class="showPathsLevelFilter ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ml-1"></i>
+                  <i :class="showPathsLevelFilter ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ms-1"></i>
                 </button>
 
                 <!-- Dropdown Menu -->
                 <div
                   v-if="showPathsLevelFilter"
-                  class="absolute left-0 top-full mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
+                  class="absolute start-0 top-full mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
                 >
                   <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Select Levels</div>
                   <div class="max-h-48 overflow-y-auto">
@@ -3532,7 +3539,7 @@ function resumeFeaturedAutoPlay() {
                       :key="level.id"
                       @click="togglePathsLevelFilter(level.id)"
                       :class="[
-                        'w-full px-3 py-2 text-left text-sm flex items-center gap-3 transition-colors',
+                        'w-full px-3 py-2 text-start text-sm flex items-center gap-3 transition-colors',
                         pathsLevelFilter.includes(level.id) ? 'bg-teal-50 text-teal-700' : 'text-gray-700 hover:bg-gray-50'
                       ]"
                     >
@@ -3575,19 +3582,19 @@ function resumeFeaturedAutoPlay() {
                 >
                   <i class="fas fa-route text-sm"></i>
                   <span>{{ pathFilter === 'all' ? 'All Paths' : pathFilter === 'enrolled' ? 'My Enrolled' : 'Available' }}</span>
-                  <i :class="showPathsEnrollmentFilter ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ml-1"></i>
+                  <i :class="showPathsEnrollmentFilter ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ms-1"></i>
                 </button>
                 <!-- Dropdown Panel -->
                 <div
                   v-if="showPathsEnrollmentFilter"
-                  class="absolute left-0 top-full mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
+                  class="absolute start-0 top-full mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
                 >
                   <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Filter by Status</div>
                   <div class="max-h-64 overflow-y-auto">
                     <button
                       @click="pathFilter = 'all'; showPathsEnrollmentFilter = false"
                       :class="[
-                        'w-full px-3 py-2 text-left text-sm flex items-center gap-3 transition-colors',
+                        'w-full px-3 py-2 text-start text-sm flex items-center gap-3 transition-colors',
                         pathFilter === 'all' ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50'
                       ]"
                     >
@@ -3603,7 +3610,7 @@ function resumeFeaturedAutoPlay() {
                     <button
                       @click="pathFilter = 'enrolled'; showPathsEnrollmentFilter = false"
                       :class="[
-                        'w-full px-3 py-2 text-left text-sm flex items-center gap-3 transition-colors',
+                        'w-full px-3 py-2 text-start text-sm flex items-center gap-3 transition-colors',
                         pathFilter === 'enrolled' ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50'
                       ]"
                     >
@@ -3619,7 +3626,7 @@ function resumeFeaturedAutoPlay() {
                     <button
                       @click="pathFilter = 'available'; showPathsEnrollmentFilter = false"
                       :class="[
-                        'w-full px-3 py-2 text-left text-sm flex items-center gap-3 transition-colors',
+                        'w-full px-3 py-2 text-start text-sm flex items-center gap-3 transition-colors',
                         pathFilter === 'available' ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50'
                       ]"
                     >
@@ -3638,14 +3645,14 @@ function resumeFeaturedAutoPlay() {
               </div>
 
               <!-- Sort Options with Order Toggle -->
-              <div class="relative ml-auto flex items-center">
+              <div class="relative ms-auto flex items-center">
                 <button
                   @click="showPathsSortDropdown = !showPathsSortDropdown"
                   class="flex items-center gap-2 px-3 py-1.5 rounded-l-lg text-xs font-medium transition-all border border-r-0 bg-white border-gray-200 text-gray-600 hover:bg-gray-50"
                 >
                   <i :class="[pathsSortOptions.find(o => o.value === pathsSortBy)?.icon, 'text-sm text-teal-500']"></i>
                   <span>{{ pathsSortOptions.find(o => o.value === pathsSortBy)?.label }}</span>
-                  <i :class="showPathsSortDropdown ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ml-1"></i>
+                  <i :class="showPathsSortDropdown ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ms-1"></i>
                 </button>
                 <button
                   @click="pathsSortOrder = pathsSortOrder === 'asc' ? 'desc' : 'asc'"
@@ -3658,7 +3665,7 @@ function resumeFeaturedAutoPlay() {
                 <!-- Dropdown Menu -->
                 <div
                   v-if="showPathsSortDropdown"
-                  class="absolute left-0 top-full mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
+                  class="absolute start-0 top-full mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
                 >
                   <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Sort By</div>
                   <div class="max-h-64 overflow-y-auto">
@@ -3667,7 +3674,7 @@ function resumeFeaturedAutoPlay() {
                       :key="option.value"
                       @click="pathsSortBy = option.value; showPathsSortDropdown = false"
                       :class="[
-                        'w-full px-3 py-2 text-left text-sm flex items-center gap-3 transition-colors',
+                        'w-full px-3 py-2 text-start text-sm flex items-center gap-3 transition-colors',
                         pathsSortBy === option.value ? 'bg-teal-50 text-teal-700' : 'text-gray-700 hover:bg-gray-50'
                       ]"
                     >
@@ -3711,7 +3718,7 @@ function resumeFeaturedAutoPlay() {
               <span v-if="pathsSearch" class="px-2.5 py-1 bg-gray-100 text-gray-700 rounded-lg text-xs font-medium flex items-center gap-1.5 border border-gray-200">
                 <i class="fas fa-search text-[10px]"></i>
                 "{{ pathsSearch }}"
-                <button @click="pathsSearch = ''" class="ml-1 hover:text-gray-900 hover:bg-gray-200 rounded-full w-4 h-4 flex items-center justify-center"><i class="fas fa-times text-[10px]"></i></button>
+                <button @click="pathsSearch = ''" class="ms-1 hover:text-gray-900 hover:bg-gray-200 rounded-full w-4 h-4 flex items-center justify-center"><i class="fas fa-times text-[10px]"></i></button>
               </span>
               <!-- Level Filters -->
               <span
@@ -3721,13 +3728,13 @@ function resumeFeaturedAutoPlay() {
               >
                 <i class="fas fa-signal text-[10px]"></i>
                 {{ level.charAt(0).toUpperCase() + level.slice(1) }}
-                <button @click="togglePathsLevelFilter(level)" class="ml-1 hover:text-teal-900 hover:bg-teal-100 rounded-full w-4 h-4 flex items-center justify-center"><i class="fas fa-times text-[10px]"></i></button>
+                <button @click="togglePathsLevelFilter(level)" class="ms-1 hover:text-teal-900 hover:bg-teal-100 rounded-full w-4 h-4 flex items-center justify-center"><i class="fas fa-times text-[10px]"></i></button>
               </span>
               <!-- Enrollment Filter -->
               <span v-if="pathFilter !== 'all'" class="px-2.5 py-1 bg-blue-50 text-blue-700 rounded-lg text-xs font-medium flex items-center gap-1.5 border border-blue-100">
                 <i class="fas fa-user-graduate text-[10px]"></i>
                 {{ pathFilter === 'enrolled' ? 'My Enrolled' : 'Available' }}
-                <button @click="pathFilter = 'all'" class="ml-1 hover:text-blue-900 hover:bg-blue-100 rounded-full w-4 h-4 flex items-center justify-center"><i class="fas fa-times text-[10px]"></i></button>
+                <button @click="pathFilter = 'all'" class="ms-1 hover:text-blue-900 hover:bg-blue-100 rounded-full w-4 h-4 flex items-center justify-center"><i class="fas fa-times text-[10px]"></i></button>
               </span>
             </div>
             <button @click="clearAllPathsFilters" class="px-3 py-1.5 text-xs font-medium text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors flex items-center gap-1.5">
@@ -3748,13 +3755,13 @@ function resumeFeaturedAutoPlay() {
 
                   <!-- Save Button -->
                   <button
-                    class="absolute top-2 right-2 w-8 h-8 rounded-full flex items-center justify-center transition-all z-10 bg-white/90 text-gray-600 opacity-0 group-hover:opacity-100 hover:bg-teal-500 hover:text-white"
+                    class="absolute top-2 end-2 w-8 h-8 rounded-full flex items-center justify-center transition-all z-10 bg-white/90 text-gray-600 opacity-0 group-hover:opacity-100 hover:bg-teal-500 hover:text-white"
                   >
                     <i class="far fa-bookmark text-sm"></i>
                   </button>
 
                   <!-- Badges -->
-                  <div class="absolute top-2 left-2 flex gap-1.5 z-10">
+                  <div class="absolute top-2 start-2 flex gap-1.5 z-10">
                     <StatusBadge v-if="path.isEnrolled && path.progress === 100" status="completed" size="xs" />
                     <StatusBadge v-else-if="path.isEnrolled && path.progress > 0" status="in-progress" size="xs" />
                     <StatusBadge v-else-if="path.isEnrolled" status="pending" label="Not Started" size="xs" />
@@ -3762,7 +3769,7 @@ function resumeFeaturedAutoPlay() {
                   </div>
 
                   <!-- Duration Badge -->
-                  <div class="absolute bottom-3 right-3 all-course-duration-badge z-10">
+                  <div class="absolute bottom-3 end-3 all-course-duration-badge z-10">
                     <i class="fas fa-clock"></i> {{ path.duration }}
                   </div>
 
@@ -3772,7 +3779,7 @@ function resumeFeaturedAutoPlay() {
                   </div>
 
                   <!-- Progress Bar for Enrolled Paths -->
-                  <div v-if="path.isEnrolled" class="absolute bottom-0 left-0 right-0 h-1.5 bg-black/30 z-10">
+                  <div v-if="path.isEnrolled" class="absolute bottom-0 start-0 end-0 h-1.5 bg-black/30 z-10">
                     <div class="h-full bg-gradient-to-r from-teal-400 to-teal-500 transition-all" :style="{ width: path.progress + '%' }"></div>
                   </div>
                 </div>
@@ -4055,15 +4062,15 @@ function resumeFeaturedAutoPlay() {
               <!-- Search -->
               <div class="relative flex-1 max-w-xl">
                 <div class="relative">
-                  <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-400"></i>
+                  <i class="fas fa-search absolute start-3 top-1/2 -translate-y-1/2 text-sm text-gray-400"></i>
                   <input
                     v-model="lessonsSearch"
                     type="text"
                     placeholder="Search lessons..."
                     @input="lessonsCurrentPage = 1"
-                    class="w-full pl-9 pr-20 py-2 text-sm rounded-lg bg-white border border-gray-200 focus:ring-2 focus:ring-teal-500 focus:border-transparent focus:outline-none transition-all"
+                    class="w-full ps-9 pe-20 py-2 text-sm rounded-lg bg-white border border-gray-200 focus:ring-2 focus:ring-teal-500 focus:border-transparent focus:outline-none transition-all"
                   >
-                  <div class="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                  <div class="absolute end-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
                     <button
                       v-if="lessonsSearch"
                       @click="lessonsSearch = ''; lessonsCurrentPage = 1"
@@ -4086,14 +4093,14 @@ function resumeFeaturedAutoPlay() {
                 >
                   <i class="fas fa-layer-group text-sm"></i>
                   <span>{{ selectedLessonsCategories.length > 0 ? `Category (${selectedLessonsCategories.length})` : 'Category' }}</span>
-                  <i :class="showLessonsCategoryDropdown ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ml-1"></i>
+                  <i :class="showLessonsCategoryDropdown ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ms-1"></i>
                 </button>
 
                 <div v-if="showLessonsCategoryDropdown" @click="showLessonsCategoryDropdown = false" class="fixed inset-0 z-40"></div>
 
                 <div
                   v-if="showLessonsCategoryDropdown"
-                  class="absolute left-0 top-full mt-2 w-64 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
+                  class="absolute start-0 top-full mt-2 w-64 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
                 >
                   <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Categories</div>
                   <div class="max-h-48 overflow-y-auto">
@@ -4102,7 +4109,7 @@ function resumeFeaturedAutoPlay() {
                       :key="cat.id"
                       @click="toggleLessonsCategoryFilter(cat.id)"
                       :class="[
-                        'w-full px-3 py-2 text-left text-sm flex items-center gap-3 transition-colors',
+                        'w-full px-3 py-2 text-start text-sm flex items-center gap-3 transition-colors',
                         isLessonsCategorySelected(cat.id) ? 'bg-teal-50 text-teal-700' : 'text-gray-700 hover:bg-gray-50'
                       ]"
                     >
@@ -4148,14 +4155,14 @@ function resumeFeaturedAutoPlay() {
                 >
                   <i class="fas fa-flag text-sm"></i>
                   <span>{{ selectedLessonsPriorities.length > 0 ? `Priority (${selectedLessonsPriorities.length})` : 'Priority' }}</span>
-                  <i :class="showLessonsPriorityDropdown ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ml-1"></i>
+                  <i :class="showLessonsPriorityDropdown ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ms-1"></i>
                 </button>
 
                 <div v-if="showLessonsPriorityDropdown" @click="showLessonsPriorityDropdown = false" class="fixed inset-0 z-40"></div>
 
                 <div
                   v-if="showLessonsPriorityDropdown"
-                  class="absolute left-0 top-full mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
+                  class="absolute start-0 top-full mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
                 >
                   <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Priorities</div>
                   <div class="max-h-48 overflow-y-auto">
@@ -4164,7 +4171,7 @@ function resumeFeaturedAutoPlay() {
                       :key="pri.id"
                       @click="toggleLessonsPriorityFilter(pri.id)"
                       :class="[
-                        'w-full px-3 py-2 text-left text-sm flex items-center gap-3 transition-colors',
+                        'w-full px-3 py-2 text-start text-sm flex items-center gap-3 transition-colors',
                         isLessonsPrioritySelected(pri.id) ? 'bg-teal-50 text-teal-700' : 'text-gray-700 hover:bg-gray-50'
                       ]"
                     >
@@ -4209,14 +4216,14 @@ function resumeFeaturedAutoPlay() {
                 >
                   <i class="fas fa-tags text-sm"></i>
                   <span>{{ selectedLessonsTags.length > 0 ? `Tags (${selectedLessonsTags.length})` : 'Tags' }}</span>
-                  <i :class="showLessonsTagsDropdown ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ml-1"></i>
+                  <i :class="showLessonsTagsDropdown ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ms-1"></i>
                 </button>
 
                 <div v-if="showLessonsTagsDropdown" @click="showLessonsTagsDropdown = false" class="fixed inset-0 z-40"></div>
 
                 <div
                   v-if="showLessonsTagsDropdown"
-                  class="absolute left-0 top-full mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
+                  class="absolute start-0 top-full mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
                 >
                   <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Tags</div>
                   <div class="max-h-48 overflow-y-auto">
@@ -4225,7 +4232,7 @@ function resumeFeaturedAutoPlay() {
                       :key="tag"
                       @click="toggleLessonsTagFilter(tag)"
                       :class="[
-                        'w-full px-3 py-2 text-left text-sm flex items-center gap-3 transition-colors',
+                        'w-full px-3 py-2 text-start text-sm flex items-center gap-3 transition-colors',
                         isLessonsTagSelected(tag) ? 'bg-teal-50 text-teal-700' : 'text-gray-700 hover:bg-gray-50'
                       ]"
                     >
@@ -4272,14 +4279,14 @@ function resumeFeaturedAutoPlay() {
               </button>
 
               <!-- Sort Options with Order Toggle -->
-              <div class="relative ml-auto flex items-center">
+              <div class="relative ms-auto flex items-center">
                 <button
                   @click="showLessonsSortDropdown = !showLessonsSortDropdown"
                   class="flex items-center gap-2 px-3 py-1.5 rounded-l-lg text-xs font-medium transition-all border border-r-0 bg-white border-gray-200 text-gray-600 hover:bg-gray-50"
                 >
                   <i :class="[lessonsSortOptions.find(o => o.value === lessonsSortBy)?.icon || 'fas fa-sort', 'text-sm text-teal-500']"></i>
                   <span>{{ lessonsSortOptions.find(o => o.value === lessonsSortBy)?.label || 'Sort' }}</span>
-                  <i :class="showLessonsSortDropdown ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ml-1"></i>
+                  <i :class="showLessonsSortDropdown ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ms-1"></i>
                 </button>
                 <button
                   @click="lessonsSortOrder = lessonsSortOrder === 'asc' ? 'desc' : 'asc'"
@@ -4293,7 +4300,7 @@ function resumeFeaturedAutoPlay() {
 
                 <div
                   v-if="showLessonsSortDropdown"
-                  class="absolute left-0 top-full mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
+                  class="absolute start-0 top-full mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
                 >
                   <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Sort By</div>
                   <div class="max-h-64 overflow-y-auto">
@@ -4302,7 +4309,7 @@ function resumeFeaturedAutoPlay() {
                       :key="option.value"
                       @click="lessonsSortBy = option.value; showLessonsSortDropdown = false"
                       :class="[
-                        'w-full px-3 py-2 text-left text-sm flex items-center gap-3 transition-colors',
+                        'w-full px-3 py-2 text-start text-sm flex items-center gap-3 transition-colors',
                         lessonsSortBy === option.value ? 'bg-teal-50 text-teal-700' : 'text-gray-700 hover:bg-gray-50'
                       ]"
                     >
@@ -4345,7 +4352,7 @@ function resumeFeaturedAutoPlay() {
               <span v-if="lessonsSearch" class="px-2.5 py-1 bg-gray-100 text-gray-700 rounded-lg text-xs font-medium flex items-center gap-1.5 border border-gray-200">
                 <i class="fas fa-search text-[10px]"></i>
                 "{{ lessonsSearch }}"
-                <button @click="lessonsSearch = ''; lessonsCurrentPage = 1" class="ml-1 hover:text-gray-900 hover:bg-gray-200 rounded-full w-4 h-4 flex items-center justify-center"><i class="fas fa-times text-[10px]"></i></button>
+                <button @click="lessonsSearch = ''; lessonsCurrentPage = 1" class="ms-1 hover:text-gray-900 hover:bg-gray-200 rounded-full w-4 h-4 flex items-center justify-center"><i class="fas fa-times text-[10px]"></i></button>
               </span>
               <!-- Category Filters (multiple) -->
               <span
@@ -4355,7 +4362,7 @@ function resumeFeaturedAutoPlay() {
               >
                 <i class="fas fa-layer-group text-[10px]"></i>
                 {{ getLessonCategoryInfo(catId as LessonCategory).label }}
-                <button @click="toggleLessonsCategoryFilter(catId)" class="ml-1 hover:text-teal-900 hover:bg-teal-100 rounded-full w-4 h-4 flex items-center justify-center"><i class="fas fa-times text-[10px]"></i></button>
+                <button @click="toggleLessonsCategoryFilter(catId)" class="ms-1 hover:text-teal-900 hover:bg-teal-100 rounded-full w-4 h-4 flex items-center justify-center"><i class="fas fa-times text-[10px]"></i></button>
               </span>
               <!-- Priority Filters (multiple) -->
               <span
@@ -4365,7 +4372,7 @@ function resumeFeaturedAutoPlay() {
               >
                 <i class="fas fa-flag text-[10px]"></i>
                 {{ priId }}
-                <button @click="toggleLessonsPriorityFilter(priId)" class="ml-1 hover:text-teal-900 hover:bg-teal-100 rounded-full w-4 h-4 flex items-center justify-center"><i class="fas fa-times text-[10px]"></i></button>
+                <button @click="toggleLessonsPriorityFilter(priId)" class="ms-1 hover:text-teal-900 hover:bg-teal-100 rounded-full w-4 h-4 flex items-center justify-center"><i class="fas fa-times text-[10px]"></i></button>
               </span>
               <!-- Tag Filters (multiple) -->
               <span
@@ -4375,7 +4382,7 @@ function resumeFeaturedAutoPlay() {
               >
                 <i class="fas fa-tag text-[10px]"></i>
                 {{ tag }}
-                <button @click="toggleLessonsTagFilter(tag)" class="ml-1 hover:text-teal-900 hover:bg-teal-100 rounded-full w-4 h-4 flex items-center justify-center"><i class="fas fa-times text-[10px]"></i></button>
+                <button @click="toggleLessonsTagFilter(tag)" class="ms-1 hover:text-teal-900 hover:bg-teal-100 rounded-full w-4 h-4 flex items-center justify-center"><i class="fas fa-times text-[10px]"></i></button>
               </span>
               <!-- Bookmarked Filter -->
               <span
@@ -4384,7 +4391,7 @@ function resumeFeaturedAutoPlay() {
               >
                 <i class="fas fa-bookmark text-[10px]"></i>
                 Bookmarked
-                <button @click="showBookmarkedOnly = false; lessonsCurrentPage = 1" class="ml-1 hover:text-amber-900 hover:bg-amber-100 rounded-full w-4 h-4 flex items-center justify-center"><i class="fas fa-times text-[10px]"></i></button>
+                <button @click="showBookmarkedOnly = false; lessonsCurrentPage = 1" class="ms-1 hover:text-amber-900 hover:bg-amber-100 rounded-full w-4 h-4 flex items-center justify-center"><i class="fas fa-times text-[10px]"></i></button>
               </span>
             </div>
             <button @click="clearLessonsFilters" class="px-3 py-1.5 text-xs font-medium text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors flex items-center gap-1.5">
@@ -4854,7 +4861,7 @@ function resumeFeaturedAutoPlay() {
             </div>
 
             <!-- Sort Dropdown -->
-            <div class="relative ml-auto flex items-center">
+            <div class="relative ms-auto flex items-center">
               <button
                 @click="showCertSortDropdown = !showCertSortDropdown"
                 class="cert-sort-btn"
@@ -5129,7 +5136,7 @@ function resumeFeaturedAutoPlay() {
 
           <div class="ai-rec-footer">
             <span class="text-sm text-gray-500">
-              <i class="fas fa-clock mr-1"></i>
+              <i class="fas fa-clock me-1"></i>
               {{ rec.estimatedTime }}
             </span>
             <button class="ai-rec-enroll-btn">
@@ -6202,7 +6209,7 @@ function resumeFeaturedAutoPlay() {
 .featured-course-play i {
   color: #0d9488;
   font-size: 1.25rem;
-  margin-left: 3px;
+  margin-inline-start: 3px;
 }
 
 .featured-course-progress-bar {
@@ -6573,7 +6580,7 @@ function resumeFeaturedAutoPlay() {
 .up-next-play i {
   color: #0d9488;
   font-size: 0.625rem;
-  margin-left: 1px;
+  margin-inline-start: 1px;
 }
 
 .up-next-duration {
@@ -6760,7 +6767,7 @@ function resumeFeaturedAutoPlay() {
 }
 
 .up-next-meta i {
-  margin-right: 0.125rem;
+  margin-inline-end: 0.125rem;
 }
 
 .up-next-meta span:first-child i {
@@ -7522,7 +7529,7 @@ function resumeFeaturedAutoPlay() {
   border-radius: 1rem;
   padding: 1.25rem;
   box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  border-left: 4px solid #14b8a6;
+  border-inline-start: 4px solid #14b8a6;
 }
 
 .my-paths-header {
@@ -7855,7 +7862,7 @@ function resumeFeaturedAutoPlay() {
 .courses-more {
   font-size: 0.625rem;
   color: #94a3b8;
-  padding-left: 1.125rem;
+  padding-inline-start: 1.125rem;
 }
 
 /* Skills */
@@ -8006,7 +8013,7 @@ function resumeFeaturedAutoPlay() {
 .all-course-play-btn i {
   color: #0d9488;
   font-size: 1rem;
-  margin-left: 2px;
+  margin-inline-start: 2px;
 }
 
 /* All Courses List View */
@@ -8065,7 +8072,7 @@ function resumeFeaturedAutoPlay() {
 .all-course-list-play-overlay i {
   color: #0d9488;
   font-size: 0.75rem;
-  margin-left: 2px;
+  margin-inline-start: 2px;
 }
 
 .all-course-list-duration {
@@ -8591,7 +8598,7 @@ function resumeFeaturedAutoPlay() {
 
   .courses-more {
     display: block;
-    padding-left: 0;
+    padding-inline-start: 0;
   }
 
   .my-path-skills {
@@ -9386,7 +9393,7 @@ function resumeFeaturedAutoPlay() {
   font-size: 0.85rem;
   opacity: 0.9;
   line-height: 1.4;
-  padding-left: 1rem;
+  padding-inline-start: 1rem;
   position: relative;
 }
 
@@ -9762,7 +9769,7 @@ function resumeFeaturedAutoPlay() {
 }
 
 .ll-dropdown-item .fa-check {
-  margin-left: auto;
+  margin-inline-start: auto;
   color: #14b8a6;
 }
 
@@ -9829,7 +9836,7 @@ function resumeFeaturedAutoPlay() {
   color: #14b8a6;
   cursor: pointer;
   padding: 0;
-  margin-left: 0.25rem;
+  margin-inline-start: 0.25rem;
 }
 
 .ll-active-chip button:hover {
@@ -9837,7 +9844,7 @@ function resumeFeaturedAutoPlay() {
 }
 
 .ll-clear-all {
-  margin-left: auto;
+  margin-inline-start: auto;
   padding: 0.375rem 0.75rem;
   border: none;
   background: transparent;
@@ -10429,7 +10436,7 @@ function resumeFeaturedAutoPlay() {
 .ll-impact-highlight {
   padding: 1rem;
   background: #f0fdf4;
-  border-left: 3px solid #22c55e;
+  border-inline-start: 3px solid #22c55e;
   border-radius: 0.5rem;
   font-size: 0.9rem;
   color: #166534;
@@ -10881,7 +10888,7 @@ function resumeFeaturedAutoPlay() {
 
 .cert-filter-btn .chevron {
   font-size: 0.625rem;
-  margin-left: 0.25rem;
+  margin-inline-start: 0.25rem;
 }
 
 .cert-dropdown-panel {
@@ -10972,7 +10979,7 @@ function resumeFeaturedAutoPlay() {
 }
 
 .cert-dropdown-option .check-icon {
-  margin-left: auto;
+  margin-inline-start: auto;
   font-size: 0.75rem;
   color: #14b8a6;
 }
@@ -11003,7 +11010,7 @@ function resumeFeaturedAutoPlay() {
 
 .cert-sort-btn .chevron {
   font-size: 0.625rem;
-  margin-left: 0.25rem;
+  margin-inline-start: 0.25rem;
 }
 
 .cert-sort-order-btn {
@@ -11122,7 +11129,7 @@ function resumeFeaturedAutoPlay() {
   background: rgba(0, 0, 0, 0.1);
   border: none;
   cursor: pointer;
-  margin-left: 0.25rem;
+  margin-inline-start: 0.25rem;
   transition: all 0.2s ease;
 }
 
@@ -12460,7 +12467,7 @@ function resumeFeaturedAutoPlay() {
 
 .path-outcomes li {
   position: relative;
-  padding-left: 1rem;
+  padding-inline-start: 1rem;
   font-size: 0.8rem;
   color: #4b5563;
   margin-bottom: 0.375rem;

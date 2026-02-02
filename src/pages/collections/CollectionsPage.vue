@@ -72,28 +72,28 @@ const showTypeFilter = ref(false)
 const showSortDropdown = ref(false)
 
 // View options
-const viewOptions = ref([
-  { id: 'all', name: 'All Collections', icon: 'fas fa-layer-group', color: 'text-teal-500' },
-  { id: 'my', name: 'My Collections', icon: 'fas fa-user', color: 'text-blue-500' },
-  { id: 'shared', name: 'Shared with Me', icon: 'fas fa-share-alt', color: 'text-purple-500' },
-  { id: 'recent', name: 'Recently Viewed', icon: 'fas fa-clock', color: 'text-amber-500' }
+const viewOptions = computed(() => [
+  { id: 'all', name: t('collections.allCollections'), icon: 'fas fa-layer-group', color: 'text-teal-500' },
+  { id: 'my', name: t('collections.myCollections'), icon: 'fas fa-user', color: 'text-blue-500' },
+  { id: 'shared', name: t('collections.sharedWithMe'), icon: 'fas fa-share-alt', color: 'text-purple-500' },
+  { id: 'recent', name: t('collections.recentlyViewed'), icon: 'fas fa-clock', color: 'text-amber-500' }
 ])
 
 // Type filter options
-const typeOptions = ref([
-  { id: 'all', label: 'All Types', icon: 'fas fa-asterisk' },
-  { id: 'mixed', label: 'Mixed Content', icon: 'fas fa-layer-group' },
-  { id: 'articles', label: 'Articles Only', icon: 'fas fa-newspaper' },
-  { id: 'documents', label: 'Documents Only', icon: 'fas fa-file-alt' },
-  { id: 'media', label: 'Media Only', icon: 'fas fa-photo-video' }
+const typeOptions = computed(() => [
+  { id: 'all', label: t('collections.allTypes'), icon: 'fas fa-asterisk' },
+  { id: 'mixed', label: t('collections.mixedContent'), icon: 'fas fa-layer-group' },
+  { id: 'articles', label: t('collections.articlesOnly'), icon: 'fas fa-newspaper' },
+  { id: 'documents', label: t('collections.documentsOnly'), icon: 'fas fa-file-alt' },
+  { id: 'media', label: t('collections.mediaOnly'), icon: 'fas fa-photo-video' }
 ])
 
 // Sort options
-const sortOptions = ref([
-  { id: 'updated', label: 'Recently Updated', icon: 'fas fa-clock' },
-  { id: 'created', label: 'Date Created', icon: 'fas fa-calendar' },
-  { id: 'name', label: 'Name (A-Z)', icon: 'fas fa-sort-alpha-down' },
-  { id: 'items', label: 'Most Items', icon: 'fas fa-sort-numeric-down' }
+const sortOptions = computed(() => [
+  { id: 'updated', label: t('collections.recentlyUpdated'), icon: 'fas fa-clock' },
+  { id: 'created', label: t('collections.dateCreated'), icon: 'fas fa-calendar' },
+  { id: 'name', label: t('collections.nameAZ'), icon: 'fas fa-sort-alpha-down' },
+  { id: 'items', label: t('collections.mostItems'), icon: 'fas fa-sort-numeric-down' }
 ])
 
 // Recently viewed collections (for the "Recent" view)
@@ -320,10 +320,10 @@ function formatDate(dateString: string): string {
   const diffMs = now.getTime() - date.getTime()
   const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
 
-  if (diffDays === 0) return 'Today'
-  if (diffDays === 1) return 'Yesterday'
-  if (diffDays < 7) return `${diffDays} days ago`
-  if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`
+  if (diffDays === 0) return t('common.today')
+  if (diffDays === 1) return t('common.yesterday')
+  if (diffDays < 7) return t('common.daysAgo', { count: diffDays })
+  if (diffDays < 30) return t('common.weeksAgo', { count: Math.floor(diffDays / 7) })
   return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
 }
 
@@ -354,11 +354,11 @@ function createNewCollection() {
 }
 
 function getCurrentSortLabel(): string {
-  return sortOptions.value.find(o => o.id === sortBy.value)?.label || 'Recently Updated'
+  return sortOptions.value.find(o => o.id === sortBy.value)?.label || t('collections.recentlyUpdated')
 }
 
 function getCurrentTypeLabel(): string {
-  return typeOptions.value.find(o => o.id === selectedType.value)?.label || 'All Types'
+  return typeOptions.value.find(o => o.id === selectedType.value)?.label || t('collections.allTypes')
 }
 
 // New collection form
@@ -464,7 +464,7 @@ function saveNewCollection() {
           >
             <i class="fas fa-filter"></i>
             <span>{{ getCurrentTypeLabel() }}</span>
-            <i :class="showTypeFilter ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="ml-1"></i>
+            <i :class="showTypeFilter ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="ms-1"></i>
           </button>
           <div v-if="showTypeFilter" class="dropdown-menu">
             <button
@@ -475,7 +475,7 @@ function saveNewCollection() {
             >
               <i :class="option.icon"></i>
               <span>{{ option.label }}</span>
-              <i v-if="selectedType === option.id" class="fas fa-check ml-auto"></i>
+              <i v-if="selectedType === option.id" class="fas fa-check ms-auto"></i>
             </button>
           </div>
           <div v-if="showTypeFilter" @click="showTypeFilter = false" class="dropdown-backdrop"></div>
@@ -489,7 +489,7 @@ function saveNewCollection() {
           >
             <i class="fas fa-sort"></i>
             <span>{{ getCurrentSortLabel() }}</span>
-            <i :class="showSortDropdown ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="ml-1"></i>
+            <i :class="showSortDropdown ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="ms-1"></i>
           </button>
           <div v-if="showSortDropdown" class="dropdown-menu">
             <button
@@ -500,7 +500,7 @@ function saveNewCollection() {
             >
               <i :class="option.icon"></i>
               <span>{{ option.label }}</span>
-              <i v-if="sortBy === option.id" class="fas fa-check ml-auto"></i>
+              <i v-if="sortBy === option.id" class="fas fa-check ms-auto"></i>
             </button>
           </div>
           <div v-if="showSortDropdown" @click="showSortDropdown = false" class="dropdown-backdrop"></div>
@@ -567,7 +567,7 @@ function saveNewCollection() {
           <template v-else>
             <div class="thumb-empty">
               <i class="fas fa-layer-group"></i>
-              <span>Empty Collection</span>
+              <span>{{ $t('collections.emptyCollection') }}</span>
             </div>
           </template>
 
@@ -631,7 +631,7 @@ function saveNewCollection() {
                 +{{ collection.collaborators.length - 3 }}
               </div>
             </div>
-            <span class="collaborators-label">{{ collection.collaborators.length }} collaborators</span>
+            <span class="collaborators-label">{{ collection.collaborators.length }} {{ $t('collections.collaborators') }}</span>
           </div>
         </div>
       </div>
@@ -640,12 +640,12 @@ function saveNewCollection() {
       <EmptyState
         v-if="filteredCollections.length === 0"
         icon="fas fa-layer-group"
-        title="No collections found"
-        :description="currentView === 'my' ? 'You haven\'t created any collections yet.' :
-                     currentView === 'shared' ? 'No collections have been shared with you.' :
-                     searchQuery ? 'Try adjusting your search or filters.' :
-                     'Create your first collection to get started.'"
-        action-label="Create Collection"
+        :title="$t('collections.noCollectionsFound')"
+        :description="currentView === 'my' ? $t('collections.noCollectionsCreated') :
+                     currentView === 'shared' ? $t('collections.noCollectionsShared') :
+                     searchQuery ? $t('collections.tryAdjusting') :
+                     $t('collections.createFirstCollection')"
+        :action-label="$t('collections.createCollection')"
         action-icon="fas fa-plus"
         size="lg"
         @action="createNewCollection"
@@ -659,8 +659,8 @@ function saveNewCollection() {
           <div class="modal-content">
             <div class="modal-header">
               <h3 class="modal-title">
-                <i class="fas fa-layer-group text-teal-500 mr-2"></i>
-                Create New Collection
+                <i class="fas fa-layer-group text-teal-500 me-2"></i>
+                {{ $t('collections.createNewCollection') }}
               </h3>
               <button @click="showCreateModal = false" class="modal-close">
                 <i class="fas fa-times"></i>
@@ -668,57 +668,57 @@ function saveNewCollection() {
             </div>
             <div class="modal-body">
               <div class="form-group">
-                <label class="form-label">Collection Name</label>
+                <label class="form-label">{{ $t('collections.collectionName') }}</label>
                 <input
                   v-model="newCollectionName"
                   type="text"
                   class="form-input"
-                  placeholder="e.g., Tournament Highlights"
+                  :placeholder="$t('collections.namePlaceholder')"
                   autofocus
                 />
               </div>
               <div class="form-group">
-                <label class="form-label">Description (optional)</label>
+                <label class="form-label">{{ $t('collections.descriptionOptional') }}</label>
                 <textarea
                   v-model="newCollectionDescription"
                   class="form-textarea"
                   rows="3"
-                  placeholder="What's this collection about?"
+                  :placeholder="$t('collections.descriptionPlaceholder')"
                 ></textarea>
               </div>
               <div class="form-group">
-                <label class="form-label">Visibility</label>
+                <label class="form-label">{{ $t('collections.visibility') }}</label>
                 <div class="visibility-options">
                   <button
                     @click="newCollectionVisibility = 'private'"
                     :class="['visibility-option', newCollectionVisibility === 'private' ? 'active' : '']"
                   >
                     <i class="fas fa-lock"></i>
-                    <span>Private</span>
-                    <small>Only you can see this collection</small>
+                    <span>{{ $t('collections.private') }}</span>
+                    <small>{{ $t('collections.privateDescription') }}</small>
                   </button>
                   <button
                     @click="newCollectionVisibility = 'shared'"
                     :class="['visibility-option', newCollectionVisibility === 'shared' ? 'active' : '']"
                   >
                     <i class="fas fa-globe"></i>
-                    <span>Shared</span>
-                    <small>Invite collaborators to view or edit</small>
+                    <span>{{ $t('collections.shared') }}</span>
+                    <small>{{ $t('collections.sharedDescription') }}</small>
                   </button>
                 </div>
               </div>
             </div>
             <div class="modal-footer">
               <button @click="showCreateModal = false" class="btn-cancel">
-                Cancel
+                {{ $t('common.cancel') }}
               </button>
               <button
                 @click="saveNewCollection"
                 class="btn-save"
                 :disabled="!newCollectionName.trim()"
               >
-                <i class="fas fa-plus mr-2"></i>
-                Create Collection
+                <i class="fas fa-plus me-2"></i>
+                {{ $t('collections.createCollection') }}
               </button>
             </div>
           </div>
@@ -783,7 +783,7 @@ function saveNewCollection() {
 
 .search-box i {
   position: absolute;
-  left: 0.875rem;
+  inset-inline-start: 0.875rem;
   top: 50%;
   transform: translateY(-50%);
   color: #94a3b8;
@@ -807,7 +807,7 @@ function saveNewCollection() {
 
 .clear-search {
   position: absolute;
-  right: 0.5rem;
+  inset-inline-end: 0.5rem;
   top: 50%;
   transform: translateY(-50%);
   width: 24px;
@@ -831,7 +831,7 @@ function saveNewCollection() {
 .toolbar-filters {
   display: flex;
   gap: 0.75rem;
-  margin-left: auto;
+  margin-inline-start: auto;
 }
 
 .filter-dropdown {
@@ -867,7 +867,7 @@ function saveNewCollection() {
 .dropdown-menu {
   position: absolute;
   top: calc(100% + 4px);
-  right: 0;
+  inset-inline-end: 0;
   min-width: 200px;
   background: white;
   border: 1px solid #e5e7eb;
@@ -1022,7 +1022,7 @@ function saveNewCollection() {
 .visibility-badge {
   position: absolute;
   top: 0.75rem;
-  right: 0.75rem;
+  inset-inline-end: 0.75rem;
   width: 28px;
   height: 28px;
   border-radius: 50%;
@@ -1161,11 +1161,11 @@ function saveNewCollection() {
   font-weight: 600;
   color: white;
   border: 2px solid white;
-  margin-left: -8px;
+  margin-inline-start: -8px;
 }
 
 .collaborator-avatar:first-child {
-  margin-left: 0;
+  margin-inline-start: 0;
 }
 
 .collaborator-avatar.more {
