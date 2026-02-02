@@ -3,6 +3,7 @@ import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { useI18n } from 'vue-i18n'
 import UnifiedSearch from './UnifiedSearch.vue'
 import LanguageSwitcher from '@/components/common/LanguageSwitcher.vue'
+import ViewAllButton from '@/components/common/ViewAllButton.vue'
 
 const { t } = useI18n()
 
@@ -291,10 +292,7 @@ onBeforeUnmount(() => {
                 </a>
               </div>
               <div class="unified-header__dropdown-footer">
-                <button @click="handleViewAllNotifications" class="unified-header__view-all">
-                  {{ $t('header.viewAllNotifications') }}
-                  <i class="fas fa-arrow-right"></i>
-                </button>
+                <ViewAllButton variant="text" :label="$t('header.viewAllNotifications')" @click="handleViewAllNotifications" />
               </div>
             </div>
           </Transition>

@@ -5,6 +5,7 @@ import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '@/stores/auth'
 import { useUIStore } from '@/stores/ui'
 import { useNotificationsStore } from '@/stores/notifications'
+import ViewAllButton from '@/components/common/ViewAllButton.vue'
 
 const { t } = useI18n()
 const router = useRouter()
@@ -252,11 +253,8 @@ onBeforeUnmount(() => {
                   <div v-if="!notif.isRead" class="w-2 h-2 bg-teal-500 rounded-full flex-shrink-0 mt-2"></div>
                 </button>
               </div>
-              <div class="px-4 py-3 border-t border-gray-100 bg-gray-50/50">
-                <button @click="viewAllNotifications" class="w-full text-sm text-teal-600 hover:text-teal-700 font-medium flex items-center justify-center gap-2">
-                  {{ $t('header.viewAllNotifications') }}
-                  <i class="fas fa-arrow-right text-xs"></i>
-                </button>
+              <div class="px-4 py-3 border-t border-gray-100 bg-gray-50/50 flex justify-center">
+                <ViewAllButton variant="text" :label="$t('header.viewAllNotifications')" @click="viewAllNotifications" />
               </div>
             </div>
           </Transition>

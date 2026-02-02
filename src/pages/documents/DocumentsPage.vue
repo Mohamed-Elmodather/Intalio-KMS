@@ -6,6 +6,7 @@ import PageHeroHeader from '@/components/common/PageHeroHeader.vue'
 import PageFilterBar from '@/components/common/PageFilterBar.vue'
 import FilterDropdown from '@/components/common/FilterDropdown.vue'
 import AddToCollectionModal from '@/components/common/AddToCollectionModal.vue'
+import ViewAllButton from '@/components/common/ViewAllButton.vue'
 import { useAIServicesStore } from '@/stores/aiServices'
 import { useComparisonStore } from '@/stores/comparison'
 import { AISuggestionChip, AILoadingIndicator, AIConfidenceBar } from '@/components/ai'
@@ -1325,10 +1326,7 @@ function getCategoryColor(category: string): string {
                 <span class="text-xs font-medium text-gray-500">{{ $t('documents.quickAccess') }}</span>
               </div>
             </h2>
-            <button @click="currentView = 'starred'" class="text-sm text-teal-600 hover:text-teal-700 font-medium flex items-center gap-1">
-              {{ $t('common.viewAll') }}
-              <i class="fas fa-arrow-right text-xs"></i>
-            </button>
+            <ViewAllButton variant="text" size="sm" @click="currentView = 'starred'" />
           </div>
 
           <div class="space-y-2">
@@ -1391,10 +1389,7 @@ function getCategoryColor(category: string): string {
                 <span class="text-xs font-medium text-gray-500">{{ $t('documents.recentlyModified') }}</span>
               </div>
             </h2>
-            <button class="text-sm text-teal-600 hover:text-teal-700 font-medium flex items-center gap-1">
-              {{ $t('common.viewAll') }}
-              <i class="fas fa-arrow-right text-xs"></i>
-            </button>
+            <ViewAllButton variant="text" size="sm" />
           </div>
 
           <div class="space-y-2">

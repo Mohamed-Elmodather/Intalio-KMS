@@ -5,6 +5,7 @@ import { useI18n } from 'vue-i18n'
 import PageHeroHeader from '@/components/common/PageHeroHeader.vue'
 import ContentActionsDropdown from '@/components/common/ContentActionsDropdown.vue'
 import FilterDropdown from '@/components/common/FilterDropdown.vue'
+import ViewAllButton from '@/components/common/ViewAllButton.vue'
 
 const { t } = useI18n()
 import AddToCollectionModal from '@/components/common/AddToCollectionModal.vue'
@@ -1824,7 +1825,7 @@ onUnmounted(() => {
               <i class="fas fa-star text-amber-500"></i>
               {{ $t('media.featuredContent') }}
             </h2>
-            <router-link to="/media" class="view-all-link">{{ $t('common.viewAll') }} <i class="fas fa-arrow-right"></i></router-link>
+            <ViewAllButton to="/media" variant="text" size="sm" />
           </div>
           <!-- Featured Grid: Main + Up Next side by side -->
           <div class="featured-inner-grid">
@@ -1909,7 +1910,7 @@ onUnmounted(() => {
               <i class="fas fa-history text-teal-500"></i>
               Continue Watching
             </h2>
-            <router-link to="/media" class="view-all-link">View All ({{ watchHistory.length }}) <i class="fas fa-arrow-right"></i></router-link>
+            <ViewAllButton to="/media" variant="text" size="sm" :count="watchHistory.length" />
           </div>
           <div class="continue-vertical-scroll">
             <div v-for="item in watchHistory.slice(0, 3)" :key="item.id"

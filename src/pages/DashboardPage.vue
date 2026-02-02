@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useAIServicesStore } from '@/stores/aiServices'
 import { AILoadingIndicator, AISuggestionChip, AIConfidenceBar } from '@/components/ai'
+import ViewAllButton from '@/components/common/ViewAllButton.vue'
 
 const router = useRouter()
 const { t } = useI18n()
@@ -1444,9 +1445,7 @@ onUnmounted(() => {
             <span class="text-[10px] sm:text-xs font-medium text-orange-600">{{ $t('dashboard.afcAsianCupShort') }}</span>
           </div>
         </h2>
-        <router-link to="/articles" class="px-2 py-1 sm:px-3 sm:py-1.5 text-xs sm:text-sm text-teal-600 hover:text-white bg-teal-50 hover:bg-teal-500 rounded-lg font-medium flex items-center gap-1 sm:gap-1.5 transition-all">
-          {{ $t('common.viewAll') }} <i class="fas fa-arrow-right text-[10px] sm:text-xs"></i>
-        </router-link>
+        <ViewAllButton to="/articles" size="sm" />
       </div>
 
       <!-- Updates Grid: Featured + Up Next -->
@@ -1613,9 +1612,7 @@ onUnmounted(() => {
               <span class="text-[10px] sm:text-xs font-medium text-teal-600">{{ $t('dashboard.latestNewsUpdates') }}</span>
             </div>
           </h2>
-          <router-link to="/articles" class="px-2 py-1 sm:px-3 sm:py-1.5 text-xs sm:text-sm text-teal-600 hover:text-white bg-teal-50 hover:bg-teal-500 rounded-lg font-medium flex items-center gap-1 sm:gap-1.5 transition-all">
-            {{ $t('common.viewAll') }} <i class="fas fa-arrow-right text-[10px] sm:text-xs"></i>
-          </router-link>
+          <ViewAllButton to="/articles" size="sm" />
         </div>
         <div class="space-y-2.5">
           <div v-for="(article, index) in recentArticles" :key="article.id"
@@ -1671,9 +1668,7 @@ onUnmounted(() => {
               <span class="text-[10px] sm:text-xs font-medium text-teal-600">{{ $t('dashboard.filesResources') }}</span>
             </div>
           </h2>
-          <router-link to="/documents" class="px-2 py-1 sm:px-3 sm:py-1.5 text-xs sm:text-sm text-teal-600 hover:text-white bg-teal-50 hover:bg-teal-500 rounded-lg font-medium flex items-center gap-1 sm:gap-1.5 transition-all">
-            {{ $t('common.viewAll') }} <i class="fas fa-arrow-right text-[10px] sm:text-xs"></i>
-          </router-link>
+          <ViewAllButton to="/documents" size="sm" />
         </div>
         <div class="space-y-2.5">
           <div v-for="(doc, index) in recentDocuments.slice(0, 4)" :key="doc.id"
@@ -1729,9 +1724,7 @@ onUnmounted(() => {
             <span class="text-[10px] sm:text-xs font-medium text-teal-600">{{ $t('dashboard.videosPodcasts') }}</span>
           </div>
         </h2>
-        <router-link to="/media" class="px-2 py-1 sm:px-3 sm:py-1.5 text-xs sm:text-sm text-teal-600 hover:text-white bg-teal-50 hover:bg-teal-500 rounded-lg font-medium flex items-center gap-1 sm:gap-1.5 transition-all">
-          {{ $t('common.viewAll') }} <i class="fas fa-arrow-right text-[10px] sm:text-xs"></i>
-        </router-link>
+        <ViewAllButton to="/media" size="sm" />
       </div>
       <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-2 sm:gap-3">
         <div v-for="media in mediaItems" :key="media.id"
@@ -1805,9 +1798,7 @@ onUnmounted(() => {
               <span class="text-[10px] sm:text-xs font-medium text-teal-600">{{ $t('dashboard.afcAsianCupShort') }}</span>
             </div>
           </h2>
-          <router-link to="/events" class="px-2 py-1 sm:px-3 sm:py-1.5 text-xs sm:text-sm text-teal-600 hover:text-white bg-teal-50 hover:bg-teal-500 rounded-lg font-medium flex items-center gap-1 sm:gap-1.5 transition-all">
-            {{ $t('common.viewAll') }} <i class="fas fa-arrow-right text-[10px] sm:text-xs"></i>
-          </router-link>
+          <ViewAllButton to="/events" size="sm" />
         </div>
 
         <div class="space-y-2 sm:space-y-3">
@@ -1912,9 +1903,7 @@ onUnmounted(() => {
               <span class="text-[10px] sm:text-xs font-medium text-teal-600">{{ $t('dashboard.castYourVote') }}</span>
             </div>
           </h2>
-          <router-link to="/polls" class="px-2 py-1 sm:px-3 sm:py-1.5 text-xs sm:text-sm text-teal-600 hover:text-white bg-teal-50 hover:bg-teal-500 rounded-lg font-medium flex items-center gap-1 sm:gap-1.5 transition-all">
-            {{ $t('common.viewAll') }} <i class="fas fa-arrow-right text-[10px] sm:text-xs"></i>
-          </router-link>
+          <ViewAllButton to="/polls" size="sm" />
         </div>
         <div class="space-y-5">
           <div v-for="poll in activePolls" :key="poll.id" class="poll-card p-5 rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow-md transition-all">
@@ -2139,9 +2128,7 @@ onUnmounted(() => {
               <span class="text-xs font-medium text-teal-600">{{ $t('dashboard.recentUpdates') }}</span>
             </div>
           </h2>
-          <router-link to="/collaboration" class="px-3 py-1.5 text-sm text-teal-600 hover:text-white bg-teal-50 hover:bg-teal-500 rounded-lg font-medium flex items-center gap-1.5 transition-all">
-            {{ $t('common.viewAll') }} <i class="fas fa-arrow-right text-xs"></i>
-          </router-link>
+          <ViewAllButton to="/collaboration" />
         </div>
 
         <div class="space-y-3 max-h-[400px] overflow-y-auto pe-1 custom-scrollbar">
@@ -2215,9 +2202,7 @@ onUnmounted(() => {
               <span class="text-xs font-medium text-teal-600">{{ $t('dashboard.afcAsianCupShort') }}</span>
             </div>
           </h2>
-          <router-link to="/self-services" class="px-3 py-1.5 text-sm text-teal-600 hover:text-white bg-teal-50 hover:bg-teal-500 rounded-lg font-medium flex items-center gap-1.5 transition-all">
-            {{ $t('common.viewAll') }} <i class="fas fa-arrow-right text-xs"></i>
-          </router-link>
+          <ViewAllButton to="/self-services" />
         </div>
 
         <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">

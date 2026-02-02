@@ -6,6 +6,7 @@ import PageHeroHeader from '@/components/common/PageHeroHeader.vue'
 import FilterDropdown from '@/components/common/FilterDropdown.vue'
 import ContentActionsDropdown from '@/components/common/ContentActionsDropdown.vue'
 import AddToCollectionModal from '@/components/common/AddToCollectionModal.vue'
+import ViewAllButton from '@/components/common/ViewAllButton.vue'
 import { useAIServicesStore } from '@/stores/aiServices'
 import { useComparisonStore } from '@/stores/comparison'
 import { AISuggestionChip, AISentimentBadge, AILoadingIndicator } from '@/components/ai'
@@ -1243,7 +1244,7 @@ onUnmounted(() => {
               <i class="fas fa-history text-purple-500"></i>
               {{ $t('articles.continueReading') }}
             </h2>
-            <button @click="scrollToAllArticles" class="view-all-link">{{ $t('common.viewAll') }} <i class="fas fa-arrow-right"></i></button>
+            <ViewAllButton variant="text" size="sm" @click="scrollToAllArticles" />
           </div>
           <div class="section-scroll scrollbar-elegant">
             <div v-for="article in continueReadingArticles" :key="'continue-' + article!.id"
@@ -1282,7 +1283,7 @@ onUnmounted(() => {
               <i class="fas fa-bookmark text-yellow-500"></i>
               {{ $t('articles.yourBookmarks') }}
             </h2>
-            <button @click="scrollToAllArticles" class="view-all-link">{{ $t('common.viewAll') }} ({{ bookmarkedArticles.length }}) <i class="fas fa-arrow-right"></i></button>
+            <ViewAllButton variant="text" size="sm" :count="bookmarkedArticles.length" @click="scrollToAllArticles" />
           </div>
           <div class="section-scroll scrollbar-elegant">
             <div v-for="article in bookmarkedArticles" :key="'bookmark-' + article!.id"
@@ -1519,9 +1520,7 @@ onUnmounted(() => {
               <i class="fas fa-fire text-red-500"></i>
               {{ $t('common.trendingNow') }}
             </h2>
-            <button @click="scrollToAllArticles" class="view-all-link">
-              {{ $t('common.viewAll') }} <i class="fas fa-arrow-right"></i>
-            </button>
+            <ViewAllButton variant="text" size="sm" @click="scrollToAllArticles" />
           </div>
           <div class="trending-scroll scrollbar-elegant">
             <div v-for="(article, index) in trendingThisWeek" :key="'trending-' + article.id"
@@ -1571,9 +1570,7 @@ onUnmounted(() => {
               <i class="fas fa-history text-blue-500"></i>
               {{ $t('common.recentlyViewed') }}
             </h2>
-            <button @click="scrollToAllArticles" class="view-all-link">
-              {{ $t('common.viewAll') }} <i class="fas fa-arrow-right"></i>
-            </button>
+            <ViewAllButton variant="text" size="sm" @click="scrollToAllArticles" />
           </div>
           <div class="recently-viewed-scroll scrollbar-elegant">
             <template v-for="article in recentlyViewedArticles" :key="'recent-' + article?.id">
