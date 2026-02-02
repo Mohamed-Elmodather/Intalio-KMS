@@ -3,6 +3,7 @@ import { ref, computed, watch, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import PageHeroHeader from '@/components/common/PageHeroHeader.vue'
+import ViewAllButton from '@/components/common/ViewAllButton.vue'
 import { useAIServicesStore } from '@/stores/aiServices'
 import { AILoadingIndicator, AIConfidenceBar, AISuggestionChip } from '@/components/ai'
 import type { ClassificationResult, NERResult } from '@/types/ai'
@@ -2628,9 +2629,7 @@ function resumeFeaturedAutoPlay() {
                 <p class="trending-subtitle">Popular courses this week</p>
               </div>
             </div>
-            <button class="trending-see-all">
-              See All <i class="fas fa-arrow-right"></i>
-            </button>
+            <ViewAllButton size="sm" />
           </div>
           <div class="trending-grid">
             <div v-for="course in trendingCourses" :key="course.id" class="trending-card">
@@ -2690,9 +2689,7 @@ function resumeFeaturedAutoPlay() {
                 <p class="recommended-subtitle">Based on your learning history and interests</p>
               </div>
             </div>
-            <button class="recommended-see-all">
-              See All <i class="fas fa-arrow-right"></i>
-            </button>
+            <ViewAllButton size="sm" />
           </div>
           <div class="recommended-grid">
             <div v-for="course in recommendedCourses" :key="course.id" class="recommended-card">
@@ -3449,9 +3446,7 @@ function resumeFeaturedAutoPlay() {
                 <p class="my-paths-subtitle">Continue your journey • {{ myEnrolledPaths.length }} active paths</p>
               </div>
             </div>
-            <button class="my-paths-see-all">
-              View All <i class="fas fa-arrow-right"></i>
-            </button>
+            <ViewAllButton size="sm" />
           </div>
 
           <div class="my-paths-grid">
