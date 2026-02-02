@@ -1128,11 +1128,11 @@ function toggleCategoryFilter(cat: string) {
 
 function getEnrollmentLabel(option: string): string {
   const labels: Record<string, string> = {
-    'enrolled': 'My Enrolled',
-    'not-enrolled': 'Not Enrolled',
-    'in-progress': 'In Progress',
-    'completed': 'Completed',
-    'not-started': 'Not Started'
+    'enrolled': t('learning.myEnrolled'),
+    'not-enrolled': t('learning.notEnrolled'),
+    'in-progress': t('common.inProgress'),
+    'completed': t('common.completed'),
+    'not-started': t('common.notStarted')
   }
   return labels[option] || option
 }
@@ -2045,7 +2045,7 @@ const activePathsFiltersCount = computed(() => {
   return count
 })
 
-// Clear all paths filters
+// {{ $t('common.clearAll') }} paths filters
 function clearAllPathsFilters() {
   pathsSearch.value = ''
   pathsLevelFilter.value = []
@@ -3004,7 +3004,7 @@ function resumeFeaturedAutoPlay() {
                   ]"
                 >
                   <i class="fas fa-bookmark text-sm"></i>
-                  <span>{{ selectedStatusFilters.length > 0 ? `${selectedStatusFilters.length} Saved & Shared` : 'Saved & Shared' }}</span>
+                  <span>{{ selectedStatusFilters.length > 0 ? `${selectedStatusFilters.length} ${$t('learning.savedAndShared')}` : $t('learning.savedAndShared') }}</span>
                   <i :class="showStatusFilter ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ms-1"></i>
                 </button>
 
@@ -3170,13 +3170,13 @@ function resumeFeaturedAutoPlay() {
                 class="px-2.5 py-1 bg-amber-50 text-amber-700 rounded-lg text-xs font-medium flex items-center gap-1.5 border border-amber-100"
               >
                 <i :class="[status === 'saved' ? 'fas fa-bookmark' : 'fas fa-share-alt', 'text-[10px]']"></i>
-                {{ status === 'saved' ? 'My Saved' : 'Shared with me' }}
+                {{ status === 'saved' ? $t('learning.mySaved') : $t('learning.sharedWithMe') }}
                 <button @click="toggleStatusFilter(status)" class="ms-1 hover:text-amber-900 hover:bg-amber-100 rounded-full w-4 h-4 flex items-center justify-center"><i class="fas fa-times text-[10px]"></i></button>
               </span>
             </div>
             <button @click="clearAllFilters" class="px-3 py-1.5 text-xs font-medium text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors flex items-center gap-1.5">
               <i class="fas fa-times-circle"></i>
-              Clear all
+              {{ $t('common.clearAll') }}
             </button>
           </div>
 
@@ -3581,7 +3581,7 @@ function resumeFeaturedAutoPlay() {
                   ]"
                 >
                   <i class="fas fa-route text-sm"></i>
-                  <span>{{ pathFilter === 'all' ? 'All Paths' : pathFilter === 'enrolled' ? 'My Enrolled' : 'Available' }}</span>
+                  <span>{{ pathFilter === 'all' ? $t('learning.allPaths') : pathFilter === 'enrolled' ? $t('learning.myEnrolled') : $t('learning.available') }}</span>
                   <i :class="showPathsEnrollmentFilter ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ms-1"></i>
                 </button>
                 <!-- Dropdown Panel -->
@@ -3733,13 +3733,13 @@ function resumeFeaturedAutoPlay() {
               <!-- Enrollment Filter -->
               <span v-if="pathFilter !== 'all'" class="px-2.5 py-1 bg-blue-50 text-blue-700 rounded-lg text-xs font-medium flex items-center gap-1.5 border border-blue-100">
                 <i class="fas fa-user-graduate text-[10px]"></i>
-                {{ pathFilter === 'enrolled' ? 'My Enrolled' : 'Available' }}
+                {{ pathFilter === 'enrolled' ? $t('learning.myEnrolled') : $t('learning.available') }}
                 <button @click="pathFilter = 'all'" class="ms-1 hover:text-blue-900 hover:bg-blue-100 rounded-full w-4 h-4 flex items-center justify-center"><i class="fas fa-times text-[10px]"></i></button>
               </span>
             </div>
             <button @click="clearAllPathsFilters" class="px-3 py-1.5 text-xs font-medium text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors flex items-center gap-1.5">
               <i class="fas fa-times-circle"></i>
-              Clear all
+              {{ $t('common.clearAll') }}
             </button>
           </div>
 
@@ -4396,7 +4396,7 @@ function resumeFeaturedAutoPlay() {
             </div>
             <button @click="clearLessonsFilters" class="px-3 py-1.5 text-xs font-medium text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors flex items-center gap-1.5">
               <i class="fas fa-times-circle"></i>
-              Clear all
+              {{ $t('common.clearAll') }}
             </button>
           </div>
 
@@ -4936,7 +4936,7 @@ function resumeFeaturedAutoPlay() {
             </div>
             <button @click="clearAllCertFilters" class="cert-clear-all-btn">
               <i class="fas fa-times-circle"></i>
-              Clear all
+              {{ $t('common.clearAll') }}
             </button>
           </div>
 

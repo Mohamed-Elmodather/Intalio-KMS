@@ -867,6 +867,7 @@ export default {
     certificateOfCompletion: 'Certificate of Completion',
     noCertificatesFound: 'No certificates found',
     skillGapDetails: 'Skill Gap Details',
+    savedAndShared: 'Saved & Shared',
     featuredInsights: 'Featured Insights',
     allLessons: 'All Lessons',
     newLesson: 'New Lesson',

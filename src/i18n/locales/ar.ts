@@ -869,6 +869,7 @@ export default {
     certificateOfCompletion: 'شهادة إتمام',
     noCertificatesFound: 'لم يتم العثور على شهادات',
     skillGapDetails: 'تفاصيل فجوة المهارات',
+    savedAndShared: 'المحفوظة والمشاركة',
     featuredInsights: 'رؤى مميزة',
     allLessons: 'جميع الدروس',
     newLesson: 'درس جديد',
