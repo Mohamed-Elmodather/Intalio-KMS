@@ -6,6 +6,9 @@ import PageHeroHeader from '@/components/common/PageHeroHeader.vue'
 import ViewAllButton from '@/components/common/ViewAllButton.vue'
 import EmptyState from '@/components/common/EmptyState.vue'
 import Pagination from '@/components/common/Pagination.vue'
+import CategoryBadge from '@/components/common/CategoryBadge.vue'
+import StatusBadge from '@/components/common/StatusBadge.vue'
+import TagBadge from '@/components/common/TagBadge.vue'
 import { useAIServicesStore } from '@/stores/aiServices'
 import { AILoadingIndicator, AIConfidenceBar, AISuggestionChip } from '@/components/ai'
 import type { ClassificationResult, NERResult } from '@/types/ai'
@@ -2482,7 +2485,7 @@ function resumeFeaturedAutoPlay() {
 
                 <!-- Badges -->
                 <div class="featured-course-badges">
-                  <span class="badge-featured"><i class="fas fa-star"></i> Featured</span>
+                  <StatusBadge status="featured" variant="gradient" size="sm" />
                   <span :class="['badge-level', featuredCourse.levelClass]">{{ featuredCourse.level }}</span>
                 </div>
 
@@ -2504,7 +2507,7 @@ function resumeFeaturedAutoPlay() {
                 <div class="featured-course-content">
                   <!-- Tags -->
                   <div class="featured-course-tags">
-                    <span v-for="tag in featuredCourse.tags" :key="tag" class="featured-tag">{{ tag }}</span>
+                    <TagBadge v-for="tag in featuredCourse.tags" :key="tag" :tag="tag" size="xs" variant="glass" />
                   </div>
 
                   <h3 class="featured-course-title">{{ featuredCourse.title }}</h3>
@@ -2656,7 +2659,7 @@ function resumeFeaturedAutoPlay() {
               <!-- Content -->
               <div class="trending-content">
                 <div class="trending-tags">
-                  <span v-for="tag in course.tags" :key="tag" class="trending-tag">{{ tag }}</span>
+                  <TagBadge v-for="tag in course.tags" :key="tag" :tag="tag" size="xs" />
                   <span :class="['trending-level', course.levelClass]">{{ course.level }}</span>
                 </div>
                 <h3 class="trending-course-title">{{ course.title }}</h3>
@@ -3181,12 +3184,10 @@ function resumeFeaturedAutoPlay() {
 
                   <!-- Badges -->
                   <div class="absolute top-2 left-2 flex gap-1.5 z-10">
-                    <span v-if="course.enrolled" :class="['px-2 py-0.5 text-[10px] font-semibold rounded-full', course.statusClass === 'completed' ? 'bg-green-500 text-white' : course.statusClass === 'in-progress' ? 'bg-blue-500 text-white' : 'bg-gray-500 text-white']">
-                      {{ course.status }}
-                    </span>
-                    <span v-if="course.isNew" class="all-course-new-badge">
-                      <i class="fas fa-sparkles"></i> New
-                    </span>
+                    <StatusBadge v-if="course.enrolled && course.statusClass === 'completed'" status="completed" size="xs" />
+                    <StatusBadge v-else-if="course.enrolled && course.statusClass === 'in-progress'" status="in-progress" size="xs" />
+                    <StatusBadge v-else-if="course.enrolled" status="pending" :label="course.status" size="xs" />
+                    <StatusBadge v-if="course.isNew" status="new" size="xs" variant="gradient" />
                   </div>
 
                   <!-- Duration Badge -->
@@ -3226,20 +3227,17 @@ function resumeFeaturedAutoPlay() {
 
                   <!-- Category -->
                   <p class="text-xs text-gray-500 mb-3">
-                    <span class="px-2 py-0.5 bg-teal-50 text-teal-600 text-[10px] font-medium rounded-full">
-                      {{ course.category }}
-                    </span>
+                    <CategoryBadge :category="course.category" size="xs" />
                   </p>
 
                   <!-- Tags -->
                   <div class="flex flex-wrap gap-1.5 mb-3">
-                    <span
+                    <TagBadge
                       v-for="tag in course.tags.slice(0, 3)"
                       :key="tag"
-                      class="px-2 py-0.5 bg-gray-100 text-gray-600 text-[10px] font-medium rounded-full hover:bg-teal-50 hover:text-teal-600 transition-colors"
-                    >
-                      {{ tag }}
-                    </span>
+                      :tag="tag"
+                      size="xs"
+                    />
                   </div>
 
                   <!-- Footer -->
@@ -3294,13 +3292,11 @@ function resumeFeaturedAutoPlay() {
                   <div class="all-course-list-header">
                     <div class="all-course-list-badges">
                       <span :class="['all-course-level-badge', course.levelClass]">{{ course.level }}</span>
-                      <span class="all-course-category-badge">{{ course.category }}</span>
-                      <span v-if="course.enrolled" :class="['px-2 py-0.5 text-[10px] font-semibold rounded-full', course.statusClass === 'completed' ? 'bg-green-100 text-green-700' : course.statusClass === 'in-progress' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-700']">
-                        {{ course.status }}
-                      </span>
-                      <span v-if="course.isNew" class="all-course-list-new-badge">
-                        <i class="fas fa-sparkles"></i> New
-                      </span>
+                      <CategoryBadge :category="course.category" size="xs" />
+                      <StatusBadge v-if="course.enrolled && course.statusClass === 'completed'" status="completed" size="xs" />
+                      <StatusBadge v-else-if="course.enrolled && course.statusClass === 'in-progress'" status="in-progress" size="xs" />
+                      <StatusBadge v-else-if="course.enrolled" status="pending" :label="course.status" size="xs" />
+                      <StatusBadge v-if="course.isNew" status="new" size="xs" variant="gradient" />
                     </div>
                     <h3 class="all-course-list-title">{{ course.title }}</h3>
                   </div>
@@ -3744,12 +3740,10 @@ function resumeFeaturedAutoPlay() {
 
                   <!-- Badges -->
                   <div class="absolute top-2 left-2 flex gap-1.5 z-10">
-                    <span v-if="path.isEnrolled" :class="['px-2 py-0.5 text-[10px] font-semibold rounded-full', path.progress === 100 ? 'bg-green-500 text-white' : path.progress > 0 ? 'bg-blue-500 text-white' : 'bg-gray-500 text-white']">
-                      {{ path.progress === 100 ? 'Completed' : path.progress > 0 ? 'In Progress' : 'Not Started' }}
-                    </span>
-                    <span v-if="path.enrolled > 1000" class="all-course-new-badge" style="background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);">
-                      <i class="fas fa-fire"></i> Popular
-                    </span>
+                    <StatusBadge v-if="path.isEnrolled && path.progress === 100" status="completed" size="xs" />
+                    <StatusBadge v-else-if="path.isEnrolled && path.progress > 0" status="in-progress" size="xs" />
+                    <StatusBadge v-else-if="path.isEnrolled" status="pending" label="Not Started" size="xs" />
+                    <StatusBadge v-if="path.enrolled > 1000" status="popular" size="xs" variant="gradient" />
                   </div>
 
                   <!-- Duration Badge -->
@@ -3792,13 +3786,12 @@ function resumeFeaturedAutoPlay() {
 
                   <!-- Skills Tags -->
                   <div class="flex flex-wrap gap-1.5 mb-3">
-                    <span
+                    <TagBadge
                       v-for="skill in path.skills.slice(0, 3)"
                       :key="skill"
-                      class="px-2 py-0.5 bg-gray-100 text-gray-600 text-[10px] font-medium rounded-full hover:bg-teal-50 hover:text-teal-600 transition-colors"
-                    >
-                      {{ skill }}
-                    </span>
+                      :tag="skill"
+                      size="xs"
+                    />
                     <span v-if="path.skills.length > 3" class="px-2 py-0.5 bg-gray-100 text-gray-500 text-[10px] rounded-full">
                       +{{ path.skills.length - 3 }}
                     </span>
@@ -4411,13 +4404,9 @@ function resumeFeaturedAutoPlay() {
                     <!-- Badges & Actions -->
                     <div class="flex items-center gap-2">
                       <!-- Featured Badge -->
-                      <span v-if="lesson.isFeatured" class="px-2 py-0.5 bg-amber-100 text-amber-700 text-[10px] font-semibold rounded-full flex items-center gap-1">
-                        <i class="fas fa-star text-[8px]"></i> Featured
-                      </span>
+                      <StatusBadge v-if="lesson.isFeatured" status="featured" size="xs" variant="gradient" />
                       <!-- Priority Badge -->
-                      <span :class="['px-2 py-0.5 text-[10px] font-semibold rounded-full', lesson.priority === 'critical' ? 'bg-red-100 text-red-700' : lesson.priority === 'high' ? 'bg-orange-100 text-orange-700' : lesson.priority === 'medium' ? 'bg-amber-100 text-amber-700' : 'bg-green-100 text-green-700']">
-                        {{ lesson.priority }}
-                      </span>
+                      <CategoryBadge :category="lesson.priority" :category-id="lesson.priority" size="xs" />
                       <!-- Bookmark Button -->
                       <button
                         @click.stop="toggleLessonBookmark(lesson.id)"
@@ -4455,13 +4444,12 @@ function resumeFeaturedAutoPlay() {
 
                   <!-- Tags -->
                   <div class="flex flex-wrap gap-1.5 mb-3">
-                    <span
+                    <TagBadge
                       v-for="tag in lesson.tags?.slice(0, 3)"
                       :key="tag"
-                      class="px-2 py-0.5 bg-gray-100 text-gray-600 text-[10px] font-medium rounded-full hover:bg-teal-50 hover:text-teal-600 transition-colors"
-                    >
-                      {{ tag }}
-                    </span>
+                      :tag="tag"
+                      size="xs"
+                    />
                     <span v-if="lesson.tags?.length > 3" class="px-2 py-0.5 bg-teal-50 text-teal-600 text-[10px] font-medium rounded-full">
                       +{{ lesson.tags.length - 3 }}
                     </span>
@@ -4518,16 +4506,9 @@ function resumeFeaturedAutoPlay() {
                   <div class="flex-1 min-w-0">
                     <!-- Header Badges -->
                     <div class="flex flex-wrap items-center gap-2 mb-1.5">
-                      <span class="px-2 py-0.5 bg-teal-50 text-teal-700 text-[10px] font-semibold rounded-full flex items-center gap-1">
-                        <i :class="[getLessonCategoryInfo(lesson.category).icon, 'text-[8px]']"></i>
-                        {{ getLessonCategoryInfo(lesson.category).label }}
-                      </span>
-                      <span v-if="lesson.isFeatured" class="px-2 py-0.5 bg-amber-100 text-amber-700 text-[10px] font-semibold rounded-full flex items-center gap-1">
-                        <i class="fas fa-star text-[8px]"></i> Featured
-                      </span>
-                      <span :class="['px-2 py-0.5 text-[10px] font-semibold rounded-full', lesson.priority === 'critical' ? 'bg-red-100 text-red-700' : lesson.priority === 'high' ? 'bg-orange-100 text-orange-700' : lesson.priority === 'medium' ? 'bg-amber-100 text-amber-700' : 'bg-green-100 text-green-700']">
-                        {{ lesson.priority }}
-                      </span>
+                      <CategoryBadge :category="getLessonCategoryInfo(lesson.category).label" :icon="getLessonCategoryInfo(lesson.category).icon" size="xs" />
+                      <StatusBadge v-if="lesson.isFeatured" status="featured" size="xs" variant="gradient" />
+                      <CategoryBadge :category="lesson.priority" :category-id="lesson.priority" size="xs" />
                       <span class="text-[10px] text-gray-400 flex items-center gap-1">
                         <i class="fas fa-calendar text-[8px]"></i>
                         {{ lesson.createdAt }}

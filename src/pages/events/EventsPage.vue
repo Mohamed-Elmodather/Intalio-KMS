@@ -7,6 +7,8 @@ import FilterDropdown from '@/components/common/FilterDropdown.vue'
 import EmptyState from '@/components/common/EmptyState.vue'
 import Pagination from '@/components/common/Pagination.vue'
 import ComparisonButton from '@/components/common/ComparisonButton.vue'
+import CategoryBadge from '@/components/common/CategoryBadge.vue'
+import StatusBadge from '@/components/common/StatusBadge.vue'
 import { useAIServicesStore } from '@/stores/aiServices'
 import { usePagination } from '@/composables/usePagination'
 import { AILoadingIndicator, AISuggestionChip, AIConfidenceBar } from '@/components/ai'
@@ -1679,10 +1681,13 @@ function getCategoryColor(category: string) {
                  :class="['event-card-premium', event.category]">
               <div class="event-card-glow"></div>
               <div class="event-card-header-premium">
-                <span :class="['event-type-badge-premium', event.category]">
-                  <i :class="getEventTypeIcon(event.category)"></i>
-                  {{ event.categoryLabel }}
-                </span>
+                <CategoryBadge
+                  :category="event.categoryLabel"
+                  :category-id="event.category"
+                  :icon="getEventTypeIcon(event.category)"
+                  size="sm"
+                  variant="gradient"
+                />
                 <div class="event-date-badge-premium">
                   <span class="event-date-month-premium">{{ event.month }}</span>
                   <span class="event-date-day-premium">{{ event.day }}</span>
@@ -2057,13 +2062,9 @@ function getCategoryColor(category: string) {
                   </div>
                   <div class="popup-event-main">
                     <div class="popup-event-badges">
-                      <span :class="['popup-type-badge', event.category]">{{ event.categoryLabel }}</span>
-                      <span v-if="event.featured" class="popup-featured-badge">
-                        <i class="fas fa-star"></i> Featured
-                      </span>
-                      <span v-if="event.virtual" class="popup-virtual-badge">
-                        <i class="fas fa-video"></i> Virtual
-                      </span>
+                      <CategoryBadge :category="event.categoryLabel" :category-id="event.category" size="xs" />
+                      <StatusBadge v-if="event.featured" status="featured" size="xs" variant="gradient" />
+                      <StatusBadge v-if="event.virtual" status="virtual" size="xs" variant="solid" />
                     </div>
                     <h4 class="popup-event-title">{{ event.title }}</h4>
                     <p class="popup-event-location">

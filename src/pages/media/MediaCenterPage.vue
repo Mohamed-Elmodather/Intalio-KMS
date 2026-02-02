@@ -9,6 +9,9 @@ import ViewAllButton from '@/components/common/ViewAllButton.vue'
 import EmptyState from '@/components/common/EmptyState.vue'
 import Pagination from '@/components/common/Pagination.vue'
 import ComparisonButton from '@/components/common/ComparisonButton.vue'
+import CategoryBadge from '@/components/common/CategoryBadge.vue'
+import StatusBadge from '@/components/common/StatusBadge.vue'
+import TagBadge from '@/components/common/TagBadge.vue'
 
 const { t } = useI18n()
 import AddToCollectionModal from '@/components/common/AddToCollectionModal.vue'
@@ -1814,8 +1817,8 @@ onUnmounted(() => {
                 <div class="featured-main-overlay"></div>
                 <!-- Badges -->
                 <div class="featured-main-badges">
-                  <span class="badge-featured"><i class="fas fa-star"></i> {{ $t('common.featured') }}</span>
-                  <span class="badge-category">{{ featuredVideo.category }}</span>
+                  <StatusBadge status="featured" :label="$t('common.featured')" variant="gradient" size="sm" />
+                  <CategoryBadge :category="featuredVideo.category" size="sm" class="!bg-white !text-gray-800" />
                 </div>
                 <!-- Play Button -->
                 <div class="featured-main-play">
@@ -1955,12 +1958,8 @@ onUnmounted(() => {
                 </div>
                 <!-- Badges -->
                 <div class="trending-badges">
-                  <span v-if="media.isNew" class="trending-new-badge">
-                    <i class="fas fa-sparkles"></i> New
-                  </span>
-                  <span v-if="index < 3" class="trending-hot-badge">
-                    <i class="fas fa-fire-alt"></i> Hot
-                  </span>
+                  <StatusBadge v-if="media.isNew" status="new" size="xs" variant="gradient" />
+                  <StatusBadge v-if="index < 3" status="hot" size="xs" variant="gradient" />
                 </div>
                 <!-- Duration -->
                 <div class="trending-duration">
@@ -2719,9 +2718,7 @@ onUnmounted(() => {
 
                   <!-- Card Badges -->
                   <div class="absolute bottom-3 left-3 flex gap-1.5 z-20">
-                    <span v-if="media.isNew" class="new-badge">
-                      <i class="fas fa-sparkles"></i> New
-                    </span>
+                    <StatusBadge v-if="media.isNew" status="new" size="xs" variant="gradient" />
                     <span v-if="media.hasTranscript" class="transcript-badge">
                       <i class="fas fa-closed-captioning"></i> CC
                     </span>
@@ -2930,10 +2927,8 @@ onUnmounted(() => {
                         <i :class="media.type === 'video' ? 'fas fa-video' : media.type === 'audio' ? 'fas fa-headphones' : media.type === 'image' ? 'fas fa-image' : 'fas fa-images'"></i>
                         {{ media.type === 'video' ? 'Video' : media.type === 'audio' ? 'Audio' : media.type === 'image' ? 'Image' : 'Gallery' }}
                       </span>
-                      <span :class="['list-category-badge', media.category.toLowerCase().split(' ')[0]]">{{ media.category }}</span>
-                      <span v-if="media.isNew" class="list-new-badge">
-                        <i class="fas fa-sparkles"></i> New
-                      </span>
+                      <CategoryBadge :category="media.category" :category-id="media.category.toLowerCase().split(' ')[0]" size="xs" />
+                      <StatusBadge v-if="media.isNew" status="new" size="xs" variant="gradient" />
                     </div>
                     <h3 class="list-item-title">{{ media.title }}</h3>
                   </div>

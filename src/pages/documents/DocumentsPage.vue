@@ -9,6 +9,8 @@ import AddToCollectionModal from '@/components/common/AddToCollectionModal.vue'
 import ViewAllButton from '@/components/common/ViewAllButton.vue'
 import Pagination from '@/components/common/Pagination.vue'
 import ComparisonButton from '@/components/common/ComparisonButton.vue'
+import StatusBadge from '@/components/common/StatusBadge.vue'
+import TagBadge from '@/components/common/TagBadge.vue'
 import { useAIServicesStore } from '@/stores/aiServices'
 import { usePagination } from '@/composables/usePagination'
 import { AISuggestionChip, AILoadingIndicator, AIConfidenceBar } from '@/components/ai'
@@ -1399,7 +1401,7 @@ function getCategoryColor(category: string): string {
               <span class="block">{{ $t('documents.aiOrganizationSuggestions') }}</span>
               <span class="text-xs font-medium text-gray-500">{{ $t('documents.smartFolderRecommendations') }}</span>
             </div>
-            <span class="ai-powered-badge-doc">{{ $t('documents.aiPowered') }}</span>
+            <StatusBadge status="ai-powered" :label="$t('documents.aiPowered')" size="xs" variant="gradient" />
           </h2>
           <div class="flex items-center gap-2">
             <button @click="dismissAllFolderSuggestions" class="text-xs text-gray-500 hover:text-gray-700 px-2 py-1">
@@ -2221,12 +2223,8 @@ function getCategoryColor(category: string): string {
 
                 <!-- Tags -->
                 <div v-if="doc.tags && doc.tags.length > 0" class="flex flex-wrap gap-1 mb-2">
-                  <span v-for="tag in doc.tags.slice(0, 2)" :key="tag" class="px-1.5 py-0.5 bg-gray-100 text-gray-500 text-[10px] rounded-md font-medium">
-                    {{ tag }}
-                  </span>
-                  <span v-if="doc.tags.length > 2" class="px-1.5 py-0.5 bg-gray-100 text-gray-400 text-[10px] rounded-md font-medium">
-                    +{{ doc.tags.length - 2 }}
-                  </span>
+                  <TagBadge v-for="tag in doc.tags.slice(0, 2)" :key="tag" :tag="tag" size="xs" />
+                  <TagBadge v-if="doc.tags.length > 2" :tag="`+${doc.tags.length - 2}`" size="xs" variant="outlined" />
                 </div>
 
                 <!-- AI Classification Badge -->
@@ -2375,9 +2373,7 @@ function getCategoryColor(category: string): string {
                       <p class="text-xs text-gray-500 truncate">{{ (doc as any).description || 'Official document for AFC Asian Cup 2027 tournament operations' }}</p>
                       <!-- Tags Row -->
                       <div class="flex items-center gap-2 flex-wrap">
-                        <span v-for="tag in doc.tags.slice(0, 3)" :key="tag" class="px-2 py-0.5 bg-gradient-to-r from-gray-100 to-gray-50 text-gray-600 text-[10px] rounded-md font-medium hover:from-teal-100 hover:to-teal-50 hover:text-teal-700 transition-all cursor-pointer border border-gray-100 hover:border-teal-200">
-                          {{ tag }}
-                        </span>
+                        <TagBadge v-for="tag in doc.tags.slice(0, 3)" :key="tag" :tag="tag" size="xs" clickable />
                         <span v-if="doc.tags.length > 3" class="text-[10px] text-gray-400 font-medium">
                           +{{ doc.tags.length - 3 }}
                         </span>

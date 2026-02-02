@@ -43,7 +43,7 @@ This plan outlines the systematic unification of duplicated UI components across
 ---
 
 ### Step 1.3: Badge Components Suite
-**Status:** In Progress (ArticlesPage done)
+**Status:** Complete
 
 **New Components:**
 - `src/components/common/CategoryBadge.vue`
