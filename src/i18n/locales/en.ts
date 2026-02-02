@@ -900,6 +900,55 @@ export default {
     activeFilters: 'Active Filters',
     noLearningPathsFound: 'No learning paths found',
     noLessonsFound: 'No lessons found',
+    // Section headers
+    continueLearningTitle: 'Continue Learning',
+    pickUpWhereYouLeftOff: 'Pick up where you left off',
+    inProgress: 'In Progress',
+    upNext: 'Up Next',
+    continueCourseDefault: 'Continue course',
+    ofLessons: 'of {total} lessons',
+    featuredCourses: 'Featured Courses',
+    trendingNow: 'Trending Now',
+    featuredInsights: 'Featured Insights',
+    allLessonsTab: 'All Lessons',
+    bookmarked: 'Bookmarked',
+    myCertificates: 'My Certificates',
+    // Filter labels
+    selectLevels: 'Select Levels',
+    selectCategories: 'Select Categories',
+    sortBy: 'Sort By',
+    enrollment: 'Enrollment',
+    progressFilter: 'Progress',
+    priorities: 'Priorities',
+    tagsFilter: 'Tags',
+    // Learning paths
+    allPaths: 'All Paths',
+    available: 'Available',
+    notStarted: 'Not Started',
+    learningPath: 'Learning Path',
+    resetFilters: 'Reset Filters',
+    clearFilters: 'Clear Filters',
+    // Insights
+    keyImpact: 'Key Impact',
+    quickTakeaways: 'Quick Takeaways',
+    // Certificates
+    totalCertificates: 'Total Certificates',
+    learningHours: 'Learning Hours',
+    averageScore: 'Average Score',
+    verified: 'Verified',
+    view: 'View',
+    // Skills
+    careerReady: 'Career Ready',
+    current: 'Current',
+    target: 'Target',
+    // Actions
+    close: 'Close',
+    // Placeholders
+    searchCoursesPlaceholder: 'Search courses...',
+    searchLearningPathsPlaceholder: 'Search learning paths...',
+    searchLessonsPlaceholder: 'Search lessons...',
+    searchCertificatesPlaceholder: 'Search certificates...',
+    filterByScore: 'Filter by Score',
   },
 
   // Events

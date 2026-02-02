@@ -2366,14 +2366,14 @@ function resumeFeaturedAutoPlay() {
                 <div class="icon-pulse"></div>
               </div>
               <div>
-                <h2 class="text-xl font-bold text-gray-900">Continue Learning</h2>
-                <p class="text-sm text-gray-500">Pick up where you left off</p>
+                <h2 class="text-xl font-bold text-gray-900">{{ $t('learning.continueLearningTitle') }}</h2>
+                <p class="text-sm text-gray-500">{{ $t('learning.pickUpWhereYouLeftOff') }}</p>
               </div>
             </div>
             <div class="flex items-center gap-3">
               <div class="px-4 py-2 bg-teal-50 rounded-xl flex items-center gap-2">
                 <div class="w-2 h-2 bg-teal-500 rounded-full animate-pulse"></div>
-                <span class="text-sm font-semibold text-teal-700">{{ inProgressCourses.length }} In Progress</span>
+                <span class="text-sm font-semibold text-teal-700">{{ inProgressCourses.length }} {{ $t('learning.inProgress') }}</span>
               </div>
             </div>
           </div>
@@ -2445,9 +2445,9 @@ function resumeFeaturedAutoPlay() {
                 <div class="current-lesson">
                   <div class="lesson-indicator">
                     <i class="fas fa-play-circle"></i>
-                    <span>Up Next</span>
+                    <span>{{ $t('learning.upNext') }}</span>
                   </div>
-                  <p class="lesson-title">{{ course.syllabus?.find(l => l.current)?.title || 'Continue course' }}</p>
+                  <p class="lesson-title">{{ course.syllabus?.find(l => l.current)?.title || $t('learning.continueCourseDefault') }}</p>
                 </div>
 
                 <!-- Progress Bar -->
@@ -2468,7 +2468,7 @@ function resumeFeaturedAutoPlay() {
 
                 <!-- Action Button -->
                 <button class="continue-btn">
-                  <span>Continue Learning</span>
+                  <span>{{ $t('learning.continueLearning') }}</span>
                   <i class="fas fa-arrow-right"></i>
                 </button>
               </div>
@@ -2484,7 +2484,7 @@ function resumeFeaturedAutoPlay() {
                 <i class="fas fa-star"></i>
               </div>
               <div>
-                <h2 class="featured-courses-title">Featured Courses</h2>
+                <h2 class="featured-courses-title">{{ $t('learning.featuredCourses') }}</h2>
                 <p class="featured-courses-subtitle">Explore our top recommended courses</p>
               </div>
             </div>
@@ -2563,7 +2563,7 @@ function resumeFeaturedAutoPlay() {
                       <div class="author-avatar">{{ featuredCourse.instructorInitials }}</div>
                       <div class="author-info">
                         <span class="author-name">{{ featuredCourse.instructor }}</span>
-                        <span class="author-role">Instructor</span>
+                        <span class="author-role">{{ $t('learning.instructor') }}</span>
                       </div>
                     </div>
                     <button class="featured-enroll-btn" @click.stop="navigateToCourse(featuredCourse.id)">
@@ -2652,7 +2652,7 @@ function resumeFeaturedAutoPlay() {
                 <i class="fas fa-fire-flame-curved"></i>
               </div>
               <div>
-                <h2 class="trending-title">Trending Now</h2>
+                <h2 class="trending-title">{{ $t('learning.trendingNow') }}</h2>
                 <p class="trending-subtitle">Popular courses this week</p>
               </div>
             </div>
@@ -2792,7 +2792,7 @@ function resumeFeaturedAutoPlay() {
                 <input
                   v-model="allCoursesSearch"
                   type="text"
-                  placeholder="Search courses..."
+                  :placeholder="$t('learning.searchCoursesPlaceholder')"
                   class="w-full ps-9 pe-4 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all"
                 >
                 <button v-if="allCoursesSearch" @click="allCoursesSearch = ''" class="absolute end-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
@@ -2819,7 +2819,7 @@ function resumeFeaturedAutoPlay() {
                   v-if="showLevelFilter"
                   class="absolute start-0 top-full mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
                 >
-                  <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Select Levels</div>
+                  <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">{{ $t('learning.selectLevels') }}</div>
                   <div class="max-h-48 overflow-y-auto">
                     <button
                       v-for="level in courseLevelOptions"
@@ -2877,7 +2877,7 @@ function resumeFeaturedAutoPlay() {
                   v-if="showCategoryFilterDropdown"
                   class="absolute start-0 top-full mt-2 w-64 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
                 >
-                  <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Select Categories</div>
+                  <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">{{ $t('learning.selectCategories') }}</div>
                   <div class="max-h-48 overflow-y-auto">
                     <button
                       v-for="cat in courseCategoryOptions"
@@ -2935,7 +2935,7 @@ function resumeFeaturedAutoPlay() {
                   v-if="showEnrollmentFilter"
                   class="absolute start-0 top-full mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
                 >
-                  <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Enrollment</div>
+                  <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">{{ $t('learning.enrollment') }}</div>
                   <div class="max-h-48 overflow-y-auto">
                     <button
                       v-for="option in courseEnrollmentOptions"
@@ -2955,7 +2955,7 @@ function resumeFeaturedAutoPlay() {
                       <span class="flex-1">{{ option.label }}</span>
                     </button>
                   </div>
-                  <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider border-t border-gray-100 mt-2 pt-2">Progress</div>
+                  <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider border-t border-gray-100 mt-2 pt-2">{{ $t('learning.progressFilter') }}</div>
                   <div class="max-h-48 overflow-y-auto">
                     <button
                       v-for="option in courseProgressOptions"
@@ -3080,7 +3080,7 @@ function resumeFeaturedAutoPlay() {
                   v-if="showAllCoursesSortDropdown"
                   class="absolute start-0 top-full mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
                 >
-                  <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Sort By</div>
+                  <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">{{ $t('learning.sortBy') }}</div>
                   <div class="max-h-64 overflow-y-auto">
                     <button
                       v-for="option in allCoursesSortOptions"
@@ -3505,7 +3505,7 @@ function resumeFeaturedAutoPlay() {
                 <input
                   v-model="pathsSearch"
                   type="text"
-                  placeholder="Search learning paths..."
+                  :placeholder="$t('learning.searchLearningPathsPlaceholder')"
                   class="w-full ps-9 pe-4 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all"
                 >
                 <button v-if="pathsSearch" @click="pathsSearch = ''" class="absolute end-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
@@ -3532,7 +3532,7 @@ function resumeFeaturedAutoPlay() {
                   v-if="showPathsLevelFilter"
                   class="absolute start-0 top-full mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
                 >
-                  <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Select Levels</div>
+                  <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">{{ $t('learning.selectLevels') }}</div>
                   <div class="max-h-48 overflow-y-auto">
                     <button
                       v-for="level in pathLevelOptions"
@@ -3605,7 +3605,7 @@ function resumeFeaturedAutoPlay() {
                         <i v-if="pathFilter === 'all'" class="fas fa-circle text-white text-[6px]"></i>
                       </div>
                       <i class="fas fa-layer-group text-sm w-4" :class="pathFilter === 'all' ? 'text-blue-500' : 'text-gray-400'"></i>
-                      <span class="flex-1">All Paths</span>
+                      <span class="flex-1">{{ $t('learning.allPaths') }}</span>
                     </button>
                     <button
                       @click="pathFilter = 'enrolled'; showPathsEnrollmentFilter = false"
@@ -3621,7 +3621,7 @@ function resumeFeaturedAutoPlay() {
                         <i v-if="pathFilter === 'enrolled'" class="fas fa-circle text-white text-[6px]"></i>
                       </div>
                       <i class="fas fa-user-check text-sm w-4" :class="pathFilter === 'enrolled' ? 'text-blue-500' : 'text-gray-400'"></i>
-                      <span class="flex-1">My Enrolled</span>
+                      <span class="flex-1">{{ $t('learning.myEnrolled') }}</span>
                     </button>
                     <button
                       @click="pathFilter = 'available'; showPathsEnrollmentFilter = false"
@@ -3637,7 +3637,7 @@ function resumeFeaturedAutoPlay() {
                         <i v-if="pathFilter === 'available'" class="fas fa-circle text-white text-[6px]"></i>
                       </div>
                       <i class="fas fa-unlock text-sm w-4" :class="pathFilter === 'available' ? 'text-blue-500' : 'text-gray-400'"></i>
-                      <span class="flex-1">Available</span>
+                      <span class="flex-1">{{ $t('learning.available') }}</span>
                     </button>
                   </div>
                 </div>
@@ -3667,7 +3667,7 @@ function resumeFeaturedAutoPlay() {
                   v-if="showPathsSortDropdown"
                   class="absolute start-0 top-full mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
                 >
-                  <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Sort By</div>
+                  <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">{{ $t('learning.sortBy') }}</div>
                   <div class="max-h-64 overflow-y-auto">
                     <button
                       v-for="option in pathsSortOptions"
@@ -3764,7 +3764,7 @@ function resumeFeaturedAutoPlay() {
                   <div class="absolute top-2 start-2 flex gap-1.5 z-10">
                     <StatusBadge v-if="path.isEnrolled && path.progress === 100" status="completed" size="xs" />
                     <StatusBadge v-else-if="path.isEnrolled && path.progress > 0" status="in-progress" size="xs" />
-                    <StatusBadge v-else-if="path.isEnrolled" status="pending" label="Not Started" size="xs" />
+                    <StatusBadge v-else-if="path.isEnrolled" status="pending" :label="$t('learning.notStarted')" size="xs" />
                     <StatusBadge v-if="path.enrolled > 1000" status="popular" size="xs" variant="gradient" />
                   </div>
 
@@ -3826,7 +3826,7 @@ function resumeFeaturedAutoPlay() {
                       <div class="w-7 h-7 rounded-full flex items-center justify-center text-white text-[10px] font-semibold shadow-sm" :style="{ background: `linear-gradient(135deg, ${path.color} 0%, ${path.color}dd 100%)` }">
                         <i :class="[path.icon, 'text-xs']"></i>
                       </div>
-                      <span class="text-xs text-gray-600 font-medium">Learning Path</span>
+                      <span class="text-xs text-gray-600 font-medium">{{ $t('learning.learningPath') }}</span>
                     </div>
 
                     <!-- Stats -->
@@ -3854,7 +3854,7 @@ function resumeFeaturedAutoPlay() {
               icon="fas fa-route"
               :title="$t('learning.noLearningPathsFound')"
               description="Try adjusting your filter selection"
-              action-label="Reset Filters"
+              :action-label="$t('learning.resetFilters')"
               action-icon="fas fa-redo"
               @action="clearAllPathsFilters"
             />
@@ -3884,7 +3884,7 @@ function resumeFeaturedAutoPlay() {
                 <i class="fas fa-sparkles"></i>
               </div>
               <div>
-                <h2 class="ll-featured-title">Featured Insights</h2>
+                <h2 class="ll-featured-title">{{ $t('learning.featuredInsights') }}</h2>
                 <p class="ll-featured-subtitle">Discover top lessons from our knowledge base</p>
               </div>
             </div>
@@ -3936,7 +3936,7 @@ function resumeFeaturedAutoPlay() {
                         <i class="fas fa-bolt"></i>
                       </div>
                       <div class="ll-impact-content">
-                        <span class="ll-impact-label">Key Impact</span>
+                        <span class="ll-impact-label">{{ $t('learning.keyImpact') }}</span>
                         <span class="ll-impact-text">{{ currentFeaturedLesson.impact }}</span>
                       </div>
                     </div>
@@ -3945,7 +3945,7 @@ function resumeFeaturedAutoPlay() {
                     <div v-if="currentFeaturedLesson.recommendations?.length" class="ll-main-takeaways">
                       <div class="ll-takeaway-header">
                         <i class="fas fa-lightbulb"></i>
-                        <span>Quick Takeaways</span>
+                        <span>{{ $t('learning.quickTakeaways') }}</span>
                       </div>
                       <div class="ll-takeaway-list">
                         <div v-for="(rec, idx) in currentFeaturedLesson.recommendations.slice(0, 2)" :key="idx" class="ll-takeaway-item">
@@ -3995,7 +3995,7 @@ function resumeFeaturedAutoPlay() {
             <div class="ll-next-lessons">
               <div class="ll-next-header">
                 <i class="fas fa-layer-group"></i>
-                <span>Up Next</span>
+                <span>{{ $t('learning.upNext') }}</span>
               </div>
 
               <div class="ll-next-list">
@@ -4050,7 +4050,7 @@ function resumeFeaturedAutoPlay() {
                 <i class="fas fa-lightbulb text-white text-sm"></i>
               </div>
               <div>
-                <span class="block">All Lessons</span>
+                <span class="block">{{ $t('learning.allLessonsTab') }}</span>
                 <span class="text-xs font-medium text-gray-500">{{ filteredLessons.length }} lessons found</span>
               </div>
             </h2>
@@ -4066,7 +4066,7 @@ function resumeFeaturedAutoPlay() {
                   <input
                     v-model="lessonsSearch"
                     type="text"
-                    placeholder="Search lessons..."
+                    :placeholder="$t('learning.searchLessonsPlaceholder')"
                     @input="lessonsCurrentPage = 1"
                     class="w-full ps-9 pe-20 py-2 text-sm rounded-lg bg-white border border-gray-200 focus:ring-2 focus:ring-teal-500 focus:border-transparent focus:outline-none transition-all"
                   >
@@ -4102,7 +4102,7 @@ function resumeFeaturedAutoPlay() {
                   v-if="showLessonsCategoryDropdown"
                   class="absolute start-0 top-full mt-2 w-64 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
                 >
-                  <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Categories</div>
+                  <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">{{ $t('common.categories') }}</div>
                   <div class="max-h-48 overflow-y-auto">
                     <button
                       v-for="cat in lessonsCategoryOptions.filter(c => c.id !== 'all')"
@@ -4164,7 +4164,7 @@ function resumeFeaturedAutoPlay() {
                   v-if="showLessonsPriorityDropdown"
                   class="absolute start-0 top-full mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
                 >
-                  <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Priorities</div>
+                  <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">{{ $t('learning.priorities') }}</div>
                   <div class="max-h-48 overflow-y-auto">
                     <button
                       v-for="pri in lessonsPriorityOptions.filter(p => p.id !== 'all')"
@@ -4225,7 +4225,7 @@ function resumeFeaturedAutoPlay() {
                   v-if="showLessonsTagsDropdown"
                   class="absolute start-0 top-full mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
                 >
-                  <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Tags</div>
+                  <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">{{ $t('learning.tagsFilter') }}</div>
                   <div class="max-h-48 overflow-y-auto">
                     <button
                       v-for="tag in allLessonsTags"
@@ -4275,7 +4275,7 @@ function resumeFeaturedAutoPlay() {
                 ]"
               >
                 <i :class="showBookmarkedOnly ? 'fas fa-bookmark' : 'far fa-bookmark'" class="text-sm"></i>
-                <span>Bookmarked</span>
+                <span>{{ $t('learning.bookmarked') }}</span>
               </button>
 
               <!-- Sort Options with Order Toggle -->
@@ -4302,7 +4302,7 @@ function resumeFeaturedAutoPlay() {
                   v-if="showLessonsSortDropdown"
                   class="absolute start-0 top-full mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
                 >
-                  <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Sort By</div>
+                  <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">{{ $t('learning.sortBy') }}</div>
                   <div class="max-h-64 overflow-y-auto">
                     <button
                       v-for="option in lessonsSortOptions"
@@ -4616,7 +4616,7 @@ function resumeFeaturedAutoPlay() {
               icon="fas fa-search"
               :title="$t('learning.noLessonsFound')"
               description="Try adjusting your search or filters"
-              action-label="Clear Filters"
+              :action-label="$t('learning.clearFilters')"
               action-icon="fas fa-rotate"
               size="lg"
               @action="clearLessonsFilters"
@@ -4718,7 +4718,7 @@ function resumeFeaturedAutoPlay() {
                     <i class="fas fa-share-alt"></i> Share
                   </button>
                 </div>
-                <button @click="closeLessonDetail" class="ll-close-btn">Close</button>
+                <button @click="closeLessonDetail" class="ll-close-btn">{{ $t('learning.close') }}</button>
               </div>
             </div>
           </div>
@@ -4737,7 +4737,7 @@ function resumeFeaturedAutoPlay() {
               </div>
               <div class="cert-stat-content">
                 <p class="cert-stat-value">{{ certificateStats.total }}</p>
-                <p class="cert-stat-label">Total Certificates</p>
+                <p class="cert-stat-label">{{ $t('learning.totalCertificates') }}</p>
               </div>
               <div class="cert-stat-badge">
                 <i class="fas fa-trophy"></i>
@@ -4763,7 +4763,7 @@ function resumeFeaturedAutoPlay() {
               </div>
               <div class="cert-stat-content">
                 <p class="cert-stat-value">{{ certificateStats.totalHours }}<span class="cert-stat-unit">h</span></p>
-                <p class="cert-stat-label">Learning Hours</p>
+                <p class="cert-stat-label">{{ $t('learning.learningHours') }}</p>
               </div>
               <div class="cert-stat-badge">
                 <i class="fas fa-hourglass-half"></i>
@@ -4776,7 +4776,7 @@ function resumeFeaturedAutoPlay() {
               </div>
               <div class="cert-stat-content">
                 <p class="cert-stat-value">{{ certificateStats.avgScore }}<span class="cert-stat-unit">%</span></p>
-                <p class="cert-stat-label">Average Score</p>
+                <p class="cert-stat-label">{{ $t('learning.averageScore') }}</p>
               </div>
               <div class="cert-stat-badge">
                 <i class="fas fa-star"></i>
@@ -4795,7 +4795,7 @@ function resumeFeaturedAutoPlay() {
                 <div class="cert-header-icon-ring"></div>
               </div>
               <div>
-                <h2 class="cert-header-title">My Certificates</h2>
+                <h2 class="cert-header-title">{{ $t('learning.myCertificates') }}</h2>
                 <p class="cert-header-subtitle">{{ filteredCertificates.length }} achievements earned</p>
               </div>
             </div>
@@ -4819,7 +4819,7 @@ function resumeFeaturedAutoPlay() {
               <input
                 v-model="certSearch"
                 type="text"
-                placeholder="Search certificates..."
+                :placeholder="$t('learning.searchCertificatesPlaceholder')"
                 class="cert-search-input"
               />
               <button v-if="certSearch" @click="certSearch = ''" class="cert-search-clear">
@@ -4842,7 +4842,7 @@ function resumeFeaturedAutoPlay() {
               </button>
               <!-- Dropdown Panel -->
               <div v-if="showCertScoreFilter" class="cert-dropdown-panel">
-                <div class="cert-dropdown-header">Filter by Score</div>
+                <div class="cert-dropdown-header">{{ $t('learning.filterByScore') }}</div>
                 <div class="cert-dropdown-options">
                   <button
                     v-for="option in certScoreOptions"
@@ -4880,7 +4880,7 @@ function resumeFeaturedAutoPlay() {
 
               <!-- Sort Dropdown Panel -->
               <div v-if="showCertSortDropdown" class="cert-dropdown-panel sort-panel">
-                <div class="cert-dropdown-header">Sort By</div>
+                <div class="cert-dropdown-header">{{ $t('learning.sortBy') }}</div>
                 <div class="cert-dropdown-options">
                   <button
                     v-for="option in certSortOptions"
@@ -4971,7 +4971,7 @@ function resumeFeaturedAutoPlay() {
                   </div>
                   <div class="cert-verified-badge">
                     <i class="fas fa-check-circle"></i>
-                    <span>Verified</span>
+                    <span>{{ $t('learning.verified') }}</span>
                   </div>
                 </div>
 
@@ -5020,7 +5020,7 @@ function resumeFeaturedAutoPlay() {
                   <div class="cert-actions">
                     <button class="cert-action-btn primary">
                       <i class="fas fa-eye"></i>
-                      <span>View</span>
+                      <span>{{ $t('learning.view') }}</span>
                     </button>
                     <button class="cert-action-btn secondary">
                       <i class="fas fa-download"></i>
@@ -5188,7 +5188,7 @@ function resumeFeaturedAutoPlay() {
                 </svg>
                 <div class="readiness-value">
                   <span class="text-3xl font-bold text-gray-900">{{ skillGapAnalysis.overallReadiness }}%</span>
-                  <span class="text-xs text-gray-500">Career Ready</span>
+                  <span class="text-xs text-gray-500">{{ $t('learning.careerReady') }}</span>
                 </div>
               </div>
               <p class="text-sm text-gray-600 mt-3 text-center">Based on industry standards and your learning goals</p>
@@ -5225,7 +5225,7 @@ function resumeFeaturedAutoPlay() {
                 <div class="gap-bars">
                   <div class="gap-bar-container">
                     <div class="gap-bar-label">
-                      <span>Current</span>
+                      <span>{{ $t('learning.current') }}</span>
                       <span class="font-medium">{{ gap.currentLevel }}%</span>
                     </div>
                     <div class="gap-bar">
@@ -5234,7 +5234,7 @@ function resumeFeaturedAutoPlay() {
                   </div>
                   <div class="gap-bar-container">
                     <div class="gap-bar-label">
-                      <span>Target</span>
+                      <span>{{ $t('learning.target') }}</span>
                       <span class="font-medium">{{ gap.targetLevel }}%</span>
                     </div>
                     <div class="gap-bar">
@@ -5266,7 +5266,7 @@ function resumeFeaturedAutoPlay() {
         </div>
 
         <div class="modal-footer">
-          <button @click="showSkillGapModal = false" class="btn-secondary">Close</button>
+          <button @click="showSkillGapModal = false" class="btn-secondary">{{ $t('learning.close') }}</button>
           <button @click="generateAILearningPaths(); showSkillGapModal = false" class="btn-primary">
             <i class="fas fa-route"></i>
             Get AI Learning Path
@@ -5366,7 +5366,7 @@ function resumeFeaturedAutoPlay() {
         </div>
 
         <div class="modal-footer">
-          <button @click="showAILearningPathModal = false" class="btn-secondary">Close</button>
+          <button @click="showAILearningPathModal = false" class="btn-secondary">{{ $t('learning.close') }}</button>
           <button
             v-if="selectedAIPath"
             @click="enrollInAIPath(selectedAIPath)"

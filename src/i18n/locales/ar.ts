@@ -902,6 +902,55 @@ export default {
     activeFilters: 'الفلاتر النشطة',
     noLearningPathsFound: 'لم يتم العثور على مسارات تعليمية',
     noLessonsFound: 'لم يتم العثور على دروس',
+    // Section headers
+    continueLearningTitle: 'متابعة التعلم',
+    pickUpWhereYouLeftOff: 'استكمل من حيث توقفت',
+    inProgress: 'قيد التقدم',
+    upNext: 'التالي',
+    continueCourseDefault: 'متابعة الدورة',
+    ofLessons: 'من {total} درس',
+    featuredCourses: 'الدورات المميزة',
+    trendingNow: 'الأكثر رواجاً',
+    featuredInsights: 'رؤى مميزة',
+    allLessonsTab: 'جميع الدروس',
+    bookmarked: 'المحفوظات',
+    myCertificates: 'شهاداتي',
+    // Filter labels
+    selectLevels: 'اختر المستويات',
+    selectCategories: 'اختر الفئات',
+    sortBy: 'ترتيب حسب',
+    enrollment: 'التسجيل',
+    progressFilter: 'التقدم',
+    priorities: 'الأولويات',
+    tagsFilter: 'الوسوم',
+    // Learning paths
+    allPaths: 'جميع المسارات',
+    available: 'متاح',
+    notStarted: 'لم يبدأ',
+    learningPath: 'مسار تعليمي',
+    resetFilters: 'إعادة تعيين الفلاتر',
+    clearFilters: 'مسح الفلاتر',
+    // Insights
+    keyImpact: 'الأثر الرئيسي',
+    quickTakeaways: 'نقاط سريعة',
+    // Certificates
+    totalCertificates: 'إجمالي الشهادات',
+    learningHours: 'ساعات التعلم',
+    averageScore: 'متوسط الدرجات',
+    verified: 'موثق',
+    view: 'عرض',
+    // Skills
+    careerReady: 'جاهز للعمل',
+    current: 'الحالي',
+    target: 'المستهدف',
+    // Actions
+    close: 'إغلاق',
+    // Placeholders
+    searchCoursesPlaceholder: 'البحث في الدورات...',
+    searchLearningPathsPlaceholder: 'البحث في مسارات التعلم...',
+    searchLessonsPlaceholder: 'البحث في الدروس...',
+    searchCertificatesPlaceholder: 'البحث في الشهادات...',
+    filterByScore: 'تصفية حسب الدرجة',
   },
 
   // Events
