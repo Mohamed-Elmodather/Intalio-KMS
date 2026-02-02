@@ -19,6 +19,7 @@ export default {
     previous: 'السابق',
     viewAll: 'عرض الكل',
     show: 'عرض',
+    showing: 'عرض',
     showMore: 'عرض المزيد',
     showLess: 'عرض أقل',
     noResults: 'لا توجد نتائج',

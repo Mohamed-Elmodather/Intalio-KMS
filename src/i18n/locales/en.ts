@@ -19,6 +19,7 @@ export default {
     previous: 'Previous',
     viewAll: 'View All',
     show: 'Show',
+    showing: 'Showing',
     showMore: 'Show More',
     showLess: 'Show Less',
     noResults: 'No results found',
