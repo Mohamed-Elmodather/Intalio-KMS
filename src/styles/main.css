@@ -121,6 +121,21 @@ html[dir="rtl"] body {
   transition: all 0.2s ease;
 }
 
+/* Smaller header button for mobile */
+.header-btn-sm {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+}
+
+@media (min-width: 640px) {
+  .header-btn-sm {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+  }
+}
+
 .header-btn:hover {
   background: linear-gradient(135deg, rgba(20, 184, 166, 0.08), rgba(13, 148, 136, 0.05));
 }
@@ -201,8 +216,14 @@ html[dir="rtl"] body {
   position: relative;
   background: #f9fafb;
   border: 1px solid #e5e7eb;
-  border-radius: 14px;
+  border-radius: 10px;
   transition: all 0.3s ease;
+}
+
+@media (min-width: 640px) {
+  .search-inner {
+    border-radius: 14px;
+  }
 }
 
 .search-container:focus-within .search-inner {
@@ -226,8 +247,9 @@ html[dir="rtl"] body {
 .ai-search-btn {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 6px 12px;
+  justify-content: center;
+  gap: 4px;
+  padding: 6px 8px;
   background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
   color: white;
   border: none;
@@ -235,6 +257,13 @@ html[dir="rtl"] body {
   font-size: 12px;
   cursor: pointer;
   transition: all 0.2s ease;
+}
+
+@media (min-width: 640px) {
+  .ai-search-btn {
+    gap: 6px;
+    padding: 6px 12px;
+  }
 }
 
 .ai-search-btn:hover {

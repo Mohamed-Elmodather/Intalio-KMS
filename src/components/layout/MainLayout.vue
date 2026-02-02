@@ -173,10 +173,9 @@ onMounted(async () => {
       @logout="handleLogout"
     />
 
-    <!-- Fixed Sidebar - starts at 64px from top -->
+    <!-- Fixed Sidebar - starts below header -->
     <aside
-      class="fixed start-0 bg-white border-e z-40 overflow-hidden sidebar-bounce"
-      style="top: 64px; height: calc(100vh - 64px);"
+      class="layout-sidebar fixed start-0 overflow-hidden sidebar-bounce"
       :class="isCollapsed ? 'w-20' : 'w-64'"
     >
       <UnifiedSidebar
@@ -188,11 +187,10 @@ onMounted(async () => {
       />
     </aside>
 
-    <!-- Main Content - margin-top: 64px for header -->
+    <!-- Main Content - margin-top for header -->
     <main
-      class="relative z-10 content-bounce"
-      style="margin-top: 64px; min-height: calc(100vh - 64px);"
-      :class="isCollapsed ? 'ms-20' : 'ms-64'"
+      class="layout-main relative z-10 content-bounce"
+      :class="['sm:ms-20', { 'sm:ms-64': !isCollapsed }]"
     >
       <slot />
     </main>
@@ -200,3 +198,35 @@ onMounted(async () => {
     <AppToast />
   </div>
 </template>
+
+<style scoped>
+.layout-sidebar {
+  display: none;
+  top: 56px;
+  height: calc(100vh - 56px);
+  background-color: #ffffff;
+  border-inline-end: 1px solid #e5e7eb;
+  z-index: 40;
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.05);
+}
+
+@media (min-width: 640px) {
+  .layout-sidebar {
+    display: block;
+    top: 64px;
+    height: calc(100vh - 64px);
+  }
+}
+
+.layout-main {
+  margin-top: 56px;
+  min-height: calc(100vh - 56px);
+}
+
+@media (min-width: 640px) {
+  .layout-main {
+    margin-top: 64px;
+    min-height: calc(100vh - 64px);
+  }
+}
+</style>

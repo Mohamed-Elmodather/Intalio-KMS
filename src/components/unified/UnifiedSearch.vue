@@ -408,11 +408,17 @@ function handleKeyDown(event: KeyboardEvent) {
   position: absolute;
   inset: 0;
   background: linear-gradient(135deg, rgba(20, 184, 166, 0.15), rgba(13, 148, 136, 0.1));
-  border-radius: 14px;
+  border-radius: 10px;
   opacity: 0;
   filter: blur(8px);
   transition: opacity 0.3s ease;
   pointer-events: none;
+}
+
+@media (min-width: 640px) {
+  .unified-search__glow {
+    border-radius: 14px;
+  }
 }
 
 .unified-search--focused .unified-search__glow {
@@ -423,8 +429,14 @@ function handleKeyDown(event: KeyboardEvent) {
   position: relative;
   background: #f9fafb;
   border: 1px solid #e5e7eb;
-  border-radius: 14px;
+  border-radius: 10px;
   transition: all 0.3s ease;
+}
+
+@media (min-width: 640px) {
+  .unified-search__inner {
+    border-radius: 14px;
+  }
 }
 
 .unified-search--focused .unified-search__inner {
@@ -446,8 +458,15 @@ function handleKeyDown(event: KeyboardEvent) {
 .unified-search__content {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 0 16px;
+  gap: 8px;
+  padding: 0 10px;
+}
+
+@media (min-width: 640px) {
+  .unified-search__content {
+    gap: 12px;
+    padding: 0 16px;
+  }
 }
 
 .unified-search__icon {
@@ -500,16 +519,24 @@ function handleKeyDown(event: KeyboardEvent) {
 }
 
 .unified-search__divider {
+  display: none;
   width: 1px;
   height: 20px;
   background: #e5e7eb;
 }
 
+@media (min-width: 640px) {
+  .unified-search__divider {
+    display: block;
+  }
+}
+
 .unified-search__ai-btn {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 6px 12px;
+  justify-content: center;
+  gap: 0;
+  padding: 6px 8px;
   background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
   color: white;
   border: none;
@@ -519,6 +546,21 @@ function handleKeyDown(event: KeyboardEvent) {
   cursor: pointer;
   transition: all 0.2s ease;
   white-space: nowrap;
+}
+
+.unified-search__ai-btn span {
+  display: none;
+}
+
+@media (min-width: 640px) {
+  .unified-search__ai-btn {
+    gap: 6px;
+    padding: 6px 12px;
+  }
+
+  .unified-search__ai-btn span {
+    display: inline;
+  }
 }
 
 .unified-search__ai-btn:hover {
@@ -560,19 +602,32 @@ function handleKeyDown(event: KeyboardEvent) {
   top: 100%;
   left: 0;
   right: 0;
-  margin-top: 8px;
+  margin-top: 6px;
   background: white;
   border: 1px solid #e5e7eb;
-  border-radius: 14px;
+  border-radius: 10px;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1), 0 2px 10px rgba(0, 0, 0, 0.05);
   z-index: 50;
   overflow: hidden;
 }
 
+@media (min-width: 640px) {
+  .unified-search__suggestions {
+    margin-top: 8px;
+    border-radius: 14px;
+  }
+}
+
 .unified-search__suggestions-header {
-  padding: 12px 16px;
+  padding: 10px 12px;
   background: linear-gradient(to right, rgba(20, 184, 166, 0.05), rgba(16, 185, 129, 0.05));
   border-bottom: 1px solid #f3f4f6;
+}
+
+@media (min-width: 640px) {
+  .unified-search__suggestions-header {
+    padding: 12px 16px;
+  }
 }
 
 .unified-search__suggestions-list {
@@ -583,14 +638,21 @@ function handleKeyDown(event: KeyboardEvent) {
 .unified-search__suggestion-item {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   width: 100%;
-  padding: 12px 16px;
+  padding: 10px 12px;
   text-align: left;
   background: transparent;
   border: none;
   cursor: pointer;
   transition: all 0.15s ease;
+}
+
+@media (min-width: 640px) {
+  .unified-search__suggestion-item {
+    gap: 12px;
+    padding: 12px 16px;
+  }
 }
 
 .unified-search__suggestion-item:hover,
@@ -603,17 +665,31 @@ function handleKeyDown(event: KeyboardEvent) {
 }
 
 .unified-search__suggestion-icon {
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
 }
 
+@media (min-width: 640px) {
+  .unified-search__suggestion-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+  }
+}
+
 .unified-search__suggestion-icon i {
-  font-size: 12px;
+  font-size: 11px;
+}
+
+@media (min-width: 640px) {
+  .unified-search__suggestion-icon i {
+    font-size: 12px;
+  }
 }
 
 .unified-search__suggestion-content {
@@ -625,12 +701,18 @@ function handleKeyDown(event: KeyboardEvent) {
 }
 
 .unified-search__suggestion-text {
-  font-size: 14px;
+  font-size: 13px;
   color: #374151;
   font-weight: 500;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+@media (min-width: 640px) {
+  .unified-search__suggestion-text {
+    font-size: 14px;
+  }
 }
 
 .unified-search__suggestion-confidence {
@@ -648,10 +730,17 @@ function handleKeyDown(event: KeyboardEvent) {
 }
 
 .unified-search__suggestions-footer {
+  display: none;
   padding: 10px 16px;
   background: #f9fafb;
   border-top: 1px solid #f3f4f6;
   text-align: center;
+}
+
+@media (min-width: 640px) {
+  .unified-search__suggestions-footer {
+    display: block;
+  }
 }
 
 /* Transition animations */
