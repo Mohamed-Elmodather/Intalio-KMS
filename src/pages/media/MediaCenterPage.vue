@@ -8,20 +8,18 @@ import FilterDropdown from '@/components/common/FilterDropdown.vue'
 import ViewAllButton from '@/components/common/ViewAllButton.vue'
 import EmptyState from '@/components/common/EmptyState.vue'
 import Pagination from '@/components/common/Pagination.vue'
+import ComparisonButton from '@/components/common/ComparisonButton.vue'
 
 const { t } = useI18n()
 import AddToCollectionModal from '@/components/common/AddToCollectionModal.vue'
 import { useAIServicesStore } from '@/stores/aiServices'
-import { useComparisonStore } from '@/stores/comparison'
 import { AILoadingIndicator, AIConfidenceBar, AISuggestionChip } from '@/components/ai'
 import ComparisonPanel from '@/components/ai/ComparisonPanel.vue'
 import ComparisonModal from '@/components/ai/ComparisonModal.vue'
 import type { AutoTagResult, OCRResult, ClassificationResult } from '@/types/ai'
-import type { ComparisonItem } from '@/types'
 
 const router = useRouter()
 const aiStore = useAIServicesStore()
-const comparisonStore = useComparisonStore()
 
 // State
 const showUploadModal = ref(false)
@@ -696,38 +694,6 @@ function handleAddedToCollection(collectionIds: string[]) {
 }
 
 // Comparison Functions
-function addToComparison(media: typeof mediaItems.value[0]) {
-  const comparisonItem: ComparisonItem = {
-    id: String(media.id),
-    type: 'media',
-    title: media.title,
-    thumbnail: media.thumbnail,
-    description: `${media.type} media - ${media.category}`,
-    metadata: {
-      author: 'Unknown',
-      date: media.date,
-      duration: media.duration ? parseInt(media.duration.toString()) : undefined,
-      category: media.category,
-      tags: media.tags,
-      views: media.views,
-      mediaType: media.type,
-    },
-  }
-  comparisonStore.addItem(comparisonItem)
-}
-
-function isInComparison(mediaId: number): boolean {
-  return comparisonStore.isItemSelected(String(mediaId))
-}
-
-function toggleComparison(media: typeof mediaItems.value[0]) {
-  if (isInComparison(media.id)) {
-    comparisonStore.removeItem(String(media.id))
-  } else {
-    addToComparison(media)
-  }
-}
-
 function handleDrop(e: DragEvent) {
   isDragging.value = false
   const files = e.dataTransfer?.files
@@ -2813,18 +2779,13 @@ onUnmounted(() => {
                   </div>
 
                   <!-- Compare Button (visible on hover or when selected) -->
-                  <button
-                    class="absolute top-2 left-10 z-30 w-6 h-6 rounded-lg flex items-center justify-center transition-all shadow-sm"
-                    :class="[
-                      isInComparison(media.id)
-                        ? 'bg-purple-500 text-white ring-2 ring-purple-300'
-                        : 'bg-white/90 backdrop-blur-sm text-gray-500 hover:bg-purple-50 hover:text-purple-600 opacity-0 group-hover:opacity-100'
-                    ]"
-                    @click.stop="toggleComparison(media)"
-                    :title="isInComparison(media.id) ? 'Remove from Compare' : 'Add to Compare'"
-                  >
-                    <i class="fas fa-layer-group text-[10px]"></i>
-                  </button>
+                  <ComparisonButton
+                    :item="media"
+                    type="media"
+                    size="sm"
+                    variant="overlay"
+                    class="absolute top-2 left-10 z-30"
+                  />
 
                   <!-- AI Analysis Badge -->
                   <div v-if="showAIFeatures && hasAIAnalysis(media.id)" class="absolute top-2 right-2 z-30">
@@ -3005,15 +2966,12 @@ onUnmounted(() => {
                     <i class="fas fa-share-alt"></i>
                   </button>
                   <!-- Compare Button -->
-                  <button
-                    :class="[
-                      'list-action-btn',
-                      isInComparison(media.id) ? 'bg-purple-500 text-white' : ''
-                    ]"
-                    @click.stop="toggleComparison(media)"
-                    :title="isInComparison(media.id) ? 'Remove from Compare' : 'Add to Compare'">
-                    <i class="fas fa-layer-group"></i>
-                  </button>
+                  <ComparisonButton
+                    :item="media"
+                    type="media"
+                    size="md"
+                    variant="solid"
+                  />
                 </div>
               </div>
             </div>

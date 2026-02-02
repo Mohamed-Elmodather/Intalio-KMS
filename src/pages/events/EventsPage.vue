@@ -6,20 +6,18 @@ import PageHeroHeader from '@/components/common/PageHeroHeader.vue'
 import FilterDropdown from '@/components/common/FilterDropdown.vue'
 import EmptyState from '@/components/common/EmptyState.vue'
 import Pagination from '@/components/common/Pagination.vue'
+import ComparisonButton from '@/components/common/ComparisonButton.vue'
 import { useAIServicesStore } from '@/stores/aiServices'
-import { useComparisonStore } from '@/stores/comparison'
 import { AILoadingIndicator, AISuggestionChip, AIConfidenceBar } from '@/components/ai'
 import ComparisonPanel from '@/components/ai/ComparisonPanel.vue'
 import ComparisonModal from '@/components/ai/ComparisonModal.vue'
 import type { SummarizationResult, ClassificationResult } from '@/types/ai'
-import type { ComparisonItem } from '@/types'
 
 const router = useRouter()
 const { t } = useI18n()
 
 // Initialize AI store
 const aiStore = useAIServicesStore()
-const comparisonStore = useComparisonStore()
 
 // State
 const showCreateModal = ref(false)
@@ -794,38 +792,6 @@ function toggleReserve(eventId: number) {
 // ============================================================================
 // Comparison Functions
 // ============================================================================
-
-function addToComparison(event: typeof events.value[0]) {
-  const comparisonItem: ComparisonItem = {
-    id: String(event.id),
-    type: 'event',
-    title: event.title,
-    thumbnail: undefined,
-    description: event.description,
-    metadata: {
-      author: 'Event Organizer',
-      date: event.date,
-      category: event.category,
-      tags: [],
-      location: event.location,
-      virtual: event.virtual,
-      attendees: event.attendees?.length || 0,
-    },
-  }
-  comparisonStore.addItem(comparisonItem)
-}
-
-function isInComparison(eventId: number): boolean {
-  return comparisonStore.isItemSelected(String(eventId))
-}
-
-function toggleComparison(event: typeof events.value[0]) {
-  if (isInComparison(event.id)) {
-    comparisonStore.removeItem(String(event.id))
-  } else {
-    addToComparison(event)
-  }
-}
 
 // ============================================================================
 // AI Features State & Functions
@@ -1766,13 +1732,13 @@ function getCategoryColor(category: string) {
                   <button class="card-action-btn" @click.stop title="Share">
                     <i class="fas fa-share-alt"></i>
                   </button>
-                  <button
-                    @click.stop="toggleComparison(event)"
-                    :class="['card-action-btn', isInComparison(event.id) ? 'bg-purple-500 text-white' : '']"
-                    :title="isInComparison(event.id) ? 'Remove from Compare' : 'Add to Compare'"
-                  >
-                    <i class="fas fa-layer-group"></i>
-                  </button>
+                  <ComparisonButton
+                    :item="event"
+                    type="event"
+                    size="md"
+                    variant="solid"
+                    class="card-action-btn"
+                  />
                   <button
                     @click.stop="toggleReserve(event.id)"
                     :class="['rsvp-btn-premium', event.isGoing ? 'going' : 'pending']"

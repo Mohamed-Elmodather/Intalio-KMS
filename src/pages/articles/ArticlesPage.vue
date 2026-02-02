@@ -9,18 +9,16 @@ import AddToCollectionModal from '@/components/common/AddToCollectionModal.vue'
 import ViewAllButton from '@/components/common/ViewAllButton.vue'
 import EmptyState from '@/components/common/EmptyState.vue'
 import Pagination from '@/components/common/Pagination.vue'
+import ComparisonButton from '@/components/common/ComparisonButton.vue'
 import { useAIServicesStore } from '@/stores/aiServices'
-import { useComparisonStore } from '@/stores/comparison'
 import { AISuggestionChip, AISentimentBadge, AILoadingIndicator } from '@/components/ai'
 import ComparisonPanel from '@/components/ai/ComparisonPanel.vue'
 import ComparisonModal from '@/components/ai/ComparisonModal.vue'
 import type { ContentRecommendation, SentimentResult } from '@/types/ai'
-import type { ComparisonItem } from '@/types'
 
 const router = useRouter()
 const { t } = useI18n()
 const aiStore = useAIServicesStore()
-const comparisonStore = useComparisonStore()
 
 // ============================================
 // CORE STATE
@@ -890,37 +888,6 @@ function openAddToCollection(article: any) {
     thumbnail: article.coverImage || undefined
   }
   showAddToCollectionModal.value = true
-}
-
-// Comparison Functions
-function addToComparison(article: typeof articles.value[0]) {
-  const comparisonItem: ComparisonItem = {
-    id: String(article.id),
-    type: 'article',
-    title: article.title,
-    thumbnail: article.image,
-    description: article.excerpt,
-    metadata: {
-      author: article.author?.name || 'Unknown',
-      date: article.date,
-      category: article.category,
-      tags: article.tags,
-      readTime: article.readTime,
-    },
-  }
-  comparisonStore.addItem(comparisonItem)
-}
-
-function isInComparison(articleId: number): boolean {
-  return comparisonStore.isItemSelected(String(articleId))
-}
-
-function toggleComparison(article: typeof articles.value[0]) {
-  if (isInComparison(article.id)) {
-    comparisonStore.removeItem(String(article.id))
-  } else {
-    addToComparison(article)
-  }
 }
 
 function handleAddedToCollection(collectionIds: string[]) {
@@ -1994,18 +1961,12 @@ onUnmounted(() => {
                       <i :class="bookmarks.includes(article.id) ? 'fas fa-bookmark' : 'far fa-bookmark'" class="text-xs"></i>
                     </button>
                     <!-- Compare button -->
-                    <button
-                      @click.stop="toggleComparison(article)"
-                      :class="[
-                        'w-7 h-7 rounded-full flex items-center justify-center transition-all shadow-sm',
-                        isInComparison(article.id)
-                          ? 'bg-purple-500 text-white ring-2 ring-purple-300'
-                          : 'bg-white/90 backdrop-blur-sm text-gray-400 hover:bg-purple-50 hover:text-purple-600'
-                      ]"
-                      :title="isInComparison(article.id) ? 'Remove from Compare' : 'Add to Compare'"
-                    >
-                      <i class="fas fa-layer-group text-xs"></i>
-                    </button>
+                    <ComparisonButton
+                      :item="article"
+                      type="article"
+                      size="sm"
+                      variant="overlay"
+                    />
                   </div>
                 </div>
 
@@ -2194,18 +2155,12 @@ onUnmounted(() => {
               <!-- Actions -->
               <div class="flex flex-col gap-2">
                 <!-- Compare button - always visible -->
-                <button
-                  @click.stop="toggleComparison(article)"
-                  :class="[
-                    'w-8 h-8 rounded-lg flex items-center justify-center transition-all shadow-sm',
-                    isInComparison(article.id)
-                      ? 'bg-purple-500 text-white ring-2 ring-purple-300'
-                      : 'bg-white text-gray-400 hover:bg-purple-50 hover:text-purple-600 border border-gray-200'
-                  ]"
-                  :title="isInComparison(article.id) ? 'Remove from Compare' : 'Add to Compare'"
-                >
-                  <i class="fas fa-layer-group text-xs"></i>
-                </button>
+                <ComparisonButton
+                  :item="article"
+                  type="article"
+                  size="md"
+                  variant="outline"
+                />
                 <!-- Other actions - visible on hover -->
                 <div class="flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                   <button
