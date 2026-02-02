@@ -13,6 +13,7 @@ import CategoryBadge from '@/components/common/CategoryBadge.vue'
 import StatusBadge from '@/components/common/StatusBadge.vue'
 import TagBadge from '@/components/common/TagBadge.vue'
 import ShareContentModal from '@/components/common/ShareContentModal.vue'
+import SkeletonLoader from '@/components/common/SkeletonLoader.vue'
 
 const { t } = useI18n()
 import AddToCollectionModal from '@/components/common/AddToCollectionModal.vue'
