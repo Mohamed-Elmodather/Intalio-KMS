@@ -43,7 +43,7 @@ This plan outlines the systematic unification of duplicated UI components across
 ---
 
 ### Step 1.3: Badge Components Suite
-**Status:** Pending
+**Status:** In Progress (ArticlesPage done)
 
 **New Components:**
 - `src/components/common/CategoryBadge.vue`
@@ -158,7 +158,7 @@ This plan outlines the systematic unification of duplicated UI components across
 |------|-----------|--------|---------------|--------|
 | 1.1 | ComparisonButton | Complete | ~167 lines | - |
 | 1.2 | usePagination | Complete | ~150 lines | - |
-| 1.3 | Badge Suite | Pending | - | - |
+| 1.3 | Badge Suite | In Progress | - | - |
 | 2.1 | CardActionButtons | Pending | - | - |
 | 2.2 | ShareContentModal | Pending | - | - |
 | 2.3 | SkeletonLoader | Pending | - | - |

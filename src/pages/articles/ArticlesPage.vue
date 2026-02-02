@@ -10,6 +10,9 @@ import ViewAllButton from '@/components/common/ViewAllButton.vue'
 import EmptyState from '@/components/common/EmptyState.vue'
 import Pagination from '@/components/common/Pagination.vue'
 import ComparisonButton from '@/components/common/ComparisonButton.vue'
+import CategoryBadge from '@/components/common/CategoryBadge.vue'
+import StatusBadge from '@/components/common/StatusBadge.vue'
+import TagBadge from '@/components/common/TagBadge.vue'
 import { useAIServicesStore } from '@/stores/aiServices'
 import { usePagination } from '@/composables/usePagination'
 import { AISuggestionChip, AISentimentBadge, AILoadingIndicator } from '@/components/ai'
@@ -1327,11 +1330,9 @@ onUnmounted(() => {
                   <div class="featured-spotlight-main">
                     <div class="featured-spotlight-content">
                       <div class="flex items-center gap-2 mb-4 flex-wrap">
-                        <span class="featured-badge-lg"><i class="fas fa-star me-1"></i> {{ $t('articles.featured') }}</span>
-                        <span class="editor-pick-badge" v-if="currentFeaturedItem.editorPick">{{ $t('articles.editorPick') }}</span>
-                        <span class="featured-category-badge">
-                          <i class="fas fa-folder me-1"></i> {{ currentFeaturedArticle.category }}
-                        </span>
+                        <StatusBadge status="featured" :label="$t('articles.featured')" variant="gradient" size="md" />
+                        <StatusBadge v-if="currentFeaturedItem.editorPick" status="recommended" :label="$t('articles.editorPick')" variant="glass" size="md" />
+                        <CategoryBadge :category="currentFeaturedArticle.category" :category-id="currentFeaturedArticle.categoryId" icon="fas fa-folder" variant="glass" size="md" class="!bg-white/15 !text-white !border-white/20" />
                       </div>
                       <h2 class="text-2xl font-bold text-white mb-3">{{ currentFeaturedArticle.title }}</h2>
                       <p class="text-teal-100 mb-4">{{ currentFeaturedArticle.excerpt }}</p>
@@ -1343,9 +1344,7 @@ onUnmounted(() => {
 
                       <!-- Tags -->
                       <div class="featured-tags">
-                        <span v-for="tag in currentFeaturedItem.tags" :key="tag" class="featured-tag">
-                          #{{ tag }}
-                        </span>
+                        <TagBadge v-for="tag in currentFeaturedItem.tags" :key="tag" :tag="tag" show-hash variant="colored" class="!bg-teal-500/20 !text-teal-100 !border-teal-400/30" />
                       </div>
 
                       <div class="flex items-center gap-4 mt-4 flex-wrap">
@@ -1896,9 +1895,7 @@ onUnmounted(() => {
                 <div class="absolute top-3 start-3 end-3 flex items-start justify-between">
                   <div class="flex flex-wrap gap-1.5">
                     <!-- Featured Badge -->
-                    <span v-if="article.featured" class="article-category-tag featured">
-                      <i class="fas fa-star text-[8px]"></i> {{ $t('articles.featured') }}
-                    </span>
+                    <StatusBadge v-if="article.featured" status="featured" :label="$t('articles.featured')" size="xs" variant="gradient" />
                     <!-- AI Sentiment Badge -->
                     <AISentimentBadge
                       v-if="getArticleSentiment(article.id)"
@@ -1931,9 +1928,7 @@ onUnmounted(() => {
 
                 <!-- Category Badge (Bottom) -->
                 <div class="absolute bottom-3 start-3">
-                  <span :class="['article-category-tag', article.categoryId]">
-                    {{ article.category }}
-                  </span>
+                  <CategoryBadge :category="article.category" :category-id="article.categoryId" size="xs" />
                 </div>
 
                 <!-- Read Button (Hover) -->
@@ -1971,13 +1966,14 @@ onUnmounted(() => {
 
                 <!-- Tags -->
                 <div class="flex flex-wrap gap-1.5 mb-3">
-                  <span
+                  <TagBadge
                     v-for="tag in article.tags?.slice(0, 3)"
                     :key="tag"
-                    class="px-2 py-0.5 bg-gray-100 text-gray-600 text-[10px] font-medium rounded-full hover:bg-teal-50 hover:text-teal-600 transition-colors"
-                  >
-                    {{ tag }}
-                  </span>
+                    :tag="tag"
+                    size="xs"
+                    clickable
+                    class="!rounded-full"
+                  />
                 </div>
 
                 <!-- Footer -->
@@ -2042,16 +2038,14 @@ onUnmounted(() => {
               <div class="flex-1 min-w-0">
                 <!-- Header Badges -->
                 <div class="flex flex-wrap items-center gap-2 mb-1.5">
-                  <span :class="['article-category-tag', article.categoryId]">
-                    {{ article.category }}
-                  </span>
-                  <span
+                  <CategoryBadge :category="article.category" :category-id="article.categoryId" size="xs" />
+                  <CategoryBadge
                     v-if="article.type"
-                    class="px-2 py-0.5 bg-teal-50 text-teal-700 text-[10px] font-semibold rounded-full flex items-center gap-1"
-                  >
-                    <i :class="[articleTypes.find(t => t.id === article.type)?.icon || 'fas fa-file', 'text-[8px]']"></i>
-                    {{ getTypeName(article.type) }}
-                  </span>
+                    :category="getTypeName(article.type)"
+                    :icon="articleTypes.find(t => t.id === article.type)?.icon || 'fas fa-file'"
+                    color="#0d9488"
+                    size="xs"
+                  />
                   <AISentimentBadge
                     v-if="getArticleSentiment(article.id)"
                     :sentiment="getArticleSentiment(article.id)!.overall"
@@ -2089,13 +2083,13 @@ onUnmounted(() => {
                   <!-- Stats & Tags -->
                   <div class="flex items-center gap-3">
                     <div class="hidden sm:flex items-center gap-1.5">
-                      <span
+                      <TagBadge
                         v-for="tag in article.tags?.slice(0, 2)"
                         :key="tag"
-                        class="px-1.5 py-0.5 bg-gray-100 text-gray-500 text-[10px] rounded-full"
-                      >
-                        {{ tag }}
-                      </span>
+                        :tag="tag"
+                        size="xs"
+                        class="!rounded-full"
+                      />
                     </div>
                     <div class="flex items-center gap-2 text-[11px] text-gray-400">
                       <span class="flex items-center gap-1">
