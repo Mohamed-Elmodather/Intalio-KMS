@@ -1324,20 +1324,20 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="px-8 py-6">
+  <div class="px-4 sm:px-6 lg:px-8 xl:px-10 py-4 sm:py-6">
     <!-- Welcome Section - Enhanced -->
-    <div class="welcome-hero rounded-2xl mb-8 relative overflow-hidden stagger-1">
+    <div class="welcome-hero rounded-xl lg:rounded-2xl mb-5 lg:mb-8 relative overflow-hidden stagger-1">
       <!-- Decorative elements with drift animations -->
       <div class="absolute top-0 end-0 w-96 h-96 bg-white/5 rounded-full circle-drift-1"></div>
       <div class="absolute bottom-0 start-0 w-64 h-64 bg-white/5 rounded-full circle-drift-2"></div>
       <div class="absolute top-1/2 end-1/4 w-32 h-32 bg-white/10 rounded-full circle-drift-3"></div>
 
       <!-- Trophy Icon - Top Right with glow animation -->
-      <div class="absolute top-6 end-6 w-20 h-20 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center trophy-glow">
-        <i class="fas fa-trophy text-white text-3xl"></i>
+      <div class="absolute top-4 end-4 lg:top-6 lg:end-6 w-14 h-14 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-xl lg:rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center trophy-glow">
+        <i class="fas fa-trophy text-white text-xl sm:text-2xl lg:text-3xl"></i>
       </div>
 
-      <div class="relative p-8">
+      <div class="relative p-4 sm:p-6 lg:p-8">
         <div class="flex items-center gap-3 mb-4">
           <div class="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-white text-xs font-semibold flex items-center gap-2">
             <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
@@ -1345,46 +1345,46 @@ onUnmounted(() => {
           </div>
         </div>
 
-        <h1 class="text-3xl font-bold text-white mb-3 fade-in-up" style="animation-delay: 0.3s;">
-          {{ $t(`dashboard.greeting.${timeOfDay}`, { name: currentUser.name }) }} <span class="text-2xl inline-block icon-float">👋</span>
+        <h1 class="text-xl sm:text-2xl lg:text-3xl font-bold text-white mb-2 lg:mb-3 fade-in-up" style="animation-delay: 0.3s;">
+          {{ $t(`dashboard.greeting.${timeOfDay}`, { name: currentUser.name }) }} <span class="text-lg sm:text-xl lg:text-2xl inline-block icon-float">👋</span>
         </h1>
-        <p class="text-teal-100 max-w-lg fade-in-up text-base" style="animation-delay: 0.4s;">
+        <p class="text-teal-100 max-w-lg fade-in-up text-sm lg:text-base" style="animation-delay: 0.4s;">
           {{ $t('dashboard.welcomeMessage') }}
           <span class="font-semibold text-white">{{ $t('dashboard.pendingTasks', { count: pendingTasksCount }) }}</span> {{ $t('common.and') }}
           <span class="font-semibold text-white">{{ $t('dashboard.newUpdates', { count: newUpdatesCount }) }}</span>.
         </p>
 
         <!-- Quick Action Buttons -->
-        <div class="flex flex-wrap gap-3 mt-6 fade-in-up" style="animation-delay: 0.5s;">
-          <router-link to="/learning" class="px-5 py-2.5 bg-white text-teal-600 rounded-xl font-semibold text-sm flex items-center gap-2 hover:bg-teal-50 transition-all shadow-lg shadow-black/10">
+        <div class="flex flex-wrap gap-2 lg:gap-3 mt-4 lg:mt-6 fade-in-up" style="animation-delay: 0.5s;">
+          <router-link to="/learning" class="px-3 py-2 lg:px-5 lg:py-2.5 bg-white text-teal-600 rounded-lg lg:rounded-xl font-semibold text-xs lg:text-sm flex items-center gap-1.5 lg:gap-2 hover:bg-teal-50 transition-all shadow-lg shadow-black/10">
             <i class="fas fa-play text-xs"></i>
             {{ $t('learning.continueLearning') }}
           </router-link>
-          <router-link to="/articles/new" class="px-5 py-2.5 bg-white/20 backdrop-blur-sm border border-white/30 text-white rounded-xl font-semibold text-sm hover:bg-white/30 transition-all flex items-center gap-2">
+          <router-link to="/articles/new" class="px-3 py-2 lg:px-5 lg:py-2.5 bg-white/20 backdrop-blur-sm border border-white/30 text-white rounded-lg lg:rounded-xl font-semibold text-xs lg:text-sm hover:bg-white/30 transition-all flex items-center gap-1.5 lg:gap-2">
             <i class="fas fa-plus text-xs"></i>
             {{ $t('dashboard.createContent') }}
           </router-link>
-          <router-link to="/events" class="px-5 py-2.5 bg-white/20 backdrop-blur-sm border border-white/30 text-white rounded-xl font-semibold text-sm hover:bg-white/30 transition-all flex items-center gap-2">
+          <router-link to="/events" class="px-3 py-2 lg:px-5 lg:py-2.5 bg-white/20 backdrop-blur-sm border border-white/30 text-white rounded-lg lg:rounded-xl font-semibold text-xs lg:text-sm hover:bg-white/30 transition-all flex items-center gap-1.5 lg:gap-2">
             <i class="fas fa-calendar text-xs"></i>
             {{ $t('dashboard.viewEvents') }}
           </router-link>
           <!-- AI Buttons -->
-          <button @click="loadAIInsights" class="px-5 py-2.5 bg-gradient-to-r from-emerald-400 to-teal-400 text-white rounded-xl font-semibold text-sm hover:from-emerald-500 hover:to-teal-500 transition-all flex items-center gap-2 shadow-lg shadow-teal-500/20">
+          <button @click="loadAIInsights" class="px-3 py-2 lg:px-5 lg:py-2.5 bg-gradient-to-r from-emerald-400 to-teal-400 text-white rounded-lg lg:rounded-xl font-semibold text-xs lg:text-sm hover:from-emerald-500 hover:to-teal-500 transition-all flex items-center gap-1.5 lg:gap-2 shadow-lg shadow-teal-500/20">
             <i class="fas fa-wand-magic-sparkles text-xs"></i>
             {{ $t('learning.aiInsights') }}
           </button>
-          <button @click="loadRecommendations" class="px-5 py-2.5 bg-white/20 backdrop-blur-sm border border-white/30 text-white rounded-xl font-semibold text-sm hover:bg-white/30 transition-all flex items-center gap-2">
+          <button @click="loadRecommendations" class="px-3 py-2 lg:px-5 lg:py-2.5 bg-white/20 backdrop-blur-sm border border-white/30 text-white rounded-lg lg:rounded-xl font-semibold text-xs lg:text-sm hover:bg-white/30 transition-all flex items-center gap-1.5 lg:gap-2">
             <i class="fas fa-compass text-xs"></i>
             {{ $t('dashboard.forYou') }}
           </button>
         </div>
 
         <!-- AI Quick Insight Badge -->
-        <div class="mt-4 fade-in-up" style="animation-delay: 0.6s;">
-          <div class="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-xl border border-white/20">
-            <i class="fas fa-robot text-emerald-300"></i>
-            <span class="text-sm text-white/90">{{ quickAIInsight.text }}</span>
-            <span class="flex items-center gap-1 text-xs text-emerald-300 font-semibold">
+        <div class="mt-3 sm:mt-4 fade-in-up" style="animation-delay: 0.6s;">
+          <div class="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-white/10 backdrop-blur-sm rounded-lg sm:rounded-xl border border-white/20 max-w-full">
+            <i class="fas fa-robot text-emerald-300 text-sm sm:text-base flex-shrink-0"></i>
+            <span class="text-xs sm:text-sm text-white/90 truncate">{{ quickAIInsight.text }}</span>
+            <span class="hidden sm:flex items-center gap-1 text-xs text-emerald-300 font-semibold flex-shrink-0">
               <i class="fas fa-arrow-up"></i> {{ $t('dashboard.trending') }}
             </span>
           </div>
@@ -1433,19 +1433,19 @@ onUnmounted(() => {
     </div>
 
     <!-- Latest Updates Section -->
-    <section class="updates-section mb-8">
+    <section class="updates-section mb-5 lg:mb-8">
       <div class="updates-header">
-        <h2 class="text-lg font-bold text-gray-900 flex items-center gap-3">
-          <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-lg shadow-orange-200">
-            <i class="fas fa-fire text-white"></i>
+        <h2 class="text-base sm:text-lg font-bold text-gray-900 flex items-center gap-2 sm:gap-3">
+          <div class="w-9 h-9 sm:w-11 sm:h-11 rounded-lg sm:rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-lg shadow-orange-200">
+            <i class="fas fa-fire text-white text-sm sm:text-base"></i>
           </div>
           <div>
             <span class="block">{{ $t('dashboard.latestUpdates') }}</span>
-            <span class="text-xs font-medium text-orange-600">{{ $t('dashboard.afcAsianCupShort') }}</span>
+            <span class="text-[10px] sm:text-xs font-medium text-orange-600">{{ $t('dashboard.afcAsianCupShort') }}</span>
           </div>
         </h2>
-        <router-link to="/articles" class="px-3 py-1.5 text-sm text-teal-600 hover:text-white bg-teal-50 hover:bg-teal-500 rounded-lg font-medium flex items-center gap-1.5 transition-all">
-          {{ $t('common.viewAll') }} <i class="fas fa-arrow-right text-xs"></i>
+        <router-link to="/articles" class="px-2 py-1 sm:px-3 sm:py-1.5 text-xs sm:text-sm text-teal-600 hover:text-white bg-teal-50 hover:bg-teal-500 rounded-lg font-medium flex items-center gap-1 sm:gap-1.5 transition-all">
+          {{ $t('common.viewAll') }} <i class="fas fa-arrow-right text-[10px] sm:text-xs"></i>
         </router-link>
       </div>
 
@@ -1578,9 +1578,9 @@ onUnmounted(() => {
     </section>
 
     <!-- Stats Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-5 mb-6 lg:mb-8">
       <div v-for="(stat, index) in stats" :key="stat.label"
-           class="stat-card card-animated rounded-2xl p-5"
+           class="stat-card card-animated rounded-xl sm:rounded-2xl p-4 sm:p-5"
            :style="{ animationDelay: index * 100 + 'ms' }">
         <div class="flex items-center justify-between mb-4">
           <div :class="['w-11 h-11 rounded-xl flex items-center justify-center', stat.iconBg]">
@@ -1591,8 +1591,8 @@ onUnmounted(() => {
             {{ stat.trend }}
           </div>
         </div>
-        <div class="stat-value text-3xl font-bold text-gray-900">{{ formatNumber(stat.displayValue) }}</div>
-        <div class="text-sm text-gray-500 mt-1">{{ stat.label }}</div>
+        <div class="stat-value text-2xl sm:text-3xl font-bold text-gray-900">{{ formatNumber(stat.displayValue) }}</div>
+        <div class="text-xs sm:text-sm text-gray-500 mt-1">{{ stat.label }}</div>
         <router-link :to="stat.link" class="text-xs text-primary-600 font-medium mt-3 flex items-center gap-1 hover:text-primary-700">
           {{ stat.linkText }} <i class="fas fa-arrow-right text-[10px]"></i>
         </router-link>
@@ -1600,21 +1600,21 @@ onUnmounted(() => {
     </div>
 
     <!-- Main Grid Row 1 - Articles & Documents -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6 mb-6 lg:mb-8">
       <!-- Recent Articles -->
-      <div class="card-animated rounded-2xl p-6 stagger-2 bg-gradient-to-br from-white to-teal-50/30 border border-teal-100/50">
-        <div class="flex items-center justify-between mb-5">
-          <h2 class="text-lg font-bold text-gray-900 flex items-center gap-3">
-            <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center shadow-lg shadow-teal-200">
-              <i class="fas fa-newspaper text-white"></i>
+      <div class="card-animated rounded-xl lg:rounded-2xl p-4 lg:p-6 stagger-2 bg-gradient-to-br from-white to-teal-50/30 border border-teal-100/50">
+        <div class="flex items-center justify-between mb-4 sm:mb-5">
+          <h2 class="text-base sm:text-lg font-bold text-gray-900 flex items-center gap-2 sm:gap-3">
+            <div class="w-9 h-9 sm:w-11 sm:h-11 rounded-lg sm:rounded-xl bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center shadow-lg shadow-teal-200">
+              <i class="fas fa-newspaper text-white text-sm sm:text-base"></i>
             </div>
             <div>
               <span class="block">{{ $t('dashboard.recentArticles') }}</span>
-              <span class="text-xs font-medium text-teal-600">{{ $t('dashboard.latestNewsUpdates') }}</span>
+              <span class="text-[10px] sm:text-xs font-medium text-teal-600">{{ $t('dashboard.latestNewsUpdates') }}</span>
             </div>
           </h2>
-          <router-link to="/articles" class="px-3 py-1.5 text-sm text-teal-600 hover:text-white bg-teal-50 hover:bg-teal-500 rounded-lg font-medium flex items-center gap-1.5 transition-all">
-            {{ $t('common.viewAll') }} <i class="fas fa-arrow-right text-xs"></i>
+          <router-link to="/articles" class="px-2 py-1 sm:px-3 sm:py-1.5 text-xs sm:text-sm text-teal-600 hover:text-white bg-teal-50 hover:bg-teal-500 rounded-lg font-medium flex items-center gap-1 sm:gap-1.5 transition-all">
+            {{ $t('common.viewAll') }} <i class="fas fa-arrow-right text-[10px] sm:text-xs"></i>
           </router-link>
         </div>
         <div class="space-y-2.5">
@@ -1660,19 +1660,19 @@ onUnmounted(() => {
       </div>
 
       <!-- Recent Documents -->
-      <div class="card-animated rounded-2xl p-6 stagger-3 bg-gradient-to-br from-white to-teal-50/30 border border-teal-100/50">
-        <div class="flex items-center justify-between mb-5">
-          <h2 class="text-lg font-bold text-gray-900 flex items-center gap-3">
-            <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center shadow-lg shadow-teal-200">
-              <i class="fas fa-folder-open text-white"></i>
+      <div class="card-animated rounded-xl lg:rounded-2xl p-4 lg:p-6 stagger-3 bg-gradient-to-br from-white to-teal-50/30 border border-teal-100/50">
+        <div class="flex items-center justify-between mb-4 sm:mb-5">
+          <h2 class="text-base sm:text-lg font-bold text-gray-900 flex items-center gap-2 sm:gap-3">
+            <div class="w-9 h-9 sm:w-11 sm:h-11 rounded-lg sm:rounded-xl bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center shadow-lg shadow-teal-200">
+              <i class="fas fa-folder-open text-white text-sm sm:text-base"></i>
             </div>
             <div>
               <span class="block">{{ $t('dashboard.recentDocuments') }}</span>
-              <span class="text-xs font-medium text-teal-600">{{ $t('dashboard.filesResources') }}</span>
+              <span class="text-[10px] sm:text-xs font-medium text-teal-600">{{ $t('dashboard.filesResources') }}</span>
             </div>
           </h2>
-          <router-link to="/documents" class="px-3 py-1.5 text-sm text-teal-600 hover:text-white bg-teal-50 hover:bg-teal-500 rounded-lg font-medium flex items-center gap-1.5 transition-all">
-            {{ $t('common.viewAll') }} <i class="fas fa-arrow-right text-xs"></i>
+          <router-link to="/documents" class="px-2 py-1 sm:px-3 sm:py-1.5 text-xs sm:text-sm text-teal-600 hover:text-white bg-teal-50 hover:bg-teal-500 rounded-lg font-medium flex items-center gap-1 sm:gap-1.5 transition-all">
+            {{ $t('common.viewAll') }} <i class="fas fa-arrow-right text-[10px] sm:text-xs"></i>
           </router-link>
         </div>
         <div class="space-y-2.5">
@@ -1718,22 +1718,22 @@ onUnmounted(() => {
     </div>
 
     <!-- Recent Media - Enhanced Section -->
-    <div class="card-animated rounded-2xl p-5 mb-6 stagger-2 bg-gradient-to-br from-white to-teal-50/30 border border-teal-100/50">
-      <div class="flex items-center justify-between mb-4">
-        <h2 class="text-lg font-bold text-gray-900 flex items-center gap-3">
-          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center shadow-lg shadow-teal-200">
-            <i class="fas fa-photo-film text-white text-sm"></i>
+    <div class="card-animated rounded-xl lg:rounded-2xl p-4 lg:p-5 mb-5 lg:mb-6 stagger-2 bg-gradient-to-br from-white to-teal-50/30 border border-teal-100/50">
+      <div class="flex items-center justify-between mb-3 sm:mb-4">
+        <h2 class="text-base sm:text-lg font-bold text-gray-900 flex items-center gap-2 sm:gap-3">
+          <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center shadow-lg shadow-teal-200">
+            <i class="fas fa-photo-film text-white text-xs sm:text-sm"></i>
           </div>
           <div>
             <span class="block">{{ $t('dashboard.recentMedia') }}</span>
-            <span class="text-xs font-medium text-teal-600">{{ $t('dashboard.videosPodcasts') }}</span>
+            <span class="text-[10px] sm:text-xs font-medium text-teal-600">{{ $t('dashboard.videosPodcasts') }}</span>
           </div>
         </h2>
-        <router-link to="/media" class="px-3 py-1.5 text-sm text-teal-600 hover:text-white bg-teal-50 hover:bg-teal-500 rounded-lg font-medium flex items-center gap-1.5 transition-all">
-          {{ $t('common.viewAll') }} <i class="fas fa-arrow-right text-xs"></i>
+        <router-link to="/media" class="px-2 py-1 sm:px-3 sm:py-1.5 text-xs sm:text-sm text-teal-600 hover:text-white bg-teal-50 hover:bg-teal-500 rounded-lg font-medium flex items-center gap-1 sm:gap-1.5 transition-all">
+          {{ $t('common.viewAll') }} <i class="fas fa-arrow-right text-[10px] sm:text-xs"></i>
         </router-link>
       </div>
-      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-2 sm:gap-3">
         <div v-for="media in mediaItems" :key="media.id"
              @click="playMedia(media.id)"
              class="media-card cursor-pointer group rounded-xl bg-white border border-gray-100 hover:border-teal-200 hover:shadow-lg transition-all overflow-hidden">
@@ -1776,15 +1776,15 @@ onUnmounted(() => {
           </div>
 
           <!-- Content -->
-          <div class="p-2.5">
-            <div class="flex items-center gap-1.5 mb-1">
-              <span class="text-[9px] font-semibold px-1.5 py-0.5 rounded-full bg-teal-100 text-teal-600">{{ media.category }}</span>
+          <div class="p-2 sm:p-2.5">
+            <div class="flex items-center gap-1.5 mb-0.5 sm:mb-1">
+              <span class="text-[8px] sm:text-[9px] font-semibold px-1 sm:px-1.5 py-0.5 rounded-full bg-teal-100 text-teal-600">{{ media.category }}</span>
             </div>
-            <h4 class="font-semibold text-gray-900 text-xs leading-tight line-clamp-2 group-hover:text-teal-600 transition-colors mb-1">{{ media.title }}</h4>
-            <div class="flex items-center gap-2 text-[10px] text-gray-400">
+            <h4 class="font-semibold text-gray-900 text-[10px] sm:text-xs leading-tight line-clamp-2 group-hover:text-teal-600 transition-colors mb-0.5 sm:mb-1">{{ media.title }}</h4>
+            <div class="flex items-center gap-1 sm:gap-2 text-[9px] sm:text-[10px] text-gray-400">
               <span><i class="fas fa-eye me-0.5"></i>{{ media.views }}</span>
-              <span>•</span>
-              <span>{{ media.date }}</span>
+              <span class="hidden sm:inline">•</span>
+              <span class="hidden sm:inline">{{ media.date }}</span>
             </div>
           </div>
         </div>
@@ -1792,25 +1792,25 @@ onUnmounted(() => {
     </div>
 
     <!-- Main Grid Row 2 -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6 mb-6 lg:mb-8">
       <!-- Events - Enhanced -->
-      <div class="card-animated rounded-2xl p-6 stagger-3 bg-gradient-to-br from-white to-teal-50/30 border border-teal-100/50">
-        <div class="flex items-center justify-between mb-5">
-          <h2 class="text-lg font-bold text-gray-900 flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center shadow-lg shadow-teal-200">
-              <i class="fas fa-calendar-alt text-white text-sm"></i>
+      <div class="card-animated rounded-xl lg:rounded-2xl p-4 lg:p-6 stagger-3 bg-gradient-to-br from-white to-teal-50/30 border border-teal-100/50">
+        <div class="flex items-center justify-between mb-4 sm:mb-5">
+          <h2 class="text-base sm:text-lg font-bold text-gray-900 flex items-center gap-2 sm:gap-3">
+            <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center shadow-lg shadow-teal-200">
+              <i class="fas fa-calendar-alt text-white text-xs sm:text-sm"></i>
             </div>
             <div>
               <span class="block">{{ $t('dashboard.upcomingEvents') }}</span>
-              <span class="text-xs font-medium text-teal-600">{{ $t('dashboard.afcAsianCupShort') }}</span>
+              <span class="text-[10px] sm:text-xs font-medium text-teal-600">{{ $t('dashboard.afcAsianCupShort') }}</span>
             </div>
           </h2>
-          <router-link to="/events" class="px-3 py-1.5 text-sm text-teal-600 hover:text-white bg-teal-50 hover:bg-teal-500 rounded-lg font-medium flex items-center gap-1.5 transition-all">
-            {{ $t('common.viewAll') }} <i class="fas fa-arrow-right text-xs"></i>
+          <router-link to="/events" class="px-2 py-1 sm:px-3 sm:py-1.5 text-xs sm:text-sm text-teal-600 hover:text-white bg-teal-50 hover:bg-teal-500 rounded-lg font-medium flex items-center gap-1 sm:gap-1.5 transition-all">
+            {{ $t('common.viewAll') }} <i class="fas fa-arrow-right text-[10px] sm:text-xs"></i>
           </router-link>
         </div>
 
-        <div class="space-y-3">
+        <div class="space-y-2 sm:space-y-3">
           <div v-for="event in upcomingEvents" :key="event.id"
                @click="viewEvent(event.id)"
                class="event-card relative rounded-xl cursor-pointer border border-gray-100 hover:border-teal-200 hover:shadow-lg transition-all group overflow-hidden"
@@ -1901,19 +1901,19 @@ onUnmounted(() => {
       </div>
 
       <!-- Polls -->
-      <div class="card-animated rounded-2xl p-6 stagger-4 bg-gradient-to-br from-white to-teal-50/30 border border-teal-100/50">
-        <div class="flex items-center justify-between mb-5">
-          <h2 class="text-lg font-bold text-gray-900 flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center shadow-lg shadow-teal-200">
-              <i class="fas fa-chart-pie text-white text-sm"></i>
+      <div class="card-animated rounded-xl lg:rounded-2xl p-4 lg:p-6 stagger-4 bg-gradient-to-br from-white to-teal-50/30 border border-teal-100/50">
+        <div class="flex items-center justify-between mb-4 sm:mb-5">
+          <h2 class="text-base sm:text-lg font-bold text-gray-900 flex items-center gap-2 sm:gap-3">
+            <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center shadow-lg shadow-teal-200">
+              <i class="fas fa-chart-pie text-white text-xs sm:text-sm"></i>
             </div>
             <div>
               <span class="block">{{ $t('dashboard.activePolls') }}</span>
-              <span class="text-xs font-medium text-teal-600">{{ $t('dashboard.castYourVote') }}</span>
+              <span class="text-[10px] sm:text-xs font-medium text-teal-600">{{ $t('dashboard.castYourVote') }}</span>
             </div>
           </h2>
-          <router-link to="/polls" class="px-3 py-1.5 text-sm text-teal-600 hover:text-white bg-teal-50 hover:bg-teal-500 rounded-lg font-medium flex items-center gap-1.5 transition-all">
-            {{ $t('common.viewAll') }} <i class="fas fa-arrow-right text-xs"></i>
+          <router-link to="/polls" class="px-2 py-1 sm:px-3 sm:py-1.5 text-xs sm:text-sm text-teal-600 hover:text-white bg-teal-50 hover:bg-teal-500 rounded-lg font-medium flex items-center gap-1 sm:gap-1.5 transition-all">
+            {{ $t('common.viewAll') }} <i class="fas fa-arrow-right text-[10px] sm:text-xs"></i>
           </router-link>
         </div>
         <div class="space-y-5">
@@ -1993,7 +1993,7 @@ onUnmounted(() => {
       </div>
 
       <!-- Learning Progress - Enhanced -->
-      <div class="card-animated rounded-2xl p-6 stagger-5 bg-gradient-to-br from-white to-teal-50/30 border border-teal-100/50">
+      <div class="card-animated rounded-xl lg:rounded-2xl p-4 lg:p-6 stagger-5 bg-gradient-to-br from-white to-teal-50/30 border border-teal-100/50">
         <div class="flex items-center justify-between mb-5">
           <h2 class="text-lg font-bold text-gray-900 flex items-center gap-3">
             <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center shadow-lg shadow-teal-200">
@@ -2126,9 +2126,9 @@ onUnmounted(() => {
     </div>
 
     <!-- Main Grid Row 3 -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
       <!-- Team Activity - Enhanced -->
-      <div class="card-animated rounded-2xl p-6 stagger-5 bg-gradient-to-br from-white to-teal-50/30 border border-teal-100/50">
+      <div class="card-animated rounded-xl lg:rounded-2xl p-4 lg:p-6 stagger-5 bg-gradient-to-br from-white to-teal-50/30 border border-teal-100/50">
         <div class="flex items-center justify-between mb-5">
           <h2 class="text-lg font-bold text-gray-900 flex items-center gap-3">
             <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center shadow-lg shadow-teal-200">
@@ -2487,7 +2487,13 @@ onUnmounted(() => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+@media (min-width: 640px) {
+  .updates-header {
+    margin-bottom: 0.75rem;
+  }
 }
 
 .updates-title {
@@ -2519,12 +2525,32 @@ onUnmounted(() => {
 .updates-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 1rem;
+  gap: 0.75rem;
 }
 
 @media (min-width: 640px) {
   .updates-grid {
+    gap: 1rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .updates-grid {
+    grid-template-columns: 1.5fr 1fr;
+  }
+}
+
+@media (min-width: 1024px) {
+  .updates-grid {
+    grid-template-columns: 1.6fr 1fr;
+    gap: 1rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  .updates-grid {
     grid-template-columns: 1.8fr 1fr;
+    gap: 1.25rem;
   }
 }
 
@@ -2536,14 +2562,26 @@ onUnmounted(() => {
 .featured-main-card {
   position: relative;
   display: block;
-  border-radius: 1rem;
+  border-radius: 0.75rem;
   overflow: hidden;
   cursor: pointer;
   background: #0f172a;
   aspect-ratio: 16/9;
 }
 
+@media (min-width: 640px) {
+  .featured-main-card {
+    border-radius: 1rem;
+  }
+}
+
 @media (min-width: 1024px) {
+  .featured-main-card {
+    aspect-ratio: 16/9;
+  }
+}
+
+@media (min-width: 1280px) {
   .featured-main-card {
     aspect-ratio: 2/1;
   }
@@ -2691,16 +2729,50 @@ onUnmounted(() => {
   bottom: 0;
   left: 0;
   right: 0;
-  padding: 1.5rem;
+  padding: 1rem;
   z-index: 2;
+}
+
+@media (min-width: 640px) {
+  .featured-main-content {
+    padding: 1.25rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .featured-main-content {
+    padding: 1.25rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  .featured-main-content {
+    padding: 1.5rem;
+  }
 }
 
 .featured-main-meta {
   display: flex;
-  gap: 1rem;
-  margin-bottom: 0.75rem;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
   color: rgba(255,255,255,0.9);
-  font-size: 0.875rem;
+  font-size: 0.75rem;
+}
+
+@media (min-width: 640px) {
+  .featured-main-meta {
+    gap: 0.75rem;
+    margin-bottom: 0.625rem;
+    font-size: 0.8125rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  .featured-main-meta {
+    gap: 1rem;
+    margin-bottom: 0.75rem;
+    font-size: 0.875rem;
+  }
 }
 
 .featured-main-meta span {
@@ -2714,11 +2786,11 @@ onUnmounted(() => {
 }
 
 .featured-main-title {
-  font-size: 1.5rem;
+  font-size: 1.125rem;
   font-weight: 700;
   color: white;
   line-height: 1.3;
-  margin: 0 0 0.5rem 0;
+  margin: 0 0 0.375rem 0;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -2726,39 +2798,95 @@ onUnmounted(() => {
   transition: color 0.3s ease;
 }
 
+@media (min-width: 640px) {
+  .featured-main-title {
+    font-size: 1.25rem;
+    margin: 0 0 0.5rem 0;
+  }
+}
+
+@media (min-width: 1024px) {
+  .featured-main-title {
+    font-size: 1.25rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  .featured-main-title {
+    font-size: 1.5rem;
+  }
+}
+
 .featured-main-card:hover .featured-main-title {
   color: #99f6e4;
 }
 
 .featured-main-desc {
-  font-size: 1rem;
+  font-size: 0.8125rem;
   color: rgba(255,255,255,0.85);
   line-height: 1.5;
-  margin: 0 0 0.75rem 0;
+  margin: 0 0 0.5rem 0;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
 
+@media (min-width: 640px) {
+  .featured-main-desc {
+    font-size: 0.875rem;
+    margin: 0 0 0.625rem 0;
+  }
+}
+
+@media (min-width: 1024px) {
+  .featured-main-desc {
+    font-size: 0.875rem;
+    -webkit-line-clamp: 2;
+  }
+}
+
+@media (min-width: 1280px) {
+  .featured-main-desc {
+    font-size: 1rem;
+    margin: 0 0 0.75rem 0;
+  }
+}
+
 .featured-main-author {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  font-size: 0.875rem;
+  gap: 0.375rem;
+  font-size: 0.75rem;
   color: rgba(255,255,255,0.9);
 }
 
+@media (min-width: 640px) {
+  .featured-main-author {
+    gap: 0.5rem;
+    font-size: 0.875rem;
+  }
+}
+
 .author-avatar-sm {
-  width: 1.75rem;
-  height: 1.75rem;
-  border-radius: 0.375rem;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 0.25rem;
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
-  font-size: 0.5625rem;
+  font-size: 0.5rem;
   font-weight: 700;
+}
+
+@media (min-width: 640px) {
+  .author-avatar-sm {
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: 0.375rem;
+    font-size: 0.5625rem;
+  }
 }
 
 .dot {
@@ -2775,22 +2903,57 @@ onUnmounted(() => {
 .up-next-title {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  font-size: 0.8125rem;
+  gap: 0.375rem;
+  font-size: 0.75rem;
   font-weight: 600;
   color: #334155;
-  margin: 0 0 0.625rem 0;
+  margin: 0 0 0.5rem 0;
+}
+
+@media (min-width: 640px) {
+  .up-next-title {
+    gap: 0.5rem;
+    font-size: 0.8125rem;
+    margin: 0 0 0.625rem 0;
+  }
 }
 
 .up-next-title i {
   color: #64748b;
-  font-size: 0.6875rem;
+  font-size: 0.625rem;
+}
+
+@media (min-width: 640px) {
+  .up-next-title i {
+    font-size: 0.6875rem;
+  }
 }
 
 .up-next-list {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.375rem;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+@media (min-width: 640px) {
+  .up-next-list {
+    gap: 0.5rem;
+    max-height: 450px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .up-next-list {
+    max-height: 380px;
+  }
+}
+
+@media (min-width: 1280px) {
+  .up-next-list {
+    max-height: 420px;
+  }
 }
 
 /* Carousel Navigation */
@@ -2798,8 +2961,8 @@ onUnmounted(() => {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  width: 36px;
-  height: 36px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.9);
   border: none;
@@ -2808,10 +2971,20 @@ onUnmounted(() => {
   justify-content: center;
   cursor: pointer;
   transition: all 0.3s ease;
-  opacity: 0;
+  opacity: 0.7;
   z-index: 10;
   color: #334155;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  font-size: 0.75rem;
+}
+
+@media (min-width: 640px) {
+  .carousel-arrow {
+    width: 36px;
+    height: 36px;
+    opacity: 0;
+    font-size: 1rem;
+  }
 }
 
 .featured-main-card:hover .carousel-arrow {
@@ -2825,26 +2998,44 @@ onUnmounted(() => {
 }
 
 .carousel-prev {
-  left: 0.75rem;
+  left: 0.5rem;
 }
 
 .carousel-next {
-  right: 0.75rem;
+  right: 0.5rem;
+}
+
+@media (min-width: 640px) {
+  .carousel-prev {
+    left: 0.75rem;
+  }
+
+  .carousel-next {
+    right: 0.75rem;
+  }
 }
 
 /* Carousel Dots */
 .carousel-dots {
   position: absolute;
-  bottom: 0.75rem;
-  right: 0.75rem;
+  bottom: 0.5rem;
+  right: 0.5rem;
   display: flex;
-  gap: 0.375rem;
+  gap: 0.25rem;
   z-index: 10;
 }
 
+@media (min-width: 640px) {
+  .carousel-dots {
+    bottom: 0.75rem;
+    right: 0.75rem;
+    gap: 0.375rem;
+  }
+}
+
 .carousel-dot {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.5);
   border: none;
@@ -2853,14 +3044,28 @@ onUnmounted(() => {
   padding: 0;
 }
 
+@media (min-width: 640px) {
+  .carousel-dot {
+    width: 8px;
+    height: 8px;
+  }
+}
+
 .carousel-dot:hover {
   background: rgba(255, 255, 255, 0.8);
 }
 
 .carousel-dot.active {
   background: white;
-  width: 20px;
-  border-radius: 4px;
+  width: 16px;
+  border-radius: 3px;
+}
+
+@media (min-width: 640px) {
+  .carousel-dot.active {
+    width: 20px;
+    border-radius: 4px;
+  }
 }
 
 /* Carousel Fade Transition */
@@ -2903,7 +3108,7 @@ onUnmounted(() => {
   height: 100%;
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 768px) {
   .secondary-link {
     flex-direction: row;
   }
@@ -2911,15 +3116,35 @@ onUnmounted(() => {
 
 .secondary-image {
   position: relative;
-  height: 140px;
+  height: 120px;
   flex-shrink: 0;
   overflow: hidden;
 }
 
+@media (min-width: 640px) {
+  .secondary-image {
+    height: 140px;
+  }
+}
+
+@media (min-width: 768px) {
+  .secondary-image {
+    width: 120px;
+    height: auto;
+    min-height: 100px;
+  }
+}
+
 @media (min-width: 1024px) {
   .secondary-image {
+    width: 120px;
+    min-height: 100px;
+  }
+}
+
+@media (min-width: 1280px) {
+  .secondary-image {
     width: 140px;
-    height: auto;
     min-height: 120px;
   }
 }
@@ -3061,9 +3286,21 @@ onUnmounted(() => {
 
 .secondary-content {
   flex: 1;
-  padding: 1rem;
+  padding: 0.75rem;
   display: flex;
   flex-direction: column;
+}
+
+@media (min-width: 640px) {
+  .secondary-content {
+    padding: 0.875rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  .secondary-content {
+    padding: 1rem;
+  }
 }
 
 .secondary-meta {
@@ -3087,11 +3324,11 @@ onUnmounted(() => {
 }
 
 .secondary-title {
-  font-size: 0.9375rem;
+  font-size: 0.8125rem;
   font-weight: 700;
   color: #0f172a;
   line-height: 1.4;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.375rem;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -3099,20 +3336,55 @@ onUnmounted(() => {
   transition: color 0.3s ease;
 }
 
+@media (min-width: 640px) {
+  .secondary-title {
+    font-size: 0.875rem;
+    margin-bottom: 0.5rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  .secondary-title {
+    font-size: 0.9375rem;
+  }
+}
+
 .secondary-card:hover .secondary-title {
   color: #0d9488;
 }
 
 .secondary-description {
-  font-size: 0.8125rem;
+  font-size: 0.75rem;
   color: #64748b;
   line-height: 1.5;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
+  display: none;
+  -webkit-line-clamp: 1;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.5rem;
   flex: 1;
+}
+
+@media (min-width: 640px) {
+  .secondary-description {
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+  }
+}
+
+@media (min-width: 1024px) {
+  .secondary-description {
+    -webkit-line-clamp: 1;
+    font-size: 0.75rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  .secondary-description {
+    -webkit-line-clamp: 2;
+    font-size: 0.8125rem;
+    margin-bottom: 0.75rem;
+  }
 }
 
 .secondary-footer {
