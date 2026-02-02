@@ -120,7 +120,7 @@ watch(isOpen, (value) => {
         class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
         @click.self="close"
       >
-        <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl overflow-hidden">
+        <div class="modal-content bg-white rounded-2xl max-w-md w-full shadow-2xl overflow-hidden">
           <!-- Header -->
           <div class="bg-gradient-to-r from-teal-500 to-cyan-500 px-6 py-4">
             <div class="flex items-center justify-between">
@@ -232,7 +232,12 @@ watch(isOpen, (value) => {
 <style scoped>
 .modal-enter-active,
 .modal-leave-active {
-  transition: all 0.3s ease;
+  transition: opacity 0.3s ease;
+}
+
+.modal-enter-active .modal-content,
+.modal-leave-active .modal-content {
+  transition: transform 0.3s ease;
 }
 
 .modal-enter-from,
@@ -240,8 +245,8 @@ watch(isOpen, (value) => {
   opacity: 0;
 }
 
-.modal-enter-from .bg-white,
-.modal-leave-to .bg-white {
+.modal-enter-from .modal-content,
+.modal-leave-to .modal-content {
   transform: scale(0.95) translateY(10px);
 }
 
