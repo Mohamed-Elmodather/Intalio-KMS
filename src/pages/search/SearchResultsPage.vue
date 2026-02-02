@@ -5,6 +5,7 @@ import { useI18n } from 'vue-i18n'
 import { useUIStore } from '@/stores/ui'
 import { useAIServicesStore } from '@/stores/aiServices'
 import { AIVoiceInput } from '@/components/ai'
+import EmptyState from '@/components/common/EmptyState.vue'
 
 // Stores
 const uiStore = useUIStore()
@@ -1136,22 +1137,22 @@ function getIntentLabel(type: string): string {
           </template>
 
           <!-- Empty State -->
-          <div v-else-if="displayQuery" class="flex flex-col items-center justify-center py-20 text-center">
-            <div class="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center mb-4">
-              <i class="fas fa-search text-3xl text-gray-400"></i>
-            </div>
-            <h3 class="text-xl font-semibold text-gray-800 mb-2">{{ textConstants.noResults }}</h3>
-            <p class="text-gray-500">{{ textConstants.noResultsDesc }}</p>
-          </div>
+          <EmptyState
+            v-else-if="displayQuery"
+            icon="fas fa-search"
+            :title="textConstants.noResults"
+            :description="textConstants.noResultsDesc"
+            size="lg"
+          />
 
           <!-- Initial State -->
-          <div v-else class="flex flex-col items-center justify-center py-20 text-center">
-            <div class="w-20 h-20 rounded-full bg-teal-50 flex items-center justify-center mb-4">
-              <i class="fas fa-search text-3xl text-teal-400"></i>
-            </div>
-            <h3 class="text-xl font-semibold text-gray-800 mb-2">{{ textConstants.initialStateTitle }}</h3>
-            <p class="text-gray-500">{{ textConstants.initialStateDesc }}</p>
-          </div>
+          <EmptyState
+            v-else
+            icon="fas fa-search"
+            :title="textConstants.initialStateTitle"
+            :description="textConstants.initialStateDesc"
+            size="lg"
+          />
         </div>
       </div>
     </div>

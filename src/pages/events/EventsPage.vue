@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import PageHeroHeader from '@/components/common/PageHeroHeader.vue'
 import FilterDropdown from '@/components/common/FilterDropdown.vue'
+import EmptyState from '@/components/common/EmptyState.vue'
 import { useAIServicesStore } from '@/stores/aiServices'
 import { useComparisonStore } from '@/stores/comparison'
 import { AILoadingIndicator, AISuggestionChip, AIConfidenceBar } from '@/components/ai'
@@ -1843,19 +1844,17 @@ function getCategoryColor(category: string) {
             </div>
           </div>
 
-          <!-- Premium Empty State -->
-          <div v-if="filteredEvents.length === 0 && calendarView !== 'calendar'" class="empty-state-premium">
-            <div class="empty-state-icon">
-              <div class="empty-state-icon-bg"></div>
-              <i class="fas fa-calendar-xmark"></i>
-            </div>
-            <h3 class="empty-state-title">No events found</h3>
-            <p class="empty-state-text">Try adjusting your filters or search query</p>
-            <button @click="clearFilters" class="empty-state-btn">
-              <i class="fas fa-refresh"></i>
-              Clear all filters
-            </button>
-          </div>
+          <!-- Empty State -->
+          <EmptyState
+            v-if="filteredEvents.length === 0 && calendarView !== 'calendar'"
+            icon="fas fa-calendar-xmark"
+            title="No events found"
+            description="Try adjusting your filters or search query"
+            action-label="Clear all filters"
+            action-icon="fas fa-refresh"
+            size="lg"
+            @action="clearFilters"
+          />
 
           <!-- Pagination -->
           <div v-if="filteredEvents.length > 0 && calendarView !== 'calendar'" class="mt-4 px-4 py-3 bg-white rounded-2xl border border-gray-100 shadow-sm">

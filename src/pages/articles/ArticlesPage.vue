@@ -7,6 +7,7 @@ import FilterDropdown from '@/components/common/FilterDropdown.vue'
 import ContentActionsDropdown from '@/components/common/ContentActionsDropdown.vue'
 import AddToCollectionModal from '@/components/common/AddToCollectionModal.vue'
 import ViewAllButton from '@/components/common/ViewAllButton.vue'
+import EmptyState from '@/components/common/EmptyState.vue'
 import { useAIServicesStore } from '@/stores/aiServices'
 import { useComparisonStore } from '@/stores/comparison'
 import { AISuggestionChip, AISentimentBadge, AILoadingIndicator } from '@/components/ai'
@@ -2320,17 +2321,15 @@ onUnmounted(() => {
         </div>
 
         <!-- Empty State -->
-        <div v-else class="empty-state">
-          <div class="empty-state-icon">
-            <i class="fas fa-search"></i>
-          </div>
-          <h3 class="empty-state-title">{{ $t('articles.noArticles') }}</h3>
-          <p class="empty-state-text">{{ $t('articles.tryAdjustingFilters') }}</p>
-          <button @click="clearFilters" class="empty-state-btn">
-            <i class="fas fa-rotate"></i>
-            {{ $t('articles.clearFilters') }}
-          </button>
-        </div>
+        <EmptyState
+          v-else
+          icon="fas fa-search"
+          :title="$t('articles.noArticles')"
+          :description="$t('articles.tryAdjustingFilters')"
+          :action-label="$t('articles.clearFilters')"
+          action-icon="fas fa-rotate"
+          @action="clearFilters"
+        />
       </div>
     </div>
 

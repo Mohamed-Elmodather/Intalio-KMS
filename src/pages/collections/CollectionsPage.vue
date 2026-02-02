@@ -3,6 +3,7 @@ import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import PageHeroHeader from '@/components/common/PageHeroHeader.vue'
+import EmptyState from '@/components/common/EmptyState.vue'
 
 const router = useRouter()
 const { t } = useI18n()
@@ -636,22 +637,19 @@ function saveNewCollection() {
       </div>
 
       <!-- Empty State -->
-      <div v-if="filteredCollections.length === 0" class="empty-state">
-        <div class="empty-icon">
-          <i class="fas fa-layer-group"></i>
-        </div>
-        <h3 class="empty-title">No collections found</h3>
-        <p class="empty-description">
-          {{ currentView === 'my' ? "You haven't created any collections yet." :
-             currentView === 'shared' ? "No collections have been shared with you." :
-             searchQuery ? "Try adjusting your search or filters." :
-             "Create your first collection to get started." }}
-        </p>
-        <button @click="createNewCollection" class="btn-create-empty">
-          <i class="fas fa-plus mr-2"></i>
-          Create Collection
-        </button>
-      </div>
+      <EmptyState
+        v-if="filteredCollections.length === 0"
+        icon="fas fa-layer-group"
+        title="No collections found"
+        :description="currentView === 'my' ? 'You haven\'t created any collections yet.' :
+                     currentView === 'shared' ? 'No collections have been shared with you.' :
+                     searchQuery ? 'Try adjusting your search or filters.' :
+                     'Create your first collection to get started.'"
+        action-label="Create Collection"
+        action-icon="fas fa-plus"
+        size="lg"
+        @action="createNewCollection"
+      />
     </div>
 
     <!-- Create Collection Modal -->

@@ -6,6 +6,7 @@ import PageHeroHeader from '@/components/common/PageHeroHeader.vue'
 import ContentActionsDropdown from '@/components/common/ContentActionsDropdown.vue'
 import FilterDropdown from '@/components/common/FilterDropdown.vue'
 import ViewAllButton from '@/components/common/ViewAllButton.vue'
+import EmptyState from '@/components/common/EmptyState.vue'
 
 const { t } = useI18n()
 import AddToCollectionModal from '@/components/common/AddToCollectionModal.vue'
@@ -3017,16 +3018,15 @@ onUnmounted(() => {
             </div>
 
             <!-- Empty State -->
-            <div v-if="filteredMedia.length === 0" class="empty-state">
-              <div class="empty-state-icon">
-                <i class="fas fa-video-slash"></i>
-              </div>
-              <h3 class="empty-state-title">No media found</h3>
-              <p class="empty-state-text">Try adjusting your filters or search query</p>
-              <button @click="clearFilters" class="btn-vibrant ripple">
-                <i class="fas fa-undo mr-2"></i> Clear Filters
-              </button>
-            </div>
+            <EmptyState
+              v-if="filteredMedia.length === 0"
+              icon="fas fa-video-slash"
+              title="No media found"
+              description="Try adjusting your filters or search query"
+              action-label="Clear Filters"
+              action-icon="fas fa-undo"
+              @action="clearFilters"
+            />
           </div>
         </div>
 

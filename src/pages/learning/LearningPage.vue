@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import PageHeroHeader from '@/components/common/PageHeroHeader.vue'
 import ViewAllButton from '@/components/common/ViewAllButton.vue'
+import EmptyState from '@/components/common/EmptyState.vue'
 import { useAIServicesStore } from '@/stores/aiServices'
 import { AILoadingIndicator, AIConfidenceBar, AISuggestionChip } from '@/components/ai'
 import type { ClassificationResult, NERResult } from '@/types/ai'
@@ -3904,16 +3905,15 @@ function resumeFeaturedAutoPlay() {
             </div>
 
             <!-- Empty State -->
-            <div v-if="paginatedPaths.length === 0" class="all-courses-empty">
-              <div class="all-courses-empty-icon">
-                <i class="fas fa-route"></i>
-              </div>
-              <h3 class="all-courses-empty-title">No learning paths found</h3>
-              <p class="all-courses-empty-text">Try adjusting your filter selection</p>
-              <button @click="clearAllPathsFilters" class="all-courses-clear-btn">
-                <i class="fas fa-redo"></i> Reset Filters
-              </button>
-            </div>
+            <EmptyState
+              v-if="paginatedPaths.length === 0"
+              icon="fas fa-route"
+              title="No learning paths found"
+              description="Try adjusting your filter selection"
+              action-label="Reset Filters"
+              action-icon="fas fa-redo"
+              @action="clearAllPathsFilters"
+            />
 
             <!-- Pagination Footer -->
             <div v-if="filteredPaths.length > 0" class="mt-4 px-4 py-3 bg-white rounded-2xl border border-gray-100 shadow-sm">
@@ -4824,17 +4824,16 @@ function resumeFeaturedAutoPlay() {
             </div>
 
             <!-- Empty State -->
-            <div v-else class="py-16 text-center">
-              <div class="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-teal-100 to-cyan-100 flex items-center justify-center">
-                <i class="fas fa-search text-3xl text-teal-400"></i>
-              </div>
-              <h3 class="text-lg font-semibold text-gray-800 mb-2">No lessons found</h3>
-              <p class="text-sm text-gray-500 mb-4">Try adjusting your search or filters</p>
-              <button @click="clearLessonsFilters" class="px-4 py-2 bg-teal-500 text-white text-sm font-medium rounded-lg hover:bg-teal-600 transition-colors inline-flex items-center gap-2">
-                <i class="fas fa-rotate"></i>
-                Clear Filters
-              </button>
-            </div>
+            <EmptyState
+              v-else
+              icon="fas fa-search"
+              title="No lessons found"
+              description="Try adjusting your search or filters"
+              action-label="Clear Filters"
+              action-icon="fas fa-rotate"
+              size="lg"
+              @action="clearLessonsFilters"
+            />
           </div>
         </div>
 
