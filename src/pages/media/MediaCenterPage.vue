@@ -33,6 +33,7 @@ const searchQuery = ref('')
 const unifiedSearchQuery = ref('')
 const isAISearchMode = ref(false)
 const showAISuggestions = ref(false)
+const aiSearchResults = ref<any[]>([])
 const categoryFilter = ref('')
 const sortBy = ref('recent')
 const sortOrder = ref<'asc' | 'desc'>('desc')
@@ -1101,7 +1102,6 @@ const isGeneratingAudioDesc = ref(false)
 
 // AI Natural Language Search
 const naturalLanguageQuery = ref('')
-const aiSearchResults = ref<any[]>([])
 const isProcessingNLSearch = ref(false)
 const nlSearchSuggestions = [
   'Show me highlights from Japan matches',
