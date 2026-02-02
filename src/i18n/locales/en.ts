@@ -73,6 +73,7 @@ export default {
     featured: 'Featured',
     recommended: 'Recommended',
     itemsPerPage: 'Items per page',
+    perPage: 'per page',
     of: 'of',
     page: 'Page',
     gridView: 'Grid View',

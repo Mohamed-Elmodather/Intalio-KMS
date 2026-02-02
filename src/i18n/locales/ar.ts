@@ -73,6 +73,7 @@ export default {
     featured: 'مميز',
     recommended: 'موصى به',
     itemsPerPage: 'عناصر في الصفحة',
+    perPage: 'لكل صفحة',
     of: 'من',
     page: 'صفحة',
     gridView: 'عرض شبكي',
