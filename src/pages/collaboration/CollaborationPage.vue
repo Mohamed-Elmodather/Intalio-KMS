@@ -121,13 +121,13 @@ const showAISuggestions = ref(false)
 const naturalLanguageQuery = ref('')
 const aiSearchResults = ref<any[]>([])
 const isProcessingNLSearch = ref(false)
-const nlSearchSuggestions = [
-  'Messages from Sarah',
-  'Files shared today',
-  'Conversations about the project',
-  'Recent announcements',
-  'Unread messages'
-]
+const nlSearchSuggestions = computed(() => [
+  t('collaboration.nlSearchSuggestions.messagesFromSarah'),
+  t('collaboration.nlSearchSuggestions.filesSharedToday'),
+  t('collaboration.nlSearchSuggestions.conversationsAboutProject'),
+  t('collaboration.nlSearchSuggestions.recentAnnouncements'),
+  t('collaboration.nlSearchSuggestions.unreadMessages'),
+])
 const leftPanelCollapsed = ref(false)
 const rightPanelCollapsed = ref(false)
 const showCreateChannelModal = ref(false)
@@ -1448,7 +1448,7 @@ watch(currentMessages, () => {
                   ? 'bg-gradient-to-r from-teal-500 to-cyan-500 border-teal-500 text-white'
                   : 'bg-gray-100 border-gray-200 text-gray-500 hover:bg-gray-200'
               ]"
-              title="Toggle AI Search"
+              :title="$t('collaboration.toggleAISearch')"
             >
               <i class="fas fa-wand-magic-sparkles text-[10px]"></i>
             </button>
@@ -1456,7 +1456,7 @@ watch(currentMessages, () => {
             <!-- Search Input -->
             <div class="relative flex-1">
               <i :class="[
-                'absolute left-3 top-1/2 -translate-y-1/2 text-xs transition-colors',
+                'absolute start-3 top-1/2 -translate-y-1/2 text-xs transition-colors',
                 isAISearchMode ? 'fas fa-brain text-teal-500' : 'fas fa-search text-gray-400'
               ]"></i>
               <input
@@ -1466,7 +1466,7 @@ watch(currentMessages, () => {
                 @keyup.enter="handleUnifiedSearch"
                 @input="handleSearchInput"
                 :class="[
-                  'w-full pl-8 pr-10 py-2.5 text-sm focus:outline-none transition-all',
+                  'w-full ps-8 pe-10 py-2.5 text-sm focus:outline-none transition-all',
                   showAIFeatures ? 'rounded-r-xl' : 'rounded-xl',
                   isAISearchMode
                     ? 'bg-gradient-to-r from-teal-50 to-cyan-50 border border-teal-200 focus:ring-2 focus:ring-teal-400 focus:border-transparent placeholder:text-teal-400'
@@ -1475,7 +1475,7 @@ watch(currentMessages, () => {
                 ]"
               >
               <!-- Clear & Search Buttons -->
-              <div class="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-0.5">
+              <div class="absolute end-2 top-1/2 -translate-y-1/2 flex items-center gap-0.5">
                 <button
                   v-if="unifiedSearchQuery"
                   @click="clearUnifiedSearch"
@@ -1498,17 +1498,17 @@ watch(currentMessages, () => {
           <!-- AI Search Suggestions Dropdown -->
           <div
             v-if="showAIFeatures && isAISearchMode && showAISuggestions && !unifiedSearchQuery"
-            class="absolute left-0 top-full mt-2 w-full bg-white rounded-xl shadow-lg border border-teal-100 py-2 z-50"
+            class="absolute start-0 top-full mt-2 w-full bg-white rounded-xl shadow-lg border border-teal-100 py-2 z-50"
           >
             <div class="px-3 py-1.5 text-[10px] font-semibold text-teal-500 flex items-center gap-2">
               <i class="fas fa-lightbulb"></i>
-              Try asking:
+              {{ $t('collaboration.tryAsking') }}
             </div>
             <button
               v-for="suggestion in nlSearchSuggestions"
               :key="suggestion"
               @click="unifiedSearchQuery = suggestion; handleUnifiedSearch()"
-              class="w-full px-3 py-1.5 text-left text-xs text-gray-700 hover:bg-teal-50 flex items-center gap-2"
+              class="w-full px-3 py-1.5 text-start text-xs text-gray-700 hover:bg-teal-50 flex items-center gap-2"
             >
               <i class="fas fa-search text-teal-400 text-[10px]"></i>
               {{ suggestion }}
@@ -1518,14 +1518,14 @@ watch(currentMessages, () => {
           <!-- AI Processing Indicator -->
           <div
             v-if="isProcessingNLSearch"
-            class="absolute left-0 top-full mt-2 w-full bg-gradient-to-r from-teal-50 to-cyan-50 rounded-xl shadow-lg border border-teal-100 p-3 z-50"
+            class="absolute start-0 top-full mt-2 w-full bg-gradient-to-r from-teal-50 to-cyan-50 rounded-xl shadow-lg border border-teal-100 p-3 z-50"
           >
             <div class="flex items-center gap-2">
               <div class="w-6 h-6 rounded-lg bg-gradient-to-br from-teal-500 to-cyan-500 flex items-center justify-center">
                 <i class="fas fa-brain text-white text-[10px] animate-pulse"></i>
               </div>
               <div>
-                <div class="text-xs font-medium text-teal-700">AI is searching...</div>
+                <div class="text-xs font-medium text-teal-700">{{ $t('collaboration.aiSearching') }}</div>
               </div>
             </div>
           </div>
@@ -1533,7 +1533,7 @@ watch(currentMessages, () => {
         <button
           v-else
           class="w-full flex items-center justify-center p-2.5 bg-gray-50 rounded-xl border border-gray-200 hover:bg-teal-50 hover:border-teal-200 transition-all duration-200 group"
-          title="Search"
+          :title="$t('collaboration.search')"
         >
           <i class="fas fa-search text-gray-400 group-hover:text-teal-600"></i>
         </button>
@@ -1546,12 +1546,12 @@ watch(currentMessages, () => {
           <div v-if="!leftPanelCollapsed" class="flex items-center justify-between mb-2 px-1">
             <button class="flex items-center gap-2 text-xs font-semibold text-gray-500 hover:text-gray-700 transition-colors uppercase tracking-wider">
               <i class="fas fa-chevron-down text-[10px]"></i>
-              <span>Channels</span>
+              <span>{{ $t('collaboration.channels') }}</span>
             </button>
             <button
               @click="showCreateChannelModal = true"
               class="p-1.5 hover:bg-teal-50 rounded-lg transition-all duration-200 group"
-              title="Create Channel"
+              :title="$t('collaboration.createChannel')"
             >
               <i class="fas fa-plus text-gray-400 group-hover:text-teal-600 text-xs"></i>
             </button>
@@ -1592,7 +1592,7 @@ watch(currentMessages, () => {
                 </span>
               </div>
               <template v-if="!leftPanelCollapsed">
-                <span class="flex-1 text-left truncate font-medium text-sm">{{ channel.name }}</span>
+                <span class="flex-1 text-start truncate font-medium text-sm">{{ channel.name }}</span>
                 <span
                   v-if="channel.unreadCount > 0"
                   class="bg-gradient-to-r from-teal-500 to-emerald-500 text-white text-xs font-bold px-2 py-0.5 rounded-full min-w-[22px] text-center shadow-sm"
@@ -1609,7 +1609,7 @@ watch(currentMessages, () => {
         <div class="mb-4">
           <div v-if="!leftPanelCollapsed" class="flex items-center gap-2 text-xs font-semibold text-gray-500 hover:text-gray-700 transition-colors mb-2 px-1 uppercase tracking-wider">
             <i class="fas fa-chevron-down text-[10px]"></i>
-            <span>Teams</span>
+            <span>{{ $t('collaboration.teams') }}</span>
           </div>
           <div v-else class="flex justify-center mb-2">
             <span class="text-[10px] font-semibold text-gray-400 uppercase">TM</span>
@@ -1650,7 +1650,7 @@ watch(currentMessages, () => {
                   </span>
                 </div>
                 <template v-if="!leftPanelCollapsed">
-                  <div class="flex-1 text-left">
+                  <div class="flex-1 text-start">
                     <span class="font-semibold truncate block">{{ team.name }}</span>
                     <span class="text-xs text-gray-400">{{ team.memberCount }} members</span>
                   </div>
@@ -1680,7 +1680,7 @@ watch(currentMessages, () => {
                     channel.type === 'private' ? 'fas fa-lock' : 'fas fa-hashtag',
                     'text-xs w-4'
                   ]"></i>
-                  <span class="flex-1 text-left truncate">{{ channel.name }}</span>
+                  <span class="flex-1 text-start truncate">{{ channel.name }}</span>
                   <span
                     v-if="channel.unreadCount > 0"
                     class="bg-teal-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full min-w-[20px] text-center"
@@ -1698,9 +1698,9 @@ watch(currentMessages, () => {
           <div v-if="!leftPanelCollapsed" class="flex items-center justify-between mb-2 px-1">
             <button class="flex items-center gap-2 text-xs font-semibold text-gray-500 hover:text-gray-700 transition-colors uppercase tracking-wider">
               <i class="fas fa-chevron-down text-[10px]"></i>
-              <span>Direct Messages</span>
+              <span>{{ $t('collaboration.directMessages') }}</span>
             </button>
-            <button class="p-1.5 hover:bg-teal-50 rounded-lg transition-all duration-200 group" title="New Message">
+            <button class="p-1.5 hover:bg-teal-50 rounded-lg transition-all duration-200 group" :title="$t('collaboration.newMessage')">
               <i class="fas fa-edit text-gray-400 group-hover:text-teal-600 text-xs"></i>
             </button>
           </div>
@@ -1743,7 +1743,7 @@ watch(currentMessages, () => {
                 </span>
               </div>
               <template v-if="!leftPanelCollapsed">
-                <div class="flex-1 min-w-0 text-left">
+                <div class="flex-1 min-w-0 text-start">
                   <p class="font-medium truncate text-sm">{{ dm.user.displayName }}</p>
                   <p :class="[
                     'text-xs truncate',
@@ -1787,7 +1787,7 @@ watch(currentMessages, () => {
               <p class="text-sm font-semibold text-gray-800 truncate">You</p>
               <p class="text-xs text-emerald-600 flex items-center gap-1">
                 <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full"></span>
-                Online
+                {{ $t('collaboration.online') }}
               </p>
             </div>
             <div class="flex items-center gap-1">
@@ -1800,7 +1800,7 @@ watch(currentMessages, () => {
             </div>
           </template>
           <template v-else>
-            <button class="p-1.5 hover:bg-gray-100 rounded-lg transition-all duration-200 group" title="Settings">
+            <button class="p-1.5 hover:bg-gray-100 rounded-lg transition-all duration-200 group" :title="$t('collaboration.settingsTooltip')">
               <i class="fas fa-cog text-gray-400 group-hover:text-teal-600 text-sm"></i>
             </button>
           </template>
@@ -1829,13 +1829,13 @@ watch(currentMessages, () => {
         </div>
 
         <div class="flex items-center gap-2">
-          <button class="p-2 hover:bg-gray-100 rounded-lg transition-colors" title="Search">
+          <button class="p-2 hover:bg-gray-100 rounded-lg transition-colors" :title="$t('collaboration.search')">
             <i class="fas fa-search text-gray-500"></i>
           </button>
-          <button class="p-2 hover:bg-gray-100 rounded-lg transition-colors" title="Start Huddle">
+          <button class="p-2 hover:bg-gray-100 rounded-lg transition-colors" :title="$t('collaboration.startHuddle')">
             <i class="fas fa-headset text-gray-500"></i>
           </button>
-          <button class="p-2 hover:bg-gray-100 rounded-lg transition-colors" title="Pin">
+          <button class="p-2 hover:bg-gray-100 rounded-lg transition-colors" :title="$t('collaboration.pin')">
             <i class="fas fa-thumbtack text-gray-500"></i>
           </button>
           <div class="w-px h-5 bg-gray-200 mx-1"></div>
@@ -1845,11 +1845,11 @@ watch(currentMessages, () => {
               'p-2 rounded-lg transition-colors',
               showRightPanel ? 'bg-teal-50 text-teal-600' : 'hover:bg-gray-100 text-gray-500'
             ]"
-            title="Toggle Details"
+            :title="$t('collaboration.toggleDetails')"
           >
             <i class="fas fa-sidebar-flip"></i>
           </button>
-          <div class="flex items-center -space-x-2 ml-2">
+          <div class="flex items-center -space-x-2 ms-2">
             <div
               v-for="(member, idx) in channelMembers.slice(0, 4)"
               :key="member.id"
@@ -1911,9 +1911,9 @@ watch(currentMessages, () => {
                 <div class="flex items-center gap-2 mb-1">
                   <span class="font-semibold text-gray-900 text-sm">{{ message.sender.displayName }}</span>
                   <span class="text-xs text-gray-400">{{ formatTime(message.createdAt) }}</span>
-                  <span v-if="message.isEdited" class="text-xs text-gray-400">(edited)</span>
+                  <span v-if="message.isEdited" class="text-xs text-gray-400">{{ $t('collaboration.edited') }}</span>
                   <span v-if="message.isPinned" class="text-xs text-amber-600 font-medium">
-                    <i class="fas fa-thumbtack mr-1"></i>Pinned
+                    <i class="fas fa-thumbtack me-1"></i>{{ $t('collaboration.pinned') }}
                   </span>
                 </div>
 
@@ -1943,13 +1943,13 @@ watch(currentMessages, () => {
                     <div class="p-4">
                       <div class="flex items-center gap-2 mb-2">
                         <span class="px-2 py-0.5 bg-teal-100 text-teal-700 text-xs font-medium rounded-full">
-                          <i class="fas fa-calendar-alt mr-1"></i>Event
+                          <i class="fas fa-calendar-alt me-1"></i>Event
                         </span>
                       </div>
                       <h4 class="font-semibold text-gray-900 mb-1">{{ message.linkedContent.title }}</h4>
                       <p class="text-sm text-gray-600 mb-2">{{ message.linkedContent.description }}</p>
                       <p class="text-xs text-gray-500">
-                        <i class="fas fa-clock mr-1"></i>{{ message.linkedContent.date }}
+                        <i class="fas fa-clock me-1"></i>{{ message.linkedContent.date }}
                       </p>
                     </div>
                   </div>
@@ -1967,7 +1967,7 @@ watch(currentMessages, () => {
                     <div class="p-4 flex-1">
                       <div class="flex items-center gap-2 mb-2">
                         <span class="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs font-medium rounded-full">
-                          <i class="fas fa-newspaper mr-1"></i>Article
+                          <i class="fas fa-newspaper me-1"></i>Article
                         </span>
                       </div>
                       <h4 class="font-semibold text-gray-900 mb-1 text-sm">{{ message.linkedContent.title }}</h4>
@@ -2064,7 +2064,7 @@ watch(currentMessages, () => {
                 <!-- Expanded Thread -->
                 <div
                   v-if="expandedThreadId === message.id"
-                  class="mt-3 ml-4 pl-4 border-l-2 border-teal-200 space-y-3"
+                  class="mt-3 ms-4 ps-4 border-s-2 border-teal-200 space-y-3"
                 >
                   <div
                     v-for="reply in (threadMessages.get(message.id) || [])"
@@ -2107,14 +2107,14 @@ watch(currentMessages, () => {
                   <button
                     @click="activeEmojiMessageId = message.id; showEmojiPicker = true"
                     class="p-1.5 hover:bg-gray-100 rounded-l-lg transition-colors"
-                    title="Add reaction"
+                    :title="$t('collaboration.addReaction')"
                   >
                     <i class="fas fa-smile text-gray-500 text-sm"></i>
                   </button>
                   <button
                     @click="openThread(message.id)"
                     class="p-1.5 hover:bg-gray-100 transition-colors"
-                    title="Reply in thread"
+                    :title="$t('collaboration.replyInThread')"
                   >
                     <i class="fas fa-comment text-gray-500 text-sm"></i>
                   </button>
@@ -2125,7 +2125,7 @@ watch(currentMessages, () => {
                   >
                     <i :class="['fas fa-thumbtack text-sm', message.isPinned ? 'text-amber-500' : 'text-gray-500']"></i>
                   </button>
-                  <button class="p-1.5 hover:bg-gray-100 rounded-r-lg transition-colors" title="More">
+                  <button class="p-1.5 hover:bg-gray-100 rounded-r-lg transition-colors" :title="$t('collaboration.more')">
                     <i class="fas fa-ellipsis-h text-gray-500 text-sm"></i>
                   </button>
                 </div>
@@ -2150,7 +2150,7 @@ watch(currentMessages, () => {
         <!-- Emoji Picker -->
         <div
           v-if="showEmojiPicker && activeEmojiMessageId"
-          class="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-white rounded-xl shadow-xl border border-gray-200 p-3 z-50"
+          class="absolute bottom-full mb-2 start-1/2 -translate-x-1/2 bg-white rounded-xl shadow-xl border border-gray-200 p-3 z-50"
         >
           <div class="flex flex-wrap gap-1 max-w-xs">
             <button
@@ -2167,7 +2167,7 @@ watch(currentMessages, () => {
         <!-- Mention Autocomplete -->
         <div
           v-if="showMentionAutocomplete && filteredMembers.length"
-          class="absolute bottom-full mb-2 left-4 bg-white rounded-xl shadow-xl border border-gray-200 p-2 z-50 w-64"
+          class="absolute bottom-full mb-2 start-4 bg-white rounded-xl shadow-xl border border-gray-200 p-2 z-50 w-64"
         >
           <button
             v-for="member in filteredMembers"
@@ -2178,7 +2178,7 @@ watch(currentMessages, () => {
             <div class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center text-sm font-medium">
               {{ member.displayName.split(' ').map(n => n[0]).join('') }}
             </div>
-            <div class="text-left">
+            <div class="text-start">
               <p class="font-medium text-gray-900 text-sm">{{ member.displayName }}</p>
               <p class="text-xs text-gray-500">{{ member.role }}</p>
             </div>
@@ -2190,7 +2190,7 @@ watch(currentMessages, () => {
           <div class="ai-replies-header">
             <div class="flex items-center gap-2">
               <i class="fas fa-wand-magic-sparkles text-teal-500"></i>
-              <span class="text-xs font-medium text-gray-600">AI Suggestions</span>
+              <span class="text-xs font-medium text-gray-600">{{ $t('collaboration.aiSuggestions') }}</span>
             </div>
             <button @click="showSmartReplies = false" class="text-gray-400 hover:text-gray-600">
               <i class="fas fa-times text-xs"></i>
@@ -2211,13 +2211,13 @@ watch(currentMessages, () => {
 
         <div class="flex items-end gap-3">
           <div class="flex gap-1">
-            <button class="p-2 hover:bg-gray-100 rounded-lg transition-colors" title="Attach file">
+            <button class="p-2 hover:bg-gray-100 rounded-lg transition-colors" :title="$t('collaboration.attachFile')">
               <i class="fas fa-paperclip text-gray-500"></i>
             </button>
             <button
               @click="showContentPicker = true"
               class="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-              title="Share content"
+              :title="$t('collaboration.shareContentTooltip')"
             >
               <i class="fas fa-share-square text-gray-500"></i>
             </button>
@@ -2226,7 +2226,7 @@ watch(currentMessages, () => {
               @click="generateMeetingSummary"
               :disabled="isGeneratingSummary"
               class="p-2 hover:bg-teal-50 rounded-lg transition-colors group"
-              title="AI Meeting Summary"
+              :title="$t('collaboration.aiMeetingSummary')"
             >
               <i :class="[isGeneratingSummary ? 'fas fa-spinner fa-spin' : 'fas fa-wand-magic-sparkles', 'text-teal-500 group-hover:text-teal-600']"></i>
             </button>
@@ -2234,7 +2234,7 @@ watch(currentMessages, () => {
               @click="analyzeConversationSentiment"
               :disabled="isAnalyzingSentiment"
               class="p-2 hover:bg-purple-50 rounded-lg transition-colors group"
-              title="Analyze Sentiment"
+              :title="$t('collaboration.analyzeSentiment')"
             >
               <i :class="[isAnalyzingSentiment ? 'fas fa-spinner fa-spin' : 'fas fa-chart-pie', 'text-purple-500 group-hover:text-purple-600']"></i>
             </button>
@@ -2252,7 +2252,7 @@ watch(currentMessages, () => {
           </div>
 
           <div class="flex gap-1">
-            <button class="p-2 hover:bg-gray-100 rounded-lg transition-colors" title="Emoji">
+            <button class="p-2 hover:bg-gray-100 rounded-lg transition-colors" :title="$t('collaboration.emoji')">
               <i class="fas fa-smile text-gray-500"></i>
             </button>
             <button
@@ -2398,7 +2398,7 @@ watch(currentMessages, () => {
                 {{ selectedDM.user.displayName.split(' ').map(n => n[0]).join('') }}
               </div>
               <span
-                :class="['absolute bottom-1 right-1 w-4 h-4 rounded-full border-3 border-white', getPresenceColor(selectedDM.presence)]"
+                :class="['absolute bottom-1 end-1 w-4 h-4 rounded-full border-3 border-white', getPresenceColor(selectedDM.presence)]"
               ></span>
             </div>
             <h4 class="font-semibold text-gray-900 text-lg">{{ selectedDM.user.displayName }}</h4>
@@ -2516,7 +2516,7 @@ watch(currentMessages, () => {
                 {{ member.displayName.split(' ').map(n => n[0]).join('') }}
               </div>
               <span
-                :class="['absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-gray-50', getPresenceColor(member.presence)]"
+                :class="['absolute bottom-0 end-0 w-3 h-3 rounded-full border-2 border-gray-50', getPresenceColor(member.presence)]"
               ></span>
             </div>
             <div class="flex-1 min-w-0">
@@ -2576,7 +2576,7 @@ watch(currentMessages, () => {
         <div v-if="rightPanelTab === 'pinned'" class="space-y-3">
           <div v-if="pinnedMessages.length === 0" class="text-center py-8 text-gray-500">
             <i class="fas fa-thumbtack text-3xl mb-3 opacity-50"></i>
-            <p class="text-sm">No pinned messages yet</p>
+            <p class="text-sm">{{ $t('collaboration.noPinnedMessages') }}</p>
           </div>
           <div
             v-for="message in pinnedMessages"
@@ -2595,7 +2595,7 @@ watch(currentMessages, () => {
               @click="togglePin(message.id)"
               class="mt-2 text-xs text-teal-600 hover:text-teal-700"
             >
-              <i class="fas fa-thumbtack mr-1"></i>Unpin
+              <i class="fas fa-thumbtack me-1"></i>{{ $t('collaboration.unpin') }}
             </button>
           </div>
         </div>
@@ -2610,7 +2610,7 @@ watch(currentMessages, () => {
     >
       <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 m-4">
         <div class="flex items-center justify-between mb-6">
-          <h3 class="text-xl font-bold text-gray-900">Create Channel</h3>
+          <h3 class="text-xl font-bold text-gray-900">{{ $t('collaboration.createChannel') }}</h3>
           <button
             @click="showCreateChannelModal = false"
             class="p-2 hover:bg-gray-100 rounded-lg transition-colors"
@@ -2621,23 +2621,23 @@ watch(currentMessages, () => {
 
         <div class="space-y-4">
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Channel Name</label>
+            <label class="block text-sm font-medium text-gray-700 mb-1">{{ $t('collaboration.channelName') }}</label>
             <div class="relative">
-              <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">#</span>
+              <span class="absolute start-3 top-1/2 -translate-y-1/2 text-gray-400">#</span>
               <input
                 v-model="newChannel.name"
                 type="text"
-                placeholder="e.g. marketing"
-                class="w-full pl-8 pr-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                :placeholder="$t('collaboration.channelPlaceholder')"
+                class="w-full ps-8 pe-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
               />
             </div>
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Description (optional)</label>
+            <label class="block text-sm font-medium text-gray-700 mb-1">{{ $t('collaboration.descriptionOptional') }}</label>
             <textarea
               v-model="newChannel.description"
-              placeholder="What's this channel about?"
+              :placeholder="$t('collaboration.channelDescPlaceholder')"
               rows="2"
               class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent resize-none"
             ></textarea>
@@ -2651,8 +2651,8 @@ watch(currentMessages, () => {
                 class="w-5 h-5 rounded border-gray-300 text-teal-500 focus:ring-teal-500"
               />
               <div>
-                <p class="font-medium text-gray-900 text-sm">Make private</p>
-                <p class="text-xs text-gray-500">Only invited members can see this channel</p>
+                <p class="font-medium text-gray-900 text-sm">{{ $t('collaboration.makePrivate') }}</p>
+                <p class="text-xs text-gray-500">{{ $t('collaboration.privateChannelDesc') }}</p>
               </div>
             </label>
             <i :class="['fas text-xl', newChannel.isPrivate ? 'fa-lock text-amber-500' : 'fa-globe text-teal-500']"></i>
@@ -2664,7 +2664,7 @@ watch(currentMessages, () => {
             @click="showCreateChannelModal = false"
             class="flex-1 px-4 py-2.5 border border-gray-200 rounded-xl text-gray-700 font-medium hover:bg-gray-50 transition-colors"
           >
-            Cancel
+            {{ $t('collaboration.cancel') }}
           </button>
           <button
             @click="createChannel"
@@ -2676,7 +2676,7 @@ watch(currentMessages, () => {
                 : 'bg-gray-100 text-gray-400 cursor-not-allowed'
             ]"
           >
-            Create Channel
+            {{ $t('collaboration.createChannel') }}
           </button>
         </div>
       </div>
@@ -2690,7 +2690,7 @@ watch(currentMessages, () => {
     >
       <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg p-6 m-4">
         <div class="flex items-center justify-between mb-6">
-          <h3 class="text-xl font-bold text-gray-900">Share Content</h3>
+          <h3 class="text-xl font-bold text-gray-900">{{ $t('collaboration.shareContent') }}</h3>
           <button
             @click="showContentPicker = false"
             class="p-2 hover:bg-gray-100 rounded-lg transition-colors"
@@ -2699,32 +2699,32 @@ watch(currentMessages, () => {
           </button>
         </div>
 
-        <p class="text-gray-500 text-sm mb-4">Share content from other modules in this channel</p>
+        <p class="text-gray-500 text-sm mb-4">{{ $t('collaboration.shareContentDesc') }}</p>
 
         <div class="grid grid-cols-2 gap-3">
           <button class="flex flex-col items-center gap-3 p-6 border-2 border-gray-200 rounded-2xl hover:border-teal-500 hover:bg-teal-50 transition-all">
             <div class="w-14 h-14 bg-teal-100 rounded-xl flex items-center justify-center">
               <i class="fas fa-calendar-alt text-teal-600 text-2xl"></i>
             </div>
-            <span class="font-medium text-gray-900">Event</span>
+            <span class="font-medium text-gray-900">{{ $t('collaboration.event') }}</span>
           </button>
           <button class="flex flex-col items-center gap-3 p-6 border-2 border-gray-200 rounded-2xl hover:border-blue-500 hover:bg-blue-50 transition-all">
             <div class="w-14 h-14 bg-blue-100 rounded-xl flex items-center justify-center">
               <i class="fas fa-newspaper text-blue-600 text-2xl"></i>
             </div>
-            <span class="font-medium text-gray-900">Article</span>
+            <span class="font-medium text-gray-900">{{ $t('collaboration.article') }}</span>
           </button>
           <button class="flex flex-col items-center gap-3 p-6 border-2 border-gray-200 rounded-2xl hover:border-purple-500 hover:bg-purple-50 transition-all">
             <div class="w-14 h-14 bg-purple-100 rounded-xl flex items-center justify-center">
               <i class="fas fa-file-alt text-purple-600 text-2xl"></i>
             </div>
-            <span class="font-medium text-gray-900">Document</span>
+            <span class="font-medium text-gray-900">{{ $t('collaboration.document') }}</span>
           </button>
           <button class="flex flex-col items-center gap-3 p-6 border-2 border-gray-200 rounded-2xl hover:border-amber-500 hover:bg-amber-50 transition-all">
             <div class="w-14 h-14 bg-amber-100 rounded-xl flex items-center justify-center">
               <i class="fas fa-poll text-amber-600 text-2xl"></i>
             </div>
-            <span class="font-medium text-gray-900">Poll</span>
+            <span class="font-medium text-gray-900">{{ $t('collaboration.poll') }}</span>
           </button>
         </div>
       </div>
@@ -2741,8 +2741,8 @@ watch(currentMessages, () => {
               <i class="fas fa-wand-magic-sparkles text-white"></i>
             </div>
             <div>
-              <h3 class="text-lg font-semibold text-gray-900">AI Meeting Summary</h3>
-              <p class="text-sm text-gray-500">Generated from conversation</p>
+              <h3 class="text-lg font-semibold text-gray-900">{{ $t('collaboration.aiMeetingSummary') }}</h3>
+              <p class="text-sm text-gray-500">{{ $t('collaboration.generatedFromConversation') }}</p>
             </div>
           </div>
           <button @click="showMeetingSummaryModal = false" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
@@ -2752,23 +2752,23 @@ watch(currentMessages, () => {
       </div>
 
       <div class="p-6 overflow-y-auto max-h-[60vh]">
-        <AILoadingIndicator v-if="isGeneratingSummary" message="Generating meeting summary..." />
+        <AILoadingIndicator v-if="isGeneratingSummary" :message="$t('collaboration.generatingMeetingSummary')" />
 
         <div v-else-if="meetingSummary" class="space-y-6">
           <!-- Summary Header -->
           <div class="bg-gradient-to-r from-teal-50 to-emerald-50 rounded-xl p-4">
             <h4 class="font-semibold text-gray-900 mb-2">{{ meetingSummary.title }}</h4>
             <div class="flex items-center gap-4 text-sm text-gray-600">
-              <span><i class="fas fa-calendar mr-1"></i> {{ meetingSummary.date }}</span>
-              <span><i class="fas fa-clock mr-1"></i> {{ meetingSummary.duration }}</span>
-              <span><i class="fas fa-users mr-1"></i> {{ meetingSummary.participants.length }} participants</span>
+              <span><i class="fas fa-calendar me-1"></i> {{ meetingSummary.date }}</span>
+              <span><i class="fas fa-clock me-1"></i> {{ meetingSummary.duration }}</span>
+              <span><i class="fas fa-users me-1"></i> {{ meetingSummary.participants.length }} {{ $t('collaboration.participants') }}</span>
             </div>
           </div>
 
           <!-- Key Points -->
           <div>
             <h5 class="font-medium text-gray-900 mb-3 flex items-center gap-2">
-              <i class="fas fa-list-check text-teal-500"></i> Key Discussion Points
+              <i class="fas fa-list-check text-teal-500"></i> {{ $t('collaboration.keyDiscussionPoints') }}
             </h5>
             <ul class="space-y-2">
               <li v-for="(point, idx) in meetingSummary.keyPoints" :key="idx"
@@ -2782,7 +2782,7 @@ watch(currentMessages, () => {
           <!-- Decisions Made -->
           <div>
             <h5 class="font-medium text-gray-900 mb-3 flex items-center gap-2">
-              <i class="fas fa-gavel text-amber-500"></i> Decisions Made
+              <i class="fas fa-gavel text-amber-500"></i> {{ $t('collaboration.decisionsMade') }}
             </h5>
             <ul class="space-y-2">
               <li v-for="(decision, idx) in meetingSummary.decisions" :key="idx"
@@ -2796,7 +2796,7 @@ watch(currentMessages, () => {
           <!-- Action Items -->
           <div>
             <h5 class="font-medium text-gray-900 mb-3 flex items-center gap-2">
-              <i class="fas fa-tasks text-blue-500"></i> Action Items
+              <i class="fas fa-tasks text-blue-500"></i> {{ $t('collaboration.actionItems') }}
             </h5>
             <div class="space-y-2">
               <div v-for="(action, idx) in meetingSummary.actionItems" :key="idx"
@@ -2816,7 +2816,7 @@ watch(currentMessages, () => {
           <!-- Next Steps -->
           <div class="bg-gray-50 rounded-xl p-4">
             <h5 class="font-medium text-gray-900 mb-2 flex items-center gap-2">
-              <i class="fas fa-arrow-right text-gray-500"></i> Next Steps
+              <i class="fas fa-arrow-right text-gray-500"></i> {{ $t('collaboration.nextSteps') }}
             </h5>
             <p class="text-gray-700">{{ meetingSummary.nextSteps }}</p>
           </div>
@@ -2907,7 +2907,7 @@ watch(currentMessages, () => {
                        }"
                        :style="{ width: `${emotion.score * 100}%` }"></div>
                 </div>
-                <span class="text-sm font-medium text-gray-700 w-12 text-right">{{ Math.round(emotion.score * 100) }}%</span>
+                <span class="text-sm font-medium text-gray-700 w-12 text-end">{{ Math.round(emotion.score * 100) }}%</span>
               </div>
             </div>
           </div>
