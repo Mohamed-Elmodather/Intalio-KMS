@@ -4,7 +4,7 @@ import { computed } from 'vue'
 interface Props {
   tag: string
   size?: 'xs' | 'sm' | 'md'
-  variant?: 'default' | 'outlined' | 'gradient' | 'colored'
+  variant?: 'default' | 'outlined' | 'gradient' | 'colored' | 'glass'
   color?: string
   clickable?: boolean
   removable?: boolean
@@ -63,6 +63,12 @@ const variantStyles = computed(() => {
         background: 'linear-gradient(135deg, #ccfbf1 0%, #99f6e4 100%)',
         color: '#0d9488',
         border: '1px solid #5eead4'
+      }
+    case 'glass':
+      return {
+        background: 'rgba(20, 184, 166, 0.2)',
+        color: '#99f6e4',
+        border: '1px solid rgba(94, 234, 212, 0.3)'
       }
     case 'default':
     default:

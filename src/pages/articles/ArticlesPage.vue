@@ -1344,7 +1344,7 @@ onUnmounted(() => {
 
                       <!-- Tags -->
                       <div class="featured-tags">
-                        <TagBadge v-for="tag in currentFeaturedItem.tags" :key="tag" :tag="tag" show-hash variant="colored" class="!bg-teal-500/20 !text-teal-100 !border-teal-400/30" />
+                        <TagBadge v-for="tag in currentFeaturedItem.tags" :key="tag" :tag="tag" show-hash variant="glass" />
                       </div>
 
                       <div class="flex items-center gap-4 mt-4 flex-wrap">
