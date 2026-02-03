@@ -1857,6 +1857,45 @@ export default {
       finance: 'Finance',
       operations: 'Operations',
     },
+    // Additional sections
+    byViewsAndRating: 'By views and rating',
+    viewAll: 'View All',
+    recentActivity: 'Recent Activity',
+    userInteractions: 'User interactions',
+    aiPoweredInsights: 'AI-Powered Insights',
+    teamLeaderboard: 'Team Leaderboard',
+    topContributingTeams: 'Top contributing teams',
+    points: 'points',
+    departmentStats: 'Department Stats',
+    adoptionOverview: 'Adoption overview',
+    predictions: 'Predictions',
+    anomalies: 'Anomalies',
+    detectedAnomalies: 'Detected Anomalies',
+    // Content engagement types
+    engagementTypes: {
+      articles: 'Articles',
+      courses: 'Courses',
+      events: 'Events',
+      documents: 'Documents',
+      polls: 'Polls',
+      videos: 'Videos',
+    },
+    // Category names
+    categories: {
+      engineering: 'Engineering',
+      marketing: 'Marketing',
+      hr: 'HR',
+      sales: 'Sales',
+      product: 'Product',
+      operations: 'Operations',
+    },
+    // Reports section
+    generatedReports: 'Generated Reports',
+    downloadPastReports: 'Download past reports',
+    generateNew: 'Generate New',
+    download: 'Download',
+    aiGeneratedReport: 'AI-Generated Report',
+    generated: 'Generated',
   },
 
   // Settings

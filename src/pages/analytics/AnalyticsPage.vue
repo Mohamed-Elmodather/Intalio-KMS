@@ -45,18 +45,18 @@ const contentTypes = computed(() => [
 ])
 
 // Content Engagement Data
-const contentEngagement = ref([
-  { name: 'Articles', views: 4200, interactions: 1800, color: '#14b8a6', colorLight: '#5eead4' },
-  { name: 'Courses', views: 2800, interactions: 1500, color: '#3b82f6', colorLight: '#93c5fd' },
-  { name: 'Events', views: 1900, interactions: 1400, color: '#8b5cf6', colorLight: '#c4b5fd' },
-  { name: 'Documents', views: 3100, interactions: 980, color: '#f59e0b', colorLight: '#fcd34d' },
-  { name: 'Polls', views: 1200, interactions: 890, color: '#ec4899', colorLight: '#f9a8d4' },
-  { name: 'Videos', views: 1600, interactions: 720, color: '#10b981', colorLight: '#6ee7b7' }
+const contentEngagement = computed(() => [
+  { name: t('analytics.engagementTypes.articles'), views: 4200, interactions: 1800, color: '#14b8a6', colorLight: '#5eead4' },
+  { name: t('analytics.engagementTypes.courses'), views: 2800, interactions: 1500, color: '#3b82f6', colorLight: '#93c5fd' },
+  { name: t('analytics.engagementTypes.events'), views: 1900, interactions: 1400, color: '#8b5cf6', colorLight: '#c4b5fd' },
+  { name: t('analytics.engagementTypes.documents'), views: 3100, interactions: 980, color: '#f59e0b', colorLight: '#fcd34d' },
+  { name: t('analytics.engagementTypes.polls'), views: 1200, interactions: 890, color: '#ec4899', colorLight: '#f9a8d4' },
+  { name: t('analytics.engagementTypes.videos'), views: 1600, interactions: 720, color: '#10b981', colorLight: '#6ee7b7' }
 ])
 
 // Get max value for chart scaling
 const maxEngagementValue = computed(() => {
-  return Math.max(...contentEngagement.value.map(c => c.views))
+  return Math.max(...contentEngagement.value.map((c: { views: number }) => c.views))
 })
 
 // Department filters
@@ -206,13 +206,13 @@ const userActivity = ref([
 ])
 
 // Department Participation breakdown
-const categoryBreakdown = ref([
-  { name: 'Engineering', value: 28, color: '#14b8a6' },
-  { name: 'Marketing', value: 18, color: '#3b82f6' },
-  { name: 'HR', value: 15, color: '#ec4899' },
-  { name: 'Sales', value: 14, color: '#8b5cf6' },
-  { name: 'Product', value: 13, color: '#06b6d4' },
-  { name: 'Operations', value: 12, color: '#10b981' }
+const categoryBreakdown = computed(() => [
+  { name: t('analytics.categories.engineering'), value: 28, color: '#14b8a6' },
+  { name: t('analytics.categories.marketing'), value: 18, color: '#3b82f6' },
+  { name: t('analytics.categories.hr'), value: 15, color: '#ec4899' },
+  { name: t('analytics.categories.sales'), value: 14, color: '#8b5cf6' },
+  { name: t('analytics.categories.product'), value: 13, color: '#06b6d4' },
+  { name: t('analytics.categories.operations'), value: 12, color: '#10b981' }
 ])
 
 // Reports list
@@ -528,11 +528,11 @@ function getAnomalySeverityColor(severity: string): string {
         <div class="flex flex-wrap gap-4 mt-4 w-full">
           <button @click="showTrendPredictions = true" class="px-4 py-2 bg-white/10 backdrop-blur-sm rounded-xl border border-white/20 text-white text-sm flex items-center gap-2 hover:bg-white/20 transition-all">
             <i class="fas fa-crystal-ball text-purple-300"></i>
-            <span>{{ trendPredictions.length }} Predictions</span>
+            <span>{{ trendPredictions.length }} {{ $t('analytics.predictions') }}</span>
           </button>
           <button @click="showAnomalyPanel = true" class="px-4 py-2 bg-white/10 backdrop-blur-sm rounded-xl border border-white/20 text-white text-sm flex items-center gap-2 hover:bg-white/20 transition-all">
             <i class="fas fa-exclamation-triangle text-amber-300"></i>
-            <span>{{ metricAnomalies.length }} Anomalies</span>
+            <span>{{ metricAnomalies.length }} {{ $t('analytics.anomalies') }}</span>
           </button>
         </div>
       </template>
@@ -938,12 +938,12 @@ function getAnomalySeverityColor(severity: string): string {
                 <i class="fas fa-trophy text-white text-sm"></i>
               </div>
               <div>
-                <span class="block">Top Content</span>
-                <span class="text-xs font-medium text-gray-500">By views and rating</span>
+                <span class="block">{{ $t('analytics.topContent') }}</span>
+                <span class="text-xs font-medium text-gray-500">{{ $t('analytics.byViewsAndRating') }}</span>
               </div>
             </h2>
             <button class="text-sm text-teal-600 hover:text-teal-700 font-medium flex items-center gap-1">
-              View All
+              {{ $t('analytics.viewAll') }}
               <i class="fas fa-arrow-right text-xs"></i>
             </button>
           </div>
@@ -962,7 +962,7 @@ function getAnomalySeverityColor(severity: string): string {
               </div>
               <div class="text-right">
                 <p class="text-sm font-semibold text-gray-900">{{ formatNumber(item.views) }}</p>
-                <p class="text-xs text-gray-500">views</p>
+                <p class="text-xs text-gray-500">{{ $t('analytics.views').toLowerCase() }}</p>
               </div>
               <div class="flex items-center gap-1">
                 <i class="fas fa-star text-amber-400 text-xs"></i>
@@ -980,12 +980,12 @@ function getAnomalySeverityColor(severity: string): string {
                 <i class="fas fa-history text-white text-sm"></i>
               </div>
               <div>
-                <span class="block">Recent Activity</span>
-                <span class="text-xs font-medium text-gray-500">User interactions</span>
+                <span class="block">{{ $t('analytics.recentActivity') }}</span>
+                <span class="text-xs font-medium text-gray-500">{{ $t('analytics.userInteractions') }}</span>
               </div>
             </h2>
             <button class="text-sm text-teal-600 hover:text-teal-700 font-medium flex items-center gap-1">
-              View All
+              {{ $t('analytics.viewAll') }}
               <i class="fas fa-arrow-right text-xs"></i>
             </button>
           </div>
@@ -1013,12 +1013,12 @@ function getAnomalySeverityColor(severity: string): string {
 
       <!-- Insights, Team Leaderboard & Department Stats Row -->
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <!-- AI-Powered Insights -->
+        <!-- {{ $t('analytics.aiPoweredInsights') }} -->
         <div class="insights-card rounded-2xl p-6 text-white relative overflow-hidden">
           <div class="relative z-10">
             <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
               <i class="fas fa-lightbulb text-teal-300"></i>
-              AI-Powered Insights
+              {{ $t('analytics.aiPoweredInsights') }}
             </h3>
             <div class="space-y-4">
               <div v-for="insight in tournamentInsights" :key="insight.id" class="flex items-start gap-3 pb-3 border-b border-white/10 last:border-0">
@@ -1039,8 +1039,8 @@ function getAnomalySeverityColor(severity: string): string {
                 <i class="fas fa-crown text-white text-sm"></i>
               </div>
               <div>
-                <span class="block">Team Leaderboard</span>
-                <span class="text-xs font-medium text-gray-500">Top contributing teams</span>
+                <span class="block">{{ $t('analytics.teamLeaderboard') }}</span>
+                <span class="text-xs font-medium text-gray-500">{{ $t('analytics.topContributingTeams') }}</span>
               </div>
             </h2>
           </div>
@@ -1064,7 +1064,7 @@ function getAnomalySeverityColor(severity: string): string {
               </div>
               <div class="text-right">
                 <p class="text-sm font-bold text-gray-900">{{ team.contributions }}</p>
-                <p class="text-[10px] text-gray-400">points</p>
+                <p class="text-[10px] text-gray-400">{{ $t('analytics.points') }}</p>
               </div>
             </div>
           </div>
@@ -1078,8 +1078,8 @@ function getAnomalySeverityColor(severity: string): string {
                 <i class="fas fa-building text-white text-sm"></i>
               </div>
               <div>
-                <span class="block">Department Stats</span>
-                <span class="text-xs font-medium text-gray-500">Adoption overview</span>
+                <span class="block">{{ $t('analytics.departmentStats') }}</span>
+                <span class="text-xs font-medium text-gray-500">{{ $t('analytics.adoptionOverview') }}</span>
               </div>
             </h2>
           </div>
@@ -1114,13 +1114,13 @@ function getAnomalySeverityColor(severity: string): string {
               <i class="fas fa-file-export text-white text-sm"></i>
             </div>
             <div>
-              <span class="block">Generated Reports</span>
-              <span class="text-xs font-medium text-gray-500">Download past reports</span>
+              <span class="block">{{ $t('analytics.generatedReports') }}</span>
+              <span class="text-xs font-medium text-gray-500">{{ $t('analytics.downloadPastReports') }}</span>
             </div>
           </h2>
           <button class="px-4 py-2 bg-gradient-to-r from-teal-500 to-teal-600 text-white rounded-lg text-sm font-medium hover:from-teal-600 hover:to-teal-700 transition-all flex items-center gap-2 shadow-sm shadow-teal-200">
             <i class="fas fa-plus"></i>
-            Generate New
+            {{ $t('analytics.generateNew') }}
           </button>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 p-5">
@@ -1144,7 +1144,7 @@ function getAnomalySeverityColor(severity: string): string {
             </div>
             <button class="mt-3 w-full px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-xs font-medium text-gray-600 hover:bg-teal-500 hover:text-white hover:border-teal-500 transition-all flex items-center justify-center gap-2">
               <i class="fas fa-download"></i>
-              Download
+              {{ $t('analytics.download') }}
             </button>
           </div>
         </div>
@@ -1264,7 +1264,7 @@ function getAnomalySeverityColor(severity: string): string {
                   <i class="fas fa-crystal-ball text-white"></i>
                 </div>
                 <div>
-                  <h3 class="font-semibold text-white">AI Trend Predictions</h3>
+                  <h3 class="font-semibold text-white">{{ $t('analytics.aiPoweredInsights') }}</h3>
                   <p class="text-xs text-white/80">Forecasted metrics based on historical data</p>
                 </div>
               </div>
@@ -1329,7 +1329,7 @@ function getAnomalySeverityColor(severity: string): string {
                   <i class="fas fa-exclamation-triangle text-white"></i>
                 </div>
                 <div>
-                  <h3 class="font-semibold text-white">Detected Anomalies</h3>
+                  <h3 class="font-semibold text-white">{{ $t('analytics.detectedAnomalies') }}</h3>
                   <p class="text-xs text-white/80">Unusual patterns in your metrics</p>
                 </div>
               </div>
@@ -1392,7 +1392,7 @@ function getAnomalySeverityColor(severity: string): string {
                   <i class="fas fa-wand-magic-sparkles text-white"></i>
                 </div>
                 <div>
-                  <h3 class="font-semibold text-white">AI-Generated Report</h3>
+                  <h3 class="font-semibold text-white">{{ $t('analytics.aiGeneratedReport') }}</h3>
                   <p class="text-xs text-white/80">Automated analytics summary</p>
                 </div>
               </div>
@@ -1412,7 +1412,7 @@ function getAnomalySeverityColor(severity: string): string {
             <div v-else-if="generatedReport" class="space-y-6">
               <div>
                 <h4 class="text-xl font-bold text-gray-900">{{ generatedReport.title }}</h4>
-                <p class="text-xs text-gray-500 mt-1">Generated {{ generatedReport.generatedAt.toLocaleString() }}</p>
+                <p class="text-xs text-gray-500 mt-1">{{ $t('analytics.generated') }} {{ generatedReport.generatedAt.toLocaleString() }}</p>
               </div>
 
               <div class="p-4 bg-teal-50 rounded-xl border border-teal-100">

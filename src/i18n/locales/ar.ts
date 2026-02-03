@@ -1859,6 +1859,45 @@ export default {
       finance: 'المالية',
       operations: 'العمليات',
     },
+    // Additional sections
+    byViewsAndRating: 'حسب المشاهدات والتقييم',
+    viewAll: 'عرض الكل',
+    recentActivity: 'النشاط الأخير',
+    userInteractions: 'تفاعلات المستخدمين',
+    aiPoweredInsights: 'رؤى مدعومة بالذكاء الاصطناعي',
+    teamLeaderboard: 'ترتيب الفرق',
+    topContributingTeams: 'أفضل الفرق المساهمة',
+    points: 'نقاط',
+    departmentStats: 'إحصائيات الأقسام',
+    adoptionOverview: 'نظرة عامة على التبني',
+    predictions: 'التنبؤات',
+    anomalies: 'الشذوذات',
+    detectedAnomalies: 'الشذوذات المكتشفة',
+    // Content engagement types
+    engagementTypes: {
+      articles: 'المقالات',
+      courses: 'الدورات',
+      events: 'الفعاليات',
+      documents: 'المستندات',
+      polls: 'الاستطلاعات',
+      videos: 'الفيديوهات',
+    },
+    // Category names
+    categories: {
+      engineering: 'الهندسة',
+      marketing: 'التسويق',
+      hr: 'الموارد البشرية',
+      sales: 'المبيعات',
+      product: 'المنتجات',
+      operations: 'العمليات',
+    },
+    // Reports section
+    generatedReports: 'التقارير المُنشأة',
+    downloadPastReports: 'تحميل التقارير السابقة',
+    generateNew: 'إنشاء جديد',
+    download: 'تحميل',
+    aiGeneratedReport: 'تقرير مُنشأ بالذكاء الاصطناعي',
+    generated: 'تم الإنشاء',
   },
 
   // Settings
