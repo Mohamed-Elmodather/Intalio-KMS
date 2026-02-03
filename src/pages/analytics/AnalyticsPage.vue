@@ -29,20 +29,20 @@ const selectedContentType = ref('all')
 const hoveredSegment = ref<string | null>(null)
 
 // Period options (Date ranges)
-const periodOptions = [
-  { value: '7d', label: '7 Days' },
-  { value: '30d', label: '30 Days' },
-  { value: '90d', label: 'Quarter' },
-  { value: 'ytd', label: 'YTD' }
-]
+const periodOptions = computed(() => [
+  { value: '7d', label: t('analytics.periods.sevenDays') },
+  { value: '30d', label: t('analytics.periods.thirtyDays') },
+  { value: '90d', label: t('analytics.periods.quarter') },
+  { value: 'ytd', label: t('analytics.periods.ytd') }
+])
 
 // Content type filters
-const contentTypes = [
-  { value: 'all', label: 'All' },
-  { value: 'articles', label: 'Articles' },
-  { value: 'courses', label: 'Courses' },
-  { value: 'events', label: 'Events' }
-]
+const contentTypes = computed(() => [
+  { value: 'all', label: t('analytics.contentTypes.all') },
+  { value: 'articles', label: t('analytics.contentTypes.articles') },
+  { value: 'courses', label: t('analytics.contentTypes.courses') },
+  { value: 'events', label: t('analytics.contentTypes.events') }
+])
 
 // Content Engagement Data
 const contentEngagement = ref([
@@ -60,15 +60,15 @@ const maxEngagementValue = computed(() => {
 })
 
 // Department filters
-const departments = [
-  { id: 'all', name: 'All Departments' },
-  { id: 'engineering', name: 'Engineering' },
-  { id: 'marketing', name: 'Marketing' },
-  { id: 'sales', name: 'Sales' },
-  { id: 'hr', name: 'Human Resources' },
-  { id: 'finance', name: 'Finance' },
-  { id: 'operations', name: 'Operations' }
-]
+const departments = computed(() => [
+  { id: 'all', name: t('analytics.departments.allDepartments') },
+  { id: 'engineering', name: t('analytics.departments.engineering') },
+  { id: 'marketing', name: t('analytics.departments.marketing') },
+  { id: 'sales', name: t('analytics.departments.sales') },
+  { id: 'hr', name: t('analytics.departments.humanResources') },
+  { id: 'finance', name: t('analytics.departments.finance') },
+  { id: 'operations', name: t('analytics.departments.operations') }
+])
 
 // Executive Stats (Hero)
 const stats = ref({
@@ -543,7 +543,7 @@ function getAnomalySeverityColor(severity: string): string {
       <!-- Period Selector -->
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-2">
-          <span class="text-sm font-medium text-gray-600">Time Period:</span>
+          <span class="text-sm font-medium text-gray-600">{{ $t('analytics.timePeriod') }}:</span>
           <div class="flex items-center bg-white border border-gray-200 rounded-lg p-1">
             <button
               v-for="period in periodOptions"
@@ -561,11 +561,11 @@ function getAnomalySeverityColor(severity: string): string {
         <div class="flex items-center gap-2">
           <button class="px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50 flex items-center gap-2">
             <i class="fas fa-filter text-xs"></i>
-            Filter
+            {{ $t('analytics.filter') }}
           </button>
           <button class="px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50 flex items-center gap-2">
             <i class="fas fa-sync-alt text-xs"></i>
-            Refresh
+            {{ $t('analytics.refresh') }}
           </button>
         </div>
       </div>
@@ -576,7 +576,7 @@ function getAnomalySeverityColor(severity: string): string {
           <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center shadow-lg shadow-teal-200">
             <i class="fas fa-tachometer-alt text-white text-sm"></i>
           </div>
-          <span>Platform Health Metrics</span>
+          <span>{{ $t('analytics.platformHealthMetrics') }}</span>
         </h2>
       </div>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -624,8 +624,8 @@ function getAnomalySeverityColor(severity: string): string {
                 <i class="fas fa-chart-area text-white text-sm"></i>
               </div>
               <div>
-                <span class="block">Platform Usage Trends</span>
-                <span class="text-xs font-medium text-gray-500">Active users vs target</span>
+                <span class="block">{{ $t('analytics.platformUsageTrends') }}</span>
+                <span class="text-xs font-medium text-gray-500">{{ $t('analytics.activeUsersVsTarget') }}</span>
               </div>
             </h2>
           </div>
@@ -650,11 +650,11 @@ function getAnomalySeverityColor(severity: string): string {
             <div class="flex items-center justify-center gap-6 pt-2 border-t border-gray-100">
               <div class="flex items-center gap-2">
                 <span class="w-3 h-3 rounded-full bg-teal-500"></span>
-                <span class="text-xs text-gray-500">Active Users</span>
+                <span class="text-xs text-gray-500">{{ $t('analytics.activeUsers') }}</span>
               </div>
               <div class="flex items-center gap-2">
                 <span class="w-3 h-3 rounded-full bg-gray-300"></span>
-                <span class="text-xs text-gray-500">Target</span>
+                <span class="text-xs text-gray-500">{{ $t('analytics.target') }}</span>
               </div>
             </div>
           </div>
@@ -668,8 +668,8 @@ function getAnomalySeverityColor(severity: string): string {
                 <i class="fas fa-bolt text-white text-sm"></i>
               </div>
               <div>
-                <span class="block">This Week's Highlights</span>
-                <span class="text-xs font-medium text-gray-500">Tournament Records</span>
+                <span class="block">{{ $t('analytics.thisWeeksHighlights') }}</span>
+                <span class="text-xs font-medium text-gray-500">{{ $t('analytics.tournamentRecords') }}</span>
               </div>
             </h2>
           </div>
@@ -698,8 +698,8 @@ function getAnomalySeverityColor(severity: string): string {
                   <i class="fas fa-book-reader text-white text-sm"></i>
                 </div>
                 <div>
-                  <span class="block">Content Engagement by Type</span>
-                  <span class="text-xs font-medium text-gray-500">Views vs Interactions</span>
+                  <span class="block">{{ $t('analytics.contentEngagementByType') }}</span>
+                  <span class="text-xs font-medium text-gray-500">{{ $t('analytics.viewsVsInteractions') }}</span>
                 </div>
               </h2>
               <div class="flex items-center gap-1">
@@ -763,11 +763,11 @@ function getAnomalySeverityColor(severity: string): string {
             <div class="flex items-center justify-center gap-8 mt-5 pt-4 border-t border-gray-100">
               <div class="flex items-center gap-2">
                 <div class="w-4 h-3 rounded-sm bg-gradient-to-r from-teal-500 to-teal-300"></div>
-                <span class="text-xs font-medium text-gray-600">Views</span>
+                <span class="text-xs font-medium text-gray-600">{{ $t('analytics.views') }}</span>
               </div>
               <div class="flex items-center gap-2">
                 <div class="w-4 h-3 rounded-sm bg-gradient-to-r from-teal-500/50 to-teal-300/50"></div>
-                <span class="text-xs font-medium text-gray-600">Interactions</span>
+                <span class="text-xs font-medium text-gray-600">{{ $t('analytics.interactions') }}</span>
               </div>
             </div>
           </div>
@@ -781,8 +781,8 @@ function getAnomalySeverityColor(severity: string): string {
                 <i class="fas fa-building text-white text-sm"></i>
               </div>
               <div>
-                <span class="block">Department Participation</span>
-                <span class="text-xs font-medium text-gray-500">Platform adoption by team</span>
+                <span class="block">{{ $t('analytics.departmentParticipation') }}</span>
+                <span class="text-xs font-medium text-gray-500">{{ $t('analytics.platformAdoptionByTeam') }}</span>
               </div>
             </h2>
           </div>
@@ -816,7 +816,7 @@ function getAnomalySeverityColor(severity: string): string {
                 <div class="absolute inset-0 flex items-center justify-center flex-col">
                   <div class="w-36 h-36 rounded-full bg-white shadow-inner flex items-center justify-center flex-col">
                     <span class="text-4xl font-bold text-gray-900">{{ totalCategoryValue }}%</span>
-                    <span class="text-xs text-gray-500 uppercase tracking-wide">Active</span>
+                    <span class="text-xs text-gray-500 uppercase tracking-wide">{{ $t('analytics.active') }}</span>
                   </div>
                 </div>
               </div>
@@ -860,8 +860,8 @@ function getAnomalySeverityColor(severity: string): string {
                 <i class="fas fa-fire text-white text-sm"></i>
               </div>
               <div>
-                <span class="block">Top Performing Content</span>
-                <span class="text-xs font-medium text-gray-500">Top players & performers</span>
+                <span class="block">{{ $t('analytics.topPerformingContent') }}</span>
+                <span class="text-xs font-medium text-gray-500">{{ $t('analytics.topPlayersAndPerformers') }}</span>
               </div>
             </h2>
             <div class="flex items-center gap-2">
@@ -882,10 +882,10 @@ function getAnomalySeverityColor(severity: string): string {
             <table class="w-full">
               <thead>
                 <tr class="bg-gray-50 border-b border-gray-100">
-                  <th class="text-left px-5 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Content</th>
-                  <th class="text-left px-5 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Views</th>
-                  <th class="text-left px-5 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Engagement</th>
-                  <th class="text-left px-5 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Completion</th>
+                  <th class="text-start px-5 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">{{ $t('analytics.content') }}</th>
+                  <th class="text-start px-5 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">{{ $t('analytics.views') }}</th>
+                  <th class="text-start px-5 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">{{ $t('analytics.engagement') }}</th>
+                  <th class="text-start px-5 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">{{ $t('analytics.completion') }}</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-gray-50">

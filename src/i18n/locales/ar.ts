@@ -1812,6 +1812,53 @@ export default {
     topContent: 'أفضل المحتوى',
     topAuthors: 'أفضل الكتاب',
     popularTags: 'الوسوم الشائعة',
+    // Additional UI labels
+    platformAdoption: 'تبني المنصة',
+    totalContent: 'إجمالي المحتوى',
+    engagementScore: 'درجة التفاعل',
+    timePeriod: 'الفترة الزمنية',
+    filter: 'تصفية',
+    refresh: 'تحديث',
+    platformHealthMetrics: 'مقاييس صحة المنصة',
+    platformUsageTrends: 'اتجاهات استخدام المنصة',
+    activeUsersVsTarget: 'المستخدمون النشطون مقابل الهدف',
+    target: 'الهدف',
+    thisWeeksHighlights: 'أبرز أحداث هذا الأسبوع',
+    tournamentRecords: 'سجلات البطولة',
+    contentEngagementByType: 'تفاعل المحتوى حسب النوع',
+    viewsVsInteractions: 'المشاهدات مقابل التفاعلات',
+    interactions: 'التفاعلات',
+    departmentParticipation: 'مشاركة الأقسام',
+    platformAdoptionByTeam: 'تبني المنصة حسب الفريق',
+    active: 'نشط',
+    topPerformingContent: 'أفضل المحتوى أداءً',
+    topPlayersAndPerformers: 'أفضل اللاعبين والمؤدين',
+    content: 'المحتوى',
+    completion: 'الإكمال',
+    // Period options
+    periods: {
+      sevenDays: '٧ أيام',
+      thirtyDays: '٣٠ يوم',
+      quarter: 'ربع سنوي',
+      ytd: 'منذ بداية العام',
+    },
+    // Content types
+    contentTypes: {
+      all: 'الكل',
+      articles: 'المقالات',
+      courses: 'الدورات',
+      events: 'الفعاليات',
+    },
+    // Departments
+    departments: {
+      allDepartments: 'جميع الأقسام',
+      engineering: 'الهندسة',
+      marketing: 'التسويق',
+      sales: 'المبيعات',
+      humanResources: 'الموارد البشرية',
+      finance: 'المالية',
+      operations: 'العمليات',
+    },
   },
 
   // Settings

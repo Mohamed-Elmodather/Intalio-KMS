@@ -1810,6 +1810,53 @@ export default {
     topContent: 'Top Content',
     topAuthors: 'Top Authors',
     popularTags: 'Popular Tags',
+    // Additional UI labels
+    platformAdoption: 'Platform Adoption',
+    totalContent: 'Total Content',
+    engagementScore: 'Engagement Score',
+    timePeriod: 'Time Period',
+    filter: 'Filter',
+    refresh: 'Refresh',
+    platformHealthMetrics: 'Platform Health Metrics',
+    platformUsageTrends: 'Platform Usage Trends',
+    activeUsersVsTarget: 'Active users vs target',
+    target: 'Target',
+    thisWeeksHighlights: "This Week's Highlights",
+    tournamentRecords: 'Tournament Records',
+    contentEngagementByType: 'Content Engagement by Type',
+    viewsVsInteractions: 'Views vs Interactions',
+    interactions: 'Interactions',
+    departmentParticipation: 'Department Participation',
+    platformAdoptionByTeam: 'Platform adoption by team',
+    active: 'Active',
+    topPerformingContent: 'Top Performing Content',
+    topPlayersAndPerformers: 'Top players & performers',
+    content: 'Content',
+    completion: 'Completion',
+    // Period options
+    periods: {
+      sevenDays: '7 Days',
+      thirtyDays: '30 Days',
+      quarter: 'Quarter',
+      ytd: 'YTD',
+    },
+    // Content types
+    contentTypes: {
+      all: 'All',
+      articles: 'Articles',
+      courses: 'Courses',
+      events: 'Events',
+    },
+    // Departments
+    departments: {
+      allDepartments: 'All Departments',
+      engineering: 'Engineering',
+      marketing: 'Marketing',
+      sales: 'Sales',
+      humanResources: 'Human Resources',
+      finance: 'Finance',
+      operations: 'Operations',
+    },
   },
 
   // Settings
