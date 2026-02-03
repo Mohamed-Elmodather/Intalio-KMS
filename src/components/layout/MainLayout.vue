@@ -183,7 +183,7 @@ onMounted(async () => {
         :workspace-items="workspaceItems"
         :bottom-actions="bottomActions"
         :is-collapsed="isCollapsed"
-        :workspaces-title="$t('nav.workspaces')"
+        :workspaces-title="$t('nav.workspaces.title')"
       />
     </aside>
 

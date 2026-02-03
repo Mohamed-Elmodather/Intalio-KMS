@@ -462,6 +462,7 @@ export default {
     continueReading: 'متابعة القراءة',
     resume: 'استئناف',
     yourBookmarks: 'مفضلاتك',
+    bookmark: 'إشارة مرجعية',
     recommendedForYou: 'موصى به لك',
     // Categories
     categoryCompanyNews: 'أخبار الشركة',

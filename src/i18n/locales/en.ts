@@ -462,6 +462,7 @@ export default {
     continueReading: 'Continue Reading',
     resume: 'Resume',
     yourBookmarks: 'Your Bookmarks',
+    bookmark: 'Bookmark',
     recommendedForYou: 'Recommended for You',
     // Categories
     categoryCompanyNews: 'Company News',

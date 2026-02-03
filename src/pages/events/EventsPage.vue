@@ -136,7 +136,7 @@ const eventTypeFilterOptions = computed(() =>
 )
 
 const formatFilterOptions = computed(() =>
-  formatOptions.map(format => ({
+  formatOptions.value.map(format => ({
     id: format.id,
     label: format.label,
     icon: format.icon,
