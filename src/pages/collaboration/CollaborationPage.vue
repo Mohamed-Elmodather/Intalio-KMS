@@ -2299,7 +2299,7 @@ watch(currentMessages, () => {
           v-for="tab in rightPanelTabs"
           :key="tab"
           @click="rightPanelTab = tab; rightPanelCollapsed = false"
-          :title="tab"
+          :title="$t('collaboration.tabs.' + tab)"
           :class="[
             'w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200',
             rightPanelTab === tab
@@ -2327,13 +2327,13 @@ watch(currentMessages, () => {
             :key="tab"
             @click="rightPanelTab = tab"
             :class="[
-              'px-3 py-1.5 text-sm font-medium rounded-lg transition-colors capitalize',
+              'px-3 py-1.5 text-sm font-medium rounded-lg transition-colors',
               rightPanelTab === tab
                 ? 'bg-teal-100 text-teal-700'
                 : 'text-gray-500 hover:bg-gray-100'
             ]"
           >
-            {{ tab }}
+            {{ $t('collaboration.tabs.' + tab) }}
           </button>
         </div>
       </div>

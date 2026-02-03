@@ -1478,6 +1478,15 @@ export default {
     isTyping: 'is typing...',
     areTyping: 'are typing...',
     membersCount: 'members',
+    // Tab labels
+    tabs: {
+      details: 'Details',
+      members: 'Members',
+      files: 'Files',
+      pinned: 'Pinned',
+      profile: 'Profile',
+      media: 'Media',
+    },
   },
 
   // Self-Services

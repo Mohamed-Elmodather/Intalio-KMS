@@ -1480,6 +1480,15 @@ export default {
     isTyping: 'يكتب...',
     areTyping: 'يكتبون...',
     membersCount: 'أعضاء',
+    // Tab labels
+    tabs: {
+      details: 'التفاصيل',
+      members: 'الأعضاء',
+      files: 'الملفات',
+      pinned: 'المثبتة',
+      profile: 'الملف الشخصي',
+      media: 'الوسائط',
+    },
   },
 
   // Self-Services
