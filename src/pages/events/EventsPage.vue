@@ -1121,7 +1121,7 @@ function getCategoryColor(category: string) {
               <div class="featured-avatar" style="background: #3b82f6;">SC</div>
               <div class="featured-avatar" style="background: #ec4899;">LW</div>
             </div>
-            <span class="featured-attendee-text">+12 {{ $t('events.attending') }}</span>
+            <span class="featured-attendee-text">+12 {{ $t('events.attendingCount') }}</span>
           </div>
           <div class="featured-actions">
             <button class="featured-action-btn secondary" :title="$t('events.setReminder')">

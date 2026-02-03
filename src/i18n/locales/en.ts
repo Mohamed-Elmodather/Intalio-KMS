@@ -1084,7 +1084,7 @@ export default {
     viewDetails: 'View Details',
     allDay: 'All Day',
     eventsCount: 'events',
-    attending: 'attending',
+    attendingCount: 'attending',
     startDate: 'Start Date',
     endDate: 'End Date',
     rsvpd: "RSVP'd",

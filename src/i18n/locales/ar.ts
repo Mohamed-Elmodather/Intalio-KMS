@@ -1086,7 +1086,7 @@ export default {
     viewDetails: 'عرض التفاصيل',
     allDay: 'طوال اليوم',
     eventsCount: 'فعاليات',
-    attending: 'حاضرين',
+    attendingCount: 'حاضرين',
     startDate: 'تاريخ البدء',
     endDate: 'تاريخ الانتهاء',
     rsvpd: 'تم التسجيل',
