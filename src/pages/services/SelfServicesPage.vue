@@ -44,28 +44,28 @@ const heroStats = computed(() => [
   { icon: 'fas fa-cogs', value: totalServices.value, label: t('services.title') }
 ])
 
-// Categories
-const categories = ref([
-  { id: 'all', label: 'All Services' },
-  { id: 'it', label: 'IT' },
-  { id: 'hr', label: 'HR' },
-  { id: 'facilities', label: 'Facilities' },
-  { id: 'finance', label: 'Finance' }
+// Categories - using translations
+const categories = computed(() => [
+  { id: 'all', label: t('services.categories.all') },
+  { id: 'it', label: t('services.categories.it') },
+  { id: 'hr', label: t('services.categories.hr') },
+  { id: 'facilities', label: t('services.categories.facilities') },
+  { id: 'finance', label: t('services.categories.finance') }
 ])
 
-// Services data
-const services = ref([
-  { id: 1, name: 'Password Reset', description: 'Reset your account password', category: 'it', icon: 'fas fa-key', iconBg: 'bg-teal-100', iconColor: 'text-teal-600', eta: '< 1 hour', priority: 'Quick', priorityClass: 'bg-teal-100 text-teal-700' },
-  { id: 2, name: 'Software Request', description: 'Request new software installation', category: 'it', icon: 'fas fa-download', iconBg: 'bg-teal-100', iconColor: 'text-teal-600', eta: '2-3 days', priority: 'Standard', priorityClass: 'bg-teal-100 text-teal-700' },
-  { id: 3, name: 'Hardware Request', description: 'Request new equipment or peripherals', category: 'it', icon: 'fas fa-desktop', iconBg: 'bg-teal-100', iconColor: 'text-teal-600', eta: '5-7 days', priority: 'Standard', priorityClass: 'bg-teal-100 text-teal-700' },
-  { id: 4, name: 'VPN Access', description: 'Request VPN access for remote work', category: 'it', icon: 'fas fa-shield-alt', iconBg: 'bg-teal-100', iconColor: 'text-teal-600', eta: '1-2 days', priority: 'Standard', priorityClass: 'bg-teal-100 text-teal-700' },
-  { id: 5, name: 'Leave Request', description: 'Submit vacation or sick leave', category: 'hr', icon: 'fas fa-calendar-alt', iconBg: 'bg-teal-100', iconColor: 'text-teal-600', eta: '1-2 days', priority: 'Standard', priorityClass: 'bg-teal-100 text-teal-700' },
-  { id: 6, name: 'Benefits Inquiry', description: 'Questions about benefits and insurance', category: 'hr', icon: 'fas fa-heart', iconBg: 'bg-teal-100', iconColor: 'text-teal-600', eta: '< 1 day', priority: 'Quick', priorityClass: 'bg-teal-100 text-teal-700' },
-  { id: 7, name: 'Training Request', description: 'Request professional development training', category: 'hr', icon: 'fas fa-graduation-cap', iconBg: 'bg-teal-100', iconColor: 'text-teal-600', eta: '3-5 days', priority: 'Standard', priorityClass: 'bg-teal-100 text-teal-700' },
-  { id: 8, name: 'Room Booking', description: 'Reserve meeting rooms and spaces', category: 'facilities', icon: 'fas fa-door-open', iconBg: 'bg-teal-100', iconColor: 'text-teal-700', eta: 'Instant', priority: 'Quick', priorityClass: 'bg-teal-100 text-teal-700' },
-  { id: 9, name: 'Maintenance Request', description: 'Report facility issues', category: 'facilities', icon: 'fas fa-tools', iconBg: 'bg-teal-100', iconColor: 'text-teal-700', eta: '1-3 days', priority: 'Standard', priorityClass: 'bg-teal-100 text-teal-700' },
-  { id: 10, name: 'Expense Report', description: 'Submit expense reimbursement', category: 'finance', icon: 'fas fa-receipt', iconBg: 'bg-teal-100', iconColor: 'text-teal-600', eta: '3-5 days', priority: 'Standard', priorityClass: 'bg-teal-100 text-teal-700' },
-  { id: 11, name: 'Travel Request', description: 'Request travel approval', category: 'finance', icon: 'fas fa-plane', iconBg: 'bg-teal-100', iconColor: 'text-teal-600', eta: '2-3 days', priority: 'Standard', priorityClass: 'bg-teal-100 text-teal-700' }
+// Services data - using translations
+const services = computed(() => [
+  { id: 1, name: t('services.serviceItems.passwordReset'), description: t('services.serviceItems.passwordResetDesc'), category: 'it', icon: 'fas fa-key', iconBg: 'bg-teal-100', iconColor: 'text-teal-600', eta: '< 1 hour', priority: t('services.priorities.quick'), priorityClass: 'bg-teal-100 text-teal-700' },
+  { id: 2, name: t('services.serviceItems.softwareRequest'), description: t('services.serviceItems.softwareRequestDesc'), category: 'it', icon: 'fas fa-download', iconBg: 'bg-teal-100', iconColor: 'text-teal-600', eta: '2-3 days', priority: t('services.priorities.standard'), priorityClass: 'bg-teal-100 text-teal-700' },
+  { id: 3, name: t('services.serviceItems.hardwareRequest'), description: t('services.serviceItems.hardwareRequestDesc'), category: 'it', icon: 'fas fa-desktop', iconBg: 'bg-teal-100', iconColor: 'text-teal-600', eta: '5-7 days', priority: t('services.priorities.standard'), priorityClass: 'bg-teal-100 text-teal-700' },
+  { id: 4, name: t('services.serviceItems.vpnAccess'), description: t('services.serviceItems.vpnAccessDesc'), category: 'it', icon: 'fas fa-shield-alt', iconBg: 'bg-teal-100', iconColor: 'text-teal-600', eta: '1-2 days', priority: t('services.priorities.standard'), priorityClass: 'bg-teal-100 text-teal-700' },
+  { id: 5, name: t('services.serviceItems.leaveRequest'), description: t('services.serviceItems.leaveRequestDesc'), category: 'hr', icon: 'fas fa-calendar-alt', iconBg: 'bg-teal-100', iconColor: 'text-teal-600', eta: '1-2 days', priority: t('services.priorities.standard'), priorityClass: 'bg-teal-100 text-teal-700' },
+  { id: 6, name: t('services.serviceItems.benefitsInquiry'), description: t('services.serviceItems.benefitsInquiryDesc'), category: 'hr', icon: 'fas fa-heart', iconBg: 'bg-teal-100', iconColor: 'text-teal-600', eta: '< 1 day', priority: t('services.priorities.quick'), priorityClass: 'bg-teal-100 text-teal-700' },
+  { id: 7, name: t('services.serviceItems.trainingRequest'), description: t('services.serviceItems.trainingRequestDesc'), category: 'hr', icon: 'fas fa-graduation-cap', iconBg: 'bg-teal-100', iconColor: 'text-teal-600', eta: '3-5 days', priority: t('services.priorities.standard'), priorityClass: 'bg-teal-100 text-teal-700' },
+  { id: 8, name: t('services.serviceItems.roomBooking'), description: t('services.serviceItems.roomBookingDesc'), category: 'facilities', icon: 'fas fa-door-open', iconBg: 'bg-teal-100', iconColor: 'text-teal-700', eta: 'Instant', priority: t('services.priorities.quick'), priorityClass: 'bg-teal-100 text-teal-700' },
+  { id: 9, name: t('services.serviceItems.maintenanceRequest'), description: t('services.serviceItems.maintenanceRequestDesc'), category: 'facilities', icon: 'fas fa-tools', iconBg: 'bg-teal-100', iconColor: 'text-teal-700', eta: '1-3 days', priority: t('services.priorities.standard'), priorityClass: 'bg-teal-100 text-teal-700' },
+  { id: 10, name: t('services.serviceItems.expenseReport'), description: t('services.serviceItems.expenseReportDesc'), category: 'finance', icon: 'fas fa-receipt', iconBg: 'bg-teal-100', iconColor: 'text-teal-600', eta: '3-5 days', priority: t('services.priorities.standard'), priorityClass: 'bg-teal-100 text-teal-700' },
+  { id: 11, name: t('services.serviceItems.travelRequest'), description: t('services.serviceItems.travelRequestDesc'), category: 'finance', icon: 'fas fa-plane', iconBg: 'bg-teal-100', iconColor: 'text-teal-600', eta: '2-3 days', priority: t('services.priorities.standard'), priorityClass: 'bg-teal-100 text-teal-700' }
 ])
 
 // My Requests data
@@ -138,11 +138,11 @@ const faqs = ref([
   { question: 'What if I need to cancel a request?', answer: 'You can cancel pending requests from the request detail page. Completed or in-progress requests may require contacting support.', open: false }
 ])
 
-// Priorities
-const priorities = ref([
-  { value: 'low', label: 'Low' },
-  { value: 'medium', label: 'Medium' },
-  { value: 'high', label: 'High' }
+// Priorities - using translations
+const priorities = computed(() => [
+  { value: 'low', label: t('services.priorities.low') },
+  { value: 'medium', label: t('services.priorities.medium') },
+  { value: 'high', label: t('services.priorities.high') }
 ])
 
 // New Request Form
@@ -181,7 +181,7 @@ function closeNewRequest() {
 }
 
 function submitRequest() {
-  alert('Request submitted successfully!')
+  alert(t('services.requestSubmittedSuccess'))
   closeNewRequest()
 }
 
@@ -340,7 +340,7 @@ function getMatchTypeColor(type: string) {
   <div class="min-h-screen bg-gray-50">
     <!-- Loading State -->
     <div v-if="isLoading" class="flex items-center justify-center min-h-[400px]">
-      <LoadingSpinner size="lg" text="Loading services..." />
+      <LoadingSpinner size="lg" :text="$t('services.loadingServices')" />
     </div>
 
     <template v-else>
@@ -434,16 +434,16 @@ function getMatchTypeColor(type: string) {
                       <i class="fas fa-clipboard-list text-white text-sm"></i>
                     </div>
                     <div>
-                      <span class="block">My Requests</span>
-                      <span class="text-xs font-medium text-gray-500">{{ filteredRequests.length }} requests</span>
+                      <span class="block">{{ $t('services.myRequests') }}</span>
+                      <span class="text-xs font-medium text-gray-500">{{ filteredRequests.length }} {{ $t('services.requests') }}</span>
                     </div>
                   </h2>
                   <div class="flex items-center gap-2">
                     <select v-model="requestFilter" class="px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-sm text-gray-600 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent">
-                      <option value="all">All Status</option>
-                      <option value="pending">Pending</option>
-                      <option value="in-progress">In Progress</option>
-                      <option value="completed">Completed</option>
+                      <option value="all">{{ $t('services.allStatus') }}</option>
+                      <option value="pending">{{ $t('services.pending') }}</option>
+                      <option value="in-progress">{{ $t('services.inProgress') }}</option>
+                      <option value="completed">{{ $t('services.completed') }}</option>
                     </select>
                   </div>
                 </div>
@@ -497,7 +497,7 @@ function getMatchTypeColor(type: string) {
                 <div class="w-16 h-16 rounded-full bg-teal-100 flex items-center justify-center mx-auto mb-4">
                   <i class="fas fa-inbox text-teal-400 text-2xl"></i>
                 </div>
-                <p class="text-gray-500">No requests found</p>
+                <p class="text-gray-500">{{ $t('services.noRequests') }}</p>
               </div>
             </div>
           </div>
@@ -511,22 +511,22 @@ function getMatchTypeColor(type: string) {
                   <i class="fas fa-robot text-white"></i>
                 </div>
                 <div>
-                  <h3 class="font-bold text-gray-900">AI Assistant</h3>
-                  <p class="text-xs text-gray-500">Get instant help</p>
+                  <h3 class="font-bold text-gray-900">{{ $t('services.aiAssistant') }}</h3>
+                  <p class="text-xs text-gray-500">{{ $t('services.getInstantHelp') }}</p>
                 </div>
               </div>
 
               <div class="space-y-2 mb-4">
                 <button v-for="(query, idx) in quickQueries" :key="idx"
                         @click="askAI(query)"
-                        class="w-full p-3 text-left text-sm rounded-xl bg-gray-50 hover:bg-teal-50 hover:border-teal-200 border border-gray-100 text-gray-700 transition-all">
+                        class="w-full p-3 text-start text-sm rounded-xl bg-gray-50 hover:bg-teal-50 hover:border-teal-200 border border-gray-100 text-gray-700 transition-all">
                   <i class="fas fa-comment-dots text-teal-500 mr-2"></i>{{ query }}
                 </button>
               </div>
 
               <div class="relative">
                 <input type="text" v-model="aiQuery" @keydown.enter="askAI(aiQuery)"
-                       placeholder="Ask anything..."
+                       :placeholder="$t('services.askAnything')"
                        class="w-full pl-4 pr-10 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all">
                 <button @click="askAI(aiQuery)" class="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-lg hover:bg-teal-100 text-teal-500 transition-colors">
                   <i class="fas fa-paper-plane"></i>
@@ -541,13 +541,13 @@ function getMatchTypeColor(type: string) {
                   <i class="fas fa-question text-white"></i>
                 </div>
                 <div>
-                  <h3 class="font-bold text-gray-900">FAQ</h3>
-                  <p class="text-xs text-gray-500">Common questions</p>
+                  <h3 class="font-bold text-gray-900">{{ $t('services.faq') }}</h3>
+                  <p class="text-xs text-gray-500">{{ $t('services.commonQuestions') }}</p>
                 </div>
               </div>
               <div class="space-y-2">
                 <div v-for="(faq, idx) in faqs" :key="idx" class="rounded-xl border border-gray-100 overflow-hidden">
-                  <button @click="faq.open = !faq.open" class="w-full p-3 text-left flex items-center justify-between bg-gray-50 hover:bg-gray-100 transition-colors">
+                  <button @click="faq.open = !faq.open" class="w-full p-3 text-start flex items-center justify-between bg-gray-50 hover:bg-gray-100 transition-colors">
                     <span class="text-sm font-medium text-gray-800">{{ faq.question }}</span>
                     <i :class="['fas text-gray-400 transition-transform text-xs', faq.open ? 'fa-chevron-up' : 'fa-chevron-down']"></i>
                   </button>
@@ -563,8 +563,8 @@ function getMatchTypeColor(type: string) {
                   <i class="fas fa-headset text-white"></i>
                 </div>
                 <div>
-                  <h3 class="font-bold text-gray-900">Need Help?</h3>
-                  <p class="text-xs text-gray-500">Contact support</p>
+                  <h3 class="font-bold text-gray-900">{{ $t('services.needHelp') }}</h3>
+                  <p class="text-xs text-gray-500">{{ $t('services.contactSupport') }}</p>
                 </div>
               </div>
               <div class="space-y-2">
@@ -573,7 +573,7 @@ function getMatchTypeColor(type: string) {
                     <i class="fas fa-phone text-teal-600 text-sm"></i>
                   </div>
                   <div>
-                    <p class="text-sm font-medium text-gray-800 group-hover:text-teal-600 transition-colors">Call Support</p>
+                    <p class="text-sm font-medium text-gray-800 group-hover:text-teal-600 transition-colors">{{ $t('services.callSupport') }}</p>
                     <p class="text-xs text-gray-500">+1 (555) 123-4567</p>
                   </div>
                 </a>
@@ -582,7 +582,7 @@ function getMatchTypeColor(type: string) {
                     <i class="fas fa-envelope text-blue-600 text-sm"></i>
                   </div>
                   <div>
-                    <p class="text-sm font-medium text-gray-800 group-hover:text-teal-600 transition-colors">Email Us</p>
+                    <p class="text-sm font-medium text-gray-800 group-hover:text-teal-600 transition-colors">{{ $t('services.emailUs') }}</p>
                     <p class="text-xs text-gray-500">support@afc.com</p>
                   </div>
                 </a>
@@ -591,8 +591,8 @@ function getMatchTypeColor(type: string) {
                     <i class="fas fa-comments text-purple-600 text-sm"></i>
                   </div>
                   <div>
-                    <p class="text-sm font-medium text-gray-800 group-hover:text-teal-600 transition-colors">Live Chat</p>
-                    <p class="text-xs text-gray-500">Available 24/7</p>
+                    <p class="text-sm font-medium text-gray-800 group-hover:text-teal-600 transition-colors">{{ $t('services.liveChat') }}</p>
+                    <p class="text-xs text-gray-500">{{ $t('services.available247') }}</p>
                   </div>
                 </a>
               </div>
@@ -606,7 +606,7 @@ function getMatchTypeColor(type: string) {
         <div class="card-animated w-full max-w-2xl max-h-[90vh] overflow-y-auto">
           <div class="p-5 border-b border-gray-100 flex items-center justify-between sticky top-0 bg-white/80 backdrop-blur-sm">
             <h2 class="text-xl font-semibold text-gray-900">
-              {{ selectedService ? selectedService.name : 'New Service Request' }}
+              {{ selectedService ? selectedService.name : $t('services.newServiceRequest') }}
             </h2>
             <button @click="closeNewRequest" class="p-2 rounded-lg hover:bg-teal-50 text-gray-500 ripple-effect hover-scale">
               <i class="fas fa-times"></i>
@@ -630,12 +630,12 @@ function getMatchTypeColor(type: string) {
             <!-- Request Form -->
             <form v-else @submit.prevent="submitRequest" class="space-y-5">
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Subject</label>
-                <input type="text" v-model="newRequest.subject" class="input" placeholder="Brief description of your request" required>
+                <label class="block text-sm font-medium text-gray-700 mb-2">{{ $t('services.subject') }}</label>
+                <input type="text" v-model="newRequest.subject" class="input" :placeholder="$t('services.subjectPlaceholder')" required>
               </div>
 
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Priority</label>
+                <label class="block text-sm font-medium text-gray-700 mb-2">{{ $t('services.priority') }}</label>
                 <div class="flex gap-3">
                   <label v-for="p in priorities" :key="p.value"
                          :class="['flex-1 p-3 rounded-xl border-2 cursor-pointer text-center transition-all',
@@ -648,31 +648,31 @@ function getMatchTypeColor(type: string) {
 
               <div>
                 <div class="flex items-center justify-between mb-2">
-                  <label class="block text-sm font-medium text-gray-700">Description</label>
+                  <label class="block text-sm font-medium text-gray-700">{{ $t('services.description') }}</label>
                   <button @click="generateAutoFill" type="button"
                           class="px-3 py-1 text-xs font-medium text-teal-600 bg-teal-50 rounded-lg hover:bg-teal-100 transition-colors flex items-center gap-1">
                     <i class="fas fa-wand-magic-sparkles"></i>
-                    AI Auto-fill
+                    {{ $t('services.aiAutoFill') }}
                   </button>
                 </div>
-                <textarea v-model="newRequest.description" class="input" rows="4" placeholder="Provide detailed information about your request..." required></textarea>
+                <textarea v-model="newRequest.description" class="input" rows="4" :placeholder="$t('services.descriptionPlaceholder')" required></textarea>
               </div>
 
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Attachments</label>
+                <label class="block text-sm font-medium text-gray-700 mb-2">{{ $t('services.attachments') }}</label>
                 <div class="border-2 border-dashed border-gray-200 rounded-xl p-6 text-center hover:border-gray-400 transition-colors cursor-pointer">
                   <i class="fas fa-cloud-upload-alt text-3xl text-gray-300 mb-2"></i>
-                  <p class="text-sm text-gray-500">Drop files here or click to upload</p>
-                  <p class="text-xs text-gray-400 mt-1">Max 10MB per file</p>
+                  <p class="text-sm text-gray-500">{{ $t('services.dropFilesHere') }}</p>
+                  <p class="text-xs text-gray-400 mt-1">{{ $t('services.maxFileSize') }}</p>
                 </div>
               </div>
 
               <div class="flex gap-3 pt-4">
                 <button type="button" @click="selectedService = null" class="btn btn-secondary flex-1 ripple-effect">
-                  <i class="fas fa-arrow-left"></i> Back
+                  <i class="fas fa-arrow-left"></i> {{ $t('services.back') }}
                 </button>
                 <button type="submit" class="btn btn-vibrant flex-1 ripple-effect">
-                  <i class="fas fa-paper-plane"></i> Submit Request
+                  <i class="fas fa-paper-plane"></i> {{ $t('services.submitRequest') }}
                 </button>
               </div>
             </form>
@@ -691,8 +691,8 @@ function getMatchTypeColor(type: string) {
                     <i class="fas fa-wand-magic-sparkles text-white"></i>
                   </div>
                   <div>
-                    <h3 class="text-lg font-semibold text-gray-900">Smart Suggestions</h3>
-                    <p class="text-sm text-gray-500">AI-recommended services for you</p>
+                    <h3 class="text-lg font-semibold text-gray-900">{{ $t('services.smartSuggestions') }}</h3>
+                    <p class="text-sm text-gray-500">{{ $t('services.aiRecommendedServices') }}</p>
                   </div>
                 </div>
                 <button @click="showAIRecommendationsPanel = false" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
@@ -714,7 +714,7 @@ function getMatchTypeColor(type: string) {
 
               <!-- Recommended Services -->
               <div v-if="aiRecommendations.length > 0" class="space-y-3">
-                <h4 class="text-sm font-semibold text-gray-500 uppercase">Recommended Services</h4>
+                <h4 class="text-sm font-semibold text-gray-500 uppercase">{{ $t('services.recommendedServices') }}</h4>
                 <div v-for="rec in aiRecommendations" :key="rec.id"
                      class="border border-gray-200 rounded-xl p-4 hover:border-teal-300 hover:bg-teal-50/30 transition-all cursor-pointer"
                      @click="selectRecommendedService(rec)">
@@ -730,7 +730,7 @@ function getMatchTypeColor(type: string) {
                     </div>
                     <div class="text-right ml-4">
                       <div class="text-lg font-bold text-teal-600">{{ Math.round(rec.confidence * 100) }}%</div>
-                      <div class="text-xs text-gray-500">Match</div>
+                      <div class="text-xs text-gray-500">{{ $t('services.match') }}</div>
                     </div>
                   </div>
                 </div>
@@ -740,11 +740,11 @@ function getMatchTypeColor(type: string) {
             <div class="p-4 border-t border-gray-100 flex justify-end gap-3">
               <button @click="fetchAIRecommendations"
                       class="px-4 py-2 text-teal-600 hover:bg-teal-50 rounded-lg transition-colors flex items-center gap-2">
-                <i class="fas fa-rotate"></i> Refresh
+                <i class="fas fa-rotate"></i> {{ $t('services.refresh') }}
               </button>
               <button @click="showAIRecommendationsPanel = false"
                       class="px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-colors">
-                Close
+                {{ $t('services.close') }}
               </button>
             </div>
           </div>
@@ -762,8 +762,8 @@ function getMatchTypeColor(type: string) {
                     <i class="fas fa-pen-fancy text-white"></i>
                   </div>
                   <div>
-                    <h3 class="text-lg font-semibold text-gray-900">AI Auto-fill</h3>
-                    <p class="text-sm text-gray-500">Suggested request details</p>
+                    <h3 class="text-lg font-semibold text-gray-900">{{ $t('services.aiAutoFill') }}</h3>
+                    <p class="text-sm text-gray-500">{{ $t('services.suggestedRequestDetails') }}</p>
                   </div>
                 </div>
                 <button @click="showAutoFillModal = false" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
@@ -773,26 +773,26 @@ function getMatchTypeColor(type: string) {
             </div>
 
             <div class="p-6 overflow-y-auto max-h-[60vh]">
-              <AILoadingIndicator v-if="isGeneratingAutoFill" message="Generating form suggestions..." />
+              <AILoadingIndicator v-if="isGeneratingAutoFill" :message="$t('services.generatingFormSuggestions')" />
 
               <div v-else-if="autoFillSuggestions" class="space-y-4">
                 <div>
-                  <label class="text-xs font-semibold text-gray-500 uppercase">Subject</label>
+                  <label class="text-xs font-semibold text-gray-500 uppercase">{{ $t('services.subject') }}</label>
                   <p class="mt-1 p-3 bg-gray-50 rounded-lg text-gray-900">{{ autoFillSuggestions.subject }}</p>
                 </div>
 
                 <div>
-                  <label class="text-xs font-semibold text-gray-500 uppercase">Description</label>
+                  <label class="text-xs font-semibold text-gray-500 uppercase">{{ $t('services.description') }}</label>
                   <p class="mt-1 p-3 bg-gray-50 rounded-lg text-gray-700 text-sm">{{ autoFillSuggestions.description }}</p>
                 </div>
 
                 <div>
-                  <label class="text-xs font-semibold text-gray-500 uppercase">Priority</label>
+                  <label class="text-xs font-semibold text-gray-500 uppercase">{{ $t('services.priority') }}</label>
                   <p class="mt-1 px-3 py-1 bg-amber-100 text-amber-700 rounded-full text-sm inline-block capitalize">{{ autoFillSuggestions.priority }}</p>
                 </div>
 
                 <div>
-                  <label class="text-xs font-semibold text-gray-500 uppercase">Additional Information</label>
+                  <label class="text-xs font-semibold text-gray-500 uppercase">{{ $t('services.additionalInfo') }}</label>
                   <ul class="mt-2 space-y-2">
                     <li v-for="(info, idx) in autoFillSuggestions.additionalInfo" :key="idx"
                         class="flex items-start gap-2 text-sm text-gray-600">
@@ -807,11 +807,11 @@ function getMatchTypeColor(type: string) {
             <div class="p-4 border-t border-gray-100 flex justify-end gap-3">
               <button @click="generateAutoFill"
                       class="px-4 py-2 text-purple-600 hover:bg-purple-50 rounded-lg transition-colors flex items-center gap-2">
-                <i class="fas fa-rotate"></i> Regenerate
+                <i class="fas fa-rotate"></i> {{ $t('services.regenerate') }}
               </button>
               <button @click="applyAutoFill"
                       class="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors flex items-center gap-2">
-                <i class="fas fa-check"></i> Apply
+                <i class="fas fa-check"></i> {{ $t('services.apply') }}
               </button>
             </div>
           </div>
