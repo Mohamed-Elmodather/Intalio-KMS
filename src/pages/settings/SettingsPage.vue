@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
 import { useAIServicesStore } from '@/stores/aiServices'
@@ -26,16 +26,16 @@ const currentUser = ref({
 })
 
 // Tabs configuration
-const tabs = ref([
-  { id: 'account', label: 'Account', icon: 'fas fa-user' },
-  { id: 'ai', label: 'AI Settings', icon: 'fas fa-wand-magic-sparkles' },
-  { id: 'notifications', label: 'Notifications', icon: 'fas fa-bell' },
-  { id: 'privacy', label: 'Privacy', icon: 'fas fa-shield-alt' },
-  { id: 'appearance', label: 'Appearance', icon: 'fas fa-palette' },
-  { id: 'language', label: 'Language', icon: 'fas fa-globe' },
-  { id: 'security', label: 'Security', icon: 'fas fa-lock' },
-  { id: 'apps', label: 'Connected Apps', icon: 'fas fa-plug' },
-  { id: 'shortcuts', label: 'Shortcuts', icon: 'fas fa-keyboard' }
+const tabs = computed(() => [
+  { id: 'account', label: t('settings.tabs.account'), icon: 'fas fa-user' },
+  { id: 'ai', label: t('settings.tabs.ai'), icon: 'fas fa-wand-magic-sparkles' },
+  { id: 'notifications', label: t('settings.tabs.notifications'), icon: 'fas fa-bell' },
+  { id: 'privacy', label: t('settings.tabs.privacy'), icon: 'fas fa-shield-alt' },
+  { id: 'appearance', label: t('settings.tabs.appearance'), icon: 'fas fa-palette' },
+  { id: 'language', label: t('settings.tabs.language'), icon: 'fas fa-globe' },
+  { id: 'security', label: t('settings.tabs.security'), icon: 'fas fa-lock' },
+  { id: 'apps', label: t('settings.tabs.apps'), icon: 'fas fa-plug' },
+  { id: 'shortcuts', label: t('settings.tabs.shortcuts'), icon: 'fas fa-keyboard' }
 ])
 
 // Account settings
@@ -62,34 +62,51 @@ interface NotificationCategory {
   items: NotificationItem[]
 }
 
-const notifications = ref<NotificationCategory[]>([
+const notificationSettings = ref({
+  comments: { email: true, push: true },
+  mentions: { email: true, push: true },
+  reactions: { email: false, push: true },
+  news: { email: true, push: true },
+  events: { email: true, push: false },
+  courses: { email: true, push: false }
+})
+
+const notifications = computed<NotificationCategory[]>(() => [
   {
     id: 'activity',
-    title: 'Activity',
+    title: t('settings.notificationCategories.activity'),
     items: [
-      { id: 'comments', label: 'Comments on my content', description: 'When someone comments on your articles or posts', email: true, push: true },
-      { id: 'mentions', label: 'Mentions', description: 'When someone mentions you', email: true, push: true },
-      { id: 'reactions', label: 'Reactions', description: 'When someone reacts to your content', email: false, push: true }
+      { id: 'comments', label: t('settings.notificationItems.comments'), description: t('settings.notificationItems.commentsDesc'), email: notificationSettings.value.comments.email, push: notificationSettings.value.comments.push },
+      { id: 'mentions', label: t('settings.notificationItems.mentions'), description: t('settings.notificationItems.mentionsDesc'), email: notificationSettings.value.mentions.email, push: notificationSettings.value.mentions.push },
+      { id: 'reactions', label: t('settings.notificationItems.reactions'), description: t('settings.notificationItems.reactionsDesc'), email: notificationSettings.value.reactions.email, push: notificationSettings.value.reactions.push }
     ]
   },
   {
     id: 'updates',
-    title: 'Updates',
+    title: t('settings.notificationCategories.updates'),
     items: [
-      { id: 'news', label: 'Company News', description: 'Important announcements and updates', email: true, push: true },
-      { id: 'events', label: 'Events', description: 'Upcoming events and reminders', email: true, push: false },
-      { id: 'courses', label: 'Learning Updates', description: 'New courses and learning opportunities', email: true, push: false }
+      { id: 'news', label: t('settings.notificationItems.news'), description: t('settings.notificationItems.newsDesc'), email: notificationSettings.value.news.email, push: notificationSettings.value.news.push },
+      { id: 'events', label: t('settings.notificationItems.events'), description: t('settings.notificationItems.eventsDesc'), email: notificationSettings.value.events.email, push: notificationSettings.value.events.push },
+      { id: 'courses', label: t('settings.notificationItems.courses'), description: t('settings.notificationItems.coursesDesc'), email: notificationSettings.value.courses.email, push: notificationSettings.value.courses.push }
     ]
   }
 ])
 
 // Privacy settings
-const privacySettings = ref([
-  { id: 'profile', label: 'Public Profile', description: 'Allow others to view your profile', enabled: true },
-  { id: 'activity', label: 'Show Activity Status', description: "Display when you're online", enabled: true },
-  { id: 'contributions', label: 'Show Contributions', description: 'Display your articles and comments publicly', enabled: true },
-  { id: 'search', label: 'Appear in Search', description: 'Allow your profile to appear in search results', enabled: true },
-  { id: 'analytics', label: 'Usage Analytics', description: 'Help improve the platform with anonymous usage data', enabled: false }
+const privacySettingsState = ref({
+  profile: true,
+  activity: true,
+  contributions: true,
+  search: true,
+  analytics: false
+})
+
+const privacySettings = computed(() => [
+  { id: 'profile', label: t('settings.privacyOptions.publicProfile'), description: t('settings.privacyOptions.publicProfileDesc'), enabled: privacySettingsState.value.profile },
+  { id: 'activity', label: t('settings.privacyOptions.showActivity'), description: t('settings.privacyOptions.showActivityDesc'), enabled: privacySettingsState.value.activity },
+  { id: 'contributions', label: t('settings.privacyOptions.showContributions'), description: t('settings.privacyOptions.showContributionsDesc'), enabled: privacySettingsState.value.contributions },
+  { id: 'search', label: t('settings.privacyOptions.appearInSearch'), description: t('settings.privacyOptions.appearInSearchDesc'), enabled: privacySettingsState.value.search },
+  { id: 'analytics', label: t('settings.privacyOptions.usageAnalytics'), description: t('settings.privacyOptions.usageAnalyticsDesc'), enabled: privacySettingsState.value.analytics }
 ])
 
 // Appearance settings
@@ -102,10 +119,10 @@ const appearance = ref({
 })
 
 // Themes
-const themes = ref([
-  { id: 'light', label: 'Light', icon: 'fas fa-sun' },
-  { id: 'dark', label: 'Dark', icon: 'fas fa-moon' },
-  { id: 'system', label: 'System', icon: 'fas fa-laptop' }
+const themes = computed(() => [
+  { id: 'light', label: t('settings.themes.light'), icon: 'fas fa-sun' },
+  { id: 'dark', label: t('settings.themes.dark'), icon: 'fas fa-moon' },
+  { id: 'system', label: t('settings.themes.system'), icon: 'fas fa-laptop' }
 ])
 
 // Accent colors
@@ -146,42 +163,42 @@ const connectedApps = ref([
 ])
 
 // Keyboard shortcuts
-const keyboardShortcuts = ref([
+const keyboardShortcuts = computed(() => [
   {
-    category: 'Navigation',
+    category: t('settings.shortcutCategories.navigation'),
     shortcuts: [
-      { keys: ['G', 'H'], description: 'Go to Home/Dashboard' },
-      { keys: ['G', 'A'], description: 'Go to Articles' },
-      { keys: ['G', 'D'], description: 'Go to Documents' },
-      { keys: ['G', 'E'], description: 'Go to Events' },
-      { keys: ['G', 'P'], description: 'Go to Profile' },
-      { keys: ['G', 'S'], description: 'Go to Settings' }
+      { keys: ['G', 'H'], description: t('settings.shortcuts.goToHome') },
+      { keys: ['G', 'A'], description: t('settings.shortcuts.goToArticles') },
+      { keys: ['G', 'D'], description: t('settings.shortcuts.goToDocuments') },
+      { keys: ['G', 'E'], description: t('settings.shortcuts.goToEvents') },
+      { keys: ['G', 'P'], description: t('settings.shortcuts.goToProfile') },
+      { keys: ['G', 'S'], description: t('settings.shortcuts.goToSettings') }
     ]
   },
   {
-    category: 'Search & Actions',
+    category: t('settings.shortcutCategories.searchActions'),
     shortcuts: [
-      { keys: ['/', ''], description: 'Focus search bar' },
-      { keys: ['Ctrl', 'K'], description: 'Open command palette' },
-      { keys: ['N'], description: 'Create new item' },
-      { keys: ['Esc'], description: 'Close modal/dialog' }
+      { keys: ['/', ''], description: t('settings.shortcuts.focusSearch') },
+      { keys: ['Ctrl', 'K'], description: t('settings.shortcuts.openCommandPalette') },
+      { keys: ['N'], description: t('settings.shortcuts.createNewItem') },
+      { keys: ['Esc'], description: t('settings.shortcuts.closeModal') }
     ]
   },
   {
-    category: 'Content',
+    category: t('settings.shortcutCategories.content'),
     shortcuts: [
-      { keys: ['E'], description: 'Edit current item' },
-      { keys: ['B'], description: 'Bookmark item' },
-      { keys: ['S'], description: 'Share item' },
-      { keys: ['Ctrl', 'Enter'], description: 'Submit/Save form' }
+      { keys: ['E'], description: t('settings.shortcuts.editItem') },
+      { keys: ['B'], description: t('settings.shortcuts.bookmarkItem') },
+      { keys: ['S'], description: t('settings.shortcuts.shareItem') },
+      { keys: ['Ctrl', 'Enter'], description: t('settings.shortcuts.submitForm') }
     ]
   },
   {
-    category: 'AI Features',
+    category: t('settings.shortcutCategories.aiFeatures'),
     shortcuts: [
-      { keys: ['Ctrl', 'Shift', 'A'], description: 'Open AI Assistant' },
-      { keys: ['Ctrl', 'Shift', 'S'], description: 'AI Summarize selection' },
-      { keys: ['Ctrl', 'Shift', 'T'], description: 'AI Translate selection' }
+      { keys: ['Ctrl', 'Shift', 'A'], description: t('settings.shortcuts.openAIAssistant') },
+      { keys: ['Ctrl', 'Shift', 'S'], description: t('settings.shortcuts.aiSummarize') },
+      { keys: ['Ctrl', 'Shift', 'T'], description: t('settings.shortcuts.aiTranslate') }
     ]
   }
 ])
@@ -217,62 +234,74 @@ interface AITranslationLanguage {
   nativeName: string
 }
 
+// AI Feature Toggles State
+const aiFeatureStates = ref({
+  suggestions: true,
+  summarization: true,
+  translation: true,
+  chatbot: true,
+  classification: true,
+  ocr: true,
+  sentiment: false,
+  recommendations: true
+})
+
 // AI Feature Toggles
-const aiFeatureToggles = ref<AIFeatureToggle[]>([
+const aiFeatureToggles = computed<AIFeatureToggle[]>(() => [
   {
     id: 'suggestions',
-    label: 'Smart Suggestions',
-    description: 'Get AI-powered suggestions while creating content',
-    enabled: true,
+    label: t('settings.aiFeatureToggles.smartSuggestions'),
+    description: t('settings.aiFeatureToggles.smartSuggestionsDesc'),
+    enabled: aiFeatureStates.value.suggestions,
     icon: 'fas fa-lightbulb'
   },
   {
     id: 'summarization',
-    label: 'Auto Summarization',
-    description: 'Automatically generate summaries for long content',
-    enabled: true,
+    label: t('settings.aiFeatureToggles.autoSummarization'),
+    description: t('settings.aiFeatureToggles.autoSummarizationDesc'),
+    enabled: aiFeatureStates.value.summarization,
     icon: 'fas fa-compress-alt'
   },
   {
     id: 'translation',
-    label: 'AI Translation',
-    description: 'Translate content to different languages using AI',
-    enabled: true,
+    label: t('settings.aiFeatureToggles.aiTranslation'),
+    description: t('settings.aiFeatureToggles.aiTranslationDesc'),
+    enabled: aiFeatureStates.value.translation,
     icon: 'fas fa-language'
   },
   {
     id: 'chatbot',
-    label: 'AI Assistant Chat',
-    description: 'Enable the AI chatbot for questions and assistance',
-    enabled: true,
+    label: t('settings.aiFeatureToggles.aiAssistantChat'),
+    description: t('settings.aiFeatureToggles.aiAssistantChatDesc'),
+    enabled: aiFeatureStates.value.chatbot,
     icon: 'fas fa-robot'
   },
   {
     id: 'classification',
-    label: 'Auto Classification',
-    description: 'Automatically categorize and tag uploaded content',
-    enabled: true,
+    label: t('settings.aiFeatureToggles.autoClassification'),
+    description: t('settings.aiFeatureToggles.autoClassificationDesc'),
+    enabled: aiFeatureStates.value.classification,
     icon: 'fas fa-tags'
   },
   {
     id: 'ocr',
-    label: 'Document OCR',
-    description: 'Extract text from images and scanned documents',
-    enabled: true,
+    label: t('settings.aiFeatureToggles.documentOCR'),
+    description: t('settings.aiFeatureToggles.documentOCRDesc'),
+    enabled: aiFeatureStates.value.ocr,
     icon: 'fas fa-file-image'
   },
   {
     id: 'sentiment',
-    label: 'Sentiment Analysis',
-    description: 'Analyze emotional tone in feedback and comments',
-    enabled: false,
+    label: t('settings.aiFeatureToggles.sentimentAnalysis'),
+    description: t('settings.aiFeatureToggles.sentimentAnalysisDesc'),
+    enabled: aiFeatureStates.value.sentiment,
     icon: 'fas fa-smile'
   },
   {
     id: 'recommendations',
-    label: 'Personalized Recommendations',
-    description: 'Get AI-powered content recommendations based on your activity',
-    enabled: true,
+    label: t('settings.aiFeatureToggles.personalizedRecommendations'),
+    description: t('settings.aiFeatureToggles.personalizedRecommendationsDesc'),
+    enabled: aiFeatureStates.value.recommendations,
     icon: 'fas fa-star'
   }
 ])
@@ -302,10 +331,10 @@ const aiPreferences = ref({
 })
 
 // Summary Length Options
-const summaryLengthOptions = ref([
-  { id: 'brief', label: 'Brief', description: '2-3 sentences' },
-  { id: 'medium', label: 'Medium', description: '1-2 paragraphs' },
-  { id: 'detailed', label: 'Detailed', description: 'Comprehensive summary' }
+const summaryLengthOptions = computed(() => [
+  { id: 'brief', label: t('settings.summaryLengthOptions.brief'), description: t('settings.summaryLengthOptions.briefDesc') },
+  { id: 'medium', label: t('settings.summaryLengthOptions.medium'), description: t('settings.summaryLengthOptions.mediumDesc') },
+  { id: 'detailed', label: t('settings.summaryLengthOptions.detailed'), description: t('settings.summaryLengthOptions.detailedDesc') }
 ])
 
 // AI Usage Stats (Mock)
@@ -378,7 +407,7 @@ function changePassword() {
   <div class="min-h-screen px-6 py-6">
     <!-- Loading State -->
     <div v-if="isLoading" class="flex items-center justify-center min-h-[60vh]">
-      <LoadingSpinner size="lg" text="Loading settings..." />
+      <LoadingSpinner size="lg" :text="$t('settings.loadingSettings')" />
     </div>
 
     <div v-else>
@@ -482,7 +511,7 @@ function changePassword() {
                 :key="tab.id"
                 @click="activeTab = tab.id"
                 :class="[
-                  'w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition-all ripple list-item-animated',
+                  'w-full flex items-center gap-3 px-4 py-3 rounded-xl text-start transition-all ripple list-item-animated',
                   activeTab === tab.id ? 'bg-teal-500 text-white' : 'text-teal-700 hover:bg-teal-50'
                 ]"
                 :style="{ animationDelay: `${0.2 + index * 0.05}s` }"
@@ -499,8 +528,8 @@ function changePassword() {
           <!-- Account Settings -->
           <div v-if="activeTab === 'account'" class="card-animated rounded-2xl overflow-hidden fade-in-up" style="animation-delay: 0.2s;">
             <div class="p-6 border-b border-teal-100">
-              <h2 class="text-lg font-semibold text-teal-900">Account Settings</h2>
-              <p class="text-sm text-teal-500">Manage your account information</p>
+              <h2 class="text-lg font-semibold text-teal-900">{{ $t('settings.accountSettings') }}</h2>
+              <p class="text-sm text-teal-500">{{ $t('settings.manageAccountInfo') }}</p>
             </div>
             <div class="p-6 space-y-6">
               <div class="flex items-center gap-6">
@@ -513,35 +542,35 @@ function changePassword() {
                   </button>
                 </div>
                 <div>
-                  <p class="font-medium text-teal-900">Profile Photo</p>
-                  <p class="text-sm text-teal-500 mb-2">JPG, PNG or GIF. Max 2MB</p>
-                  <button class="btn btn-secondary btn-sm ripple">Upload Photo</button>
+                  <p class="font-medium text-teal-900">{{ $t('settings.profilePhoto') }}</p>
+                  <p class="text-sm text-teal-500 mb-2">{{ $t('settings.photoHint') }}</p>
+                  <button class="btn btn-secondary btn-sm ripple">{{ $t('settings.uploadPhoto') }}</button>
                 </div>
               </div>
 
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label class="block text-sm font-medium text-teal-700 mb-2">First Name</label>
+                  <label class="block text-sm font-medium text-teal-700 mb-2">{{ $t('settings.firstName') }}</label>
                   <input type="text" v-model="account.firstName" class="input">
                 </div>
                 <div>
-                  <label class="block text-sm font-medium text-teal-700 mb-2">Last Name</label>
+                  <label class="block text-sm font-medium text-teal-700 mb-2">{{ $t('settings.lastName') }}</label>
                   <input type="text" v-model="account.lastName" class="input">
                 </div>
               </div>
 
               <div>
-                <label class="block text-sm font-medium text-teal-700 mb-2">Email Address</label>
+                <label class="block text-sm font-medium text-teal-700 mb-2">{{ $t('settings.emailAddress') }}</label>
                 <input type="email" v-model="account.email" class="input">
               </div>
 
               <div>
-                <label class="block text-sm font-medium text-teal-700 mb-2">Phone Number</label>
+                <label class="block text-sm font-medium text-teal-700 mb-2">{{ $t('settings.phoneNumber') }}</label>
                 <input type="tel" v-model="account.phone" class="input">
               </div>
 
               <div>
-                <label class="block text-sm font-medium text-teal-700 mb-2">Time Zone</label>
+                <label class="block text-sm font-medium text-teal-700 mb-2">{{ $t('settings.timeZone') }}</label>
                 <select v-model="account.timezone" class="input">
                   <option value="UTC+4">Gulf Standard Time (UTC+4)</option>
                   <option value="UTC+0">UTC</option>
@@ -551,8 +580,8 @@ function changePassword() {
               </div>
 
               <div class="pt-4 border-t border-teal-100 flex justify-end gap-3">
-                <button class="btn btn-secondary ripple">Cancel</button>
-                <button class="btn-vibrant ripple">Save Changes</button>
+                <button class="btn btn-secondary ripple">{{ $t('settings.cancel') }}</button>
+                <button class="btn-vibrant ripple">{{ $t('settings.saveChanges') }}</button>
               </div>
             </div>
           </div>
@@ -568,14 +597,14 @@ function changePassword() {
                       <i class="fas fa-wand-magic-sparkles text-white text-2xl"></i>
                     </div>
                     <div>
-                      <h2 class="text-xl font-semibold text-white">AI Settings</h2>
-                      <p class="text-teal-100">Manage your AI features and preferences</p>
+                      <h2 class="text-xl font-semibold text-white">{{ $t('settings.aiSettings') }}</h2>
+                      <p class="text-teal-100">{{ $t('settings.manageAIFeatures') }}</p>
                     </div>
                   </div>
                   <button @click="testAIConnection"
                           class="px-4 py-2 bg-white/20 backdrop-blur text-white rounded-xl font-medium text-sm hover:bg-white/30 transition-all flex items-center gap-2">
                     <i class="fas fa-plug"></i>
-                    Test Connection
+                    {{ $t('settings.testConnection') }}
                   </button>
                 </div>
 
@@ -583,19 +612,19 @@ function changePassword() {
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
                   <div class="bg-white/10 backdrop-blur rounded-xl p-3 text-center">
                     <p class="text-2xl font-bold text-white">{{ aiUsageStats.summariesGenerated }}</p>
-                    <p class="text-xs text-teal-100">Summaries</p>
+                    <p class="text-xs text-teal-100">{{ $t('settings.aiUsageStats.summaries') }}</p>
                   </div>
                   <div class="bg-white/10 backdrop-blur rounded-xl p-3 text-center">
                     <p class="text-2xl font-bold text-white">{{ aiUsageStats.translationsPerformed }}</p>
-                    <p class="text-xs text-teal-100">Translations</p>
+                    <p class="text-xs text-teal-100">{{ $t('settings.aiUsageStats.translations') }}</p>
                   </div>
                   <div class="bg-white/10 backdrop-blur rounded-xl p-3 text-center">
                     <p class="text-2xl font-bold text-white">{{ aiUsageStats.chatMessages }}</p>
-                    <p class="text-xs text-teal-100">Chat Messages</p>
+                    <p class="text-xs text-teal-100">{{ $t('settings.aiUsageStats.chatMessages') }}</p>
                   </div>
                   <div class="bg-white/10 backdrop-blur rounded-xl p-3 text-center">
                     <p class="text-2xl font-bold text-white">{{ aiUsageStats.documentsScanned }}</p>
-                    <p class="text-xs text-teal-100">OCR Scans</p>
+                    <p class="text-xs text-teal-100">{{ $t('settings.aiUsageStats.ocrScans') }}</p>
                   </div>
                 </div>
               </div>
@@ -604,8 +633,8 @@ function changePassword() {
             <!-- AI Feature Toggles -->
             <div class="card-animated rounded-2xl overflow-hidden fade-in-up" style="animation-delay: 0.3s;">
               <div class="p-6 border-b border-teal-100">
-                <h3 class="text-lg font-semibold text-teal-900">AI Features</h3>
-                <p class="text-sm text-teal-500">Enable or disable specific AI capabilities</p>
+                <h3 class="text-lg font-semibold text-teal-900">{{ $t('settings.aiFeatures') }}</h3>
+                <p class="text-sm text-teal-500">{{ $t('settings.enableDisableAI') }}</p>
               </div>
               <div class="p-6 space-y-4">
                 <div v-for="feature in aiFeatureToggles" :key="feature.id"
@@ -630,22 +659,22 @@ function changePassword() {
             <!-- Translation Preferences -->
             <div class="card-animated rounded-2xl overflow-hidden fade-in-up" style="animation-delay: 0.4s;">
               <div class="p-6 border-b border-teal-100">
-                <h3 class="text-lg font-semibold text-teal-900">Translation Preferences</h3>
-                <p class="text-sm text-teal-500">Configure your preferred languages for AI translation</p>
+                <h3 class="text-lg font-semibold text-teal-900">{{ $t('settings.translationPreferences') }}</h3>
+                <p class="text-sm text-teal-500">{{ $t('settings.configureLanguages') }}</p>
               </div>
               <div class="p-6 space-y-6">
                 <div>
-                  <label class="block text-sm font-medium text-teal-700 mb-2">Default Translation Language</label>
+                  <label class="block text-sm font-medium text-teal-700 mb-2">{{ $t('settings.defaultTranslationLanguage') }}</label>
                   <select v-model="aiPreferences.defaultTranslationLanguage" class="input">
                     <option v-for="lang in aiTranslationLanguages" :key="lang.code" :value="lang.code">
                       {{ lang.name }} ({{ lang.nativeName }})
                     </option>
                   </select>
-                  <p class="text-xs text-teal-500 mt-1">Content will be translated to this language by default</p>
+                  <p class="text-xs text-teal-500 mt-1">{{ $t('settings.translationLanguageHint') }}</p>
                 </div>
 
                 <div>
-                  <label class="block text-sm font-medium text-teal-700 mb-3">Preferred Summary Length</label>
+                  <label class="block text-sm font-medium text-teal-700 mb-3">{{ $t('settings.preferredSummaryLength') }}</label>
                   <div class="grid grid-cols-3 gap-4">
                     <label v-for="option in summaryLengthOptions" :key="option.id"
                            :class="[
@@ -664,27 +693,27 @@ function changePassword() {
             <!-- AI Behavior Preferences -->
             <div class="card-animated rounded-2xl overflow-hidden fade-in-up" style="animation-delay: 0.5s;">
               <div class="p-6 border-b border-teal-100">
-                <h3 class="text-lg font-semibold text-teal-900">AI Behavior</h3>
-                <p class="text-sm text-teal-500">Customize how AI features work for you</p>
+                <h3 class="text-lg font-semibold text-teal-900">{{ $t('settings.aiBehavior') }}</h3>
+                <p class="text-sm text-teal-500">{{ $t('settings.customizeAIBehavior') }}</p>
               </div>
               <div class="p-6 space-y-6">
                 <!-- Confidence Threshold -->
                 <div>
                   <div class="flex items-center justify-between mb-2">
-                    <label class="text-sm font-medium text-teal-700">Confidence Threshold</label>
+                    <label class="text-sm font-medium text-teal-700">{{ $t('settings.confidenceThreshold') }}</label>
                     <span class="text-sm font-medium text-teal-600">{{ Math.round(aiPreferences.confidenceThreshold * 100) }}%</span>
                   </div>
                   <input type="range" v-model.number="aiPreferences.confidenceThreshold" min="0.5" max="0.95" step="0.05"
                          class="w-full h-2 bg-teal-100 rounded-lg appearance-none cursor-pointer">
-                  <p class="text-xs text-teal-500 mt-1">Only show AI suggestions with confidence above this threshold</p>
+                  <p class="text-xs text-teal-500 mt-1">{{ $t('settings.confidenceThresholdHint') }}</p>
                 </div>
 
                 <!-- Toggle Preferences -->
                 <div class="space-y-4">
                   <div class="flex items-center justify-between py-3 border-b border-teal-100">
                     <div>
-                      <p class="font-medium text-teal-800">Show Confidence Scores</p>
-                      <p class="text-sm text-teal-500">Display AI confidence levels on suggestions</p>
+                      <p class="font-medium text-teal-800">{{ $t('settings.showConfidenceScores') }}</p>
+                      <p class="text-sm text-teal-500">{{ $t('settings.showConfidenceScoresDesc') }}</p>
                     </div>
                     <label class="toggle">
                       <input type="checkbox" v-model="aiPreferences.showConfidenceScores">
@@ -694,8 +723,8 @@ function changePassword() {
 
                   <div class="flex items-center justify-between py-3 border-b border-teal-100">
                     <div>
-                      <p class="font-medium text-teal-800">Auto-Apply Suggestions</p>
-                      <p class="text-sm text-teal-500">Automatically apply high-confidence suggestions</p>
+                      <p class="font-medium text-teal-800">{{ $t('settings.autoApplySuggestions') }}</p>
+                      <p class="text-sm text-teal-500">{{ $t('settings.autoApplySuggestionsDesc') }}</p>
                     </div>
                     <label class="toggle">
                       <input type="checkbox" v-model="aiPreferences.autoApplySuggestions">
@@ -705,8 +734,8 @@ function changePassword() {
 
                   <div class="flex items-center justify-between py-3">
                     <div>
-                      <p class="font-medium text-teal-800">AI Data Usage Consent</p>
-                      <p class="text-sm text-teal-500">Allow your interactions to improve AI models</p>
+                      <p class="font-medium text-teal-800">{{ $t('settings.aiDataUsageConsent') }}</p>
+                      <p class="text-sm text-teal-500">{{ $t('settings.aiDataUsageConsentDesc') }}</p>
                     </div>
                     <label class="toggle">
                       <input type="checkbox" v-model="aiPreferences.dataUsageConsent">
@@ -720,8 +749,8 @@ function changePassword() {
             <!-- Data & Privacy -->
             <div class="card-animated rounded-2xl overflow-hidden fade-in-up" style="animation-delay: 0.6s;">
               <div class="p-6 border-b border-teal-100">
-                <h3 class="text-lg font-semibold text-teal-900">AI Data & Privacy</h3>
-                <p class="text-sm text-teal-500">Manage your AI interaction data</p>
+                <h3 class="text-lg font-semibold text-teal-900">{{ $t('settings.aiDataPrivacy') }}</h3>
+                <p class="text-sm text-teal-500">{{ $t('settings.manageAIData') }}</p>
               </div>
               <div class="p-6 space-y-4">
                 <div class="p-4 bg-teal-50 rounded-xl">
@@ -730,15 +759,15 @@ function changePassword() {
                       <i class="fas fa-database text-teal-600"></i>
                     </div>
                     <div class="flex-1">
-                      <p class="font-medium text-teal-900">AI Interaction History</p>
-                      <p class="text-sm text-teal-600 mb-3">Your AI chat history, summaries, and translations are stored locally for personalization.</p>
+                      <p class="font-medium text-teal-900">{{ $t('settings.aiInteractionHistory') }}</p>
+                      <p class="text-sm text-teal-600 mb-3">{{ $t('settings.aiInteractionHistoryDesc') }}</p>
                       <div class="flex gap-3">
                         <button class="px-4 py-2 text-sm font-medium text-teal-600 bg-white rounded-lg hover:bg-teal-100 transition-colors">
-                          <i class="fas fa-download mr-2"></i>Export Data
+                          <i class="fas fa-download mr-2"></i>{{ $t('settings.exportData') }}
                         </button>
                         <button @click="clearAIHistory"
                                 class="px-4 py-2 text-sm font-medium text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition-colors">
-                          <i class="fas fa-trash mr-2"></i>Clear History
+                          <i class="fas fa-trash mr-2"></i>{{ $t('settings.clearHistory') }}
                         </button>
                       </div>
                     </div>
@@ -749,8 +778,8 @@ function changePassword() {
                   <div class="flex items-start gap-3">
                     <i class="fas fa-info-circle text-blue-500 mt-0.5"></i>
                     <div>
-                      <p class="text-sm text-blue-800 font-medium">About Your AI Data</p>
-                      <p class="text-sm text-blue-600 mt-1">Your AI interactions are processed securely by the Intalio AI Engine. Personal data is never shared with third parties without your explicit consent.</p>
+                      <p class="text-sm text-blue-800 font-medium">{{ $t('settings.aboutAIData') }}</p>
+                      <p class="text-sm text-blue-600 mt-1">{{ $t('settings.aboutAIDataDesc') }}</p>
                     </div>
                   </div>
                 </div>
@@ -760,10 +789,10 @@ function changePassword() {
             <!-- Actions -->
             <div class="flex justify-end gap-3 pt-4">
               <button @click="resetAISettings" class="btn btn-secondary ripple">
-                <i class="fas fa-undo mr-2"></i>Reset to Defaults
+                <i class="fas fa-undo mr-2"></i>{{ $t('settings.resetToDefaults') }}
               </button>
               <button @click="saveAISettings" class="btn-vibrant ripple">
-                <i class="fas fa-check mr-2"></i>Save AI Settings
+                <i class="fas fa-check mr-2"></i>{{ $t('settings.saveAISettings') }}
               </button>
             </div>
           </div>
@@ -771,8 +800,8 @@ function changePassword() {
           <!-- Notifications -->
           <div v-if="activeTab === 'notifications'" class="card-animated rounded-2xl overflow-hidden fade-in-up" style="animation-delay: 0.2s;">
             <div class="p-6 border-b border-teal-100">
-              <h2 class="text-lg font-semibold text-teal-900">Notification Preferences</h2>
-              <p class="text-sm text-teal-500">Choose how you want to be notified</p>
+              <h2 class="text-lg font-semibold text-teal-900">{{ $t('settings.notificationPreferences') }}</h2>
+              <p class="text-sm text-teal-500">{{ $t('settings.chooseNotifications') }}</p>
             </div>
             <div class="p-6 space-y-6">
               <div v-for="category in notifications" :key="category.id" class="border-b border-teal-100 last:border-0 pb-6 last:pb-0">
@@ -789,23 +818,23 @@ function changePassword() {
                     </div>
                     <div class="flex items-center gap-4">
                       <label class="toggle">
-                        <input type="checkbox" v-model="item.email">
+                        <input type="checkbox" v-model="notificationSettings[item.id as keyof typeof notificationSettings].email">
                         <span class="toggle-slider"></span>
                       </label>
-                      <span class="text-xs text-teal-500 w-12">Email</span>
+                      <span class="text-xs text-teal-500 w-12">{{ $t('settings.email') }}</span>
                       <label class="toggle">
-                        <input type="checkbox" v-model="item.push">
+                        <input type="checkbox" v-model="notificationSettings[item.id as keyof typeof notificationSettings].push">
                         <span class="toggle-slider"></span>
                       </label>
-                      <span class="text-xs text-teal-500 w-12">Push</span>
+                      <span class="text-xs text-teal-500 w-12">{{ $t('settings.push') }}</span>
                     </div>
                   </div>
                 </div>
               </div>
 
               <div class="pt-4 flex justify-end gap-3">
-                <button class="btn btn-secondary ripple">Reset to Default</button>
-                <button class="btn-vibrant ripple">Save Preferences</button>
+                <button class="btn btn-secondary ripple">{{ $t('settings.resetToDefault') }}</button>
+                <button class="btn-vibrant ripple">{{ $t('settings.savePreferences') }}</button>
               </div>
             </div>
           </div>
@@ -813,8 +842,8 @@ function changePassword() {
           <!-- Privacy -->
           <div v-if="activeTab === 'privacy'" class="card-animated rounded-2xl overflow-hidden fade-in-up" style="animation-delay: 0.2s;">
             <div class="p-6 border-b border-teal-100">
-              <h2 class="text-lg font-semibold text-teal-900">Privacy Settings</h2>
-              <p class="text-sm text-teal-500">Control your privacy and visibility</p>
+              <h2 class="text-lg font-semibold text-teal-900">{{ $t('settings.privacySettings') }}</h2>
+              <p class="text-sm text-teal-500">{{ $t('settings.controlPrivacy') }}</p>
             </div>
             <div class="p-6 space-y-6">
               <div
@@ -827,15 +856,15 @@ function changePassword() {
                   <p class="text-sm text-teal-500">{{ setting.description }}</p>
                 </div>
                 <label class="toggle">
-                  <input type="checkbox" v-model="setting.enabled">
+                  <input type="checkbox" v-model="privacySettingsState[setting.id as keyof typeof privacySettingsState]">
                   <span class="toggle-slider"></span>
                 </label>
               </div>
 
               <div class="p-4 bg-red-50 rounded-xl border border-red-200">
-                <h4 class="font-medium text-red-800 mb-2"><i class="fas fa-exclamation-triangle mr-2 icon-soft"></i>Danger Zone</h4>
-                <p class="text-sm text-red-600 mb-3">Permanently delete your account and all data</p>
-                <button class="btn bg-red-500 hover:bg-red-600 text-white btn-sm ripple">Delete Account</button>
+                <h4 class="font-medium text-red-800 mb-2"><i class="fas fa-exclamation-triangle mr-2 icon-soft"></i>{{ $t('settings.dangerZone') }}</h4>
+                <p class="text-sm text-red-600 mb-3">{{ $t('settings.deleteAccountWarning') }}</p>
+                <button class="btn bg-red-500 hover:bg-red-600 text-white btn-sm ripple">{{ $t('settings.deleteAccount') }}</button>
               </div>
             </div>
           </div>
@@ -843,12 +872,12 @@ function changePassword() {
           <!-- Appearance -->
           <div v-if="activeTab === 'appearance'" class="card-animated rounded-2xl overflow-hidden fade-in-up" style="animation-delay: 0.2s;">
             <div class="p-6 border-b border-teal-100">
-              <h2 class="text-lg font-semibold text-teal-900">Appearance</h2>
-              <p class="text-sm text-teal-500">Customize how the app looks</p>
+              <h2 class="text-lg font-semibold text-teal-900">{{ $t('settings.appearanceSettings') }}</h2>
+              <p class="text-sm text-teal-500">{{ $t('settings.customizeAppearance') }}</p>
             </div>
             <div class="p-6 space-y-6">
               <div>
-                <label class="block text-sm font-medium text-teal-700 mb-3">Theme</label>
+                <label class="block text-sm font-medium text-teal-700 mb-3">{{ $t('settings.theme') }}</label>
                 <div class="grid grid-cols-3 gap-4">
                   <label
                     v-for="theme in themes"
@@ -866,7 +895,7 @@ function changePassword() {
               </div>
 
               <div>
-                <label class="block text-sm font-medium text-teal-700 mb-3">Accent Color</label>
+                <label class="block text-sm font-medium text-teal-700 mb-3">{{ $t('settings.accentColor') }}</label>
                 <div class="flex gap-3">
                   <button
                     v-for="color in accentColors"
@@ -882,7 +911,7 @@ function changePassword() {
               </div>
 
               <div>
-                <label class="block text-sm font-medium text-teal-700 mb-3">Font Size</label>
+                <label class="block text-sm font-medium text-teal-700 mb-3">{{ $t('settings.fontSize') }}</label>
                 <div class="flex items-center gap-4">
                   <span class="text-sm text-teal-500">A</span>
                   <input type="range" v-model="appearance.fontSize" min="12" max="20" class="flex-1 h-2 bg-teal-100 rounded-lg appearance-none cursor-pointer">
@@ -893,8 +922,8 @@ function changePassword() {
 
               <div class="flex items-center justify-between py-3">
                 <div>
-                  <p class="font-medium text-teal-800">Compact Mode</p>
-                  <p class="text-sm text-teal-500">Reduce spacing and padding</p>
+                  <p class="font-medium text-teal-800">{{ $t('settings.compactMode') }}</p>
+                  <p class="text-sm text-teal-500">{{ $t('settings.compactModeDesc') }}</p>
                 </div>
                 <label class="toggle">
                   <input type="checkbox" v-model="appearance.compact">
@@ -904,8 +933,8 @@ function changePassword() {
 
               <div class="flex items-center justify-between py-3">
                 <div>
-                  <p class="font-medium text-teal-800">Animations</p>
-                  <p class="text-sm text-teal-500">Enable interface animations</p>
+                  <p class="font-medium text-teal-800">{{ $t('settings.animations') }}</p>
+                  <p class="text-sm text-teal-500">{{ $t('settings.animationsDesc') }}</p>
                 </div>
                 <label class="toggle">
                   <input type="checkbox" v-model="appearance.animations">
@@ -914,8 +943,8 @@ function changePassword() {
               </div>
 
               <div class="pt-4 border-t border-teal-100 flex justify-end gap-3">
-                <button class="btn btn-secondary ripple">Reset to Default</button>
-                <button class="btn-vibrant ripple">Save Changes</button>
+                <button class="btn btn-secondary ripple">{{ $t('settings.resetToDefault') }}</button>
+                <button class="btn-vibrant ripple">{{ $t('settings.saveChanges') }}</button>
               </div>
             </div>
           </div>
@@ -923,12 +952,12 @@ function changePassword() {
           <!-- Language -->
           <div v-if="activeTab === 'language'" class="card-animated rounded-2xl overflow-hidden fade-in-up" style="animation-delay: 0.2s;">
             <div class="p-6 border-b border-teal-100">
-              <h2 class="text-lg font-semibold text-teal-900">Language & Region</h2>
-              <p class="text-sm text-teal-500">Set your language and regional preferences</p>
+              <h2 class="text-lg font-semibold text-teal-900">{{ $t('settings.languageRegion') }}</h2>
+              <p class="text-sm text-teal-500">{{ $t('settings.languagePreferences') }}</p>
             </div>
             <div class="p-6 space-y-6">
               <div>
-                <label class="block text-sm font-medium text-teal-700 mb-2">Display Language</label>
+                <label class="block text-sm font-medium text-teal-700 mb-2">{{ $t('settings.displayLanguage') }}</label>
                 <select v-model="language.display" class="input">
                   <option value="en">English (US)</option>
                   <option value="ar">Arabic</option>
@@ -939,7 +968,7 @@ function changePassword() {
               </div>
 
               <div>
-                <label class="block text-sm font-medium text-teal-700 mb-2">Date Format</label>
+                <label class="block text-sm font-medium text-teal-700 mb-2">{{ $t('settings.dateFormat') }}</label>
                 <select v-model="language.dateFormat" class="input">
                   <option value="mdy">MM/DD/YYYY</option>
                   <option value="dmy">DD/MM/YYYY</option>
@@ -948,7 +977,7 @@ function changePassword() {
               </div>
 
               <div>
-                <label class="block text-sm font-medium text-teal-700 mb-2">Time Format</label>
+                <label class="block text-sm font-medium text-teal-700 mb-2">{{ $t('settings.timeFormat') }}</label>
                 <div class="flex gap-4">
                   <label
                     :class="[
@@ -957,7 +986,7 @@ function changePassword() {
                     ]"
                   >
                     <input type="radio" v-model="language.timeFormat" value="12" class="hidden">
-                    <span class="font-medium" :class="language.timeFormat === '12' ? 'text-teal-700' : 'text-teal-500'">12-hour (2:30 PM)</span>
+                    <span class="font-medium" :class="language.timeFormat === '12' ? 'text-teal-700' : 'text-teal-500'">{{ $t('settings.timeFormat12') }}</span>
                   </label>
                   <label
                     :class="[
@@ -966,23 +995,23 @@ function changePassword() {
                     ]"
                   >
                     <input type="radio" v-model="language.timeFormat" value="24" class="hidden">
-                    <span class="font-medium" :class="language.timeFormat === '24' ? 'text-teal-700' : 'text-teal-500'">24-hour (14:30)</span>
+                    <span class="font-medium" :class="language.timeFormat === '24' ? 'text-teal-700' : 'text-teal-500'">{{ $t('settings.timeFormat24') }}</span>
                   </label>
                 </div>
               </div>
 
               <div>
-                <label class="block text-sm font-medium text-teal-700 mb-2">First Day of Week</label>
+                <label class="block text-sm font-medium text-teal-700 mb-2">{{ $t('settings.firstDayOfWeek') }}</label>
                 <select v-model="language.firstDay" class="input">
-                  <option value="sunday">Sunday</option>
-                  <option value="monday">Monday</option>
-                  <option value="saturday">Saturday</option>
+                  <option value="sunday">{{ $t('settings.weekDays.sunday') }}</option>
+                  <option value="monday">{{ $t('settings.weekDays.monday') }}</option>
+                  <option value="saturday">{{ $t('settings.weekDays.saturday') }}</option>
                 </select>
               </div>
 
               <div class="pt-4 border-t border-teal-100 flex justify-end gap-3">
-                <button class="btn btn-secondary ripple">Cancel</button>
-                <button class="btn-vibrant ripple">Save Changes</button>
+                <button class="btn btn-secondary ripple">{{ $t('settings.cancel') }}</button>
+                <button class="btn-vibrant ripple">{{ $t('settings.saveChanges') }}</button>
               </div>
             </div>
           </div>
@@ -990,18 +1019,18 @@ function changePassword() {
           <!-- Security -->
           <div v-if="activeTab === 'security'" class="card-animated rounded-2xl overflow-hidden fade-in-up" style="animation-delay: 0.2s;">
             <div class="p-6 border-b border-teal-100">
-              <h2 class="text-lg font-semibold text-teal-900">Security</h2>
-              <p class="text-sm text-teal-500">Manage your security settings</p>
+              <h2 class="text-lg font-semibold text-teal-900">{{ $t('settings.securitySettings') }}</h2>
+              <p class="text-sm text-teal-500">{{ $t('settings.manageSecuritySettings') }}</p>
             </div>
             <div class="p-6 space-y-6">
               <!-- Password -->
               <div class="p-4 rounded-xl bg-teal-50">
                 <div class="flex items-center justify-between mb-4">
                   <div>
-                    <h4 class="font-medium text-teal-900">Password</h4>
-                    <p class="text-sm text-teal-500">Last changed 3 months ago</p>
+                    <h4 class="font-medium text-teal-900">{{ $t('settings.password') }}</h4>
+                    <p class="text-sm text-teal-500">{{ $t('settings.lastChanged', { time: '3 months ago' }) }}</p>
                   </div>
-                  <button @click="showChangePassword = true" class="btn btn-secondary btn-sm ripple">Change Password</button>
+                  <button @click="showChangePassword = true" class="btn btn-secondary btn-sm ripple">{{ $t('settings.changePassword') }}</button>
                 </div>
               </div>
 
@@ -1009,8 +1038,8 @@ function changePassword() {
               <div class="p-4 rounded-xl bg-teal-50">
                 <div class="flex items-center justify-between">
                   <div>
-                    <h4 class="font-medium text-teal-900">Two-Factor Authentication</h4>
-                    <p class="text-sm text-teal-500">Add an extra layer of security</p>
+                    <h4 class="font-medium text-teal-900">{{ $t('settings.twoFactorAuthentication') }}</h4>
+                    <p class="text-sm text-teal-500">{{ $t('settings.addExtraSecurityLayer') }}</p>
                   </div>
                   <label class="toggle">
                     <input type="checkbox" v-model="security.twoFactor">
@@ -1021,7 +1050,7 @@ function changePassword() {
 
               <!-- Sessions -->
               <div>
-                <h4 class="font-medium text-teal-900 mb-4">Active Sessions</h4>
+                <h4 class="font-medium text-teal-900 mb-4">{{ $t('settings.activeSessions') }}</h4>
                 <div class="space-y-3">
                   <div
                     v-for="session in sessions"
@@ -1038,13 +1067,13 @@ function changePassword() {
                       </div>
                     </div>
                     <button v-if="!session.current" class="text-red-500 hover:text-red-700 text-sm font-medium">
-                      Revoke
+                      {{ $t('settings.revoke') }}
                     </button>
-                    <span v-else class="badge badge-green">Current</span>
+                    <span v-else class="badge badge-green">{{ $t('settings.current') }}</span>
                   </div>
                 </div>
                 <button class="w-full mt-3 py-2 text-center text-red-500 hover:text-red-700 font-medium">
-                  Sign out all other sessions
+                  {{ $t('settings.signOutAllSessions') }}
                 </button>
               </div>
             </div>
@@ -1053,8 +1082,8 @@ function changePassword() {
           <!-- Connected Apps -->
           <div v-if="activeTab === 'apps'" class="card-animated rounded-2xl overflow-hidden fade-in-up" style="animation-delay: 0.2s;">
             <div class="p-6 border-b border-teal-100">
-              <h2 class="text-lg font-semibold text-teal-900">Connected Apps</h2>
-              <p class="text-sm text-teal-500">Manage third-party app integrations</p>
+              <h2 class="text-lg font-semibold text-teal-900">{{ $t('settings.connectedAppsTitle') }}</h2>
+              <p class="text-sm text-teal-500">{{ $t('settings.manageIntegrations') }}</p>
             </div>
             <div class="p-6 space-y-4">
               <div
@@ -1068,14 +1097,14 @@ function changePassword() {
                   </div>
                   <div>
                     <p class="font-medium text-teal-900">{{ app.name }}</p>
-                    <p class="text-sm text-teal-500">Connected {{ app.connectedDate }}</p>
+                    <p class="text-sm text-teal-500">{{ $t('settings.connected') }} {{ app.connectedDate }}</p>
                   </div>
                 </div>
-                <button class="btn btn-secondary btn-sm text-red-500 hover:text-red-700 ripple">Disconnect</button>
+                <button class="btn btn-secondary btn-sm text-red-500 hover:text-red-700 ripple">{{ $t('settings.disconnect') }}</button>
               </div>
 
               <button class="w-full p-4 rounded-xl border-2 border-dashed border-teal-200 text-teal-500 hover:border-teal-400 hover:text-teal-700 transition-colors ripple">
-                <i class="fas fa-plus mr-2 icon-soft"></i>Connect New App
+                <i class="fas fa-plus mr-2 icon-soft"></i>{{ $t('settings.connectNewApp') }}
               </button>
             </div>
           </div>
@@ -1091,12 +1120,12 @@ function changePassword() {
                       <i class="fas fa-keyboard text-white text-2xl"></i>
                     </div>
                     <div>
-                      <h2 class="text-xl font-semibold text-white">Keyboard Shortcuts</h2>
-                      <p class="text-gray-400">Speed up your workflow with keyboard shortcuts</p>
+                      <h2 class="text-xl font-semibold text-white">{{ $t('settings.keyboardShortcuts') }}</h2>
+                      <p class="text-gray-400">{{ $t('settings.speedUpWorkflow') }}</p>
                     </div>
                   </div>
                   <div class="flex items-center gap-3">
-                    <span class="text-sm text-gray-400">Enable Shortcuts</span>
+                    <span class="text-sm text-gray-400">{{ $t('settings.enableShortcuts') }}</span>
                     <label class="toggle">
                       <input type="checkbox" v-model="shortcutsEnabled">
                       <span class="toggle-slider"></span>
@@ -1144,19 +1173,19 @@ function changePassword() {
                   <i class="fas fa-lightbulb text-blue-600"></i>
                 </div>
                 <div>
-                  <h4 class="font-medium text-teal-900 mb-2">Pro Tips</h4>
+                  <h4 class="font-medium text-teal-900 mb-2">{{ $t('settings.proTips') }}</h4>
                   <ul class="space-y-2 text-sm text-teal-600">
                     <li class="flex items-start gap-2">
                       <i class="fas fa-check text-teal-500 mt-0.5"></i>
-                      <span>Press <kbd class="px-1.5 py-0.5 bg-gray-100 border border-gray-300 rounded text-xs font-mono">?</kbd> anywhere to see available shortcuts</span>
+                      <span>{{ $t('settings.proTipsList.tip1') }}</span>
                     </li>
                     <li class="flex items-start gap-2">
                       <i class="fas fa-check text-teal-500 mt-0.5"></i>
-                      <span>Two-key shortcuts (like G + H) should be pressed in sequence, not together</span>
+                      <span>{{ $t('settings.proTipsList.tip2') }}</span>
                     </li>
                     <li class="flex items-start gap-2">
                       <i class="fas fa-check text-teal-500 mt-0.5"></i>
-                      <span>Shortcuts are disabled when typing in text fields</span>
+                      <span>{{ $t('settings.proTipsList.tip3') }}</span>
                     </li>
                   </ul>
                 </div>
@@ -1167,7 +1196,7 @@ function changePassword() {
             <div class="flex justify-end">
               <button class="px-4 py-2 bg-teal-100 text-teal-700 rounded-xl font-medium text-sm hover:bg-teal-200 transition-all flex items-center gap-2">
                 <i class="fas fa-print"></i>
-                Print Shortcut Reference
+                {{ $t('settings.printShortcuts') }}
               </button>
             </div>
           </div>
@@ -1179,27 +1208,27 @@ function changePassword() {
     <div v-if="showChangePassword" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <div class="card-animated rounded-2xl w-full max-w-md fade-in-up">
         <div class="p-5 border-b border-teal-100 flex items-center justify-between">
-          <h2 class="text-xl font-semibold text-teal-900">Change Password</h2>
+          <h2 class="text-xl font-semibold text-teal-900">{{ $t('settings.changePassword') }}</h2>
           <button @click="showChangePassword = false" class="p-2 rounded-lg hover:bg-teal-100 text-teal-500 ripple">
             <i class="fas fa-times icon-soft"></i>
           </button>
         </div>
         <form @submit.prevent="changePassword" class="p-6 space-y-4">
           <div>
-            <label class="block text-sm font-medium text-teal-700 mb-2">Current Password</label>
+            <label class="block text-sm font-medium text-teal-700 mb-2">{{ $t('settings.currentPassword') }}</label>
             <input type="password" class="input" required>
           </div>
           <div>
-            <label class="block text-sm font-medium text-teal-700 mb-2">New Password</label>
+            <label class="block text-sm font-medium text-teal-700 mb-2">{{ $t('settings.newPassword') }}</label>
             <input type="password" class="input" required>
           </div>
           <div>
-            <label class="block text-sm font-medium text-teal-700 mb-2">Confirm New Password</label>
+            <label class="block text-sm font-medium text-teal-700 mb-2">{{ $t('settings.confirmNewPassword') }}</label>
             <input type="password" class="input" required>
           </div>
           <div class="flex gap-3 pt-4">
-            <button type="button" @click="showChangePassword = false" class="btn btn-secondary flex-1 ripple">Cancel</button>
-            <button type="submit" class="btn-vibrant flex-1 ripple">Update Password</button>
+            <button type="button" @click="showChangePassword = false" class="btn btn-secondary flex-1 ripple">{{ $t('settings.cancel') }}</button>
+            <button type="submit" class="btn-vibrant flex-1 ripple">{{ $t('settings.updatePassword') }}</button>
           </div>
         </form>
       </div>
@@ -1216,8 +1245,8 @@ function changePassword() {
                   <i class="fas fa-plug text-white"></i>
                 </div>
                 <div>
-                  <h3 class="text-lg font-semibold text-gray-900">AI Connection Test</h3>
-                  <p class="text-sm text-gray-500">Testing Intalio AI Engine connection</p>
+                  <h3 class="text-lg font-semibold text-gray-900">{{ $t('settings.aiConnectionTest') }}</h3>
+                  <p class="text-sm text-gray-500">{{ $t('settings.testingConnection') }}</p>
                 </div>
               </div>
               <button @click="showAITestModal = false" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
@@ -1232,7 +1261,7 @@ function changePassword() {
                 <div class="absolute inset-0 border-4 border-teal-200 rounded-full"></div>
                 <div class="absolute inset-0 border-4 border-teal-500 rounded-full border-t-transparent animate-spin"></div>
               </div>
-              <p class="text-gray-600">Testing connection to AI services...</p>
+              <p class="text-gray-600">{{ $t('settings.testingAIServices') }}</p>
             </div>
 
             <div v-else-if="aiTestResults" class="space-y-4">
@@ -1255,7 +1284,7 @@ function changePassword() {
                     'font-semibold',
                     aiTestResults.status === 'success' ? 'text-green-800' : 'text-red-800'
                   ]">
-                    {{ aiTestResults.status === 'success' ? 'Connection Successful' : 'Connection Failed' }}
+                    {{ aiTestResults.status === 'success' ? $t('settings.connectionSuccessful') : $t('settings.connectionFailed') }}
                   </p>
                   <p :class="aiTestResults.status === 'success' ? 'text-green-600' : 'text-red-600'" class="text-sm">
                     {{ aiTestResults.message }}
@@ -1266,16 +1295,16 @@ function changePassword() {
               <!-- Details -->
               <div v-if="aiTestResults.status === 'success'" class="space-y-3">
                 <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                  <span class="text-sm text-gray-600">Service</span>
+                  <span class="text-sm text-gray-600">{{ $t('settings.service') }}</span>
                   <span class="text-sm font-medium text-gray-900">{{ aiTestResults.service }}</span>
                 </div>
                 <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                  <span class="text-sm text-gray-600">Response Time</span>
+                  <span class="text-sm text-gray-600">{{ $t('settings.responseTime') }}</span>
                   <span class="text-sm font-medium text-green-600">{{ aiTestResults.responseTime }}ms</span>
                 </div>
                 <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                  <span class="text-sm text-gray-600">Status</span>
-                  <span class="px-2 py-1 text-xs font-medium bg-green-100 text-green-700 rounded-full">Operational</span>
+                  <span class="text-sm text-gray-600">{{ $t('common.status') }}</span>
+                  <span class="px-2 py-1 text-xs font-medium bg-green-100 text-green-700 rounded-full">{{ $t('settings.operational') }}</span>
                 </div>
               </div>
             </div>
@@ -1284,11 +1313,11 @@ function changePassword() {
           <div class="p-4 border-t border-gray-100 flex justify-end gap-3">
             <button @click="testAIConnection"
                     class="px-4 py-2 text-teal-600 hover:bg-teal-50 rounded-lg transition-colors flex items-center gap-2">
-              <i class="fas fa-rotate"></i> Test Again
+              <i class="fas fa-rotate"></i> {{ $t('settings.testAgain') }}
             </button>
             <button @click="showAITestModal = false"
                     class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
-              Close
+              {{ $t('common.close') }}
             </button>
           </div>
         </div>
