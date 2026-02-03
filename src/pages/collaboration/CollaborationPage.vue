@@ -1412,7 +1412,7 @@ watch(currentMessages, () => {
               class="bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center font-bold text-sm shadow-lg border border-white/30 cursor-pointer hover:bg-white/30 transition-all duration-200"
               :class="leftPanelCollapsed ? 'w-12 h-12' : 'w-11 h-11'"
               @click="leftPanelCollapsed = !leftPanelCollapsed"
-              :title="leftPanelCollapsed ? 'Expand sidebar' : 'Collapse sidebar'"
+              :title="leftPanelCollapsed ? $t('collaboration.expandSidebar') : $t('collaboration.collapseSidebar')"
             >
               AFC
             </div>
@@ -1427,7 +1427,7 @@ watch(currentMessages, () => {
           <button
             @click="leftPanelCollapsed = !leftPanelCollapsed"
             class="p-2 hover:bg-white/10 rounded-xl transition-all duration-200 group"
-            :title="leftPanelCollapsed ? 'Expand sidebar' : 'Collapse sidebar'"
+            :title="leftPanelCollapsed ? $t('collaboration.expandSidebar') : $t('collaboration.collapseSidebar')"
           >
             <i :class="['fas text-white/70 group-hover:text-white transition-transform duration-200', leftPanelCollapsed ? 'fa-chevron-right' : 'fa-chevron-left']"></i>
           </button>
@@ -1652,7 +1652,7 @@ watch(currentMessages, () => {
                 <template v-if="!leftPanelCollapsed">
                   <div class="flex-1 text-start">
                     <span class="font-semibold truncate block">{{ team.name }}</span>
-                    <span class="text-xs text-gray-400">{{ team.memberCount }} members</span>
+                    <span class="text-xs text-gray-400">{{ team.memberCount }} {{ $t('collaboration.membersCount') }}</span>
                   </div>
                   <span
                     v-if="getTeamUnreadCount(team) > 0"
@@ -1784,7 +1784,7 @@ watch(currentMessages, () => {
           </div>
           <template v-if="!leftPanelCollapsed">
             <div class="flex-1 min-w-0">
-              <p class="text-sm font-semibold text-gray-800 truncate">You</p>
+              <p class="text-sm font-semibold text-gray-800 truncate">{{ $t('collaboration.you') }}</p>
               <p class="text-xs text-emerald-600 flex items-center gap-1">
                 <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full"></span>
                 {{ $t('collaboration.online') }}
@@ -1943,7 +1943,7 @@ watch(currentMessages, () => {
                     <div class="p-4">
                       <div class="flex items-center gap-2 mb-2">
                         <span class="px-2 py-0.5 bg-teal-100 text-teal-700 text-xs font-medium rounded-full">
-                          <i class="fas fa-calendar-alt me-1"></i>Event
+                          <i class="fas fa-calendar-alt me-1"></i>{{ $t('collaboration.event') }}
                         </span>
                       </div>
                       <h4 class="font-semibold text-gray-900 mb-1">{{ message.linkedContent.title }}</h4>
@@ -1967,7 +1967,7 @@ watch(currentMessages, () => {
                     <div class="p-4 flex-1">
                       <div class="flex items-center gap-2 mb-2">
                         <span class="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs font-medium rounded-full">
-                          <i class="fas fa-newspaper me-1"></i>Article
+                          <i class="fas fa-newspaper me-1"></i>{{ $t('collaboration.article') }}
                         </span>
                       </div>
                       <h4 class="font-semibold text-gray-900 mb-1 text-sm">{{ message.linkedContent.title }}</h4>
@@ -1986,7 +1986,7 @@ watch(currentMessages, () => {
                     <div class="flex-1">
                       <div class="flex items-center gap-2 mb-1">
                         <span class="px-2 py-0.5 bg-purple-100 text-purple-700 text-xs font-medium rounded-full">
-                          Document
+                          {{ $t('collaboration.document') }}
                         </span>
                       </div>
                       <h4 class="font-semibold text-gray-900 text-sm">{{ message.linkedContent.title }}</h4>
@@ -2057,8 +2057,8 @@ watch(currentMessages, () => {
                   class="mt-2 flex items-center gap-2 text-sm text-teal-600 hover:text-teal-700 hover:underline"
                 >
                   <i class="fas fa-comments"></i>
-                  <span>{{ message.threadCount }} {{ message.threadCount === 1 ? 'reply' : 'replies' }}</span>
-                  <span class="text-gray-400 font-normal">Last reply: {{ message.threadLastReply }}</span>
+                  <span>{{ message.threadCount }} {{ message.threadCount === 1 ? $t('collaboration.reply') : $t('collaboration.repliesCount') }}</span>
+                  <span class="text-gray-400 font-normal">{{ $t('collaboration.lastReply') }}: {{ message.threadLastReply }}</span>
                 </button>
 
                 <!-- Expanded Thread -->
@@ -2093,7 +2093,7 @@ watch(currentMessages, () => {
                         v-model="threadReplyInput"
                         @keydown.enter="sendThreadReply(message.id)"
                         type="text"
-                        placeholder="Reply in thread..."
+                        :placeholder="$t('collaboration.replyInThreadPlaceholder')"
                         class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
                       />
                     </div>
@@ -2121,7 +2121,7 @@ watch(currentMessages, () => {
                   <button
                     @click="togglePin(message.id)"
                     class="p-1.5 hover:bg-gray-100 transition-colors"
-                    :title="message.isPinned ? 'Unpin' : 'Pin'"
+                    :title="message.isPinned ? $t('collaboration.unpin') : $t('collaboration.pin')"
                   >
                     <i :class="['fas fa-thumbtack text-sm', message.isPinned ? 'text-amber-500' : 'text-gray-500']"></i>
                   </button>
@@ -2141,7 +2141,7 @@ watch(currentMessages, () => {
             <span class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 150ms"></span>
             <span class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 300ms"></span>
           </div>
-          <span>{{ typingUsers.join(', ') }} {{ typingUsers.length === 1 ? 'is' : 'are' }} typing...</span>
+          <span>{{ typingUsers.join(', ') }} {{ typingUsers.length === 1 ? $t('collaboration.isTyping') : $t('collaboration.areTyping') }}</span>
         </div>
       </div>
 
@@ -2282,11 +2282,11 @@ watch(currentMessages, () => {
     >
       <!-- Panel Header (Context Aware) -->
       <div class="h-14 px-3 border-b border-gray-200 flex items-center bg-white" :class="rightPanelCollapsed ? 'justify-center' : 'justify-between'">
-        <h3 v-if="!rightPanelCollapsed" class="font-semibold text-gray-900">{{ isViewingDM ? 'Profile' : 'Details' }}</h3>
+        <h3 v-if="!rightPanelCollapsed" class="font-semibold text-gray-900">{{ isViewingDM ? $t('collaboration.profile') : $t('collaboration.details') }}</h3>
         <button
           @click="rightPanelCollapsed = !rightPanelCollapsed"
           class="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
-          :title="rightPanelCollapsed ? 'Expand panel' : 'Collapse panel'"
+          :title="rightPanelCollapsed ? $t('collaboration.expandPanel') : $t('collaboration.collapsePanel')"
         >
           <i :class="['fas text-gray-500', rightPanelCollapsed ? 'fa-chevron-left' : 'fa-chevron-right']"></i>
         </button>
@@ -2355,20 +2355,20 @@ watch(currentMessages, () => {
 
           <div class="space-y-4">
             <div class="flex items-center justify-between py-2">
-              <span class="text-sm text-gray-500">Type</span>
+              <span class="text-sm text-gray-500">{{ $t('collaboration.type') }}</span>
               <span class="text-sm font-medium text-gray-900 capitalize flex items-center gap-1">
                 <i :class="selectedChannel.type === 'private' ? 'fas fa-lock text-amber-500' : 'fas fa-globe text-teal-500'"></i>
                 {{ selectedChannel.type }}
               </span>
             </div>
             <div class="flex items-center justify-between py-2">
-              <span class="text-sm text-gray-500">Members</span>
+              <span class="text-sm text-gray-500">{{ $t('collaboration.members') }}</span>
               <span class="text-sm font-medium text-gray-900">{{ selectedChannel.memberCount }}</span>
             </div>
             <div class="flex items-center justify-between py-2">
-              <span class="text-sm text-gray-500">Notifications</span>
+              <span class="text-sm text-gray-500">{{ $t('collaboration.notifications') }}</span>
               <button class="text-sm font-medium text-teal-600">
-                {{ selectedChannel.isMuted ? 'Muted' : 'All messages' }}
+                {{ selectedChannel.isMuted ? $t('collaboration.muted') : $t('collaboration.allMessages') }}
               </button>
             </div>
           </div>
@@ -2376,15 +2376,15 @@ watch(currentMessages, () => {
           <div class="mt-6 space-y-2">
             <button class="w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-700 hover:bg-white rounded-lg transition-colors">
               <i class="fas fa-bell w-5 text-gray-400"></i>
-              <span>Notification preferences</span>
+              <span>{{ $t('collaboration.notificationPreferences') }}</span>
             </button>
             <button class="w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-700 hover:bg-white rounded-lg transition-colors">
               <i class="fas fa-edit w-5 text-gray-400"></i>
-              <span>Edit channel</span>
+              <span>{{ $t('collaboration.editChannel') }}</span>
             </button>
             <button class="w-full flex items-center gap-3 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors">
               <i class="fas fa-sign-out-alt w-5"></i>
-              <span>Leave channel</span>
+              <span>{{ $t('collaboration.leaveChannel') }}</span>
             </button>
           </div>
         </div>
@@ -2413,40 +2413,40 @@ watch(currentMessages, () => {
           <div class="grid grid-cols-3 gap-2 mb-6">
             <button class="flex flex-col items-center gap-1 p-3 bg-white rounded-xl border border-gray-100 hover:border-teal-200 hover:bg-teal-50 transition-colors">
               <i class="fas fa-video text-teal-600"></i>
-              <span class="text-xs text-gray-600">Video</span>
+              <span class="text-xs text-gray-600">{{ $t('collaboration.video') }}</span>
             </button>
             <button class="flex flex-col items-center gap-1 p-3 bg-white rounded-xl border border-gray-100 hover:border-teal-200 hover:bg-teal-50 transition-colors">
               <i class="fas fa-phone text-teal-600"></i>
-              <span class="text-xs text-gray-600">Call</span>
+              <span class="text-xs text-gray-600">{{ $t('collaboration.call') }}</span>
             </button>
             <button class="flex flex-col items-center gap-1 p-3 bg-white rounded-xl border border-gray-100 hover:border-teal-200 hover:bg-teal-50 transition-colors">
               <i class="fas fa-calendar-plus text-teal-600"></i>
-              <span class="text-xs text-gray-600">Schedule</span>
+              <span class="text-xs text-gray-600">{{ $t('collaboration.schedule') }}</span>
             </button>
           </div>
 
           <!-- User Info -->
           <div class="bg-white rounded-xl border border-gray-100 p-4 mb-4">
-            <h5 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Contact Information</h5>
+            <h5 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">{{ $t('collaboration.contactInformation') }}</h5>
             <div class="space-y-3">
               <div class="flex items-center gap-3">
                 <i class="fas fa-envelope text-gray-400 w-5"></i>
                 <div>
-                  <p class="text-xs text-gray-400">Email</p>
+                  <p class="text-xs text-gray-400">{{ $t('collaboration.email') }}</p>
                   <p class="text-sm text-gray-700">{{ selectedDM.user.displayName.toLowerCase().replace(' ', '.') }}@afc2027.org</p>
                 </div>
               </div>
               <div class="flex items-center gap-3">
                 <i class="fas fa-building text-gray-400 w-5"></i>
                 <div>
-                  <p class="text-xs text-gray-400">Department</p>
+                  <p class="text-xs text-gray-400">{{ $t('collaboration.department') }}</p>
                   <p class="text-sm text-gray-700">{{ selectedDM.user.role }}</p>
                 </div>
               </div>
               <div class="flex items-center gap-3">
                 <i class="fas fa-clock text-gray-400 w-5"></i>
                 <div>
-                  <p class="text-xs text-gray-400">Local Time</p>
+                  <p class="text-xs text-gray-400">{{ $t('collaboration.localTime') }}</p>
                   <p class="text-sm text-gray-700">{{ new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) }} (GST)</p>
                 </div>
               </div>
@@ -2457,19 +2457,19 @@ watch(currentMessages, () => {
           <div class="space-y-2">
             <button class="w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-700 hover:bg-white rounded-lg transition-colors">
               <i class="fas fa-search w-5 text-gray-400"></i>
-              <span>Search in conversation</span>
+              <span>{{ $t('collaboration.searchInConversation') }}</span>
             </button>
             <button class="w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-700 hover:bg-white rounded-lg transition-colors">
               <i class="fas fa-bell-slash w-5 text-gray-400"></i>
-              <span>Mute notifications</span>
+              <span>{{ $t('collaboration.muteNotifications') }}</span>
             </button>
             <button class="w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-700 hover:bg-white rounded-lg transition-colors">
               <i class="fas fa-thumbtack w-5 text-gray-400"></i>
-              <span>Pin conversation</span>
+              <span>{{ $t('collaboration.pinConversation') }}</span>
             </button>
             <button class="w-full flex items-center gap-3 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors">
               <i class="fas fa-ban w-5"></i>
-              <span>Block user</span>
+              <span>{{ $t('collaboration.blockUser') }}</span>
             </button>
           </div>
         </div>
@@ -2477,10 +2477,10 @@ watch(currentMessages, () => {
         <!-- Media Tab (DM Context) -->
         <div v-if="rightPanelTab === 'media' && selectedDM">
           <div class="mb-4">
-            <h5 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Shared Photos & Videos</h5>
+            <h5 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">{{ $t('collaboration.sharedPhotosVideos') }}</h5>
             <div v-if="dmSharedFiles.filter(f => f.type === 'image' || f.type === 'video').length === 0" class="text-center py-8 text-gray-400">
               <i class="fas fa-photo-video text-3xl mb-3 opacity-50"></i>
-              <p class="text-sm">No media shared yet</p>
+              <p class="text-sm">{{ $t('collaboration.noMediaShared') }}</p>
             </div>
             <div v-else class="grid grid-cols-3 gap-2">
               <div
@@ -2496,10 +2496,10 @@ watch(currentMessages, () => {
           </div>
 
           <div>
-            <h5 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Shared Links</h5>
+            <h5 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">{{ $t('collaboration.sharedLinks') }}</h5>
             <div class="text-center py-6 text-gray-400">
               <i class="fas fa-link text-2xl mb-2 opacity-50"></i>
-              <p class="text-sm">No links shared yet</p>
+              <p class="text-sm">{{ $t('collaboration.noLinksShared') }}</p>
             </div>
           </div>
         </div>
@@ -2535,8 +2535,8 @@ watch(currentMessages, () => {
           <template v-if="isViewingDM">
             <div v-if="dmSharedFiles.length === 0" class="text-center py-8 text-gray-400">
               <i class="fas fa-file text-3xl mb-3 opacity-50"></i>
-              <p class="text-sm">No files shared yet</p>
-              <p class="text-xs mt-1">Files shared in this conversation will appear here</p>
+              <p class="text-sm">{{ $t('collaboration.noFilesShared') }}</p>
+              <p class="text-xs mt-1">{{ $t('collaboration.filesWillAppearHere') }}</p>
             </div>
             <div
               v-for="file in dmSharedFiles"
