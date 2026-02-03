@@ -1121,16 +1121,16 @@ function getCategoryColor(category: string) {
               <div class="featured-avatar" style="background: #3b82f6;">SC</div>
               <div class="featured-avatar" style="background: #ec4899;">LW</div>
             </div>
-            <span class="featured-attendee-text">+12 attending</span>
+            <span class="featured-attendee-text">+12 {{ $t('events.attending') }}</span>
           </div>
           <div class="featured-actions">
-            <button class="featured-action-btn secondary" title="Set Reminder">
+            <button class="featured-action-btn secondary" :title="$t('events.setReminder')">
               <i class="fas fa-bell"></i>
             </button>
-            <button class="featured-action-btn secondary" title="Share Event" @click="shareEvent(featuredEvent!)">
+            <button class="featured-action-btn secondary" :title="$t('events.shareEvent')" @click="shareEvent(featuredEvent!)">
               <i class="fas fa-share-alt"></i>
             </button>
-            <button class="featured-action-btn secondary" title="Add to Calendar">
+            <button class="featured-action-btn secondary" :title="$t('events.addToCalendar')">
               <i class="fas fa-calendar-plus"></i>
             </button>
             <button class="featured-rsvp-btn">
@@ -1152,22 +1152,22 @@ function getCategoryColor(category: string) {
                 <i class="fas fa-calendar-alt text-white text-sm"></i>
               </div>
               <div>
-                <span class="block">Events</span>
-                <span class="text-xs font-medium text-gray-500">{{ filteredEvents.length }} events</span>
+                <span class="block">{{ $t('nav.events') }}</span>
+                <span class="text-xs font-medium text-gray-500">{{ filteredEvents.length }} {{ $t('events.eventsCount') }}</span>
               </div>
             </h2>
             <div class="flex items-center gap-2">
               <!-- Primary Actions -->
               <button @click="showCreateModal = true" class="px-4 py-2 bg-gradient-to-r from-teal-500 to-teal-600 text-white rounded-lg text-sm font-medium hover:from-teal-600 hover:to-teal-700 transition-all flex items-center gap-2 shadow-sm shadow-teal-200">
                 <i class="fas fa-plus"></i>
-                Create Event
+                {{ $t('events.createEvent') }}
               </button>
 
               <!-- Refresh Button -->
               <button
                 @click="currentPage = 1"
                 class="w-9 h-9 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-800 flex items-center justify-center transition-all"
-                title="Refresh"
+                :title="$t('events.refresh')"
               >
                 <i class="fas fa-sync-alt text-sm"></i>
               </button>
@@ -1189,7 +1189,7 @@ function getCategoryColor(category: string) {
                       ? 'bg-gradient-to-r from-teal-500 to-cyan-500 border-teal-500 text-white'
                       : 'bg-gray-100 border-gray-200 text-gray-500 hover:bg-gray-200'
                   ]"
-                  title="Toggle AI Search"
+                  :title="$t('events.toggleAISearch')"
                 >
                   <i class="fas fa-wand-magic-sparkles"></i>
                   <span class="hidden sm:inline">AI</span>
@@ -1324,7 +1324,7 @@ function getCategoryColor(category: string) {
 
                   <div class="space-y-3">
                     <div>
-                      <label class="block text-xs font-medium text-gray-500 mb-1">Start Date</label>
+                      <label class="block text-xs font-medium text-gray-500 mb-1">{{ $t('events.startDate') }}</label>
                       <input
                         type="date"
                         v-model="customDateStart"
@@ -1332,7 +1332,7 @@ function getCategoryColor(category: string) {
                       >
                     </div>
                     <div>
-                      <label class="block text-xs font-medium text-gray-500 mb-1">End Date</label>
+                      <label class="block text-xs font-medium text-gray-500 mb-1">{{ $t('events.endDate') }}</label>
                       <input
                         type="date"
                         v-model="customDateEnd"
@@ -1401,7 +1401,7 @@ function getCategoryColor(category: string) {
               ]"
             >
               <i class="fas fa-star text-sm"></i>
-              <span>Featured</span>
+              <span>{{ $t('events.featured') }}</span>
               <span v-if="showFeaturedOnly" class="w-4 h-4 rounded-full bg-amber-500 text-white text-[10px] flex items-center justify-center">
                 <i class="fas fa-check"></i>
               </span>
@@ -1416,7 +1416,7 @@ function getCategoryColor(category: string) {
               ]"
             >
               <i :class="showInterestedOnly ? 'fas fa-heart' : 'far fa-heart'" class="text-sm"></i>
-              <span>Interested</span>
+              <span>{{ $t('events.interested') }}</span>
               <span v-if="showInterestedOnly" class="w-4 h-4 rounded-full bg-red-500 text-white text-[10px] flex items-center justify-center">
                 <i class="fas fa-check"></i>
               </span>
@@ -1431,7 +1431,7 @@ function getCategoryColor(category: string) {
               ]"
             >
               <i class="fas fa-user-check text-sm"></i>
-              <span>My Events</span>
+              <span>{{ $t('events.myEvents') }}</span>
               <span v-if="showMyEventsOnly" class="w-4 h-4 rounded-full bg-purple-500 text-white text-[10px] flex items-center justify-center">
                 <i class="fas fa-check"></i>
               </span>
@@ -1444,7 +1444,7 @@ function getCategoryColor(category: string) {
               class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-red-600 bg-red-50 border border-red-200 hover:bg-red-100 transition-colors"
             >
               <i class="fas fa-times text-xs"></i>
-              <span>Clear</span>
+              <span>{{ $t('events.clear') }}</span>
             </button>
 
             <!-- Spacer -->
@@ -1501,21 +1501,21 @@ function getCategoryColor(category: string) {
               <button
                 @click="calendarView = 'calendar'"
                 :class="['px-2.5 py-1 rounded-md transition-all', calendarView === 'calendar' ? 'bg-teal-500 text-white' : 'text-gray-500 hover:bg-gray-100']"
-                title="Calendar view"
+                :title="$t('events.calendarViewTooltip')"
               >
                 <i class="fas fa-calendar text-xs"></i>
               </button>
               <button
                 @click="calendarView = 'grid'"
                 :class="['px-2.5 py-1 rounded-md transition-all', calendarView === 'grid' ? 'bg-teal-500 text-white' : 'text-gray-500 hover:bg-gray-100']"
-                title="Grid view"
+                :title="$t('events.gridViewTooltip')"
               >
                 <i class="fas fa-th-large text-xs"></i>
               </button>
               <button
                 @click="calendarView = 'list'"
                 :class="['px-2.5 py-1 rounded-md transition-all', calendarView === 'list' ? 'bg-teal-500 text-white' : 'text-gray-500 hover:bg-gray-100']"
-                title="List view"
+                :title="$t('events.listViewTooltip')"
               >
                 <i class="fas fa-list text-xs"></i>
               </button>
@@ -1619,8 +1619,8 @@ function getCategoryColor(category: string) {
                          @click.stop="openEvent(event)"
                          :class="['day-event-premium', event.category]">
                       <div class="event-indicators">
-                        <i v-if="event.featured" class="fas fa-star featured-indicator" title="Featured"></i>
-                        <i v-if="event.isGoing" class="fas fa-check-circle going-indicator" title="RSVP'd"></i>
+                        <i v-if="event.featured" class="fas fa-star featured-indicator" :title="$t('events.featured')"></i>
+                        <i v-if="event.isGoing" class="fas fa-check-circle going-indicator" :title="$t('events.rsvpd')"></i>
                       </div>
                       <span class="event-time-mini">{{ getShortTime(event.time) }}</span>
                       <span class="event-text">{{ event.title }}</span>
@@ -1655,9 +1655,9 @@ function getCategoryColor(category: string) {
                       <div class="week-event-header">
                         <span class="week-event-time">{{ event.time }}</span>
                         <div class="week-event-badges">
-                          <i v-if="event.featured" class="fas fa-star featured-indicator" title="Featured"></i>
-                          <i v-if="event.isGoing" class="fas fa-check-circle going-indicator" title="RSVP'd"></i>
-                          <i v-if="event.virtual" class="fas fa-video virtual-indicator" title="Virtual"></i>
+                          <i v-if="event.featured" class="fas fa-star featured-indicator" :title="$t('events.featured')"></i>
+                          <i v-if="event.isGoing" class="fas fa-check-circle going-indicator" :title="$t('events.rsvpd')"></i>
+                          <i v-if="event.virtual" class="fas fa-video virtual-indicator" :title="$t('events.virtual')"></i>
                         </div>
                       </div>
                       <h4 class="week-event-title">{{ event.title }}</h4>
@@ -1684,7 +1684,7 @@ function getCategoryColor(category: string) {
                     </div>
                     <div v-if="day.events.length === 0" class="week-no-events">
                       <i class="far fa-calendar"></i>
-                      <span>No events</span>
+                      <span>{{ $t('events.noEventsInDay') }}</span>
                     </div>
                   </div>
                 </div>
@@ -1747,7 +1747,7 @@ function getCategoryColor(category: string) {
                   >
                     <i :class="event.interested ? 'fas fa-heart' : 'far fa-heart'"></i>
                   </button>
-                  <button class="card-action-btn" @click.stop="shareEvent(event)" title="Share">
+                  <button class="card-action-btn" @click.stop="shareEvent(event)" :title="$t('events.share')">
                     <i class="fas fa-share-alt"></i>
                   </button>
                   <ComparisonButton
@@ -1811,10 +1811,10 @@ function getCategoryColor(category: string) {
                   >
                     <i :class="event.interested ? 'fas fa-heart' : 'far fa-heart'"></i>
                   </button>
-                  <button class="list-action-btn" @click.stop="shareEvent(event)" title="Share">
+                  <button class="list-action-btn" @click.stop="shareEvent(event)" :title="$t('events.share')">
                     <i class="fas fa-share-alt"></i>
                   </button>
-                  <button class="list-action-btn" @click.stop title="Add to Calendar">
+                  <button class="list-action-btn" @click.stop :title="$t('events.addToCalendar')">
                     <i class="fas fa-calendar-plus"></i>
                   </button>
                   <button
@@ -1833,7 +1833,7 @@ function getCategoryColor(category: string) {
           <EmptyState
             v-if="filteredEvents.length === 0 && calendarView !== 'calendar'"
             icon="fas fa-calendar-xmark"
-            title="No events found"
+            :title="$t('events.noEvents')"
             description="Try adjusting your filters or search query"
             action-label="Clear all filters"
             action-icon="fas fa-refresh"
@@ -1875,7 +1875,7 @@ function getCategoryColor(category: string) {
                   </div>
                 </div>
                 <div class="my-event-actions">
-                  <button class="my-event-action-btn" title="View Details">
+                  <button class="my-event-action-btn" :title="$t('events.viewDetails')">
                     <i class="fas fa-arrow-right"></i>
                   </button>
                 </div>
@@ -1956,7 +1956,7 @@ function getCategoryColor(category: string) {
       <div v-if="showCreateModal" class="modal-overlay" @click.self="showCreateModal = false">
         <div class="modal-content">
           <div class="modal-header">
-            <h3 class="modal-title">Create Event</h3>
+            <h3 class="modal-title">{{ $t('events.createEvent') }}</h3>
             <button @click="showCreateModal = false" class="modal-close">
               <i class="fas fa-times"></i>
             </button>
@@ -1964,7 +1964,7 @@ function getCategoryColor(category: string) {
           <div class="modal-body">
             <div class="space-y-4">
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Event Title</label>
+                <label class="block text-sm font-medium text-gray-700 mb-1">{{ $t('events.eventTitle') }}</label>
                 <input type="text" v-model="newEvent.title" placeholder="Enter event title..."
                        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500">
               </div>
@@ -2010,11 +2010,11 @@ function getCategoryColor(category: string) {
               <div class="flex items-center gap-6">
                 <label class="flex items-center gap-2 cursor-pointer">
                   <input type="checkbox" v-model="newEvent.virtual" class="w-4 h-4 text-teal-600 rounded focus:ring-teal-500">
-                  <span class="text-sm text-gray-700">Virtual Event</span>
+                  <span class="text-sm text-gray-700">{{ $t('events.virtualEvent') }}</span>
                 </label>
                 <label class="flex items-center gap-2 cursor-pointer">
                   <input type="checkbox" v-model="newEvent.allDay" class="w-4 h-4 text-teal-600 rounded focus:ring-teal-500">
-                  <span class="text-sm text-gray-700">All Day</span>
+                  <span class="text-sm text-gray-700">{{ $t('events.allDay') }}</span>
                 </label>
               </div>
             </div>
