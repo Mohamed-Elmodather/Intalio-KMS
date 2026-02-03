@@ -15,144 +15,144 @@ const { t } = useI18n()
 const aiStore = useAIServicesStore()
 
 // ============================================================================
-// Configurable Text Constants
+// Configurable Text Constants (using i18n)
 // ============================================================================
-const textConstants = {
+const textConstants = computed(() => ({
   // Hero Section
   appBadge: 'AFC Asian Cup 2027',
-  pageTitle: 'Polls & Surveys',
-  pageDescription: 'Gather feedback and insights from your team. Create polls, collect responses, and analyze results.',
-  createNewPoll: 'Create New Poll',
-  quickPoll: 'Quick Poll',
-  aiInsights: 'AI Insights',
-  patternAnalysis: 'Pattern Analysis',
+  pageTitle: t('polls.title'),
+  pageDescription: t('polls.description'),
+  createNewPoll: t('polls.createNewPoll'),
+  quickPoll: t('polls.quickPoll'),
+  aiInsights: t('polls.aiInsights'),
+  patternAnalysis: t('polls.patternAnalysis'),
 
   // Stats Labels
-  activePolls: 'Active Polls',
-  responsesLabel: 'Responses',
-  createdLabel: 'Created',
-  participationLabel: 'Participation',
+  activePolls: t('polls.activePolls'),
+  responsesLabel: t('polls.responses'),
+  createdLabel: t('polls.created'),
+  participationLabel: t('polls.participation'),
 
   // Tabs
-  tabActive: 'Active',
-  tabMyPolls: 'My Polls',
-  tabCompleted: 'Completed',
+  tabActive: t('polls.tabActive'),
+  tabMyPolls: t('polls.myPolls'),
+  tabCompleted: t('polls.tabCompleted'),
 
   // Sort Options
-  sortMostRecent: 'Most Recent',
-  sortMostPopular: 'Most Popular',
-  sortMostVotes: 'Most Votes',
-  sortEndingSoon: 'Ending Soon',
-  sortNameAZ: 'Name (A-Z)',
-  sortBy: 'Sort By',
+  sortMostRecent: t('polls.sortMostRecent'),
+  sortMostPopular: t('polls.sortMostPopular'),
+  sortMostVotes: t('polls.sortMostVotes'),
+  sortEndingSoon: t('polls.sortEndingSoon'),
+  sortNameAZ: t('polls.sortNameAZ'),
+  sortBy: t('polls.sortBy'),
 
   // Status Options
-  statusActive: 'Active',
-  statusDraft: 'Draft',
-  statusScheduled: 'Scheduled',
-  statusCompleted: 'Completed',
+  statusActive: t('polls.statusActive'),
+  statusDraft: t('polls.statusDraft'),
+  statusScheduled: t('polls.statusScheduled'),
+  statusCompleted: t('polls.statusCompleted'),
 
   // Featured Poll
-  featuredPoll: 'Featured Poll',
-  anonymous: 'Anonymous',
-  live: 'Live',
-  responses: 'responses',
-  daysLeft: 'days left',
-  createdBy: 'created by',
-  castYourVote: 'Cast Your Vote',
-  voted: 'Voted',
-  selectAnOption: 'Select an option',
-  submitVote: 'Submit Vote',
-  voteRecorded: 'Your vote has been recorded',
-  viewFullDetails: 'View Full Details',
+  featuredPoll: t('polls.featuredPoll'),
+  anonymous: t('polls.anonymous'),
+  live: t('polls.live'),
+  responses: t('polls.responses'),
+  daysLeft: t('polls.daysLeft'),
+  createdBy: t('polls.createdBy'),
+  castYourVote: t('polls.castYourVote'),
+  voted: t('polls.voted'),
+  selectAnOption: t('polls.selectAnOption'),
+  submitVote: t('polls.submitVote'),
+  voteRecorded: t('polls.voteRecorded'),
+  viewFullDetails: t('polls.viewFullDetails'),
 
   // Trending Section
-  trendingNow: 'Trending Now',
-  trendingSubtitle: 'Most popular polls this week',
-  viewAll: 'View All',
-  voteNow: 'Vote Now',
+  trendingNow: t('polls.trendingNow'),
+  trendingSubtitle: t('polls.trendingSubtitle'),
+  viewAll: t('polls.viewAll'),
+  voteNow: t('polls.voteNow'),
 
   // All Polls Section
-  allPolls: 'All Polls',
-  polls: 'polls',
-  createPoll: 'Create Poll',
-  searchPolls: 'Search polls...',
-  category: 'Category',
-  categories: 'Categories',
-  status: 'Status',
-  selectCategories: 'Select Categories',
-  filterByStatus: 'Filter by Status',
-  clearAll: 'Clear All',
-  apply: 'Apply',
-  gridView: 'Grid view',
-  listView: 'List view',
-  ascendingOrder: 'Ascending order - Click for descending',
-  descendingOrder: 'Descending order - Click for ascending',
+  allPolls: t('polls.allPolls'),
+  polls: t('polls.polls'),
+  createPoll: t('polls.createPoll'),
+  searchPolls: t('polls.searchPolls'),
+  category: t('polls.category'),
+  categories: t('polls.categories'),
+  status: t('polls.status'),
+  selectCategories: t('polls.selectCategories'),
+  filterByStatus: t('polls.filterByStatus'),
+  clearAll: t('polls.clearAll'),
+  apply: t('polls.apply'),
+  gridView: t('polls.gridView'),
+  listView: t('polls.listView'),
+  ascendingOrder: t('polls.ascendingOrder'),
+  descendingOrder: t('polls.descendingOrder'),
 
   // Poll Cards
-  by: 'By',
-  leading: 'Leading',
-  vote: 'Vote',
-  results: 'Results',
+  by: t('polls.by'),
+  leading: t('polls.leading'),
+  vote: t('polls.vote'),
+  results: t('polls.results'),
 
   // My Polls Section
-  yourPolls: 'Your Polls',
-  filter: 'Filter',
+  yourPolls: t('polls.yourPolls'),
+  filter: t('polls.filter'),
 
   // Completed Polls
-  completed: 'Completed',
-  ended: 'Ended',
-  winner: 'Winner',
-  totalVotes: 'total votes',
-  analytics: 'Analytics',
-  export: 'Export',
+  completed: t('polls.completed'),
+  ended: t('polls.ended'),
+  winner: t('polls.winner'),
+  totalVotes: t('polls.totalVotes'),
+  analytics: t('polls.analytics'),
+  export: t('polls.export'),
 
   // Quick Poll Modal
-  quickPollTitle: 'Quick Poll',
-  question: 'Question',
-  questionPlaceholder: 'What would you like to ask?',
-  options: 'Options',
-  optionPlaceholder: 'Option',
-  addOption: 'Add Option',
-  anonymousVoting: 'Anonymous voting',
-  cancel: 'Cancel',
+  quickPollTitle: t('polls.quickPoll'),
+  question: t('polls.question'),
+  questionPlaceholder: t('polls.questionPlaceholder'),
+  options: t('polls.options'),
+  optionPlaceholder: t('polls.optionPlaceholder'),
+  addOption: t('polls.addOption'),
+  anonymousVoting: t('polls.anonymousVoting'),
+  cancel: t('polls.cancel'),
 
   // AI Insights Modal
-  aiPollInsights: 'AI Poll Insights',
-  smartAnalytics: 'Smart analytics and predictions',
-  analyzingPollData: 'Analyzing poll data...',
-  aiAnalysisComplete: 'AI Analysis Complete',
-  basedOn: 'Based on',
-  responsesAcross: 'responses across',
-  activeLabel: 'active polls',
-  confidence: 'Confidence',
-  refresh: 'Refresh',
-  close: 'Close',
+  aiPollInsights: t('polls.aiPollInsights'),
+  smartAnalytics: t('polls.smartAnalytics'),
+  analyzingPollData: t('polls.analyzingPollData'),
+  aiAnalysisComplete: t('polls.aiAnalysisComplete'),
+  basedOn: t('polls.basedOn'),
+  responsesAcross: t('polls.responsesAcross'),
+  activeLabel: t('polls.activeLabel'),
+  confidence: t('polls.confidence'),
+  refresh: t('polls.refresh'),
+  close: t('polls.close'),
 
   // Sentiment Analysis Modal
-  sentimentAnalysis: 'Sentiment Analysis',
-  understandVoterSentiment: 'Understand voter sentiment',
-  analyzingSentiment: 'Analyzing sentiment...',
-  sentiment: 'Sentiment',
-  confidenceScore: 'confidence score',
-  optionSentimentBreakdown: 'Option Sentiment Breakdown',
-  summary: 'Summary',
-  recommendations: 'Recommendations',
+  sentimentAnalysis: t('polls.sentimentAnalysis'),
+  understandVoterSentiment: t('polls.understandVoterSentiment'),
+  analyzingSentiment: t('polls.analyzingSentiment'),
+  sentiment: t('polls.sentiment'),
+  confidenceScore: t('polls.confidenceScore'),
+  optionSentimentBreakdown: t('polls.optionSentimentBreakdown'),
+  summary: t('polls.summary'),
+  recommendations: t('polls.recommendations'),
 
   // Pattern Analysis Modal
-  responsePatternAnalysis: 'Response Pattern Analysis',
-  analyzingPatterns: 'Analyzing patterns...',
-  detectedPatterns: 'Detected Patterns',
-  keyInsights: 'Key Insights',
+  responsePatternAnalysis: t('polls.responsePatternAnalysis'),
+  analyzingPatterns: t('polls.analyzingPatterns'),
+  detectedPatterns: t('polls.detectedPatterns'),
+  keyInsights: t('polls.keyInsights'),
 
   // Loading & Empty States
-  loadingPolls: 'Loading polls...',
-  noPollsFound: 'No polls found',
-  noPollsDescription: 'Create your first poll to get started',
+  loadingPolls: t('polls.loadingPolls'),
+  noPollsFound: t('polls.noPollsFound'),
+  noPollsDescription: t('polls.tryDifferentFilters'),
 
   // Alert Messages
-  pollCreatedSuccess: 'Poll created successfully!'
-}
+  pollCreatedSuccess: t('polls.pollCreatedSuccess')
+}))
 
 // State
 const isLoading = ref(false)
@@ -169,21 +169,21 @@ const showSortDropdown = ref(false)
 const selectedStatuses = ref<string[]>([])
 
 // Sort options - using textConstants
-const sortOptions = [
-  { value: 'recent', label: textConstants.sortMostRecent, icon: 'fas fa-clock' },
-  { value: 'popular', label: textConstants.sortMostPopular, icon: 'fas fa-fire' },
-  { value: 'votes', label: textConstants.sortMostVotes, icon: 'fas fa-users' },
-  { value: 'ending', label: textConstants.sortEndingSoon, icon: 'fas fa-hourglass-end' },
-  { value: 'name', label: textConstants.sortNameAZ, icon: 'fas fa-font' }
-]
+const sortOptions = computed(() => [
+  { value: 'recent', label: textConstants.value.sortMostRecent, icon: 'fas fa-clock' },
+  { value: 'popular', label: textConstants.value.sortMostPopular, icon: 'fas fa-fire' },
+  { value: 'votes', label: textConstants.value.sortMostVotes, icon: 'fas fa-users' },
+  { value: 'ending', label: textConstants.value.sortEndingSoon, icon: 'fas fa-hourglass-end' },
+  { value: 'name', label: textConstants.value.sortNameAZ, icon: 'fas fa-font' }
+])
 
 // Status filter options - using textConstants
-const statusOptions = [
-  { id: 'active', label: textConstants.statusActive, icon: 'fas fa-play-circle', color: 'text-green-500' },
-  { id: 'draft', label: textConstants.statusDraft, icon: 'fas fa-file-alt', color: 'text-gray-500' },
-  { id: 'scheduled', label: textConstants.statusScheduled, icon: 'fas fa-calendar-alt', color: 'text-blue-500' },
-  { id: 'completed', label: textConstants.statusCompleted, icon: 'fas fa-check-circle', color: 'text-purple-500' }
-]
+const statusOptions = computed(() => [
+  { id: 'active', label: textConstants.value.statusActive, icon: 'fas fa-play-circle', color: 'text-green-500' },
+  { id: 'draft', label: textConstants.value.statusDraft, icon: 'fas fa-file-alt', color: 'text-gray-500' },
+  { id: 'scheduled', label: textConstants.value.statusScheduled, icon: 'fas fa-calendar-alt', color: 'text-blue-500' },
+  { id: 'completed', label: textConstants.value.statusCompleted, icon: 'fas fa-check-circle', color: 'text-purple-500' }
+])
 
 // Interfaces
 interface PollOption {
@@ -268,18 +268,17 @@ const stats = ref({
 
 // Hero stats for PageHeroHeader component
 const heroStats = computed(() => [
-  { icon: 'fas fa-poll', value: stats.value.active, label: textConstants.activePolls },
-  { icon: 'fas fa-vote-yea', value: stats.value.responses.toLocaleString(), label: textConstants.responsesLabel },
-  { icon: 'fas fa-chart-pie', value: stats.value.created, label: textConstants.createdLabel },
-  { icon: 'fas fa-users', value: stats.value.participation + '%', label: textConstants.participationLabel }
+  { icon: 'fas fa-poll', value: stats.value.active, label: textConstants.value.activePolls },
+  { icon: 'fas fa-vote-yea', value: stats.value.responses.toLocaleString(), label: textConstants.value.responsesLabel },
+  { icon: 'fas fa-chart-pie', value: stats.value.created, label: textConstants.value.createdLabel },
+  { icon: 'fas fa-users', value: stats.value.participation + '%', label: textConstants.value.participationLabel }
 ])
 
-// Tabs
-// Tabs - using textConstants
-const tabs = ref([
-  { id: 'active', label: textConstants.tabActive, icon: 'fas fa-play-circle', count: 8 },
-  { id: 'my-polls', label: textConstants.tabMyPolls, icon: 'fas fa-user', count: 12 },
-  { id: 'completed', label: textConstants.tabCompleted, icon: 'fas fa-check-circle', count: 23 }
+// Tabs - using textConstants (computed for reactivity)
+const tabs = computed(() => [
+  { id: 'active', label: textConstants.value.tabActive, icon: 'fas fa-play-circle', count: 8 },
+  { id: 'my-polls', label: textConstants.value.tabMyPolls, icon: 'fas fa-user', count: 12 },
+  { id: 'completed', label: textConstants.value.tabCompleted, icon: 'fas fa-check-circle', count: 23 }
 ])
 
 // Featured Poll
@@ -617,7 +616,7 @@ function removeQuickPollOption(idx: number) {
 
 function createQuickPoll() {
   // Simulate poll creation
-  alert(textConstants.pollCreatedSuccess)
+  alert(textConstants.value.pollCreatedSuccess)
   showQuickPollModal.value = false
   quickPoll.value = { question: '', options: ['', ''], anonymous: false }
 }
@@ -628,7 +627,7 @@ function goToCreatePoll() {
 
 // Toolbar helper functions
 const currentSortOption = computed(() => {
-  return sortOptions.find(opt => opt.value === sortBy.value) || sortOptions[0]
+  return sortOptions.value.find(opt => opt.value === sortBy.value) || sortOptions.value[0]
 })
 
 const totalPollsCount = computed(() => {
@@ -882,7 +881,7 @@ function getInsightTypeColor(type: string) {
   <div class="min-h-screen bg-gray-50">
     <!-- Loading State -->
     <div v-if="isLoading" class="flex items-center justify-center py-20">
-      <LoadingSpinner size="lg" text="Loading polls..." />
+      <LoadingSpinner size="lg" :text="textConstants.loadingPolls" />
     </div>
 
     <template v-else>
@@ -1101,7 +1100,7 @@ function getInsightTypeColor(type: string) {
             <!-- Hot Badge -->
             <div v-if="poll.isHot" class="hot-badge">
               <i class="fas fa-fire-flame-curved"></i>
-              <span>HOT</span>
+              <span>{{ $t('polls.hot') }}</span>
             </div>
 
             <!-- Rank Badge -->
@@ -1132,7 +1131,7 @@ function getInsightTypeColor(type: string) {
               <div class="trending-stats">
                 <div class="trending-stat">
                   <i class="fas fa-users"></i>
-                  <span>{{ poll.totalVotes.toLocaleString() }} votes</span>
+                  <span>{{ poll.totalVotes.toLocaleString() }} {{ $t('polls.votes') }}</span>
                 </div>
                 <div class="trending-stat growth">
                   <i class="fas fa-arrow-trend-up"></i>
@@ -1145,7 +1144,7 @@ function getInsightTypeColor(type: string) {
                 <div class="progress-track">
                   <div class="progress-fill" :style="{ width: poll.responseRate + '%' }"></div>
                 </div>
-                <span class="progress-label">{{ poll.responseRate }}% response rate</span>
+                <span class="progress-label">{{ poll.responseRate }}% {{ $t('polls.responseRate') }}</span>
               </div>
             </div>
 
@@ -1153,7 +1152,7 @@ function getInsightTypeColor(type: string) {
             <div class="trending-bottom-bar">
               <div class="ends-in-badge">
                 <i class="fas fa-hourglass-half"></i>
-                <span>Ends in {{ poll.endsIn }}</span>
+                <span>{{ $t('polls.endsIn') }} {{ poll.endsIn }}</span>
               </div>
               <button class="trending-vote-btn-sm" @click.stop="openTrendingPoll(poll.id)">
                 <span>{{ textConstants.voteNow }}</span>
@@ -1240,7 +1239,7 @@ function getInsightTypeColor(type: string) {
                 ]"
               >
                 <i class="fas fa-toggle-on text-sm"></i>
-                <span>{{ selectedStatuses.length > 0 ? `${selectedStatuses.length} Status` : 'Status' }}</span>
+                <span>{{ selectedStatuses.length > 0 ? `${selectedStatuses.length} ${textConstants.status}` : textConstants.status }}</span>
                 <i :class="showStatusFilter ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-[10px] ml-1"></i>
               </button>
 
@@ -1249,14 +1248,14 @@ function getInsightTypeColor(type: string) {
                 v-if="showStatusFilter"
                 class="absolute left-0 top-full mt-2 w-56 bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-[100]"
               >
-                <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Filter by Status</div>
+                <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">{{ textConstants.filterByStatus }}</div>
                 <div class="max-h-48 overflow-y-auto">
                   <button
                     v-for="option in statusOptions"
                     :key="option.id"
                     @click="toggleStatus(option.id)"
                     :class="[
-                      'w-full px-3 py-2 text-left text-sm flex items-center gap-3 transition-colors',
+                      'w-full px-3 py-2 text-start text-sm flex items-center gap-3 transition-colors',
                       isStatusSelected(option.id) ? 'bg-teal-50 text-teal-700' : 'text-gray-700 hover:bg-gray-50'
                     ]"
                   >
@@ -1278,13 +1277,13 @@ function getInsightTypeColor(type: string) {
                     @click="selectedStatuses = []; showStatusFilter = false"
                     class="flex-1 px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
                   >
-                    Clear All
+                    {{ textConstants.clearAll }}
                   </button>
                   <button
                     @click="showStatusFilter = false"
                     class="flex-1 px-3 py-1.5 text-xs font-medium text-white bg-teal-500 rounded-lg hover:bg-teal-600 transition-colors"
                   >
-                    Apply
+                    {{ textConstants.apply }}
                   </button>
                 </div>
               </div>
@@ -1306,7 +1305,7 @@ function getInsightTypeColor(type: string) {
               <button
                 @click="sortOrder = sortOrder === 'asc' ? 'desc' : 'asc'"
                 class="flex items-center justify-center w-8 h-8 rounded-r-lg text-xs font-medium transition-all border bg-white border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-teal-600"
-                :title="sortOrder === 'asc' ? 'Ascending order - Click for descending' : 'Descending order - Click for ascending'"
+                :title="sortOrder === 'asc' ? textConstants.ascendingOrder : textConstants.descendingOrder"
               >
                 <i :class="sortOrder === 'asc' ? 'fas fa-arrow-up' : 'fas fa-arrow-down'" class="text-sm text-teal-500"></i>
               </button>
@@ -1316,14 +1315,14 @@ function getInsightTypeColor(type: string) {
                 v-if="showSortDropdown"
                 class="absolute left-0 top-full mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-[100]"
               >
-                <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Sort By</div>
+                <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">{{ textConstants.sortBy }}</div>
                 <div class="max-h-64 overflow-y-auto">
                   <button
                     v-for="option in sortOptions"
                     :key="option.value"
                     @click="selectSortOption(option.value)"
                     :class="[
-                      'w-full px-3 py-2 text-left text-sm flex items-center gap-3 transition-colors',
+                      'w-full px-3 py-2 text-start text-sm flex items-center gap-3 transition-colors',
                       sortBy === option.value ? 'bg-teal-50 text-teal-700' : 'text-gray-700 hover:bg-gray-50'
                     ]"
                   >
@@ -1341,14 +1340,14 @@ function getInsightTypeColor(type: string) {
               <button
                 @click="viewMode = 'grid'"
                 :class="['px-2.5 py-1 rounded-md transition-all', viewMode === 'grid' ? 'bg-teal-500 text-white' : 'text-gray-500 hover:bg-gray-100']"
-                title="Grid view"
+                :title="textConstants.gridView"
               >
                 <i class="fas fa-th-large text-xs"></i>
               </button>
               <button
                 @click="viewMode = 'list'"
                 :class="['px-2.5 py-1 rounded-md transition-all', viewMode === 'list' ? 'bg-teal-500 text-white' : 'text-gray-500 hover:bg-gray-100']"
-                title="List view"
+                :title="textConstants.listView"
               >
                 <i class="fas fa-list text-xs"></i>
               </button>
@@ -1384,7 +1383,7 @@ function getInsightTypeColor(type: string) {
               </div>
             </div>
             <h3 class="font-semibold text-gray-900 mb-1">{{ poll.question }}</h3>
-            <p class="text-xs text-gray-500">By {{ poll.author }}</p>
+            <p class="text-xs text-gray-500">{{ textConstants.by }} {{ poll.author }}</p>
           </div>
 
           <div class="poll-card-body space-y-2">
@@ -1469,7 +1468,7 @@ function getInsightTypeColor(type: string) {
               </div>
               <div class="flex-1 min-w-0">
                 <h4 class="font-medium text-gray-900 truncate">{{ poll.title }}</h4>
-                <p class="text-xs text-gray-500">Created {{ poll.created }}</p>
+                <p class="text-xs text-gray-500">{{ textConstants.createdLabel }} {{ poll.created }}</p>
               </div>
             </div>
             <div class="flex items-center gap-4">
@@ -1562,13 +1561,13 @@ function getInsightTypeColor(type: string) {
           </div>
           <div class="modal-body space-y-4">
             <div>
-              <label class="form-label">Question</label>
-              <input type="text" v-model="quickPoll.question" class="form-input" placeholder="What would you like to ask?">
+              <label class="form-label">{{ textConstants.question }}</label>
+              <input type="text" v-model="quickPoll.question" class="form-input" :placeholder="textConstants.questionPlaceholder">
             </div>
             <div class="space-y-2">
-              <label class="form-label">Options</label>
+              <label class="form-label">{{ textConstants.options }}</label>
               <div v-for="(opt, idx) in quickPoll.options" :key="idx" class="flex items-center gap-2">
-                <input type="text" v-model="quickPoll.options[idx]" class="form-input flex-1" :placeholder="'Option ' + (idx + 1)">
+                <input type="text" v-model="quickPoll.options[idx]" class="form-input flex-1" :placeholder="textConstants.optionPlaceholder + ' ' + (idx + 1)">
                 <button
                   v-if="quickPoll.options.length > 2"
                   @click="removeQuickPollOption(idx)"
@@ -1582,20 +1581,20 @@ function getInsightTypeColor(type: string) {
                 @click="addQuickPollOption"
                 class="text-sm text-teal-600 hover:text-teal-700 font-medium"
               >
-                <i class="fas fa-plus mr-1"></i> Add Option
+                <i class="fas fa-plus mr-1"></i> {{ textConstants.addOption }}
               </button>
             </div>
             <div class="flex items-center gap-4">
               <label class="flex items-center gap-2 cursor-pointer">
                 <input type="checkbox" v-model="quickPoll.anonymous" class="checkbox">
-                <span class="text-sm text-gray-600">Anonymous voting</span>
+                <span class="text-sm text-gray-600">{{ textConstants.anonymousVoting }}</span>
               </label>
             </div>
           </div>
           <div class="modal-footer">
-            <button class="btn btn-secondary" @click="showQuickPollModal = false">Cancel</button>
+            <button class="btn btn-secondary" @click="showQuickPollModal = false">{{ textConstants.cancel }}</button>
             <button class="btn-vibrant" @click="createQuickPoll">
-              <i class="fas fa-paper-plane mr-1"></i> Create Poll
+              <i class="fas fa-paper-plane mr-1"></i> {{ textConstants.createPoll }}
             </button>
           </div>
         </div>
@@ -1613,8 +1612,8 @@ function getInsightTypeColor(type: string) {
                   <i class="fas fa-wand-magic-sparkles text-white"></i>
                 </div>
                 <div>
-                  <h3 class="text-lg font-semibold text-gray-900">AI Poll Insights</h3>
-                  <p class="text-sm text-gray-500">Smart analytics and predictions</p>
+                  <h3 class="text-lg font-semibold text-gray-900">{{ textConstants.aiPollInsights }}</h3>
+                  <p class="text-sm text-gray-500">{{ textConstants.smartAnalytics }}</p>
                 </div>
               </div>
               <button @click="showAIInsightsPanel = false" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
@@ -1624,15 +1623,15 @@ function getInsightTypeColor(type: string) {
           </div>
 
           <div class="p-6 overflow-y-auto max-h-[60vh]">
-            <AILoadingIndicator v-if="isFetchingInsights" message="Analyzing poll data..." />
+            <AILoadingIndicator v-if="isFetchingInsights" :message="textConstants.analyzingPollData" />
 
             <div v-else-if="aiInsights.length > 0" class="space-y-4">
               <div class="bg-gradient-to-r from-teal-50 to-emerald-50 rounded-xl p-4 mb-4">
                 <div class="flex items-center gap-2 text-teal-700 font-medium mb-1">
                   <i class="fas fa-brain"></i>
-                  AI Analysis Complete
+                  {{ textConstants.aiAnalysisComplete }}
                 </div>
-                <p class="text-sm text-gray-600">Based on {{ stats.responses.toLocaleString() }} responses across {{ stats.active }} active polls</p>
+                <p class="text-sm text-gray-600">{{ textConstants.basedOn }} {{ stats.responses.toLocaleString() }} {{ textConstants.responsesAcross }} {{ stats.active }} {{ textConstants.activeLabel }}</p>
               </div>
 
               <div v-for="insight in aiInsights" :key="insight.id"
@@ -1652,7 +1651,7 @@ function getInsightTypeColor(type: string) {
                   </div>
                   <div class="text-right">
                     <div class="text-lg font-bold text-teal-600">{{ Math.round(insight.confidence * 100) }}%</div>
-                    <div class="text-xs text-gray-500">Confidence</div>
+                    <div class="text-xs text-gray-500">{{ textConstants.confidence }}</div>
                   </div>
                 </div>
               </div>
@@ -1662,11 +1661,11 @@ function getInsightTypeColor(type: string) {
           <div class="p-4 border-t border-gray-100 flex justify-end gap-3">
             <button @click="fetchAIInsights"
                     class="px-4 py-2 text-teal-600 hover:bg-teal-50 rounded-lg transition-colors flex items-center gap-2">
-              <i class="fas fa-rotate"></i> Refresh
+              <i class="fas fa-rotate"></i> {{ textConstants.refresh }}
             </button>
             <button @click="showAIInsightsPanel = false"
                     class="px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-colors">
-              Close
+              {{ textConstants.close }}
             </button>
           </div>
         </div>
@@ -1684,8 +1683,8 @@ function getInsightTypeColor(type: string) {
                   <i class="fas fa-face-smile text-white"></i>
                 </div>
                 <div>
-                  <h3 class="text-lg font-semibold text-gray-900">Sentiment Analysis</h3>
-                  <p class="text-sm text-gray-500">Understand voter sentiment</p>
+                  <h3 class="text-lg font-semibold text-gray-900">{{ textConstants.sentimentAnalysis }}</h3>
+                  <p class="text-sm text-gray-500">{{ textConstants.understandVoterSentiment }}</p>
                 </div>
               </div>
               <button @click="showSentimentModal = false" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
@@ -1695,7 +1694,7 @@ function getInsightTypeColor(type: string) {
           </div>
 
           <div class="p-6 overflow-y-auto max-h-[60vh]">
-            <AILoadingIndicator v-if="isAnalyzingSentiment" message="Analyzing sentiment..." />
+            <AILoadingIndicator v-if="isAnalyzingSentiment" :message="textConstants.analyzingSentiment" />
 
             <div v-else-if="pollSentiment" class="space-y-6">
               <!-- Overall Sentiment -->
@@ -1710,14 +1709,14 @@ function getInsightTypeColor(type: string) {
                      pollSentiment.overall === 'positive' ? 'text-green-500' :
                      pollSentiment.overall === 'negative' ? 'text-red-500' : 'text-yellow-500']"></i>
                 </div>
-                <h4 class="text-xl font-semibold text-gray-900 capitalize mb-1">{{ pollSentiment.overall }} Sentiment</h4>
-                <p class="text-gray-600">{{ Math.round(pollSentiment.score * 100) }}% confidence score</p>
+                <h4 class="text-xl font-semibold text-gray-900 capitalize mb-1">{{ pollSentiment.overall }} {{ textConstants.sentiment }}</h4>
+                <p class="text-gray-600">{{ Math.round(pollSentiment.score * 100) }}% {{ textConstants.confidenceScore }}</p>
               </div>
 
               <!-- Option Breakdown -->
               <div>
                 <h5 class="font-medium text-gray-900 mb-3 flex items-center gap-2">
-                  <i class="fas fa-list text-purple-500"></i> Option Sentiment Breakdown
+                  <i class="fas fa-list text-purple-500"></i> {{ textConstants.optionSentimentBreakdown }}
                 </h5>
                 <div class="space-y-3">
                   <div v-for="item in pollSentiment.breakdown" :key="item.option"
@@ -1742,7 +1741,7 @@ function getInsightTypeColor(type: string) {
               <!-- Summary -->
               <div class="bg-gray-50 rounded-xl p-4">
                 <h5 class="font-medium text-gray-900 mb-2 flex items-center gap-2">
-                  <i class="fas fa-lightbulb text-purple-500"></i> Analysis Summary
+                  <i class="fas fa-lightbulb text-purple-500"></i> {{ textConstants.summary }}
                 </h5>
                 <p class="text-gray-700 text-sm">{{ pollSentiment.summary }}</p>
               </div>
@@ -1750,7 +1749,7 @@ function getInsightTypeColor(type: string) {
               <!-- Recommendations -->
               <div>
                 <h5 class="font-medium text-gray-900 mb-3 flex items-center gap-2">
-                  <i class="fas fa-check-circle text-purple-500"></i> AI Recommendations
+                  <i class="fas fa-check-circle text-purple-500"></i> {{ textConstants.recommendations }}
                 </h5>
                 <ul class="space-y-2">
                   <li v-for="(rec, idx) in pollSentiment.recommendations" :key="idx"
@@ -1766,11 +1765,11 @@ function getInsightTypeColor(type: string) {
           <div class="p-4 border-t border-gray-100 flex justify-end gap-3">
             <button @click="analyzePollSentiment()"
                     class="px-4 py-2 text-purple-600 hover:bg-purple-50 rounded-lg transition-colors flex items-center gap-2">
-              <i class="fas fa-rotate"></i> Refresh
+              <i class="fas fa-rotate"></i> {{ textConstants.refresh }}
             </button>
             <button @click="showSentimentModal = false"
                     class="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors">
-              Close
+              {{ textConstants.close }}
             </button>
           </div>
         </div>
@@ -1788,8 +1787,8 @@ function getInsightTypeColor(type: string) {
                   <i class="fas fa-chart-bar text-white"></i>
                 </div>
                 <div>
-                  <h3 class="text-lg font-semibold text-gray-900">Response Pattern Analysis</h3>
-                  <p class="text-sm text-gray-500">Discover voting behavior patterns</p>
+                  <h3 class="text-lg font-semibold text-gray-900">{{ textConstants.responsePatternAnalysis }}</h3>
+                  <p class="text-sm text-gray-500">{{ $t('polls.discoverVotingPatterns') }}</p>
                 </div>
               </div>
               <button @click="showPatternAnalysisModal = false" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
@@ -1799,15 +1798,15 @@ function getInsightTypeColor(type: string) {
           </div>
 
           <div class="p-6 overflow-y-auto max-h-[60vh]">
-            <AILoadingIndicator v-if="isAnalyzingPatterns" message="Analyzing response patterns..." />
+            <AILoadingIndicator v-if="isAnalyzingPatterns" :message="textConstants.analyzingPatterns" />
 
             <div v-else-if="responsePatterns.length > 0" class="space-y-4">
               <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4 mb-4">
                 <div class="flex items-center gap-2 text-blue-700 font-medium mb-1">
                   <i class="fas fa-chart-line"></i>
-                  Pattern Detection Complete
+                  {{ textConstants.detectedPatterns }}
                 </div>
-                <p class="text-sm text-gray-600">Identified {{ responsePatterns.length }} significant voting patterns</p>
+                <p class="text-sm text-gray-600">{{ $t('polls.identifiedPatterns', { count: responsePatterns.length }) }}</p>
               </div>
 
               <div v-for="pattern in responsePatterns" :key="pattern.id"
@@ -1822,11 +1821,11 @@ function getInsightTypeColor(type: string) {
                   </div>
                   <div class="text-right">
                     <div class="text-2xl font-bold text-blue-600">{{ pattern.percentage }}%</div>
-                    <div class="text-xs text-gray-500">Occurrence</div>
+                    <div class="text-xs text-gray-500">{{ $t('polls.occurrence') }}</div>
                   </div>
                 </div>
                 <div class="bg-gray-50 rounded-lg p-3">
-                  <h5 class="text-xs font-semibold text-gray-500 uppercase mb-2">Key Insights</h5>
+                  <h5 class="text-xs font-semibold text-gray-500 uppercase mb-2">{{ textConstants.keyInsights }}</h5>
                   <ul class="space-y-1">
                     <li v-for="(insight, idx) in pattern.insights" :key="idx"
                         class="text-sm text-gray-700 flex items-start gap-2">
@@ -1842,11 +1841,11 @@ function getInsightTypeColor(type: string) {
           <div class="p-4 border-t border-gray-100 flex justify-end gap-3">
             <button @click="analyzeResponsePatterns"
                     class="px-4 py-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors flex items-center gap-2">
-              <i class="fas fa-rotate"></i> Refresh
+              <i class="fas fa-rotate"></i> {{ textConstants.refresh }}
             </button>
             <button @click="showPatternAnalysisModal = false"
                     class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
-              Close
+              {{ textConstants.close }}
             </button>
           </div>
         </div>
