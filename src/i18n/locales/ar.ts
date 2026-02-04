@@ -2271,6 +2271,8 @@ export default {
     subtitle: 'إدارة حسابك وإعدادات التطبيق',
     managePreferences: 'إدارة تفضيلاتك',
     secureSettings: 'إعداداتك آمنة',
+    activeNow: 'نشط الآن',
+    strong: 'قوي',
     general: 'عام',
     account: 'الحساب',
     security: 'الأمان',

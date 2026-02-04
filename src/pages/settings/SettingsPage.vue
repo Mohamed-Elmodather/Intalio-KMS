@@ -458,24 +458,50 @@ function changePassword() {
           </div>
 
           <!-- Quick Stats -->
-          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-6">
-            <div class="bg-white/10 backdrop-blur rounded-xl p-3 text-center">
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6">
+            <div class="stats-card group bg-white/10 backdrop-blur rounded-2xl p-4 text-center hover:bg-white/20 transition-all cursor-pointer">
+              <div class="w-10 h-10 mx-auto mb-2 rounded-xl bg-white/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <i class="fas fa-user-check text-white"></i>
+              </div>
               <p class="text-2xl font-bold text-white">89%</p>
-              <p class="text-xs text-teal-100">{{ $t('settings.profileComplete') }}</p>
+              <p class="text-xs text-teal-100 mt-1">{{ $t('settings.profileComplete') }}</p>
+              <div class="mt-2 h-1.5 bg-white/20 rounded-full overflow-hidden">
+                <div class="h-full bg-white rounded-full" style="width: 89%"></div>
+              </div>
             </div>
-            <div class="bg-white/10 backdrop-blur rounded-xl p-3 text-center">
+            <div class="stats-card group bg-white/10 backdrop-blur rounded-2xl p-4 text-center hover:bg-white/20 transition-all cursor-pointer">
+              <div class="w-10 h-10 mx-auto mb-2 rounded-xl bg-white/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <i class="fas fa-plug text-white"></i>
+              </div>
               <p class="text-2xl font-bold text-white">12</p>
-              <p class="text-xs text-teal-100">{{ $t('settings.connectedApps') }}</p>
+              <p class="text-xs text-teal-100 mt-1">{{ $t('settings.connectedApps') }}</p>
+              <div class="mt-2 flex justify-center gap-1">
+                <span class="w-2 h-2 rounded-full bg-green-400"></span>
+                <span class="w-2 h-2 rounded-full bg-green-400"></span>
+                <span class="w-2 h-2 rounded-full bg-green-400"></span>
+                <span class="w-2 h-2 rounded-full bg-white/30"></span>
+              </div>
             </div>
-            <div class="bg-white/10 backdrop-blur rounded-xl p-3 text-center">
+            <div class="stats-card group bg-white/10 backdrop-blur rounded-2xl p-4 text-center hover:bg-white/20 transition-all cursor-pointer">
+              <div class="w-10 h-10 mx-auto mb-2 rounded-xl bg-white/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <i class="fas fa-desktop text-white"></i>
+              </div>
               <p class="text-2xl font-bold text-white">3</p>
-              <p class="text-xs text-teal-100">{{ $t('settings.activeSessions') }}</p>
+              <p class="text-xs text-teal-100 mt-1">{{ $t('settings.activeSessions') }}</p>
+              <div class="mt-2 flex justify-center gap-1">
+                <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
+                <span class="text-[10px] text-teal-200">{{ $t('settings.activeNow') }}</span>
+              </div>
             </div>
-            <div class="bg-white/10 backdrop-blur rounded-xl p-3 text-center">
-              <p class="text-2xl font-bold text-white flex items-center justify-center gap-1">
-                <i class="fas fa-shield-check text-green-300 text-lg"></i>
-              </p>
-              <p class="text-xs text-teal-100">{{ $t('settings.securityStrong') }}</p>
+            <div class="stats-card group bg-white/10 backdrop-blur rounded-2xl p-4 text-center hover:bg-white/20 transition-all cursor-pointer">
+              <div class="w-10 h-10 mx-auto mb-2 rounded-xl bg-white/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <i class="fas fa-shield-alt text-white"></i>
+              </div>
+              <p class="text-2xl font-bold text-white">100%</p>
+              <p class="text-xs text-teal-100 mt-1">{{ $t('settings.securityStrong') }}</p>
+              <div class="mt-2 h-1.5 bg-white/20 rounded-full overflow-hidden">
+                <div class="h-full bg-white rounded-full" style="width: 100%"></div>
+              </div>
             </div>
           </div>
         </div>

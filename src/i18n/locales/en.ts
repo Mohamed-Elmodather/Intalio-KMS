@@ -2269,6 +2269,8 @@ export default {
     subtitle: 'Manage your account and application settings',
     managePreferences: 'Manage your preferences',
     secureSettings: 'Your settings are secure',
+    activeNow: 'Active now',
+    strong: 'Strong',
     general: 'General',
     account: 'Account',
     security: 'Security',
