@@ -378,7 +378,18 @@ function saveAISettings() {
 }
 
 function resetAISettings() {
-  aiFeatureToggles.value.forEach(toggle => toggle.enabled = true)
+  // Reset AI feature states
+  aiFeatureStates.value = {
+    suggestions: true,
+    summarization: true,
+    translation: true,
+    chatbot: true,
+    classification: true,
+    ocr: true,
+    sentiment: false,
+    recommendations: true
+  }
+  // Reset AI preferences
   aiPreferences.value = {
     defaultTranslationLanguage: 'ar',
     summaryLength: 'medium',
@@ -696,7 +707,7 @@ function changePassword() {
                     </div>
                   </div>
                   <label class="toggle">
-                    <input type="checkbox" v-model="feature.enabled">
+                    <input type="checkbox" v-model="aiFeatureStates[feature.id as keyof typeof aiFeatureStates]">
                     <span class="toggle-slider"></span>
                   </label>
                 </div>
