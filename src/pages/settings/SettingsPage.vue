@@ -561,9 +561,16 @@ function changePassword() {
         <div class="flex-1">
           <!-- Account Settings -->
           <div v-if="activeTab === 'account'" class="card-animated rounded-2xl overflow-hidden fade-in-up" style="animation-delay: 0.2s;">
-            <div class="p-6 border-b border-teal-100">
-              <h2 class="text-lg font-semibold text-teal-900">{{ $t('settings.accountSettings') }}</h2>
-              <p class="text-sm text-teal-500">{{ $t('settings.manageAccountInfo') }}</p>
+            <div class="settings-tab-header p-5 bg-gradient-to-r from-teal-500 to-emerald-500">
+              <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-white/20 backdrop-blur rounded-xl flex items-center justify-center">
+                  <i class="fas fa-user text-white text-xl"></i>
+                </div>
+                <div>
+                  <h2 class="text-lg font-semibold text-white">{{ $t('settings.accountSettings') }}</h2>
+                  <p class="text-sm text-teal-100">{{ $t('settings.manageAccountInfo') }}</p>
+                </div>
+              </div>
             </div>
             <div class="p-6 space-y-6">
               <div class="flex items-center gap-6">
@@ -624,15 +631,15 @@ function changePassword() {
           <div v-if="activeTab === 'ai'" class="space-y-6">
             <!-- AI Settings Header Card -->
             <div class="card-animated rounded-2xl overflow-hidden fade-in-up" style="animation-delay: 0.2s;">
-              <div class="p-6 bg-gradient-to-r from-teal-500 to-emerald-500">
+              <div class="settings-tab-header p-5 bg-gradient-to-r from-teal-500 to-emerald-500">
                 <div class="flex items-center justify-between">
                   <div class="flex items-center gap-4">
-                    <div class="w-14 h-14 bg-white/20 backdrop-blur rounded-2xl flex items-center justify-center">
-                      <i class="fas fa-wand-magic-sparkles text-white text-2xl"></i>
+                    <div class="w-12 h-12 bg-white/20 backdrop-blur rounded-xl flex items-center justify-center">
+                      <i class="fas fa-wand-magic-sparkles text-white text-xl"></i>
                     </div>
                     <div>
-                      <h2 class="text-xl font-semibold text-white">{{ $t('settings.aiSettings') }}</h2>
-                      <p class="text-teal-100">{{ $t('settings.manageAIFeatures') }}</p>
+                      <h2 class="text-lg font-semibold text-white">{{ $t('settings.aiSettings') }}</h2>
+                      <p class="text-sm text-teal-100">{{ $t('settings.manageAIFeatures') }}</p>
                     </div>
                   </div>
                   <button @click="testAIConnection"
@@ -640,26 +647,6 @@ function changePassword() {
                     <i class="fas fa-plug"></i>
                     {{ $t('settings.testConnection') }}
                   </button>
-                </div>
-
-                <!-- AI Usage Stats -->
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
-                  <div class="bg-white/10 backdrop-blur rounded-xl p-3 text-center">
-                    <p class="text-2xl font-bold text-white">{{ aiUsageStats.summariesGenerated }}</p>
-                    <p class="text-xs text-teal-100">{{ $t('settings.aiUsageStats.summaries') }}</p>
-                  </div>
-                  <div class="bg-white/10 backdrop-blur rounded-xl p-3 text-center">
-                    <p class="text-2xl font-bold text-white">{{ aiUsageStats.translationsPerformed }}</p>
-                    <p class="text-xs text-teal-100">{{ $t('settings.aiUsageStats.translations') }}</p>
-                  </div>
-                  <div class="bg-white/10 backdrop-blur rounded-xl p-3 text-center">
-                    <p class="text-2xl font-bold text-white">{{ aiUsageStats.chatMessages }}</p>
-                    <p class="text-xs text-teal-100">{{ $t('settings.aiUsageStats.chatMessages') }}</p>
-                  </div>
-                  <div class="bg-white/10 backdrop-blur rounded-xl p-3 text-center">
-                    <p class="text-2xl font-bold text-white">{{ aiUsageStats.documentsScanned }}</p>
-                    <p class="text-xs text-teal-100">{{ $t('settings.aiUsageStats.ocrScans') }}</p>
-                  </div>
                 </div>
               </div>
             </div>
@@ -833,9 +820,16 @@ function changePassword() {
 
           <!-- Notifications -->
           <div v-if="activeTab === 'notifications'" class="card-animated rounded-2xl overflow-hidden fade-in-up" style="animation-delay: 0.2s;">
-            <div class="p-6 border-b border-teal-100">
-              <h2 class="text-lg font-semibold text-teal-900">{{ $t('settings.notificationPreferences') }}</h2>
-              <p class="text-sm text-teal-500">{{ $t('settings.chooseNotifications') }}</p>
+            <div class="settings-tab-header p-5 bg-gradient-to-r from-teal-500 to-emerald-500">
+              <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-white/20 backdrop-blur rounded-xl flex items-center justify-center">
+                  <i class="fas fa-bell text-white text-xl"></i>
+                </div>
+                <div>
+                  <h2 class="text-lg font-semibold text-white">{{ $t('settings.notificationPreferences') }}</h2>
+                  <p class="text-sm text-teal-100">{{ $t('settings.chooseNotifications') }}</p>
+                </div>
+              </div>
             </div>
             <div class="p-6 space-y-6">
               <div v-for="category in notifications" :key="category.id" class="border-b border-teal-100 last:border-0 pb-6 last:pb-0">
@@ -875,9 +869,16 @@ function changePassword() {
 
           <!-- Privacy -->
           <div v-if="activeTab === 'privacy'" class="card-animated rounded-2xl overflow-hidden fade-in-up" style="animation-delay: 0.2s;">
-            <div class="p-6 border-b border-teal-100">
-              <h2 class="text-lg font-semibold text-teal-900">{{ $t('settings.privacySettings') }}</h2>
-              <p class="text-sm text-teal-500">{{ $t('settings.controlPrivacy') }}</p>
+            <div class="settings-tab-header p-5 bg-gradient-to-r from-teal-500 to-emerald-500">
+              <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-white/20 backdrop-blur rounded-xl flex items-center justify-center">
+                  <i class="fas fa-shield-alt text-white text-xl"></i>
+                </div>
+                <div>
+                  <h2 class="text-lg font-semibold text-white">{{ $t('settings.privacySettings') }}</h2>
+                  <p class="text-sm text-teal-100">{{ $t('settings.controlPrivacy') }}</p>
+                </div>
+              </div>
             </div>
             <div class="p-6 space-y-6">
               <div
@@ -905,9 +906,16 @@ function changePassword() {
 
           <!-- Appearance -->
           <div v-if="activeTab === 'appearance'" class="card-animated rounded-2xl overflow-hidden fade-in-up" style="animation-delay: 0.2s;">
-            <div class="p-6 border-b border-teal-100">
-              <h2 class="text-lg font-semibold text-teal-900">{{ $t('settings.appearanceSettings') }}</h2>
-              <p class="text-sm text-teal-500">{{ $t('settings.customizeAppearance') }}</p>
+            <div class="settings-tab-header p-5 bg-gradient-to-r from-teal-500 to-emerald-500">
+              <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-white/20 backdrop-blur rounded-xl flex items-center justify-center">
+                  <i class="fas fa-palette text-white text-xl"></i>
+                </div>
+                <div>
+                  <h2 class="text-lg font-semibold text-white">{{ $t('settings.appearanceSettings') }}</h2>
+                  <p class="text-sm text-teal-100">{{ $t('settings.customizeAppearance') }}</p>
+                </div>
+              </div>
             </div>
             <div class="p-6 space-y-6">
               <div>
@@ -985,9 +993,16 @@ function changePassword() {
 
           <!-- Language -->
           <div v-if="activeTab === 'language'" class="card-animated rounded-2xl overflow-hidden fade-in-up" style="animation-delay: 0.2s;">
-            <div class="p-6 border-b border-teal-100">
-              <h2 class="text-lg font-semibold text-teal-900">{{ $t('settings.languageRegion') }}</h2>
-              <p class="text-sm text-teal-500">{{ $t('settings.languagePreferences') }}</p>
+            <div class="settings-tab-header p-5 bg-gradient-to-r from-teal-500 to-emerald-500">
+              <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-white/20 backdrop-blur rounded-xl flex items-center justify-center">
+                  <i class="fas fa-globe text-white text-xl"></i>
+                </div>
+                <div>
+                  <h2 class="text-lg font-semibold text-white">{{ $t('settings.languageRegion') }}</h2>
+                  <p class="text-sm text-teal-100">{{ $t('settings.languagePreferences') }}</p>
+                </div>
+              </div>
             </div>
             <div class="p-6 space-y-6">
               <div>
@@ -1052,9 +1067,16 @@ function changePassword() {
 
           <!-- Security -->
           <div v-if="activeTab === 'security'" class="card-animated rounded-2xl overflow-hidden fade-in-up" style="animation-delay: 0.2s;">
-            <div class="p-6 border-b border-teal-100">
-              <h2 class="text-lg font-semibold text-teal-900">{{ $t('settings.securitySettings') }}</h2>
-              <p class="text-sm text-teal-500">{{ $t('settings.manageSecuritySettings') }}</p>
+            <div class="settings-tab-header p-5 bg-gradient-to-r from-teal-500 to-emerald-500">
+              <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-white/20 backdrop-blur rounded-xl flex items-center justify-center">
+                  <i class="fas fa-lock text-white text-xl"></i>
+                </div>
+                <div>
+                  <h2 class="text-lg font-semibold text-white">{{ $t('settings.securitySettings') }}</h2>
+                  <p class="text-sm text-teal-100">{{ $t('settings.manageSecuritySettings') }}</p>
+                </div>
+              </div>
             </div>
             <div class="p-6 space-y-6">
               <!-- Password -->
@@ -1115,9 +1137,16 @@ function changePassword() {
 
           <!-- Connected Apps -->
           <div v-if="activeTab === 'apps'" class="card-animated rounded-2xl overflow-hidden fade-in-up" style="animation-delay: 0.2s;">
-            <div class="p-6 border-b border-teal-100">
-              <h2 class="text-lg font-semibold text-teal-900">{{ $t('settings.connectedAppsTitle') }}</h2>
-              <p class="text-sm text-teal-500">{{ $t('settings.manageIntegrations') }}</p>
+            <div class="settings-tab-header p-5 bg-gradient-to-r from-teal-500 to-emerald-500">
+              <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-white/20 backdrop-blur rounded-xl flex items-center justify-center">
+                  <i class="fas fa-plug text-white text-xl"></i>
+                </div>
+                <div>
+                  <h2 class="text-lg font-semibold text-white">{{ $t('settings.connectedAppsTitle') }}</h2>
+                  <p class="text-sm text-teal-100">{{ $t('settings.manageIntegrations') }}</p>
+                </div>
+              </div>
             </div>
             <div class="p-6 space-y-4">
               <div
@@ -1147,19 +1176,19 @@ function changePassword() {
           <div v-if="activeTab === 'shortcuts'" class="space-y-6">
             <!-- Shortcuts Header -->
             <div class="card-animated rounded-2xl overflow-hidden fade-in-up" style="animation-delay: 0.2s;">
-              <div class="p-6 bg-gradient-to-r from-gray-800 to-gray-900">
+              <div class="settings-tab-header p-5 bg-gradient-to-r from-teal-500 to-emerald-500">
                 <div class="flex items-center justify-between">
                   <div class="flex items-center gap-4">
-                    <div class="w-14 h-14 bg-white/10 backdrop-blur rounded-2xl flex items-center justify-center">
-                      <i class="fas fa-keyboard text-white text-2xl"></i>
+                    <div class="w-12 h-12 bg-white/20 backdrop-blur rounded-xl flex items-center justify-center">
+                      <i class="fas fa-keyboard text-white text-xl"></i>
                     </div>
                     <div>
-                      <h2 class="text-xl font-semibold text-white">{{ $t('settings.keyboardShortcuts') }}</h2>
-                      <p class="text-gray-400">{{ $t('settings.speedUpWorkflow') }}</p>
+                      <h2 class="text-lg font-semibold text-white">{{ $t('settings.keyboardShortcuts') }}</h2>
+                      <p class="text-sm text-teal-100">{{ $t('settings.speedUpWorkflow') }}</p>
                     </div>
                   </div>
                   <div class="flex items-center gap-3">
-                    <span class="text-sm text-gray-400">{{ $t('settings.enableShortcuts') }}</span>
+                    <span class="text-sm text-teal-100">{{ $t('settings.enableShortcuts') }}</span>
                     <label class="toggle">
                       <input type="checkbox" v-model="shortcutsEnabled">
                       <span class="toggle-slider"></span>
@@ -1409,12 +1438,14 @@ function changePassword() {
 }
 
 /* Sidebar header glow effect */
-.sidebar-header {
+.sidebar-header,
+.settings-tab-header {
   position: relative;
   overflow: hidden;
 }
 
-.sidebar-header::before {
+.sidebar-header::before,
+.settings-tab-header::before {
   content: '';
   position: absolute;
   top: -50%;
@@ -1428,6 +1459,11 @@ function changePassword() {
 @keyframes headerGlow {
   0%, 100% { transform: translate(0, 0); }
   50% { transform: translate(-20%, 20%); }
+}
+
+/* Settings tab header unified styling */
+.settings-tab-header {
+  border-bottom: none;
 }
 
 /* Card animations */
