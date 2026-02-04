@@ -306,8 +306,183 @@ export default {
   // Profile
   profile: {
     follow: 'متابعة',
+    followBack: 'متابعة بالمقابل',
+    following: 'متابَع',
     aiInsights: 'رؤى الذكاء الاصطناعي',
     editProfile: 'تعديل الملف الشخصي',
+    edit: 'تعديل',
+    verified: 'موثق',
+    level: 'المستوى',
+    loadingProfile: 'جارٍ تحميل الملف الشخصي...',
+
+    // Stats
+    stats: {
+      articles: 'المقالات',
+      documents: 'المستندات',
+      courses: 'الدورات',
+      followers: 'المتابعون',
+      following: 'المتابَعون',
+    },
+
+    // About Section
+    about: {
+      title: 'نبذة',
+      aiGenerateBio: 'توليد السيرة بالذكاء الاصطناعي',
+      skillsExpertise: 'المهارات والخبرات',
+      aiAnalyzeSkills: 'تحليل المهارات بالذكاء الاصطناعي',
+      email: 'البريد الإلكتروني',
+      phone: 'الهاتف',
+    },
+
+    // Activity Section
+    activity: {
+      title: 'النشاط الأخير',
+      viewAll: 'عرض جميع الأنشطة',
+      filter: {
+        all: 'جميع الأنشطة',
+        articles: 'المقالات',
+        comments: 'التعليقات',
+        courses: 'الدورات',
+      },
+    },
+
+    // Contributions Section
+    contributions: {
+      title: 'المساهمات',
+      subtitle: 'نشاطك وتأثيرك',
+      thisYear: 'هذا العام',
+      thisMonth: 'هذا الشهر',
+      thisWeek: 'هذا الأسبوع',
+      dayStreak: 'سلسلة {count} يوم',
+      topContributor: 'ضمن أفضل {percent}% من المساهمين',
+      articlesPublished: 'المقالات المنشورة',
+      commentsMade: 'التعليقات المكتوبة',
+      documentsShared: 'المستندات المشاركة',
+      coursesCompleted: 'الدورات المكتملة',
+      activityOverview: 'نظرة عامة على النشاط',
+      contributionsLabel: 'المساهمات',
+      avg: 'المتوسط',
+      contributionsTooltip: '{count} مساهمة',
+      thisWeeksActivity: 'نشاط هذا الأسبوع',
+      yourImpact: 'تأثيرك',
+      impactMessage: 'تمت مشاهدة مساهماتك <strong>{views}</strong> مرة وساعدت <strong>{helped}</strong> زميلاً هذا الشهر. استمر في العمل الرائع!',
+      months: {
+        jan: 'يناير',
+        feb: 'فبراير',
+        mar: 'مارس',
+        apr: 'أبريل',
+        may: 'مايو',
+        jun: 'يونيو',
+        jul: 'يوليو',
+        aug: 'أغسطس',
+        sep: 'سبتمبر',
+        oct: 'أكتوبر',
+        nov: 'نوفمبر',
+        dec: 'ديسمبر',
+      },
+      days: {
+        mon: 'الإثنين',
+        tue: 'الثلاثاء',
+        wed: 'الأربعاء',
+        thu: 'الخميس',
+        fri: 'الجمعة',
+        sat: 'السبت',
+        sun: 'الأحد',
+      },
+    },
+
+    // Content Authored Section
+    content: {
+      title: 'المحتوى المُنشأ',
+      articles: 'المقالات',
+      documents: 'المستندات',
+      polls: 'الاستطلاعات',
+      views: 'مشاهدة',
+      likes: 'إعجاب',
+      downloads: 'تحميل',
+      votes: 'صوت',
+      active: 'نشط',
+      completed: 'مكتمل',
+      viewAllArticles: 'عرض جميع المقالات',
+      viewAllDocuments: 'عرض جميع المستندات',
+      viewAllPolls: 'عرض جميع الاستطلاعات',
+    },
+
+    // Right Column Sections
+    badges: {
+      title: 'الشارات والإنجازات',
+      viewAll: 'عرض جميع الشارات',
+    },
+    learning: {
+      title: 'تقدم التعلم',
+      viewAllCourses: 'عرض جميع الدورات',
+    },
+    certificates: {
+      title: 'الشهادات',
+    },
+    team: {
+      title: 'الفريق',
+    },
+    connections: {
+      title: 'العلاقات',
+      mutual: 'مشترك',
+      followers: 'المتابعون',
+      following: 'المتابَعون',
+      recentFollowers: 'المتابعون الجدد',
+      viewAll: 'عرض جميع العلاقات',
+    },
+
+    // Edit Profile Modal
+    editModal: {
+      title: 'تعديل الملف الشخصي',
+      firstName: 'الاسم الأول',
+      lastName: 'اسم العائلة',
+      jobTitle: 'المسمى الوظيفي',
+      bio: 'السيرة الذاتية',
+      phone: 'الهاتف',
+      location: 'الموقع',
+      cancel: 'إلغاء',
+      saveChanges: 'حفظ التغييرات',
+    },
+
+    // AI Profile Summary Modal
+    aiSummary: {
+      title: 'ملخص الملف الشخصي بالذكاء الاصطناعي',
+      subtitle: 'سيرة مهنية مُولّدة من أنشطتك',
+      analyzing: 'جارٍ تحليل بيانات ملفك الشخصي...',
+      confidenceMessage: 'نسبة الثقة {percent}% بناءً على أنشطتك',
+      professionalSummary: 'الملخص المهني',
+      keyStrengths: 'نقاط القوة الرئيسية',
+      areasOfExpertise: 'مجالات الخبرة',
+      impactStatement: 'بيان التأثير',
+      regenerate: 'إعادة التوليد',
+      cancel: 'إلغاء',
+      applyToProfile: 'تطبيق على الملف الشخصي',
+    },
+
+    // AI Skills Analysis Modal
+    aiSkills: {
+      title: 'تحليل المهارات بالذكاء الاصطناعي',
+      subtitle: 'المهارات المكتشفة من أنماط نشاطك',
+      analyzing: 'جارٍ تحليل مهاراتك من الأنشطة...',
+      detectedSkills: 'المهارات المكتشفة',
+      suggestedSkills: 'المهارات المقترحة للإضافة',
+      relevant: 'ذو صلة',
+      addToProfile: 'إضافة إلى الملف الشخصي',
+      skillGapAnalysis: 'تحليل فجوات المهارات',
+      reAnalyze: 'إعادة التحليل',
+      close: 'إغلاق',
+    },
+
+    // AI Profile Insights Modal
+    aiInsightsModal: {
+      title: 'رؤى الملف الشخصي بالذكاء الاصطناعي',
+      subtitle: 'رؤى مخصصة بناءً على نشاطك',
+      generating: 'جارٍ توليد الرؤى المخصصة...',
+      noInsights: 'لا توجد رؤى متاحة حتى الآن. استمر في المساهمة لفتح الرؤى المخصصة!',
+      refresh: 'تحديث',
+      close: 'إغلاق',
+    },
   },
 
   // Dashboard

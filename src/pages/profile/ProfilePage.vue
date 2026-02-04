@@ -667,7 +667,7 @@ function getInsightColor(type: string): string {
   <div class="px-6 py-6">
     <!-- Loading State -->
     <div v-if="isLoading" class="flex items-center justify-center min-h-[60vh]">
-      <LoadingSpinner size="lg" text="Loading profile..." />
+      <LoadingSpinner size="lg" :text="$t('profile.loadingProfile')" />
     </div>
 
     <template v-else>
@@ -766,7 +766,7 @@ function getInsightColor(type: string): string {
                   </button>
                   <button @click="showEditProfile = true" class="px-3 py-2 bg-teal-500 text-white rounded-lg font-medium text-xs flex items-center gap-1.5 hover:bg-teal-600 transition-all shadow-md">
                     <i class="fas fa-edit"></i>
-                    Edit
+                    {{ $t('profile.edit') }}
                   </button>
                   <button @click="goToSettings" class="p-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-all">
                     <i class="fas fa-cog text-sm"></i>
@@ -780,23 +780,23 @@ function getInsightColor(type: string): string {
               <div class="flex items-center gap-6">
                 <div class="text-center cursor-pointer hover:opacity-80 transition-opacity">
                   <p class="text-lg font-bold text-gray-900">{{ stats.articles }}</p>
-                  <p class="text-xs text-gray-500">Articles</p>
+                  <p class="text-xs text-gray-500">{{ $t('profile.stats.articles') }}</p>
                 </div>
                 <div class="text-center cursor-pointer hover:opacity-80 transition-opacity">
                   <p class="text-lg font-bold text-gray-900">{{ stats.documents }}</p>
-                  <p class="text-xs text-gray-500">Documents</p>
+                  <p class="text-xs text-gray-500">{{ $t('profile.stats.documents') }}</p>
                 </div>
                 <div class="text-center cursor-pointer hover:opacity-80 transition-opacity">
                   <p class="text-lg font-bold text-gray-900">{{ stats.courses }}</p>
-                  <p class="text-xs text-gray-500">Courses</p>
+                  <p class="text-xs text-gray-500">{{ $t('profile.stats.courses') }}</p>
                 </div>
                 <div class="text-center cursor-pointer hover:opacity-80 transition-opacity">
                   <p class="text-lg font-bold text-gray-900">{{ followersCount }}</p>
-                  <p class="text-xs text-gray-500">Followers</p>
+                  <p class="text-xs text-gray-500">{{ $t('profile.stats.followers') }}</p>
                 </div>
                 <div class="text-center cursor-pointer hover:opacity-80 transition-opacity">
                   <p class="text-lg font-bold text-gray-900">{{ followingCount }}</p>
-                  <p class="text-xs text-gray-500">Following</p>
+                  <p class="text-xs text-gray-500">{{ $t('profile.stats.following') }}</p>
                 </div>
               </div>
             </div>
@@ -810,11 +810,11 @@ function getInsightColor(type: string): string {
           <!-- About -->
           <div class="card-animated fade-in-up rounded-2xl p-6" style="animation-delay: 0.2s">
             <div class="flex items-center justify-between mb-4">
-              <h2 class="text-lg font-semibold text-teal-900">About</h2>
+              <h2 class="text-lg font-semibold text-teal-900">{{ $t('profile.about.title') }}</h2>
               <button @click="generateAIProfileSummary"
                       class="px-3 py-1.5 text-xs font-medium text-teal-600 bg-teal-50 rounded-lg hover:bg-teal-100 transition-colors flex items-center gap-1.5">
                 <i class="fas fa-wand-magic-sparkles"></i>
-                AI Generate Bio
+                {{ $t('profile.about.aiGenerateBio') }}
               </button>
             </div>
             <p class="text-teal-700 leading-relaxed">{{ user.bio }}</p>
@@ -822,11 +822,11 @@ function getInsightColor(type: string): string {
             <!-- Skills -->
             <div class="mt-6">
               <div class="flex items-center justify-between mb-3">
-                <h3 class="text-sm font-semibold text-teal-500 uppercase tracking-wider">Skills & Expertise</h3>
+                <h3 class="text-sm font-semibold text-teal-500 uppercase tracking-wider">{{ $t('profile.about.skillsExpertise') }}</h3>
                 <button @click="analyzeSkills"
                         class="px-3 py-1 text-xs font-medium text-teal-600 bg-teal-50 rounded-lg hover:bg-teal-100 transition-colors flex items-center gap-1">
                   <i class="fas fa-brain"></i>
-                  AI Analyze Skills
+                  {{ $t('profile.about.aiAnalyzeSkills') }}
                 </button>
               </div>
               <div class="flex flex-wrap gap-2">
@@ -847,7 +847,7 @@ function getInsightColor(type: string): string {
                   <i class="fas fa-envelope text-blue-600 icon-vibrant"></i>
                 </div>
                 <div>
-                  <p class="text-xs text-teal-500">Email</p>
+                  <p class="text-xs text-teal-500">{{ $t('profile.about.email') }}</p>
                   <p class="text-sm text-teal-800">{{ user.email }}</p>
                 </div>
               </div>
@@ -856,7 +856,7 @@ function getInsightColor(type: string): string {
                   <i class="fas fa-phone text-green-600 icon-vibrant"></i>
                 </div>
                 <div>
-                  <p class="text-xs text-teal-500">Phone</p>
+                  <p class="text-xs text-teal-500">{{ $t('profile.about.phone') }}</p>
                   <p class="text-sm text-teal-800">{{ user.phone }}</p>
                 </div>
               </div>
@@ -866,12 +866,12 @@ function getInsightColor(type: string): string {
           <!-- Activity Timeline -->
           <div class="card-animated fade-in-up rounded-2xl p-6" style="animation-delay: 0.3s">
             <div class="flex items-center justify-between mb-6">
-              <h2 class="text-lg font-semibold text-teal-900">Recent Activity</h2>
+              <h2 class="text-lg font-semibold text-teal-900">{{ $t('profile.activity.title') }}</h2>
               <select v-model="activityFilter" class="input text-sm py-2 w-auto">
-                <option value="all">All Activity</option>
-                <option value="articles">Articles</option>
-                <option value="comments">Comments</option>
-                <option value="courses">Courses</option>
+                <option value="all">{{ $t('profile.activity.filter.all') }}</option>
+                <option value="articles">{{ $t('profile.activity.filter.articles') }}</option>
+                <option value="comments">{{ $t('profile.activity.filter.comments') }}</option>
+                <option value="courses">{{ $t('profile.activity.filter.courses') }}</option>
               </select>
             </div>
 
@@ -890,7 +890,7 @@ function getInsightColor(type: string): string {
                 </div>
                 <div
                   @click="goToActivityLink(activity.link)"
-                  class="card-animated rounded-xl p-4 ml-2 hover:shadow-md transition-all ripple cursor-pointer group"
+                  class="card-animated rounded-xl p-4 ms-2 hover:shadow-md transition-all ripple cursor-pointer group"
                 >
                   <div class="flex items-center justify-between mb-1">
                     <span :class="['badge text-xs', activity.typeBadge]">{{ activity.type }}</span>
@@ -903,7 +903,7 @@ function getInsightColor(type: string): string {
             </div>
 
             <button class="btn-vibrant ripple w-full mt-4 py-3 text-center text-teal-600 hover:text-teal-800 font-medium">
-              View All Activity <i class="fas fa-arrow-right ml-1 icon-soft"></i>
+              {{ $t('profile.activity.viewAll') }} <i class="fas fa-arrow-right ms-1 icon-soft"></i>
             </button>
           </div>
 
@@ -917,14 +917,14 @@ function getInsightColor(type: string): string {
                     <i class="fas fa-chart-line text-white text-xl"></i>
                   </div>
                   <div>
-                    <h2 class="text-lg font-semibold text-white">Contributions</h2>
-                    <p class="text-teal-100 text-sm">Your activity and impact</p>
+                    <h2 class="text-lg font-semibold text-white">{{ $t('profile.contributions.title') }}</h2>
+                    <p class="text-teal-100 text-sm">{{ $t('profile.contributions.subtitle') }}</p>
                   </div>
                 </div>
                 <select class="px-3 py-1.5 bg-white/20 backdrop-blur text-white text-sm rounded-lg border border-white/30 focus:outline-none">
-                  <option value="year" class="text-gray-800">This Year</option>
-                  <option value="month" class="text-gray-800">This Month</option>
-                  <option value="week" class="text-gray-800">This Week</option>
+                  <option value="year" class="text-gray-800">{{ $t('profile.contributions.thisYear') }}</option>
+                  <option value="month" class="text-gray-800">{{ $t('profile.contributions.thisMonth') }}</option>
+                  <option value="week" class="text-gray-800">{{ $t('profile.contributions.thisWeek') }}</option>
                 </select>
               </div>
 
@@ -932,11 +932,11 @@ function getInsightColor(type: string): string {
               <div class="flex items-center gap-4 mt-4">
                 <div class="flex items-center gap-2 px-3 py-1.5 bg-white/20 backdrop-blur rounded-full">
                   <i class="fas fa-fire text-orange-300"></i>
-                  <span class="text-white text-sm font-medium">32 day streak</span>
+                  <span class="text-white text-sm font-medium">{{ $t('profile.contributions.dayStreak', { count: 32 }) }}</span>
                 </div>
                 <div class="flex items-center gap-2 px-3 py-1.5 bg-white/20 backdrop-blur rounded-full">
                   <i class="fas fa-trophy text-yellow-300"></i>
-                  <span class="text-white text-sm font-medium">Top 5% contributor</span>
+                  <span class="text-white text-sm font-medium">{{ $t('profile.contributions.topContributor', { percent: 5 }) }}</span>
                 </div>
               </div>
             </div>
@@ -954,7 +954,7 @@ function getInsightColor(type: string): string {
                     </span>
                   </div>
                   <p class="text-2xl font-bold text-teal-700">{{ stats.articles }}</p>
-                  <p class="text-sm text-teal-600">Articles Published</p>
+                  <p class="text-sm text-teal-600">{{ $t('profile.contributions.articlesPublished') }}</p>
                 </div>
 
                 <div class="p-4 rounded-xl bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200">
@@ -967,7 +967,7 @@ function getInsightColor(type: string): string {
                     </span>
                   </div>
                   <p class="text-2xl font-bold text-blue-700">{{ stats.comments }}</p>
-                  <p class="text-sm text-blue-600">Comments Made</p>
+                  <p class="text-sm text-blue-600">{{ $t('profile.contributions.commentsMade') }}</p>
                 </div>
 
                 <div class="p-4 rounded-xl bg-gradient-to-br from-purple-50 to-purple-100 border border-purple-200">
@@ -980,7 +980,7 @@ function getInsightColor(type: string): string {
                     </span>
                   </div>
                   <p class="text-2xl font-bold text-purple-700">{{ stats.documents }}</p>
-                  <p class="text-sm text-purple-600">Documents Shared</p>
+                  <p class="text-sm text-purple-600">{{ $t('profile.contributions.documentsShared') }}</p>
                 </div>
 
                 <div class="p-4 rounded-xl bg-gradient-to-br from-green-50 to-green-100 border border-green-200">
@@ -993,20 +993,20 @@ function getInsightColor(type: string): string {
                     </span>
                   </div>
                   <p class="text-2xl font-bold text-green-700">{{ stats.courses }}</p>
-                  <p class="text-sm text-green-600">Courses Completed</p>
+                  <p class="text-sm text-green-600">{{ $t('profile.contributions.coursesCompleted') }}</p>
                 </div>
               </div>
 
               <!-- Activity Chart -->
               <div class="bg-gray-50 rounded-xl p-4">
                 <div class="flex items-center justify-between mb-4">
-                  <h3 class="text-sm font-semibold text-gray-700">Activity Overview</h3>
+                  <h3 class="text-sm font-semibold text-gray-700">{{ $t('profile.contributions.activityOverview') }}</h3>
                   <div class="flex items-center gap-4 text-xs">
                     <span class="flex items-center gap-1">
-                      <span class="w-3 h-3 rounded-full bg-teal-500"></span> Contributions
+                      <span class="w-3 h-3 rounded-full bg-teal-500"></span> {{ $t('profile.contributions.contributionsLabel') }}
                     </span>
                     <span class="flex items-center gap-1">
-                      <span class="w-3 h-3 rounded-full bg-teal-200"></span> Avg
+                      <span class="w-3 h-3 rounded-full bg-teal-200"></span> {{ $t('profile.contributions.avg') }}
                     </span>
                   </div>
                 </div>
@@ -1026,7 +1026,7 @@ function getInsightColor(type: string): string {
                         ></div>
                         <!-- Tooltip -->
                         <div class="absolute -top-8 left-1/2 -translate-x-1/2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
-                          {{ val }} contributions
+                          {{ $t('profile.contributions.contributionsTooltip', { count: val }) }}
                         </div>
                       </div>
                     </div>
@@ -1042,7 +1042,7 @@ function getInsightColor(type: string): string {
 
               <!-- Weekly Activity -->
               <div class="mt-6">
-                <h3 class="text-sm font-semibold text-gray-700 mb-3">This Week's Activity</h3>
+                <h3 class="text-sm font-semibold text-gray-700 mb-3">{{ $t('profile.contributions.thisWeeksActivity') }}</h3>
                 <div class="grid grid-cols-7 gap-2">
                   <div v-for="(day, idx) in ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']" :key="day" class="text-center">
                     <div
@@ -1065,10 +1065,8 @@ function getInsightColor(type: string): string {
                     <i class="fas fa-star text-white"></i>
                   </div>
                   <div>
-                    <h4 class="font-semibold text-amber-800">Your Impact</h4>
-                    <p class="text-sm text-amber-700 mt-1">
-                      Your contributions have been viewed <strong>12,450</strong> times and helped
-                      <strong>234</strong> colleagues this month. Keep up the great work!
+                    <h4 class="font-semibold text-amber-800">{{ $t('profile.contributions.yourImpact') }}</h4>
+                    <p class="text-sm text-amber-700 mt-1" v-html="$t('profile.contributions.impactMessage', { views: '12,450', helped: '234' })">
                     </p>
                   </div>
                 </div>
@@ -1079,7 +1077,7 @@ function getInsightColor(type: string): string {
           <!-- Content Authored -->
           <div class="card-animated fade-in-up rounded-2xl p-6" style="animation-delay: 0.5s">
             <div class="flex items-center justify-between mb-6">
-              <h2 class="text-lg font-semibold text-teal-900">Content Authored</h2>
+              <h2 class="text-lg font-semibold text-teal-900">{{ $t('profile.content.title') }}</h2>
               <div class="flex gap-1 bg-teal-50 rounded-lg p-1">
                 <button
                   @click="activeContentTab = 'articles'"
@@ -1090,7 +1088,7 @@ function getInsightColor(type: string): string {
                       : 'text-teal-600 hover:text-teal-800'
                   ]"
                 >
-                  Articles
+                  {{ $t('profile.content.articles') }}
                 </button>
                 <button
                   @click="activeContentTab = 'documents'"
@@ -1101,7 +1099,7 @@ function getInsightColor(type: string): string {
                       : 'text-teal-600 hover:text-teal-800'
                   ]"
                 >
-                  Documents
+                  {{ $t('profile.content.documents') }}
                 </button>
                 <button
                   @click="activeContentTab = 'polls'"
@@ -1112,7 +1110,7 @@ function getInsightColor(type: string): string {
                       : 'text-teal-600 hover:text-teal-800'
                   ]"
                 >
-                  Polls
+                  {{ $t('profile.content.polls') }}
                 </button>
               </div>
             </div>
@@ -1132,16 +1130,16 @@ function getInsightColor(type: string): string {
                       {{ article.title }}
                     </h3>
                     <div class="flex items-center gap-4 mt-2 text-sm text-teal-500">
-                      <span><i class="fas fa-eye mr-1"></i>{{ article.views.toLocaleString() }} views</span>
-                      <span><i class="fas fa-heart mr-1"></i>{{ article.likes }} likes</span>
-                      <span><i class="fas fa-clock mr-1"></i>{{ article.date }}</span>
+                      <span><i class="fas fa-eye me-1"></i>{{ article.views.toLocaleString() }} {{ $t('profile.content.views') }}</span>
+                      <span><i class="fas fa-heart me-1"></i>{{ article.likes }} {{ $t('profile.content.likes') }}</span>
+                      <span><i class="fas fa-clock me-1"></i>{{ article.date }}</span>
                     </div>
                   </div>
                   <i class="fas fa-chevron-right text-teal-400 group-hover:text-teal-600 transition-colors mt-1"></i>
                 </div>
               </router-link>
               <button @click="goToArticles" class="w-full py-2 text-center text-sm text-teal-600 hover:text-teal-800 font-medium">
-                View All Articles <i class="fas fa-arrow-right ml-1"></i>
+                {{ $t('profile.content.viewAllArticles') }} <i class="fas fa-arrow-right ms-1"></i>
               </button>
             </div>
 
@@ -1164,8 +1162,8 @@ function getInsightColor(type: string): string {
                         {{ doc.title }}
                       </h3>
                       <div class="flex items-center gap-4 mt-1 text-sm text-teal-500">
-                        <span><i class="fas fa-download mr-1"></i>{{ doc.downloads }} downloads</span>
-                        <span><i class="fas fa-clock mr-1"></i>{{ doc.date }}</span>
+                        <span><i class="fas fa-download me-1"></i>{{ doc.downloads }} {{ $t('profile.content.downloads') }}</span>
+                        <span><i class="fas fa-clock me-1"></i>{{ doc.date }}</span>
                       </div>
                     </div>
                   </div>
@@ -1173,7 +1171,7 @@ function getInsightColor(type: string): string {
                 </div>
               </router-link>
               <button @click="goToDocuments" class="w-full py-2 text-center text-sm text-teal-600 hover:text-teal-800 font-medium">
-                View All Documents <i class="fas fa-arrow-right ml-1"></i>
+                {{ $t('profile.content.viewAllDocuments') }} <i class="fas fa-arrow-right ms-1"></i>
               </button>
             </div>
 
@@ -1196,12 +1194,12 @@ function getInsightColor(type: string): string {
                         {{ poll.title }}
                       </h3>
                       <div class="flex items-center gap-4 mt-1 text-sm text-teal-500">
-                        <span><i class="fas fa-vote-yea mr-1"></i>{{ poll.votes }} votes</span>
+                        <span><i class="fas fa-vote-yea me-1"></i>{{ poll.votes }} {{ $t('profile.content.votes') }}</span>
                         <span :class="[
                           'px-2 py-0.5 rounded-full text-xs font-medium',
                           poll.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'
                         ]">
-                          {{ poll.status === 'active' ? 'Active' : 'Completed' }}
+                          {{ poll.status === 'active' ? $t('profile.content.active') : $t('profile.content.completed') }}
                         </span>
                       </div>
                     </div>
@@ -1210,7 +1208,7 @@ function getInsightColor(type: string): string {
                 </div>
               </router-link>
               <button @click="goToPolls" class="w-full py-2 text-center text-sm text-teal-600 hover:text-teal-800 font-medium">
-                View All Polls <i class="fas fa-arrow-right ml-1"></i>
+                {{ $t('profile.content.viewAllPolls') }} <i class="fas fa-arrow-right ms-1"></i>
               </button>
             </div>
           </div>
@@ -1220,7 +1218,7 @@ function getInsightColor(type: string): string {
         <div class="space-y-6">
           <!-- Badges & Achievements -->
           <div class="card-animated fade-in-up rounded-2xl p-6" style="animation-delay: 0.2s">
-            <h2 class="text-lg font-semibold text-teal-900 mb-4">Badges & Achievements</h2>
+            <h2 class="text-lg font-semibold text-teal-900 mb-4">{{ $t('profile.badges.title') }}</h2>
             <div class="grid grid-cols-3 gap-4">
               <div
                 v-for="(badge, idx) in badges"
@@ -1236,13 +1234,13 @@ function getInsightColor(type: string): string {
               </div>
             </div>
             <button class="btn-vibrant ripple w-full mt-4 py-2 text-center text-sm text-teal-600 hover:text-teal-800">
-              View All Badges ({{ totalBadges }})
+              {{ $t('profile.badges.viewAll') }} ({{ totalBadges }})
             </button>
           </div>
 
           <!-- Learning Progress -->
           <div class="card-animated fade-in-up rounded-2xl p-6" style="animation-delay: 0.3s">
-            <h2 class="text-lg font-semibold text-teal-900 mb-4">Learning Progress</h2>
+            <h2 class="text-lg font-semibold text-teal-900 mb-4">{{ $t('profile.learning.title') }}</h2>
             <div class="space-y-4">
               <div
                 v-for="(course, idx) in learningProgress"
@@ -1260,13 +1258,13 @@ function getInsightColor(type: string): string {
               </div>
             </div>
             <button @click="goToLearning" class="btn-vibrant ripple block w-full mt-4 py-2 text-center text-sm text-teal-600 hover:text-teal-800">
-              View All Courses <i class="fas fa-arrow-right ml-1 icon-soft"></i>
+              {{ $t('profile.learning.viewAllCourses') }} <i class="fas fa-arrow-right ms-1 icon-soft"></i>
             </button>
           </div>
 
           <!-- Certificates -->
           <div class="card-animated fade-in-up rounded-2xl p-6" style="animation-delay: 0.4s">
-            <h2 class="text-lg font-semibold text-teal-900 mb-4">Certificates</h2>
+            <h2 class="text-lg font-semibold text-teal-900 mb-4">{{ $t('profile.certificates.title') }}</h2>
             <div class="space-y-3">
               <div
                 v-for="(cert, idx) in certificates"
@@ -1290,7 +1288,7 @@ function getInsightColor(type: string): string {
 
           <!-- Team Members -->
           <div class="card-animated fade-in-up rounded-2xl p-6" style="animation-delay: 0.5s">
-            <h2 class="text-lg font-semibold text-teal-900 mb-4">Team</h2>
+            <h2 class="text-lg font-semibold text-teal-900 mb-4">{{ $t('profile.team.title') }}</h2>
             <div class="space-y-3">
               <div
                 v-for="(member, idx) in teamMembers"
@@ -1324,24 +1322,24 @@ function getInsightColor(type: string): string {
           <!-- Followers & Following -->
           <div class="card-animated fade-in-up rounded-2xl p-6" style="animation-delay: 0.6s">
             <div class="flex items-center justify-between mb-4">
-              <h2 class="text-lg font-semibold text-teal-900">Connections</h2>
-              <span class="text-xs text-teal-500">{{ mutualConnections }} mutual</span>
+              <h2 class="text-lg font-semibold text-teal-900">{{ $t('profile.connections.title') }}</h2>
+              <span class="text-xs text-teal-500">{{ mutualConnections }} {{ $t('profile.connections.mutual') }}</span>
             </div>
 
             <!-- Quick Stats -->
             <div class="grid grid-cols-2 gap-3 mb-4">
               <div class="text-center p-3 rounded-xl bg-purple-50 cursor-pointer hover:bg-purple-100 transition-colors">
                 <p class="text-lg font-bold text-purple-600">{{ followersCount }}</p>
-                <p class="text-xs text-purple-500">Followers</p>
+                <p class="text-xs text-purple-500">{{ $t('profile.connections.followers') }}</p>
               </div>
               <div class="text-center p-3 rounded-xl bg-indigo-50 cursor-pointer hover:bg-indigo-100 transition-colors">
                 <p class="text-lg font-bold text-indigo-600">{{ followingCount }}</p>
-                <p class="text-xs text-indigo-500">Following</p>
+                <p class="text-xs text-indigo-500">{{ $t('profile.connections.following') }}</p>
               </div>
             </div>
 
             <!-- Recent Followers -->
-            <p class="text-xs font-semibold text-teal-500 uppercase tracking-wider mb-3">Recent Followers</p>
+            <p class="text-xs font-semibold text-teal-500 uppercase tracking-wider mb-3">{{ $t('profile.connections.recentFollowers') }}</p>
             <div class="space-y-2">
               <div
                 v-for="(follower, idx) in followers.slice(0, 4)"
@@ -1367,13 +1365,13 @@ function getInsightColor(type: string): string {
                       : 'bg-teal-500 text-white hover:bg-teal-600'
                   ]"
                 >
-                  {{ follower.isFollowing ? 'Following' : 'Follow Back' }}
+                  {{ follower.isFollowing ? $t('profile.following') : $t('profile.followBack') }}
                 </button>
               </div>
             </div>
 
             <button class="btn-vibrant ripple w-full mt-4 py-2 text-center text-sm text-teal-600 hover:text-teal-800">
-              View All Connections <i class="fas fa-arrow-right ml-1 icon-soft"></i>
+              {{ $t('profile.connections.viewAll') }} <i class="fas fa-arrow-right ms-1 icon-soft"></i>
             </button>
           </div>
         </div>
@@ -1384,7 +1382,7 @@ function getInsightColor(type: string): string {
         <div v-if="showEditProfile" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div class="card-animated fade-in-up rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-white">
             <div class="p-5 border-b border-teal-100 flex items-center justify-between sticky top-0 bg-white/80 backdrop-blur-sm">
-              <h2 class="text-xl font-semibold text-teal-900">Edit Profile</h2>
+              <h2 class="text-xl font-semibold text-teal-900">{{ $t('profile.editModal.title') }}</h2>
               <button @click="showEditProfile = false" class="btn-vibrant ripple p-2 rounded-lg hover:bg-teal-100 text-teal-500">
                 <i class="fas fa-times icon-soft"></i>
               </button>
@@ -1392,33 +1390,33 @@ function getInsightColor(type: string): string {
             <form @submit.prevent="saveProfile" class="p-6 space-y-5">
               <div class="grid grid-cols-2 gap-4">
                 <div>
-                  <label class="block text-sm font-medium text-teal-700 mb-2">First Name</label>
+                  <label class="block text-sm font-medium text-teal-700 mb-2">{{ $t('profile.editModal.firstName') }}</label>
                   <input type="text" v-model="editForm.firstName" class="input" required>
                 </div>
                 <div>
-                  <label class="block text-sm font-medium text-teal-700 mb-2">Last Name</label>
+                  <label class="block text-sm font-medium text-teal-700 mb-2">{{ $t('profile.editModal.lastName') }}</label>
                   <input type="text" v-model="editForm.lastName" class="input" required>
                 </div>
               </div>
               <div>
-                <label class="block text-sm font-medium text-teal-700 mb-2">Job Title</label>
+                <label class="block text-sm font-medium text-teal-700 mb-2">{{ $t('profile.editModal.jobTitle') }}</label>
                 <input type="text" v-model="editForm.title" class="input">
               </div>
               <div>
-                <label class="block text-sm font-medium text-teal-700 mb-2">Bio</label>
+                <label class="block text-sm font-medium text-teal-700 mb-2">{{ $t('profile.editModal.bio') }}</label>
                 <textarea v-model="editForm.bio" class="input" rows="4"></textarea>
               </div>
               <div>
-                <label class="block text-sm font-medium text-teal-700 mb-2">Phone</label>
+                <label class="block text-sm font-medium text-teal-700 mb-2">{{ $t('profile.editModal.phone') }}</label>
                 <input type="tel" v-model="editForm.phone" class="input">
               </div>
               <div>
-                <label class="block text-sm font-medium text-teal-700 mb-2">Location</label>
+                <label class="block text-sm font-medium text-teal-700 mb-2">{{ $t('profile.editModal.location') }}</label>
                 <input type="text" v-model="editForm.location" class="input">
               </div>
               <div class="flex gap-3 pt-4">
-                <button type="button" @click="showEditProfile = false" class="btn btn-secondary btn-vibrant ripple flex-1">Cancel</button>
-                <button type="submit" class="btn btn-primary btn-vibrant ripple flex-1">Save Changes</button>
+                <button type="button" @click="showEditProfile = false" class="btn btn-secondary btn-vibrant ripple flex-1">{{ $t('profile.editModal.cancel') }}</button>
+                <button type="submit" class="btn btn-primary btn-vibrant ripple flex-1">{{ $t('profile.editModal.saveChanges') }}</button>
               </div>
             </form>
           </div>
@@ -1434,8 +1432,8 @@ function getInsightColor(type: string): string {
                     <i class="fas fa-wand-magic-sparkles text-white"></i>
                   </div>
                   <div>
-                    <h3 class="text-lg font-semibold text-gray-900">AI Profile Summary</h3>
-                    <p class="text-sm text-gray-500">Professional bio generated from your activities</p>
+                    <h3 class="text-lg font-semibold text-gray-900">{{ $t('profile.aiSummary.title') }}</h3>
+                    <p class="text-sm text-gray-500">{{ $t('profile.aiSummary.subtitle') }}</p>
                   </div>
                 </div>
                 <button @click="showAIProfileModal = false" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
@@ -1445,18 +1443,18 @@ function getInsightColor(type: string): string {
             </div>
 
             <div class="p-6 overflow-y-auto max-h-[60vh]">
-              <AILoadingIndicator v-if="isGeneratingProfile" message="Analyzing your profile data..." />
+              <AILoadingIndicator v-if="isGeneratingProfile" :message="$t('profile.aiSummary.analyzing')" />
 
               <div v-else-if="aiProfileSummary" class="space-y-6">
                 <!-- Confidence -->
                 <div class="flex items-center gap-3 p-3 bg-teal-50 rounded-xl">
                   <AIConfidenceBar :value="aiProfileSummary.confidence" />
-                  <span class="text-sm text-teal-700">{{ Math.round(aiProfileSummary.confidence * 100) }}% confidence based on your activities</span>
+                  <span class="text-sm text-teal-700">{{ $t('profile.aiSummary.confidenceMessage', { percent: Math.round(aiProfileSummary.confidence * 100) }) }}</span>
                 </div>
 
                 <!-- Professional Summary -->
                 <div>
-                  <h4 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">Professional Summary</h4>
+                  <h4 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">{{ $t('profile.aiSummary.professionalSummary') }}</h4>
                   <p class="text-gray-800 leading-relaxed bg-gray-50 p-4 rounded-xl border border-gray-200">
                     {{ aiProfileSummary.professional }}
                   </p>
@@ -1464,7 +1462,7 @@ function getInsightColor(type: string): string {
 
                 <!-- Strengths -->
                 <div>
-                  <h4 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">Key Strengths</h4>
+                  <h4 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">{{ $t('profile.aiSummary.keyStrengths') }}</h4>
                   <ul class="space-y-2">
                     <li v-for="(strength, idx) in aiProfileSummary.strengths" :key="idx"
                         class="flex items-start gap-2 text-gray-700">
@@ -1476,7 +1474,7 @@ function getInsightColor(type: string): string {
 
                 <!-- Areas of Expertise -->
                 <div>
-                  <h4 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">Areas of Expertise</h4>
+                  <h4 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">{{ $t('profile.aiSummary.areasOfExpertise') }}</h4>
                   <div class="flex flex-wrap gap-2">
                     <span v-for="(exp, idx) in aiProfileSummary.expertise" :key="idx"
                           class="px-3 py-1.5 bg-teal-100 text-teal-700 rounded-full text-sm">
@@ -1487,7 +1485,7 @@ function getInsightColor(type: string): string {
 
                 <!-- Impact Statement -->
                 <div>
-                  <h4 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">Impact Statement</h4>
+                  <h4 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">{{ $t('profile.aiSummary.impactStatement') }}</h4>
                   <div class="p-4 bg-gradient-to-r from-teal-50 to-emerald-50 rounded-xl border border-teal-200">
                     <i class="fas fa-quote-left text-teal-300 text-xl mb-2"></i>
                     <p class="text-gray-800 italic">{{ aiProfileSummary.impactStatement }}</p>
@@ -1499,15 +1497,15 @@ function getInsightColor(type: string): string {
             <div class="p-4 border-t border-gray-100 flex justify-end gap-3">
               <button @click="generateAIProfileSummary"
                       class="px-4 py-2 text-teal-600 hover:bg-teal-50 rounded-lg transition-colors flex items-center gap-2">
-                <i class="fas fa-rotate"></i> Regenerate
+                <i class="fas fa-rotate"></i> {{ $t('profile.aiSummary.regenerate') }}
               </button>
               <button @click="showAIProfileModal = false"
                       class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
-                Cancel
+                {{ $t('profile.aiSummary.cancel') }}
               </button>
               <button @click="applyAISummary"
                       class="px-4 py-2 bg-gradient-to-r from-teal-500 to-emerald-500 text-white rounded-lg hover:from-teal-600 hover:to-emerald-600 transition-colors flex items-center gap-2">
-                <i class="fas fa-check"></i> Apply to Profile
+                <i class="fas fa-check"></i> {{ $t('profile.aiSummary.applyToProfile') }}
               </button>
             </div>
           </div>
@@ -1523,8 +1521,8 @@ function getInsightColor(type: string): string {
                     <i class="fas fa-brain text-white"></i>
                   </div>
                   <div>
-                    <h3 class="text-lg font-semibold text-gray-900">AI Skills Analysis</h3>
-                    <p class="text-sm text-gray-500">Skills detected from your activity patterns</p>
+                    <h3 class="text-lg font-semibold text-gray-900">{{ $t('profile.aiSkills.title') }}</h3>
+                    <p class="text-sm text-gray-500">{{ $t('profile.aiSkills.subtitle') }}</p>
                   </div>
                 </div>
                 <button @click="showAISkillsModal = false" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
@@ -1534,13 +1532,13 @@ function getInsightColor(type: string): string {
             </div>
 
             <div class="p-6 overflow-y-auto max-h-[60vh]">
-              <AILoadingIndicator v-if="isAnalyzingSkills" message="Analyzing your skills from activities..." />
+              <AILoadingIndicator v-if="isAnalyzingSkills" :message="$t('profile.aiSkills.analyzing')" />
 
               <div v-else-if="aiSkillAnalysis" class="space-y-6">
                 <!-- Detected Skills -->
                 <div>
                   <h4 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">
-                    <i class="fas fa-check-circle text-green-500 mr-2"></i>Detected Skills
+                    <i class="fas fa-check-circle text-green-500 me-2"></i>{{ $t('profile.aiSkills.detectedSkills') }}
                   </h4>
                   <div class="space-y-3">
                     <div v-for="skill in aiSkillAnalysis.detectedSkills" :key="skill.name"
@@ -1558,7 +1556,7 @@ function getInsightColor(type: string): string {
                         </div>
                       </div>
                       <p class="text-sm text-gray-500">
-                        <i class="fas fa-info-circle mr-1"></i>{{ skill.source }}
+                        <i class="fas fa-info-circle me-1"></i>{{ skill.source }}
                       </p>
                     </div>
                   </div>
@@ -1567,7 +1565,7 @@ function getInsightColor(type: string): string {
                 <!-- Suggested Skills -->
                 <div>
                   <h4 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">
-                    <i class="fas fa-lightbulb text-yellow-500 mr-2"></i>Suggested Skills to Add
+                    <i class="fas fa-lightbulb text-yellow-500 me-2"></i>{{ $t('profile.aiSkills.suggestedSkills') }}
                   </h4>
                   <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <div v-for="skill in aiSkillAnalysis.suggestedSkills" :key="skill.name"
@@ -1576,12 +1574,12 @@ function getInsightColor(type: string): string {
                       <div class="flex items-center justify-between mb-2">
                         <span class="font-medium text-gray-900">{{ skill.name }}</span>
                         <span class="text-xs text-yellow-700 bg-yellow-100 px-2 py-0.5 rounded-full">
-                          {{ Math.round(skill.relevance * 100) }}% relevant
+                          {{ Math.round(skill.relevance * 100) }}% {{ $t('profile.aiSkills.relevant') }}
                         </span>
                       </div>
                       <p class="text-sm text-gray-600">{{ skill.reason }}</p>
                       <button class="mt-2 text-xs text-teal-600 font-medium flex items-center gap-1 hover:text-teal-700">
-                        <i class="fas fa-plus"></i> Add to Profile
+                        <i class="fas fa-plus"></i> {{ $t('profile.aiSkills.addToProfile') }}
                       </button>
                     </div>
                   </div>
@@ -1590,7 +1588,7 @@ function getInsightColor(type: string): string {
                 <!-- Skill Gaps -->
                 <div>
                   <h4 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">
-                    <i class="fas fa-exclamation-triangle text-orange-500 mr-2"></i>Skill Gap Analysis
+                    <i class="fas fa-exclamation-triangle text-orange-500 me-2"></i>{{ $t('profile.aiSkills.skillGapAnalysis') }}
                   </h4>
                   <div class="space-y-3">
                     <div v-for="gap in aiSkillAnalysis.skillGaps" :key="gap.skill"
@@ -1600,7 +1598,7 @@ function getInsightColor(type: string): string {
                         <span class="text-xs text-orange-700">{{ gap.importance }}</span>
                       </div>
                       <p class="text-sm text-gray-600">
-                        <i class="fas fa-graduation-cap mr-1 text-orange-500"></i>{{ gap.recommendation }}
+                        <i class="fas fa-graduation-cap me-1 text-orange-500"></i>{{ gap.recommendation }}
                       </p>
                     </div>
                   </div>
@@ -1611,11 +1609,11 @@ function getInsightColor(type: string): string {
             <div class="p-4 border-t border-gray-100 flex justify-end gap-3">
               <button @click="analyzeSkills"
                       class="px-4 py-2 text-teal-600 hover:bg-teal-50 rounded-lg transition-colors flex items-center gap-2">
-                <i class="fas fa-rotate"></i> Re-analyze
+                <i class="fas fa-rotate"></i> {{ $t('profile.aiSkills.reAnalyze') }}
               </button>
               <button @click="showAISkillsModal = false"
                       class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
-                Close
+                {{ $t('profile.aiSkills.close') }}
               </button>
             </div>
           </div>
@@ -1631,8 +1629,8 @@ function getInsightColor(type: string): string {
                     <i class="fas fa-chart-line text-white"></i>
                   </div>
                   <div>
-                    <h3 class="text-lg font-semibold text-gray-900">AI Profile Insights</h3>
-                    <p class="text-sm text-gray-500">Personalized insights based on your activity</p>
+                    <h3 class="text-lg font-semibold text-gray-900">{{ $t('profile.aiInsightsModal.title') }}</h3>
+                    <p class="text-sm text-gray-500">{{ $t('profile.aiInsightsModal.subtitle') }}</p>
                   </div>
                 </div>
                 <button @click="showAIInsightsModal = false" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
@@ -1642,7 +1640,7 @@ function getInsightColor(type: string): string {
             </div>
 
             <div class="p-6 overflow-y-auto max-h-[60vh]">
-              <AILoadingIndicator v-if="isLoadingInsights" message="Generating personalized insights..." />
+              <AILoadingIndicator v-if="isLoadingInsights" :message="$t('profile.aiInsightsModal.generating')" />
 
               <div v-else-if="aiProfileInsights.length > 0" class="space-y-4">
                 <div v-for="insight in aiProfileInsights" :key="insight.id"
@@ -1670,18 +1668,18 @@ function getInsightColor(type: string): string {
 
               <div v-else class="text-center py-8 text-gray-500">
                 <i class="fas fa-chart-pie text-4xl mb-3 text-gray-300"></i>
-                <p>No insights available yet. Keep contributing to unlock personalized insights!</p>
+                <p>{{ $t('profile.aiInsightsModal.noInsights') }}</p>
               </div>
             </div>
 
             <div class="p-4 border-t border-gray-100 flex justify-end gap-3">
               <button @click="loadAIInsights"
                       class="px-4 py-2 text-teal-600 hover:bg-teal-50 rounded-lg transition-colors flex items-center gap-2">
-                <i class="fas fa-rotate"></i> Refresh
+                <i class="fas fa-rotate"></i> {{ $t('profile.aiInsightsModal.refresh') }}
               </button>
               <button @click="showAIInsightsModal = false"
                       class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
-                Close
+                {{ $t('profile.aiInsightsModal.close') }}
               </button>
             </div>
           </div>

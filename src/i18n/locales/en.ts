@@ -306,8 +306,183 @@ export default {
   // Profile
   profile: {
     follow: 'Follow',
+    followBack: 'Follow Back',
+    following: 'Following',
     aiInsights: 'AI Insights',
     editProfile: 'Edit Profile',
+    edit: 'Edit',
+    verified: 'Verified',
+    level: 'Lvl',
+    loadingProfile: 'Loading profile...',
+
+    // Stats
+    stats: {
+      articles: 'Articles',
+      documents: 'Documents',
+      courses: 'Courses',
+      followers: 'Followers',
+      following: 'Following',
+    },
+
+    // About Section
+    about: {
+      title: 'About',
+      aiGenerateBio: 'AI Generate Bio',
+      skillsExpertise: 'Skills & Expertise',
+      aiAnalyzeSkills: 'AI Analyze Skills',
+      email: 'Email',
+      phone: 'Phone',
+    },
+
+    // Activity Section
+    activity: {
+      title: 'Recent Activity',
+      viewAll: 'View All Activity',
+      filter: {
+        all: 'All Activity',
+        articles: 'Articles',
+        comments: 'Comments',
+        courses: 'Courses',
+      },
+    },
+
+    // Contributions Section
+    contributions: {
+      title: 'Contributions',
+      subtitle: 'Your activity and impact',
+      thisYear: 'This Year',
+      thisMonth: 'This Month',
+      thisWeek: 'This Week',
+      dayStreak: '{count} day streak',
+      topContributor: 'Top {percent}% contributor',
+      articlesPublished: 'Articles Published',
+      commentsMade: 'Comments Made',
+      documentsShared: 'Documents Shared',
+      coursesCompleted: 'Courses Completed',
+      activityOverview: 'Activity Overview',
+      contributionsLabel: 'Contributions',
+      avg: 'Avg',
+      contributionsTooltip: '{count} contributions',
+      thisWeeksActivity: "This Week's Activity",
+      yourImpact: 'Your Impact',
+      impactMessage: 'Your contributions have been viewed <strong>{views}</strong> times and helped <strong>{helped}</strong> colleagues this month. Keep up the great work!',
+      months: {
+        jan: 'Jan',
+        feb: 'Feb',
+        mar: 'Mar',
+        apr: 'Apr',
+        may: 'May',
+        jun: 'Jun',
+        jul: 'Jul',
+        aug: 'Aug',
+        sep: 'Sep',
+        oct: 'Oct',
+        nov: 'Nov',
+        dec: 'Dec',
+      },
+      days: {
+        mon: 'Mon',
+        tue: 'Tue',
+        wed: 'Wed',
+        thu: 'Thu',
+        fri: 'Fri',
+        sat: 'Sat',
+        sun: 'Sun',
+      },
+    },
+
+    // Content Authored Section
+    content: {
+      title: 'Content Authored',
+      articles: 'Articles',
+      documents: 'Documents',
+      polls: 'Polls',
+      views: 'views',
+      likes: 'likes',
+      downloads: 'downloads',
+      votes: 'votes',
+      active: 'Active',
+      completed: 'Completed',
+      viewAllArticles: 'View All Articles',
+      viewAllDocuments: 'View All Documents',
+      viewAllPolls: 'View All Polls',
+    },
+
+    // Right Column Sections
+    badges: {
+      title: 'Badges & Achievements',
+      viewAll: 'View All Badges',
+    },
+    learning: {
+      title: 'Learning Progress',
+      viewAllCourses: 'View All Courses',
+    },
+    certificates: {
+      title: 'Certificates',
+    },
+    team: {
+      title: 'Team',
+    },
+    connections: {
+      title: 'Connections',
+      mutual: 'mutual',
+      followers: 'Followers',
+      following: 'Following',
+      recentFollowers: 'Recent Followers',
+      viewAll: 'View All Connections',
+    },
+
+    // Edit Profile Modal
+    editModal: {
+      title: 'Edit Profile',
+      firstName: 'First Name',
+      lastName: 'Last Name',
+      jobTitle: 'Job Title',
+      bio: 'Bio',
+      phone: 'Phone',
+      location: 'Location',
+      cancel: 'Cancel',
+      saveChanges: 'Save Changes',
+    },
+
+    // AI Profile Summary Modal
+    aiSummary: {
+      title: 'AI Profile Summary',
+      subtitle: 'Professional bio generated from your activities',
+      analyzing: 'Analyzing your profile data...',
+      confidenceMessage: '{percent}% confidence based on your activities',
+      professionalSummary: 'Professional Summary',
+      keyStrengths: 'Key Strengths',
+      areasOfExpertise: 'Areas of Expertise',
+      impactStatement: 'Impact Statement',
+      regenerate: 'Regenerate',
+      cancel: 'Cancel',
+      applyToProfile: 'Apply to Profile',
+    },
+
+    // AI Skills Analysis Modal
+    aiSkills: {
+      title: 'AI Skills Analysis',
+      subtitle: 'Skills detected from your activity patterns',
+      analyzing: 'Analyzing your skills from activities...',
+      detectedSkills: 'Detected Skills',
+      suggestedSkills: 'Suggested Skills to Add',
+      relevant: 'relevant',
+      addToProfile: 'Add to Profile',
+      skillGapAnalysis: 'Skill Gap Analysis',
+      reAnalyze: 'Re-analyze',
+      close: 'Close',
+    },
+
+    // AI Profile Insights Modal
+    aiInsightsModal: {
+      title: 'AI Profile Insights',
+      subtitle: 'Personalized insights based on your activity',
+      generating: 'Generating personalized insights...',
+      noInsights: 'No insights available yet. Keep contributing to unlock personalized insights!',
+      refresh: 'Refresh',
+      close: 'Close',
+    },
   },
 
   // Dashboard
