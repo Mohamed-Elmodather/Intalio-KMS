@@ -2267,6 +2267,8 @@ export default {
   settings: {
     title: 'Settings',
     subtitle: 'Manage your account and application settings',
+    managePreferences: 'Manage your preferences',
+    secureSettings: 'Your settings are secure',
     general: 'General',
     account: 'Account',
     security: 'Security',

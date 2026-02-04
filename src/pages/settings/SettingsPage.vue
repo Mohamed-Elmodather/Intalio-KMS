@@ -482,7 +482,7 @@ function changePassword() {
       </div>
 
       <!-- Mobile Tab Navigation -->
-      <div class="lg:hidden mb-6 overflow-x-auto hide-scrollbar">
+      <div class="settings-mobile-tabs mb-6 overflow-x-auto hide-scrollbar">
         <div class="flex gap-2 pb-2">
           <button
             v-for="tab in tabs"
@@ -503,23 +503,57 @@ function changePassword() {
 
       <div class="flex gap-6">
         <!-- Settings Navigation -->
-        <aside class="w-64 flex-shrink-0 hidden lg:block fade-in-up" style="animation-delay: 0.1s;">
-          <div class="card-animated rounded-2xl p-4 sticky top-24">
-            <nav class="space-y-1">
-              <button
-                v-for="(tab, index) in tabs"
-                :key="tab.id"
-                @click="activeTab = tab.id"
-                :class="[
-                  'w-full flex items-center gap-3 px-4 py-3 rounded-xl text-start transition-all ripple list-item-animated',
-                  activeTab === tab.id ? 'bg-teal-500 text-white' : 'text-teal-700 hover:bg-teal-50'
-                ]"
-                :style="{ animationDelay: `${0.2 + index * 0.05}s` }"
-              >
-                <i :class="[tab.icon, activeTab === tab.id ? 'icon-vibrant' : 'icon-soft']"></i>
-                <span class="font-medium">{{ tab.label }}</span>
-              </button>
-            </nav>
+        <aside class="settings-sidebar w-72 flex-shrink-0 fade-in-up" style="animation-delay: 0.1s;">
+          <div class="sticky top-24">
+            <!-- Sidebar Header -->
+            <div class="sidebar-header rounded-t-2xl p-5 bg-gradient-to-br from-teal-500 via-teal-600 to-emerald-600">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center">
+                  <i class="fas fa-cog text-white text-lg"></i>
+                </div>
+                <div>
+                  <h3 class="text-white font-semibold">{{ $t('settings.title') }}</h3>
+                  <p class="text-teal-100 text-xs">{{ $t('settings.managePreferences') }}</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Navigation Items -->
+            <div class="bg-white rounded-b-2xl shadow-lg border border-gray-100 border-t-0 overflow-hidden">
+              <nav class="p-3 space-y-1">
+                <button
+                  v-for="(tab, index) in tabs"
+                  :key="tab.id"
+                  @click="activeTab = tab.id"
+                  :class="[
+                    'sidebar-nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-start transition-all',
+                    activeTab === tab.id
+                      ? 'bg-gradient-to-r from-teal-500 to-emerald-500 text-white shadow-md shadow-teal-200'
+                      : 'text-gray-700 hover:bg-gray-50'
+                  ]"
+                  :style="{ animationDelay: `${0.2 + index * 0.05}s` }"
+                >
+                  <div :class="[
+                    'w-9 h-9 rounded-lg flex items-center justify-center transition-all',
+                    activeTab === tab.id
+                      ? 'bg-white/20'
+                      : 'bg-gray-100 group-hover:bg-teal-100'
+                  ]">
+                    <i :class="[tab.icon, 'text-sm', activeTab === tab.id ? 'text-white' : 'text-teal-600']"></i>
+                  </div>
+                  <span class="font-medium text-sm">{{ tab.label }}</span>
+                  <i v-if="activeTab === tab.id" class="fas fa-chevron-right ms-auto text-xs text-white/70"></i>
+                </button>
+              </nav>
+
+              <!-- Sidebar Footer -->
+              <div class="p-4 border-t border-gray-100 bg-gray-50/50">
+                <div class="flex items-center gap-2 text-xs text-gray-500">
+                  <i class="fas fa-shield-check text-teal-500"></i>
+                  <span>{{ $t('settings.secureSettings') }}</span>
+                </div>
+              </div>
+            </div>
           </div>
         </aside>
 
@@ -1327,6 +1361,75 @@ function changePassword() {
 </template>
 
 <style scoped>
+/* Settings navigation responsive visibility */
+.settings-mobile-tabs {
+  display: block;
+}
+
+.settings-sidebar {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .settings-mobile-tabs {
+    display: none;
+  }
+
+  .settings-sidebar {
+    display: block;
+  }
+}
+
+/* Sidebar navigation item styles */
+.sidebar-nav-item {
+  position: relative;
+  overflow: hidden;
+}
+
+.sidebar-nav-item::before {
+  content: '';
+  position: absolute;
+  inset-inline-start: 0;
+  top: 50%;
+  transform: translateY(-50%) scaleY(0);
+  width: 3px;
+  height: 60%;
+  background: linear-gradient(180deg, #14b8a6, #10b981);
+  border-radius: 0 4px 4px 0;
+  transition: transform 0.3s ease;
+}
+
+.sidebar-nav-item:not(.bg-gradient-to-r):hover::before {
+  transform: translateY(-50%) scaleY(1);
+}
+
+.sidebar-nav-item:not(.bg-gradient-to-r):hover {
+  padding-inline-start: 1.25rem;
+  background: linear-gradient(90deg, rgba(20, 184, 166, 0.08), transparent);
+}
+
+/* Sidebar header glow effect */
+.sidebar-header {
+  position: relative;
+  overflow: hidden;
+}
+
+.sidebar-header::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 60%);
+  animation: headerGlow 8s ease-in-out infinite;
+}
+
+@keyframes headerGlow {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(-20%, 20%); }
+}
+
 /* Card animations */
 .card-animated {
   background: #ffffff;

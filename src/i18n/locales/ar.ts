@@ -2269,6 +2269,8 @@ export default {
   settings: {
     title: 'الإعدادات',
     subtitle: 'إدارة حسابك وإعدادات التطبيق',
+    managePreferences: 'إدارة تفضيلاتك',
+    secureSettings: 'إعداداتك آمنة',
     general: 'عام',
     account: 'الحساب',
     security: 'الأمان',
