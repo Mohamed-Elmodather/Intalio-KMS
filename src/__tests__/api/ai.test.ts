@@ -443,5 +443,210 @@ describe('AI API', () => {
         })
       )
     })
+
+    it('should handle HTTP error response', async () => {
+      const onMessage = vi.fn()
+      const onError = vi.fn()
+
+      mockFetch.mockResolvedValue({
+        ok: false,
+        status: 500,
+      })
+
+      aiApi.streamChat('Test', { onMessage, onError })
+
+      // Wait for the promise to settle
+      await vi.advanceTimersByTimeAsync(100)
+
+      expect(onError).toHaveBeenCalledWith(expect.any(Error))
+    })
+
+    it('should handle missing response body', async () => {
+      const onMessage = vi.fn()
+      const onError = vi.fn()
+
+      mockFetch.mockResolvedValue({
+        ok: true,
+        body: null,
+      })
+
+      aiApi.streamChat('Test', { onMessage, onError })
+
+      await vi.advanceTimersByTimeAsync(100)
+
+      expect(onError).toHaveBeenCalledWith(expect.any(Error))
+    })
+
+    it('should handle abort error gracefully', async () => {
+      const onMessage = vi.fn()
+      const onError = vi.fn()
+
+      const abortError = new Error('AbortError')
+      abortError.name = 'AbortError'
+
+      mockFetch.mockRejectedValue(abortError)
+
+      aiApi.streamChat('Test', { onMessage, onError })
+
+      await vi.advanceTimersByTimeAsync(100)
+
+      // onError should not be called for abort errors
+      expect(onError).not.toHaveBeenCalled()
+    })
+
+    it('should handle non-abort errors', async () => {
+      const onMessage = vi.fn()
+      const onError = vi.fn()
+
+      mockFetch.mockRejectedValue(new Error('Network error'))
+
+      aiApi.streamChat('Test', { onMessage, onError })
+
+      await vi.advanceTimersByTimeAsync(100)
+
+      expect(onError).toHaveBeenCalledWith(expect.any(Error))
+    })
+
+    it('should work without conversationId', () => {
+      mockFetch.mockImplementation(
+        () =>
+          new Promise(() => {
+            // Never resolve
+          })
+      )
+
+      const onMessage = vi.fn()
+      aiApi.streamChat('Test message', { onMessage })
+
+      expect(mockFetch).toHaveBeenCalledWith(
+        expect.any(URL),
+        expect.objectContaining({
+          body: JSON.stringify({
+            message: 'Test message',
+            conversationId: undefined,
+          }),
+        })
+      )
+    })
+
+    it('should use empty string for missing auth token', () => {
+      localStorage.removeItem('auth_token')
+
+      mockFetch.mockImplementation(
+        () =>
+          new Promise(() => {
+            // Never resolve
+          })
+      )
+
+      const onMessage = vi.fn()
+      aiApi.streamChat('Test', { onMessage })
+
+      expect(mockFetch).toHaveBeenCalledWith(
+        expect.any(URL),
+        expect.objectContaining({
+          headers: expect.objectContaining({
+            Authorization: 'Bearer ',
+          }),
+        })
+      )
+    })
+  })
+
+  describe('Translation Languages', () => {
+    it('should translate to German', async () => {
+      const promise = aiApi.translateContent('Hello', 'de')
+      vi.advanceTimersByTime(2000)
+      const result = await promise
+
+      expect(result.targetLanguage).toBe('de')
+      expect(result.translatedText).toContain('Deutsche')
+    })
+
+    it('should translate to Chinese', async () => {
+      const promise = aiApi.translateContent('Hello', 'zh')
+      vi.advanceTimersByTime(2000)
+      const result = await promise
+
+      expect(result.targetLanguage).toBe('zh')
+    })
+
+    it('should translate to Japanese', async () => {
+      const promise = aiApi.translateContent('Hello', 'ja')
+      vi.advanceTimersByTime(2000)
+      const result = await promise
+
+      expect(result.targetLanguage).toBe('ja')
+    })
+
+    it('should handle unsupported language with fallback', async () => {
+      const promise = aiApi.translateContent('Hello world', 'ko' as any)
+      vi.advanceTimersByTime(2000)
+      const result = await promise
+
+      expect(result.targetLanguage).toBe('ko')
+      expect(result.translatedText).toContain('[Translated to ko]')
+    })
+  })
+
+  describe('Content Type Filtering', () => {
+    it('should filter recommendations by content type', async () => {
+      const promise = aiApi.getRecommendations('article', 5)
+      vi.advanceTimersByTime(2000)
+      const result = await promise
+
+      expect(Array.isArray(result)).toBe(true)
+    })
+
+    it('should filter recommendations by course type', async () => {
+      const promise = aiApi.getRecommendations('course', 3)
+      vi.advanceTimersByTime(2000)
+      const result = await promise
+
+      expect(result.length).toBeLessThanOrEqual(3)
+    })
+  })
+
+  describe('Smart Search Short Query', () => {
+    it('should provide didYouMean for short queries', async () => {
+      const promise = aiApi.smartSearch('cup')
+      vi.advanceTimersByTime(2000)
+      const result = await promise
+
+      expect(result.didYouMean).toBeDefined()
+      expect(result.didYouMean).toContain('tournament')
+    })
+
+    it('should not provide didYouMean for long queries', async () => {
+      const promise = aiApi.smartSearch('asia cup tournament schedule')
+      vi.advanceTimersByTime(2000)
+      const result = await promise
+
+      expect(result.didYouMean).toBeUndefined()
+    })
+  })
+
+  describe('Default Summary Type', () => {
+    it('should use brief as default summary type', async () => {
+      const promise = aiApi.summarizeContent('Some content')
+      vi.advanceTimersByTime(2000)
+      const result = await promise
+
+      expect(result.summary).toBeDefined()
+      expect(result.wordCount).toBe(50) // brief = 50 words
+    })
+  })
+
+  describe('Compression Ratio Calculation', () => {
+    it('should calculate compression ratio correctly', async () => {
+      const longContent = 'word '.repeat(500) // 500 words
+      const promise = aiApi.summarizeContent(longContent, 'brief')
+      vi.advanceTimersByTime(2000)
+      const result = await promise
+
+      expect(result.compressionRatio).toBeGreaterThan(1)
+      // Ratio should be approximately 10 (500 words / 50 summary length)
+      expect(result.compressionRatio).toBeCloseTo(10, 0)
+    })
   })
 })
