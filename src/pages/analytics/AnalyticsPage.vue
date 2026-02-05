@@ -2,6 +2,7 @@
 import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import PageHeroHeader from '@/components/common/PageHeroHeader.vue'
+import { sanitizeBasicHtml } from '@/utils/sanitize'
 import { useAIServicesStore } from '@/stores/aiServices'
 import { AILoadingIndicator, AIConfidenceBar } from '@/components/ai'
 
@@ -1025,7 +1026,7 @@ function getAnomalySeverityColor(severity: string): string {
                 <div class="w-7 h-7 rounded-lg bg-teal-500/20 flex items-center justify-center flex-shrink-0">
                   <i :class="[insight.icon, 'text-teal-300 text-xs']"></i>
                 </div>
-                <p class="text-sm text-gray-200 leading-relaxed" v-html="insight.text"></p>
+                <p class="text-sm text-gray-200 leading-relaxed" v-html="sanitizeBasicHtml(insight.text)"></p>
               </div>
             </div>
           </div>

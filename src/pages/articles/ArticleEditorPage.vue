@@ -4,6 +4,7 @@ import { useRouter, onBeforeRouteLeave } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useUIStore } from '@/stores/ui'
 import { aiApi } from '@/api/ai'
+import { sanitizeHtml } from '@/utils/sanitize'
 
 const { t } = useI18n()
 import type { TitleGenerationResult, ClassificationResult, AutoTagResult, SummarizationResult, SentimentResult } from '@/types/ai'
@@ -783,7 +784,7 @@ function goBack() {
 
             <!-- Preview Pane -->
             <div v-if="showPreview" class="preview-pane p-4 bg-gray-50 overflow-auto max-h-[500px]">
-              <div class="prose prose-teal max-w-none text-sm" v-html="content || `<p class='text-gray-400'>${$t('articles.previewAppearHere')}</p>`"></div>
+              <div class="prose prose-teal max-w-none text-sm" v-html="sanitizeHtml(content) || `<p class='text-gray-400'>${$t('articles.previewAppearHere')}</p>`"></div>
             </div>
           </div>
 

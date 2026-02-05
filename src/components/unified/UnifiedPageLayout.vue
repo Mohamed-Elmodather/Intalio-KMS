@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { escapeHtml } from '@/utils/sanitize'
 
 // Types
 export interface PageStat {
@@ -65,13 +66,17 @@ const maxWidthClass = computed(() => {
 })
 
 const displayTitle = computed(() => {
+  // Escape HTML to prevent XSS
+  const safeTitle = escapeHtml(props.title)
+  const safeHighlight = escapeHtml(props.titleHighlight)
+
   if (props.titleHighlight && props.title.includes(props.titleHighlight)) {
-    return props.title.replace(
-      props.titleHighlight,
-      `<span class="unified-page__title-highlight">${props.titleHighlight}</span>`
+    return safeTitle.replace(
+      safeHighlight,
+      `<span class="unified-page__title-highlight">${safeHighlight}</span>`
     )
   }
-  return props.title
+  return safeTitle
 })
 
 // Methods

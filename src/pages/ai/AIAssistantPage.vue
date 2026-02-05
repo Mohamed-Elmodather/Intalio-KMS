@@ -2,6 +2,7 @@
 import { ref, computed, nextTick, onMounted, onUnmounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
+import { sanitizeHtml } from '@/utils/sanitize'
 import { useAIServicesStore } from '@/stores/aiServices'
 import { useComparisonStore } from '@/stores/comparison'
 import { useAIWorkflowsStore } from '@/stores/aiWorkflows'
@@ -1581,7 +1582,7 @@ function handleEntityClick(entity: { text: string; type: string }) {
               </div>
               <div class="flex-1">
                 <div class="bg-white/80 backdrop-blur-sm p-4 rounded-2xl rounded-tl-md shadow-sm border border-teal-100 max-w-[90%] transition-all duration-300 hover:shadow-md">
-                  <div class="prose prose-teal text-teal-900" v-html="msg.content"></div>
+                  <div class="prose prose-teal text-teal-900" v-html="sanitizeHtml(msg.content)"></div>
 
                   <!-- Sources/References -->
                   <div v-if="msg.sources && msg.sources.length" class="mt-4 pt-4 border-t border-teal-100">

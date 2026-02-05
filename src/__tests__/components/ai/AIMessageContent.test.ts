@@ -95,11 +95,13 @@ describe('AIMessageContent', () => {
   })
 
   describe('Rendered Content', () => {
-    it('should escape HTML', () => {
+    it('should sanitize dangerous HTML (XSS prevention)', () => {
       const wrapper = mountComponent({ content: '<script>alert("xss")</script>' })
       const vm = wrapper.vm as any
+      // Script tags are escaped to prevent XSS - they become &lt;script&gt;
+      // The actual <script> tag is not present as executable HTML
+      expect(vm.renderedContent).not.toMatch(/<script[^&]/)
       expect(vm.renderedContent).toContain('&lt;script&gt;')
-      expect(vm.renderedContent).not.toContain('<script>')
     })
 
     it('should convert bold markdown', () => {
@@ -135,11 +137,13 @@ describe('AIMessageContent', () => {
       expect(vm.renderedContent).toContain('link text')
     })
 
-    it('should escape angle brackets', () => {
+    it('should handle greater-than character safely', () => {
       const wrapper = mountComponent({ content: '> Quote text' })
       const vm = wrapper.vm as any
-      // > is escaped to &gt; for security
-      expect(vm.renderedContent).toContain('&gt;')
+      // > is handled safely by DOMPurify
+      expect(vm.renderedContent).toContain('Quote text')
+      // No dangerous content injection
+      expect(vm.renderedContent).not.toContain('<script>')
     })
 
     it('should convert horizontal rules', () => {

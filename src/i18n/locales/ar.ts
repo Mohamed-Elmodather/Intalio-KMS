@@ -74,6 +74,9 @@ export default {
     trending: 'الرائج',
     featured: 'مميز',
     recommended: 'موصى به',
+    tryAgain: 'حاول مرة أخرى',
+    showDetails: 'عرض التفاصيل',
+    hideDetails: 'إخفاء التفاصيل',
     itemsPerPage: 'عناصر في الصفحة',
     perPage: 'لكل صفحة',
     of: 'من',
@@ -2679,6 +2682,11 @@ export default {
     pageNotFound: 'الصفحة غير موجودة',
     pageNotFoundDesc: 'الصفحة التي تبحث عنها غير موجودة',
     articleNotFound: 'المقال الذي تبحث عنه غير موجود أو تمت إزالته.',
+    somethingWentWrong: 'عذراً! حدث خطأ ما',
+    category: 'الفئة',
+    message: 'الرسالة',
+    component: 'المكون',
+    stackTrace: 'تتبع المكدس',
   },
 
   // Time

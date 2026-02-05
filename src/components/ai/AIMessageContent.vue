@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import DOMPurify from 'dompurify'
 import AISentimentBadge from './AISentimentBadge.vue'
 import AIConfidenceBar from './AIConfidenceBar.vue'
 import type { Entity, SentimentResult, ClassificationResult, SummarizationResult } from '@/types/ai'
@@ -108,7 +109,13 @@ const renderedContent = computed(() => {
     html = `<p class="ai-paragraph">${html}</p>`
   }
 
-  return html
+  // Sanitize final output to prevent any XSS
+  return DOMPurify.sanitize(html, {
+    ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'code', 'pre', 'h1', 'h2', 'h3', 'ul', 'ol', 'li',
+                   'a', 'blockquote', 'hr', 'table', 'thead', 'tbody', 'tr', 'th', 'td', 'div', 'span', 'i', 'button'],
+    ALLOWED_ATTR: ['class', 'href', 'target', 'rel', 'data-language', 'title'],
+    ADD_ATTR: ['target'],
+  })
 })
 
 // Get unique entity types for color coding

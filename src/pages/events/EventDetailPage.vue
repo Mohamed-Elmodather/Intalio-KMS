@@ -3,6 +3,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
+import { sanitizeHtml } from '@/utils/sanitize'
 import { CommentsSection, SocialShareButtons, RelatedContentCarousel, BookmarkButton } from '@/components/common'
 import type { EventAttendee, EventAgendaItem, EventSpeaker, Author, Attachment } from '@/types/detail-pages'
 
@@ -405,7 +406,7 @@ function getInitialsColor(initials: string): string {
             <!-- Tab Content -->
             <div class="p-6">
               <!-- Description Tab -->
-              <div v-if="activeTab === 'description'" v-html="event.description" class="prose prose-teal max-w-none"></div>
+              <div v-if="activeTab === 'description'" v-html="sanitizeHtml(event.description)" class="prose prose-teal max-w-none"></div>
 
               <!-- Agenda Tab -->
               <div v-else-if="activeTab === 'agenda'" class="space-y-4">

@@ -74,6 +74,9 @@ export default {
     trending: 'Trending',
     featured: 'Featured',
     recommended: 'Recommended',
+    tryAgain: 'Try Again',
+    showDetails: 'Show Details',
+    hideDetails: 'Hide Details',
     itemsPerPage: 'Items per page',
     perPage: 'per page',
     of: 'of',
@@ -2677,6 +2680,11 @@ export default {
     pageNotFound: 'Page not found',
     pageNotFoundDesc: 'The page you are looking for does not exist',
     articleNotFound: "The article you're looking for doesn't exist or has been removed.",
+    somethingWentWrong: 'Oops! Something went wrong',
+    category: 'Category',
+    message: 'Message',
+    component: 'Component',
+    stackTrace: 'Stack Trace',
   },
 
   // Time

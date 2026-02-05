@@ -5,6 +5,7 @@ import { useI18n } from 'vue-i18n'
 import { articlesApi } from '@/api'
 import { aiApi } from '@/api/ai'
 import type { Article } from '@/types'
+import { sanitizeHtml } from '@/utils/sanitize'
 
 const { t } = useI18n()
 import type { SummarizationResult, TranslationResult, NERResult, SupportedLanguage } from '@/types/ai'
@@ -700,7 +701,7 @@ function navigateToArticle(slug: string) {
               <div class="p-8 md:p-12">
                 <div
                   class="article-content prose prose-lg max-w-none prose-headings:scroll-mt-24"
-                  v-html="article.content"
+                  v-html="sanitizeHtml(article.content)"
                 ></div>
               </div>
 

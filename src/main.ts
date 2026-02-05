@@ -4,6 +4,7 @@ import router from './router'
 import i18n from './i18n'
 import App from './App.vue'
 import { useLocaleStore } from './stores/locale'
+import { installErrorHandler } from './utils/errorHandler'
 
 // Styles
 import '@fortawesome/fontawesome-free/css/all.min.css'
@@ -37,6 +38,9 @@ async function init() {
   app.use(pinia)
   app.use(router)
   app.use(i18n)
+
+  // Install global error handler
+  installErrorHandler(app)
 
   // Initialize locale store
   const localeStore = useLocaleStore()

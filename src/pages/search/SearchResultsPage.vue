@@ -7,6 +7,7 @@ import { useAIServicesStore } from '@/stores/aiServices'
 import { AIVoiceInput } from '@/components/ai'
 import EmptyState from '@/components/common/EmptyState.vue'
 import Pagination from '@/components/common/Pagination.vue'
+import { highlightSearchTerms } from '@/utils/sanitize'
 
 // Stores
 const uiStore = useUIStore()
@@ -564,13 +565,8 @@ async function analyzeSearchQuery(query: string): Promise<void> {
 
 function highlightText(text: string): string {
   if (!displayQuery.value) return text
-  const words = displayQuery.value.toLowerCase().split(' ').filter(w => w.length > 2)
-  let result = text
-  words.forEach(word => {
-    const regex = new RegExp(`(${word})`, 'gi')
-    result = result.replace(regex, '<mark class="bg-yellow-200 text-gray-900 rounded px-0.5">$1</mark>')
-  })
-  return result
+  // Use safe highlighting that escapes HTML to prevent XSS
+  return highlightSearchTerms(text, displayQuery.value)
 }
 
 function toggleTag(tag: Tag): void {
