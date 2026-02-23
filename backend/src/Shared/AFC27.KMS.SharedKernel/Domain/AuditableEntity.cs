@@ -43,12 +43,6 @@ public abstract class AuditableEntity : Entity
         DeletedBy = userId;
     }
 
-    public void Delete()
-    {
-        IsDeleted = true;
-        DeletedAt = DateTime.UtcNow;
-    }
-
     public void Restore()
     {
         IsDeleted = false;

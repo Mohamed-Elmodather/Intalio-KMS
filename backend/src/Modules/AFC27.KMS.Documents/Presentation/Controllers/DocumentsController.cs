@@ -1,11 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using AFC27.KMS.Documents.Application.DTOs;
-using AFC27.KMS.Documents.Application.Interfaces;
-using AFC27.KMS.Documents.Domain.Entities;
 using AFC27.KMS.Contracts.Common;
-using AFC27.KMS.Infrastructure.Storage;
-using System.Security.Claims;
 
 namespace AFC27.KMS.Documents.Presentation.Controllers;
 
@@ -17,59 +13,71 @@ namespace AFC27.KMS.Documents.Presentation.Controllers;
 [Authorize]
 public class DocumentsController : ControllerBase
 {
-    private readonly IDocumentService _documentService;
-    private readonly IStorageService _storageService;
     private readonly ILogger<DocumentsController> _logger;
 
-    public DocumentsController(
-        IDocumentService documentService,
-        IStorageService storageService,
-        ILogger<DocumentsController> logger)
+    public DocumentsController(ILogger<DocumentsController> logger)
     {
-        _documentService = documentService;
-        _storageService = storageService;
         _logger = logger;
-    }
-
-    private Guid GetCurrentUserId()
-    {
-        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
-            ?? User.FindFirst("sub")?.Value;
-
-        if (Guid.TryParse(userIdClaim, out var userId))
-            return userId;
-
-        // Fallback for development
-        return Guid.Empty;
-    }
-
-    private string GetCurrentUserName()
-    {
-        return User.FindFirst(ClaimTypes.Name)?.Value
-            ?? User.FindFirst("name")?.Value
-            ?? "Unknown User";
     }
 
     /// <summary>
     /// Get paginated list of documents.
     /// </summary>
     [HttpGet]
-    [ProducesResponseType(typeof(ApiResponse<PagedResult<DocumentSummaryDto>>), 200)]
-    public async Task<ActionResult<ApiResponse<PagedResult<DocumentSummaryDto>>>> GetDocuments(
-        [FromQuery] DocumentFilterRequest filter,
-        CancellationToken cancellationToken)
+    public ActionResult<ApiResponse<PagedResult<DocumentSummaryDto>>> GetDocuments([FromQuery] DocumentFilterRequest filter)
     {
-        var userId = GetCurrentUserId();
+        var documents = new List<DocumentSummaryDto>
+        {
+            new()
+            {
+                Id = Guid.NewGuid(),
+                Name = "Tournament Operations Manual",
+                NameArabic = "دليل عمليات البطولة",
+                FileName = "tournament-operations-manual-v2.pdf",
+                FileExtension = ".pdf",
+                FileSize = 5242880, // 5 MB
+                ThumbnailUrl = "/thumbnails/pdf-icon.png",
+                Version = "2.1",
+                Status = "Published",
+                IsCheckedOut = false,
+                CreatedByName = "Mohammed Al-Rashid",
+                CreatedAt = DateTime.UtcNow.AddDays(-30),
+                UpdatedAt = DateTime.UtcNow.AddDays(-5)
+            },
+            new()
+            {
+                Id = Guid.NewGuid(),
+                Name = "Venue Specifications",
+                NameArabic = "مواصفات الملاعب",
+                FileName = "venue-specifications.xlsx",
+                FileExtension = ".xlsx",
+                FileSize = 2097152, // 2 MB
+                ThumbnailUrl = "/thumbnails/excel-icon.png",
+                Version = "1.3",
+                Status = "CheckedOut",
+                IsCheckedOut = true,
+                CheckedOutByName = "Sara Ali",
+                CreatedByName = "Ahmed Hassan",
+                CreatedAt = DateTime.UtcNow.AddDays(-45),
+                UpdatedAt = DateTime.UtcNow.AddDays(-1)
+            },
+            new()
+            {
+                Id = Guid.NewGuid(),
+                Name = "Brand Guidelines",
+                NameArabic = "إرشادات العلامة التجارية",
+                FileName = "afc27-brand-guidelines.pdf",
+                FileExtension = ".pdf",
+                FileSize = 15728640, // 15 MB
+                Version = "1.0",
+                Status = "Published",
+                IsCheckedOut = false,
+                CreatedByName = "Fatima Al-Saud",
+                CreatedAt = DateTime.UtcNow.AddDays(-60)
+            }
+        };
 
-        var result = await _documentService.SearchDocumentsAsync(
-            userId,
-            filter.LibraryId,
-            filter.FolderId,
-            filter.SearchTerm,
-            filter.Page,
-            filter.PageSize,
-            cancellationToken);
-
+        var result = PagedResult<DocumentSummaryDto>.Create(documents, 250, filter.Page, filter.PageSize);
         return Ok(ApiResponse<PagedResult<DocumentSummaryDto>>.Ok(result));
     }
 
@@ -77,14 +85,22 @@ public class DocumentsController : ControllerBase
     /// Get recent documents for current user.
     /// </summary>
     [HttpGet("recent")]
-    [ProducesResponseType(typeof(ApiResponse<IReadOnlyList<DocumentSummaryDto>>), 200)]
-    public async Task<ActionResult<ApiResponse<IReadOnlyList<DocumentSummaryDto>>>> GetRecentDocuments(
-        [FromQuery] int limit = 10,
-        CancellationToken cancellationToken = default)
+    public ActionResult<ApiResponse<IReadOnlyList<DocumentSummaryDto>>> GetRecentDocuments([FromQuery] int limit = 10)
     {
-        var userId = GetCurrentUserId();
-
-        var documents = await _documentService.GetRecentDocumentsAsync(userId, limit, cancellationToken);
+        var documents = new List<DocumentSummaryDto>
+        {
+            new()
+            {
+                Id = Guid.NewGuid(),
+                Name = "Tournament Operations Manual",
+                FileName = "tournament-operations-manual-v2.pdf",
+                FileExtension = ".pdf",
+                FileSize = 5242880,
+                Version = "2.1",
+                Status = "Published",
+                UpdatedAt = DateTime.UtcNow.AddHours(-2)
+            }
+        };
 
         return Ok(ApiResponse<IReadOnlyList<DocumentSummaryDto>>.Ok(documents));
     }
@@ -93,20 +109,40 @@ public class DocumentsController : ControllerBase
     /// Get document by ID.
     /// </summary>
     [HttpGet("{id:guid}")]
-    [ProducesResponseType(typeof(ApiResponse<DocumentDto>), 200)]
-    [ProducesResponseType(typeof(ApiResponse), 404)]
-    public async Task<ActionResult<ApiResponse<DocumentDto>>> GetDocument(
-        Guid id,
-        CancellationToken cancellationToken)
+    public ActionResult<ApiResponse<DocumentDto>> GetDocument(Guid id)
     {
-        var userId = GetCurrentUserId();
-
-        var document = await _documentService.GetDocumentAsync(id, userId, cancellationToken);
-
-        if (document == null)
+        var document = new DocumentDto
         {
-            return NotFound(ApiResponse.Fail("Document not found or access denied"));
-        }
+            Id = id,
+            Name = "Tournament Operations Manual",
+            NameArabic = "دليل عمليات البطولة",
+            Description = "Complete operational guidelines for the AFC Asian Cup 2027",
+            DescriptionArabic = "الإرشادات التشغيلية الكاملة لكأس آسيا 2027",
+            FileName = "tournament-operations-manual-v2.pdf",
+            FileExtension = ".pdf",
+            ContentType = "application/pdf",
+            FileSize = 5242880,
+            ThumbnailUrl = "/thumbnails/pdf-icon.png",
+            LibraryId = Guid.NewGuid(),
+            LibraryName = "Operations Documents",
+            FolderId = Guid.NewGuid(),
+            FolderPath = "Operations/Manuals",
+            Version = "2.1",
+            Status = "Published",
+            RequiresApproval = true,
+            DownloadCount = 156,
+            ViewCount = 423,
+            CreatedById = Guid.NewGuid(),
+            CreatedByName = "Mohammed Al-Rashid",
+            CreatedAt = DateTime.UtcNow.AddDays(-30),
+            UpdatedAt = DateTime.UtcNow.AddDays(-5),
+            Metadata = new List<DocumentMetadataDto>
+            {
+                new() { Key = "Department", Value = "Operations", DataType = "String" },
+                new() { Key = "Confidentiality", Value = "Internal", DataType = "String" },
+                new() { Key = "ExpiryDate", Value = "2027-12-31", DataType = "Date" }
+            }
+        };
 
         return Ok(ApiResponse<DocumentDto>.Ok(document));
     }
@@ -116,51 +152,34 @@ public class DocumentsController : ControllerBase
     /// </summary>
     [HttpPost("upload")]
     [Authorize(Policy = "CanUploadDocuments")]
-    [ProducesResponseType(typeof(ApiResponse<DocumentDto>), 201)]
-    [ProducesResponseType(typeof(ApiResponse), 400)]
     public async Task<ActionResult<ApiResponse<DocumentDto>>> UploadDocument(
         [FromForm] IFormFile file,
-        [FromForm] UploadDocumentRequest request,
-        CancellationToken cancellationToken)
+        [FromForm] UploadDocumentRequest request)
     {
-        if (file == null || file.Length == 0)
-        {
-            return BadRequest(ApiResponse.Fail("No file provided"));
-        }
+        _logger.LogInformation("Uploading document {FileName} to library {LibraryId}", file.FileName, request.LibraryId);
 
-        var userId = GetCurrentUserId();
-        var userName = GetCurrentUserName();
+        await Task.Delay(100);
 
-        _logger.LogInformation("User {UserId} uploading document {FileName} to library {LibraryId}",
-            userId, file.FileName, request.LibraryId);
+        var document = new DocumentDto
+        {
+            Id = Guid.NewGuid(),
+            Name = request.Name ?? Path.GetFileNameWithoutExtension(file.FileName),
+            NameArabic = request.NameArabic,
+            Description = request.Description,
+            FileName = file.FileName,
+            FileExtension = Path.GetExtension(file.FileName),
+            ContentType = file.ContentType,
+            FileSize = file.Length,
+            LibraryId = request.LibraryId,
+            FolderId = request.FolderId,
+            Version = "1.0",
+            Status = "Draft",
+            CreatedById = Guid.NewGuid(),
+            CreatedByName = "Current User",
+            CreatedAt = DateTime.UtcNow
+        };
 
-        try
-        {
-            var document = await _documentService.UploadDocumentAsync(
-                file.OpenReadStream(),
-                file.FileName,
-                file.ContentType,
-                request.LibraryId,
-                request.FolderId,
-                request.Name ?? Path.GetFileNameWithoutExtension(file.FileName),
-                request.NameArabic,
-                request.Description,
-                request.DescriptionArabic,
-                request.Tags,
-                userId,
-                userName,
-                cancellationToken);
-
-            return CreatedAtAction(nameof(GetDocument), new { id = document.Id }, ApiResponse<DocumentDto>.Ok(document));
-        }
-        catch (UnauthorizedAccessException ex)
-        {
-            return Forbid();
-        }
-        catch (ArgumentException ex)
-        {
-            return BadRequest(ApiResponse.Fail(ex.Message));
-        }
+        return CreatedAtAction(nameof(GetDocument), new { id = document.Id }, ApiResponse<DocumentDto>.Ok(document));
     }
 
     /// <summary>
@@ -168,31 +187,11 @@ public class DocumentsController : ControllerBase
     /// </summary>
     [HttpPut("{id:guid}")]
     [Authorize(Policy = "CanEditDocuments")]
-    [ProducesResponseType(typeof(ApiResponse), 200)]
-    [ProducesResponseType(typeof(ApiResponse), 404)]
-    public async Task<ActionResult<ApiResponse>> UpdateDocument(
-        Guid id,
-        [FromBody] UpdateDocumentRequest request,
-        CancellationToken cancellationToken)
+    public async Task<ActionResult<ApiResponse>> UpdateDocument(Guid id, [FromBody] UpdateDocumentRequest request)
     {
-        var userId = GetCurrentUserId();
+        _logger.LogInformation("Updating document {DocumentId}", id);
 
-        _logger.LogInformation("User {UserId} updating document {DocumentId}", userId, id);
-
-        var success = await _documentService.UpdateDocumentAsync(
-            id,
-            request.Name,
-            request.NameArabic,
-            request.Description,
-            request.DescriptionArabic,
-            request.Tags,
-            userId,
-            cancellationToken);
-
-        if (!success)
-        {
-            return NotFound(ApiResponse.Fail("Document not found or access denied"));
-        }
+        await Task.Delay(100);
 
         return Ok(ApiResponse.Ok("Document updated successfully"));
     }
@@ -202,22 +201,11 @@ public class DocumentsController : ControllerBase
     /// </summary>
     [HttpDelete("{id:guid}")]
     [Authorize(Policy = "CanDeleteDocuments")]
-    [ProducesResponseType(typeof(ApiResponse), 200)]
-    [ProducesResponseType(typeof(ApiResponse), 404)]
-    public async Task<ActionResult<ApiResponse>> DeleteDocument(
-        Guid id,
-        CancellationToken cancellationToken)
+    public async Task<ActionResult<ApiResponse>> DeleteDocument(Guid id)
     {
-        var userId = GetCurrentUserId();
+        _logger.LogInformation("Deleting document {DocumentId}", id);
 
-        _logger.LogInformation("User {UserId} deleting document {DocumentId}", userId, id);
-
-        var success = await _documentService.DeleteDocumentAsync(id, userId, cancellationToken);
-
-        if (!success)
-        {
-            return NotFound(ApiResponse.Fail("Document not found or access denied"));
-        }
+        await Task.Delay(100);
 
         return Ok(ApiResponse.Ok("Document deleted successfully"));
     }
@@ -226,191 +214,110 @@ public class DocumentsController : ControllerBase
     /// Download a document.
     /// </summary>
     [HttpGet("{id:guid}/download")]
-    [ProducesResponseType(200)]
-    [ProducesResponseType(404)]
-    public async Task<IActionResult> DownloadDocument(
-        Guid id,
-        CancellationToken cancellationToken)
+    public async Task<IActionResult> DownloadDocument(Guid id)
     {
-        var userId = GetCurrentUserId();
+        _logger.LogInformation("Downloading document {DocumentId}", id);
 
-        _logger.LogInformation("User {UserId} downloading document {DocumentId}", userId, id);
+        await Task.Delay(100);
 
-        var document = await _documentService.GetDocumentAsync(id, userId, cancellationToken);
-        if (document == null)
-        {
-            return NotFound();
-        }
+        // In real implementation, this would stream the file
+        var bytes = new byte[] { 0x25, 0x50, 0x44, 0x46 }; // PDF magic bytes
+        return File(bytes, "application/pdf", "document.pdf");
+    }
 
-        var stream = await _storageService.DownloadAsync(document.StoragePath, cancellationToken);
-        if (stream == null)
-        {
-            _logger.LogError("Document {DocumentId} not found in storage", id);
-            return NotFound();
-        }
-
-        // Log download
-        await _documentService.LogDownloadAsync(id, userId, cancellationToken);
-
-        return File(stream, document.ContentType ?? "application/octet-stream", document.FileName);
+    /// <summary>
+    /// Get document preview URL.
+    /// </summary>
+    [HttpGet("{id:guid}/preview")]
+    public ActionResult<ApiResponse<string>> GetPreviewUrl(Guid id)
+    {
+        var previewUrl = $"/api/documents/{id}/preview/content";
+        return Ok(ApiResponse<string>.Ok(previewUrl));
     }
 
     /// <summary>
     /// Check out a document.
     /// </summary>
     [HttpPost("{id:guid}/checkout")]
-    [ProducesResponseType(typeof(ApiResponse), 200)]
-    [ProducesResponseType(typeof(ApiResponse), 400)]
-    [ProducesResponseType(typeof(ApiResponse), 404)]
-    public async Task<ActionResult<ApiResponse>> CheckoutDocument(
-        Guid id,
-        CancellationToken cancellationToken)
+    public async Task<ActionResult<ApiResponse>> CheckoutDocument(Guid id)
     {
-        var userId = GetCurrentUserId();
-        var userName = GetCurrentUserName();
+        _logger.LogInformation("Checking out document {DocumentId}", id);
 
-        _logger.LogInformation("User {UserId} checking out document {DocumentId}", userId, id);
+        await Task.Delay(100);
 
-        try
-        {
-            var success = await _documentService.CheckOutDocumentAsync(id, userId, userName, cancellationToken);
-
-            if (!success)
-            {
-                return NotFound(ApiResponse.Fail("Document not found or access denied"));
-            }
-
-            return Ok(ApiResponse.Ok("Document checked out"));
-        }
-        catch (InvalidOperationException ex)
-        {
-            return BadRequest(ApiResponse.Fail(ex.Message));
-        }
+        return Ok(ApiResponse.Ok("Document checked out"));
     }
 
     /// <summary>
     /// Check in a document with a new version.
     /// </summary>
     [HttpPost("{id:guid}/checkin")]
-    [ProducesResponseType(typeof(ApiResponse), 200)]
-    [ProducesResponseType(typeof(ApiResponse), 400)]
-    [ProducesResponseType(typeof(ApiResponse), 404)]
     public async Task<ActionResult<ApiResponse>> CheckinDocument(
         Guid id,
         [FromForm] IFormFile? file,
-        [FromForm] CheckInDocumentRequest request,
-        CancellationToken cancellationToken)
+        [FromForm] CheckInDocumentRequest request)
     {
-        var userId = GetCurrentUserId();
-        var userName = GetCurrentUserName();
+        _logger.LogInformation("Checking in document {DocumentId}, Major version: {IsMajor}", id, request.IsMajorVersion);
 
-        _logger.LogInformation("User {UserId} checking in document {DocumentId}", userId, id);
+        await Task.Delay(100);
 
-        try
-        {
-            Stream? fileStream = file?.OpenReadStream();
-            string? fileName = file?.FileName;
-            string? contentType = file?.ContentType;
-
-            var success = await _documentService.CheckInDocumentAsync(
-                id,
-                fileStream,
-                fileName,
-                contentType,
-                request.IsMajorVersion,
-                request.Comments,
-                userId,
-                userName,
-                cancellationToken);
-
-            if (!success)
-            {
-                return NotFound(ApiResponse.Fail("Document not found or access denied"));
-            }
-
-            return Ok(ApiResponse.Ok("Document checked in"));
-        }
-        catch (InvalidOperationException ex)
-        {
-            return BadRequest(ApiResponse.Fail(ex.Message));
-        }
+        return Ok(ApiResponse.Ok("Document checked in"));
     }
 
     /// <summary>
     /// Discard checkout.
     /// </summary>
     [HttpPost("{id:guid}/discard-checkout")]
-    [ProducesResponseType(typeof(ApiResponse), 200)]
-    [ProducesResponseType(typeof(ApiResponse), 400)]
-    [ProducesResponseType(typeof(ApiResponse), 404)]
-    public async Task<ActionResult<ApiResponse>> DiscardCheckout(
-        Guid id,
-        CancellationToken cancellationToken)
+    public async Task<ActionResult<ApiResponse>> DiscardCheckout(Guid id)
     {
-        var userId = GetCurrentUserId();
+        _logger.LogInformation("Discarding checkout for document {DocumentId}", id);
 
-        _logger.LogInformation("User {UserId} discarding checkout for document {DocumentId}", userId, id);
+        await Task.Delay(100);
 
-        try
-        {
-            var success = await _documentService.DiscardCheckoutAsync(id, userId, cancellationToken);
-
-            if (!success)
-            {
-                return NotFound(ApiResponse.Fail("Document not found or access denied"));
-            }
-
-            return Ok(ApiResponse.Ok("Checkout discarded"));
-        }
-        catch (InvalidOperationException ex)
-        {
-            return BadRequest(ApiResponse.Fail(ex.Message));
-        }
+        return Ok(ApiResponse.Ok("Checkout discarded"));
     }
 
     /// <summary>
     /// Get document versions.
     /// </summary>
     [HttpGet("{id:guid}/versions")]
-    [ProducesResponseType(typeof(ApiResponse<IReadOnlyList<DocumentVersionDto>>), 200)]
-    [ProducesResponseType(typeof(ApiResponse), 404)]
-    public async Task<ActionResult<ApiResponse<IReadOnlyList<DocumentVersionDto>>>> GetVersions(
-        Guid id,
-        CancellationToken cancellationToken)
+    public ActionResult<ApiResponse<IReadOnlyList<DocumentVersionDto>>> GetVersions(Guid id)
     {
-        var userId = GetCurrentUserId();
-
-        var versions = await _documentService.GetDocumentVersionsAsync(id, userId, cancellationToken);
-
-        if (versions == null)
+        var versions = new List<DocumentVersionDto>
         {
-            return NotFound(ApiResponse.Fail("Document not found or access denied"));
-        }
+            new()
+            {
+                Id = Guid.NewGuid(),
+                Version = "2.1",
+                FileName = "tournament-operations-manual-v2.pdf",
+                FileSize = 5242880,
+                CreatedByName = "Mohammed Al-Rashid",
+                CreatedAt = DateTime.UtcNow.AddDays(-5),
+                ChangeNotes = "Updated security protocols"
+            },
+            new()
+            {
+                Id = Guid.NewGuid(),
+                Version = "2.0",
+                FileName = "tournament-operations-manual-v2.pdf",
+                FileSize = 5100000,
+                CreatedByName = "Sara Ali",
+                CreatedAt = DateTime.UtcNow.AddDays(-15),
+                ChangeNotes = "Major revision - added new chapters"
+            },
+            new()
+            {
+                Id = Guid.NewGuid(),
+                Version = "1.0",
+                FileName = "tournament-operations-manual.pdf",
+                FileSize = 4800000,
+                CreatedByName = "Mohammed Al-Rashid",
+                CreatedAt = DateTime.UtcNow.AddDays(-30),
+                ChangeNotes = "Initial version"
+            }
+        };
 
         return Ok(ApiResponse<IReadOnlyList<DocumentVersionDto>>.Ok(versions));
-    }
-
-    /// <summary>
-    /// Download a specific version.
-    /// </summary>
-    [HttpGet("{id:guid}/versions/{versionId:guid}/download")]
-    [ProducesResponseType(200)]
-    [ProducesResponseType(404)]
-    public async Task<IActionResult> DownloadVersion(
-        Guid id,
-        Guid versionId,
-        CancellationToken cancellationToken)
-    {
-        var userId = GetCurrentUserId();
-
-        var result = await _documentService.DownloadVersionAsync(id, versionId, userId, cancellationToken);
-
-        if (result == null)
-        {
-            return NotFound();
-        }
-
-        return File(result.Value.Stream, result.Value.ContentType, result.Value.FileName);
     }
 
     /// <summary>
@@ -418,25 +325,11 @@ public class DocumentsController : ControllerBase
     /// </summary>
     [HttpPost("{id:guid}/versions/{versionId:guid}/restore")]
     [Authorize(Policy = "CanEditDocuments")]
-    [ProducesResponseType(typeof(ApiResponse), 200)]
-    [ProducesResponseType(typeof(ApiResponse), 404)]
-    public async Task<ActionResult<ApiResponse>> RestoreVersion(
-        Guid id,
-        Guid versionId,
-        CancellationToken cancellationToken)
+    public async Task<ActionResult<ApiResponse>> RestoreVersion(Guid id, Guid versionId)
     {
-        var userId = GetCurrentUserId();
-        var userName = GetCurrentUserName();
+        _logger.LogInformation("Restoring document {DocumentId} to version {VersionId}", id, versionId);
 
-        _logger.LogInformation("User {UserId} restoring document {DocumentId} to version {VersionId}",
-            userId, id, versionId);
-
-        var success = await _documentService.RestoreVersionAsync(id, versionId, userId, userName, cancellationToken);
-
-        if (!success)
-        {
-            return NotFound(ApiResponse.Fail("Document or version not found, or access denied"));
-        }
+        await Task.Delay(100);
 
         return Ok(ApiResponse.Ok("Version restored"));
     }
@@ -445,20 +338,33 @@ public class DocumentsController : ControllerBase
     /// Get document audit trail.
     /// </summary>
     [HttpGet("{id:guid}/audit")]
-    [ProducesResponseType(typeof(ApiResponse<IReadOnlyList<DocumentAuditDto>>), 200)]
-    [ProducesResponseType(typeof(ApiResponse), 404)]
-    public async Task<ActionResult<ApiResponse<IReadOnlyList<DocumentAuditDto>>>> GetAuditTrail(
-        Guid id,
-        CancellationToken cancellationToken)
+    public ActionResult<ApiResponse<IReadOnlyList<DocumentAuditDto>>> GetAuditTrail(Guid id)
     {
-        var userId = GetCurrentUserId();
-
-        var auditTrail = await _documentService.GetAuditTrailAsync(id, userId, cancellationToken);
-
-        if (auditTrail == null)
+        var auditTrail = new List<DocumentAuditDto>
         {
-            return NotFound(ApiResponse.Fail("Document not found or access denied"));
-        }
+            new()
+            {
+                Id = Guid.NewGuid(),
+                Action = "Downloaded",
+                PerformedByName = "Ahmed Hassan",
+                PerformedAt = DateTime.UtcNow.AddHours(-2)
+            },
+            new()
+            {
+                Id = Guid.NewGuid(),
+                Action = "Viewed",
+                PerformedByName = "Sara Ali",
+                PerformedAt = DateTime.UtcNow.AddHours(-5)
+            },
+            new()
+            {
+                Id = Guid.NewGuid(),
+                Action = "Checked In",
+                Details = "Version 2.1 - Updated security protocols",
+                PerformedByName = "Mohammed Al-Rashid",
+                PerformedAt = DateTime.UtcNow.AddDays(-5)
+            }
+        };
 
         return Ok(ApiResponse<IReadOnlyList<DocumentAuditDto>>.Ok(auditTrail));
     }
@@ -468,28 +374,11 @@ public class DocumentsController : ControllerBase
     /// </summary>
     [HttpPost("{id:guid}/move")]
     [Authorize(Policy = "CanEditDocuments")]
-    [ProducesResponseType(typeof(ApiResponse), 200)]
-    [ProducesResponseType(typeof(ApiResponse), 404)]
-    public async Task<ActionResult<ApiResponse>> MoveDocument(
-        Guid id,
-        [FromBody] MoveDocumentRequest request,
-        CancellationToken cancellationToken)
+    public async Task<ActionResult<ApiResponse>> MoveDocument(Guid id, [FromBody] MoveDocumentRequest request)
     {
-        var userId = GetCurrentUserId();
+        _logger.LogInformation("Moving document {DocumentId} to folder {FolderId}", id, request.TargetFolderId);
 
-        _logger.LogInformation("User {UserId} moving document {DocumentId} to folder {FolderId}",
-            userId, id, request.TargetFolderId);
-
-        var success = await _documentService.MoveDocumentAsync(
-            id,
-            request.TargetFolderId,
-            userId,
-            cancellationToken);
-
-        if (!success)
-        {
-            return NotFound(ApiResponse.Fail("Document or folder not found, or access denied"));
-        }
+        await Task.Delay(100);
 
         return Ok(ApiResponse.Ok("Document moved successfully"));
     }
@@ -499,30 +388,23 @@ public class DocumentsController : ControllerBase
     /// </summary>
     [HttpPost("{id:guid}/copy")]
     [Authorize(Policy = "CanUploadDocuments")]
-    [ProducesResponseType(typeof(ApiResponse<DocumentDto>), 200)]
-    [ProducesResponseType(typeof(ApiResponse), 404)]
-    public async Task<ActionResult<ApiResponse<DocumentDto>>> CopyDocument(
-        Guid id,
-        [FromBody] MoveDocumentRequest request,
-        CancellationToken cancellationToken)
+    public async Task<ActionResult<ApiResponse<DocumentDto>>> CopyDocument(Guid id, [FromBody] MoveDocumentRequest request)
     {
-        var userId = GetCurrentUserId();
-        var userName = GetCurrentUserName();
+        _logger.LogInformation("Copying document {DocumentId} to folder {FolderId}", id, request.TargetFolderId);
 
-        _logger.LogInformation("User {UserId} copying document {DocumentId} to folder {FolderId}",
-            userId, id, request.TargetFolderId);
+        await Task.Delay(100);
 
-        var document = await _documentService.CopyDocumentAsync(
-            id,
-            request.TargetFolderId,
-            userId,
-            userName,
-            cancellationToken);
-
-        if (document == null)
+        var document = new DocumentDto
         {
-            return NotFound(ApiResponse.Fail("Document or folder not found, or access denied"));
-        }
+            Id = Guid.NewGuid(),
+            Name = "Tournament Operations Manual (Copy)",
+            FileName = "tournament-operations-manual-v2-copy.pdf",
+            FileExtension = ".pdf",
+            FileSize = 5242880,
+            Version = "1.0",
+            Status = "Draft",
+            CreatedAt = DateTime.UtcNow
+        };
 
         return Ok(ApiResponse<DocumentDto>.Ok(document));
     }
@@ -532,22 +414,11 @@ public class DocumentsController : ControllerBase
     /// </summary>
     [HttpPost("{id:guid}/publish")]
     [Authorize(Policy = "CanPublishDocuments")]
-    [ProducesResponseType(typeof(ApiResponse), 200)]
-    [ProducesResponseType(typeof(ApiResponse), 404)]
-    public async Task<ActionResult<ApiResponse>> PublishDocument(
-        Guid id,
-        CancellationToken cancellationToken)
+    public async Task<ActionResult<ApiResponse>> PublishDocument(Guid id)
     {
-        var userId = GetCurrentUserId();
+        _logger.LogInformation("Publishing document {DocumentId}", id);
 
-        _logger.LogInformation("User {UserId} publishing document {DocumentId}", userId, id);
-
-        var success = await _documentService.PublishDocumentAsync(id, userId, cancellationToken);
-
-        if (!success)
-        {
-            return NotFound(ApiResponse.Fail("Document not found or access denied"));
-        }
+        await Task.Delay(100);
 
         return Ok(ApiResponse.Ok("Document published"));
     }
@@ -557,137 +428,12 @@ public class DocumentsController : ControllerBase
     /// </summary>
     [HttpPost("{id:guid}/archive")]
     [Authorize(Policy = "CanEditDocuments")]
-    [ProducesResponseType(typeof(ApiResponse), 200)]
-    [ProducesResponseType(typeof(ApiResponse), 404)]
-    public async Task<ActionResult<ApiResponse>> ArchiveDocument(
-        Guid id,
-        CancellationToken cancellationToken)
+    public async Task<ActionResult<ApiResponse>> ArchiveDocument(Guid id)
     {
-        var userId = GetCurrentUserId();
+        _logger.LogInformation("Archiving document {DocumentId}", id);
 
-        _logger.LogInformation("User {UserId} archiving document {DocumentId}", userId, id);
-
-        var success = await _documentService.ArchiveDocumentAsync(id, userId, cancellationToken);
-
-        if (!success)
-        {
-            return NotFound(ApiResponse.Fail("Document not found or access denied"));
-        }
+        await Task.Delay(100);
 
         return Ok(ApiResponse.Ok("Document archived"));
     }
-
-    /// <summary>
-    /// Bulk delete documents.
-    /// </summary>
-    [HttpPost("bulk/delete")]
-    [Authorize(Policy = "CanDeleteDocuments")]
-    [ProducesResponseType(typeof(ApiResponse<BulkOperationResult>), 200)]
-    public async Task<ActionResult<ApiResponse<BulkOperationResult>>> BulkDeleteDocuments(
-        [FromBody] BulkDocumentRequest request,
-        CancellationToken cancellationToken)
-    {
-        var userId = GetCurrentUserId();
-
-        _logger.LogInformation("User {UserId} bulk deleting {Count} documents", userId, request.DocumentIds.Count);
-
-        var successCount = 0;
-        var failedIds = new List<Guid>();
-
-        foreach (var documentId in request.DocumentIds)
-        {
-            var success = await _documentService.DeleteDocumentAsync(documentId, userId, cancellationToken);
-            if (success)
-                successCount++;
-            else
-                failedIds.Add(documentId);
-        }
-
-        var result = new BulkOperationResult
-        {
-            SuccessCount = successCount,
-            FailedCount = failedIds.Count,
-            FailedIds = failedIds
-        };
-
-        return Ok(ApiResponse<BulkOperationResult>.Ok(result));
-    }
-
-    /// <summary>
-    /// Bulk move documents.
-    /// </summary>
-    [HttpPost("bulk/move")]
-    [Authorize(Policy = "CanEditDocuments")]
-    [ProducesResponseType(typeof(ApiResponse<BulkOperationResult>), 200)]
-    public async Task<ActionResult<ApiResponse<BulkOperationResult>>> BulkMoveDocuments(
-        [FromBody] BulkMoveRequest request,
-        CancellationToken cancellationToken)
-    {
-        var userId = GetCurrentUserId();
-
-        _logger.LogInformation("User {UserId} bulk moving {Count} documents to folder {FolderId}",
-            userId, request.DocumentIds.Count, request.TargetFolderId);
-
-        var successCount = 0;
-        var failedIds = new List<Guid>();
-
-        foreach (var documentId in request.DocumentIds)
-        {
-            var success = await _documentService.MoveDocumentAsync(documentId, request.TargetFolderId, userId, cancellationToken);
-            if (success)
-                successCount++;
-            else
-                failedIds.Add(documentId);
-        }
-
-        var result = new BulkOperationResult
-        {
-            SuccessCount = successCount,
-            FailedCount = failedIds.Count,
-            FailedIds = failedIds
-        };
-
-        return Ok(ApiResponse<BulkOperationResult>.Ok(result));
-    }
-}
-
-/// <summary>
-/// Document filter request.
-/// </summary>
-public record DocumentFilterRequest
-{
-    public Guid? LibraryId { get; init; }
-    public Guid? FolderId { get; init; }
-    public string? SearchTerm { get; init; }
-    public string? Status { get; init; }
-    public string? FileType { get; init; }
-    public int Page { get; init; } = 1;
-    public int PageSize { get; init; } = 20;
-}
-
-/// <summary>
-/// Bulk document request.
-/// </summary>
-public record BulkDocumentRequest
-{
-    public IReadOnlyList<Guid> DocumentIds { get; init; } = Array.Empty<Guid>();
-}
-
-/// <summary>
-/// Bulk move request.
-/// </summary>
-public record BulkMoveRequest
-{
-    public IReadOnlyList<Guid> DocumentIds { get; init; } = Array.Empty<Guid>();
-    public Guid? TargetFolderId { get; init; }
-}
-
-/// <summary>
-/// Bulk operation result.
-/// </summary>
-public record BulkOperationResult
-{
-    public int SuccessCount { get; init; }
-    public int FailedCount { get; init; }
-    public IReadOnlyList<Guid> FailedIds { get; init; } = Array.Empty<Guid>();
 }

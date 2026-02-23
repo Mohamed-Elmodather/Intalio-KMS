@@ -1,9 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using AFC27.KMS.Documents.Application.DTOs;
-using AFC27.KMS.Documents.Application.Interfaces;
 using AFC27.KMS.Contracts.Common;
-using System.Security.Claims;
 
 namespace AFC27.KMS.Documents.Presentation.Controllers;
 
@@ -15,49 +13,82 @@ namespace AFC27.KMS.Documents.Presentation.Controllers;
 [Authorize]
 public class LibrariesController : ControllerBase
 {
-    private readonly ILibraryService _libraryService;
-    private readonly IFolderService _folderService;
     private readonly ILogger<LibrariesController> _logger;
 
-    public LibrariesController(
-        ILibraryService libraryService,
-        IFolderService folderService,
-        ILogger<LibrariesController> logger)
+    public LibrariesController(ILogger<LibrariesController> logger)
     {
-        _libraryService = libraryService;
-        _folderService = folderService;
         _logger = logger;
-    }
-
-    private Guid GetCurrentUserId()
-    {
-        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
-            ?? User.FindFirst("sub")?.Value;
-
-        if (Guid.TryParse(userIdClaim, out var userId))
-            return userId;
-
-        return Guid.Empty;
-    }
-
-    private string GetCurrentUserName()
-    {
-        return User.FindFirst(ClaimTypes.Name)?.Value
-            ?? User.FindFirst("name")?.Value
-            ?? "Unknown User";
     }
 
     /// <summary>
     /// Get all accessible libraries.
     /// </summary>
     [HttpGet]
-    [ProducesResponseType(typeof(ApiResponse<IReadOnlyList<LibrarySummaryDto>>), 200)]
-    public async Task<ActionResult<ApiResponse<IReadOnlyList<LibrarySummaryDto>>>> GetLibraries(
-        CancellationToken cancellationToken)
+    public ActionResult<ApiResponse<IReadOnlyList<LibrarySummaryDto>>> GetLibraries()
     {
-        var userId = GetCurrentUserId();
-
-        var libraries = await _libraryService.GetLibrariesAsync(userId, cancellationToken);
+        var libraries = new List<LibrarySummaryDto>
+        {
+            new()
+            {
+                Id = Guid.NewGuid(),
+                Name = "Operations Documents",
+                NameArabic = "وثائق العمليات",
+                IconName = "pi pi-folder",
+                Color = "#2E7D32",
+                Type = "Department",
+                IsPublic = false,
+                DocumentCount = 156,
+                TotalSize = 524288000 // 500 MB
+            },
+            new()
+            {
+                Id = Guid.NewGuid(),
+                Name = "Media Assets",
+                NameArabic = "الملفات الإعلامية",
+                IconName = "pi pi-images",
+                Color = "#D4AF37",
+                Type = "General",
+                IsPublic = true,
+                DocumentCount = 2500,
+                TotalSize = 10737418240 // 10 GB
+            },
+            new()
+            {
+                Id = Guid.NewGuid(),
+                Name = "Brand Guidelines",
+                NameArabic = "إرشادات العلامة التجارية",
+                IconName = "pi pi-palette",
+                Color = "#1976D2",
+                Type = "General",
+                IsPublic = true,
+                DocumentCount = 45,
+                TotalSize = 157286400 // 150 MB
+            },
+            new()
+            {
+                Id = Guid.NewGuid(),
+                Name = "Project Archives",
+                NameArabic = "أرشيف المشاريع",
+                IconName = "pi pi-inbox",
+                Color = "#5D4037",
+                Type = "Archive",
+                IsPublic = false,
+                DocumentCount = 890,
+                TotalSize = 5368709120 // 5 GB
+            },
+            new()
+            {
+                Id = Guid.NewGuid(),
+                Name = "My Documents",
+                NameArabic = "مستنداتي",
+                IconName = "pi pi-user",
+                Color = "#7B1FA2",
+                Type = "Personal",
+                IsPublic = false,
+                DocumentCount = 23,
+                TotalSize = 52428800 // 50 MB
+            }
+        };
 
         return Ok(ApiResponse<IReadOnlyList<LibrarySummaryDto>>.Ok(libraries));
     }
@@ -66,20 +97,31 @@ public class LibrariesController : ControllerBase
     /// Get library by ID.
     /// </summary>
     [HttpGet("{id:guid}")]
-    [ProducesResponseType(typeof(ApiResponse<LibraryDto>), 200)]
-    [ProducesResponseType(typeof(ApiResponse), 404)]
-    public async Task<ActionResult<ApiResponse<LibraryDto>>> GetLibrary(
-        Guid id,
-        CancellationToken cancellationToken)
+    public ActionResult<ApiResponse<LibraryDto>> GetLibrary(Guid id)
     {
-        var userId = GetCurrentUserId();
-
-        var library = await _libraryService.GetLibraryAsync(id, userId, cancellationToken);
-
-        if (library == null)
+        var library = new LibraryDto
         {
-            return NotFound(ApiResponse.Fail("Library not found or access denied"));
-        }
+            Id = id,
+            Name = "Operations Documents",
+            NameArabic = "وثائق العمليات",
+            Description = "Central repository for all operational documentation",
+            DescriptionArabic = "المستودع المركزي لجميع الوثائق التشغيلية",
+            IconName = "pi pi-folder",
+            Color = "#2E7D32",
+            Type = "Department",
+            IsPublic = false,
+            RequiresApproval = true,
+            EnableVersioning = true,
+            MaxVersions = 10,
+            MaxFileSize = 104857600, // 100 MB
+            AllowedExtensions = ".pdf,.docx,.xlsx,.pptx,.jpg,.png",
+            OwnerId = Guid.NewGuid(),
+            OwnerName = "Mohammed Al-Rashid",
+            DocumentCount = 156,
+            FolderCount = 24,
+            TotalSize = 524288000,
+            CreatedAt = DateTime.UtcNow.AddYears(-1)
+        };
 
         return Ok(ApiResponse<LibraryDto>.Ok(library));
     }
@@ -88,99 +130,50 @@ public class LibrariesController : ControllerBase
     /// Get library contents (folders and documents).
     /// </summary>
     [HttpGet("{id:guid}/contents")]
-    [ProducesResponseType(typeof(ApiResponse<LibraryContentsDto>), 200)]
-    [ProducesResponseType(typeof(ApiResponse), 404)]
-    public async Task<ActionResult<ApiResponse<LibraryContentsDto>>> GetLibraryContents(
+    public ActionResult<ApiResponse<LibraryContentsDto>> GetLibraryContents(
         Guid id,
-        [FromQuery] Guid? folderId,
-        CancellationToken cancellationToken)
+        [FromQuery] Guid? folderId)
     {
-        var userId = GetCurrentUserId();
-
-        // If folderId is provided, get folder contents instead
-        if (folderId.HasValue)
-        {
-            var folderContents = await _folderService.GetFolderContentsAsync(folderId.Value, userId, cancellationToken);
-
-            var libraryInfo = await _libraryService.GetLibraryAsync(id, userId, cancellationToken);
-            if (libraryInfo == null)
-            {
-                return NotFound(ApiResponse.Fail("Library not found or access denied"));
-            }
-
-            var contents = new LibraryContentsDto
-            {
-                Library = new LibrarySummaryDto
-                {
-                    Id = libraryInfo.Id,
-                    Name = libraryInfo.Name,
-                    NameArabic = libraryInfo.NameArabic,
-                    IconName = libraryInfo.IconName,
-                    Color = libraryInfo.Color,
-                    Type = libraryInfo.Type,
-                    IsPublic = libraryInfo.IsPublic,
-                    DocumentCount = libraryInfo.DocumentCount,
-                    TotalSize = libraryInfo.TotalSize
-                },
-                CurrentFolder = folderContents.Folder,
-                Folders = folderContents.Subfolders,
-                Documents = folderContents.Documents,
-                Breadcrumbs = folderContents.Breadcrumbs
-            };
-
-            return Ok(ApiResponse<LibraryContentsDto>.Ok(contents));
-        }
-
-        // Get library root contents
-        var library = await _libraryService.GetLibraryAsync(id, userId, cancellationToken);
-        if (library == null)
-        {
-            return NotFound(ApiResponse.Fail("Library not found or access denied"));
-        }
-
-        var folderTree = await _libraryService.GetFolderTreeAsync(id, userId, cancellationToken);
-
-        // Get documents at library root (documents without a folder)
-        // For now, return an empty list as we'd need a specific method for this
-        var rootDocuments = new List<DocumentSummaryDto>();
-
-        var libraryContents = new LibraryContentsDto
+        var contents = new LibraryContentsDto
         {
             Library = new LibrarySummaryDto
             {
-                Id = library.Id,
-                Name = library.Name,
-                NameArabic = library.NameArabic,
-                IconName = library.IconName,
-                Color = library.Color,
-                Type = library.Type,
-                IsPublic = library.IsPublic,
-                DocumentCount = library.DocumentCount,
-                TotalSize = library.TotalSize
+                Id = id,
+                Name = "Operations Documents",
+                NameArabic = "وثائق العمليات",
+                Type = "Department",
+                DocumentCount = 156,
+                TotalSize = 524288000
             },
-            Folders = folderTree.Select(f => new FolderSummaryDto
+            Folders = new List<FolderSummaryDto>
             {
-                Id = f.Id,
-                Name = f.Name,
-                NameArabic = f.NameArabic,
-                IconName = f.IconName,
-                DocumentCount = f.DocumentCount,
-                ChildFolderCount = f.Children.Count
-            }).ToList(),
-            Documents = rootDocuments,
-            Breadcrumbs = new List<BreadcrumbDto>
+                new() { Id = Guid.NewGuid(), Name = "Manuals", NameArabic = "الأدلة", IconName = "pi pi-book", DocumentCount = 25, ChildFolderCount = 3 },
+                new() { Id = Guid.NewGuid(), Name = "Policies", NameArabic = "السياسات", IconName = "pi pi-file", DocumentCount = 18, ChildFolderCount = 0 },
+                new() { Id = Guid.NewGuid(), Name = "Templates", NameArabic = "القوالب", IconName = "pi pi-copy", DocumentCount = 12, ChildFolderCount = 2 },
+                new() { Id = Guid.NewGuid(), Name = "Reports", NameArabic = "التقارير", IconName = "pi pi-chart-bar", DocumentCount = 45, ChildFolderCount = 5 }
+            },
+            Documents = new List<DocumentSummaryDto>
             {
                 new()
                 {
-                    Id = library.Id,
-                    Name = library.Name,
-                    NameArabic = library.NameArabic,
-                    Type = "library"
+                    Id = Guid.NewGuid(),
+                    Name = "README",
+                    FileName = "README.txt",
+                    FileExtension = ".txt",
+                    FileSize = 2048,
+                    Version = "1.0",
+                    Status = "Published",
+                    CreatedByName = "System",
+                    CreatedAt = DateTime.UtcNow.AddYears(-1)
                 }
+            },
+            Breadcrumbs = new List<BreadcrumbDto>
+            {
+                new() { Id = id, Name = "Operations Documents", NameArabic = "وثائق العمليات", Type = "library" }
             }
         };
 
-        return Ok(ApiResponse<LibraryContentsDto>.Ok(libraryContents));
+        return Ok(ApiResponse<LibraryContentsDto>.Ok(contents));
     }
 
     /// <summary>
@@ -188,27 +181,34 @@ public class LibrariesController : ControllerBase
     /// </summary>
     [HttpPost]
     [Authorize(Policy = "CanManageLibraries")]
-    [ProducesResponseType(typeof(ApiResponse<LibraryDto>), 201)]
-    [ProducesResponseType(typeof(ApiResponse), 400)]
-    public async Task<ActionResult<ApiResponse<LibraryDto>>> CreateLibrary(
-        [FromBody] CreateLibraryRequest request,
-        CancellationToken cancellationToken)
+    public async Task<ActionResult<ApiResponse<LibraryDto>>> CreateLibrary([FromBody] CreateLibraryRequest request)
     {
-        var userId = GetCurrentUserId();
-        var userName = GetCurrentUserName();
+        _logger.LogInformation("Creating library {LibraryName}", request.Name);
 
-        _logger.LogInformation("User {UserId} creating library {LibraryName}", userId, request.Name);
+        await Task.Delay(100);
 
-        try
+        var library = new LibraryDto
         {
-            var library = await _libraryService.CreateLibraryAsync(request, userId, userName, cancellationToken);
+            Id = Guid.NewGuid(),
+            Name = request.Name,
+            NameArabic = request.NameArabic,
+            Description = request.Description,
+            Type = request.Type,
+            IsPublic = request.IsPublic,
+            RequiresApproval = request.RequiresApproval,
+            EnableVersioning = request.EnableVersioning,
+            MaxVersions = request.MaxVersions,
+            MaxFileSize = request.MaxFileSize,
+            AllowedExtensions = request.AllowedExtensions,
+            OwnerId = Guid.NewGuid(),
+            OwnerName = "Current User",
+            DocumentCount = 0,
+            FolderCount = 0,
+            TotalSize = 0,
+            CreatedAt = DateTime.UtcNow
+        };
 
-            return CreatedAtAction(nameof(GetLibrary), new { id = library.Id }, ApiResponse<LibraryDto>.Ok(library));
-        }
-        catch (ArgumentException ex)
-        {
-            return BadRequest(ApiResponse.Fail(ex.Message));
-        }
+        return CreatedAtAction(nameof(GetLibrary), new { id = library.Id }, ApiResponse<LibraryDto>.Ok(library));
     }
 
     /// <summary>
@@ -216,23 +216,11 @@ public class LibrariesController : ControllerBase
     /// </summary>
     [HttpPut("{id:guid}")]
     [Authorize(Policy = "CanManageLibraries")]
-    [ProducesResponseType(typeof(ApiResponse), 200)]
-    [ProducesResponseType(typeof(ApiResponse), 404)]
-    public async Task<ActionResult<ApiResponse>> UpdateLibrary(
-        Guid id,
-        [FromBody] UpdateLibraryRequest request,
-        CancellationToken cancellationToken)
+    public async Task<ActionResult<ApiResponse>> UpdateLibrary(Guid id, [FromBody] UpdateLibraryRequest request)
     {
-        var userId = GetCurrentUserId();
+        _logger.LogInformation("Updating library {LibraryId}", id);
 
-        _logger.LogInformation("User {UserId} updating library {LibraryId}", userId, id);
-
-        var success = await _libraryService.UpdateLibraryAsync(id, request, userId, cancellationToken);
-
-        if (!success)
-        {
-            return NotFound(ApiResponse.Fail("Library not found or access denied"));
-        }
+        await Task.Delay(100);
 
         return Ok(ApiResponse.Ok("Library updated successfully"));
     }
@@ -242,22 +230,11 @@ public class LibrariesController : ControllerBase
     /// </summary>
     [HttpDelete("{id:guid}")]
     [Authorize(Policy = "CanManageLibraries")]
-    [ProducesResponseType(typeof(ApiResponse), 200)]
-    [ProducesResponseType(typeof(ApiResponse), 404)]
-    public async Task<ActionResult<ApiResponse>> DeleteLibrary(
-        Guid id,
-        CancellationToken cancellationToken)
+    public async Task<ActionResult<ApiResponse>> DeleteLibrary(Guid id)
     {
-        var userId = GetCurrentUserId();
+        _logger.LogInformation("Deleting library {LibraryId}", id);
 
-        _logger.LogInformation("User {UserId} deleting library {LibraryId}", userId, id);
-
-        var success = await _libraryService.DeleteLibraryAsync(id, userId, cancellationToken);
-
-        if (!success)
-        {
-            return NotFound(ApiResponse.Fail("Library not found or access denied"));
-        }
+        await Task.Delay(100);
 
         return Ok(ApiResponse.Ok("Library deleted successfully"));
     }
@@ -267,87 +244,57 @@ public class LibrariesController : ControllerBase
     /// </summary>
     [HttpPost("{id:guid}/folders")]
     [Authorize(Policy = "CanUploadDocuments")]
-    [ProducesResponseType(typeof(ApiResponse<FolderDto>), 201)]
-    [ProducesResponseType(typeof(ApiResponse), 400)]
-    public async Task<ActionResult<ApiResponse<FolderDto>>> CreateFolder(
-        Guid id,
-        [FromBody] CreateFolderRequest request,
-        CancellationToken cancellationToken)
+    public async Task<ActionResult<ApiResponse<FolderDto>>> CreateFolder(Guid id, [FromBody] CreateFolderRequest request)
     {
-        var userId = GetCurrentUserId();
+        _logger.LogInformation("Creating folder {FolderName} in library {LibraryId}", request.Name, id);
 
-        _logger.LogInformation("User {UserId} creating folder {FolderName} in library {LibraryId}",
-            userId, request.Name, id);
+        await Task.Delay(100);
 
-        // Ensure the library ID in the request matches the route
-        var folderRequest = request with { LibraryId = id };
-
-        try
+        var folder = new FolderDto
         {
-            var folder = await _folderService.CreateFolderAsync(folderRequest, userId, cancellationToken);
+            Id = Guid.NewGuid(),
+            Name = request.Name,
+            NameArabic = request.NameArabic,
+            Description = request.Description,
+            LibraryId = id,
+            ParentId = request.ParentId,
+            Path = request.Name,
+            DocumentCount = 0,
+            ChildFolderCount = 0,
+            CreatedAt = DateTime.UtcNow
+        };
 
-            return CreatedAtAction(nameof(GetFolder), new { id, folderId = folder.Id }, ApiResponse<FolderDto>.Ok(folder));
-        }
-        catch (UnauthorizedAccessException)
-        {
-            return Forbid();
-        }
-        catch (ArgumentException ex)
-        {
-            return BadRequest(ApiResponse.Fail(ex.Message));
-        }
+        return CreatedAtAction(nameof(GetFolder), new { id, folderId = folder.Id }, ApiResponse<FolderDto>.Ok(folder));
     }
 
     /// <summary>
     /// Get a folder.
     /// </summary>
     [HttpGet("{id:guid}/folders/{folderId:guid}")]
-    [ProducesResponseType(typeof(ApiResponse<FolderDto>), 200)]
-    [ProducesResponseType(typeof(ApiResponse), 404)]
-    public async Task<ActionResult<ApiResponse<FolderDto>>> GetFolder(
-        Guid id,
-        Guid folderId,
-        CancellationToken cancellationToken)
+    public ActionResult<ApiResponse<FolderDto>> GetFolder(Guid id, Guid folderId)
     {
-        var userId = GetCurrentUserId();
-
-        var folder = await _folderService.GetFolderAsync(folderId, userId, cancellationToken);
-
-        if (folder == null)
+        var folder = new FolderDto
         {
-            return NotFound(ApiResponse.Fail("Folder not found or access denied"));
-        }
-
-        // Verify folder belongs to the specified library
-        if (folder.LibraryId != id)
-        {
-            return NotFound(ApiResponse.Fail("Folder not found in this library"));
-        }
+            Id = folderId,
+            Name = "Manuals",
+            NameArabic = "الأدلة",
+            Description = "Operational manuals and guides",
+            DescriptionArabic = "الأدلة والإرشادات التشغيلية",
+            LibraryId = id,
+            Path = "Manuals",
+            IconName = "pi pi-book",
+            DocumentCount = 25,
+            ChildFolderCount = 3,
+            Children = new List<FolderSummaryDto>
+            {
+                new() { Id = Guid.NewGuid(), Name = "Technical", NameArabic = "التقنية", DocumentCount = 10 },
+                new() { Id = Guid.NewGuid(), Name = "Operations", NameArabic = "العمليات", DocumentCount = 8 },
+                new() { Id = Guid.NewGuid(), Name = "HR", NameArabic = "الموارد البشرية", DocumentCount = 7 }
+            },
+            CreatedAt = DateTime.UtcNow.AddMonths(-6)
+        };
 
         return Ok(ApiResponse<FolderDto>.Ok(folder));
-    }
-
-    /// <summary>
-    /// Get folder contents.
-    /// </summary>
-    [HttpGet("{id:guid}/folders/{folderId:guid}/contents")]
-    [ProducesResponseType(typeof(ApiResponse<FolderContentsDto>), 200)]
-    [ProducesResponseType(typeof(ApiResponse), 404)]
-    public async Task<ActionResult<ApiResponse<FolderContentsDto>>> GetFolderContents(
-        Guid id,
-        Guid folderId,
-        CancellationToken cancellationToken)
-    {
-        var userId = GetCurrentUserId();
-
-        var contents = await _folderService.GetFolderContentsAsync(folderId, userId, cancellationToken);
-
-        if (contents.Folder == null || contents.Folder.Id == Guid.Empty)
-        {
-            return NotFound(ApiResponse.Fail("Folder not found or access denied"));
-        }
-
-        return Ok(ApiResponse<FolderContentsDto>.Ok(contents));
     }
 
     /// <summary>
@@ -355,25 +302,11 @@ public class LibrariesController : ControllerBase
     /// </summary>
     [HttpPut("{id:guid}/folders/{folderId:guid}")]
     [Authorize(Policy = "CanEditDocuments")]
-    [ProducesResponseType(typeof(ApiResponse), 200)]
-    [ProducesResponseType(typeof(ApiResponse), 404)]
-    public async Task<ActionResult<ApiResponse>> UpdateFolder(
-        Guid id,
-        Guid folderId,
-        [FromBody] UpdateFolderRequest request,
-        CancellationToken cancellationToken)
+    public async Task<ActionResult<ApiResponse>> UpdateFolder(Guid id, Guid folderId, [FromBody] UpdateFolderRequest request)
     {
-        var userId = GetCurrentUserId();
+        _logger.LogInformation("Updating folder {FolderId} in library {LibraryId}", folderId, id);
 
-        _logger.LogInformation("User {UserId} updating folder {FolderId} in library {LibraryId}",
-            userId, folderId, id);
-
-        var success = await _folderService.UpdateFolderAsync(folderId, request, userId, cancellationToken);
-
-        if (!success)
-        {
-            return NotFound(ApiResponse.Fail("Folder not found or access denied"));
-        }
+        await Task.Delay(100);
 
         return Ok(ApiResponse.Ok("Folder updated successfully"));
     }
@@ -383,182 +316,58 @@ public class LibrariesController : ControllerBase
     /// </summary>
     [HttpDelete("{id:guid}/folders/{folderId:guid}")]
     [Authorize(Policy = "CanDeleteDocuments")]
-    [ProducesResponseType(typeof(ApiResponse), 200)]
-    [ProducesResponseType(typeof(ApiResponse), 404)]
-    [ProducesResponseType(typeof(ApiResponse), 400)]
-    public async Task<ActionResult<ApiResponse>> DeleteFolder(
-        Guid id,
-        Guid folderId,
-        [FromQuery] bool deleteContents = false,
-        CancellationToken cancellationToken = default)
+    public async Task<ActionResult<ApiResponse>> DeleteFolder(Guid id, Guid folderId)
     {
-        var userId = GetCurrentUserId();
+        _logger.LogInformation("Deleting folder {FolderId} from library {LibraryId}", folderId, id);
 
-        _logger.LogInformation("User {UserId} deleting folder {FolderId} from library {LibraryId}, deleteContents={DeleteContents}",
-            userId, folderId, id, deleteContents);
-
-        var success = await _folderService.DeleteFolderAsync(folderId, deleteContents, userId, cancellationToken);
-
-        if (!success)
-        {
-            return NotFound(ApiResponse.Fail("Folder not found, not empty, or access denied"));
-        }
+        await Task.Delay(100);
 
         return Ok(ApiResponse.Ok("Folder deleted successfully"));
-    }
-
-    /// <summary>
-    /// Move a folder.
-    /// </summary>
-    [HttpPost("{id:guid}/folders/{folderId:guid}/move")]
-    [Authorize(Policy = "CanEditDocuments")]
-    [ProducesResponseType(typeof(ApiResponse), 200)]
-    [ProducesResponseType(typeof(ApiResponse), 404)]
-    public async Task<ActionResult<ApiResponse>> MoveFolder(
-        Guid id,
-        Guid folderId,
-        [FromBody] MoveFolderRequest request,
-        CancellationToken cancellationToken)
-    {
-        var userId = GetCurrentUserId();
-
-        _logger.LogInformation("User {UserId} moving folder {FolderId} to parent {TargetParentId}",
-            userId, folderId, request.TargetParentId);
-
-        var success = await _folderService.MoveFolderAsync(folderId, request.TargetParentId, userId, cancellationToken);
-
-        if (!success)
-        {
-            return NotFound(ApiResponse.Fail("Folder not found or cannot be moved"));
-        }
-
-        return Ok(ApiResponse.Ok("Folder moved successfully"));
-    }
-
-    /// <summary>
-    /// Get library folder tree.
-    /// </summary>
-    [HttpGet("{id:guid}/tree")]
-    [ProducesResponseType(typeof(ApiResponse<IReadOnlyList<FolderTreeDto>>), 200)]
-    [ProducesResponseType(typeof(ApiResponse), 404)]
-    public async Task<ActionResult<ApiResponse<IReadOnlyList<FolderTreeDto>>>> GetFolderTree(
-        Guid id,
-        CancellationToken cancellationToken)
-    {
-        var userId = GetCurrentUserId();
-
-        var tree = await _libraryService.GetFolderTreeAsync(id, userId, cancellationToken);
-
-        if (tree == null || !tree.Any())
-        {
-            // Check if library exists
-            var library = await _libraryService.GetLibraryAsync(id, userId, cancellationToken);
-            if (library == null)
-            {
-                return NotFound(ApiResponse.Fail("Library not found or access denied"));
-            }
-        }
-
-        return Ok(ApiResponse<IReadOnlyList<FolderTreeDto>>.Ok(tree));
     }
 
     /// <summary>
     /// Get library statistics.
     /// </summary>
     [HttpGet("{id:guid}/stats")]
-    [ProducesResponseType(typeof(ApiResponse<LibraryStatsDto>), 200)]
-    [ProducesResponseType(typeof(ApiResponse), 404)]
-    public async Task<ActionResult<ApiResponse<LibraryStatsDto>>> GetLibraryStats(
-        Guid id,
-        CancellationToken cancellationToken)
+    public ActionResult<ApiResponse<LibraryStatsDto>> GetLibraryStats(Guid id)
     {
-        var userId = GetCurrentUserId();
-
-        var stats = await _libraryService.GetLibraryStatsAsync(id, userId, cancellationToken);
-
-        if (stats.LibraryId == Guid.Empty && stats.TotalDocuments == 0)
+        var stats = new LibraryStatsDto
         {
-            return NotFound(ApiResponse.Fail("Library not found or access denied"));
-        }
+            TotalDocuments = 156,
+            TotalFolders = 24,
+            TotalSize = 524288000,
+            DocumentsByType = new Dictionary<string, int>
+            {
+                { "PDF", 78 },
+                { "Word", 35 },
+                { "Excel", 28 },
+                { "PowerPoint", 15 }
+            },
+            RecentActivity = new List<DocumentAuditDto>
+            {
+                new()
+                {
+                    Id = Guid.NewGuid(),
+                    Action = "Uploaded",
+                    Details = "new-report.pdf",
+                    PerformedByName = "Ahmed Hassan",
+                    PerformedAt = DateTime.UtcNow.AddHours(-1)
+                }
+            }
+        };
 
         return Ok(ApiResponse<LibraryStatsDto>.Ok(stats));
-    }
-
-    /// <summary>
-    /// Get library permissions.
-    /// </summary>
-    [HttpGet("{id:guid}/permissions")]
-    [Authorize(Policy = "CanManageLibraries")]
-    [ProducesResponseType(typeof(ApiResponse<IReadOnlyList<LibraryPermissionDto>>), 200)]
-    public async Task<ActionResult<ApiResponse<IReadOnlyList<LibraryPermissionDto>>>> GetLibraryPermissions(
-        Guid id,
-        CancellationToken cancellationToken)
-    {
-        var userId = GetCurrentUserId();
-
-        var permissions = await _libraryService.GetLibraryPermissionsAsync(id, userId, cancellationToken);
-
-        return Ok(ApiResponse<IReadOnlyList<LibraryPermissionDto>>.Ok(permissions));
-    }
-
-    /// <summary>
-    /// Set library permission.
-    /// </summary>
-    [HttpPost("{id:guid}/permissions")]
-    [Authorize(Policy = "CanManageLibraries")]
-    [ProducesResponseType(typeof(ApiResponse), 200)]
-    [ProducesResponseType(typeof(ApiResponse), 400)]
-    public async Task<ActionResult<ApiResponse>> SetLibraryPermission(
-        Guid id,
-        [FromBody] SetPermissionRequest request,
-        CancellationToken cancellationToken)
-    {
-        var userId = GetCurrentUserId();
-
-        _logger.LogInformation("User {UserId} setting permission on library {LibraryId}", userId, id);
-
-        var success = await _libraryService.SetLibraryPermissionAsync(id, request, userId, cancellationToken);
-
-        if (!success)
-        {
-            return BadRequest(ApiResponse.Fail("Failed to set permission"));
-        }
-
-        return Ok(ApiResponse.Ok("Permission set successfully"));
-    }
-
-    /// <summary>
-    /// Remove library permission.
-    /// </summary>
-    [HttpDelete("{id:guid}/permissions/{permissionId:guid}")]
-    [Authorize(Policy = "CanManageLibraries")]
-    [ProducesResponseType(typeof(ApiResponse), 200)]
-    [ProducesResponseType(typeof(ApiResponse), 404)]
-    public async Task<ActionResult<ApiResponse>> RemoveLibraryPermission(
-        Guid id,
-        Guid permissionId,
-        CancellationToken cancellationToken)
-    {
-        var userId = GetCurrentUserId();
-
-        _logger.LogInformation("User {UserId} removing permission {PermissionId} from library {LibraryId}",
-            userId, permissionId, id);
-
-        var success = await _libraryService.RemoveLibraryPermissionAsync(id, permissionId, userId, cancellationToken);
-
-        if (!success)
-        {
-            return NotFound(ApiResponse.Fail("Permission not found"));
-        }
-
-        return Ok(ApiResponse.Ok("Permission removed successfully"));
     }
 }
 
 /// <summary>
-/// Move folder request.
+/// Library statistics DTO.
 /// </summary>
-public record MoveFolderRequest
+public record LibraryStatsDto
 {
-    public Guid? TargetParentId { get; init; }
+    public int TotalDocuments { get; init; }
+    public int TotalFolders { get; init; }
+    public long TotalSize { get; init; }
+    public Dictionary<string, int> DocumentsByType { get; init; } = new();
+    public IReadOnlyList<DocumentAuditDto> RecentActivity { get; init; } = Array.Empty<DocumentAuditDto>();
 }

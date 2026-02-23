@@ -15,7 +15,7 @@ public record DocumentDto
     public string ContentType { get; init; } = string.Empty;
     public long FileSize { get; init; }
     public string? ThumbnailUrl { get; init; }
-    public string StoragePath { get; init; } = string.Empty;
+    public string? StoragePath { get; init; }
     public Guid LibraryId { get; init; }
     public string LibraryName { get; init; } = string.Empty;
     public Guid? FolderId { get; init; }
@@ -45,9 +45,9 @@ public record DocumentSummaryDto
     public string? NameArabic { get; init; }
     public string FileName { get; init; } = string.Empty;
     public string FileExtension { get; init; } = string.Empty;
-    public string? Extension { get; init; }
-    public long FileSize { get; init; }
+    public string Extension { get; init; } = string.Empty;
     public string? MimeType { get; init; }
+    public long FileSize { get; init; }
     public string? ThumbnailUrl { get; init; }
     public string Version { get; init; } = "1.0";
     public string Status { get; init; } = string.Empty;
@@ -56,7 +56,7 @@ public record DocumentSummaryDto
     public string CreatedByName { get; init; } = string.Empty;
     public DateTime CreatedAt { get; init; }
     public DateTime? UpdatedAt { get; init; }
-    public DateTime ModifiedAt { get; init; }
+    public DateTime? ModifiedAt { get; init; }
 }
 
 /// <summary>
@@ -107,8 +107,8 @@ public record UploadDocumentRequest
     public string? NameArabic { get; init; }
     public string? Description { get; init; }
     public string? DescriptionArabic { get; init; }
-    public string[]? Tags { get; init; }
     public Dictionary<string, string>? Metadata { get; init; }
+    public IReadOnlyList<string>? Tags { get; init; }
 }
 
 /// <summary>
@@ -120,8 +120,8 @@ public record UpdateDocumentRequest
     public string? NameArabic { get; init; }
     public string? Description { get; init; }
     public string? DescriptionArabic { get; init; }
-    public string[]? Tags { get; init; }
     public Dictionary<string, string>? Metadata { get; init; }
+    public IReadOnlyList<string>? Tags { get; init; }
 }
 
 /// <summary>

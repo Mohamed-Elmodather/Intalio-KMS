@@ -78,6 +78,11 @@ public class DocumentLibrary : AuditableEntity
     {
         IsPublic = isPublic;
     }
+
+    public void Delete()
+    {
+        SoftDelete(Guid.Empty);
+    }
 }
 
 public enum LibraryType
@@ -147,6 +152,11 @@ public class Folder : AuditableEntity
     public void SetSortOrder(int order)
     {
         SortOrder = order;
+    }
+
+    public void Delete()
+    {
+        SoftDelete(Guid.Empty);
     }
 }
 

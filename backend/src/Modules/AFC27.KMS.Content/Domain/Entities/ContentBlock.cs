@@ -69,6 +69,11 @@ public class ContentBlock : AuditableEntity
     {
         ParentBlockId = parentBlockId;
     }
+
+    public void Delete()
+    {
+        SoftDelete(Guid.Empty);
+    }
 }
 
 /// <summary>

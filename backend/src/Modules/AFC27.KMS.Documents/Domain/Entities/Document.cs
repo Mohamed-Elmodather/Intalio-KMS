@@ -150,6 +150,12 @@ public class Document : AuditableEntity
     public void IncrementViewCount() => ViewCount++;
 
     public string GetVersionString() => $"{MajorVersion}.{MinorVersion}";
+
+    public void Delete()
+    {
+        Status = DocumentStatus.Archived;
+        SoftDelete(Guid.Empty);
+    }
 }
 
 public enum DocumentStatus
