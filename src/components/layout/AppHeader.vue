@@ -117,36 +117,36 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <header class="header-enhanced fixed top-0 left-0 right-0 z-50 h-14 sm:h-16">
-    <div class="h-full px-2 sm:px-4 flex items-center justify-between">
+  <header class="header-enhanced fixed top-0 left-0 right-0 z-50 h-14 sm:h-16 lg:h-[68px]">
+    <div class="h-full px-2 sm:px-4 lg:px-6 xl:px-8 flex items-center justify-between">
       <!-- Left: Logo & Toggle -->
-      <div class="flex items-center gap-2 sm:gap-3">
-        <button @click="uiStore.toggleSidebar" class="header-btn header-btn-sm sm:header-btn group" :title="$t('header.toggleSidebar')">
+      <div class="flex items-center gap-2 sm:gap-3 lg:gap-4">
+        <button @click="uiStore.toggleSidebar" class="header-btn header-btn-sm sm:header-btn lg:header-btn-lg group" :title="$t('header.toggleSidebar')">
           <i class="fas fa-bars text-gray-500 group-hover:text-teal-600 transition-colors"></i>
         </button>
-        <div class="flex items-center gap-2 sm:gap-3">
+        <div class="flex items-center gap-2 sm:gap-3 lg:gap-4">
           <router-link to="/">
-            <img src="/Intalio.png" alt="Intalio" class="h-6 sm:h-8 object-contain">
+            <img src="/Intalio.png" alt="Intalio" class="h-6 sm:h-8 lg:h-10 xl:h-11 object-contain">
           </router-link>
-          <div class="hidden md:flex items-center gap-2 pl-3 border-l border-gray-200">
-            <span class="text-sm font-semibold text-gray-700">Knowledge Hub</span>
+          <div class="hidden md:flex items-center gap-2 lg:gap-3 pl-3 lg:pl-4 border-l border-gray-200">
+            <span class="text-sm lg:text-base font-semibold text-gray-700">Knowledge Hub</span>
           </div>
         </div>
       </div>
 
       <!-- Center: Enhanced Search -->
-      <div class="flex-1 max-w-xs sm:max-w-md lg:max-w-2xl mx-2 sm:mx-4 lg:mx-6">
+      <div class="flex-1 max-w-xs sm:max-w-md lg:max-w-2xl xl:max-w-3xl mx-2 sm:mx-4 lg:mx-8 xl:mx-10">
         <div class="search-container group">
           <div class="search-glow"></div>
           <div class="search-inner">
-            <div class="flex items-center gap-2 sm:gap-3 px-3 sm:px-4">
-              <i class="fas fa-search text-gray-400 group-focus-within:text-teal-500 transition-colors text-sm"></i>
+            <div class="flex items-center gap-2 sm:gap-3 lg:gap-4 px-3 sm:px-4 lg:px-5">
+              <i class="fas fa-search text-gray-400 group-focus-within:text-teal-500 transition-colors text-sm lg:text-base"></i>
               <input
                 type="text"
                 v-model="searchQuery"
                 @keyup.enter="handleSearch"
                 :placeholder="$t('header.searchPlaceholder')"
-                class="flex-1 py-2 sm:py-2.5 bg-transparent text-sm text-gray-900 placeholder-gray-400 outline-none min-w-0"
+                class="flex-1 py-2 sm:py-2.5 lg:py-3 bg-transparent text-sm lg:text-base text-gray-900 placeholder-gray-400 outline-none min-w-0"
               >
               <div class="flex items-center gap-1 sm:gap-2">
                 <kbd class="hidden lg:inline-flex items-center gap-1 px-2 py-1 text-xs text-gray-400 bg-gray-100 rounded-md border border-gray-200">
@@ -164,10 +164,10 @@ onBeforeUnmount(() => {
       </div>
 
       <!-- Right: Enhanced Actions -->
-      <div class="flex items-center gap-0.5 sm:gap-1">
+      <div class="flex items-center gap-0.5 sm:gap-1 lg:gap-2">
         <!-- Quick Create -->
         <div class="relative header-dropdown-trigger">
-          <button @click.stop="toggleCreate" class="header-btn header-btn-sm sm:header-btn group" :title="$t('header.createNew')">
+          <button @click.stop="toggleCreate" class="header-btn header-btn-sm sm:header-btn lg:header-btn-lg group" :title="$t('header.createNew')">
             <i class="fas fa-plus text-gray-500 group-hover:text-teal-600 transition-colors"></i>
           </button>
           <Transition name="dropdown">
@@ -219,7 +219,7 @@ onBeforeUnmount(() => {
 
         <!-- Notifications -->
         <div class="relative header-dropdown-trigger">
-          <button @click.stop="toggleNotifications" class="header-btn header-btn-sm sm:header-btn group" :title="$t('header.notifications')">
+          <button @click.stop="toggleNotifications" class="header-btn header-btn-sm sm:header-btn lg:header-btn-lg group" :title="$t('header.notifications')">
             <i class="fas fa-bell text-gray-500 group-hover:text-teal-600 transition-colors"></i>
             <span v-if="unreadCount > 0" class="notification-badge">
               {{ unreadCount > 9 ? '9+' : unreadCount }}
@@ -261,30 +261,30 @@ onBeforeUnmount(() => {
         </div>
 
         <!-- Messages -->
-        <button @click="openMessages" class="hidden sm:flex header-btn header-btn-sm sm:header-btn group" :title="$t('header.messages')">
+        <button @click="openMessages" class="hidden sm:flex header-btn header-btn-sm sm:header-btn lg:header-btn-lg group" :title="$t('header.messages')">
           <i class="fas fa-comment-dots text-gray-500 group-hover:text-teal-600 transition-colors"></i>
           <span class="notification-badge small">3</span>
         </button>
 
         <!-- Divider -->
-        <div class="hidden sm:block w-px h-6 sm:h-8 bg-gray-200 mx-1 sm:mx-2"></div>
+        <div class="hidden sm:block w-px h-6 sm:h-8 lg:h-10 bg-gray-200 mx-1 sm:mx-2 lg:mx-3"></div>
 
         <!-- User Menu -->
         <div class="relative header-dropdown-trigger">
-          <button @click.stop="toggleUserMenu" class="flex items-center gap-1 sm:gap-3 px-1 sm:px-2 py-1 rounded-xl hover:bg-gray-50 transition-colors group">
+          <button @click.stop="toggleUserMenu" class="flex items-center gap-1 sm:gap-3 lg:gap-4 px-1 sm:px-2 lg:px-3 py-1 lg:py-1.5 rounded-xl hover:bg-gray-50 transition-colors group">
             <div class="hidden md:block text-right">
-              <p class="text-sm font-semibold text-gray-800 group-hover:text-teal-700 transition-colors">{{ user?.displayName || 'User' }}</p>
-              <p class="text-xs text-gray-500 flex items-center justify-end gap-1">
-                <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full"></span>
+              <p class="text-sm lg:text-base font-semibold text-gray-800 group-hover:text-teal-700 transition-colors">{{ user?.displayName || 'User' }}</p>
+              <p class="text-xs lg:text-sm text-gray-500 flex items-center justify-end gap-1">
+                <span class="w-1.5 h-1.5 lg:w-2 lg:h-2 bg-emerald-500 rounded-full"></span>
                 {{ $t('user.online') }}
               </p>
             </div>
-            <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center text-white font-bold text-xs sm:text-sm shadow-lg relative">
+            <div class="w-8 h-8 sm:w-10 sm:h-10 lg:w-11 lg:h-11 rounded-lg sm:rounded-xl bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center text-white font-bold text-xs sm:text-sm lg:text-base shadow-lg relative">
               <span v-if="!user?.avatar">{{ userInitials }}</span>
               <img v-else :src="user.avatar" :alt="user.displayName" class="w-full h-full object-cover rounded-lg sm:rounded-xl">
-              <span class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 sm:w-3 sm:h-3 bg-emerald-500 border-2 border-white rounded-full"></span>
+              <span class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 sm:w-3 sm:h-3 lg:w-3.5 lg:h-3.5 bg-emerald-500 border-2 border-white rounded-full"></span>
             </div>
-            <i class="hidden sm:block fas fa-chevron-down text-[10px] text-gray-400 group-hover:text-teal-600 transition-colors"></i>
+            <i class="hidden sm:block fas fa-chevron-down text-[10px] lg:text-xs text-gray-400 group-hover:text-teal-600 transition-colors"></i>
           </button>
           <Transition name="dropdown">
             <div v-if="showUserMenu" class="absolute right-0 top-full mt-2 w-64 bg-white rounded-xl shadow-lg border border-gray-100 z-50">

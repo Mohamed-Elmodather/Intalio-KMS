@@ -136,6 +136,40 @@ html[dir="rtl"] body {
   }
 }
 
+/* Larger header button for laptops */
+.header-btn-lg {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+}
+
+@media (min-width: 640px) {
+  .header-btn-lg {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .header-btn-lg {
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+  }
+
+  .header-btn-lg i {
+    font-size: 1rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  .header-btn-lg {
+    width: 46px;
+    height: 46px;
+  }
+}
+
 .header-btn:hover {
   background: linear-gradient(135deg, rgba(20, 184, 166, 0.08), rgba(13, 148, 136, 0.05));
 }

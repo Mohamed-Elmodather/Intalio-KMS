@@ -218,6 +218,13 @@ onMounted(async () => {
   }
 }
 
+@media (min-width: 1024px) {
+  .layout-sidebar {
+    top: 68px;
+    height: calc(100vh - 68px);
+  }
+}
+
 .layout-main {
   margin-top: 56px;
   min-height: calc(100vh - 56px);
@@ -227,6 +234,13 @@ onMounted(async () => {
   .layout-main {
     margin-top: 64px;
     min-height: calc(100vh - 64px);
+  }
+}
+
+@media (min-width: 1024px) {
+  .layout-main {
+    margin-top: 68px;
+    min-height: calc(100vh - 68px);
   }
 }
 </style>

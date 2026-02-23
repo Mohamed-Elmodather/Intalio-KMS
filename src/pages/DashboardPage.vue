@@ -1325,7 +1325,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="px-4 sm:px-6 lg:px-8 xl:px-10 py-4 sm:py-6">
+  <div class="px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 py-4 sm:py-6 lg:py-8">
     <!-- Welcome Section - Enhanced -->
     <div class="welcome-hero rounded-xl lg:rounded-2xl mb-5 lg:mb-8 relative overflow-hidden stagger-1">
       <!-- Decorative elements with drift animations -->
@@ -1577,39 +1577,39 @@ onUnmounted(() => {
     </section>
 
     <!-- Stats Grid -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-5 mb-6 lg:mb-8">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-5 xl:gap-6 mb-6 lg:mb-8 xl:mb-10">
       <div v-for="(stat, index) in stats" :key="stat.label"
-           class="stat-card card-animated rounded-xl sm:rounded-2xl p-4 sm:p-5"
+           class="stat-card card-animated rounded-xl sm:rounded-2xl p-4 sm:p-5 lg:p-6"
            :style="{ animationDelay: index * 100 + 'ms' }">
-        <div class="flex items-center justify-between mb-4">
-          <div :class="['w-11 h-11 rounded-xl flex items-center justify-center', stat.iconBg]">
-            <i :class="[stat.icon, stat.iconColor]"></i>
+        <div class="flex items-center justify-between mb-4 lg:mb-5">
+          <div :class="['w-11 h-11 lg:w-12 lg:h-12 rounded-xl lg:rounded-2xl flex items-center justify-center', stat.iconBg]">
+            <i :class="[stat.icon, stat.iconColor, 'lg:text-lg']"></i>
           </div>
-          <div class="flex items-center gap-1 text-xs" :class="stat.trendUp ? 'text-emerald-600' : 'text-rose-600'">
+          <div class="flex items-center gap-1 text-xs lg:text-sm" :class="stat.trendUp ? 'text-emerald-600' : 'text-rose-600'">
             <i :class="stat.trendUp ? 'fas fa-arrow-up' : 'fas fa-arrow-down'"></i>
             {{ stat.trend }}
           </div>
         </div>
-        <div class="stat-value text-2xl sm:text-3xl font-bold text-gray-900">{{ formatNumber(stat.displayValue) }}</div>
-        <div class="text-xs sm:text-sm text-gray-500 mt-1">{{ stat.label }}</div>
-        <router-link :to="stat.link" class="text-xs text-primary-600 font-medium mt-3 flex items-center gap-1 hover:text-primary-700">
-          {{ stat.linkText }} <i class="fas fa-arrow-right text-[10px]"></i>
+        <div class="stat-value text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">{{ formatNumber(stat.displayValue) }}</div>
+        <div class="text-xs sm:text-sm lg:text-base text-gray-500 mt-1 lg:mt-2">{{ stat.label }}</div>
+        <router-link :to="stat.link" class="text-xs lg:text-sm text-primary-600 font-medium mt-3 lg:mt-4 flex items-center gap-1 hover:text-primary-700">
+          {{ stat.linkText }} <i class="fas fa-arrow-right text-[10px] lg:text-xs"></i>
         </router-link>
       </div>
     </div>
 
     <!-- Main Grid Row 1 - Articles & Documents -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6 mb-6 lg:mb-8">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6 xl:gap-8 mb-6 lg:mb-8 xl:mb-10">
       <!-- Recent Articles -->
-      <div class="card-animated rounded-xl lg:rounded-2xl p-4 lg:p-6 stagger-2 bg-gradient-to-br from-white to-teal-50/30 border border-teal-100/50">
-        <div class="flex items-center justify-between mb-4 sm:mb-5">
-          <h2 class="text-base sm:text-lg font-bold text-gray-900 flex items-center gap-2 sm:gap-3">
-            <div class="w-9 h-9 sm:w-11 sm:h-11 rounded-lg sm:rounded-xl bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center shadow-lg shadow-teal-200">
-              <i class="fas fa-newspaper text-white text-sm sm:text-base"></i>
+      <div class="card-animated rounded-xl lg:rounded-2xl p-4 lg:p-6 xl:p-7 stagger-2 bg-gradient-to-br from-white to-teal-50/30 border border-teal-100/50">
+        <div class="flex items-center justify-between mb-4 sm:mb-5 lg:mb-6">
+          <h2 class="text-base sm:text-lg lg:text-xl font-bold text-gray-900 flex items-center gap-2 sm:gap-3 lg:gap-4">
+            <div class="w-9 h-9 sm:w-11 sm:h-11 lg:w-12 lg:h-12 rounded-lg sm:rounded-xl lg:rounded-2xl bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center shadow-lg shadow-teal-200">
+              <i class="fas fa-newspaper text-white text-sm sm:text-base lg:text-lg"></i>
             </div>
             <div>
               <span class="block">{{ $t('dashboard.recentArticles') }}</span>
-              <span class="text-[10px] sm:text-xs font-medium text-teal-600">{{ $t('dashboard.latestNewsUpdates') }}</span>
+              <span class="text-[10px] sm:text-xs lg:text-sm font-medium text-teal-600">{{ $t('dashboard.latestNewsUpdates') }}</span>
             </div>
           </h2>
           <ViewAllButton to="/articles" size="sm" />
