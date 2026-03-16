@@ -196,6 +196,16 @@ public enum NotificationType
     DiscussionAnswerAccepted,
     LessonLearnedApproved,
 
+    // Lessons Learned lifecycle
+    LessonSubmitted,
+    LessonRejected,
+    LessonPublished,
+    LessonActionAssigned,
+    LessonActionOverdue,
+    LessonActionCompleted,
+    LessonActionsAllComplete,
+    LessonVerified,
+
     // Workflow
     TaskAssigned,
     TaskDueSoon,

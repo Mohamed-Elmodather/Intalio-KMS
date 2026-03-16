@@ -19,6 +19,7 @@ public static class CollaborationModule
         // services.AddScoped<ICommentService, CommentService>();
         // services.AddScoped<IFollowService, FollowService>();
         // services.AddScoped<ILessonLearnedService, LessonLearnedService>();
+        // services.AddScoped<ILessonActionService, LessonActionService>();
         // services.AddScoped<IMentionService, MentionService>();
 
         // Add authorization policies
@@ -30,7 +31,9 @@ public static class CollaborationModule
             .AddPolicy("CanModerateDiscussions", policy =>
                 policy.RequireClaim("permission", "discussions:moderate"))
             .AddPolicy("CanApproveLessons", policy =>
-                policy.RequireClaim("permission", "lessons:approve"));
+                policy.RequireClaim("permission", "lessons:approve"))
+            .AddPolicy("CanManageKnowledgeAssets", policy =>
+                policy.RequireClaim("permission", "knowledge:manage"));
 
         return services;
     }
