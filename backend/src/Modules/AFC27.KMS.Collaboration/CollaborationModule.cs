@@ -1,5 +1,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using AFC27.KMS.Collaboration.Application.Interfaces;
+using AFC27.KMS.Collaboration.Application.Services;
 
 namespace AFC27.KMS.Collaboration;
 
@@ -18,9 +20,12 @@ public static class CollaborationModule
         // services.AddScoped<IDiscussionService, DiscussionService>();
         // services.AddScoped<ICommentService, CommentService>();
         // services.AddScoped<IFollowService, FollowService>();
-        // services.AddScoped<ILessonLearnedService, LessonLearnedService>();
-        // services.AddScoped<ILessonActionService, LessonActionService>();
+        services.AddScoped<ILessonLearnedService, LessonLearnedService>();
+        services.AddScoped<ILessonActionService, LessonActionService>();
         // services.AddScoped<IMentionService, MentionService>();
+
+        // Add background jobs
+        services.AddHostedService<LessonActionEscalationJob>();
 
         // Add authorization policies
         services.AddAuthorizationBuilder()

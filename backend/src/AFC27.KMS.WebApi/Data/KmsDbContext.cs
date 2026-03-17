@@ -3,6 +3,7 @@ using AFC27.KMS.SharedKernel.Domain;
 using AFC27.KMS.SharedKernel.Interfaces;
 using AFC27.KMS.Identity.Domain.Entities;
 using AFC27.KMS.Content.Domain.Entities;
+using AFC27.KMS.Collaboration.Domain.Entities;
 using System.Linq.Expressions;
 
 namespace AFC27.KMS.WebApi.Data;
@@ -24,6 +25,13 @@ public class KmsDbContext : DbContext, IUnitOfWork
     public DbSet<Article> Articles => Set<Article>();
     public DbSet<Category> Categories => Set<Category>();
     public DbSet<Tag> Tags => Set<Tag>();
+
+    // Collaboration Module - Lessons Learned
+    public DbSet<LessonLearned> LessonsLearned => Set<LessonLearned>();
+    public DbSet<LessonAction> LessonActions => Set<LessonAction>();
+    public DbSet<LessonApplication> LessonApplications => Set<LessonApplication>();
+    public DbSet<LessonTag> LessonTags => Set<LessonTag>();
+    public DbSet<LessonUsefulVote> LessonUsefulVotes => Set<LessonUsefulVote>();
 
     public KmsDbContext(DbContextOptions<KmsDbContext> options)
         : base(options)
@@ -211,6 +219,79 @@ public class KmsDbContext : DbContext, IUnitOfWork
         {
             entity.ToTable("ArticleVersions");
             entity.HasKey(av => av.Id);
+        });
+
+        // Configure Collaboration Module - Lessons Learned
+        modelBuilder.Entity<LessonLearned>(entity =>
+        {
+            entity.ToTable("LessonsLearned");
+            entity.HasKey(e => e.Id);
+
+            entity.OwnsOne(e => e.Title, title =>
+            {
+                title.Property(t => t.English).HasColumnName("TitleEn").HasMaxLength(500).IsRequired();
+                title.Property(t => t.Arabic).HasColumnName("TitleAr").HasMaxLength(500);
+            });
+
+            entity.Property(e => e.Category).HasConversion<string>().HasMaxLength(50);
+            entity.Property(e => e.Impact).HasConversion<string>().HasMaxLength(20);
+            entity.Property(e => e.Status).HasConversion<string>().HasMaxLength(30);
+            entity.Property(e => e.ProjectPhase).HasConversion<string>().HasMaxLength(30);
+            entity.Property(e => e.ImpactType).HasConversion<string>().HasMaxLength(30);
+            entity.Property(e => e.RootCauseMethod).HasConversion<string>().HasMaxLength(30);
+
+            entity.HasMany(e => e.Tags)
+                .WithOne(t => t.Lesson)
+                .HasForeignKey(t => t.LessonId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasMany(e => e.Actions)
+                .WithOne(a => a.LessonLearned)
+                .HasForeignKey(a => a.LessonLearnedId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasIndex(e => e.Status);
+            entity.HasIndex(e => e.Category);
+            entity.HasIndex(e => e.AuthorId);
+
+            entity.Ignore(e => e.DomainEvents);
+        });
+
+        modelBuilder.Entity<LessonTag>(entity =>
+        {
+            entity.ToTable("LessonTags");
+            entity.HasKey(e => new { e.LessonId, e.Tag });
+        });
+
+        modelBuilder.Entity<LessonAction>(entity =>
+        {
+            entity.ToTable("LessonActions");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Status).HasConversion<string>().HasMaxLength(20);
+            entity.Property(e => e.Priority).HasConversion<string>().HasMaxLength(20);
+            entity.HasIndex(e => e.LessonLearnedId);
+            entity.HasIndex(e => e.Status);
+            entity.HasIndex(e => e.DueDate);
+
+            entity.Ignore(e => e.DomainEvents);
+        });
+
+        modelBuilder.Entity<LessonApplication>(entity =>
+        {
+            entity.ToTable("LessonApplications");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Outcome).HasConversion<string>().HasMaxLength(30);
+            entity.HasIndex(e => e.LessonLearnedId);
+        });
+
+        modelBuilder.Entity<LessonUsefulVote>(entity =>
+        {
+            entity.ToTable("LessonUsefulVotes");
+            entity.HasKey(e => new { e.LessonLearnedId, e.UserId });
+            entity.HasOne(e => e.LessonLearned)
+                .WithMany()
+                .HasForeignKey(e => e.LessonLearnedId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
 
         // Global query filter for soft delete

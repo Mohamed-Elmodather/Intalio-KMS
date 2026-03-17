@@ -5,6 +5,7 @@ using FluentValidation;
 using AFC27.KMS.WebApi.Data;
 using AFC27.KMS.Infrastructure.Caching;
 using AFC27.KMS.SharedKernel.Interfaces;
+using AFC27.KMS.Collaboration;
 
 namespace AFC27.KMS.WebApi.Extensions;
 
@@ -159,6 +160,8 @@ public static class ServiceCollectionExtensions
         // services.AddContentModule(configuration);
         // services.AddDocumentsModule(configuration);
         // etc.
+
+        services.AddCollaborationModule(configuration);
 
         return services;
     }
