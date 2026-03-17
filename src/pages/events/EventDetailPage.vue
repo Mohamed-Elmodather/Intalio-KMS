@@ -125,6 +125,54 @@ const documents = ref<Attachment[]>([
   { id: '4', name: 'Creative Mood Board.pptx', type: 'pptx', size: 15200000, url: '#', uploadedBy: event.value.organizer, uploadedAt: new Date() }
 ])
 
+// Lessons Learned data for this event
+const eventLessons = ref([
+  {
+    id: '1',
+    title: 'Effective Crowd Management at Large Events',
+    summary: 'Key insights from managing crowd flow during the opening ceremony rehearsal.',
+    status: 'Actions Pending',
+    statusColor: 'bg-orange-100 text-orange-700',
+    impact: 'High Impact',
+    impactColor: 'bg-red-100 text-red-700',
+    author: 'Mohammed Al-Rashid',
+    date: 'Mar 6, 2026',
+    actions: '1/3 done'
+  },
+  {
+    id: '4',
+    title: 'Safety Protocol Gaps During Night Events',
+    summary: 'Critical safety gaps identified during first night match.',
+    status: 'Complete',
+    statusColor: 'bg-teal-100 text-teal-700',
+    impact: 'Critical',
+    impactColor: 'bg-red-100 text-red-700',
+    author: 'Anonymous',
+    date: 'Feb 10, 2026',
+    actions: '5/5 done'
+  },
+  {
+    id: '3',
+    title: 'Technology Integration Challenges',
+    summary: 'Technical challenges faced during ticketing system integration.',
+    status: 'Verified',
+    statusColor: 'bg-emerald-100 text-emerald-700',
+    impact: 'Critical',
+    impactColor: 'bg-red-100 text-red-700',
+    author: 'Ahmed Hassan',
+    date: 'Feb 20, 2026',
+    actions: '4/4 done'
+  }
+])
+
+function scheduleEventReview() {
+  router.push({ name: 'LessonsLearned', query: { action: 'schedule-review', project: event.value.title } })
+}
+
+function captureEventLesson() {
+  router.push({ name: 'LessonsLearned', query: { action: 'new-lesson', project: event.value.title } })
+}
+
 // Computed
 const goingCount = computed(() => attendees.value.filter(a => a.status === 'going').length)
 const maybeCount = computed(() => attendees.value.filter(a => a.status === 'maybe').length)
@@ -387,7 +435,8 @@ function getInitialsColor(initials: string): string {
                   { id: 'description', label: 'Description', icon: 'fas fa-info-circle' },
                   { id: 'agenda', label: 'Agenda', icon: 'fas fa-list-ol' },
                   { id: 'speakers', label: 'Speakers', icon: 'fas fa-users' },
-                  { id: 'documents', label: 'Documents', icon: 'fas fa-folder' }
+                  { id: 'documents', label: 'Documents', icon: 'fas fa-folder' },
+                  { id: 'lessons', label: 'Lessons Learned', icon: 'fas fa-lightbulb' }
                 ]"
                 :key="tab.id"
                 @click="activeTab = tab.id"
@@ -478,6 +527,111 @@ function getInitialsColor(initials: string): string {
                   </div>
                   <button class="px-4 py-2 text-teal-600 hover:bg-teal-50 rounded-lg transition-colors">
                     <i class="fas fa-download mr-1"></i>Download
+                  </button>
+                </div>
+              </div>
+
+              <!-- Lessons Learned Tab -->
+              <div v-else-if="activeTab === 'lessons'" class="space-y-6">
+                <!-- Review Sessions for this Event -->
+                <div>
+                  <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-sm font-bold text-gray-900 flex items-center gap-2">
+                      <div class="w-8 h-8 rounded-lg bg-purple-50 flex items-center justify-center">
+                        <i class="fas fa-users text-purple-500 text-sm"></i>
+                      </div>
+                      Review Sessions
+                    </h3>
+                    <button @click="scheduleEventReview" class="px-3 py-1.5 bg-purple-500 text-white text-xs font-semibold rounded-lg hover:bg-purple-600 transition-colors">
+                      <i class="fas fa-plus mr-1"></i>Schedule Review
+                    </button>
+                  </div>
+
+                  <div class="space-y-3">
+                    <!-- Mock past session -->
+                    <div class="flex items-start gap-4 p-4 bg-green-50 rounded-xl border border-green-100">
+                      <div class="w-10 h-10 rounded-xl bg-green-100 flex items-center justify-center shrink-0">
+                        <i class="fas fa-check-circle text-green-600"></i>
+                      </div>
+                      <div class="flex-1">
+                        <div class="flex items-center gap-2 mb-1">
+                          <h4 class="text-sm font-semibold text-gray-900">Post-Event After Action Review</h4>
+                          <span class="px-2 py-0.5 bg-green-100 text-green-700 text-[10px] font-semibold rounded-full">Completed</span>
+                        </div>
+                        <div class="flex items-center gap-3 text-xs text-gray-500">
+                          <span><i class="fas fa-calendar mr-1"></i>Mar 12, 2026</span>
+                          <span><i class="fas fa-user-tie mr-1"></i>Omar Al-Farsi</span>
+                          <span><i class="fas fa-users mr-1"></i>8 participants</span>
+                          <span class="text-teal-600 font-medium"><i class="fas fa-lightbulb mr-1"></i>3 lessons captured</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Upcoming session -->
+                    <div class="flex items-start gap-4 p-4 bg-blue-50 rounded-xl border border-blue-100">
+                      <div class="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center shrink-0">
+                        <i class="fas fa-calendar text-blue-600"></i>
+                      </div>
+                      <div class="flex-1">
+                        <div class="flex items-center gap-2 mb-1">
+                          <h4 class="text-sm font-semibold text-gray-900">Mid-Planning Pause & Learn</h4>
+                          <span class="px-2 py-0.5 bg-blue-100 text-blue-700 text-[10px] font-semibold rounded-full">Scheduled</span>
+                        </div>
+                        <div class="flex items-center gap-3 text-xs text-gray-500">
+                          <span><i class="fas fa-calendar mr-1"></i>Mar 28, 2026</span>
+                          <span><i class="fas fa-user-tie mr-1"></i>Khalid Al-Mansoori</span>
+                          <span><i class="fas fa-users mr-1"></i>5 participants</span>
+                        </div>
+                      </div>
+                      <button class="px-3 py-1.5 bg-blue-500 text-white text-xs font-semibold rounded-lg hover:bg-blue-600 transition-colors shrink-0">
+                        <i class="fas fa-lightbulb mr-1"></i>Capture Lesson
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Captured Lessons from this Event -->
+                <div>
+                  <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-sm font-bold text-gray-900 flex items-center gap-2">
+                      <div class="w-8 h-8 rounded-lg bg-teal-50 flex items-center justify-center">
+                        <i class="fas fa-lightbulb text-teal-500 text-sm"></i>
+                      </div>
+                      Captured Lessons
+                      <span class="px-2 py-0.5 bg-teal-100 text-teal-700 text-[10px] font-semibold rounded-full">3</span>
+                    </h3>
+                    <button @click="captureEventLesson" class="px-3 py-1.5 bg-teal-500 text-white text-xs font-semibold rounded-lg hover:bg-teal-600 transition-colors">
+                      <i class="fas fa-plus mr-1"></i>New Lesson
+                    </button>
+                  </div>
+
+                  <div class="space-y-3">
+                    <div v-for="lesson in eventLessons" :key="lesson.id" @click="router.push({ name: 'LessonsLearned' })" class="group flex items-start gap-4 p-4 bg-white border border-gray-200 rounded-xl hover:border-teal-200 hover:shadow-md cursor-pointer transition-all">
+                      <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center text-white shrink-0">
+                        <i class="fas fa-lightbulb"></i>
+                      </div>
+                      <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 mb-1">
+                          <span :class="[lesson.statusColor, 'px-2 py-0.5 rounded-full text-[10px] font-semibold']">{{ lesson.status }}</span>
+                          <span :class="[lesson.impactColor, 'px-2 py-0.5 rounded-full text-[10px] font-semibold']">{{ lesson.impact }}</span>
+                        </div>
+                        <h4 class="text-sm font-semibold text-gray-900 group-hover:text-teal-600 transition-colors">{{ lesson.title }}</h4>
+                        <p class="text-xs text-gray-500 mt-1 line-clamp-1">{{ lesson.summary }}</p>
+                        <div class="flex items-center gap-3 text-xs text-gray-400 mt-2">
+                          <span><i class="fas fa-user mr-1"></i>{{ lesson.author }}</span>
+                          <span><i class="fas fa-calendar mr-1"></i>{{ lesson.date }}</span>
+                          <span v-if="lesson.actions"><i class="fas fa-tasks mr-1"></i>{{ lesson.actions }}</span>
+                        </div>
+                      </div>
+                      <i class="fas fa-chevron-right text-gray-300 group-hover:text-teal-500 transition-colors mt-3"></i>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- View All Link -->
+                <div class="text-center pt-2">
+                  <button @click="router.push({ name: 'LessonsLearned' })" class="text-sm font-medium text-teal-600 hover:text-teal-700 transition-colors">
+                    View all lessons learned <i class="fas fa-arrow-right ml-1"></i>
                   </button>
                 </div>
               </div>

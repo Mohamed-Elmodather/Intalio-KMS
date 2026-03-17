@@ -804,6 +804,14 @@ function shareEvent(event: Event) {
   showShareModal.value = true
 }
 
+function captureLessonFromEvent(event: Event) {
+  router.push({ name: 'LessonsLearned', query: { action: 'new-lesson', project: event.title } })
+}
+
+function scheduleReviewForEvent(event: Event) {
+  router.push({ name: 'LessonsLearned', query: { action: 'schedule-review', project: event.title } })
+}
+
 // ============================================================================
 // Comparison Functions
 // ============================================================================
@@ -1750,6 +1758,9 @@ function getCategoryColor(category: string) {
                   <button class="card-action-btn" @click.stop="shareEvent(event)" :title="$t('events.share')">
                     <i class="fas fa-share-alt"></i>
                   </button>
+                  <button class="card-action-btn" @click.stop="captureLessonFromEvent(event)" title="Capture Lesson">
+                    <i class="fas fa-lightbulb"></i>
+                  </button>
                   <ComparisonButton
                     :item="event"
                     type="event"
@@ -1813,6 +1824,9 @@ function getCategoryColor(category: string) {
                   </button>
                   <button class="list-action-btn" @click.stop="shareEvent(event)" :title="$t('events.share')">
                     <i class="fas fa-share-alt"></i>
+                  </button>
+                  <button class="list-action-btn" @click.stop="captureLessonFromEvent(event)" title="Capture Lesson">
+                    <i class="fas fa-lightbulb"></i>
                   </button>
                   <button class="list-action-btn" @click.stop :title="$t('events.addToCalendar')">
                     <i class="fas fa-calendar-plus"></i>
