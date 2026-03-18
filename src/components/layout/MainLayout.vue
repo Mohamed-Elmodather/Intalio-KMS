@@ -8,6 +8,7 @@ import { useNotificationsStore } from '@/stores/notifications'
 import { UnifiedHeader, UnifiedSidebar } from '@/components/unified'
 import type { NavItem, WorkspaceItem, BottomAction, CreateMenuItem, NotificationItem } from '@/components/unified'
 import AppToast from '../common/AppToast.vue'
+import GlobalAIPanel from '../ai/GlobalAIPanel.vue'
 
 const router = useRouter()
 const { t } = useI18n()
@@ -198,6 +199,7 @@ onMounted(async () => {
     </main>
 
     <AppToast />
+    <GlobalAIPanel />
   </div>
 </template>
 
