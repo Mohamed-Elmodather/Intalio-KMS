@@ -9,6 +9,7 @@ const ArticleEditorPage = () => import('@/pages/articles/ArticleEditorPage.vue')
 const DocumentsPage = () => import('@/pages/documents/DocumentsPage.vue')
 const DocumentViewPage = () => import('@/pages/documents/DocumentViewPage.vue')
 const CollectionsPage = () => import('@/pages/collections/CollectionsPage.vue')
+const SpacesPage = () => import('@/pages/spaces/SpacesPage.vue')
 const CollectionDetailPage = () => import('@/pages/collections/CollectionDetailPage.vue')
 const EventsPage = () => import('@/pages/events/EventsPage.vue')
 const EventDetailPage = () => import('@/pages/events/EventDetailPage.vue')
@@ -104,6 +105,14 @@ export const routes: RouteRecordRaw[] = [
     name: 'CollectionDetail',
     component: CollectionDetailPage,
     meta: { requiresAuth: true, title: 'Collection' },
+  },
+
+  // Spaces
+  {
+    path: '/spaces',
+    name: 'Spaces',
+    component: SpacesPage,
+    meta: { requiresAuth: true, title: 'Spaces' },
   },
 
   // Events

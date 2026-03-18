@@ -36,6 +36,7 @@ const navigationItems = computed<NavItem[]>(() => [
   { id: 'documents', icon: 'fas fa-folder', label: t('nav.documents'), route: '/documents' },
   { id: 'media', icon: 'fas fa-photo-video', label: t('nav.media'), route: '/media' },
   { id: 'collections', icon: 'fas fa-layer-group', label: t('nav.collections'), route: '/collections' },
+  { id: 'spaces', icon: 'fas fa-cubes', label: 'Spaces', route: '/spaces' },
   { id: 'learning', icon: 'fas fa-graduation-cap', label: t('nav.learning'), route: '/learning', badge: '2', badgeClass: 'bg-blue-200 text-blue-700' },
   { id: 'lessons-learned', icon: 'fas fa-lightbulb', label: t('nav.lessonsLearned'), route: '/lessons-learned', badge: '11', badgeClass: 'bg-amber-200 text-amber-700' },
   { id: 'events', icon: 'fas fa-calendar-alt', label: t('nav.events'), route: '/events' },
