@@ -26,11 +26,20 @@ public class Article : AuditableEntity
     public DateTime? ScheduledPublishAt { get; private set; }
     public int Version { get; private set; } = 1;
 
+    // Knowledge Verification properties
+    public Guid? OwnerId { get; private set; }
+    public string? OwnerName { get; private set; }
+    public DateTime? LastVerifiedAt { get; private set; }
+    public DateTime? NextVerificationDue { get; private set; }
+    public VerificationStatus VerificationStatus { get; private set; }
+    public int ReviewIntervalDays { get; private set; } = 90;
+
     // Navigation properties
     public virtual Category? Category { get; private set; }
     public virtual Space? Space { get; private set; }
     public virtual ICollection<ArticleTag> Tags { get; private set; } = new List<ArticleTag>();
     public virtual ICollection<ArticleVersion> Versions { get; private set; } = new List<ArticleVersion>();
+    public virtual ICollection<VerificationRecord> VerificationRecords { get; private set; } = new List<VerificationRecord>();
 
     private Article() { }
 
@@ -151,6 +160,45 @@ public class Article : AuditableEntity
         ViewCount++;
     }
 
+    public void AssignOwner(Guid ownerId, string ownerName)
+    {
+        OwnerId = ownerId;
+        OwnerName = ownerName ?? throw new ArgumentNullException(nameof(ownerName));
+
+        AddDomainEvent(new ArticleOwnerAssignedEvent(Id, ownerId, ownerName));
+    }
+
+    public void Verify(Guid verifiedById, string verifiedByName, int? reviewIntervalDays = null)
+    {
+        if (reviewIntervalDays.HasValue)
+            ReviewIntervalDays = reviewIntervalDays.Value;
+
+        var previousStatus = VerificationStatus;
+        VerificationStatus = VerificationStatus.Verified;
+        LastVerifiedAt = DateTime.UtcNow;
+        NextVerificationDue = DateTime.UtcNow.AddDays(ReviewIntervalDays);
+
+        AddDomainEvent(new ArticleVerifiedEvent(Id, verifiedById, verifiedByName, previousStatus));
+    }
+
+    public void MarkVerificationDue()
+    {
+        if (VerificationStatus == VerificationStatus.Verified)
+        {
+            VerificationStatus = VerificationStatus.DueSoon;
+            AddDomainEvent(new ArticleVerificationDueEvent(Id, OwnerId, OwnerName, NextVerificationDue));
+        }
+    }
+
+    public void MarkVerificationOverdue()
+    {
+        if (VerificationStatus != VerificationStatus.Overdue)
+        {
+            VerificationStatus = VerificationStatus.Overdue;
+            AddDomainEvent(new ArticleVerificationOverdueEvent(Id, OwnerId, OwnerName, NextVerificationDue));
+        }
+    }
+
     private static string GenerateSlug(string title)
     {
         return title
@@ -212,9 +260,21 @@ public class ArticleTag
     public virtual Tag Tag { get; set; } = null!;
 }
 
+public enum VerificationStatus
+{
+    Unverified,
+    Verified,
+    DueSoon,
+    Overdue
+}
+
 // Domain Events
 public record ArticleCreatedEvent(Guid ArticleId, string Title, Guid AuthorId) : DomainEvent;
 public record ArticleUpdatedEvent(Guid ArticleId, string Title) : DomainEvent;
 public record ArticleSubmittedEvent(Guid ArticleId, string Title, Guid AuthorId) : DomainEvent;
 public record ArticlePublishedEvent(Guid ArticleId, string Title) : DomainEvent;
 public record ArticleRejectedEvent(Guid ArticleId, string Title, Guid AuthorId, string Reason) : DomainEvent;
+public record ArticleOwnerAssignedEvent(Guid ArticleId, Guid OwnerId, string OwnerName) : DomainEvent;
+public record ArticleVerifiedEvent(Guid ArticleId, Guid VerifiedById, string VerifiedByName, VerificationStatus PreviousStatus) : DomainEvent;
+public record ArticleVerificationDueEvent(Guid ArticleId, Guid? OwnerId, string? OwnerName, DateTime? NextVerificationDue) : DomainEvent;
+public record ArticleVerificationOverdueEvent(Guid ArticleId, Guid? OwnerId, string? OwnerName, DateTime? NextVerificationDue) : DomainEvent;

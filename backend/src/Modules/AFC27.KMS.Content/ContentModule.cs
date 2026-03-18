@@ -17,10 +17,14 @@ public static class ContentModule
     {
         // Add module-specific services
         services.AddScoped<ISpaceService, SpaceService>();
+        services.AddScoped<IVerificationService, VerificationService>();
         // services.AddScoped<IArticleService, ArticleService>();
         // services.AddScoped<ICategoryService, CategoryService>();
         // services.AddScoped<ITagService, TagService>();
         // services.AddScoped<ITemplateService, TemplateService>();
+
+        // Background jobs
+        services.AddHostedService<KnowledgeVerificationReminderJob>();
 
         // Add authorization policies
         services.AddAuthorizationBuilder()

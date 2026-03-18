@@ -29,6 +29,7 @@ public class KmsDbContext : DbContext, IUnitOfWork
     public DbSet<Space> Spaces => Set<Space>();
     public DbSet<SpaceMember> SpaceMembers => Set<SpaceMember>();
     public DbSet<SpacePermission> SpacePermissions => Set<SpacePermission>();
+    public DbSet<VerificationRecord> VerificationRecords => Set<VerificationRecord>();
 
     // Collaboration Module - Lessons Learned
     public DbSet<LessonLearned> LessonsLearned => Set<LessonLearned>();
@@ -174,6 +175,18 @@ public class KmsDbContext : DbContext, IUnitOfWork
                 .HasForeignKey(a => a.CategoryId)
                 .OnDelete(DeleteBehavior.SetNull);
 
+            // Verification properties
+            entity.Property(a => a.OwnerName).HasMaxLength(256);
+            entity.Property(a => a.VerificationStatus).HasConversion<string>().HasMaxLength(20);
+            entity.HasIndex(a => a.OwnerId);
+            entity.HasIndex(a => a.VerificationStatus);
+            entity.HasIndex(a => a.NextVerificationDue);
+
+            entity.HasMany(a => a.VerificationRecords)
+                .WithOne(v => v.Article)
+                .HasForeignKey(v => v.ArticleId)
+                .OnDelete(DeleteBehavior.Cascade);
+
             entity.Ignore(a => a.DomainEvents);
         });
 
@@ -228,6 +241,23 @@ public class KmsDbContext : DbContext, IUnitOfWork
         {
             entity.ToTable("ArticleVersions");
             entity.HasKey(av => av.Id);
+        });
+
+        modelBuilder.Entity<VerificationRecord>(entity =>
+        {
+            entity.ToTable("VerificationRecords");
+            entity.HasKey(v => v.Id);
+
+            entity.Property(v => v.VerifiedByName).HasMaxLength(256).IsRequired();
+            entity.Property(v => v.Notes).HasMaxLength(2000);
+            entity.Property(v => v.PreviousStatus).HasConversion<string>().HasMaxLength(20);
+            entity.Property(v => v.NewStatus).HasConversion<string>().HasMaxLength(20);
+
+            entity.HasIndex(v => v.ArticleId);
+            entity.HasIndex(v => v.VerifiedById);
+            entity.HasIndex(v => v.VerifiedAt);
+
+            entity.Ignore(v => v.DomainEvents);
         });
 
         // Configure Content Module - Spaces

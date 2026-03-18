@@ -206,6 +206,11 @@ public enum NotificationType
     LessonActionsAllComplete,
     LessonVerified,
 
+    // Knowledge Verification
+    VerificationDue,
+    VerificationOverdue,
+    VerificationCompleted,
+
     // Workflow
     TaskAssigned,
     TaskDueSoon,

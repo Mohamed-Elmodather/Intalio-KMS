@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using AFC27.KMS.Content.Application.DTOs;
+using AFC27.KMS.Content.Application.Interfaces;
 using AFC27.KMS.Contracts.Common;
+using AFC27.KMS.SharedKernel.Interfaces;
 
 namespace AFC27.KMS.Content.Presentation.Controllers;
 
@@ -14,10 +16,17 @@ namespace AFC27.KMS.Content.Presentation.Controllers;
 public class ArticlesController : ControllerBase
 {
     private readonly ILogger<ArticlesController> _logger;
+    private readonly IVerificationService _verificationService;
+    private readonly ICurrentUser _currentUser;
 
-    public ArticlesController(ILogger<ArticlesController> logger)
+    public ArticlesController(
+        ILogger<ArticlesController> logger,
+        IVerificationService verificationService,
+        ICurrentUser currentUser)
     {
         _logger = logger;
+        _verificationService = verificationService;
+        _currentUser = currentUser;
     }
 
     /// <summary>
@@ -410,5 +419,94 @@ public class ArticlesController : ControllerBase
         };
 
         return Ok(ApiResponse<IReadOnlyList<ArticleSummaryDto>>.Ok(articles));
+    }
+
+    // ========================================
+    // Knowledge Verification Lifecycle
+    // ========================================
+
+    /// <summary>
+    /// Verify that an article's knowledge content is still accurate.
+    /// </summary>
+    [HttpPost("{id:guid}/verify")]
+    [Authorize(Policy = "CanEditContent")]
+    public async Task<ActionResult<ApiResponse<VerificationRecordDto>>> VerifyArticle(
+        Guid id, [FromBody] VerifyArticleRequest request)
+    {
+        var userId = _currentUser.UserId ?? Guid.Empty;
+        var userName = _currentUser.DisplayName ?? "Unknown";
+
+        _logger.LogInformation("Verifying article {ArticleId} by {UserName}", id, userName);
+
+        try
+        {
+            var record = await _verificationService.VerifyArticleAsync(id, request, userId, userName);
+            return Ok(ApiResponse<VerificationRecordDto>.Ok(record, "Article verified successfully"));
+        }
+        catch (KeyNotFoundException)
+        {
+            return NotFound(ApiResponse<VerificationRecordDto>.Fail("Article not found"));
+        }
+    }
+
+    /// <summary>
+    /// Assign a knowledge owner to an article.
+    /// </summary>
+    [HttpPost("{id:guid}/assign-owner")]
+    [Authorize(Policy = "CanManageContent")]
+    public async Task<ActionResult<ApiResponse>> AssignOwner(
+        Guid id, [FromBody] AssignOwnerRequest request)
+    {
+        _logger.LogInformation("Assigning owner {OwnerName} to article {ArticleId}", request.OwnerName, id);
+
+        var result = await _verificationService.AssignOwnerAsync(id, request);
+        if (!result)
+            return NotFound(ApiResponse.Fail("Article not found"));
+
+        return Ok(ApiResponse.Ok("Owner assigned successfully"));
+    }
+
+    /// <summary>
+    /// Get the knowledge verification dashboard with metrics and lists.
+    /// </summary>
+    [HttpGet("verification-dashboard")]
+    [Authorize(Policy = "CanManageContent")]
+    public async Task<ActionResult<ApiResponse<VerificationDashboardDto>>> GetVerificationDashboard()
+    {
+        var dashboard = await _verificationService.GetDashboardAsync();
+        return Ok(ApiResponse<VerificationDashboardDto>.Ok(dashboard));
+    }
+
+    /// <summary>
+    /// Get all articles whose verification is overdue.
+    /// </summary>
+    [HttpGet("overdue")]
+    [Authorize(Policy = "CanEditContent")]
+    public async Task<ActionResult<ApiResponse<IReadOnlyList<ArticleVerificationSummaryDto>>>> GetOverdueArticles()
+    {
+        var articles = await _verificationService.GetOverdueArticlesAsync();
+        return Ok(ApiResponse<IReadOnlyList<ArticleVerificationSummaryDto>>.Ok(articles));
+    }
+
+    /// <summary>
+    /// Get all articles whose verification is due soon (within 7 days).
+    /// </summary>
+    [HttpGet("due-soon")]
+    [Authorize(Policy = "CanEditContent")]
+    public async Task<ActionResult<ApiResponse<IReadOnlyList<ArticleVerificationSummaryDto>>>> GetDueSoonArticles()
+    {
+        var articles = await _verificationService.GetDueSoonArticlesAsync();
+        return Ok(ApiResponse<IReadOnlyList<ArticleVerificationSummaryDto>>.Ok(articles));
+    }
+
+    /// <summary>
+    /// Get the verification history for a specific article.
+    /// </summary>
+    [HttpGet("{id:guid}/verification-history")]
+    [Authorize(Policy = "CanEditContent")]
+    public async Task<ActionResult<ApiResponse<IReadOnlyList<VerificationRecordDto>>>> GetVerificationHistory(Guid id)
+    {
+        var history = await _verificationService.GetVerificationHistoryAsync(id);
+        return Ok(ApiResponse<IReadOnlyList<VerificationRecordDto>>.Ok(history));
     }
 }

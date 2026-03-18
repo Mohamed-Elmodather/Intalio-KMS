@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using AFC27.KMS.AI.Application.Services;
 using AFC27.KMS.AI.Domain.Entities;
 
 namespace AFC27.KMS.AI;
@@ -23,6 +24,9 @@ public static class AIModule
         services.Configure<AzureCognitiveServicesOptions>(configuration.GetSection("AI:AzureCognitiveServices"));
         services.Configure<SemanticSearchOptions>(configuration.GetSection("AI:SemanticSearch"));
         services.Configure<QuotaOptions>(configuration.GetSection("AI:Quota"));
+
+        // Register writing assistant service
+        services.AddScoped<IWritingAssistantService, WritingAssistantService>();
 
         // Register services
         // services.AddScoped<IAIJobService, AIJobService>();
