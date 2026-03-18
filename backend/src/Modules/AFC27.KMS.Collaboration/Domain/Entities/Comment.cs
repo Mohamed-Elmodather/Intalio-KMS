@@ -170,21 +170,51 @@ public class CommentReaction : Entity
 }
 
 /// <summary>
-/// @Mention in a comment.
+/// @Mention in a comment or in article body content (Phase 8A).
+/// CommentId is nullable to support in-content mentions (not tied to a comment).
 /// </summary>
 public class Mention : Entity
 {
-    public Guid CommentId { get; private set; }
+    public Guid? CommentId { get; private set; }
     public Guid MentionedUserId { get; private set; }
     public string MentionedUserName { get; private set; } = string.Empty;
     public int StartIndex { get; private set; }
     public int EndIndex { get; private set; }
     public DateTime CreatedAt { get; private set; }
 
-    public virtual Comment Comment { get; private set; } = null!;
+    // Phase 8A: In-content mention support
+    /// <summary>
+    /// The block ID within an article body where this mention appears. Null for comment mentions.
+    /// </summary>
+    public Guid? BlockId { get; private set; }
+
+    /// <summary>
+    /// Context describing where the mention occurs (e.g. "article-body", "comment", "inline-comment").
+    /// </summary>
+    public string? MentionContext { get; private set; }
+
+    /// <summary>
+    /// The entity type being mentioned in (Article, Document, etc.). Used for in-content mentions.
+    /// </summary>
+    public string? TargetEntityType { get; private set; }
+
+    /// <summary>
+    /// The entity ID being mentioned in. Used for in-content mentions.
+    /// </summary>
+    public Guid? TargetEntityId { get; private set; }
+
+    /// <summary>
+    /// The user who created the mention. Used for in-content mentions where there is no comment author.
+    /// </summary>
+    public Guid? MentionedByUserId { get; private set; }
+
+    public virtual Comment? Comment { get; private set; }
 
     private Mention() { }
 
+    /// <summary>
+    /// Create a mention within a comment.
+    /// </summary>
     public static Mention Create(
         Guid commentId,
         Guid mentionedUserId,
@@ -199,8 +229,42 @@ public class Mention : Entity
             MentionedUserName = mentionedUserName,
             StartIndex = startIndex,
             EndIndex = endIndex,
+            MentionContext = "comment",
             CreatedAt = DateTime.UtcNow
         };
+    }
+
+    /// <summary>
+    /// Create an in-content mention (e.g. @mention in article body block editor). Phase 8A.
+    /// </summary>
+    public static Mention CreateInContent(
+        Guid mentionedUserId,
+        string mentionedUserName,
+        Guid mentionedByUserId,
+        string targetEntityType,
+        Guid targetEntityId,
+        Guid blockId,
+        int startIndex,
+        int endIndex)
+    {
+        var mention = new Mention
+        {
+            CommentId = null,
+            MentionedUserId = mentionedUserId,
+            MentionedUserName = mentionedUserName,
+            MentionedByUserId = mentionedByUserId,
+            TargetEntityType = targetEntityType,
+            TargetEntityId = targetEntityId,
+            BlockId = blockId,
+            StartIndex = startIndex,
+            EndIndex = endIndex,
+            MentionContext = "article-body",
+            CreatedAt = DateTime.UtcNow
+        };
+
+        mention.AddDomainEvent(new InContentMentionCreatedEvent(
+            mention.Id, mentionedUserId, mentionedByUserId, targetEntityType, targetEntityId, blockId));
+        return mention;
     }
 }
 
@@ -209,3 +273,8 @@ public record CommentCreatedEvent(Guid CommentId, CommentableType TargetType, Gu
 public record CommentAcceptedAsAnswerEvent(Guid CommentId, Guid DiscussionId, Guid AuthorId) : DomainEvent;
 public record UserMentionedEvent(Guid CommentId, Guid MentionedUserId, Guid MentionedByUserId) : DomainEvent;
 public record InlineCommentCreatedEvent(Guid CommentId, CommentableType TargetType, Guid TargetId, Guid AuthorId, Guid AnchorBlockId) : DomainEvent;
+
+// Phase 8A: In-content mention event
+public record InContentMentionCreatedEvent(
+    Guid MentionId, Guid MentionedUserId, Guid MentionedByUserId,
+    string TargetEntityType, Guid TargetEntityId, Guid BlockId) : DomainEvent;

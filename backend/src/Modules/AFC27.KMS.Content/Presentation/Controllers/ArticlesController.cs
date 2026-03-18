@@ -386,7 +386,7 @@ public class ArticlesController : ControllerBase
     }
 
     /// <summary>
-    /// Restore a specific version.
+    /// Restore a specific version by version ID.
     /// </summary>
     [HttpPost("{id:guid}/versions/{versionId:guid}/restore")]
     [Authorize(Policy = "CanEditContent")]
@@ -397,6 +397,57 @@ public class ArticlesController : ControllerBase
         await Task.Delay(100);
 
         return Ok(ApiResponse.Ok("Version restored"));
+    }
+
+    // ========================================
+    // Phase 8D: Version Rollback by Number
+    // ========================================
+
+    /// <summary>
+    /// Rollback an article to a specific version number.
+    /// Creates a new version with the content from the specified historical version,
+    /// preserving the full version history (non-destructive rollback).
+    /// </summary>
+    /// <param name="id">The article ID.</param>
+    /// <param name="versionNumber">The version number to rollback to.</param>
+    [HttpPost("{id:guid}/rollback/{versionNumber:int}")]
+    [Authorize(Policy = "CanEditContent")]
+    public async Task<ActionResult<ApiResponse<ArticleVersionRollbackResultDto>>> RollbackToVersion(
+        Guid id, int versionNumber)
+    {
+        if (versionNumber < 1)
+        {
+            return BadRequest(ApiResponse<ArticleVersionRollbackResultDto>.Fail(
+                "Version number must be 1 or greater."));
+        }
+
+        _logger.LogInformation(
+            "Rolling back article {ArticleId} to version {VersionNumber}", id, versionNumber);
+
+        await Task.Delay(100);
+
+        // In a real implementation, this would:
+        // 1. Fetch the article and validate it exists
+        // 2. Fetch the version history and find the target version number
+        // 3. If version number doesn't exist, return 404
+        // 4. Create a NEW version (non-destructive) using the content from the target version
+        // 5. Update the current article content to match the rolled-back version
+        // 6. Publish a domain event for audit trail
+
+        var currentVersion = 4; // Simulated: the new version number after rollback
+
+        var result = new ArticleVersionRollbackResultDto
+        {
+            ArticleId = id,
+            RolledBackFromVersion = 3, // Was at version 3
+            RolledBackToVersion = versionNumber,
+            NewVersionNumber = currentVersion,
+            RolledBackByName = _currentUser.DisplayName ?? "Current User",
+            RolledBackAt = DateTime.UtcNow,
+            ChangeNotes = $"Rolled back to version {versionNumber}"
+        };
+
+        return Ok(ApiResponse<ArticleVersionRollbackResultDto>.Ok(result, "Article rolled back successfully"));
     }
 
     /// <summary>

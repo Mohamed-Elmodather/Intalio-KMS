@@ -34,6 +34,12 @@ public static class AIModule
         // Register permission-aware RAG service
         services.AddScoped<IPermissionAwareRAGService, PermissionAwareRAGService>();
 
+        // Register knowledge agent service (Phase 5A)
+        services.AddScoped<IKnowledgeAgentService, KnowledgeAgentService>();
+
+        // Register research service (Phase 5B)
+        services.AddScoped<IResearchService, ResearchService>();
+
         // Register services
         // services.AddScoped<IAIJobService, AIJobService>();
         // services.AddScoped<ITranscriptionService, TranscriptionService>();

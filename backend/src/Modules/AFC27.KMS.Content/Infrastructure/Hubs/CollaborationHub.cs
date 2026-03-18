@@ -8,22 +8,25 @@ namespace AFC27.KMS.Content.Infrastructure.Hubs;
 
 /// <summary>
 /// SignalR hub for real-time document collaboration.
-/// Handles CRDT synchronization, presence, and cursor updates.
+/// Handles CRDT synchronization, presence, cursor updates, and active editor indicators (Phase 3D).
 /// </summary>
 [Authorize]
 public class CollaborationHub : Hub<ICollaborationClient>
 {
     private readonly ICollaborationService _collaborationService;
     private readonly IPresenceService _presenceService;
+    private readonly IActiveEditorService _activeEditorService;
     private readonly ILogger<CollaborationHub> _logger;
 
     public CollaborationHub(
         ICollaborationService collaborationService,
         IPresenceService presenceService,
+        IActiveEditorService activeEditorService,
         ILogger<CollaborationHub> logger)
     {
         _collaborationService = collaborationService;
         _presenceService = presenceService;
+        _activeEditorService = activeEditorService;
         _logger = logger;
     }
 
@@ -186,6 +189,115 @@ public class CollaborationHub : Hub<ICollaborationClient>
         });
     }
 
+    // ========================================
+    // Phase 3D: Real-time Collaboration Indicators
+    // ========================================
+
+    /// <summary>
+    /// Register as an active editor for any content item.
+    /// </summary>
+    public async Task RegisterAsEditor(string contentType, Guid contentId)
+    {
+        var userId = GetUserId();
+        var userName = GetUserName();
+        var connectionId = Context.ConnectionId;
+
+        _logger.LogInformation(
+            "User {UserId} ({UserName}) registering as editor for {ContentType} {ContentId}",
+            userId, userName, contentType, contentId);
+
+        var groupName = GetPresenceGroupName(contentType, contentId);
+        await Groups.AddToGroupAsync(connectionId, groupName);
+
+        var editor = await _activeEditorService.RegisterEditorAsync(
+            contentType, contentId, userId, userName, connectionId);
+
+        // Notify others in the group
+        await Clients.OthersInGroup(groupName).EditorJoined(new EditorJoinedMessage
+        {
+            ContentType = contentType,
+            ContentId = contentId,
+            Editor = editor
+        });
+
+        // Send current editors to the joining user
+        var editors = await _activeEditorService.GetEditorsAsync(contentId, contentType);
+        await Clients.Caller.ActiveEditorsUpdated(new ActiveEditorsMessage
+        {
+            ContentType = contentType,
+            ContentId = contentId,
+            Editors = editors.Editors
+        });
+    }
+
+    /// <summary>
+    /// Unregister as an active editor.
+    /// </summary>
+    public async Task UnregisterAsEditor(string contentType, Guid contentId)
+    {
+        var userId = GetUserId();
+        var connectionId = Context.ConnectionId;
+        var groupName = GetPresenceGroupName(contentType, contentId);
+
+        await Groups.RemoveFromGroupAsync(connectionId, groupName);
+        await _activeEditorService.UnregisterEditorAsync(contentId, userId);
+
+        await Clients.OthersInGroup(groupName).EditorLeft(new EditorLeftMessage
+        {
+            ContentType = contentType,
+            ContentId = contentId,
+            UserId = userId
+        });
+
+        _logger.LogInformation(
+            "User {UserId} unregistered as editor for {ContentType} {ContentId}",
+            userId, contentType, contentId);
+    }
+
+    /// <summary>
+    /// Update editor focus (which block the user is editing).
+    /// </summary>
+    public async Task UpdateEditorFocus(string contentType, Guid contentId, Guid? focusedBlockId, bool isTyping)
+    {
+        var userId = GetUserId();
+        var groupName = GetPresenceGroupName(contentType, contentId);
+
+        await _activeEditorService.UpdateEditorFocusAsync(contentId, userId, focusedBlockId, isTyping);
+
+        await Clients.OthersInGroup(groupName).EditorFocusUpdated(new EditorFocusMessage
+        {
+            ContentType = contentType,
+            ContentId = contentId,
+            UserId = userId,
+            FocusedBlockId = focusedBlockId,
+            IsTyping = isTyping
+        });
+    }
+
+    /// <summary>
+    /// Editor heartbeat to maintain active status.
+    /// </summary>
+    public async Task EditorHeartbeat(string contentType, Guid contentId)
+    {
+        var userId = GetUserId();
+        await _activeEditorService.HeartbeatAsync(contentId, userId);
+    }
+
+    /// <summary>
+    /// Get active editors for a content item.
+    /// </summary>
+    public async Task GetActiveEditors(string contentType, Guid contentId)
+    {
+        var editors = await _activeEditorService.GetEditorsAsync(contentId, contentType);
+
+        await Clients.Caller.ActiveEditorsUpdated(new ActiveEditorsMessage
+        {
+            ContentType = contentType,
+            ContentId = contentId,
+            Editors = editors.Editors
+        });
+    }
+
     public override async Task OnConnectedAsync()
     {
         var userId = GetUserId();
@@ -216,6 +328,9 @@ public class CollaborationHub : Hub<ICollaborationClient>
             });
         }
 
+        // Phase 3D: Clean up active editor registrations for this connection
+        await _activeEditorService.UnregisterByConnectionAsync(connectionId);
+
         await base.OnDisconnectedAsync(exception);
     }
 
@@ -238,6 +353,7 @@ public class CollaborationHub : Hub<ICollaborationClient>
     }
 
     private static string GetGroupName(Guid articleId) => $"article_{articleId}";
+    private static string GetPresenceGroupName(string contentType, Guid contentId) => $"presence_{contentType}_{contentId}";
 }
 
 /// <summary>
@@ -268,6 +384,20 @@ public interface ICollaborationClient
 
     /// <summary>Called in response to state sync request</summary>
     Task StateSynced(StateSyncMessage message);
+
+    // Phase 3D: Active editor indicator callbacks
+
+    /// <summary>Called when an editor joins a content item</summary>
+    Task EditorJoined(EditorJoinedMessage message);
+
+    /// <summary>Called when an editor leaves a content item</summary>
+    Task EditorLeft(EditorLeftMessage message);
+
+    /// <summary>Called when the list of active editors is updated</summary>
+    Task ActiveEditorsUpdated(ActiveEditorsMessage message);
+
+    /// <summary>Called when an editor's focus/typing state changes</summary>
+    Task EditorFocusUpdated(EditorFocusMessage message);
 }
 
 // Message DTOs
@@ -339,4 +469,36 @@ public record StateSyncMessage
     public Guid ArticleId { get; init; }
     public byte[]? State { get; init; }
     public IReadOnlyList<ParticipantDto> Participants { get; init; } = Array.Empty<ParticipantDto>();
+}
+
+// Phase 3D: Active Editor Indicator Messages
+
+public record EditorJoinedMessage
+{
+    public string ContentType { get; init; } = string.Empty;
+    public Guid ContentId { get; init; }
+    public ActiveEditorDto Editor { get; init; } = null!;
+}
+
+public record EditorLeftMessage
+{
+    public string ContentType { get; init; } = string.Empty;
+    public Guid ContentId { get; init; }
+    public Guid UserId { get; init; }
+}
+
+public record ActiveEditorsMessage
+{
+    public string ContentType { get; init; } = string.Empty;
+    public Guid ContentId { get; init; }
+    public IReadOnlyList<ActiveEditorDto> Editors { get; init; } = Array.Empty<ActiveEditorDto>();
+}
+
+public record EditorFocusMessage
+{
+    public string ContentType { get; init; } = string.Empty;
+    public Guid ContentId { get; init; }
+    public Guid UserId { get; init; }
+    public Guid? FocusedBlockId { get; init; }
+    public bool IsTyping { get; init; }
 }

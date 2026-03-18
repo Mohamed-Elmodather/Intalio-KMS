@@ -31,6 +31,20 @@ public class KmsDbContext : DbContext, IUnitOfWork
     public DbSet<SpacePermission> SpacePermissions => Set<SpacePermission>();
     public DbSet<VerificationRecord> VerificationRecords => Set<VerificationRecord>();
 
+    // Content Module - Phase 3C: Content Templates
+    public DbSet<ContentTemplate> ContentTemplates => Set<ContentTemplate>();
+
+    // Content Module - Phase 3D: Active Editors
+    public DbSet<ActiveEditor> ActiveEditors => Set<ActiveEditor>();
+
+    // Content Module - Collaboration
+    public DbSet<ContentBlock> ContentBlocks => Set<ContentBlock>();
+    public DbSet<CollaborationSession> CollaborationSessions => Set<CollaborationSession>();
+    public DbSet<CollaborationParticipant> CollaborationParticipants => Set<CollaborationParticipant>();
+
+    // Collaboration Module - Comments (Phase 3A: Inline Comments)
+    public DbSet<Comment> Comments => Set<Comment>();
+
     // Collaboration Module - Lessons Learned
     public DbSet<LessonLearned> LessonsLearned => Set<LessonLearned>();
     public DbSet<LessonAction> LessonActions => Set<LessonAction>();
@@ -341,6 +355,159 @@ public class KmsDbContext : DbContext, IUnitOfWork
                 .WithMany()
                 .HasForeignKey(a => a.SpaceId)
                 .OnDelete(DeleteBehavior.SetNull);
+        });
+
+        // Configure Content Module - Content Blocks & Collaboration
+        modelBuilder.Entity<ContentBlock>(entity =>
+        {
+            entity.ToTable("ContentBlocks");
+            entity.HasKey(cb => cb.Id);
+            entity.Property(cb => cb.Type).HasConversion<string>().HasMaxLength(30);
+
+            entity.HasOne(cb => cb.Article)
+                .WithMany()
+                .HasForeignKey(cb => cb.ArticleId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(cb => cb.ParentBlock)
+                .WithMany(cb => cb.ChildBlocks)
+                .HasForeignKey(cb => cb.ParentBlockId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasIndex(cb => cb.ArticleId);
+            entity.Ignore(cb => cb.DomainEvents);
+        });
+
+        modelBuilder.Entity<CollaborationSession>(entity =>
+        {
+            entity.ToTable("CollaborationSessions");
+            entity.HasKey(cs => cs.Id);
+            entity.Property(cs => cs.SessionId).HasMaxLength(64).IsRequired();
+
+            entity.HasOne(cs => cs.Article)
+                .WithMany()
+                .HasForeignKey(cs => cs.ArticleId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasIndex(cs => cs.ArticleId);
+            entity.HasIndex(cs => cs.IsActive);
+            entity.Ignore(cs => cs.DomainEvents);
+        });
+
+        modelBuilder.Entity<CollaborationParticipant>(entity =>
+        {
+            entity.ToTable("CollaborationParticipants");
+            entity.HasKey(cp => cp.Id);
+            entity.Property(cp => cp.UserName).HasMaxLength(256);
+            entity.Property(cp => cp.Color).HasMaxLength(30);
+            entity.Property(cp => cp.ConnectionId).HasMaxLength(128);
+
+            entity.HasOne(cp => cp.Session)
+                .WithMany(s => s.Participants)
+                .HasForeignKey(cp => cp.SessionId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasIndex(cp => cp.UserId);
+            entity.HasIndex(cp => cp.SessionId);
+            entity.Ignore(cp => cp.DomainEvents);
+        });
+
+        // Phase 3C: Content Templates (also Phase 3E: Review Cycles)
+        modelBuilder.Entity<ContentTemplate>(entity =>
+        {
+            entity.ToTable("ContentTemplates");
+            entity.HasKey(ct => ct.Id);
+            entity.Property(ct => ct.Name).HasMaxLength(256).IsRequired();
+            entity.Property(ct => ct.NameArabic).HasMaxLength(256);
+            entity.Property(ct => ct.Description).HasMaxLength(2000);
+            entity.Property(ct => ct.DescriptionArabic).HasMaxLength(2000);
+            entity.Property(ct => ct.Category).HasMaxLength(100).IsRequired();
+            entity.Property(ct => ct.CreatorName).HasMaxLength(256);
+            entity.Property(ct => ct.ThumbnailUrl).HasMaxLength(1000);
+            entity.Property(ct => ct.Tags).HasMaxLength(1000);
+            entity.Property(ct => ct.LastReviewedByName).HasMaxLength(256);
+            entity.Property(ct => ct.ReviewStatus).HasConversion<string>().HasMaxLength(20);
+
+            entity.HasIndex(ct => ct.Category);
+            entity.HasIndex(ct => ct.CreatorId);
+            entity.HasIndex(ct => ct.IsPublic);
+            entity.HasIndex(ct => ct.ReviewStatus);
+            entity.HasIndex(ct => ct.NextReviewDue);
+
+            entity.Ignore(ct => ct.DomainEvents);
+        });
+
+        // Phase 3D: Active Editors
+        modelBuilder.Entity<ActiveEditor>(entity =>
+        {
+            entity.ToTable("ActiveEditors");
+            entity.HasKey(ae => ae.Id);
+            entity.Property(ae => ae.ContentType).HasMaxLength(50).IsRequired();
+            entity.Property(ae => ae.UserName).HasMaxLength(256).IsRequired();
+            entity.Property(ae => ae.UserAvatarUrl).HasMaxLength(1000);
+            entity.Property(ae => ae.Color).HasMaxLength(30);
+            entity.Property(ae => ae.ConnectionId).HasMaxLength(128).IsRequired();
+            entity.Property(ae => ae.Status).HasConversion<string>().HasMaxLength(20);
+            entity.Property(ae => ae.UserAgent).HasMaxLength(500);
+
+            entity.HasIndex(ae => new { ae.ContentType, ae.ContentId });
+            entity.HasIndex(ae => ae.UserId);
+            entity.HasIndex(ae => ae.ConnectionId);
+            entity.HasIndex(ae => ae.Status);
+            entity.HasIndex(ae => ae.LastActivityAt);
+
+            entity.Ignore(ae => ae.DomainEvents);
+        });
+
+        // Configure Collaboration Module - Comments (Phase 3A: Inline Comments)
+        modelBuilder.Entity<Comment>(entity =>
+        {
+            entity.ToTable("Comments");
+            entity.HasKey(c => c.Id);
+            entity.Property(c => c.Content).IsRequired();
+            entity.Property(c => c.ContentArabic);
+            entity.Property(c => c.TargetType).HasConversion<string>().HasMaxLength(30);
+            entity.Property(c => c.AuthorName).HasMaxLength(256);
+            entity.Property(c => c.AuthorAvatarUrl).HasMaxLength(1000);
+
+            // Phase 3A: Inline annotation anchor properties
+            entity.Property(c => c.AnchorQuotedText).HasMaxLength(2000);
+            entity.HasIndex(c => c.AnchorBlockId);
+
+            entity.HasOne(c => c.Parent)
+                .WithMany(c => c.Replies)
+                .HasForeignKey(c => c.ParentId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasMany(c => c.Reactions)
+                .WithOne(r => r.Comment)
+                .HasForeignKey(r => r.CommentId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasIndex(c => new { c.TargetType, c.TargetId });
+            entity.HasIndex(c => c.AuthorId);
+            entity.HasIndex(c => c.ParentId);
+
+            entity.Ignore(c => c.DomainEvents);
+        });
+
+        modelBuilder.Entity<CommentReaction>(entity =>
+        {
+            entity.ToTable("CommentReactions");
+            entity.HasKey(r => r.Id);
+            entity.Property(r => r.ReactionType).HasMaxLength(20);
+            entity.HasIndex(r => new { r.CommentId, r.UserId }).IsUnique();
+        });
+
+        modelBuilder.Entity<Mention>(entity =>
+        {
+            entity.ToTable("Mentions");
+            entity.HasKey(m => m.Id);
+            entity.Property(m => m.MentionedUserName).HasMaxLength(256);
+            entity.HasIndex(m => m.CommentId);
+            entity.HasIndex(m => m.MentionedUserId);
+
+            entity.Ignore(m => m.DomainEvents);
         });
 
         // Configure Collaboration Module - Lessons Learned

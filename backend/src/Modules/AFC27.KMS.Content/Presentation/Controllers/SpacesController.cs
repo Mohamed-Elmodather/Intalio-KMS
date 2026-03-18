@@ -15,11 +15,16 @@ namespace AFC27.KMS.Content.Presentation.Controllers;
 public class SpacesController : ControllerBase
 {
     private readonly ISpaceService _spaceService;
+    private readonly ISpacePermissionService _permissionService;
     private readonly ILogger<SpacesController> _logger;
 
-    public SpacesController(ISpaceService spaceService, ILogger<SpacesController> logger)
+    public SpacesController(
+        ISpaceService spaceService,
+        ISpacePermissionService permissionService,
+        ILogger<SpacesController> logger)
     {
         _spaceService = spaceService;
+        _permissionService = permissionService;
         _logger = logger;
     }
 
@@ -212,5 +217,104 @@ public class SpacesController : ControllerBase
     {
         var result = await _spaceService.GetSpaceContentAsync(id, page, pageSize, ct);
         return Ok(ApiResponse<PagedResult<ArticleSummaryDto>>.Ok(result));
+    }
+
+    // ========================================
+    // Personal Workspace (Phase 4D)
+    // ========================================
+
+    /// <summary>
+    /// Get or create the current user's personal workspace.
+    /// Auto-creates a Personal space if one does not exist.
+    /// </summary>
+    [HttpGet("my-workspace")]
+    public async Task<ActionResult<ApiResponse<SpaceDto>>> GetMyWorkspace(CancellationToken ct)
+    {
+        // TODO: Replace with actual current user ID and name from claims
+        var userId = Guid.Empty;
+        var userName = "Current User";
+
+        var workspace = await _spaceService.GetOrCreateMyWorkspaceAsync(userId, userName, ct);
+        return Ok(ApiResponse<SpaceDto>.Ok(workspace));
+    }
+
+    // ========================================
+    // Permissions (Phase 4A)
+    // ========================================
+
+    /// <summary>
+    /// Get all permissions configured on a space.
+    /// </summary>
+    [HttpGet("{id:guid}/permissions")]
+    public async Task<ActionResult<ApiResponse<IReadOnlyList<SpacePermissionDto>>>> GetSpacePermissions(
+        Guid id, CancellationToken ct)
+    {
+        var permissions = await _permissionService.GetSpacePermissionsAsync(id, ct);
+        return Ok(ApiResponse<IReadOnlyList<SpacePermissionDto>>.Ok(permissions));
+    }
+
+    /// <summary>
+    /// Get the current user's effective permissions on a space.
+    /// </summary>
+    [HttpGet("{id:guid}/permissions/my")]
+    public async Task<ActionResult<ApiResponse<SpaceUserPermissionsDto>>> GetMyPermissions(
+        Guid id, CancellationToken ct)
+    {
+        // TODO: Replace with actual current user ID from claims
+        var userId = Guid.Empty;
+
+        var permissions = await _permissionService.GetUserPermissionsAsync(id, userId, ct);
+        return Ok(ApiResponse<SpaceUserPermissionsDto>.Ok(permissions));
+    }
+
+    /// <summary>
+    /// Get a specific user's effective permissions on a space.
+    /// </summary>
+    [HttpGet("{id:guid}/permissions/user/{userId:guid}")]
+    public async Task<ActionResult<ApiResponse<SpaceUserPermissionsDto>>> GetUserPermissions(
+        Guid id, Guid userId, CancellationToken ct)
+    {
+        var permissions = await _permissionService.GetUserPermissionsAsync(id, userId, ct);
+        return Ok(ApiResponse<SpaceUserPermissionsDto>.Ok(permissions));
+    }
+
+    /// <summary>
+    /// Grant a permission on a space.
+    /// Only space owners and admins can grant permissions.
+    /// </summary>
+    [HttpPost("{id:guid}/permissions")]
+    public async Task<ActionResult<ApiResponse<SpacePermissionDto>>> GrantPermission(
+        Guid id, [FromBody] GrantSpacePermissionRequest request, CancellationToken ct)
+    {
+        // TODO: Replace with actual current user ID from claims
+        var userId = Guid.Empty;
+
+        // Ensure the space ID from the route is used
+        var grantRequest = request with { SpaceId = id };
+
+        var permission = await _permissionService.GrantPermissionAsync(grantRequest, userId, ct);
+        if (permission == null)
+            return BadRequest(ApiResponse<SpacePermissionDto>.Fail(
+                "Failed to grant permission. Space not found, insufficient access, or invalid access level."));
+
+        return Ok(ApiResponse<SpacePermissionDto>.Ok(permission, "Permission granted successfully"));
+    }
+
+    /// <summary>
+    /// Revoke a permission from a space.
+    /// Only space owners and admins can revoke permissions.
+    /// </summary>
+    [HttpDelete("{id:guid}/permissions/{permissionId:guid}")]
+    public async Task<ActionResult<ApiResponse>> RevokePermission(
+        Guid id, Guid permissionId, CancellationToken ct)
+    {
+        // TODO: Replace with actual current user ID from claims
+        var userId = Guid.Empty;
+
+        var success = await _permissionService.RevokePermissionAsync(id, permissionId, userId, ct);
+        if (!success)
+            return NotFound(ApiResponse.Fail("Permission not found or insufficient access to revoke."));
+
+        return Ok(ApiResponse.Ok("Permission revoked successfully"));
     }
 }

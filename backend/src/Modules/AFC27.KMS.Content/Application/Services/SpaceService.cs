@@ -405,6 +405,51 @@ public class SpaceService : ISpaceService
     }
 
     // ========================================
+    // Personal Workspace
+    // ========================================
+
+    public async Task<SpaceDto> GetOrCreateMyWorkspaceAsync(
+        Guid userId, string userName, CancellationToken ct = default)
+    {
+        // Try to find existing personal workspace
+        var personalSpace = await _dbContext.Set<Space>()
+            .Include(s => s.Members)
+            .Include(s => s.ChildSpaces)
+            .FirstOrDefaultAsync(s =>
+                s.SpaceType == SpaceType.Personal
+                && s.OwnerId == userId
+                && !s.IsDeleted,
+                ct);
+
+        if (personalSpace != null)
+        {
+            var contentCount = await _dbContext.Set<Article>()
+                .AsNoTracking()
+                .Where(a => a.SpaceId == personalSpace.Id)
+                .CountAsync(ct);
+
+            return MapToDto(personalSpace, contentCount);
+        }
+
+        // Create personal workspace
+        var name = LocalizedString.Create($"{userName}'s Workspace", $"مساحة عمل {userName}");
+        var description = LocalizedString.Create(
+            "Personal workspace for drafts, notes, and bookmarked items",
+            "مساحة عمل شخصية للمسودات والملاحظات والعناصر المحفوظة");
+
+        personalSpace = Space.Create(name, SpaceType.Personal, userId, userName, isPublic: false, description);
+
+        _dbContext.Set<Space>().Add(personalSpace);
+        await _dbContext.SaveChangesAsync(ct);
+
+        _logger.LogInformation(
+            "Personal workspace {SpaceId} created for user {UserId} '{UserName}'",
+            personalSpace.Id, userId, userName);
+
+        return MapToDto(personalSpace, 0);
+    }
+
+    // ========================================
     // Private Helpers
     // ========================================
 

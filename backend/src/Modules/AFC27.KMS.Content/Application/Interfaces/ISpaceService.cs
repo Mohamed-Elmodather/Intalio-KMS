@@ -39,4 +39,12 @@ public interface ISpaceService
 
     Task<IReadOnlyList<SpaceSummaryDto>> GetMySpacesAsync(
         Guid userId, CancellationToken ct = default);
+
+    /// <summary>
+    /// Get or create the personal workspace for a user.
+    /// Auto-creates a Space with SpaceType.Personal if it does not exist.
+    /// Personal spaces are private by default and not visible in the space directory.
+    /// </summary>
+    Task<SpaceDto> GetOrCreateMyWorkspaceAsync(
+        Guid userId, string userName, CancellationToken ct = default);
 }

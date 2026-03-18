@@ -135,3 +135,17 @@ public record ArticleVersionDto
     public DateTime ModifiedAt { get; init; }
     public string? ChangeNotes { get; init; }
 }
+
+/// <summary>
+/// Result DTO for a version rollback operation (Phase 8D).
+/// </summary>
+public record ArticleVersionRollbackResultDto
+{
+    public Guid ArticleId { get; init; }
+    public int RolledBackFromVersion { get; init; }
+    public int RolledBackToVersion { get; init; }
+    public int NewVersionNumber { get; init; }
+    public string RolledBackByName { get; init; } = string.Empty;
+    public DateTime RolledBackAt { get; init; }
+    public string? ChangeNotes { get; init; }
+}

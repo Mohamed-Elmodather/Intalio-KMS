@@ -44,6 +44,44 @@ public record MentionDto
     public int EndIndex { get; init; }
 }
 
+// ========================================
+// Phase 8A: In-Content Mention DTOs
+// ========================================
+
+/// <summary>
+/// DTO for an in-content mention (e.g. @mention in article body).
+/// </summary>
+public record InContentMentionDto
+{
+    public Guid Id { get; init; }
+    public Guid MentionedUserId { get; init; }
+    public string MentionedUserName { get; init; } = string.Empty;
+    public string? MentionedUserAvatarUrl { get; init; }
+    public string? MentionedUserJobTitle { get; init; }
+    public Guid MentionedByUserId { get; init; }
+    public string MentionedByUserName { get; init; } = string.Empty;
+    public string TargetEntityType { get; init; } = string.Empty;
+    public Guid TargetEntityId { get; init; }
+    public Guid BlockId { get; init; }
+    public int StartIndex { get; init; }
+    public int EndIndex { get; init; }
+    public string MentionContext { get; init; } = "article-body";
+    public DateTime CreatedAt { get; init; }
+}
+
+/// <summary>
+/// Request to create an in-content mention.
+/// </summary>
+public record CreateInContentMentionRequest
+{
+    public Guid MentionedUserId { get; init; }
+    public string TargetEntityType { get; init; } = "Article";
+    public Guid TargetEntityId { get; init; }
+    public Guid BlockId { get; init; }
+    public int StartIndex { get; init; }
+    public int EndIndex { get; init; }
+}
+
 /// <summary>
 /// Create comment request.
 /// </summary>
