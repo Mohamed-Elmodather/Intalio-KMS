@@ -30,6 +30,9 @@ public static class IntegrationModule
         // services.AddScoped<IWebhookRepository, WebhookRepository>();
         // services.AddScoped<IEntityRefRepository, EntityRefRepository>();
 
+        // Phase 9A: Bot service for Teams/Slack Q&A
+        services.AddScoped<Application.Services.IBotService, Application.Services.BotService>();
+
         // TODO: Register services
         // services.AddScoped<IConnectorService, ConnectorService>();
         // services.AddScoped<ISyncService, SyncService>();

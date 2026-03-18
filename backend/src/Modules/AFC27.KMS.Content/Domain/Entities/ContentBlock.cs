@@ -16,10 +16,27 @@ public class ContentBlock : AuditableEntity
     public string? Metadata { get; private set; } // JSON for type-specific data
     public Guid? ParentBlockId { get; private set; } // For nested blocks (e.g., list items)
 
+    /// <summary>
+    /// When set, this block is a synced copy of the source block.
+    /// Changes to the source block propagate to all synced copies.
+    /// Enables block reuse across multiple articles (Phase 10 - Synced Blocks).
+    /// </summary>
+    public Guid? SyncSourceBlockId { get; private set; }
+
     // Navigation properties
     public virtual Article Article { get; private set; } = null!;
     public virtual ContentBlock? ParentBlock { get; private set; }
     public virtual ICollection<ContentBlock> ChildBlocks { get; private set; } = new List<ContentBlock>();
+
+    /// <summary>
+    /// The source block this block is synced from (if SyncSourceBlockId is set).
+    /// </summary>
+    public virtual ContentBlock? SyncSourceBlock { get; private set; }
+
+    /// <summary>
+    /// Blocks that are synced copies of this block.
+    /// </summary>
+    public virtual ICollection<ContentBlock> SyncedCopies { get; private set; } = new List<ContentBlock>();
 
     private ContentBlock() { }
 
@@ -73,6 +90,36 @@ public class ContentBlock : AuditableEntity
     public void Delete()
     {
         SoftDelete(Guid.Empty);
+    }
+
+    /// <summary>
+    /// Mark this block as a synced copy of a source block.
+    /// </summary>
+    public void SetSyncSource(Guid? sourceBlockId)
+    {
+        SyncSourceBlockId = sourceBlockId;
+    }
+
+    /// <summary>
+    /// Returns true if this block is a synced copy of another block.
+    /// </summary>
+    public bool IsSyncedCopy => SyncSourceBlockId.HasValue;
+
+    /// <summary>
+    /// Create a synced copy of this block for a different article.
+    /// </summary>
+    public ContentBlock CreateSyncedCopy(Guid targetArticleId, int order)
+    {
+        var copy = Create(
+            targetArticleId,
+            Type,
+            Content,
+            order,
+            ContentArabic,
+            Metadata,
+            parentBlockId: null);
+        copy.SetSyncSource(Id);
+        return copy;
     }
 }
 

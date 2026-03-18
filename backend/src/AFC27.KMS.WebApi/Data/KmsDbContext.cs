@@ -5,6 +5,8 @@ using AFC27.KMS.Identity.Domain.Entities;
 using AFC27.KMS.Content.Domain.Entities;
 using AFC27.KMS.Collaboration.Domain.Entities;
 using AFC27.KMS.Workflow.Domain.Entities;
+using AFC27.KMS.AI.Domain.Entities;
+using AFC27.KMS.Admin.Domain.Entities;
 using System.Linq.Expressions;
 
 namespace AFC27.KMS.WebApi.Data;
@@ -56,6 +58,20 @@ public class KmsDbContext : DbContext, IUnitOfWork
     public DbSet<WorkflowDefinition> WorkflowDefinitions => Set<WorkflowDefinition>();
     public DbSet<WorkflowInstance> WorkflowInstances => Set<WorkflowInstance>();
     public DbSet<WorkflowStepInstance> WorkflowStepInstances => Set<WorkflowStepInstance>();
+
+    // AI Module - Phase 5A: Knowledge Agents
+    public DbSet<KnowledgeAgent> KnowledgeAgents => Set<KnowledgeAgent>();
+
+    // Admin Module - Phase 6B: Webhooks
+    public DbSet<WebhookSubscription> WebhookSubscriptions => Set<WebhookSubscription>();
+    public DbSet<WebhookDeliveryLog> WebhookDeliveryLogs => Set<WebhookDeliveryLog>();
+
+    // Admin Module - Phase 6C: API Keys
+    public DbSet<ApiKey> ApiKeys => Set<ApiKey>();
+
+    // Admin Module - Phase 7C: Governance Reviews
+    public DbSet<GovernanceReview> GovernanceReviews => Set<GovernanceReview>();
+    public DbSet<GovernanceAction> GovernanceActions => Set<GovernanceAction>();
 
     public KmsDbContext(DbContextOptions<KmsDbContext> options)
         : base(options)
@@ -685,6 +701,150 @@ public class KmsDbContext : DbContext, IUnitOfWork
             entity.HasIndex(e => e.StepDefinitionId);
             entity.HasIndex(e => e.AssigneeId);
             entity.HasIndex(e => e.Status);
+
+            entity.Ignore(e => e.DomainEvents);
+        });
+
+        // ========================================
+        // Phase 5A: Knowledge Agents
+        // ========================================
+        modelBuilder.Entity<KnowledgeAgent>(entity =>
+        {
+            entity.ToTable("KnowledgeAgents");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Name).HasMaxLength(256).IsRequired();
+            entity.Property(e => e.Description).HasMaxLength(2000);
+            entity.Property(e => e.SystemPrompt).IsRequired();
+            entity.Property(e => e.Temperature);
+            entity.Property(e => e.MaxTokens);
+            entity.Property(e => e.IsActive);
+            entity.Property(e => e.AllowedSources).HasConversion(
+                v => System.Text.Json.JsonSerializer.Serialize(v, (System.Text.Json.JsonSerializerOptions?)null),
+                v => System.Text.Json.JsonSerializer.Deserialize<List<string>>(v, (System.Text.Json.JsonSerializerOptions?)null) ?? new List<string>());
+
+            entity.HasIndex(e => e.IsActive);
+            entity.HasIndex(e => e.SpaceId);
+            entity.HasIndex(e => e.CreatedById);
+        });
+
+        // ========================================
+        // Phase 6B: Webhook Subscriptions
+        // ========================================
+        modelBuilder.Entity<WebhookSubscription>(entity =>
+        {
+            entity.ToTable("WebhookSubscriptions");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Name).HasMaxLength(256).IsRequired();
+            entity.Property(e => e.Url).HasMaxLength(2000).IsRequired();
+            entity.Property(e => e.Secret).HasMaxLength(512).IsRequired();
+            entity.Property(e => e.Description).HasMaxLength(1000);
+            entity.Property(e => e.CreatedByName).HasMaxLength(256);
+            entity.Property(e => e.EventFilters).HasConversion(
+                v => System.Text.Json.JsonSerializer.Serialize(v, (System.Text.Json.JsonSerializerOptions?)null),
+                v => System.Text.Json.JsonSerializer.Deserialize<List<string>>(v, (System.Text.Json.JsonSerializerOptions?)null) ?? new List<string>());
+
+            entity.HasMany(e => e.DeliveryLogs)
+                .WithOne(l => l.Subscription)
+                .HasForeignKey(l => l.WebhookSubscriptionId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasIndex(e => e.IsActive);
+            entity.HasIndex(e => e.CreatedByUserId);
+
+            entity.Ignore(e => e.DomainEvents);
+        });
+
+        modelBuilder.Entity<WebhookDeliveryLog>(entity =>
+        {
+            entity.ToTable("WebhookDeliveryLogs");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.EventType).HasMaxLength(256).IsRequired();
+            entity.Property(e => e.ErrorMessage).HasMaxLength(2000);
+
+            entity.HasIndex(e => e.WebhookSubscriptionId);
+            entity.HasIndex(e => e.DeliveredAt);
+            entity.HasIndex(e => e.Success);
+
+            entity.Ignore(e => e.DomainEvents);
+        });
+
+        // ========================================
+        // Phase 6C: API Keys
+        // ========================================
+        modelBuilder.Entity<ApiKey>(entity =>
+        {
+            entity.ToTable("ApiKeys");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Name).HasMaxLength(256).IsRequired();
+            entity.Property(e => e.KeyHash).HasMaxLength(512).IsRequired();
+            entity.Property(e => e.KeyPrefix).HasMaxLength(16).IsRequired();
+            entity.Property(e => e.Description).HasMaxLength(1000);
+            entity.Property(e => e.CreatedByName).HasMaxLength(256);
+            entity.Property(e => e.Scopes).HasConversion(
+                v => System.Text.Json.JsonSerializer.Serialize(v, (System.Text.Json.JsonSerializerOptions?)null),
+                v => System.Text.Json.JsonSerializer.Deserialize<List<string>>(v, (System.Text.Json.JsonSerializerOptions?)null) ?? new List<string>());
+
+            entity.HasIndex(e => e.KeyPrefix);
+            entity.HasIndex(e => e.IsActive);
+            entity.HasIndex(e => e.CreatedByUserId);
+
+            entity.Ignore(e => e.DomainEvents);
+        });
+
+        // ========================================
+        // Phase 7C: Governance Reviews & Actions
+        // ========================================
+        modelBuilder.Entity<GovernanceReview>(entity =>
+        {
+            entity.ToTable("GovernanceReviews");
+            entity.HasKey(e => e.Id);
+
+            entity.OwnsOne(e => e.Title, title =>
+            {
+                title.Property(t => t.English).HasColumnName("TitleEn").HasMaxLength(500).IsRequired();
+                title.Property(t => t.Arabic).HasColumnName("TitleAr").HasMaxLength(500);
+            });
+
+            entity.Property(e => e.ReviewType).HasConversion<string>().HasMaxLength(30);
+            entity.Property(e => e.Status).HasConversion<string>().HasMaxLength(30);
+            entity.Property(e => e.ReviewerName).HasMaxLength(256);
+            entity.Property(e => e.Scope).HasMaxLength(2000);
+            entity.Property(e => e.ScopeArabic).HasMaxLength(2000);
+
+            entity.HasMany(e => e.Actions)
+                .WithOne(a => a.Review)
+                .HasForeignKey(a => a.GovernanceReviewId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasIndex(e => e.Status);
+            entity.HasIndex(e => e.ReviewDate);
+            entity.HasIndex(e => e.ReviewerId);
+
+            entity.Ignore(e => e.DomainEvents);
+        });
+
+        modelBuilder.Entity<GovernanceAction>(entity =>
+        {
+            entity.ToTable("GovernanceActions");
+            entity.HasKey(e => e.Id);
+
+            entity.OwnsOne(e => e.Title, title =>
+            {
+                title.Property(t => t.English).HasColumnName("TitleEn").HasMaxLength(500).IsRequired();
+                title.Property(t => t.Arabic).HasColumnName("TitleAr").HasMaxLength(500);
+            });
+
+            entity.Property(e => e.Description).HasMaxLength(2000);
+            entity.Property(e => e.DescriptionArabic).HasMaxLength(2000);
+            entity.Property(e => e.Priority).HasConversion<string>().HasMaxLength(20);
+            entity.Property(e => e.Status).HasConversion<string>().HasMaxLength(20);
+            entity.Property(e => e.AssigneeName).HasMaxLength(256);
+            entity.Property(e => e.CompletionNotes).HasMaxLength(2000);
+
+            entity.HasIndex(e => e.GovernanceReviewId);
+            entity.HasIndex(e => e.Status);
+            entity.HasIndex(e => e.AssigneeId);
+            entity.HasIndex(e => e.DueDate);
 
             entity.Ignore(e => e.DomainEvents);
         });

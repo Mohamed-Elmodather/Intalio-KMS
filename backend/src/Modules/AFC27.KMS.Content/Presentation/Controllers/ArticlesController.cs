@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using AFC27.KMS.Content.Application.DTOs;
 using AFC27.KMS.Content.Application.Interfaces;
+using AFC27.KMS.Content.Application.Services;
 using AFC27.KMS.Contracts.Common;
 using AFC27.KMS.SharedKernel.Interfaces;
 
@@ -18,17 +19,23 @@ public class ArticlesController : ControllerBase
     private readonly ILogger<ArticlesController> _logger;
     private readonly IVerificationService _verificationService;
     private readonly IArticleExportService _articleExportService;
+    private readonly IImportService _importService;
+    private readonly IBulkExportService _bulkExportService;
     private readonly ICurrentUser _currentUser;
 
     public ArticlesController(
         ILogger<ArticlesController> logger,
         IVerificationService verificationService,
         IArticleExportService articleExportService,
+        IImportService importService,
+        IBulkExportService bulkExportService,
         ICurrentUser currentUser)
     {
         _logger = logger;
         _verificationService = verificationService;
         _articleExportService = articleExportService;
+        _importService = importService;
+        _bulkExportService = bulkExportService;
         _currentUser = currentUser;
     }
 
@@ -632,5 +639,99 @@ public class ArticlesController : ControllerBase
     {
         var history = await _verificationService.GetVerificationHistoryAsync(id);
         return Ok(ApiResponse<IReadOnlyList<VerificationRecordDto>>.Ok(history));
+    }
+
+    // ========================================
+    // Phase 9D: Import / Export
+    // ========================================
+
+    /// <summary>
+    /// Import a DOCX or Markdown file as a new article or append to an existing article.
+    /// The file is parsed into content blocks matching the block editor format.
+    /// </summary>
+    [HttpPost("import")]
+    [Authorize(Policy = "CanCreateContent")]
+    [Consumes("multipart/form-data")]
+    [ProducesResponseType(typeof(ApiResponse<ImportResult>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<ApiResponse<ImportResult>>> ImportArticle(
+        IFormFile file,
+        [FromQuery] bool createArticle = true,
+        [FromQuery] Guid? targetArticleId = null,
+        [FromQuery] Guid? categoryId = null,
+        [FromQuery] string language = "en",
+        CancellationToken cancellationToken = default)
+    {
+        if (file == null || file.Length == 0)
+            return BadRequest(ApiResponse<ImportResult>.Fail("A file is required for import"));
+
+        var allowedExtensions = new[] { ".md", ".markdown", ".docx" };
+        var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
+        if (!allowedExtensions.Contains(extension))
+            return BadRequest(ApiResponse<ImportResult>.Fail(
+                $"Unsupported file type '{extension}'. Supported: {string.Join(", ", allowedExtensions)}"));
+
+        _logger.LogInformation(
+            "Importing file {FileName} ({Size} bytes), createArticle: {Create}",
+            file.FileName, file.Length, createArticle);
+
+        using var stream = file.OpenReadStream();
+        var options = new ImportOptions
+        {
+            CreateArticle = createArticle,
+            TargetArticleId = targetArticleId,
+            CategoryId = categoryId,
+            Language = language
+        };
+
+        var result = await _importService.ImportAsync(stream, file.FileName, file.ContentType, options, cancellationToken);
+
+        if (!result.Success)
+            return BadRequest(ApiResponse<ImportResult>.Fail(result.ErrorMessage ?? "Import failed"));
+
+        return Ok(ApiResponse<ImportResult>.Ok(result, $"Imported {result.BlockCount} blocks from {result.FileName}"));
+    }
+
+    /// <summary>
+    /// Get supported import formats.
+    /// </summary>
+    [HttpGet("import/formats")]
+    [AllowAnonymous]
+    [ProducesResponseType(typeof(ApiResponse<IReadOnlyList<ImportFormatInfo>>), StatusCodes.Status200OK)]
+    public ActionResult<ApiResponse<IReadOnlyList<ImportFormatInfo>>> GetImportFormats()
+    {
+        var formats = _importService.GetSupportedFormats();
+        return Ok(ApiResponse<IReadOnlyList<ImportFormatInfo>>.Ok(formats));
+    }
+
+    /// <summary>
+    /// Bulk-export multiple articles as a ZIP archive.
+    /// Each article is exported in the specified format (PDF, DOCX, or Markdown)
+    /// and bundled into a single downloadable ZIP file.
+    /// </summary>
+    [HttpPost("bulk-export")]
+    [Authorize(Policy = "CanEditContent")]
+    [ProducesResponseType(typeof(FileContentResult), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> BulkExport(
+        [FromBody] BulkExportRequest request,
+        CancellationToken cancellationToken)
+    {
+        if (request.ArticleIds.Count == 0)
+            return BadRequest(ApiResponse.Fail("At least one article ID is required"));
+
+        if (request.ArticleIds.Count > 100)
+            return BadRequest(ApiResponse.Fail("Maximum 100 articles per bulk export"));
+
+        _logger.LogInformation(
+            "Bulk export: {Count} articles, format: {Format}",
+            request.ArticleIds.Count, request.Format);
+
+        var result = await _bulkExportService.ExportAsync(request, cancellationToken);
+
+        if (!result.Success || result.FileContent == null)
+            return BadRequest(ApiResponse.Fail(result.ErrorMessage ?? "Bulk export failed"));
+
+        return File(result.FileContent, result.ContentType, result.FileName);
     }
 }

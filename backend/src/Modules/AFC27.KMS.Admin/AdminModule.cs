@@ -26,6 +26,19 @@ public static class AdminModule
         services.AddScoped<IDelegatedAdminService, DelegatedAdminService>();
         services.AddScoped<IGuestAccessService, GuestAccessService>();
 
+        // Phase 6 services
+        services.AddScoped<IAnalyticsService, AnalyticsService>();
+        services.AddScoped<IWebhookService, WebhookService>();
+        services.AddScoped<IApiKeyService, ApiKeyService>();
+
+        // Phase 7 services
+        services.AddScoped<IAuditTrailService, AuditTrailService>();
+        services.AddScoped<IComplianceService, ComplianceService>();
+        services.AddScoped<IGovernanceService, GovernanceService>();
+
+        // Phase 8E: Automation rules
+        services.AddScoped<IAutomationRuleService, AutomationRuleService>();
+
         // Add authorization policies
         services.AddAuthorizationBuilder()
             .AddPolicy("CanManageUsers", policy =>
@@ -33,7 +46,9 @@ public static class AdminModule
             .AddPolicy("CanManageDelegation", policy =>
                 policy.RequireClaim("permission", "admin:manage-delegation"))
             .AddPolicy("CanManageGuestAccess", policy =>
-                policy.RequireClaim("permission", "admin:manage-guest-access"));
+                policy.RequireClaim("permission", "admin:manage-guest-access"))
+            .AddPolicy("CanManageAutomationRules", policy =>
+                policy.RequireClaim("permission", "admin:manage-automation-rules"));
 
         return services;
     }

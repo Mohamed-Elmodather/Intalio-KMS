@@ -34,6 +34,10 @@ public static class ContentModule
         // Phase 3D: Active Editor Tracking Service
         services.AddScoped<IActiveEditorService, ActiveEditorService>();
 
+        // Phase 9D: Import/Export services
+        services.AddScoped<IImportService, ImportService>();
+        services.AddScoped<IBulkExportService, BulkExportService>();
+
         // Background jobs
         services.AddHostedService<KnowledgeVerificationReminderJob>();
         services.AddHostedService<ContentHealthCalculationJob>();

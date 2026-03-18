@@ -40,6 +40,9 @@ public static class AIModule
         // Register research service (Phase 5B)
         services.AddScoped<IResearchService, ResearchService>();
 
+        // Phase 8C: Recommendation service
+        services.AddScoped<IRecommendationService, RecommendationService>();
+
         // Register services
         // services.AddScoped<IAIJobService, AIJobService>();
         // services.AddScoped<ITranscriptionService, TranscriptionService>();

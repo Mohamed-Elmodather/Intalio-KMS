@@ -32,7 +32,7 @@ public record DepartmentSummaryDto
 }
 
 /// <summary>
-/// Organization chart node.
+/// Organization chart node representing a person in the hierarchy.
 /// </summary>
 public record OrgChartNodeDto
 {
@@ -43,6 +43,35 @@ public record OrgChartNodeDto
     public string? JobTitle { get; init; }
     public string? DepartmentName { get; init; }
     public IReadOnlyList<OrgChartNodeDto> Children { get; init; } = Array.Empty<OrgChartNodeDto>();
+}
+
+// ========================================
+// Phase 8F: Org Chart DTOs
+// ========================================
+
+/// <summary>
+/// Root container for the org chart response.
+/// </summary>
+public record OrgChartDto
+{
+    public Guid? RootDepartmentId { get; init; }
+    public DateTime GeneratedAt { get; init; }
+    public int TotalDepartments { get; init; }
+    public int TotalMembers { get; init; }
+    public IReadOnlyList<OrgChartDepartmentDto> Departments { get; init; } = Array.Empty<OrgChartDepartmentDto>();
+}
+
+/// <summary>
+/// Department node in the org chart tree, including manager and child departments.
+/// </summary>
+public record OrgChartDepartmentDto
+{
+    public Guid Id { get; init; }
+    public string Name { get; init; } = string.Empty;
+    public string? NameArabic { get; init; }
+    public OrgChartNodeDto? Manager { get; init; }
+    public int MemberCount { get; init; }
+    public IReadOnlyList<OrgChartDepartmentDto> Children { get; init; } = Array.Empty<OrgChartDepartmentDto>();
 }
 
 /// <summary>

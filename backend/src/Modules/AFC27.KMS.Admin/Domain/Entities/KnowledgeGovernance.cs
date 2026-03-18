@@ -313,3 +313,212 @@ public class KMPolicyAcknowledgment
 
     public virtual KMPolicy Policy { get; set; } = null!;
 }
+
+/// <summary>
+/// Governance review record for periodic knowledge governance assessments.
+/// Tracks review cycles, findings, and remediation actions for ISO 30401 Clause 9 compliance.
+/// </summary>
+public class GovernanceReview : AuditableEntity
+{
+    public LocalizedString Title { get; private set; } = null!;
+    public GovernanceReviewType ReviewType { get; private set; }
+    public GovernanceReviewStatus Status { get; private set; }
+    public DateTime ReviewDate { get; private set; }
+    public DateTime? CompletedAt { get; private set; }
+    public Guid ReviewerId { get; private set; }
+    public string ReviewerName { get; private set; } = string.Empty;
+    public string? Scope { get; private set; }
+    public string? ScopeArabic { get; private set; }
+
+    // Findings
+    public string? Findings { get; private set; }
+    public string? FindingsArabic { get; private set; }
+    public int TotalFindings { get; private set; }
+    public int CriticalFindings { get; private set; }
+    public int ResolvedFindings { get; private set; }
+
+    // Remediation
+    public string? RemediationPlan { get; private set; }
+    public string? RemediationPlanArabic { get; private set; }
+    public DateTime? RemediationDeadline { get; private set; }
+
+    // Scoring
+    public double? GovernanceScore { get; private set; } // 0-100
+    public double? PreviousScore { get; private set; }
+
+    // Navigation
+    public virtual ICollection<GovernanceAction> Actions { get; private set; } = new List<GovernanceAction>();
+
+    private GovernanceReview() { }
+
+    public static GovernanceReview Create(
+        LocalizedString title,
+        GovernanceReviewType reviewType,
+        Guid reviewerId,
+        string reviewerName,
+        DateTime reviewDate,
+        string? scope = null,
+        string? scopeArabic = null)
+    {
+        return new GovernanceReview
+        {
+            Title = title,
+            ReviewType = reviewType,
+            Status = GovernanceReviewStatus.Scheduled,
+            ReviewDate = reviewDate,
+            ReviewerId = reviewerId,
+            ReviewerName = reviewerName,
+            Scope = scope,
+            ScopeArabic = scopeArabic,
+            TotalFindings = 0,
+            CriticalFindings = 0,
+            ResolvedFindings = 0
+        };
+    }
+
+    public void StartReview()
+    {
+        Status = GovernanceReviewStatus.InProgress;
+    }
+
+    public void RecordFindings(
+        string findings,
+        string? findingsArabic,
+        int totalFindings,
+        int criticalFindings,
+        double? governanceScore)
+    {
+        Findings = findings;
+        FindingsArabic = findingsArabic;
+        TotalFindings = totalFindings;
+        CriticalFindings = criticalFindings;
+        GovernanceScore = governanceScore;
+    }
+
+    public void SetRemediationPlan(
+        string plan,
+        string? planArabic,
+        DateTime deadline)
+    {
+        RemediationPlan = plan;
+        RemediationPlanArabic = planArabic;
+        RemediationDeadline = deadline;
+    }
+
+    public void Complete(double? previousScore = null)
+    {
+        Status = GovernanceReviewStatus.Completed;
+        CompletedAt = DateTime.UtcNow;
+        PreviousScore = previousScore;
+    }
+
+    public void ResolveFindings(int count)
+    {
+        ResolvedFindings = Math.Min(TotalFindings, ResolvedFindings + count);
+    }
+
+    public void AddAction(GovernanceAction action)
+    {
+        Actions.Add(action);
+    }
+
+    public bool IsOverdue => Status != GovernanceReviewStatus.Completed && ReviewDate < DateTime.UtcNow;
+    public double RemediationProgress => TotalFindings > 0 ? (double)ResolvedFindings / TotalFindings * 100 : 100;
+}
+
+public enum GovernanceReviewType
+{
+    Scheduled,
+    AdHoc,
+    Incident,
+    Annual,
+    Quarterly,
+    External
+}
+
+public enum GovernanceReviewStatus
+{
+    Scheduled,
+    InProgress,
+    PendingRemediation,
+    Completed,
+    Cancelled
+}
+
+/// <summary>
+/// Remediation action item from a governance review.
+/// </summary>
+public class GovernanceAction : AuditableEntity
+{
+    public Guid GovernanceReviewId { get; private set; }
+    public LocalizedString Title { get; private set; } = null!;
+    public string Description { get; private set; } = string.Empty;
+    public string? DescriptionArabic { get; private set; }
+    public GovernanceActionPriority Priority { get; private set; }
+    public GovernanceActionStatus Status { get; private set; }
+    public Guid AssigneeId { get; private set; }
+    public string AssigneeName { get; private set; } = string.Empty;
+    public DateTime DueDate { get; private set; }
+    public DateTime? CompletedAt { get; private set; }
+    public string? CompletionNotes { get; private set; }
+
+    // Navigation
+    public virtual GovernanceReview Review { get; private set; } = null!;
+
+    private GovernanceAction() { }
+
+    public static GovernanceAction Create(
+        Guid reviewId,
+        LocalizedString title,
+        string description,
+        string? descriptionArabic,
+        GovernanceActionPriority priority,
+        Guid assigneeId,
+        string assigneeName,
+        DateTime dueDate)
+    {
+        return new GovernanceAction
+        {
+            GovernanceReviewId = reviewId,
+            Title = title,
+            Description = description,
+            DescriptionArabic = descriptionArabic,
+            Priority = priority,
+            Status = GovernanceActionStatus.Open,
+            AssigneeId = assigneeId,
+            AssigneeName = assigneeName,
+            DueDate = dueDate
+        };
+    }
+
+    public void MarkInProgress() => Status = GovernanceActionStatus.InProgress;
+
+    public void Complete(string? notes = null)
+    {
+        Status = GovernanceActionStatus.Completed;
+        CompletedAt = DateTime.UtcNow;
+        CompletionNotes = notes;
+    }
+
+    public void Cancel() => Status = GovernanceActionStatus.Cancelled;
+
+    public bool IsOverdue => Status != GovernanceActionStatus.Completed &&
+                             Status != GovernanceActionStatus.Cancelled &&
+                             DueDate < DateTime.UtcNow;
+}
+
+public enum GovernanceActionPriority
+{
+    Critical,
+    High,
+    Medium,
+    Low
+}
+
+public enum GovernanceActionStatus
+{
+    Open,
+    InProgress,
+    Completed,
+    Cancelled
+}
