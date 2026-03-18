@@ -34,6 +34,10 @@ public class Article : AuditableEntity
     public VerificationStatus VerificationStatus { get; private set; }
     public int ReviewIntervalDays { get; private set; } = 90;
 
+    // Content Health properties
+    public double? HealthScore { get; private set; }
+    public DateTime? HealthScoreCalculatedAt { get; private set; }
+
     // Navigation properties
     public virtual Category? Category { get; private set; }
     public virtual Space? Space { get; private set; }
@@ -188,6 +192,15 @@ public class Article : AuditableEntity
             VerificationStatus = VerificationStatus.DueSoon;
             AddDomainEvent(new ArticleVerificationDueEvent(Id, OwnerId, OwnerName, NextVerificationDue));
         }
+    }
+
+    public void SetHealthScore(double score)
+    {
+        if (score < 0.0 || score > 1.0)
+            throw new ArgumentOutOfRangeException(nameof(score), "Health score must be between 0.0 and 1.0");
+
+        HealthScore = Math.Round(score, 4);
+        HealthScoreCalculatedAt = DateTime.UtcNow;
     }
 
     public void MarkVerificationOverdue()

@@ -28,6 +28,9 @@ public static class AIModule
         // Register writing assistant service
         services.AddScoped<IWritingAssistantService, WritingAssistantService>();
 
+        // Register translation service
+        services.AddScoped<ITranslationService, TranslationService>();
+
         // Register services
         // services.AddScoped<IAIJobService, AIJobService>();
         // services.AddScoped<ITranscriptionService, TranscriptionService>();

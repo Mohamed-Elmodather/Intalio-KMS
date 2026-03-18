@@ -256,6 +256,237 @@ public class AIWritingAssistantController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Generate a complete article from a topic, prompt, and optional outline.
+    /// Returns a structured article with title, sections, summary, and suggested tags.
+    /// </summary>
+    [HttpPost("generate-article")]
+    [ProducesResponseType(typeof(GenerateArticleResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> GenerateArticle(
+        [FromBody] GenerateArticleRequest request,
+        CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(request.Topic))
+            return BadRequest(new { error = "Topic is required" });
+
+        if (request.MaxSections < 1 || request.MaxSections > 20)
+            return BadRequest(new { error = "MaxSections must be between 1 and 20" });
+
+        _logger.LogInformation(
+            "Generate article request from user {UserId}, topic: {Topic}, maxSections: {MaxSections}",
+            _currentUser.UserId, request.Topic, request.MaxSections);
+
+        var sw = System.Diagnostics.Stopwatch.StartNew();
+
+        // Build the generation prompt
+        var promptBuilder = new System.Text.StringBuilder();
+        promptBuilder.AppendLine($"Generate a complete, well-structured article about: {request.Topic}");
+
+        if (!string.IsNullOrWhiteSpace(request.Prompt))
+            promptBuilder.AppendLine($"\nAdditional instructions: {request.Prompt}");
+
+        if (!string.IsNullOrWhiteSpace(request.Style))
+            promptBuilder.AppendLine($"\nWriting style: {request.Style}");
+
+        if (!string.IsNullOrWhiteSpace(request.TargetAudience))
+            promptBuilder.AppendLine($"\nTarget audience: {request.TargetAudience}");
+
+        if (!string.IsNullOrWhiteSpace(request.Language))
+            promptBuilder.AppendLine($"\nLanguage: {(request.Language == "ar" ? "Arabic (Modern Standard Arabic)" : "English")}");
+
+        if (request.TargetWordCount.HasValue)
+            promptBuilder.AppendLine($"\nTarget word count: approximately {request.TargetWordCount} words");
+
+        promptBuilder.AppendLine($"\nMaximum sections: {request.MaxSections}");
+
+        if (request.Outline is { Count: > 0 })
+        {
+            promptBuilder.AppendLine("\nArticle outline:");
+            foreach (var section in request.Outline.OrderBy(s => s.Order))
+            {
+                promptBuilder.AppendLine($"- {section.Heading}");
+                if (!string.IsNullOrWhiteSpace(section.Description))
+                    promptBuilder.AppendLine($"  ({section.Description})");
+            }
+        }
+
+        if (!string.IsNullOrWhiteSpace(request.Context))
+            promptBuilder.AppendLine($"\nReference context:\n{request.Context}");
+
+        var generateRequest = new AIGenerateRequest
+        {
+            Prompt = promptBuilder.ToString(),
+            Style = request.Style,
+            Language = request.Language,
+            TemplateId = request.TemplateId,
+            Context = request.Context
+        };
+
+        var aiResponse = await _writingService.GenerateAsync(
+            generateRequest, _currentUser.UserId ?? Guid.Empty, cancellationToken);
+
+        sw.Stop();
+
+        // Parse the generated content into sections
+        var sections = ParseSections(aiResponse.Result, request.MaxSections);
+        var title = ExtractTitle(aiResponse.Result, request.Topic);
+        var summary = GenerateSummaryFromSections(sections);
+        var totalWordCount = sections.Sum(s => s.WordCount);
+
+        var response = new GenerateArticleResponse
+        {
+            Title = title,
+            Sections = sections,
+            Summary = summary,
+            SuggestedTags = ExtractSuggestedTags(request.Topic, aiResponse.Result),
+            SuggestedCategory = InferCategory(request.Topic),
+            WordCount = totalWordCount,
+            TokensUsed = aiResponse.TokensUsed,
+            ProcessingTimeMs = (int)sw.ElapsedMilliseconds
+        };
+
+        return Ok(response);
+    }
+
+    private static IReadOnlyList<GeneratedSection> ParseSections(string content, int maxSections)
+    {
+        var sections = new List<GeneratedSection>();
+        var lines = content.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+        var currentHeading = string.Empty;
+        var currentContent = new System.Text.StringBuilder();
+        var order = 0;
+
+        foreach (var line in lines)
+        {
+            var trimmed = line.Trim();
+
+            // Detect headings (lines starting with # or all-caps short lines)
+            if (trimmed.StartsWith('#') || (trimmed.Length < 100 && trimmed == trimmed.ToUpperInvariant() && trimmed.Length > 3))
+            {
+                // Save previous section
+                if (!string.IsNullOrEmpty(currentHeading) && currentContent.Length > 0)
+                {
+                    var sectionText = currentContent.ToString().Trim();
+                    sections.Add(new GeneratedSection
+                    {
+                        Heading = currentHeading,
+                        Content = sectionText,
+                        Order = order,
+                        WordCount = sectionText.Split(' ', StringSplitOptions.RemoveEmptyEntries).Length
+                    });
+                    order++;
+                    currentContent.Clear();
+                }
+
+                currentHeading = trimmed.TrimStart('#').Trim();
+            }
+            else
+            {
+                currentContent.AppendLine(trimmed);
+            }
+        }
+
+        // Add the last section
+        if (!string.IsNullOrEmpty(currentHeading) && currentContent.Length > 0)
+        {
+            var sectionText = currentContent.ToString().Trim();
+            sections.Add(new GeneratedSection
+            {
+                Heading = currentHeading,
+                Content = sectionText,
+                Order = order,
+                WordCount = sectionText.Split(' ', StringSplitOptions.RemoveEmptyEntries).Length
+            });
+        }
+
+        // If no sections were detected, treat the entire content as one section
+        if (sections.Count == 0 && !string.IsNullOrWhiteSpace(content))
+        {
+            sections.Add(new GeneratedSection
+            {
+                Heading = "Content",
+                Content = content.Trim(),
+                Order = 0,
+                WordCount = content.Split(' ', StringSplitOptions.RemoveEmptyEntries).Length
+            });
+        }
+
+        return sections.Take(maxSections).ToList();
+    }
+
+    private static string ExtractTitle(string content, string fallbackTopic)
+    {
+        var firstLine = content.Split('\n', StringSplitOptions.RemoveEmptyEntries).FirstOrDefault()?.Trim();
+        if (!string.IsNullOrEmpty(firstLine) && firstLine.StartsWith('#'))
+            return firstLine.TrimStart('#').Trim();
+
+        return fallbackTopic;
+    }
+
+    private static string GenerateSummaryFromSections(IReadOnlyList<GeneratedSection> sections)
+    {
+        if (sections.Count == 0)
+            return string.Empty;
+
+        // Take the first sentence from each section as a summary
+        var summaryParts = sections
+            .Select(s =>
+            {
+                var firstSentenceEnd = s.Content.IndexOfAny(new[] { '.', '!', '?' });
+                return firstSentenceEnd > 0 ? s.Content[..(firstSentenceEnd + 1)] : s.Content;
+            })
+            .Take(3);
+
+        return string.Join(" ", summaryParts);
+    }
+
+    private static IReadOnlyList<string> ExtractSuggestedTags(string topic, string content)
+    {
+        var tags = new List<string>();
+
+        // Add topic words as base tags
+        var topicWords = topic.Split(' ', StringSplitOptions.RemoveEmptyEntries)
+            .Where(w => w.Length > 3)
+            .Select(w => w.ToLowerInvariant())
+            .Distinct()
+            .Take(5);
+
+        tags.AddRange(topicWords);
+
+        // Add common AFC/sports tags if relevant
+        var lowerContent = content.ToLowerInvariant();
+        if (lowerContent.Contains("tournament") || lowerContent.Contains("cup"))
+            tags.Add("tournament");
+        if (lowerContent.Contains("stadium") || lowerContent.Contains("venue"))
+            tags.Add("venues");
+        if (lowerContent.Contains("team") || lowerContent.Contains("player"))
+            tags.Add("teams");
+        if (lowerContent.Contains("volunteer"))
+            tags.Add("volunteers");
+
+        return tags.Distinct().Take(10).ToList();
+    }
+
+    private static string? InferCategory(string topic)
+    {
+        var lower = topic.ToLowerInvariant();
+        if (lower.Contains("stadium") || lower.Contains("venue") || lower.Contains("infrastructure"))
+            return "Infrastructure";
+        if (lower.Contains("team") || lower.Contains("match") || lower.Contains("tournament"))
+            return "Tournament";
+        if (lower.Contains("volunteer") || lower.Contains("community"))
+            return "Community Engagement";
+        if (lower.Contains("partner") || lower.Contains("sponsor"))
+            return "Partnerships";
+        if (lower.Contains("security") || lower.Contains("safety"))
+            return "Security";
+        if (lower.Contains("transport") || lower.Contains("logistics"))
+            return "Operations";
+
+        return "General";
+    }
+
     private async Task SendSSEEvent(string eventType, object data)
     {
         var json = System.Text.Json.JsonSerializer.Serialize(data);
