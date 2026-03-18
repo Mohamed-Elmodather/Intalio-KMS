@@ -14,6 +14,7 @@ public record WorkflowDefinitionDto
     public string Version { get; init; } = string.Empty;
     public WorkflowStatus Status { get; init; }
     public WorkflowType Type { get; init; }
+    public WorkflowScope Scope { get; init; }
     public bool IsDefault { get; init; }
     public int ActiveInstanceCount { get; init; }
     public List<WorkflowStepDto> Steps { get; init; } = new();
@@ -66,6 +67,7 @@ public record CreateWorkflowRequest
     public string? DescriptionEn { get; init; }
     public string? DescriptionAr { get; init; }
     public WorkflowType Type { get; init; } = WorkflowType.Sequential;
+    public WorkflowScope Scope { get; init; } = WorkflowScope.ServiceRequest;
 }
 
 /// <summary>

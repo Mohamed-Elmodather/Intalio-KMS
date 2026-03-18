@@ -18,6 +18,7 @@ public class Article : AuditableEntity
     public Guid AuthorId { get; private set; }
     public string AuthorName { get; private set; } = string.Empty;
     public Guid? CategoryId { get; private set; }
+    public Guid? SpaceId { get; private set; }
     public bool IsFeatured { get; private set; }
     public bool AllowComments { get; private set; } = true;
     public int ViewCount { get; private set; }
@@ -27,6 +28,7 @@ public class Article : AuditableEntity
 
     // Navigation properties
     public virtual Category? Category { get; private set; }
+    public virtual Space? Space { get; private set; }
     public virtual ICollection<ArticleTag> Tags { get; private set; } = new List<ArticleTag>();
     public virtual ICollection<ArticleVersion> Versions { get; private set; } = new List<ArticleVersion>();
 
@@ -76,6 +78,11 @@ public class Article : AuditableEntity
     public void SetCategory(Guid? categoryId)
     {
         CategoryId = categoryId;
+    }
+
+    public void SetSpace(Guid? spaceId)
+    {
+        SpaceId = spaceId;
     }
 
     public void SetFeatured(bool isFeatured)

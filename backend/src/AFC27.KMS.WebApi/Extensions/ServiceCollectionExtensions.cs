@@ -6,6 +6,7 @@ using AFC27.KMS.WebApi.Data;
 using AFC27.KMS.Infrastructure.Caching;
 using AFC27.KMS.SharedKernel.Interfaces;
 using AFC27.KMS.Collaboration;
+using AFC27.KMS.Workflow;
 
 namespace AFC27.KMS.WebApi.Extensions;
 
@@ -101,6 +102,9 @@ public static class ServiceCollectionExtensions
 
         services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<KmsDbContext>());
 
+        // Allow modules to resolve the base DbContext type
+        services.AddScoped<DbContext>(sp => sp.GetRequiredService<KmsDbContext>());
+
         return services;
     }
 
@@ -162,6 +166,7 @@ public static class ServiceCollectionExtensions
         // etc.
 
         services.AddCollaborationModule(configuration);
+        services.AddWorkflowModule(configuration);
 
         return services;
     }

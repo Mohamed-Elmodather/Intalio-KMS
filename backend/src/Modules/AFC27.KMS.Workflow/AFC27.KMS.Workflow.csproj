@@ -10,6 +10,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.11" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\Shared\AFC27.KMS.SharedKernel\AFC27.KMS.SharedKernel.csproj" />
     <ProjectReference Include="..\..\Shared\AFC27.KMS.Contracts\AFC27.KMS.Contracts.csproj" />
   </ItemGroup>

@@ -4,6 +4,7 @@ using AFC27.KMS.SharedKernel.Interfaces;
 using AFC27.KMS.Identity.Domain.Entities;
 using AFC27.KMS.Content.Domain.Entities;
 using AFC27.KMS.Collaboration.Domain.Entities;
+using AFC27.KMS.Workflow.Domain.Entities;
 using System.Linq.Expressions;
 
 namespace AFC27.KMS.WebApi.Data;
@@ -25,6 +26,9 @@ public class KmsDbContext : DbContext, IUnitOfWork
     public DbSet<Article> Articles => Set<Article>();
     public DbSet<Category> Categories => Set<Category>();
     public DbSet<Tag> Tags => Set<Tag>();
+    public DbSet<Space> Spaces => Set<Space>();
+    public DbSet<SpaceMember> SpaceMembers => Set<SpaceMember>();
+    public DbSet<SpacePermission> SpacePermissions => Set<SpacePermission>();
 
     // Collaboration Module - Lessons Learned
     public DbSet<LessonLearned> LessonsLearned => Set<LessonLearned>();
@@ -32,6 +36,11 @@ public class KmsDbContext : DbContext, IUnitOfWork
     public DbSet<LessonApplication> LessonApplications => Set<LessonApplication>();
     public DbSet<LessonTag> LessonTags => Set<LessonTag>();
     public DbSet<LessonUsefulVote> LessonUsefulVotes => Set<LessonUsefulVote>();
+
+    // Workflow Module - Generalized Engine
+    public DbSet<WorkflowDefinition> WorkflowDefinitions => Set<WorkflowDefinition>();
+    public DbSet<WorkflowInstance> WorkflowInstances => Set<WorkflowInstance>();
+    public DbSet<WorkflowStepInstance> WorkflowStepInstances => Set<WorkflowStepInstance>();
 
     public KmsDbContext(DbContextOptions<KmsDbContext> options)
         : base(options)
@@ -221,6 +230,84 @@ public class KmsDbContext : DbContext, IUnitOfWork
             entity.HasKey(av => av.Id);
         });
 
+        // Configure Content Module - Spaces
+        modelBuilder.Entity<Space>(entity =>
+        {
+            entity.ToTable("Spaces");
+            entity.HasKey(s => s.Id);
+
+            entity.OwnsOne(s => s.Name, name =>
+            {
+                name.Property(n => n.English).HasColumnName("NameEn").HasMaxLength(256).IsRequired();
+                name.Property(n => n.Arabic).HasColumnName("NameAr").HasMaxLength(256);
+            });
+
+            entity.OwnsOne(s => s.Description, desc =>
+            {
+                desc.Property(d => d.English).HasColumnName("DescriptionEn").HasMaxLength(1000);
+                desc.Property(d => d.Arabic).HasColumnName("DescriptionAr").HasMaxLength(1000);
+            });
+
+            entity.Property(s => s.SpaceType).HasConversion<string>().HasMaxLength(30);
+            entity.Property(s => s.OwnerName).HasMaxLength(256);
+            entity.Property(s => s.IconName).HasMaxLength(100);
+            entity.Property(s => s.Color).HasMaxLength(20);
+
+            entity.HasOne(s => s.ParentSpace)
+                .WithMany(s => s.ChildSpaces)
+                .HasForeignKey(s => s.ParentSpaceId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasMany(s => s.Members)
+                .WithOne(m => m.Space)
+                .HasForeignKey(m => m.SpaceId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasMany(s => s.Permissions)
+                .WithOne(p => p.Space)
+                .HasForeignKey(p => p.SpaceId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasIndex(s => s.OwnerId);
+            entity.HasIndex(s => s.SpaceType);
+            entity.HasIndex(s => s.IsPublic);
+            entity.HasIndex(s => s.ParentSpaceId);
+
+            entity.Ignore(s => s.DomainEvents);
+        });
+
+        modelBuilder.Entity<SpaceMember>(entity =>
+        {
+            entity.ToTable("SpaceMembers");
+            entity.HasKey(sm => sm.Id);
+            entity.Property(sm => sm.UserName).HasMaxLength(256);
+            entity.Property(sm => sm.Role).HasConversion<string>().HasMaxLength(20);
+
+            entity.HasIndex(sm => new { sm.SpaceId, sm.UserId }).IsUnique();
+            entity.HasIndex(sm => sm.UserId);
+        });
+
+        modelBuilder.Entity<SpacePermission>(entity =>
+        {
+            entity.ToTable("SpacePermissions");
+            entity.HasKey(sp => sp.Id);
+            entity.Property(sp => sp.AccessLevel).HasConversion<string>().HasMaxLength(20);
+
+            entity.HasIndex(sp => sp.SpaceId);
+            entity.HasIndex(sp => sp.UserId);
+            entity.HasIndex(sp => sp.GroupId);
+            entity.HasIndex(sp => sp.RoleId);
+        });
+
+        // Configure Article -> Space relationship
+        modelBuilder.Entity<Article>(entity =>
+        {
+            entity.HasOne(a => a.Space)
+                .WithMany()
+                .HasForeignKey(a => a.SpaceId)
+                .OnDelete(DeleteBehavior.SetNull);
+        });
+
         // Configure Collaboration Module - Lessons Learned
         modelBuilder.Entity<LessonLearned>(entity =>
         {
@@ -292,6 +379,112 @@ public class KmsDbContext : DbContext, IUnitOfWork
                 .WithMany()
                 .HasForeignKey(e => e.LessonLearnedId)
                 .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // Configure Workflow Module - Generalized Engine
+        modelBuilder.Entity<WorkflowDefinition>(entity =>
+        {
+            entity.ToTable("WorkflowDefinitions");
+            entity.HasKey(e => e.Id);
+
+            entity.OwnsOne(e => e.Name, name =>
+            {
+                name.Property(n => n.English).HasColumnName("NameEn").HasMaxLength(256).IsRequired();
+                name.Property(n => n.Arabic).HasColumnName("NameAr").HasMaxLength(256);
+            });
+
+            entity.OwnsOne(e => e.Description, desc =>
+            {
+                desc.Property(d => d.English).HasColumnName("DescriptionEn").HasMaxLength(1000);
+                desc.Property(d => d.Arabic).HasColumnName("DescriptionAr").HasMaxLength(1000);
+            });
+
+            entity.Property(e => e.Version).HasMaxLength(20);
+            entity.Property(e => e.Status).HasConversion<string>().HasMaxLength(20);
+            entity.Property(e => e.Type).HasConversion<string>().HasMaxLength(30);
+            entity.Property(e => e.Scope).HasConversion<string>().HasMaxLength(40);
+
+            entity.HasMany(e => e.Instances)
+                .WithOne(i => i.WorkflowDefinition)
+                .HasForeignKey(i => i.WorkflowDefinitionId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasIndex(e => e.Status);
+            entity.HasIndex(e => e.Scope);
+
+            entity.Ignore(e => e.DomainEvents);
+        });
+
+        modelBuilder.Entity<WorkflowStepDefinition>(entity =>
+        {
+            entity.ToTable("WorkflowStepDefinitions");
+            entity.HasKey(e => e.Id);
+
+            entity.OwnsOne(e => e.Name, name =>
+            {
+                name.Property(n => n.English).HasColumnName("NameEn").HasMaxLength(256).IsRequired();
+                name.Property(n => n.Arabic).HasColumnName("NameAr").HasMaxLength(256);
+            });
+
+            entity.OwnsOne(e => e.Description, desc =>
+            {
+                desc.Property(d => d.English).HasColumnName("DescriptionEn").HasMaxLength(1000);
+                desc.Property(d => d.Arabic).HasColumnName("DescriptionAr").HasMaxLength(1000);
+            });
+
+            entity.Property(e => e.Type).HasConversion<string>().HasMaxLength(20);
+            entity.Property(e => e.Action).HasConversion<string>().HasMaxLength(20);
+            entity.Property(e => e.AssignmentType).HasConversion<string>().HasMaxLength(30);
+
+            entity.HasOne<WorkflowDefinition>()
+                .WithMany(d => d.Steps)
+                .HasForeignKey(e => e.WorkflowDefinitionId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasIndex(e => e.WorkflowDefinitionId);
+
+            entity.Ignore(e => e.DomainEvents);
+        });
+
+        modelBuilder.Entity<WorkflowInstance>(entity =>
+        {
+            entity.ToTable("WorkflowInstances");
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.TargetEntityType).HasMaxLength(100).IsRequired();
+            entity.Property(e => e.Status).HasConversion<string>().HasMaxLength(20);
+            entity.Property(e => e.InitiatedByName).HasMaxLength(256);
+
+            entity.HasMany(e => e.StepInstances)
+                .WithOne(s => s.WorkflowInstance)
+                .HasForeignKey(s => s.WorkflowInstanceId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasIndex(e => e.WorkflowDefinitionId);
+            entity.HasIndex(e => new { e.TargetEntityType, e.TargetEntityId });
+            entity.HasIndex(e => e.Status);
+            entity.HasIndex(e => e.InitiatedById);
+
+            entity.Ignore(e => e.DomainEvents);
+        });
+
+        modelBuilder.Entity<WorkflowStepInstance>(entity =>
+        {
+            entity.ToTable("WorkflowStepInstances");
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.StepName).HasMaxLength(256).IsRequired();
+            entity.Property(e => e.Status).HasConversion<string>().HasMaxLength(20);
+            entity.Property(e => e.Outcome).HasMaxLength(100);
+            entity.Property(e => e.Comments).HasMaxLength(2000);
+            entity.Property(e => e.AssigneeName).HasMaxLength(256);
+
+            entity.HasIndex(e => e.WorkflowInstanceId);
+            entity.HasIndex(e => e.StepDefinitionId);
+            entity.HasIndex(e => e.AssigneeId);
+            entity.HasIndex(e => e.Status);
+
+            entity.Ignore(e => e.DomainEvents);
         });
 
         // Global query filter for soft delete

@@ -13,8 +13,12 @@ public class WorkflowDefinition : AuditableEntity
 
     public WorkflowStatus Status { get; private set; } = WorkflowStatus.Draft;
     public WorkflowType Type { get; private set; } = WorkflowType.Sequential;
+    public WorkflowScope Scope { get; private set; } = WorkflowScope.ServiceRequest;
 
     public List<WorkflowStepDefinition> Steps { get; private set; } = new();
+
+    // Navigation to instances
+    public ICollection<WorkflowInstance> Instances { get; private set; } = new List<WorkflowInstance>();
 
     // Metadata
     public bool IsDefault { get; private set; }
@@ -24,16 +28,20 @@ public class WorkflowDefinition : AuditableEntity
 
     public static WorkflowDefinition Create(
         LocalizedString name,
-        WorkflowType type = WorkflowType.Sequential)
+        WorkflowType type = WorkflowType.Sequential,
+        WorkflowScope scope = WorkflowScope.ServiceRequest)
     {
         return new WorkflowDefinition
         {
             Id = Guid.NewGuid(),
             Name = name,
             Type = type,
+            Scope = scope,
             Status = WorkflowStatus.Draft
         };
     }
+
+    public void SetScope(WorkflowScope scope) => Scope = scope;
 
     public void Update(LocalizedString name, LocalizedString? description)
     {
@@ -232,4 +240,14 @@ public enum AssignmentType
     PreviousAssignee,
     RoundRobin,
     LeastBusy
+}
+
+public enum WorkflowScope
+{
+    ServiceRequest,
+    ContentApproval,
+    DocumentReview,
+    KnowledgeVerification,
+    LessonLearnedReview,
+    Custom
 }

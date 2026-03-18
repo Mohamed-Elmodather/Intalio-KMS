@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using AFC27.KMS.Workflow.Application.Services;
 
 namespace AFC27.KMS.Workflow;
 
@@ -23,10 +24,14 @@ public static class WorkflowModule
         services.Configure<SlaOptions>(
             configuration.GetSection("Workflow:Sla"));
 
+        // Register Workflow Engine
+        // The DbContext base class must resolve to the application's concrete DbContext.
+        // This is done by also registering the concrete context as DbContext in the host.
+        services.AddScoped<IWorkflowEngineService, WorkflowEngineService>();
+
         // TODO: Register services
         // services.AddScoped<IServiceCatalogService, ServiceCatalogService>();
         // services.AddScoped<IServiceRequestService, ServiceRequestService>();
-        // services.AddScoped<IWorkflowEngine, WorkflowEngine>();
         // services.AddScoped<ITaskService, TaskService>();
         // services.AddScoped<IFormService, FormService>();
 
