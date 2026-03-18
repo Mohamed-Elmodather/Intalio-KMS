@@ -31,6 +31,9 @@ public static class AIModule
         // Register translation service
         services.AddScoped<ITranslationService, TranslationService>();
 
+        // Register permission-aware RAG service
+        services.AddScoped<IPermissionAwareRAGService, PermissionAwareRAGService>();
+
         // Register services
         // services.AddScoped<IAIJobService, AIJobService>();
         // services.AddScoped<ITranscriptionService, TranscriptionService>();

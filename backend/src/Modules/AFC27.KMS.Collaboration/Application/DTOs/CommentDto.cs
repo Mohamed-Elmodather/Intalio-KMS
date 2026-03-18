@@ -24,6 +24,13 @@ public record CommentDto
     public IReadOnlyList<MentionDto> Mentions { get; init; } = Array.Empty<MentionDto>();
     public IReadOnlyList<CommentDto> Replies { get; init; } = Array.Empty<CommentDto>();
     public DateTime CreatedAt { get; init; }
+
+    // Inline annotation anchor (Phase 3A)
+    public Guid? AnchorBlockId { get; init; }
+    public int? AnchorStartOffset { get; init; }
+    public int? AnchorEndOffset { get; init; }
+    public string? AnchorQuotedText { get; init; }
+    public bool IsInlineComment { get; init; }
 }
 
 /// <summary>
@@ -48,6 +55,12 @@ public record CreateCommentRequest
     public Guid TargetId { get; init; }
     public Guid? ParentId { get; init; }
     public IReadOnlyList<MentionRequest>? Mentions { get; init; }
+
+    // Inline annotation anchor (Phase 3A)
+    public Guid? AnchorBlockId { get; init; }
+    public int? AnchorStartOffset { get; init; }
+    public int? AnchorEndOffset { get; init; }
+    public string? AnchorQuotedText { get; init; }
 }
 
 /// <summary>

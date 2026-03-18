@@ -21,6 +21,13 @@ public class Comment : AuditableEntity
     public int LikeCount { get; private set; }
     public int ReplyCount { get; private set; }
 
+    // Inline annotation anchor (Phase 3A)
+    public Guid? AnchorBlockId { get; private set; }
+    public int? AnchorStartOffset { get; private set; }
+    public int? AnchorEndOffset { get; private set; }
+    public string? AnchorQuotedText { get; private set; }
+    public bool IsInlineComment => AnchorBlockId.HasValue;
+
     // Navigation properties
     public virtual Comment? Parent { get; private set; }
     public virtual ICollection<Comment> Replies { get; private set; } = new List<Comment>();
@@ -49,6 +56,56 @@ public class Comment : AuditableEntity
 
         comment.AddDomainEvent(new CommentCreatedEvent(comment.Id, targetType, targetId, authorId));
         return comment;
+    }
+
+    /// <summary>
+    /// Create an inline comment anchored to a specific text range within a content block.
+    /// </summary>
+    public static Comment CreateInline(
+        string content,
+        CommentableType targetType,
+        Guid targetId,
+        Guid authorId,
+        string authorName,
+        Guid anchorBlockId,
+        int anchorStartOffset,
+        int anchorEndOffset,
+        string? anchorQuotedText = null,
+        Guid? parentId = null)
+    {
+        var comment = new Comment
+        {
+            Content = content,
+            TargetType = targetType,
+            TargetId = targetId,
+            ParentId = parentId,
+            AuthorId = authorId,
+            AuthorName = authorName,
+            AnchorBlockId = anchorBlockId,
+            AnchorStartOffset = anchorStartOffset,
+            AnchorEndOffset = anchorEndOffset,
+            AnchorQuotedText = anchorQuotedText
+        };
+
+        comment.AddDomainEvent(new InlineCommentCreatedEvent(
+            comment.Id, targetType, targetId, authorId, anchorBlockId));
+        return comment;
+    }
+
+    public void UpdateAnchor(Guid blockId, int startOffset, int endOffset, string? quotedText)
+    {
+        AnchorBlockId = blockId;
+        AnchorStartOffset = startOffset;
+        AnchorEndOffset = endOffset;
+        AnchorQuotedText = quotedText;
+    }
+
+    public void ClearAnchor()
+    {
+        AnchorBlockId = null;
+        AnchorStartOffset = null;
+        AnchorEndOffset = null;
+        AnchorQuotedText = null;
     }
 
     public void Update(string content, string? contentArabic)
@@ -151,3 +208,4 @@ public class Mention : Entity
 public record CommentCreatedEvent(Guid CommentId, CommentableType TargetType, Guid TargetId, Guid AuthorId) : DomainEvent;
 public record CommentAcceptedAsAnswerEvent(Guid CommentId, Guid DiscussionId, Guid AuthorId) : DomainEvent;
 public record UserMentionedEvent(Guid CommentId, Guid MentionedUserId, Guid MentionedByUserId) : DomainEvent;
+public record InlineCommentCreatedEvent(Guid CommentId, CommentableType TargetType, Guid TargetId, Guid AuthorId, Guid AnchorBlockId) : DomainEvent;

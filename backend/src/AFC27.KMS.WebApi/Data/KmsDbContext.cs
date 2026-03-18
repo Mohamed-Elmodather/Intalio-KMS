@@ -175,6 +175,11 @@ public class KmsDbContext : DbContext, IUnitOfWork
                 .HasForeignKey(a => a.CategoryId)
                 .OnDelete(DeleteBehavior.SetNull);
 
+            // Content Health properties
+            entity.Property(a => a.HealthScore);
+            entity.Property(a => a.HealthScoreCalculatedAt);
+            entity.HasIndex(a => a.HealthScore);
+
             // Verification properties
             entity.Property(a => a.OwnerName).HasMaxLength(256);
             entity.Property(a => a.VerificationStatus).HasConversion<string>().HasMaxLength(20);

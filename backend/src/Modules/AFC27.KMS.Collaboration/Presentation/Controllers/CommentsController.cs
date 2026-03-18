@@ -222,6 +222,138 @@ public class CommentsController : ControllerBase
 
         return Ok(ApiResponse<IReadOnlyList<CommentDto>>.Ok(replies));
     }
+
+    // ========================================
+    // Phase 3A: Inline Comments on Article Text
+    // ========================================
+
+    /// <summary>
+    /// Get inline comments for a specific article, optionally filtered by block.
+    /// </summary>
+    [HttpGet("inline")]
+    public ActionResult<ApiResponse<IReadOnlyList<CommentDto>>> GetInlineComments(
+        [FromQuery] Guid targetId,
+        [FromQuery] Guid? blockId = null)
+    {
+        var comments = new List<CommentDto>
+        {
+            new()
+            {
+                Id = Guid.NewGuid(),
+                Content = "This paragraph needs a citation.",
+                TargetType = "Article",
+                TargetId = targetId,
+                AuthorId = Guid.NewGuid(),
+                AuthorName = "Sara Ali",
+                AuthorAvatarUrl = "/avatars/sara.jpg",
+                AuthorJobTitle = "Editor",
+                AnchorBlockId = blockId ?? Guid.NewGuid(),
+                AnchorStartOffset = 12,
+                AnchorEndOffset = 45,
+                AnchorQuotedText = "world-class stadiums for the tournament",
+                IsInlineComment = true,
+                LikeCount = 1,
+                ReplyCount = 1,
+                Replies = new List<CommentDto>
+                {
+                    new()
+                    {
+                        Id = Guid.NewGuid(),
+                        Content = "I will add the source reference.",
+                        AuthorId = Guid.NewGuid(),
+                        AuthorName = "Mohammed Al-Rashid",
+                        IsInlineComment = false,
+                        CreatedAt = DateTime.UtcNow.AddMinutes(-30)
+                    }
+                },
+                CreatedAt = DateTime.UtcNow.AddHours(-1)
+            }
+        };
+
+        if (blockId.HasValue)
+        {
+            comments = comments
+                .Where(c => c.AnchorBlockId == blockId.Value)
+                .ToList();
+        }
+
+        return Ok(ApiResponse<IReadOnlyList<CommentDto>>.Ok(comments));
+    }
+
+    /// <summary>
+    /// Create an inline comment anchored to a text range in a content block.
+    /// </summary>
+    [HttpPost("inline")]
+    public async Task<ActionResult<ApiResponse<CommentDto>>> CreateInlineComment(
+        [FromBody] CreateCommentRequest request)
+    {
+        if (!request.AnchorBlockId.HasValue || !request.AnchorStartOffset.HasValue || !request.AnchorEndOffset.HasValue)
+        {
+            return BadRequest(ApiResponse<CommentDto>.Fail("Inline comments require AnchorBlockId, AnchorStartOffset, and AnchorEndOffset."));
+        }
+
+        _logger.LogInformation(
+            "Creating inline comment on block {BlockId} in {TargetType} {TargetId}, range [{Start}..{End}]",
+            request.AnchorBlockId, request.TargetType, request.TargetId,
+            request.AnchorStartOffset, request.AnchorEndOffset);
+
+        await Task.Delay(100);
+
+        var comment = new CommentDto
+        {
+            Id = Guid.NewGuid(),
+            Content = request.Content,
+            ContentArabic = request.ContentArabic,
+            TargetType = request.TargetType,
+            TargetId = request.TargetId,
+            ParentId = request.ParentId,
+            AuthorId = Guid.NewGuid(),
+            AuthorName = "Current User",
+            AnchorBlockId = request.AnchorBlockId,
+            AnchorStartOffset = request.AnchorStartOffset,
+            AnchorEndOffset = request.AnchorEndOffset,
+            AnchorQuotedText = request.AnchorQuotedText,
+            IsInlineComment = true,
+            LikeCount = 0,
+            ReplyCount = 0,
+            Mentions = request.Mentions?.Select(m => new MentionDto
+            {
+                UserId = m.UserId,
+                UserName = "Mentioned User",
+                StartIndex = m.StartIndex,
+                EndIndex = m.EndIndex
+            }).ToList() ?? new List<MentionDto>(),
+            CreatedAt = DateTime.UtcNow
+        };
+
+        return CreatedAtAction(nameof(GetComment), new { id = comment.Id }, ApiResponse<CommentDto>.Ok(comment));
+    }
+
+    /// <summary>
+    /// Resolve (mark as handled) an inline comment thread.
+    /// </summary>
+    [HttpPost("{id:guid}/resolve")]
+    public async Task<ActionResult<ApiResponse>> ResolveInlineComment(Guid id)
+    {
+        _logger.LogInformation("Resolving inline comment {CommentId}", id);
+
+        await Task.Delay(100);
+
+        return Ok(ApiResponse.Ok("Inline comment resolved"));
+    }
+
+    /// <summary>
+    /// Reopen a previously resolved inline comment thread.
+    /// </summary>
+    [HttpPost("{id:guid}/reopen")]
+    public async Task<ActionResult<ApiResponse>> ReopenInlineComment(Guid id)
+    {
+        _logger.LogInformation("Reopening inline comment {CommentId}", id);
+
+        await Task.Delay(100);
+
+        return Ok(ApiResponse.Ok("Inline comment reopened"));
+    }
 }
 
 /// <summary>

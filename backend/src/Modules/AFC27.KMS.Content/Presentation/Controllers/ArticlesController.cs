@@ -17,15 +17,18 @@ public class ArticlesController : ControllerBase
 {
     private readonly ILogger<ArticlesController> _logger;
     private readonly IVerificationService _verificationService;
+    private readonly IArticleExportService _articleExportService;
     private readonly ICurrentUser _currentUser;
 
     public ArticlesController(
         ILogger<ArticlesController> logger,
         IVerificationService verificationService,
+        IArticleExportService articleExportService,
         ICurrentUser currentUser)
     {
         _logger = logger;
         _verificationService = verificationService;
+        _articleExportService = articleExportService;
         _currentUser = currentUser;
     }
 
@@ -419,6 +422,76 @@ public class ArticlesController : ControllerBase
         };
 
         return Ok(ApiResponse<IReadOnlyList<ArticleSummaryDto>>.Ok(articles));
+    }
+
+    // ========================================
+    // Phase 3B: Article Export to PDF/DOCX
+    // ========================================
+
+    /// <summary>
+    /// Export an article to PDF or DOCX format.
+    /// </summary>
+    [HttpPost("{id:guid}/export")]
+    public async Task<IActionResult> ExportArticle(
+        Guid id,
+        [FromQuery] string format = "pdf",
+        [FromBody] ExportArticleRequest? request = null)
+    {
+        var exportFormat = format.ToLowerInvariant() switch
+        {
+            "pdf" => ExportFormat.Pdf,
+            "docx" => ExportFormat.Docx,
+            _ => ExportFormat.Pdf
+        };
+
+        var exportRequest = request ?? new ExportArticleRequest { Format = exportFormat };
+
+        // Override format from query parameter if not set in body
+        if (request == null || request.Format != exportFormat)
+        {
+            exportRequest = exportRequest with { Format = exportFormat };
+        }
+
+        _logger.LogInformation("Exporting article {ArticleId} to {Format}", id, exportFormat);
+
+        try
+        {
+            var result = await _articleExportService.ExportArticleAsync(id, exportRequest);
+
+            return File(
+                result.FileContent,
+                result.ContentType,
+                result.FileName);
+        }
+        catch (KeyNotFoundException)
+        {
+            return NotFound(ApiResponse.Fail("Article not found"));
+        }
+    }
+
+    /// <summary>
+    /// Get export metadata without downloading the file.
+    /// </summary>
+    [HttpGet("{id:guid}/export/info")]
+    public ActionResult<ApiResponse<object>> GetExportInfo(Guid id, [FromQuery] string format = "pdf")
+    {
+        var exportFormat = format.ToLowerInvariant() switch
+        {
+            "pdf" => ExportFormat.Pdf,
+            "docx" => ExportFormat.Docx,
+            _ => ExportFormat.Pdf
+        };
+
+        var info = new
+        {
+            ArticleId = id,
+            Format = format.ToLowerInvariant(),
+            ContentType = _articleExportService.GetContentType(exportFormat),
+            FileExtension = _articleExportService.GetFileExtension(exportFormat),
+            SupportedFormats = new[] { "pdf", "docx" }
+        };
+
+        return Ok(ApiResponse<object>.Ok(info));
     }
 
     // ========================================

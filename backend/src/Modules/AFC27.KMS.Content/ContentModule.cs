@@ -18,6 +18,7 @@ public static class ContentModule
         // Add module-specific services
         services.AddScoped<ISpaceService, SpaceService>();
         services.AddScoped<IVerificationService, VerificationService>();
+        services.AddScoped<IContentHealthService, ContentHealthService>();
         // services.AddScoped<IArticleService, ArticleService>();
         // services.AddScoped<ICategoryService, CategoryService>();
         // services.AddScoped<ITagService, TagService>();
@@ -25,6 +26,7 @@ public static class ContentModule
 
         // Background jobs
         services.AddHostedService<KnowledgeVerificationReminderJob>();
+        services.AddHostedService<ContentHealthCalculationJob>();
 
         // Add authorization policies
         services.AddAuthorizationBuilder()
